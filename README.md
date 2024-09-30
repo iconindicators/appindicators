@@ -15,7 +15,7 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 - `indicatortide` - [https://pypi.org/project/indicatortide](https://pypi.org/project/indicatortide)
 - `indicatorvirtualbox` - [https://pypi.org/project/indicatorvirtualbox](https://pypi.org/project/indicatorvirtualbox)
 
-Each indicator shares the common code base `indicatorbase`.
+Each indicator shares the common code `indicatorbase`.
 
 
 ## Reminder
@@ -25,7 +25,7 @@ Each indicator shares the common code base `indicatorbase`.
 
 ## Run an Indicator (from Source)
 
-To run `indicatortest`, in a terminal at the source root:
+To run `indicatortest` in a terminal at the source root:
 
 ```
     indicator=indicatortest && \
@@ -36,13 +36,16 @@ To run `indicatortest`, in a terminal at the source root:
     deactivate
 ```
 
-Some indicators, such as `indicatorlunar`, require additional packages specified in the `dependencies` field of `pyproject.toml`.  Include additional packages after `PyGObject` in the above command.
+Some indicators, such as `indicatorlunar`, require additional packages specified in the `dependencies` field of the respective `pyproject.toml`.  Include additional packages after `PyGObject` in the above command.
 
 
 ## Development Under Geany
 
+Ensure `indicatortest` runs in a terminal from source as per the previous section.
+
 Assuming the source code is located in `/home/bernard/Programming/Indicators`, create the project et al:
-#TODO See if $HOME can be used instead of /home/bernard
+  
+TODO See if $HOME can be used instead of /home/bernard
 
 ```
     Project > New
@@ -57,19 +60,23 @@ Assuming the source code is located in `/home/bernard/Programming/Indicators`, c
         x-terminal-emulator -e "env PYTHONPATH=/home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase /bin/sh %c"
 ```
 
+`indicatortest` should now run under `Geany`.
+
 References:
 
 - [https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment](https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment)
-- [https://stackoverflow.com/a/26366357/2156453](https://stackoverflow.com/a/26366357/2156453)
+- [https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide](https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide)
 
 
 ## Build a Wheel
 
 To build a wheel for `indicatortest`:
 
-    `python3 tools/build_wheel.py release indicatortest`
+```
+    python3 tools/build_wheel.py release indicatortest
+```
 
-which updates locale files (`.pot` and `.po`), creates a `.whl` and `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
+which updates locale files (`.pot` and `.po`) and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
 
 
 ## Install a Wheel
@@ -105,7 +112,7 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 
 ## Release to PyPI
 
-Build a `.whl` for `indicatortest` as above and then upload to `PyPI`:
+Build a `.whl` / `.tar.gz` for `indicatortest` as above and then upload to `PyPI`:
 
 ```
     indicator=indicatortest && \
@@ -116,9 +123,9 @@ Build a `.whl` for `indicatortest` as above and then upload to `PyPI`:
     deactivate
 ```
 
-which assumes the username `__token__` and prompts for the password (starts with `pypi-`) and uploads the `.whl` and `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
+which assumes the username `__token__` and prompts for the password (starts with `pypi-`) and uploads the `.whl` / `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
 
-To install the indicator, refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
+To install the indicator from `PyPI` (to a virtual environment in `$HOME/.local/venv_indicators`), refer to the indicator's `PyPI` page listed in the *Introduction* above.
 
 References:
 - [https://twine.readthedocs.io/en/latest](https://twine.readthedocs.io/en/latest)
@@ -127,7 +134,7 @@ References:
 
 ## Release to TestPyPI (and then Installing)
 
-For testing purposes, a `.whl` for `indicatortest` may be uploaded to `TestPyPI`:
+For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`:
 
 ```
     indicator=indicatortest && \
