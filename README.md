@@ -44,8 +44,7 @@ Some indicators, such as `indicatorlunar`, require additional packages specified
 Ensure `indicatortest` runs in a terminal from source as per the earlier section.
 
 Assuming the source code is located in `/home/bernard/Programming/Indicators`, create the project et al:
-  
-TODO What about running tools scripts?  
+
 ```
     Project > New
         Name: Indicators
@@ -61,7 +60,9 @@ TODO What about running tools scripts?
 
 `indicatortest` should now run under `Geany`.
 
-If editing `README.md` or any `markdown` document under `Geany`, using two spaces to insert an empty line may not work as `Geany` will remove trailing spaces by default.
+Note: If editing `README.md` or any `markdown` document under `Geany`, using two spaces to insert an empty line may not work as `Geany` removes trailing spaces by default.
+
+Note: Appears to be no way to execute any of the `tools` scripts within `Geany`.
 
 References:
 
