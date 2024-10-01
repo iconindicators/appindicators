@@ -41,12 +41,11 @@ Some indicators, such as `indicatorlunar`, require additional packages specified
 
 ## Development Under Geany
 
-Ensure `indicatortest` runs in a terminal from source as per the previous section.
+Ensure `indicatortest` runs in a terminal from source as per the earlier section.
 
 Assuming the source code is located in `/home/bernard/Programming/Indicators`, create the project et al:
   
-TODO See if $HOME can be used instead of /home/bernard
-
+TODO What about running tools scripts?  
 ```
     Project > New
         Name: Indicators
@@ -62,10 +61,74 @@ TODO See if $HOME can be used instead of /home/bernard
 
 `indicatortest` should now run under `Geany`.
 
+If editing `README.md` or any `markdown` document under `Geany`, using two spaces to insert an empty line may not work as `Geany` will remove trailing spaces by default.
+
 References:
 
 - [https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment](https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment)
 - [https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide](https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide)
+
+
+## Development Under Eclipse / PyDev
+
+Ensure `indicatortest` runs in a terminal from source as per the earlier section.
+
+Assuming the source code is located in `/home/bernard/Programming/Indicators`, create a `Python` interpreter:
+
+```
+    Window > Preferences > PyDev > Python Interpreter > Python Interpreters > New > Browse for python/pypy exe
+        Browse to /home/bernard/Programming/Indicators/venv/bin/python3
+        Interpreter Name: python3 venv
+        Ensure site-packages within the venv is checked
+        Set as Default
+```
+
+Create the project:
+
+```
+    File > New > PyDev Project
+        Project Name: Indicators
+        Use default: Uncheck
+        Directory: /home/bernard/Programming/Indicators
+        Interpreter Name: python3 venv
+        Finish
+
+    Project > Properties
+        PyDev - PYTHONPATH
+            External Libraries > Add Source Folder
+                Add...
+                    /home/bernard/Programming/Indicators/indicatorobase/src/indicatorbase
+```
+
+Run `indicatortest`:
+
+```
+    Right click on indicatortest.py
+        Run As > Python Run
+```
+
+Run `tools/build_wheel.py`:
+
+```
+    Right click on build_wheel.py
+        Run As > Python Run
+```
+
+which should fail, then
+
+```
+    Run > Run Configurations...
+        Indicators build_wheel.py
+            Arguments: release indicatortest
+            Working directory:
+                Other: ${workspace_loc:Indicators}
+```
+
+Append other indicators to `Arguments` above as needed.  Repeat for `tools/install_wheel.py` and `tools/uninstall_indicator.py`.
+
+References:
+
+- [https://www.pydev.org/manual_101_interpreter.html](https://www.pydev.org/manual_101_interpreter.html)
 
 
 ## Build a Wheel
