@@ -105,14 +105,13 @@ To run from a terminal (so that any messages/errors may be observed):
     python3 $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/${indicator}.py && \
     deactivate
 ```
-#TODO Check that the above run works because there is a nested shell variable (venv with ls -d).
 
 Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and modify `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
 
 
 ## Release to PyPI
 
-Build a `.whl` / `.tar.gz` for `indicatortest` as above and then upload to `PyPI`:
+To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
 
 ```
     indicator=indicatortest && \
@@ -154,11 +153,10 @@ To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.l
     . ${venv}/bin/activate && \
     python3 -m pip install --force-reinstall --extra-index-url https://test.pypi.org/simple ${indicator} && \
     deactivate && \
-    $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/post_install.sh
+    $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
 ```
-#TODO Check that the above post install works because there is a nested shell variable (venv with ls -d).
 
-Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
+Additional operating system packages may be needed; refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
 
 
 ## Uninstall an Indicator
