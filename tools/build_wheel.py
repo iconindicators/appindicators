@@ -453,7 +453,7 @@ if __name__ == "__main__":
                         "If the directory specified is 'release', " +
                         "the Python wheel will be created in 'release/wheel'.",
                     "indicators" :
-                        "The list of indicators (such as indicatorfortune indicatorlunar) to build." },
+                        "The list of indicators separated by spaces to build." },
                 {
                     "indicators" :
                         "+" } )

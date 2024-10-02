@@ -45,8 +45,7 @@ if __name__ == "__main__":
                         f"If the directory specified is 'release', "
                         "the Python wheel must be located at 'release/wheel'.",
                     "indicators" :
-                        f"The list of indicators (such as indicatorfortune "
-                        f"indicatorlunar) to install." },
+                        f"The list of indicators separated by spaces to install." },
                 {
                     "indicators" :
                         "+" } )

@@ -40,7 +40,7 @@ if __name__ == "__main__":
                 ( "indicators", ),
                 {
                     "indicators" :
-                        "The list of indicators (such as indicatorfortune indicatorlunar) to uninstall." },
+                        "The list of indicators separated by spaces to uninstall." },
                 {
                     "indicators" :
                         "+" } )
