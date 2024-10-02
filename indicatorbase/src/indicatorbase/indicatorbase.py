@@ -24,13 +24,6 @@
 # Similarly for upgrading...
 # Is there a way to make it easier for an end user to upgrade all in one go?
 #
-# Is it worthwhile also/instead lumping all indicators into one venv?
-# Still have a separate install (and upgrade and uninstall) command per indicator...
-# ...so what is the advantage?
-#
-# What is the size of a venv?
-# Around 20MB per.
-#
 # Have a wrapper indicator for all?
 #
 # Maybe have a file in the release called "upgradepath.txt" which contains
@@ -67,14 +60,8 @@
 # Still need to resolve when a user does no upgrade for a few versions
 # and perhaps needs an OS package installed (rather than just the pip upgrade).
 #
-# If somehow a script/wrapper can be written to install multiple indicators simultaneously,
-# might be best to also install all indicators to a single venv.
-# What to name the venv?
 # What to name the python/pip project that contains the script/wrapper?
 #
-#
-# How to update a single indicator in its own venv other than
-# the user manually running all commands from the PyPI page?
 #
 # An update requires two parts: OS updates which should be seldom
 # and Python (and venv) updates which are the typical update.
@@ -82,11 +69,7 @@
 # For each release, need a text file which records any OS packages
 # which are new since the very first release.
 #
-# When an indicator checks...getting messy.
-#
-#
 # To think about...
-#  - Should all indicators be lumped into one venv?
 #  - Is there a way to make installing (multiple indicators) easier?
 #  - Is there a way to make updates easier (singular or multiple indicators?
 #
@@ -99,23 +82,17 @@
 # The PyPI command will always be required for updating,
 # so only need to check versions.
 # 
-# If installing all the indicators to a common venv, need to consider...
-#   What name to give this venv?
-#   What happens if there is a name clash?
-#   Need to check if the name exists and is a venv...how to do this?
-#   Maybe need to make a statement in the Installation section
-#   about the name/location of the venv which will be created.
-#   https://stackoverflow.com/questions/34948898/check-whether-directory-is-a-virtualenv
-#   https://stackoverflow.com/questions/47462591/python-how-do-you-check-what-is-in-virtualenv
+# Maybe need to make a statement in the Installation section
+# about the name/location of the venv which will be created.
+# https://stackoverflow.com/questions/34948898/check-whether-directory-is-a-virtualenv
+# https://stackoverflow.com/questions/47462591/python-how-do-you-check-what-is-in-virtualenv
 #
 # If installing more than one indicator simultaneously,
-# (unsure about the same venv or separate)
 # split the OS packages into those common to all indicators
 # (which appear as the first step in the install instructions)
 # and add a OS install line to the install.sh on a per-indicator
 # basis for the OS specific packages.  Does this make sense...?
 # How does this make it easier to install multiple indicators simultaneously?????
-#
 #
 # If a combined/shared virtual environment is used for all indicators,
 # need a note on the PyPI page about uninstalling, in that the virtual
