@@ -16,9 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Install a Python .whl for one or more indicators to a virtual
-# environment within $HOME/.local/venv_indicators and copy across the
-# .desktop, run script and icons.
+# Install a Python wheel package for one or more indicators to a virtual
+# environment within $HOME/.local/venv_indicators and copy across the .desktop,
+# run script and icons.
 
 
 import subprocess
@@ -37,7 +37,7 @@ if __name__ == "__main__":
             utils.initialiase_parser_and_get_arguments(
                 f"Install a Python wheel package for one or more indicators to "
                 f"a virtual environment within $HOME/.local/venv_indicators "
-                f"and copies across .desktop, run script and icons.",
+                f"and copy across the .desktop, run script and icons.",
                 ( "directory_release", "indicators" ),
                 {
                     "directory_release" :
@@ -57,9 +57,8 @@ if __name__ == "__main__":
                 f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)" )
 
             command = f"$(ls -d $HOME/.local/venv_indicators/lib/python3.* | head -1)/site-packages/{indicator_name}/platform/linux/install.sh"
-            print( command )
-            print()
-            # ~ subprocess.call( command, shell = True )
+
+            subprocess.call( command, shell = True )
 
     else:
         print( message )
