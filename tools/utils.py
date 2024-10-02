@@ -65,6 +65,6 @@ def initialise_virtual_environment( venv_directory, *modules_to_install ):
 
     command = \
         f". { venv_directory.absolute() / 'bin' / 'activate' } && " + \
-        f"python3 -m pip install --upgrade --force-reinstall { ' '.join( modules_to_install ) }"
+        f"python3 -m pip install --upgrade { ' '.join( modules_to_install ) }"
 
     subprocess.call( command, shell = True )
