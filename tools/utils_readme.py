@@ -592,7 +592,7 @@ def _get_uninstall_for_operating_system(
             f"2. Uninstall `Python` virtual environment and files:\n"
             f"    ```\n"
             f"    indicator={ indicator_name } && \\\n"
-            f"    venv=$HOME/.local/venv_indicators &\\\n"
+            f"    venv=$HOME/.local/venv_indicators && \\\n"
             f"    $(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n"
             f"    . ${{venv}}/bin/activate && \\\n"
             f"    python3 -m pip uninstall --yes ${{indicator}} && \\\n"
