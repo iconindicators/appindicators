@@ -16,6 +16,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO On the laptop I ran indicatorscriptrunner and opened the Preferences.
+# I think I may have then hit escape to close, cannot be sure.
+# However I then noticed the indicator menu was greyed out.  
+# See if this can be reproduced.
+# Was running as Xorg.
+# Does not happen on Debian 12 as a virtual machine under Wayland nor Xorg.
+
+
 #TODO For installing multiple indicators as an end user,
 # is there some way to make things easier?
 # That is, a single apt-get (or equivalent) along with
