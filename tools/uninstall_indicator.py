@@ -16,9 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Uninstall one or more indicators, removing the virtual environment
-# $HOME/.local/venv_indicators and .desktop, run script and icons and
-# .config/.cache.
+# Uninstall one or more indicators, removing the .desktop, run script
+# and icons and .config/.cache.  Finally, remove the virtual environment
+# if no more indicators are installed.
 
 
 import subprocess
@@ -26,13 +26,15 @@ import subprocess
 import utils
 
 
-#TODO Need to fix this according to now using a single venv.
 if __name__ == "__main__":
-    if utils.is_correct_directory( example_arguments = "indicatorfortune" ):
+    correct_directory, message = \
+        utils.is_correct_directory( example_arguments = "indicatorfortune" )
+
+    if correct_directory:
         args = \
             utils.initialiase_parser_and_get_arguments(
                 f"Uninstall one or more indicators, including the run script, "
-                f"icons, .desktop and .config/.cache. and additionally removing ",
+                f"icons, .desktop and .config/.cache. and additionally removing "
                 f"the shared virtual environment $HOME/.local/venv_indicators "
                 f"if no indicators are installed.",
                 ( "indicators", ),
@@ -47,14 +49,14 @@ if __name__ == "__main__":
             command = \
                 f"indicator={indicator_name} && " + \
                 f"venv=$HOME/.local/venv_indicators && " + \
-                f"$(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator_name}/platform/linux/uninstall.sh && " + \
-                . ${venv}/bin/activate && \
-                python3 -m pip uninstall --yes ${indicator_name} && \
-                count=$(python3 -m pip --disable-pip-version-check list | grep -o "indicator" | wc -l) ; if [ "$count" -eq "0" ]; then rm -f -r ${venv}; fi && \
-                deactivate
-
-                
-                f"$(ls -d $HOME/.local/venv_{indicator_name}/lib/python3.* | head -1)/site-packages/{indicator_name}/platform/linux/uninstall.sh && " + \
-                f"rm -f -r $HOME/.local/venv_{indicator_name}"
+                f"$(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/{indicator_name}/platform/linux/uninstall.sh && " + \
+                f". ${{venv}}/bin/activate && " + \
+                f"python3 -m pip uninstall --yes {indicator_name} && " + \
+                f"count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && " + \
+                f"deactivate && " + \
+                f"if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi"
 
             subprocess.call( command, shell = True )
+
+    else:
+        print( message )

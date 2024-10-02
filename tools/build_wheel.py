@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Build a Python wheel for one or more indicators.
+# Build a Python .whl / .tar.gz for one or more indicators.
 #
 # To view the contents of a .whl:
 #    unzip -l indicatortest-1.0.7-py3-none-any.whl
@@ -46,7 +46,7 @@ except ModuleNotFoundError:
     # this import will fail before the check for the correct directory can be done,
     # resulting in a "ModuleNotFoundError: No module named 'indicatorbase'"
     # which is a red herring...
-    print( 
+    print(
         "indicatorbase could not be found;" + \
         "ensure you are running this script from the correct directory!" )
 
@@ -87,7 +87,7 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
 
     config = configparser.ConfigParser()
     with open( indicator_pyproject_toml ) as stream:
-        config.read_string( "[top]\n" + stream.read() ) 
+        config.read_string( "[top]\n" + stream.read() )
 
     version = config[ "top" ][ "version" ].replace( '\"', '' ).strip()
 
@@ -120,7 +120,7 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
 
     text = \
         text.replace(
-        "[project]", 
+        "[project]",
         "[project]\n" + \
         "name = \'" + indicator_name + '\'\n' + \
         "version = \'" + version + '\'\n' + \
@@ -177,7 +177,7 @@ def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
             return '{' + key + '}'
 
 
-    def read_format_write( 
+    def read_format_write(
             indicatorbase_platform_linux_path,
             source_script_name,
             destination_script_name ):
@@ -306,7 +306,7 @@ def get_pyproject_toml_authors( pyproject_toml ):
         elif "name" in line:
             name = line_[ 1 ].split( '\"' )[ 1 ]
             names_emails.append( ( name, "" ) )
-        
+
         elif "email" in line:
             email = line_[ 1 ].split( '\"' )[ 1 ]
             names_emails.append( ( "", email ) )
@@ -428,19 +428,21 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
         message = _package_source_for_build_wheel_process( directory_dist, indicator_name )
         if not message:
             command = \
-                f". ./venv/bin/activate && " + \
+                f". venv/bin/activate && " + \
                 f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }"
 
             subprocess.call( command, shell = True )
 
-#TODO Remove
-            # shutil.rmtree( directory_dist / indicator_name )
+            shutil.rmtree( directory_dist / indicator_name )
 
     return message
 
 
 if __name__ == "__main__":
-    if utils.is_correct_directory( example_arguments = "release indicatorfortune" ):
+    correct_directory, message = \
+        utils.is_correct_directory( example_arguments = "release indicatorfortune" )
+
+    if correct_directory:
         args = \
             utils.initialiase_parser_and_get_arguments(
                 "Create a Python wheel for one or more indicators.",
@@ -461,3 +463,6 @@ if __name__ == "__main__":
             message = _build_wheel_for_indicator( args.directory_release, indicator_name )
             if message:
                 print( message )
+
+    else:
+        print( message )

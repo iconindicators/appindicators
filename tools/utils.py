@@ -30,15 +30,16 @@ def is_correct_directory( example_arguments = None ):
     correct_directory = \
         Path.cwd() == Path( inspect.stack()[ 1 ].filename ).parent.parent.absolute()
 
+    message = ""
     if not correct_directory:
         path_of_caller_parts = Path( inspect.stack()[ 1 ].filename ).parts
         script_path_and_name = Path( '.' ) / path_of_caller_parts[ -2 ] / path_of_caller_parts[ -1 ]
-        print(
+        message = (
             f"The script must be run from the top level directory (one above tools).\n"
             f"For example:\n"
             f"\tpython3 { script_path_and_name } { '' if example_arguments is None else example_arguments }" )
 
-    return correct_directory
+    return correct_directory, message
 
 
 def initialiase_parser_and_get_arguments(
