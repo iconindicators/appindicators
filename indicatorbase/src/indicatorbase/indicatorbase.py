@@ -16,14 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO On the laptop I ran indicatorscriptrunner and opened the Preferences.
-# I think I may have then hit escape to close, cannot be sure.
-# However I then noticed the indicator menu was greyed out.  
-# See if this can be reproduced.
-# Was running as Xorg.
-# Does not happen on Debian 12 as a virtual machine under Wayland nor Xorg.
-
-
 #TODO For installing multiple indicators as an end user,
 # is there some way to make things easier?
 # That is, a single apt-get (or equivalent) along with
@@ -35,10 +27,10 @@
 # Have a wrapper indicator for all?
 #
 # Maybe have a file in the release called "upgradepath.txt" which contains
-# 
+#
 #   16
 #   17
-#   the python venv create/install command 
+#   the python venv create/install command
 #
 # So the indicator knows it is version 16 and there is a new version 17
 # and only needs to run the command to upgrade.
@@ -89,7 +81,7 @@
 # the OS install command.  This implies only need the latest version.
 # The PyPI command will always be required for updating,
 # so only need to check versions.
-# 
+#
 # Maybe need to make a statement in the Installation section
 # about the name/location of the venv which will be created.
 # https://stackoverflow.com/questions/34948898/check-whether-directory-is-a-virtualenv
@@ -108,20 +100,13 @@
 # virtual environment for other things.
 
 
-#TODO Probably need to also modify the README.md for the project
-# in terms of install/run/uninstall.
-
-
-#TODO Need to update the tools scripts for run/install/etc.
-
-
 #TODO Should a list of indicators be included in the install/update/remove instructions?
 # Does this make it easier in reality...?
 #
 # Not sure how to make it easier for OS packages to be installed/updated/removed across indicators.
 #
 # For Python...
-#   Installing without a list, user must copy/paste each command which only differs by indicator name. 
+#   Installing without a list, user must copy/paste each command which only differs by indicator name.
 #   Installing with a list, user may append extra indicator names to the install command.
 
 
@@ -187,7 +172,7 @@
 
 
 #TODO When finally released, or at least indicatortest is released,
-# post a note to 
+# post a note to
 #   https://github.com/AyatanaIndicators/libayatana-appindicator/issues/76
 # to help the guy out.
 
@@ -198,9 +183,9 @@
 #
 # This PPA no longer provides releases for indicators.
 # Instead, for Ubuntu 20.04 and forward, all releases are made via pip (PyPI).
-# 
+#
 # Refer to the new URL for each indicator:
-# 
+#
 # indicator-fortune: https://pypi.org/project/indicatorfortune
 # indicator-lunar: https://pypi.org/project/indicatorlunar
 # indicator-on-this-day: https://pypi.org/project/indicatoronthisday
@@ -211,11 +196,11 @@
 # indicator-test: https://pypi.org/project/indicatortest
 # indicator-tide: https://pypi.org/project/indicatortide
 # indicator-virtual-box: https://pypi.org/project/indicatorvirtualbox
-# 
+#
 # Screenshots for the indicators can be found at https://askubuntu.com/q/30334/67335
 
 
-#TODO For each indicator at 
+#TODO For each indicator at
 #   https://askubuntu.com/questions/30334/what-application-indicators-are-available?answertab=modifieddes
 # update the URL at the top with the relevant URL at PyPI.
 #
@@ -1186,7 +1171,7 @@ class IndicatorBase( ABC ):
 #TODO Rather (or perhaps in addition to) the label
 # is it feasible to get the upgrade instructions?
 # Get from where?  Download the new .whl and extract from the README.md somehow?
-# Or make a machine readable README.md?            
+# Or make a machine readable README.md?
             url = f"https://pypi.org/project/{ self.indicator_name }"
             label = Gtk.Label.new()
             label.set_markup( _(
@@ -1285,10 +1270,10 @@ class IndicatorBase( ABC ):
         When adding a menuitem to a submenu,
         under GNOME the menuitem appears in the same menu as the submenu
         and requires an indent added to look correct.
-        
+
         Under Kubuntu et al, menuitems of a submenu appear as a separate,
         detached menu and so require no indent.
-        
+
         The first value of the indent argument refers to the indent for
         a submenu's menuitems under GNOME and similar layouts.
         The second value of the indent argument refers to the indent for
@@ -1324,7 +1309,7 @@ class IndicatorBase( ABC ):
     def get_on_click_menuitem_open_browser_function( self ):
         return lambda menuitem: webbrowser.open( menuitem.get_name() )
 
-    
+
     # Takes a Gtk.TextView and returns the containing text,
     # avoiding the additional calls to get the start/end positions.
     def get_textview_text( self, textview ):
@@ -1624,7 +1609,7 @@ class IndicatorBase( ABC ):
 
         cursorchangedfunctionandarguments: A function (and parameters) to call on row selection.
 
-        rowactivatedfunctionandarguments: A function (and parameters) to call on row double click.      
+        rowactivatedfunctionandarguments: A function (and parameters) to call on row double click.
         '''
         treeview = Gtk.TreeView.new_with_model( treemodel )
 
@@ -1727,15 +1712,15 @@ class IndicatorBase( ABC ):
             for line in f:
                 if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
                     output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
-        
+
                 elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
                     parts = line.split( "sleep" )
                     right = parts[ 1 ].split( "&&" )[ 1 ]
                     output += parts[ 0 ] + "sleep " + str( delay ) + " &&" + right + '\n'
-        
+
                 else:
                     output += line
-        
+
         with open( self.desktop_file_user_home, 'w' ) as f:
             f.write( output )
 
