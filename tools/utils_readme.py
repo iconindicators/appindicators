@@ -470,7 +470,9 @@ def _get_limitations( indicator_name ):
         messages.append(
             f"- `Wayland`: The command `wmctrl` is unsupported.\n" )
 
-#TODO Remove all the comments below about testing...maybe keep somewhere else?
+    # Kubuntu 22.04     KDE     No mouse wheel scroll.            
+    # Kubuntu 24.04     KDE     No mouse wheel scroll.            
+    # Manjaro 24.0.7    KDE     No mouse wheel scroll.            
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORSTARDATE,
@@ -478,10 +480,15 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORVIRTUALBOX ):
         messages.append(
             f"- `KDE`: Mouse wheel scroll over icon is unsupported.\n" )
-# Kubuntu 22.04  KDE   No mouse wheel scroll.            
-# Kubuntu 24.04  KDE   No mouse wheel scroll.            
-# Manjaro 24.0.7 KDE   No mouse wheel scroll.            
 
+    # Kubuntu 22.04         KDE         Tooltip in lieu of label.
+    # Kubuntu 24.04         KDE         Tooltip in lieu of label.
+    # Linux Mint 22         X-Cinnamon  Tooltip in lieu of label.
+    # Lubuntu 22.04         LXQt        No label; tooltip is indicator filename.
+    # Lubuntu 24.04         LXQt        No label; tooltip is indicator filename.
+    # Manjaro 24.0.7        KDE         Tooltip in lieu of label.
+    # openSUSE Tumbleweed   ICEWM       No label/tooltip.
+    # Xubuntu 24.04         XFCE        Tooltip in lieu of label.
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORLUNAR,
@@ -494,15 +501,10 @@ def _get_limitations( indicator_name ):
             f"- `LXQt`: The icon label is unsupported; icon tooltip shows the indicator filename (effectively unsupported).\n" )
         messages.append(
             f"- `ICEWM`: The icon label and icon tooltip are unsupported.\n" )
-# Kubuntu 22.04          KDE         Tooltip in lieu of label.
-# Kubuntu 24.04          KDE         Tooltip in lieu of label.
-# Linux Mint 22          X-Cinnamon  Tooltip in lieu of label.
-# Lubuntu 22.04          LXQt        No label; tooltip is indicator filename.
-# Lubuntu 24.04          LXQt        No label; tooltip is indicator filename.
-# Manjaro 24.0.7         KDE         Tooltip in lieu of label.
-#### openSUSE Tumbleweed    ICEWM  No label/tooltip.
-# Xubuntu 24.04          XFCE        Tooltip in lieu of label.
 
+    # Linux Mint 22     X-Cinnamon  When icon is changed, it disappears.
+    # Lubuntu 22.04     LXQt        Cannot change the icon once initially set.
+    # Lubuntu 24.04     LXQt        Cannot change the icon once initially set.
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORLUNAR,
@@ -511,28 +513,26 @@ def _get_limitations( indicator_name ):
             f"- `LXQt`: The icon cannot be changed once set.\n" )
         messages.append(
             f"- `X-Cinnamon`: The icon disappears when changed from that originally set, leaving a blank space.\n" )
-# Linux Mint 22     X-Cinnamon  When icon is changed, it disappears.
-# Lubuntu 22.04     LXQt        Cannot change the icon once initially set.
-# Lubuntu 24.04     LXQt        Cannot change the icon once initially set.
 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORSCRIPTRUNNER,
         Indicator_Name.INDICATORTEST ):
+        # Lubuntu 22.04     LXQt    Default terminal (qterminal) does not work.
+        # Lubuntu 24.04     LXQt    Default terminal (qterminal) all good.
         messages.append(
             f"- `LXQt`: Commands cannot be sent to `qterminal` with version < `1.2.0` as the "
             f"arguments are not [preserved](https://github.com/lxqt/qterminal/issues/335). "
             f"Install `gnome-terminal` as a workaround.\n" )
-# Lubuntu 22.04     LXQt    Default terminal (qterminal) does not work.
-# Lubuntu 24.04     LXQt    Default terminal (qterminal) all good.
 
+    # openSUSE Tumbleweed   No `calendar` command. 
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORTEST ):
         messages.append(
             f"- `openSUSE Tumbleweed`: Does not contain the `calendar` command.\n" )
-# openSUSE Tumbleweed does not have the `calendar` command. 
 
+    # openSUSE Tumbleweed    ICEWM      No notifications.
     if is_indicator(
         indicator_name,
         Indicator_Name.INDICATORFORTUNE,
@@ -545,7 +545,6 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORVIRTUALBOX ):
         messages.append(
             f"- `ICEWM`: Notifications are unsupported.\n" )
-#### openSUSE Tumbleweed    ICEWM    No notifications.
 
     message = ""
     if messages:
