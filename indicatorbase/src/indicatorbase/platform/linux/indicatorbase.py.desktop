@@ -1,13 +1,42 @@
 # https://specifications.freedesktop.org/desktop-entry-spec/
 #
+#
 # To validate this file:
 #   desktop-file-validate {indicator_name}.py.desktop
 #
+#
 # The \\$HOME in the Exec is appropriate given the above specification.
-# However, the specification is somewhat confusing and so \$HOME also
-# seems appropriate.  Some Linux distributions/desktops handle no \,
-# or one or two slashes or some combination.  All handle two slashes
-# and so that is used here.
+# However, the specification is somewhat confusing and so \$HOME also seems
+# appropriate.  Some Linux distributions/desktops handle no \, or one or two
+# slashes or some combination.  The vast majority of distributions handle two
+# slashes and so that is used here.
+#
+# For reference, distributions and the number of slashes supported:
+#
+#   Debian 11 0/1/2
+#   Debian 12 0/1/2
+#   Fedora 38 0/1/2
+#   Fedora 39 0/1/2
+#   Fedora 40 0/2
+#   Kubuntu 22.04 0/2
+#   Linux Mint 22 Cinnamon 0/2
+#   Lubuntu 22.04 0/1/2
+#   Lubuntu 24.04 0/1/2
+#   openSUSE 0/2
+#   Ubuntu 20.04 0/1/2
+#   Ubuntu 22.04 0/1/2
+#   Ubuntu 24.04 0/2
+#   Ubuntu Budgie 24.04 0/2
+#   Ubuntu MATE 24.04 0/2
+#   Ubuntu Unity 22.04 0/1/2
+#   Ubuntu Unity 0/2
+#   Xubuntu 24.04 0/1/2
+#
+# Distributions for which autostart does not work, irrespective of \:
+#
+#   Kubuntu 24.04
+#   Manjaro 24.0.7
+#
 #
 # The operating system / desktop should update the .desktop automatically,
 # but may not do so until a log out/in or a restart.
@@ -15,6 +44,8 @@
 #   xdg-desktop-menu install --novendor {indicator_name}.py.desktop
 # may perform the update (without the log out/in or restart) but depends
 # entirely on the distribution/desktop.
+#
+#
 [Desktop Entry]
 Type=Application
 {names}
