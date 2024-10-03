@@ -1,6 +1,6 @@
 # Immediate
 
-## When installing multiple indicators as an end user, is there some way to make things easier?
+## Simplify installing/updating/remove multiple indicators for the end user.
 That is, a single apt-get (or equivalent) along with a pip install listing desired indicators?
 
 Similarly for upgrading...
@@ -197,6 +197,12 @@ update the URL at the top with the relevant URL at PyPI.
 
   
 ## Rather (or perhaps in addition to) the label
-# is it feasible to get the upgrade instructions?
-# Get from where?  Download the new .whl and extract from the README.md somehow?
-# Or make a machine readable README.md?
+is it feasible to get the upgrade instructions?
+Get from where?  Download the new .whl and extract from the README.md somehow?
+Or make a machine readable README.md?
+
+
+# Long Term
+
+## Migrate to GTK4
+May need to continue to run as GTK3 simulataneously.
