@@ -1,6 +1,6 @@
 # Immediate
 
-## Simplify installing/updating/remove multiple indicators for the end user.
+## Simplify install/update/remove of multiple indicators for the end user.
 That is, a single apt-get (or equivalent) along with a pip install listing desired indicators?
 
 Similarly for upgrading...
@@ -81,76 +81,34 @@ need a note on the PyPI page about uninstalling, in that the virtual
 environment directory will be deleted because a user might use that
 virtual environment for other things.
 
-
-## Should a list of indicators be included in the install/update/remove instructions?
-Does this make it easier in reality...?
-
-Not sure how to make it easier for OS packages to be installed/updated/removed across indicators.
-
-For Python...
-  Installing without a list, user must copy/paste each command which only differs by indicator name.
-  Installing with a list, user may append extra indicator names to the install command.
+is it feasible to get the upgrade instructions?
+Get from where?  Download the new .whl and extract from the README.md somehow?
+Or make a machine readable README.md?
 
 
-## Autostart with delay works on the following distros...
-Note that the 0/1/2 refers to the number of slashes
-used to escape $HOME that actually work.
-The number of slashes use is two to escape $HOME.
-
-Debian 11  0/1/2
-Debian 12  0/1/2
-Fedora 38 0/1/2
-Fedora 39  0/1/2
-Fedora 40  0/2
-Kubuntu 22.04 0/2
-Linux Mint 22 Cinnamon 0/2
-Lubuntu 22.04 0/1/2
-Lubuntu 24.04 0/1/2
-openSUSE 0/2
-Ubuntu 20.04 0/1/2
-Ubuntu 22.04 0/1/2
-Ubuntu 24.04 0/2
-Ubuntu Budgie 24.04 0/2
-Ubuntu MATE 24.04 0/2
-Ubuntu Unity 22.04 0/1/2
-Ubuntu Unity 0/2
-Xubuntu 24.04 0/1/2
-
-Does not work on
-Kubuntu 24.04 does not autostart.
-Manjaro does not autostart.
-
-Need to figure out why Kubuntu 24.04 and Manjaro 24.0.x do not autostart.
-Is it a KDE/plasma new thing?
-
-Kubuntu 24.04 does not work.
-Tried chmod to rw rw r but no go (works like that in Kubuntu 22.04).
-Are 22.04 and 24.04 both same desktop (plasma or whatever)?  Yes KDE/plasma.
-Might be just a bug in 24.04.
- Does not work on Manjaro either (which is also KDE/plasma).
-
-https://docs.kde.org/stable5/en/plasma-workspace/kcontrol/autostart/index.html
-https://www.reddit.com/r/Kubuntu/comments/ya0bb9/autostart_programs_dont_launch_in_kubuntu_2210/
-https://bugs.kde.org/show_bug.cgi?id=433538
-https://www.reddit.com/r/kde/comments/wlmlo1/running_a_command_on_startup/
-https://forum.manjaro.org/t/script-put-in-autostart-doesnt-work/61007/6
-https://askubuntu.com/questions/1490449/how-do-i-autostart-an-application-while-keeping-it-minimized
-https://askubuntu.com/questions/1181813/how-to-get-franz-messaging-app-start-minimized-and-with-window-along-the-right-e
-https://forum.manjaro.org/t/autostart-doesnt-work/121929/6
-https://forum.manjaro.org/t/bash-script-wont-load-on-start/114310
-https://forum.manjaro.org/t/autostart-script-does-not-work/124754
+## Autostart with delay fails
+On Kubuntu 24.04 and Manjaro 24.0.7, autostart with delay does not work.
+Determine if autostart works without delay and if so, make a note in the 
+release notes or on the README.md
+Could be a KDE/plasma new thing?
+- https://docs.kde.org/stable5/en/plasma-workspace/kcontrol/autostart/index.html
+- https://www.reddit.com/r/Kubuntu/comments/ya0bb9/autostart_programs_dont_launch_in_kubuntu_2210/
+- https://bugs.kde.org/show_bug.cgi?id=433538
+- https://www.reddit.com/r/kde/comments/wlmlo1/running_a_command_on_startup/
+- https://forum.manjaro.org/t/script-put-in-autostart-doesnt-work/61007/6
+- https://askubuntu.com/questions/1490449/how-do-i-autostart-an-application-while-keeping-it-minimized
+- https://askubuntu.com/questions/1181813/how-to-get-franz-messaging-app-start-minimized-and-with-window-along-the-right-e
+- https://forum.manjaro.org/t/autostart-doesnt-work/121929/6
+- https://forum.manjaro.org/t/bash-script-wont-load-on-start/114310
+- https://forum.manjaro.org/t/autostart-script-does-not-work/124754
 
 If the autostart works (without delay) on Kubuntu 24.04 and Manjaro 24.0.x
-then test for those if possible and only show autostart checkbox and not the delay.
+perhaps only show autostart checkbox and not the delay for those distros/versions.
 
-  https://blog.davidedmundson.co.uk/blog/plasma-and-the-systemd-startup/
-  https://forum.manjaro.org/t/autostart-doesnt-work/121929
-  https://www.reddit.com/r/archlinux/comments/ves6mh/comment/inf2mwq/
-  https://forum.manjaro.org/t/autostart-script-does-not-work/124754/6
-
-Create an example of a .destkop to autorun say a terminal
-that works on on Kubuntu 22.04 but not Kubuntu 24.04 and Manjaro 24.0.x
-and post about that to the Kubuntu forum and the Manjaro forum.
+- https://blog.davidedmundson.co.uk/blog/plasma-and-the-systemd-startup/
+- https://forum.manjaro.org/t/autostart-doesnt-work/121929
+- https://www.reddit.com/r/archlinux/comments/ves6mh/comment/inf2mwq/
+- https://forum.manjaro.org/t/autostart-script-does-not-work/124754/6
 
 
 ## When finally released, or at least indicatortest is released, post a note to
@@ -195,14 +153,11 @@ update the URL at the top with the relevant URL at PyPI.
   https://pypi.org/project/indicatortide/
   https://pypi.org/project/indicatorvirtualbox/
 
-  
-## Rather (or perhaps in addition to) the label
-is it feasible to get the upgrade instructions?
-Get from where?  Download the new .whl and extract from the README.md somehow?
-Or make a machine readable README.md?
 
 
 # Long Term
 
 ## Migrate to GTK4
 May need to continue to run as GTK3 simulataneously.
+- https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159
+- https://stackoverflow.com/questions/73006299/unable-to-get-application-icons-to-display-with-gtk4-under-ubuntu
