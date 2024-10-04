@@ -164,8 +164,8 @@ class IndicatorBase( ABC ):
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
 
-    # Commands such as wmctrl do not function under wayland.
-    # Need a way to determine whether running under wayland (or say x11).
+    # Commands such as wmctrl do not function under Wayland.
+    # Need a way to determine whether running under Wayland (or say x11).
     # Values are the result of calling
     #   echo $XDG_SESSION_TYPE
     SESSION_TYPE_WAYLAND = "wayland"
