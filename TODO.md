@@ -1,89 +1,20 @@
 # Immediate
 
-## Simplify install/update/remove of multiple indicators for the end user.
-That is, a single apt-get (or equivalent) along with a pip install listing desired indicators?
-
-Similarly for upgrading...
-Is there a way to make it easier for an end user to upgrade all in one go?
-
-Have a wrapper indicator for all?
-
-Maybe have a file in the release called "upgradepath.txt" which contains
-
-  16
-  17
-  the python venv create/install command
-
-So the indicator knows it is version 16 and there is a new version 17
-and only needs to run the command to upgrade.
-
-This could be done also for the OS package changes
-(but needs to be per OS now) so
-
-   debian_11=sudo apt-get -y install new_package
-   fedora_38=sudo dnf -y install new_package
-
-Maybe don't even need the 16, 17.
-Rather if there is an entry say
-
-   debian_11=sudo...
-   python venv/install command
-
-then if on Debian 11, the debian_11 command and python command
-both apply so show the user.
-
-So how to create this list/file?
+## Need a note in the install section on the PyPI page
+Let the user know that a virtual environment will be created in $HOME/.local/venv_indicators and will be shared for all indicators.
 
 
-Perhaps instead have an update script...?
-Not even sure how it works, but would live in the venv directory
-and we popup a dialog to let the user know of an available update
-rather than an OSD or Preferences message.
-Still need to resolve when a user does no upgrade for a few versions
-and perhaps needs an OS package installed (rather than just the pip upgrade).
-
-What to name the python/pip project that contains the script/wrapper?
+## Need a note about uninstalling on the PyPI page
+The virtual environment directory will be deleted when no more indicatores are installed.
+Flag this to the user because a user might use that virtual environment for other things.
 
 
-An update requires two parts: OS updates which should be seldom
-and Python (and venv) updates which are the typical update.
+# Check if Autostart without delay on Kubuntu 24.04 works
+Document to the user (along with the status of not working with a delay).
 
-For each release, need a text file which records any OS packages
-which are new since the very first release.
 
-To think about...
-- Is there a way to make installing (multiple indicators) easier?
-- Is there a way to make updates easier (singular or multiple indicators?
-
-For updating, if an indicator contains in its .whl
-a file containing the OS packages required for each distro
-which comes from utils_readme.py,
-the installed indicator can compare its own file with that
-at PyPI (after downloading) and message the user (undecided how)
-the OS install command.  This implies only need the latest version.
-The PyPI command will always be required for updating,
-so only need to check versions.
-
-Maybe need to make a statement in the Installation section
-about the name/location of the venv which will be created.
-https://stackoverflow.com/questions/34948898/check-whether-directory-is-a-virtualenv
-https://stackoverflow.com/questions/47462591/python-how-do-you-check-what-is-in-virtualenv
-
-If installing more than one indicator simultaneously,
-split the OS packages into those common to all indicators
-(which appear as the first step in the install instructions)
-and add a OS install line to the install.sh on a per-indicator
-basis for the OS specific packages.  Does this make sense...?
-How does this make it easier to install multiple indicators simultaneously?????
-
-If a combined/shared virtual environment is used for all indicators,
-need a note on the PyPI page about uninstalling, in that the virtual
-environment directory will be deleted because a user might use that
-virtual environment for other things.
-
-is it feasible to get the upgrade instructions?
-Get from where?  Download the new .whl and extract from the README.md somehow?
-Or make a machine readable README.md?
+# Check if Autostart without delay on Manjaro 24.0.7 works
+Document to the user (along with the status of not working with a delay).
 
 
 ## Autostart with delay fails
@@ -152,7 +83,6 @@ update the URL at the top with the relevant URL at PyPI.
   https://pypi.org/project/indicatorstardate/
   https://pypi.org/project/indicatortide/
   https://pypi.org/project/indicatorvirtualbox/
-
 
 
 # Long Term
