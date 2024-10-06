@@ -349,21 +349,20 @@ def _get_installation_additional_python_modules( indicator_name ):
     common = (
             f"For example if your `Python` script requires the `requests` module:\n"
             f"    ```\n"
-            f"    . $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
+            f"    . $HOME/.local/venv_indicators/bin/activate && \\\n"
             f"    python3 -m pip install requests && \\\n"
             f"    deactivate\n" )
 
     if indicator_name.upper() == Indicator_Name.INDICATORSCRIPTRUNNER.name:
         message = (
-            f"If you have added any `Python` scripts to `{ indicator_name }`,\n"
-            f"you may need to install `Python` modules to the virtual environment.\n"
+            f"If you have added any `Python` scripts to `{ indicator_name }`, "
+            f"you may need to install additional `Python` modules to the virtual environment. "
             f"{ common }"
             f"    ```\n" )
 
     if indicator_name.upper() == Indicator_Name.INDICATORTIDE.name:
         message = (
-            f"You will need to write a `Python` script to retrieve your tidal data.\n"
-            f"As such, you may need to install additional `Python` modules to the virtual environment.\n"
+            f"Your `Python` script to retrieve your tidal data may need additional `Python` modules installed to the virtual environment. "
             f"{ common }"
             f"    ```\n" )
 
@@ -389,7 +388,7 @@ def _get_installation_for_operating_system(
             Indicator_Name.INDICATORONTHISDAY )
 
     if indicator_uses_calendar and os_has_no_calendar:
-        dependencies = ''
+        installation = ''
 
     else:
         operating_system_packages = \
@@ -397,12 +396,15 @@ def _get_installation_for_operating_system(
                 operating_system,
                 Indicator_Name[ indicator_name.upper() ] )
 
+#TODO According to markdown, I only need to number the first section as 1. and then 
+# numbering the remaining sections also as 1. will automatically increase the numbers.
+# Test this out and if it works, can drop the 'n' stuff.
         n = 1 # Dynamically number each section.
 
         # Reference on installing some of the operating system packages:
         #   https://stackoverflow.com/a/61164149/2156453
         #   https://pygobject.gnome.org/getting_started.html
-        dependencies = (
+        installation = (
             f"<details>"
             f"<summary><b>{ _get_summary( operating_system ) }</b></summary>\n\n"
 
@@ -413,6 +415,8 @@ def _get_installation_for_operating_system(
 
         n += 1
 
+#TODO REmove below after checking!
+        '''
         extension = _get_extension( operating_system )
         if extension:
             dependencies += f"{ str( n ) }. { extension }"
@@ -423,10 +427,29 @@ def _get_installation_for_operating_system(
 
         if is_indicator( indicator_name, Indicator_Name.INDICATORSCRIPTRUNNER, Indicator_Name.INDICATORTIDE ):
             dependencies += f"{ str( n ) }. { _get_installation_additional_python_modules( indicator_name) }"
+        '''
 
-        dependencies += f"</details>\n\n"
+        installation += f"{ str( n ) }. { _get_installation_python_virtual_environment( indicator_name ) }"
+        n += 1
 
-    return dependencies
+        extension = _get_extension( operating_system )
+        if extension:
+            installation += f"{ str( n ) }. { extension }"
+            n += 1
+
+#TODO REmove below after checking!
+        '''
+        if is_indicator( indicator_name, Indicator_Name.INDICATORSCRIPTRUNNER, Indicator_Name.INDICATORTIDE ):
+            installation += f"{ str( n ) }. { _get_installation_additional_python_modules( indicator_name) }"
+        '''
+        additional_python_modules = _get_installation_additional_python_modules( indicator_name )
+        if additional_python_modules:
+            installation += f"{ str( n ) }. { additional_python_modules }"
+            n += 1
+        
+        installation += f"</details>\n\n"
+
+    return installation
 
 
 def _get_usage( indicator_name, indicator_name_human_readable ):
@@ -610,9 +633,20 @@ def _get_install_uninstall( indicator_name, install = True ):
         function = _get_installation_for_operating_system
         command_debian = "sudo apt-get -y install"
         command_fedora = "sudo dnf -y install"
-        title = \
-            "Installation / Upgrading\n" + \
-            "------------------------\n\n"
+
+        indicatortide_addition = ""
+        if is_indicator( indicator_name, Indicator_Name.INDICATORTIDE ):
+            indicatortide_addition = f"You will need to write a `Python` script to retrieve your tidal data.\n\n"
+
+        title = (
+            f"Installation / Upgrading\n"
+            f"------------------------\n\n"
+            f"The installation of `{ indicator_name }` requires generally two steps.\n\n"
+            f"1. The installation of operating system packages.\n"
+            f"2. The installation of `{ indicator_name }` via `pip` to a `Python3` virtual environment to `$HOME/.local/venv_indicators`.\n\n"
+            f"Some distributions require the installation/enabling of the `appindicator` extension.\n\n"
+            f"{ indicatortide_addition }"
+            f"\n" )
 
     else:
         function = _get_uninstall_for_operating_system
