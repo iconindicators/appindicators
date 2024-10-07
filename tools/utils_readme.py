@@ -22,6 +22,18 @@
 #   https://pygobject.gnome.org/getting_started.html
 #   https://stackoverflow.com/questions/70508775/error-could-not-build-wheels-for-pycairo-which-is-required-to-install-pyprojec
 #   https://stackoverflow.com/questions/60779139/trouble-installing-pycairo-any-suggestions-on-what-to-try-next
+#
+# To render out to HTML, assuming
+#   release/wheel/dist_indicatortest/indicatortest/README.md
+# is present:
+#
+#   indicator=indicatortest && \
+#   readme=release/wheel/dist_${indicator}/${indicator}/README. && \
+#   if [ ! -d venv ]; then python3 -m venv venv; fi && \
+#   . venv/bin/activate && \
+#   python3 -m pip install readme_renderer[md] && \
+#   python3 -m readme_renderer ${readme}md -o ${readme}html && \
+#   deactivate
 
 
 import datetime
@@ -311,8 +323,10 @@ def _get_extension( operating_system ):
     if operating_system.issubset( applicable_operating_systems ):
         extension = (
             f"For the `appindicator` extension to take effect, log out then log in "
-            f"(or restart) and in a terminal run:"
-            f"    `gnome-extensions enable ubuntu-appindicators@ubuntu.com`\n\n" )
+            f"(or restart) and in a terminal run:\n"
+            f"    ```\n"
+            f"    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
+            f"    ```\n" )
 
     applicable_operating_systems = {
         Operating_System.FEDORA_38,
@@ -330,7 +344,7 @@ def _get_extension( operating_system ):
 
 
 def _get_installation_python_virtual_environment( indicator_name ):
-    return (
+    message = (
         f"Install the indicator into a `Python` virtual environment:\n"
         f"    ```\n"
         f"    indicator={ indicator_name } && \\\n"
@@ -342,29 +356,72 @@ def _get_installation_python_virtual_environment( indicator_name ):
         f"    . $(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/${{indicator}}/platform/linux/install.sh\n"
         f"    ```\n" )
 
+#TODO Delete
+    # common = (
+    #     f"For example, to install the `requests` module to the virtual environment:\n"
+    #     f"    ```\n"
+    #     f"    . $HOME/.local/venv_indicators/bin/activate && \\\n"
+    #     f"    python3 -m pip install requests && \\\n"
+    #     f"    deactivate\n"
+    #     f"    ```\n" )
+    #
+    # if indicator_name.upper() == Indicator_Name.INDICATORSCRIPTRUNNER.name:
+    #     message += (
+    #         f"    If you have added any `Python` scripts to `{ indicator_name }`, "
+    #         f"you may need to install additional `Python` modules. "
+    #         f"{ common }" )
+    #
+    # if indicator_name.upper() == Indicator_Name.INDICATORTIDE.name:
+    #     message += (
+    #         f"    Your `Python` script to retrieve your tidal data may need additional `Python` modules. "
+    #         f"{ common }" )
 
+    return message
+
+#TODO Need a note above: can reuse the same command install/update other indicators.
+
+
+#TODO Can this go?
 def _get_installation_additional_python_modules( indicator_name ):
     message = ''
 
-    common = (
-            f"For example if your `Python` script requires the `requests` module:\n"
-            f"    ```\n"
-            f"    . $HOME/.local/venv_indicators/bin/activate && \\\n"
-            f"    python3 -m pip install requests && \\\n"
-            f"    deactivate\n" )
+    # common = (
+    #     f"For example to install the `requests` module to the virtual environment:\n\n"
+    #     f"    ```\n"
+    #     f"    . $HOME/.local/venv_indicators/bin/activate && \\\n"
+    #     f"    python3 -m pip install requests && \\\n"
+    #     f"    deactivate\n"
+    #     f"    ```\n" )
+    #
+    # if indicator_name.upper() == Indicator_Name.INDICATORSCRIPTRUNNER.name:
+    #     message = (
+    #         f"If you have added any `Python` scripts to `{ indicator_name }`, "
+    #         f"you may need to install additional `Python` modules. "
+    #         f"{ common }" )
+    #
+    # if indicator_name.upper() == Indicator_Name.INDICATORTIDE.name:
+    #     message = (
+    #         f"Your `Python` script to retrieve your tidal data may need additional `Python` modules. "
+    #         f"{ common }" )
 
+    common = (
+        f"For example, to install the `requests` module:\n"
+        f"    ```\n"
+        f"    . $HOME/.local/venv_indicators/bin/activate && \\\n"
+        f"    python3 -m pip install requests && \\\n"
+        f"    deactivate\n"
+        f"    ```\n" )
+    
     if indicator_name.upper() == Indicator_Name.INDICATORSCRIPTRUNNER.name:
-        message = (
+        message += (
             f"If you have added any `Python` scripts to `{ indicator_name }`, "
-            f"you may need to install additional `Python` modules to the virtual environment. "
-            f"{ common }"
-            f"    ```\n" )
+            f"you may need to install additional `Python` modules. "
+            f"{ common }" )
 
     if indicator_name.upper() == Indicator_Name.INDICATORTIDE.name:
-        message = (
-            f"Your `Python` script to retrieve your tidal data may need additional `Python` modules installed to the virtual environment. "
-            f"{ common }"
-            f"    ```\n" )
+        message += (
+            f"Your `Python` script which retrieves your tidal data may need additional `Python` modules. "
+            f"{ common }" )
 
     return message
 
@@ -396,11 +453,6 @@ def _get_installation_for_operating_system(
                 operating_system,
                 Indicator_Name[ indicator_name.upper() ] )
 
-#TODO According to markdown, I only need to number the first section as 1. and then 
-# numbering the remaining sections also as 1. will automatically increase the numbers.
-# Test this out and if it works, can drop the 'n' stuff.
-        n = 1 # Dynamically number each section.
-
         # Reference on installing some of the operating system packages:
         #   https://stackoverflow.com/a/61164149/2156453
         #   https://pygobject.gnome.org/getting_started.html
@@ -408,45 +460,23 @@ def _get_installation_for_operating_system(
             f"<details>"
             f"<summary><b>{ _get_summary( operating_system ) }</b></summary>\n\n"
 
-            f"{ str( n ) }. Install operating system packages:\n\n"
+            f"1. Install operating system packages:\n\n"
             f"    ```\n"
             f"    { install_command } { operating_system_packages }\n"
-            f"    ```\n\n" )
+            f"    ```\n"
+            f"    { _get_extension( operating_system ) }\n\n" )
 
-        n += 1
+        installation += f"1. { _get_installation_python_virtual_environment( indicator_name ) }"
 
-#TODO REmove below after checking!
-        '''
-        extension = _get_extension( operating_system )
-        if extension:
-            dependencies += f"{ str( n ) }. { extension }"
-            n += 1
-
-        dependencies += f"{ str( n ) }. { _get_installation_python_virtual_environment( indicator_name ) }"
-        n += 1
-
-        if is_indicator( indicator_name, Indicator_Name.INDICATORSCRIPTRUNNER, Indicator_Name.INDICATORTIDE ):
-            dependencies += f"{ str( n ) }. { _get_installation_additional_python_modules( indicator_name) }"
-        '''
-
-        installation += f"{ str( n ) }. { _get_installation_python_virtual_environment( indicator_name ) }"
-        n += 1
-
-        extension = _get_extension( operating_system )
-        if extension:
-            installation += f"{ str( n ) }. { extension }"
-            n += 1
-
-#TODO REmove below after checking!
-        '''
-        if is_indicator( indicator_name, Indicator_Name.INDICATORSCRIPTRUNNER, Indicator_Name.INDICATORTIDE ):
-            installation += f"{ str( n ) }. { _get_installation_additional_python_modules( indicator_name) }"
-        '''
         additional_python_modules = _get_installation_additional_python_modules( indicator_name )
         if additional_python_modules:
-            installation += f"{ str( n ) }. { additional_python_modules }"
-            n += 1
-        
+            installation += f"1. { additional_python_modules }"
+
+#TODO Delete?
+        # extension = _get_extension( operating_system )
+        # if extension:
+        #     installation += f"\n1. { extension }"
+
         installation += f"</details>\n\n"
 
     return installation
@@ -611,7 +641,7 @@ def _get_uninstall_for_operating_system(
             f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
             f"    ```\n\n"
 
-            f"2. Uninstall `Python` virtual environment and files:\n"
+            f"1. Uninstall `Python` virtual environment and files:\n"
             f"    ```\n"
             f"    indicator={ indicator_name } && \\\n"
             f"    venv=$HOME/.local/venv_indicators && \\\n"
@@ -624,6 +654,8 @@ def _get_uninstall_for_operating_system(
             f"    ```\n\n"
 
             f"</details>\n\n" )
+#TODO Need a note above: if no indicators are installed, the venv will be deleted.
+#TODO Need a note above: can reuse the same command in step 2 to uninstall other indicators.
 
     return uninstall
 
@@ -634,19 +666,21 @@ def _get_install_uninstall( indicator_name, install = True ):
         command_debian = "sudo apt-get -y install"
         command_fedora = "sudo dnf -y install"
 
-        indicatortide_addition = ""
+        addition = ""
+        if is_indicator( indicator_name, Indicator_Name.INDICATORSCRIPTRUNNER ):
+            addition = (
+                f"1. Any `Python` scripts you add to `{ indicator_name }` may require additional modules.\n" )
+
         if is_indicator( indicator_name, Indicator_Name.INDICATORTIDE ):
-            indicatortide_addition = f"You will need to write a `Python` script to retrieve your tidal data.\n\n"
+            addition = (
+                f"1. You will need to write a `Python` script to retrieve your tidal data.\n" )
 
         title = (
-            f"Installation / Upgrading\n"
-            f"------------------------\n\n"
-            f"The installation of `{ indicator_name }` requires generally two steps.\n\n"
-            f"1. The installation of operating system packages.\n"
-            f"2. The installation of `{ indicator_name }` via `pip` to a `Python3` virtual environment to `$HOME/.local/venv_indicators`.\n\n"
-            f"Some distributions require the installation/enabling of the `appindicator` extension.\n\n"
-            f"{ indicatortide_addition }"
-            f"\n" )
+            f"Installation & Updating\n"
+            f"-----------------------\n\n"
+            f"1. Install operating system packages.\n"
+            f"1. Install `{ indicator_name }` via `pip` to a `Python3` virtual environment to `$HOME/.local/venv_indicators`.\n\n"
+            f"{ addition }\n" )
 
     else:
         function = _get_uninstall_for_operating_system
