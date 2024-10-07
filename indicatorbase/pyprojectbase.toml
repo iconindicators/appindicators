@@ -32,6 +32,7 @@ where = [ "src" ]
 [tool.setuptools.package-data]
 {indicator_name} = [
   "CHANGELOG.md",
+  "README.html",
   "icons/*.svg",
   "locale/*.pot",
   "locale/*/LC_MESSAGES/*.mo",
