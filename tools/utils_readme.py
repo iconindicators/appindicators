@@ -201,8 +201,6 @@ def _get_installation_python_virtual_environment( indicator_name ):
 
     return message
 
-#TODO Need a note above: can reuse the same command install/update other indicators.
-
 
 def _get_extension( operating_system ):
     extension = ''
@@ -280,11 +278,6 @@ def _get_installation_for_operating_system(
         if additional_python_modules:
             installation += f"1. { additional_python_modules }"
 
-#TODO Delete?
-        # extension = _get_extension( operating_system )
-        # if extension:
-        #     installation += f"\n1. { extension }"
-
         installation += f"</details>\n\n"
 
     return installation
@@ -322,7 +315,7 @@ def _get_uninstall_for_operating_system(
             f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
             f"    ```\n\n"
 
-            f"1. Uninstall `Python` virtual environment and files:\n"
+            f"1. Uninstall the indicator from virtual environment:\n"
             f"    ```\n"
             f"    indicator={ indicator_name } && \\\n"
             f"    venv=$HOME/.local/venv_indicators && \\\n"
@@ -332,11 +325,10 @@ def _get_uninstall_for_operating_system(
             f"    count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && \\\n"
             f"    deactivate && \\\n"
             f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
-            f"    ```\n\n"
+            f"    ```\n"
+            f"    If no other indicators are installed, the virtual environment will be deleted.\n\n"
 
             f"</details>\n\n" )
-#TODO Need a note above: if no indicators are installed, the venv will be deleted.
-#TODO Need a note above: can reuse the same command in step 2 to uninstall other indicators.
 
     return uninstall
 
