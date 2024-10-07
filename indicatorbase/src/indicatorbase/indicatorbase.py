@@ -718,6 +718,7 @@ class IndicatorBase( ABC ):
         about_dialog.run()
         about_dialog.destroy()
 
+#TODO Might need to include 37...32?  Just in case?
         if self._is_fedora_38():
             self.request_update()
 
