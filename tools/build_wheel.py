@@ -388,6 +388,15 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
                     authors,
                     start_year )
 
+                command = (
+                    f". venv/bin/activate && " +
+                    f"python3 -m readme_renderer" +
+                    f"    { directory_dist }/{ indicator_name }/README.md" +
+                    f"    -o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html && " +
+                    f"deactivate" )
+
+                subprocess.call( command, shell = True )
+
                 directory_indicator_locale = Path( '.' ) / directory_indicator / "src" / indicator_name / "locale"
 
                 names_from_mo_files, comments_from_mo_files = \
@@ -427,9 +436,9 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
         message = _package_source_for_build_wheel_process( directory_dist, indicator_name )
         if not message:
-            command = \
-                f". venv/bin/activate && " + \
-                f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }"
+            command = (
+                f". venv/bin/activate && " +
+                f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }" )
 
             subprocess.call( command, shell = True )
 
@@ -462,7 +471,8 @@ if __name__ == "__main__":
             Path( '.' ) / "venv",
             "build",
             "pip",
-            "PyGObject" )
+            "PyGObject",
+            "readme_renderer[md]" )
 
         for indicator_name in args.indicators:
             message = _build_wheel_for_indicator( args.directory_release, indicator_name )
