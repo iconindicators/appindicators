@@ -718,8 +718,7 @@ class IndicatorBase( ABC ):
         about_dialog.run()
         about_dialog.destroy()
 
-#TODO Might need to include 37...32?  Just in case?
-        if self._is_fedora_38():
+        if self._is_fedora_38_or_prior():
             self.request_update()
 
         else:
@@ -761,7 +760,7 @@ class IndicatorBase( ABC ):
             self.request_update( 1 ) # Allow one second for the lock to release so the update will proceed.
 
         else:
-            if self._is_fedora_38():
+            if self._is_fedora_38_or_prior():
                 self.request_update()
 
             else:
@@ -769,7 +768,7 @@ class IndicatorBase( ABC ):
                 self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
 
-    def _is_fedora_38( self ):
+    def _is_fedora_38_or_prior( self ):
         '''
         When running under Debian 11 / 12, Fedora 38 / 39 / 40 and Ubuntu 24.04
         and the About or Preferences dialogs are opened,
@@ -783,21 +782,31 @@ class IndicatorBase( ABC ):
         kick off an update.
 
         This is not a Wayland issue as the issue was observed on Debian 12 Xorg.
+
+        Although Fedora 37 and prior are end of life, Fedora 37 and prior are
+        still recent enough and may still be in use.
+        As such, assume the same issue as Fedora 38 and include in the check.
+
+        Thanks to https://github.com/chef/os_release for providing confirmation
+        about ID and VERSION_ID values for prior versions of Fedora.
         '''
         etc_os_release = self.process_get( "cat /etc/os-release" )
         if etc_os_release is None:
             etc_os_release = ""
 
         is_fedora = False
-        is_version_38 = False
+        is_version_38_or_prior = False
         for line in etc_os_release.split():
             if "ID=fedora" in line:
                 is_fedora = True
 
-            if "VERSION_ID=38" in line:
-                is_version_38 = True
+#TODO Need to guard against 300 or 301, ...?
+# Check to see length of result perhaps?
+# Or maybe grab the result, strip, convert to an int and ensure < 39?
+            if "VERSION_ID=3" in line and "VERSION_ID=39" not in line:
+                is_version_38_or_prior = True
 
-        return is_fedora and is_version_38
+        return is_fedora and is_version_38_or_prior
 
 
     def set_menu_sensitivity( self, toggle ):
