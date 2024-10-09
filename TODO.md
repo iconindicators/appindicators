@@ -1,14 +1,5 @@
 # Immediate
 
-## Need a note in the install section on the PyPI page
-Let the user know that a virtual environment will be created in $HOME/.local/venv_indicators and will be shared for all indicators.
-
-
-## Need a note about uninstalling on the PyPI page
-The virtual environment directory will be deleted when no more indicatores are installed.
-Flag this to the user because a user might use that virtual environment for other things.
-
-
 # Check if Autostart without delay on Kubuntu 24.04 works
 Document to the user (along with the status of not working with a delay).
 
