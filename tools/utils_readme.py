@@ -32,8 +32,8 @@ from pathlib import Path
 
 
 class Operating_System( Enum ):
-    DEBIAN_11 = auto() 
-    DEBIAN_12 = auto() 
+    DEBIAN_11 = auto()
+    DEBIAN_12 = auto()
     FEDORA_38 = auto()
     FEDORA_39 = auto()
     FEDORA_40 = auto()
@@ -106,7 +106,7 @@ def _is_indicator( indicator_name, *indicator_names ):
         if indicator_name.upper() == indicator_name_.name:
             is_indicator = True
             break
-        
+
     return is_indicator
 
 
@@ -159,7 +159,7 @@ def _get_installation_additional_python_modules( indicator_name ):
         f"    python3 -m pip install --upgrade requests && \\\n"
         f"    deactivate\n"
         f"    ```\n" )
-    
+
     if indicator_name.upper() == Indicator_Name.INDICATORSCRIPTRUNNER.name:
         message += (
             f"If you have added any `Python` scripts to `{ indicator_name }`, "
@@ -176,7 +176,7 @@ def _get_installation_additional_python_modules( indicator_name ):
 
 def _get_installation_python_virtual_environment( indicator_name ):
     message = (
-        f"Install the indicator into a `Python` virtual environment:\n"
+        f"Install the indicator to a `Python` virtual environment:\n"
         f"    ```\n"
         f"    indicator={ indicator_name } && \\\n"
         f"    venv=$HOME/.local/venv_indicators && \\\n"
@@ -413,7 +413,7 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
 
     if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
         applicable_operating_systems = {
-            Operating_System.FEDORA_39, 
+            Operating_System.FEDORA_39,
             Operating_System.FEDORA_40 }
 
         if operating_system.issubset( applicable_operating_systems ):
@@ -425,7 +425,7 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
         dependencies.append( "wmctrl" )
 
         applicable_operating_systems = {
-            Operating_System.FEDORA_39, 
+            Operating_System.FEDORA_39,
             Operating_System.FEDORA_40 }
 
         if operating_system.issubset( applicable_operating_systems ):
@@ -494,7 +494,7 @@ def _get_install_uninstall( indicator_name, install = True ):
             f"-----------------------\n\n"
             f"Installtion and updating follow the same process:\n"
             f"1. Install operating system packages.\n"
-            f"1. Install `{ indicator_name }` via `pip` to a `Python3` virtual environment to `$HOME/.local/venv_indicators`.\n"
+            f"1. Install `{ indicator_name }` via `pip` into a `Python3` virtual environment at `$HOME/.local/venv_indicators`.\n"
             f"{ additional_text }\n" )
 
     else:
@@ -610,9 +610,9 @@ def _get_limitations( indicator_name ):
         messages.append(
             f"- `Wayland`: The command `wmctrl` is unsupported.\n" )
 
-    # Kubuntu 22.04     KDE     No mouse wheel scroll.            
-    # Kubuntu 24.04     KDE     No mouse wheel scroll.            
-    # Manjaro 24.0.7    KDE     No mouse wheel scroll.            
+    # Kubuntu 22.04     KDE     No mouse wheel scroll.
+    # Kubuntu 24.04     KDE     No mouse wheel scroll.
+    # Manjaro 24.0.7    KDE     No mouse wheel scroll.
     if _is_indicator(
         indicator_name,
         Indicator_Name.INDICATORSTARDATE,
@@ -665,7 +665,7 @@ def _get_limitations( indicator_name ):
             f"arguments are not [preserved](https://github.com/lxqt/qterminal/issues/335). "
             f"Install `gnome-terminal` as a workaround.\n" )
 
-    # openSUSE Tumbleweed   No `calendar` command. 
+    # openSUSE Tumbleweed   No `calendar` command.
     if _is_indicator(
         indicator_name,
         Indicator_Name.INDICATORTEST ):
