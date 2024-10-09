@@ -22,18 +22,6 @@
 #   https://pygobject.gnome.org/getting_started.html
 #   https://stackoverflow.com/questions/70508775/error-could-not-build-wheels-for-pycairo-which-is-required-to-install-pyprojec
 #   https://stackoverflow.com/questions/60779139/trouble-installing-pycairo-any-suggestions-on-what-to-try-next
-#
-# To render out to HTML, assuming
-#   release/wheel/dist_indicatortest/indicatortest/README.md
-# is present:
-#
-#   indicator=indicatortest && \
-#   readme=release/wheel/dist_${indicator}/${indicator}/README. && \
-#   if [ ! -d venv ]; then python3 -m venv venv; fi && \
-#   . venv/bin/activate && \
-#   python3 -m pip install readme_renderer[md] && \
-#   python3 -m readme_renderer ${readme}md -o ${readme}html && \
-#   deactivate
 
 
 import datetime
@@ -168,7 +156,7 @@ def _get_installation_additional_python_modules( indicator_name ):
         f"For example, to install the `requests` module:\n"
         f"    ```\n"
         f"    . $HOME/.local/venv_indicators/bin/activate && \\\n"
-        f"    python3 -m pip install requests && \\\n"
+        f"    python3 -m pip install --upgrade requests && \\\n"
         f"    deactivate\n"
         f"    ```\n" )
     
@@ -211,7 +199,7 @@ def _get_extension( operating_system ):
 
     if operating_system.issubset( applicable_operating_systems ):
         extension = (
-            f"For the `appindicator` extension to take effect, log out then log in "
+            f"For the `appindicator` extension to take effect, log out / in "
             f"(or restart) and in a terminal run:\n"
             f"    ```\n"
             f"    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
@@ -502,10 +490,11 @@ def _get_install_uninstall( indicator_name, install = True ):
                 f"1. You will need to write a `Python` script to retrieve your tidal data.\n" )
 
         title = (
-            f"Installation & Updating\n"
+            f"Installation / Updating\n"
             f"-----------------------\n\n"
+            f"Installtion and updating follow the same process:\n"
             f"1. Install operating system packages.\n"
-            f"1. Install `{ indicator_name }` via `pip` to a `Python3` virtual environment to `$HOME/.local/venv_indicators`.\n\n"
+            f"1. Install `{ indicator_name }` via `pip` to a `Python3` virtual environment to `$HOME/.local/venv_indicators`.\n"
             f"{ additional_text }\n" )
 
     else:
@@ -588,7 +577,7 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
         f"To run `{ indicator_name }`, press the `Super` key to show the applications overlay or similar "
         f"and type `{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Remove the ™ from VirtualBox™.
         f"into the search bar and the icon should be present for you to select.  "
-        f"If the icon does not appear, or appears as generic, you may have to log out and log back in (or restart).\n\n"
+        f"If the icon does not appear, or appears as generic, you may have to log out / in (or restart).\n\n"
         f"Alternatively, to run from the terminal:\n\n"
         f"```\n"
         f". $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
