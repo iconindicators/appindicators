@@ -260,11 +260,11 @@ def _get_installation_for_operating_system(
             f"    ```\n"
             f"    { _get_extension( operating_system ) }\n\n" )
 
-        installation += f"1. { _get_installation_python_virtual_environment( indicator_name ) }"
+        installation += f"2. { _get_installation_python_virtual_environment( indicator_name ) }"
 
         additional_python_modules = _get_installation_additional_python_modules( indicator_name )
         if additional_python_modules:
-            installation += f"1. { additional_python_modules }"
+            installation += f"3. { additional_python_modules }"
 
         installation += f"</details>\n\n"
 
@@ -303,7 +303,7 @@ def _get_uninstall_for_operating_system(
             f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
             f"    ```\n\n"
 
-            f"1. Uninstall the indicator from virtual environment:\n"
+            f"2. Uninstall the indicator from virtual environment:\n"
             f"    ```\n"
             f"    indicator={ indicator_name } && \\\n"
             f"    venv=$HOME/.local/venv_indicators && \\\n"
@@ -483,18 +483,18 @@ def _get_install_uninstall( indicator_name, install = True ):
         additional_text = ""
         if _is_indicator( indicator_name, Indicator_Name.INDICATORSCRIPTRUNNER ):
             additional_text = (
-                f"1. Any `Python` scripts you add to `{ indicator_name }` may require additional modules.\n" )
+                f"3. Any `Python` scripts you add to `{ indicator_name }` may require additional modules.\n" )
 
         if _is_indicator( indicator_name, Indicator_Name.INDICATORTIDE ):
             additional_text = (
-                f"1. You will need to write a `Python` script to retrieve your tidal data.\n" )
+                f"3. You will need to write a `Python` script to retrieve your tidal data.\n" )
 
         title = (
             f"Installation / Updating\n"
             f"-----------------------\n\n"
             f"Installtion and updating follow the same process:\n"
             f"1. Install operating system packages.\n"
-            f"1. Install `{ indicator_name }` via `pip` into a `Python3` virtual environment at `$HOME/.local/venv_indicators`.\n"
+            f"2. Install `{ indicator_name }` via `pip` into a `Python3` virtual environment at `$HOME/.local/venv_indicators`.\n"
             f"{ additional_text }\n" )
 
     else:

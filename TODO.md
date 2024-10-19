@@ -1,6 +1,5 @@
 # Immediate
 
-
 # Check if Autostart without delay on Kubuntu 24.04 works
 Document to the user (along with the status of not working with a delay).
 
