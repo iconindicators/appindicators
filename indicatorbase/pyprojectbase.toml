@@ -24,7 +24,7 @@ classifiers = [
   "Programming Language :: Python :: 3.8"{classifiers} ]
 
 [project.urls]
-homepage = "https://pypi.org/project/{indicator_name}"
+homepage = "https://appindicators.sourceforge.io"
 
 [tool.setuptools.packages.find]
 where = [ "src" ]
