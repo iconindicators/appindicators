@@ -1,60 +1,6 @@
 # Immediate
 
 
-# What about stardatesystemtray and worldtimesystemtray?
-Should these two projects also be under git/github?
-Perhaps the github organisation could be called indicators or icon-indicators.
-For the appindicators, call that repository appindicators or python-appindicators.
-For stardatesystemtray and worldtimesystemtray, call the repository perhaps java-system-tray-icons
-Need to look into what version of Java and/or Windows to support.
-Windows XP is no longer supported and neither is Java 6.
-So maybe look at supporting only Windows 10/11 (check for the EOL dates),
-along with the versions of Java supported for those versions of Windows.
-Consider also one or more versions prior to Windows 10 and whatever version of Java was last supported.
-
-Windows EOL
-	Vista 2017
-	7 2020
-	8 2016
-	8.1 2023
-	10 2025
-	11 ...?
-	
-Java EOL
-	1.6 2013
-	1.7 2015
-	8 2019...2026
-	9 2018
-	10 2018
-	11 2019...2027
-	12 2019
-	13 2020
-	14 2020
-	15 2021
-	16 2021
-	17 2024...2027
-	18 2022
-	19 2023
-	20 2023
-	21 2028...2029
-	22 2024
-	23 2025
-	24 2025
-	25 2030
-
-Downloaded Java for Windows 11; was recommended by the Oracle website to download Java 8.
-Installed Java 8.
-Installed Stardate System Tray.
-Installed World Time System Tray.
-Both work!
-Check if built for Java 6 or Java 8 or Java 11 and update each page's description.
-
-Consider renaming project to change the wrld to world?
-https://sourceforge.net/p/forge/site-support/new/
-
-
-
-
 # Check if Autostart without delay on Kubuntu 24.04 works
 Document to the user (along with the status of not working with a delay).
 
