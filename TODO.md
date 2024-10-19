@@ -1,40 +1,6 @@
 # Immediate
 
 
-# How to create a GitHub page for the project
-Create Github page, but unaffiliated with my username.
-This should be an organisation:
-    https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/creating-a-new-organization-from-scratch
-Call it perhaps appindicators and the repository appindicators.
-Check if appindicators is trade marked.
-If possible, put in a placeholder README saying this page will hold the source at some point.
-Can then add the URL to the pyproject.toml so it appears at PyPI.
-
-
-# Importing an existing repository into git/github
-Include the history?
-
-http://esr.ibiblio.org/?p=6778
-
-http://www.catb.org/~esr/reposurgeon/repository-editing.html#conversion
-
-https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
-
-https://stackoverflow.com/questions/22931404/import-svn-repo-to-git-without-history
-
-https://stackoverflow.com/questions/43362551/import-svn-folder-structure-to-git-repo-without-history-users
-
-https://stackoverflow.com/questions/747075/how-to-git-svn-clone-the-last-n-revisions-from-a-subversion-repository
-
-https://stackoverflow.com/questions/79165/how-do-i-migrate-an-svn-repository-with-history-to-a-new-git-repository
-
-https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
-
-https://git-scm.com/docs/git-svn
-
-https://stackoverflow.com/questions/6695783/import-subversion-repository-into-git
-
-
 # What about stardatesystemtray and worldtimesystemtray?
 Should these two projects also be under git/github?
 Perhaps the github organisation could be called indicators or icon-indicators.
