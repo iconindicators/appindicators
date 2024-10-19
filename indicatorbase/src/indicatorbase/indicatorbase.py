@@ -717,13 +717,8 @@ class IndicatorBase( ABC ):
 
         about_dialog.run()
         about_dialog.destroy()
-
-        if self._is_fedora_38_or_prior():
-            self.request_update()
-
-        else:
-            self.set_menu_sensitivity( True )
-            self.indicator.set_secondary_activate_target( self.secondary_activate_target )
+        self.set_menu_sensitivity( True )
+        self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
 
     def _add_hyperlink_label(
@@ -760,80 +755,8 @@ class IndicatorBase( ABC ):
             self.request_update( 1 ) # Allow one second for the lock to release so the update will proceed.
 
         else:
-            if self._is_fedora_38_or_prior():
-                self.request_update()
-
-            else:
-                self.set_menu_sensitivity( True )
-                self.indicator.set_secondary_activate_target( self.secondary_activate_target )
-
-
-#TODO Now works on Fedora 38 64 bit at at least.
-# Works on Debian 12 64 bit but not on Debian 12 32 bit (laptop).
-#
-#
-# Maybe use
-#    getconf LONG_BIT
-# with a response of either
-#    64
-# or
-#    32
-    def _is_fedora_38_or_prior( self ):
-        '''
-        When running under a clean install of
-        Debian 11 / 12, Fedora 38 / 39 / 40 and Ubuntu 24.04
-        and the About or Preferences dialogs are opened,
-        if the user clicks on the indicator icon and then closes the dialog
-        (by hitting the ESCAPE key or clicking the X or CANCEL button)
-        the menu would not reset back to sensitive, locking out the user.
-
-        However this mysteriously is fixed in all but Fedora 38.
-
-        As a workaround, when on Fedora 38 and the user has not clicked OK,
-        kick off an update.
-
-        This is not a Wayland issue as the issue was observed on Debian 12 Xorg.
-
-        Although Fedora 37 and prior are end of life, Fedora 37 and prior are
-        still recent enough and may still be in use.
-        As such, assume the same issue as Fedora 38 and include in the check.
-
-        Thanks to https://github.com/chef/os_release for providing confirmation
-        about ID and VERSION_ID values for prior versions of Fedora.
-        '''
-        '''
-        etc_os_release = self.process_get( "cat /etc/os-release" )
-        if etc_os_release is None:
-            etc_os_release = ""
-
-        is_fedora = False
-        is_version_38_or_prior = False
-        for line in etc_os_release.split():
-            if "ID=fedora" in line:
-                is_fedora = True
-
-#TODO Need to guard against 300 or 301, ...?
-# Check to see length of result perhaps?
-# Or maybe grab the result, strip, convert to an int and ensure < 39?
-# Don't think I need the above...
-# ...but do check this code against other os-releases from the github page
-# https://github.com/chef/os_release
-            if "VERSION_ID=3" in line and "VERSION_ID=39" not in line:
-                is_version_38_or_prior = True
-
-        return is_fedora and is_version_38_or_prior
-        '''
-#TODO I should test for Debian 11 (and 10 and 9?) on 32 bit somehow.        
-#        is_32_bit = False
-#        is_debian_12 = False
-        is_32_bit_debian_12 = False
-        getconf_long_bit = self.process_get( "getconf LONG_BIT" )
-        if getconf_long_bit is not None and "32" in getconf_long_bit:
-            etc_os_release = self.process_get( "cat /etc/os-release" )
-            if etc_os_release is not None and "VERSION_CODENAME=bookworm" in etc_os_release:
-                is_32_bit_debian_12 = True
-
-        return is_32_bit_debian_12
+            self.set_menu_sensitivity( True )
+            self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
 
     def set_menu_sensitivity( self, toggle ):

@@ -1,24 +1,6 @@
 # Immediate
 
 
-# Test again on Debian 12 for lockup on About/Preferences
-indicatortest does not resume the menu after showing the preferences and hitting escape.
-If a lock screen is done, and then return from that, the indicator is fine (on laptop).
-What to do?  Make a check for Debian 32 bit?  All good.
-Also note that a fix is already in place for Fedora 38...but now seems to work on Fedora 38.
-So how/when should this fix be implemented...if at all?
-Test on Debian 9 VM.
-Test on Debian 10 VM.
-Test on Debian 11 VM.  All good.
-Test on Debian 12 VM.  All good.
-Test on Debian 12 VM 32 bit.  All good.
-Test on Ubuntu 24.04 VM.  All good.
-Test on Fedora 38 VM.  All good.
-Test on Fedora 39 VM.  All good.
-Test on Fedora 40 VM.  All good.
-So maybe remove the fix!
-
-
 # How to create a GitHub page for the project
 Create Github page, but unaffiliated with my username.
 This should be an organisation:
