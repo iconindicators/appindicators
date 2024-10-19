@@ -2,6 +2,7 @@
 
 # Check if Autostart without delay on Kubuntu 24.04 works
 Document to the user (along with the status of not working with a delay).
+Does not work even without delay.
 
 
 # Check if Autostart without delay on Manjaro 24.0.7 works
