@@ -1,5 +1,112 @@
 # Immediate
 
+
+# Test again on Debian 12 for lockup on About/Preferences
+indicatortest does not resume the menu after showing the preferences and hitting escape.
+If a lock screen is done, and then return from that, the indicator is fine (on laptop).
+What to do?  Make a check for Debian 32 bit?  All good.
+Also note that a fix is already in place for Fedora 38...but now seems to work on Fedora 38.
+So how/when should this fix be implemented...if at all?
+Test on Debian 9 VM.
+Test on Debian 10 VM.
+Test on Debian 11 VM.  All good.
+Test on Debian 12 VM.  All good.
+Test on Debian 12 VM 32 bit.  All good.
+Test on Ubuntu 24.04 VM.  All good.
+Test on Fedora 38 VM.  All good.
+Test on Fedora 39 VM.  All good.
+Test on Fedora 40 VM.  All good.
+So maybe remove the fix!
+
+
+# How to create a GitHub page for the project
+Create Github page, but unaffiliated with my username.
+This should be an organisation:
+    https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/creating-a-new-organization-from-scratch
+Call it perhaps appindicators and the repository appindicators.
+Check if appindicators is trade marked.
+If possible, put in a placeholder README saying this page will hold the source at some point.
+Can then add the URL to the pyproject.toml so it appears at PyPI.
+
+
+# Importing an existing repository into git/github
+Include the history?
+
+http://esr.ibiblio.org/?p=6778
+
+http://www.catb.org/~esr/reposurgeon/repository-editing.html#conversion
+
+https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
+
+https://stackoverflow.com/questions/22931404/import-svn-repo-to-git-without-history
+
+https://stackoverflow.com/questions/43362551/import-svn-folder-structure-to-git-repo-without-history-users
+
+https://stackoverflow.com/questions/747075/how-to-git-svn-clone-the-last-n-revisions-from-a-subversion-repository
+
+https://stackoverflow.com/questions/79165/how-do-i-migrate-an-svn-repository-with-history-to-a-new-git-repository
+
+https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
+
+https://git-scm.com/docs/git-svn
+
+https://stackoverflow.com/questions/6695783/import-subversion-repository-into-git
+
+
+# What about stardatesystemtray and worldtimesystemtray?
+Should these two projects also be under git/github?
+Perhaps the github organisation could be called indicators or icon-indicators.
+For the appindicators, call that repository appindicators or python-appindicators.
+For stardatesystemtray and worldtimesystemtray, call the repository perhaps java-system-tray-icons
+Need to look into what version of Java and/or Windows to support.
+Windows XP is no longer supported and neither is Java 6.
+So maybe look at supporting only Windows 10/11 (check for the EOL dates),
+along with the versions of Java supported for those versions of Windows.
+Consider also one or more versions prior to Windows 10 and whatever version of Java was last supported.
+
+Windows EOL
+	Vista 2017
+	7 2020
+	8 2016
+	8.1 2023
+	10 2025
+	11 ...?
+	
+Java EOL
+	1.6 2013
+	1.7 2015
+	8 2019...2026
+	9 2018
+	10 2018
+	11 2019...2027
+	12 2019
+	13 2020
+	14 2020
+	15 2021
+	16 2021
+	17 2024...2027
+	18 2022
+	19 2023
+	20 2023
+	21 2028...2029
+	22 2024
+	23 2025
+	24 2025
+	25 2030
+
+Downloaded Java for Windows 11; was recommended by the Oracle website to download Java 8.
+Installed Java 8.
+Installed Stardate System Tray.
+Installed World Time System Tray.
+Both work!
+Check if built for Java 6 or Java 8 or Java 11 and update each page's description.
+
+Consider renaming project to change the wrld to world?
+https://sourceforge.net/p/forge/site-support/new/
+
+
+
+
 # Check if Autostart without delay on Kubuntu 24.04 works
 Document to the user (along with the status of not working with a delay).
 
@@ -65,6 +172,9 @@ Screenshots for the indicators can be found at https://askubuntu.com/q/30334/673
   https://askubuntu.com/questions/30334/what-application-indicators-are-available?answertab=modifieddes
 update the URL at the top with the relevant URL at PyPI.
 
+Also update the indicator name (remove the hyphen from the name).
+
+
   https://pypi.org/project/indicatorfortune/
   https://pypi.org/project/indicatorlunar/
   https://pypi.org/project/indicatoronthisday/
@@ -74,6 +184,40 @@ update the URL at the top with the relevant URL at PyPI.
   https://pypi.org/project/indicatorstardate/
   https://pypi.org/project/indicatortide/
   https://pypi.org/project/indicatorvirtualbox/
+
+
+When indicators released to pypi, update description at
+  https://sourceforge.net/p/appindicators/admin/overview
+to read:
+
+
+Source code repository for:
+ - indicatorfortune
+ - indicatorlunar
+ - indicatoronthisday
+ - indicatorppadownloadstatistics
+ - indicatorpunycode
+ - indicatorscriptrunner
+ - indicatorstardate
+ - indicatortest
+ - indicatortide
+ - indicatorvirtualbox
+
+More details and screenshots:
+ -  https://askubuntu.com/q/30334/67335
+
+Releases:
+- https://pypi.org/project/indicatorfortune
+- https://pypi.org/project/indicatorlunar
+- https://pypi.org/project/indicatoronthisday
+- https://pypi.org/project/indicatorppadownloadstatistics
+- https://pypi.org/project/indicatorpunycode
+- https://pypi.org/project/indicatorscriptrunner
+- https://pypi.org/project/indicatorstardate
+- https://pypi.org/project/indicatortest
+- https://pypi.org/project/indicatortide
+- https://pypi.org/project/indicatorvirtualbox
+
 
 
 # Long Term
