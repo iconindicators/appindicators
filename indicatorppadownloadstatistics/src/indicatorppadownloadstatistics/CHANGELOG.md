@@ -3,6 +3,7 @@
 ## v1.0.81 (2024-09-04)
 
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
+- Added plucky to the list of series.
 - Added oracular to the list of series.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhaul of all indicators to adhere to the pyproject.toml standard.  Further, indicators are no longer deployed using the .deb format.  Rather, PyPI (pip) is now used, along with commands, to install operating system packages and copy files.  In theory, this allows for indicators to be deployed on any platform which supports both pip and the AyatanaAppIndicator3 / AppIndicator3 library.
