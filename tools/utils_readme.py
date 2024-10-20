@@ -654,12 +654,12 @@ def _get_limitations( indicator_name ):
         messages.append(
             f"- `X-Cinnamon`: The icon disappears when changed from that originally set, leaving a blank space.\n" )
 
+    # Lubuntu 22.04     LXQt    Default terminal (qterminal) does not work.
+    # Lubuntu 24.04     LXQt    Default terminal (qterminal) all good.
     if _is_indicator(
         indicator_name,
         Indicator_Name.INDICATORSCRIPTRUNNER,
         Indicator_Name.INDICATORTEST ):
-        # Lubuntu 22.04     LXQt    Default terminal (qterminal) does not work.
-        # Lubuntu 24.04     LXQt    Default terminal (qterminal) all good.
         messages.append(
             f"- `LXQt`: Commands cannot be sent to `qterminal` with version < `1.2.0` as the "
             f"arguments are not [preserved](https://github.com/lxqt/qterminal/issues/335). "
@@ -685,6 +685,25 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORVIRTUALBOX ):
         messages.append(
             f"- `ICEWM`: Notifications are unsupported.\n" )
+
+    # Kubuntu 24.04     No autostart.
+    # Manjaro 24.04.7   No autostart.
+    if _is_indicator(
+        indicator_name,
+        Indicator_Name.INDICATORFORTUNE,
+        Indicator_Name.INDICATORLUNAR,
+        Indicator_Name.INDICATORONTHISDAY,
+        Indicator_Name.INDICATORPPADOWNLOADSTATISTICS,
+        Indicator_Name.INDICATORPUNYCODE,
+        Indicator_Name.INDICATORSCRIPTRUNNER,
+        Indicator_Name.INDICATORSTARDATE,
+        Indicator_Name.INDICATORTEST,
+        Indicator_Name.INDICATORTIDE,
+        Indicator_Name.INDICATORVIRTUALBOX ):
+        messages.append(
+            f"- `Kubuntu 24.04`: No autostart.\n" )
+        messages.append(
+            f"- `Manjaro 24`: No autostart.\n" )
 
     message = ""
     if messages:

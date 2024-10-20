@@ -1,39 +1,5 @@
 # Immediate
 
-# Check if Autostart without delay on Kubuntu 24.04 works
-Document to the user (along with the status of not working with a delay).
-Does not work even without delay.
-
-
-# Check if Autostart without delay on Manjaro 24.0.7 works
-Document to the user (along with the status of not working with a delay).
-
-
-## Autostart with delay fails
-On Kubuntu 24.04 and Manjaro 24.0.7, autostart with delay does not work.
-Determine if autostart works without delay and if so, make a note in the 
-release notes or on the README.md
-Could be a KDE/plasma new thing?
-- https://docs.kde.org/stable5/en/plasma-workspace/kcontrol/autostart/index.html
-- https://www.reddit.com/r/Kubuntu/comments/ya0bb9/autostart_programs_dont_launch_in_kubuntu_2210/
-- https://bugs.kde.org/show_bug.cgi?id=433538
-- https://www.reddit.com/r/kde/comments/wlmlo1/running_a_command_on_startup/
-- https://forum.manjaro.org/t/script-put-in-autostart-doesnt-work/61007/6
-- https://askubuntu.com/questions/1490449/how-do-i-autostart-an-application-while-keeping-it-minimized
-- https://askubuntu.com/questions/1181813/how-to-get-franz-messaging-app-start-minimized-and-with-window-along-the-right-e
-- https://forum.manjaro.org/t/autostart-doesnt-work/121929/6
-- https://forum.manjaro.org/t/bash-script-wont-load-on-start/114310
-- https://forum.manjaro.org/t/autostart-script-does-not-work/124754
-
-If the autostart works (without delay) on Kubuntu 24.04 and Manjaro 24.0.x
-perhaps only show autostart checkbox and not the delay for those distros/versions.
-
-- https://blog.davidedmundson.co.uk/blog/plasma-and-the-systemd-startup/
-- https://forum.manjaro.org/t/autostart-doesnt-work/121929
-- https://www.reddit.com/r/archlinux/comments/ves6mh/comment/inf2mwq/
-- https://forum.manjaro.org/t/autostart-script-does-not-work/124754/6
-
-
 ## When finally released, or at least indicatortest is released, post a note to
   https://github.com/AyatanaIndicators/libayatana-appindicator/issues/76
 to help the guy out.
