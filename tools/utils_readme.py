@@ -505,8 +505,6 @@ def _get_install_uninstall( indicator_name, install = True ):
             "Uninstall\n" + \
             "---------\n\n"
 
-#TODO Need a line about the upgrade...that the indicator will optionally check for upgrades
-# and give the upgrade command (so no need to revisit).
     return (
         title +
 
