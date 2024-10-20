@@ -479,5 +479,13 @@ if __name__ == "__main__":
             if message:
                 print( message )
 
+        # As a convenience, convert the project README.md to README.html
+        command = (
+            f". venv/bin/activate && " +
+            f"python3 -m readme_renderer README.md -o README.html && " +
+            f"deactivate" )
+
+        subprocess.call( command, shell = True )
+
     else:
         print( message )
