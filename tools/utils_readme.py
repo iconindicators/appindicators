@@ -492,10 +492,10 @@ def _get_install_uninstall( indicator_name, install = True ):
         title = (
             f"Installation / Updating\n"
             f"-----------------------\n\n"
-            f"Installtion and updating follow the same process:\n"
+            f"Installation and updating follow the same process:\n"
             f"1. Install operating system packages.\n"
             f"2. Install `{ indicator_name }` via `pip` into a `Python3` virtual environment at `$HOME/.local/venv_indicators`.\n"
-            f"{ additional_text }\n" )
+            f"{ additional_text }\n\n" )
 
     else:
         function = _get_uninstall_for_operating_system
@@ -578,8 +578,10 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
         f"If the icon does not appear, or appears as generic, you may have to log out / in (or restart).\n\n"
         f"Alternatively, to run from the terminal:\n\n"
         f"```\n"
-        f". $HOME/.local/venv_{ indicator_name }/bin/activate && \\\n"
-        f"python3 $(ls -d $HOME/.local/venv_{ indicator_name }/lib/python3.* | head -1)/site-packages/{ indicator_name }/{ indicator_name }.py && \\\n"
+        f"indicator={ indicator_name } && \\\n"
+        f"venv=$HOME/.local/venv_indicators && \\\n"
+        f". ${{venv}}/bin/activate && \\\n"
+        f"python3 $(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/{ indicator_name }/{ indicator_name }.py && \\\n"
         f"deactivate\n"
         f"```\n\n" )
 
@@ -634,7 +636,11 @@ def _get_limitations( indicator_name ):
         Indicator_Name.INDICATORSTARDATE,
         Indicator_Name.INDICATORTEST ):
         messages.append(
-            f"- `KDE`  |  `X-Cinnamon`  |  `XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
+            f"- `KDE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
+        messages.append(
+            f"- `X-Cinnamon`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
+        messages.append(
+            f"- `XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
         messages.append(
             f"- `LXQt`: The icon label is unsupported; icon tooltip shows the indicator filename (effectively unsupported).\n" )
         messages.append(
