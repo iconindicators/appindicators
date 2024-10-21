@@ -91,6 +91,9 @@ from zipfile import ZipFile
 
 
 class IndicatorBase( ABC ):
+    '''
+    Base class from which all indicators inherit.
+    '''
 
     _AUTOSTART_PATH = Path.home() / ".config" / "autostart"
 
