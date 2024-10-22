@@ -167,6 +167,7 @@ class IndicatorBase( ABC ):
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
 
+
     def __init__( self, comments, artwork = None, creditz = None, debug = False ):
         '''
         The comments argument is used in two places:
