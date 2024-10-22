@@ -1,6 +1,14 @@
 This document is kept for posterity and is superceded as locale is created/updated via build_locale.py which is called from build_wheel.py.
 
 
+Create a LINGUAS file
+=====================
+
+As per
+    http://www.gnu.org/software/gettext/manual/gettext.html#po_002fLINGUAS
+need a LINGUAS file listing each supported language/locale.
+
+
 Create the PO Template (POT) file
 =================================
 
