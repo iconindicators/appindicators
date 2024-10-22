@@ -95,8 +95,6 @@ class IndicatorBase( ABC ):
     Base class from which all indicators inherit.
     '''
 
-    _AUTOSTART_PATH = Path.home() / ".config" / "autostart"
-
     _CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
     _CONFIG_CHECK_LATEST_VERSION = "checklatestversion"
@@ -321,10 +319,11 @@ class IndicatorBase( ABC ):
 
 
     def _initialise_desktop_file_in_user_home( self ):
-        IndicatorBase._AUTOSTART_PATH.mkdir( parents = True, exist_ok = True )
+        autostart_path = Path.home() / ".config" / "autostart"
+        autostart_path.mkdir( parents = True, exist_ok = True )
 
         desktop_file = self.indicator_name + ".py.desktop"
-        self.desktop_file_user_home = IndicatorBase._AUTOSTART_PATH / desktop_file
+        self.desktop_file_user_home = autostart_path / desktop_file
         desktop_file_virtual_environment = \
             Path( __file__ ).parent / "platform" / "linux" / desktop_file
 
