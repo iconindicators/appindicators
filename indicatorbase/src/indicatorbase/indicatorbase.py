@@ -258,10 +258,9 @@ class IndicatorBase( ABC ):
 
 
     def _check_for_newer_version( self ):
-        url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
         try:
-            response = urlopen( url )
-            data_json = json.loads( response.read() )
+            url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
+            data_json = json.loads( urlopen( url ).read() )
             version_latest = data_json[ "info" ][ "version" ]
             if version_latest != str( self.version ):
                 self.new_version_available = True
