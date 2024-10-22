@@ -396,36 +396,44 @@ class IndicatorBase( ABC ):
                     f.write( output )
 
         else:
-            # The .desktop file is not present in $HOME/.config/autostart
-            # so copy from the virtual environment (when running in production)
-            # or a .whl from the release directory (when running in development).
-            if desktop_file_virtual_environment.exists():
-                shutil.copy(
-                    desktop_file_virtual_environment,
-                    self.desktop_file_user_home )
+            error_message = \
+                self._copy_dot_desktop_file_to_home_config_autostart(
+                    desktop_file_virtual_environment, desktop_file )
 
-            else:
-                wheel_in_release, error_message = \
-                    IndicatorBase._get_wheel_in_release( self.indicator_name )
+        return error_message
 
-                if wheel_in_release:
-                    with ZipFile( wheel_in_release, 'r' ) as z:
-                        desktop_file_in_wheel = \
-                            self.indicator_name + \
-                            "/platform/linux/" + \
-                            desktop_file
 
-                        if desktop_file_in_wheel in z.namelist():
-                            desktop_file_in_tmp = z.extract( desktop_file_in_wheel, path = "/tmp" )
-                            shutil.copy(
-                                desktop_file_in_tmp,
-                                self.desktop_file_user_home )
+    def _copy_dot_desktop_file_to_home_config_autostart( self, desktop_file_virtual_environment, desktop_file ):
+        # The .desktop file is not present in $HOME/.config/autostart
+        # so copy from the virtual environment (when running in production)
+        # or a .whl from the release directory (when running in development).
+        if desktop_file_virtual_environment.exists():
+            shutil.copy(
+                desktop_file_virtual_environment,
+                self.desktop_file_user_home )
 
-                        else:
-                            error_message = \
-                                f"Unable to locate { desktop_file_in_wheel } in { wheel_in_release.absolute() }."
+        else:
+            wheel_in_release, error_message = \
+                IndicatorBase._get_wheel_in_release( self.indicator_name )
 
-                    z.close()
+            if wheel_in_release:
+                with ZipFile( wheel_in_release, 'r' ) as z:
+                    desktop_file_in_wheel = \
+                        self.indicator_name + \
+                        "/platform/linux/" + \
+                        desktop_file
+
+                    if desktop_file_in_wheel in z.namelist():
+                        desktop_file_in_tmp = z.extract( desktop_file_in_wheel, path = "/tmp" )
+                        shutil.copy(
+                            desktop_file_in_tmp,
+                            self.desktop_file_user_home )
+
+                    else:
+                        error_message = \
+                            f"Unable to locate { desktop_file_in_wheel } in { wheel_in_release.absolute() }."
+
+                z.close()
 
         return error_message
 
