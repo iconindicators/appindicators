@@ -188,7 +188,9 @@ class IndicatorBase( ABC ):
 
         self.indicator_name = IndicatorBase.INDICATOR_NAME
 
-        project_metadata, error_message = IndicatorBase.get_project_metadata( self.indicator_name )
+        project_metadata, error_message = \
+            IndicatorBase.get_project_metadata( self.indicator_name )
+
         if error_message:
             self.show_dialog_ok(
                 None,
@@ -250,25 +252,25 @@ class IndicatorBase( ABC ):
 
         self._load_config()
 
-        threading.Thread( target = self._check_for_newer_version ).start()
+        self.new_version_available = False
+        if self.check_latest_version:
+            threading.Thread( target = self._check_for_newer_version ).start()
 
 
     def _check_for_newer_version( self ):
-        self.new_version_available = False
-        if self.check_latest_version:
-            url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
-            try:
-                response = urlopen( url )
-                data_json = json.loads( response.read() )
-                version_latest = data_json[ "info" ][ "version" ]
-                if version_latest != str( self.version ):
-                    self.new_version_available = True
-                    self.show_notification(
-                        _( "New version of {0} available..." ).format( self.indicator_name ),
-                        _( "Refer to the Preferences for details." ) )
+        url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
+        try:
+            response = urlopen( url )
+            data_json = json.loads( response.read() )
+            version_latest = data_json[ "info" ][ "version" ]
+            if version_latest != str( self.version ):
+                self.new_version_available = True
+                self.show_notification(
+                    _( "New version of {0} available..." ).format( self.indicator_name ),
+                    _( "Refer to the Preferences for details." ) )
 
-            except Exception as e:
-                logging.exception( e )
+        except Exception as e:
+            logging.exception( e )
 
 
     @staticmethod
