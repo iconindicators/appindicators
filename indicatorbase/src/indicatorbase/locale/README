@@ -4,6 +4,8 @@ This document is kept for posterity and is superceded as locale is created/updat
 Create the PO Template (POT) file
 =================================
 
+Need to create a list of source files containing translatable strings as per
+    http://www.gnu.org/software/gettext/manual/gettext.html#po_002fPOTFILES_002ein
 For say indicatorfortune, open a terminal in indicatorfortune/src/indicatorfortune:
 
     xgettext --files-from=locale/POTFILES.in --output=locale/indicatorfortune.pot
