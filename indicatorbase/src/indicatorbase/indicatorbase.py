@@ -323,6 +323,19 @@ class IndicatorBase( ABC ):
 
         error_message = None
         if self.desktop_file_user_home.is_file():
+            self._process_existing_dot_desktop_file_to_home_config_autostart(
+                desktop_file_virtual_environment )
+
+        else:
+            error_message = \
+                self._copy_dot_desktop_file_to_home_config_autostart(
+                    desktop_file_virtual_environment, desktop_file )
+
+        return error_message
+
+
+    def _process_existing_dot_desktop_file_to_home_config_autostart(
+            self, desktop_file_virtual_environment ):
             # The .desktop may be an older version with an Exec without a sleep,
             # or tags no longer used such as X-GNOME-Autostart-Delay.
             # Comment out unused tags and get the delay if present.
@@ -395,15 +408,11 @@ class IndicatorBase( ABC ):
                 with open( self.desktop_file_user_home, 'w' ) as f:
                     f.write( output )
 
-        else:
-            error_message = \
-                self._copy_dot_desktop_file_to_home_config_autostart(
-                    desktop_file_virtual_environment, desktop_file )
 
-        return error_message
-
-
-    def _copy_dot_desktop_file_to_home_config_autostart( self, desktop_file_virtual_environment, desktop_file ):
+    def _copy_dot_desktop_file_to_home_config_autostart(
+            self,
+            desktop_file_virtual_environment,
+            desktop_file ):
         # The .desktop file is not present in $HOME/.config/autostart
         # so copy from the virtual environment (when running in production)
         # or a .whl from the release directory (when running in development).
