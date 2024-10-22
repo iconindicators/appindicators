@@ -143,6 +143,8 @@ class IndicatorBase( ABC ):
     INDENT_WIDGET_LEFT = 25
     INDENT_WIDGET_TOP = 10
 
+    URL_TIMEOUT_IN_SECONDS = 20
+
     # Obtain name of indicator from the call stack and initialise gettext.
     # For a given indicator, indicatorbase MUST be imported FIRST!
     INDICATOR_NAME = None
@@ -164,9 +166,6 @@ class IndicatorBase( ABC ):
 
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
-
-    URL_TIMEOUT_IN_SECONDS = 20
-
 
     def __init__( self, comments, artwork = None, creditz = None, debug = False ):
         '''
