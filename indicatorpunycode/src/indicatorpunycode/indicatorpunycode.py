@@ -54,6 +54,7 @@ class IndicatorPunycode( IndicatorBase ):
 
         self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
 
+
     def update( self, menu ):
         self.create_and_append_menuitem(
             menu,
