@@ -2634,6 +2634,7 @@ class IndicatorLunar( IndicatorBase ):
                         IndicatorLunar.astro_backend.SATELLITE_TAG_SET_TIME_TRANSLATION,
                         set_time )
 
+
             utc_now = datetime.datetime.now( datetime.timezone.utc )
 
             now_plus_one_minute = \

@@ -113,8 +113,6 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def show_history( self ):
-        self.set_menu_sensitivity( False )
-
 
         # Scroll to the end...strange way of doing so!
         # https://stackoverflow.com/questions/5218948/how-to-auto-scroll-a-gtk-scrolledwindow
@@ -122,6 +120,8 @@ class IndicatorFortune( IndicatorBase ):
             adjustment = textview.get_parent().get_vadjustment()
             adjustment.set_value( adjustment.get_upper() - adjustment.get_page_size() )
 
+
+        self.set_menu_sensitivity( False )
 
         textview = \
             self.create_textview(

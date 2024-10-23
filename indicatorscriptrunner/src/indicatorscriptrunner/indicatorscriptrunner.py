@@ -655,7 +655,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             groups,
             background_groups ):
 
-
         def build_path_and_select_group_and_script( treeview, groups ):
             path_as_string = "0:0"
             if select_group:

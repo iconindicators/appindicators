@@ -247,16 +247,6 @@ class DataProviderOrbitalElement( DataProvider ):
     # https://www.minorplanetcenter.net/iau/info/PackedDates.html
     @staticmethod
     def get_packed_date( year, month, day ):
-        packed_year = year[ 2 : ]
-        if int( year ) < 1900:
-            packed_year = 'I' + packed_year
-
-        elif int( year ) < 2000:
-            packed_year = 'J' + packed_year
-
-        else:
-            packed_year = 'K' + packed_year
-
 
         def get_packed_day_month( day_or_month ):
             if int( day_or_month ) < 10:
@@ -266,6 +256,17 @@ class DataProviderOrbitalElement( DataProvider ):
                 packed_day_month = chr( int( day_or_month ) - 10 + ord( 'A' ) )
 
             return packed_day_month
+
+
+        packed_year = year[ 2 : ]
+        if int( year ) < 1900:
+            packed_year = 'I' + packed_year
+
+        elif int( year ) < 2000:
+            packed_year = 'J' + packed_year
+
+        else:
+            packed_year = 'K' + packed_year
 
         packed_month = get_packed_day_month( month )
         packed_day = get_packed_day_month( day )
