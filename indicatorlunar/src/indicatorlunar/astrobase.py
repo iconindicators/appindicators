@@ -102,7 +102,6 @@ class AstroBase( ABC ):
         DATA_TAG_SOLSTICE           : _( "SOLSTICE" ),
         DATA_TAG_THIRD_QUARTER      : _( "THIRD QUARTER" ) }
 
-
     # Data tags of attributes for each of the body types.
     DATA_TAGS_COMET = [
         DATA_TAG_ALTITUDE,
@@ -171,7 +170,6 @@ class AstroBase( ABC ):
     # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
     NAME_TAG_MOON_TRANSLATION = { NAME_TAG_MOON : _( "MOON" ) }
     NAME_TAG_SUN_TRANSLATION = { NAME_TAG_SUN : _( "SUN" ) }
-
 
     # Each of the planets, used as name tags.
     PLANET_MERCURY = "MERCURY"
@@ -365,7 +363,6 @@ class AstroBase( ABC ):
         [ "ZAURAK",            18543,  _( "Zaurak" ),            _( "ZAURAK" ) ],
         [ "ZUBENELGENUBI",     72622,  _( "Zubenelgenubi" ),     _( "ZUBENELGENUBI" ) ] ]
 
-
     SATELLITE_SEARCH_DURATION_HOURS = 75 # Number of hours to search from 'now' for visible satellite passes.
 
     SATELLITE_TAG_NAME = "[NAME]"
@@ -392,7 +389,6 @@ class AstroBase( ABC ):
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_TIME.strip( "[]" ), SATELLITE_TAG_RISE_TIME_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_AZIMUTH.strip( "[]" ), SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
     SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
-
 
     # Miscellaneous.
     MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.

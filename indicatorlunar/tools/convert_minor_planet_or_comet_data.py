@@ -390,8 +390,7 @@ def convert( option, in_file, out_file ):
 if __name__ == "__main__":
     description = \
         textwrap.dedent( '''\
-            Convert an ephemeris file for minor planets or comets
-            from one of the options below...
+            Convert an ephemeris file for minor planets or comets...
 
             1) Convert a minor planets file from Lowell Observatory
                (such as astorb.dat or astorb.dat.gz) to Skyfield format.
@@ -405,9 +404,9 @@ if __name__ == "__main__":
             4) Convert a comets file from Minor Planet Center
                (such as CometEls.txt) to XEphem format.
 
-            If the input file ends in .gz it will be treated as a gzip file;
-            otherwise it will be treated as text.
-            
+            An input file ending in .gz will be treated as a gzip file;
+            otherwise the input file will be treated as text.
+
             The output will ALWAYS be written to a text file.
 
             ------------------------------------------------------------------------

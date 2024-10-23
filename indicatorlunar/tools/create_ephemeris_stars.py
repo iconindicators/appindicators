@@ -143,8 +143,8 @@ if __name__ == "__main__":
 
             -------------------------------------------------------
             --- INPUT & OUTPUT PATHNAMES CONTAINING SPACES MUST ---
-            ---     BE DOUBLE QUOTED                            ---
-            ---     HAVE SPACES ESCAPED WITH A \                ---
+            ---     * BE DOUBLE QUOTED                          ---
+            ---     * HAVE SPACES ESCAPED WITH A \              ---
             -------------------------------------------------------''' )
 
     parser = \
