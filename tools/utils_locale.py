@@ -42,6 +42,8 @@ def _get_locale_directory( indicator_name ):
 
 
 def _get_linguas( indicator_name ):
+    # The LINGUAS file lists each supported language/locale:
+    #   http://www.gnu.org/software/gettext/manual/gettext.html#po_002fLINGUAS
     return _get_locale_directory( indicator_name ) / "LINGUAS"
 
 
@@ -65,7 +67,8 @@ def _create_update_pot( indicator_name, locale_directory, authors_emails, versio
     potfiles_in = locale_directory / "POTFILES.in"
     input_files_search_directory = Path( '.' ) / indicator_name / "src" / indicator_name
 
-    # Use xgettext to create a new POT file and sed to insert some other text.
+    # Use xgettext to create a new POT file and sed to insert some other text:
+    #   http://www.gnu.org/software/gettext/manual/gettext.html#po_002fPOTFILES_002ein
     command = [
         f"xgettext",
         f"--files-from={ potfiles_in }",
@@ -163,7 +166,7 @@ def _create_update_pot( indicator_name, locale_directory, authors_emails, versio
             subprocess.run( command )
 
 
-def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
+def _create_update_po(indicator_name, linguas_codes, version, copyright_, start_year ):
     pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
     for lingua_code in linguas_codes:
         po_file = (
@@ -230,6 +233,9 @@ def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
                 result = subprocess.run( command )
 
         else:
+            # http://www.gnu.org/software/gettext/manual/gettext.html#Creating
+            po_file.parents[ 0 ].mkdir( parents = True )
+
             command = [
                 f"msginit",
                 f"--input={ pot_file }",
@@ -240,9 +246,23 @@ def _create_update_po( indicator_name, linguas_codes, version, copyright_ ):
 
             subprocess.run( command )
 
-            message = f"INFO: "
-            message += f"Created { po_file } for lingua code '{ lingua_code }'. "
-            message += f"Update lines 1, 4, 12, and 13.\n"
+            message = ""
+
+            message += f"Update line 1, replacing\n"
+            message += f"\t# Portable Object Template for { indicator_name }.\n"
+            message += f"with\n"
+            message += f"\t# <name of the language in English for { lingua_code }> translation for { indicator_name }.\n\n"
+
+            message += f"Update line 4, replacing\n"
+            message += f"\t# Automatically generated, { _get_current_year() }.\n"
+            message += f"with\n"
+            message += f"\t# <author name> <<author email>>, { start_year }-{ _get_current_year() }.\n\n"
+
+            message += f"Update line 12, replacing\n"
+            message += f"\t\"Last-Translator: Automatically generated\\n\"\n"
+            message += f"with\n"
+            message += f"\t\"Last-Translator: <author name> <<author email>>\\n\"\n\n"
+
             print( message )
 
 
@@ -293,7 +313,8 @@ def update_locale_source(
             "indicatorbase",
             _get_linguas_codes( "indicatorbase" ),
             version_indicatorbase,
-            copyright_ )
+            copyright_,
+            start_year )
 
         copyright_ = f"{ start_year }-{ current_year_author }"
 
@@ -308,7 +329,8 @@ def update_locale_source(
             indicator_name,
             _get_linguas_codes( indicator_name ),
             version_indicator,
-            copyright_ )
+            copyright_,
+            start_year )
 
     return message
 
