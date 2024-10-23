@@ -55,7 +55,13 @@ def _get_current_year():
     return datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
 
 
-def _create_update_pot( indicator_name, locale_directory, authors_emails, version, copyright_ ):
+def _create_update_pot(
+        indicator_name,
+        locale_directory,
+        authors_emails,
+        version,
+        copyright_ ):
+
     pot_file = f"{ locale_directory / indicator_name }.pot"
 
     if Path( pot_file ).exists():
@@ -166,7 +172,13 @@ def _create_update_pot( indicator_name, locale_directory, authors_emails, versio
             subprocess.run( command )
 
 
-def _create_update_po(indicator_name, linguas_codes, version, copyright_, start_year ):
+def _create_update_po(
+        indicator_name,
+        linguas_codes,
+        version,
+        copyright_,
+        start_year ):
+
     pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
     for lingua_code in linguas_codes:
         po_file = (
