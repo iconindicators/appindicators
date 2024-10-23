@@ -7,7 +7,7 @@
 - Added oracular to the list of series.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhauled to adhere to the pyproject.toml standard.
-- Deployment using the .deb format is no longer supported.  Rather, PyPI (pip) is used with operating system packages and copying of files.
+- Deployment using the .deb format is superceded; PyPI (pip) is used with operating system packages and file copy.
 - Now includes an opt-in check during start up for the latest version at PyPI.
 
 

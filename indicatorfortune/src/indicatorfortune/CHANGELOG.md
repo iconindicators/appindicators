@@ -17,7 +17,7 @@
 - Bug fix: Remove characters/glyphs which appear as hexadecimal.
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Overhauled to adhere to the pyproject.toml standard.
-- Deployment using the .deb format is no longer supported.  Rather, PyPI (pip) is used with operating system packages and copying of files.
+- Deployment using the .deb format is superceded; PyPI (pip) is used with operating system packages and file copy.
 
 
 ## v1.0.41 (2023-01-09)

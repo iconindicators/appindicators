@@ -57,7 +57,7 @@
 ## v1.0.7 (2023-12-16)
 
 - Overhauled to adhere to the pyproject.toml standard.
-- Deployment using the .deb format is no longer supported.  Rather, PyPI (pip) is used with operating system packages and copying of files.
+- Deployment using the .deb format is superceded; PyPI (pip) is used with operating system packages and file copy.
 
 
 ## v1.0.6 (2022-12-01)
