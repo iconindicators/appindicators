@@ -4,7 +4,7 @@
 
 - Fixed PyGObject 3.11 deprecation warnings.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
-- Now includes an opt-in check during indicator start up for the latest version at PyPI.
+- Now includes an opt-in check during start up for the latest version at PyPI.
 
 
 ## v1.0.43 (2023-11-22)
@@ -16,7 +16,8 @@
 
 - Bug fix: Remove characters/glyphs which appear as hexadecimal.
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
-- Overhaul of all indicators to adhere to the pyproject.toml standard.  Further, indicators are no longer deployed using the .deb format.  Rather, PyPI (pip) is now used, along with commands, to install operating system packages and copy files.  In theory, this allows for indicators to be deployed on any platform which supports both pip and the AyatanaAppIndicator3 / AppIndicator3 library.
+- Overhauled to adhere to the pyproject.toml standard.
+- Deployment using the .deb format is no longer supported.  Rather, PyPI (pip) is used with operating system packages and copying of files.
 
 
 ## v1.0.41 (2023-01-09)

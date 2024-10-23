@@ -4,7 +4,7 @@
 
 - Consolidated menu options.
 - Updated README.md.
-- Now includes an opt-in check during indicator start up for the latest version at PyPI.
+- Now includes an opt-in check during start up for the latest version at PyPI.
 
 
 ## v1.0.16 (2023-12-22)
@@ -56,7 +56,8 @@
 
 ## v1.0.7 (2023-12-16)
 
-- Overhaul of all indicators to adhere to the pyproject.toml standard.  Further, indicators are no longer deployed using the .deb format.  Rather, PyPI (pip) is now used, along with commands, to install operating system packages and copy files.  In theory, this allows for indicators to be deployed on any platform which supports both pip and the AyatanaAppIndicator3 / AppIndicator3 library.
+- Overhauled to adhere to the pyproject.toml standard.
+- Deployment using the .deb format is no longer supported.  Rather, PyPI (pip) is used with operating system packages and copying of files.
 
 
 ## v1.0.6 (2022-12-01)
