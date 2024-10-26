@@ -143,6 +143,13 @@ class IndicatorBase( ABC ):
     INDENT_WIDGET_LEFT = 25
     INDENT_WIDGET_TOP = 10
 
+    # Commands such as wmctrl and the clipboard do not function under Wayland.
+    # Need a way to determine whether running under Wayland versus x11.
+    # Values are the result of calling
+    #   echo $XDG_SESSION_TYPE
+    SESSION_TYPE_WAYLAND = "wayland"
+    SESSION_TYPE_X11 = "x11"
+
     URL_TIMEOUT_IN_SECONDS = 20
 
     # Obtain name of indicator from the call stack and initialise gettext.
@@ -215,6 +222,7 @@ class IndicatorBase( ABC ):
         self.creditz = creditz
         self.debug = debug
 
+#TODO Can/should this be changed to execute on demand?  Who calls this and how often?
         self.current_desktop = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
 
         self.authors_and_emails = self.get_authors_emails( project_metadata )
@@ -675,6 +683,18 @@ class IndicatorBase( ABC ):
             else:
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction, *functionandarguments[ 1 : ] )
 
+#TODO Where else is stuff not working because of Wayland?  Can this be changed now that we have a clipboard working for wayland?
+    def _get_session_type( self ):
+        return self.process_get( "echo $XDG_SESSION_TYPE" )
+
+
+    def session_type_is_wayland( self ):
+        return self._get_session_type() == IndicatorBase.SESSION_TYPE_WAYLAND
+
+
+    def session_type_is_x11( self ):
+        return self._get_session_type() == IndicatorBase.SESSION_TYPE_X11
+
 
     def _on_about( self, menuitem ):
         self.set_menu_sensitivity( False )
@@ -779,22 +799,63 @@ class IndicatorBase( ABC ):
                 menuitem.set_sensitive( toggle )
 
 
-    # Copy text to clipboard or primary.
     def copy_to_selection( self, text, is_primary = False ):
-        selection = Gdk.SELECTION_CLIPBOARD
-        if is_primary:
-            selection = Gdk.SELECTION_PRIMARY
+        '''
+        Copy text to clipboard or primary.
+        '''
+        if self.session_type_is_wayland():
+            command = "wl-copy "
+            if is_primary:
+                command += "--primary "
 
-        Gtk.Clipboard.get( selection ).set_text( text, -1 )
+            self.process_call( command + text )
+
+        else:
+            selection = Gdk.SELECTION_CLIPBOARD
+            if is_primary:
+                selection = Gdk.SELECTION_PRIMARY
+
+            Gtk.Clipboard.get( selection ).set_text( text, -1 )
 
 
     def copy_from_selection_clipboard( self ):
-        return Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
+        if self.session_type_is_wayland():
+            text_in_clipboard = self.process_get( "wl-paste" )
+
+        else:
+            text_in_clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
+
+        return text_in_clipboard
 
 
-    def copy_from_selection_primary( self, clipboard_text_received_functionandarguments ):
-        Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
-            *clipboard_text_received_functionandarguments )
+    def copy_from_selection_primary( self, primary_received_callback_function ):
+        '''
+        To receive the text from the primary input, a callback function is required.
+        The simplest of which is:
+
+            def primary_received_callback_function( text ):
+                print( text )
+        '''
+        if self.session_type_is_wayland():
+            # Could simply return the text from the primary source immediately to the user.
+            # However this is not possible under X11.
+            # So that the caller does not need to know whether running under
+            # Wayland or X11, the caller must provide a callback function as is
+            # required for X11, despite being redunant for Wayland.
+            primary_received_callback_function(
+                self.process_get( "wl-paste --primary" ) )
+
+        else:
+            Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
+                self._clipboard_text_received_function, primary_received_callback_function )
+
+
+    def _clipboard_text_received_function( self, clipboard, text, primary_received_callback_function ):
+        '''
+        For X11 to obtain text from the primary input, a callback is needed.
+        https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
+        '''
+        primary_received_callback_function( text )
 
 
     def create_dialog(

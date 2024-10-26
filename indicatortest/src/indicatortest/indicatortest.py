@@ -244,10 +244,12 @@ class IndicatorTest( IndicatorBase ):
             _( "Label | Tooltip | OSD" ),
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
-
+#TODO Check code below makes sense!
+# May need to compare with a commit prior to Oct 26.
     def _build_menu_clipboard( self, menu ):
         submenu = Gtk.Menu()
 
+#TODO Should this now handle both wayland and x11?
         self.create_and_append_menuitem(
             submenu,
             _( "Copy current time to clipboard" ),
@@ -256,9 +258,29 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
+            submenu,
+            _( "Copy from clipboard (wayland)" ), #TODO Should this have 'Wayland' added to the menu item?  What happens if run under X11?
+            activate_functionandarguments = (
+                lambda menuitem: (
+                    self.copy_from_clipboard() ), ),
+            indent = ( 2, 0 ) )
+
+        self.create_and_append_menuitem(
             menu,
             _( "Clipboard" ),
             indent = ( 1, 1 ) ).set_submenu( submenu )
+
+
+#TODO Check code below makes sense!
+# May need to compare with a commit prior to Oct 26.
+    def copy_from_clipboard( self ):
+        if self.is_session_type_wayland():
+            result = self.process_get( "wl-paste" )
+            print( "From clipboard: " + str( result ) )
+#        self.process_call( "wl-copy " + 'XXX' + result + 'XXX' )
+
+        else:
+            print( "No effect as running under X11." )
 
 
     def _build_menu_execute_command( self, menu ):

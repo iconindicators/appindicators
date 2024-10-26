@@ -111,15 +111,14 @@ class IndicatorPunycode( IndicatorBase ):
                 self._do_conversion( text )
 
         else:
-            # https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
-            def clipboard_text_received_function( clipboard, text, data ):
+            def primary_received_callback_function( text ):
                 if text is None:
                     self.show_notification( summary, _( "No text is highlighted/selected." ) )
 
                 else:
                     self._do_conversion( text )
 
-            self.copy_from_selection_primary( ( clipboard_text_received_function, None ) )
+            self. copy_from_selection_primary( primary_received_callback_function )
 
 
 #TODO New    May not be needed now Wayland works...only for distros with no response to middle mouse click perhaps?
