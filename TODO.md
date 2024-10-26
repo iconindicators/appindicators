@@ -1,5 +1,8 @@
 # Immediate
 
+# Change the date in the latest entry in each CHANGELOG.md to date of release.
+
+
 ## When finally released, or at least indicatortest is released, post a note to
   https://github.com/AyatanaIndicators/libayatana-appindicator/issues/76
 to help the guy out.
