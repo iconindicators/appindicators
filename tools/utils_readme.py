@@ -321,6 +321,7 @@ def _get_uninstall_for_operating_system(
     return uninstall
 
 
+#TODO Work out wl-clipboard  for each distro/indicator combination.
 def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",

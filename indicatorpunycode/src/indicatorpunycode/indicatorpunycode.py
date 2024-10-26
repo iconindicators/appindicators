@@ -32,6 +32,10 @@ gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
 
+#TODO Maybe put into a tooltip somewhere that
+# text in punycode text must start with xn-- if to be recognised as punycode.
+
+
 class IndicatorPunycode( IndicatorBase ):
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Punycode" )
@@ -63,18 +67,7 @@ class IndicatorPunycode( IndicatorBase ):
             is_secondary_activate_target = True )
 
 
-#TODO For Wayland, try wl-clipboard
-#   https://github.com/bugaevc/wl-clipboard
-# which may at least get the clipboard going.
-# Available it seems on all supported distros:
-#   https://packages.ubuntu.com/search?suite=focal&searchon=names&keywords=wl-clipboard
-#   https://packages.debian.org/search?keywords=wl-clipboard&searchon=names&suite=all&section=all
-#   https://packages.fedoraproject.org/pkgs/wl-clipboard/wl-clipboard/
-#   https://software.opensuse.org/package/wl-clipboard
-#   https://archlinux.org/packages/extra/x86_64/wl-clipboard/
-
-
-#TODO New...may not be needed now Wayland works.  Maybe only needed for old Budgie 20.04?
+#TODO May not be needed now Wayland works.  Maybe only needed for old Budgie 20.04?
         self.create_and_append_menuitem(
             menu,
             _( "Convert via dialog" ),
@@ -121,7 +114,7 @@ class IndicatorPunycode( IndicatorBase ):
             self. copy_from_selection_primary( primary_received_callback_function )
 
 
-#TODO New    May not be needed now Wayland works...only for distros with no response to middle mouse click perhaps?
+#TODO May not be needed now Wayland works...only for distros with no response to middle mouse click perhaps?
     def on_convert_via_dialog( self, menuitem ):
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )

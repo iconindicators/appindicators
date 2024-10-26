@@ -19,6 +19,26 @@
 # Application indicator which displays fortunes.
 
 
+#TODO On Debian 12 Wayland,
+# copy last fortune (after log out log in) shows the first fortune only.
+# Does this happen on Xll?
+
+
+#TODO Noticed on Debian 12 Wayland when copy last fortune
+# got message about missing ) I think...which may have been a fortune
+# containing a ".
+# This might be related to the above TODO.
+# So run in a terminal to see error messages.
+# Also, may need to escape any "" in a fortune.
+
+
+Correction does much, but encouragement does more.
+        -- Goethe
+
+/bin/sh: 2: --: not found
+
+
+
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import codecs
@@ -180,14 +200,14 @@ class IndicatorFortune( IndicatorBase ):
                         self.fortune = \
                             IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
                             _( "Ensure enabled fortunes contain fortune data!" )
-    
+
                         break
-    
+
                     elif len( self.fortune ) <= self.skip_fortune_character_count: # If the fortune is within the character limit keep it...
                         history = self.read_cache_text_without_timestamp( IndicatorFortune.HISTORY_FILE )
                         if history is None:
                             history = ""
-    
+
                         # Remove characters/glyphs which appear as hexadecimal.  Refer to:
                         #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
                         #
@@ -200,14 +220,14 @@ class IndicatorFortune( IndicatorBase ):
                             if codecs.encode( str.encode( c ), "hex" ) == b'07' or \
                                codecs.encode( str.encode( c ), "hex" ) == b'08':
                                 continue
-    
+
                             output += c
-    
+
                         self.fortune = output
                         self.write_cache_text_without_timestamp(
                             history + self.fortune + "\n\n",
                             IndicatorFortune.HISTORY_FILE )
-    
+
                         break
 
 
@@ -321,7 +341,7 @@ class IndicatorFortune( IndicatorBase ):
                 1,
                 1000,
                 tooltip_text = _(
-                    "If the fortune exceeds the limit,\n" +                                  
+                    "If the fortune exceeds the limit,\n" +
                     "a new fortune is created.\n\n" +
                     "Do not set too low (below 50) as\n" +
                     "many fortunes may be dropped,\n" +
@@ -506,7 +526,7 @@ class IndicatorFortune( IndicatorBase ):
         browse_directory_button = \
             self.create_button(
                 _( "Directory" ),
-                tooltip_text = _( 
+                tooltip_text = _(
                     "This fortune is part of your\n" +
                     "system and cannot be modified." )
                     if is_system_fortune else _(
@@ -524,7 +544,7 @@ class IndicatorFortune( IndicatorBase ):
                     ( browse_directory_button, True ) ),
                 halign = Gtk.Align.END,
                 homogeneous = True ),
-            0, 1, 1, 1 )       
+            0, 1, 1, 1 )
 
         enabled_checkbox = \
             self.create_checkbutton(
@@ -576,7 +596,7 @@ class IndicatorFortune( IndicatorBase ):
             action = Gtk.FileChooserAction.SELECT_FOLDER
 
         dialog = \
-            self.create_filechooser_dialog( 
+            self.create_filechooser_dialog(
                 title,
                 add_edit_dialog,
                 fortune_file_directory.get_text(),

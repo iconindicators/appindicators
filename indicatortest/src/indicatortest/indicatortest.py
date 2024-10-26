@@ -117,6 +117,9 @@ class IndicatorTest( IndicatorBase ):
             "os.environ.get( 'DESKTOP_SESSION' ): " + os.environ.get( "DESKTOP_SESSION" ),
             indent = ( 2, 0 ) )
 
+        text = "echo $XDG_SESSION_TYPE" + ": " + self.get_session_type()
+        self.create_and_append_menuitem( submenu, text, indent = ( 2, 0 ) )
+
         self.create_and_append_menuitem(
             menu,
             _( "Desktop" ),
@@ -244,43 +247,31 @@ class IndicatorTest( IndicatorBase ):
             _( "Label | Tooltip | OSD" ),
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
-#TODO Check code below makes sense!
-# May need to compare with a commit prior to Oct 26.
+
     def _build_menu_clipboard( self, menu ):
         submenu = Gtk.Menu()
 
-#TODO Should this now handle both wayland and x11?
         self.create_and_append_menuitem(
             submenu,
             _( "Copy current time to clipboard" ),
             activate_functionandarguments = (
-                lambda menuitem: ( self.copy_to_selection( self._get_current_time() ) ), ),
+                lambda menuitem: (
+                    self.copy_to_selection( self._get_current_time() ) ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
             submenu,
-            _( "Copy from clipboard (wayland)" ), #TODO Should this have 'Wayland' added to the menu item?  What happens if run under X11?
+            _( "Copy current time to primary" ),
             activate_functionandarguments = (
                 lambda menuitem: (
-                    self.copy_from_clipboard() ), ),
+                    self.copy_to_selection(
+                        self._get_current_time(), is_primary = True ) ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
             menu,
             _( "Clipboard" ),
             indent = ( 1, 1 ) ).set_submenu( submenu )
-
-
-#TODO Check code below makes sense!
-# May need to compare with a commit prior to Oct 26.
-    def copy_from_clipboard( self ):
-        if self.is_session_type_wayland():
-            result = self.process_get( "wl-paste" )
-            print( "From clipboard: " + str( result ) )
-#        self.process_call( "wl-copy " + 'XXX' + result + 'XXX' )
-
-        else:
-            print( "No effect as running under X11." )
 
 
     def _build_menu_execute_command( self, menu ):

@@ -1,5 +1,14 @@
 # Immediate
 
+# Test clipboard/primary stuff for...
+indicatorfortune
+indicatoronthisday
+indicatorpunycode
+indicatortest
+
+on all distros.
+
+
 # Change the date in the latest entry in each CHANGELOG.md to date of release.
 
 
