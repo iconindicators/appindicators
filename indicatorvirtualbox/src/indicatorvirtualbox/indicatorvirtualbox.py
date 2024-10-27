@@ -285,6 +285,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         # Instead, have the user specify the title of the VirtualBox manager window into
         # the preferences and find the window by the window title.
         window_id = None
+#TODO Under Wayland, perhaps skip this code?        
         result = self.process_get( "wmctrl -l | grep \"" + self.virtualbox_manager_window_name + "\"" )
         if result:
             window_id = result.split()[ 0 ]
