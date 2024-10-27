@@ -685,7 +685,6 @@ class IndicatorBase( ABC ):
             else:
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction, *functionandarguments[ 1 : ] )
 
-#TODO Where else is stuff not working because of Wayland?  Can this be changed now that we have a clipboard working for wayland?
     def get_session_type( self ):
         return self.process_get( "echo $XDG_SESSION_TYPE" )
 
