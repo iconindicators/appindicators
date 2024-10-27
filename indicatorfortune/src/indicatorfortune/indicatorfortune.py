@@ -31,11 +31,11 @@
 # So run in a terminal to see error messages.
 # Also, may need to escape any "" in a fortune.
 
-
-Correction does much, but encouragement does more.
-        -- Goethe
-
-/bin/sh: 2: --: not found
+#TODO Example fail on Wayland.
+# Correction does much, but encouragement does more.
+#         -- Goethe
+#
+# /bin/sh: 2: --: not found
 
 
 
