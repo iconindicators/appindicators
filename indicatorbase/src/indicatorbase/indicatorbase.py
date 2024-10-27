@@ -799,6 +799,36 @@ class IndicatorBase( ABC ):
             for menuitem in self.indicator.get_menu().get_children():
                 menuitem.set_sensitive( toggle )
 
+#TODO Where is middle mouse button click used?
+# Determine which indicators use it and should it be disabled for any distro found not to support?
+# indicatorfortune
+# indicatorppadownloadstatistics
+# indicatorpunycode
+# indicatorscriptrunner
+# indicatortest
+# indicatorvirtualbox
+
+
+#TODO Where is mouse wheel scroll used?
+# Determine which indicators use it and should it be disabled for any distro that does not support it?
+# indicatorstardate
+# indicatortest
+# indicatorvirtualbox
+#
+# KDE does not support mouse wheel scroll.
+# Not an issue; mouse wheel scroll is not a critical function.
+
+
+#TODO Where is clipboard used?
+# indicatorfortune
+# indicatoronthisday
+# indicatorpunycode
+# indicatortest
+
+
+#TODO For wmctrl and Wayland, which indicators use this?
+# Should the functionality be ignored (for safety reasons) when a mouse wheel scroll under Wayland occurs?
+
 
 #TODO On Ubuntu 20.04 Wayland, copy to clipboard/primary causes a logout!
 # Check on other distros....then mention in limitations in readme.
