@@ -830,18 +830,21 @@ class IndicatorBase( ABC ):
 # indicatortest
 #
 # Clipboard should now work on X11 and Wayland, so no issue here.
-
-
-#TODO For wmctrl and Wayland, which indicators use this?
-# Should the functionality be ignored (for safety reasons) when a mouse wheel scroll under Wayland occurs?
-
-
-#TODO On Ubuntu 20.04 Wayland, copy to clipboard/primary causes a logout!
-# Check on other distros....then mention in limitations in readme.
 #
-#TODO For indicators where the copy on Wayland causes the desktop to log out, perhaps either
-#   1) Perhaps disable and show a notification to the user about the reason for disabling?
-#   2) Hide the option/functionality from the user?
+# EXCEPT: Under Ubuntu 20.04 Wayland, clipboard causes a logout.
+# So test clipboard on Wayland for all other distros.
+# Note in readme the bad distros.
+# What else to do?  Block the call to clipboard for these distros?
+# Tell the user in a tooltip?
+# Show a notification?
+# Hide the option/functionality from the user?
+
+
+#TODO wmctrl does not work under Wayland. For
+# indicatortest - Do not add to menu.
+# indicatorvirtualbox - Do not call wmtrl code.
+
+
     def copy_to_selection( self, text, is_primary = False ):
         '''
         Copy text to clipboard or primary.
