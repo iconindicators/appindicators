@@ -809,16 +809,17 @@ class IndicatorBase( ABC ):
         Copy text to clipboard or primary.
         '''
         if self.session_type_is_wayland():
+            with tempfile.NamedTemporaryFile( mode = 'w', delete = False ) as temporary_named_file:
+                temporary_named_file.write( text )
+
             command = "wl-copy "
             if is_primary:
                 command += "--primary "
 
             command += "< "
 
-            with tempfile.NamedTemporaryFile( mode = 'w', delete = False ) as temporary_named_file:
-                temporary_named_file.write( text )
-
             self.process_call( command + temporary_named_file.name )
+            Path( temporary_named_file.name ).unlink( missing_ok = True )
 
         else:
             selection = Gdk.SELECTION_CLIPBOARD
