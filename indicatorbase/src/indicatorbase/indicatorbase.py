@@ -805,13 +805,26 @@ class IndicatorBase( ABC ):
     def copy_to_selection( self, text, is_primary = False ):
         '''
         Copy text to clipboard or primary.
+        fortune > out.txt ;  wl-copy < out.txt
         '''
         if self.session_type_is_wayland():
+            f = "/home/bernard/out.txt"
+            try:
+                with open( f, 'w' ) as f_out:
+                   f_out.write( text )
+
+            except Exception as e:
+#                logging.exception( e )
+#                logging.error( "Error writing to cache: " + cache_file )
+                print( e )
+
+#            self.process_call( text + " > /home/bernard/out.txt" )
+
             command = "wl-copy "
             if is_primary:
                 command += "--primary "
 
-            self.process_call( command + text )
+#            self.process_call( command + " < /home/bernard/out.txt" )
 
         else:
             selection = Gdk.SELECTION_CLIPBOARD

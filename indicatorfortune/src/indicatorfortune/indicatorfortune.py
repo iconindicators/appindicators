@@ -19,26 +19,6 @@
 # Application indicator which displays fortunes.
 
 
-#TODO On Debian 12 Wayland,
-# copy last fortune (after log out log in) shows the first fortune only.
-# Does this happen on Xll?
-
-
-#TODO Noticed on Debian 12 Wayland when copy last fortune
-# got message about missing ) I think...which may have been a fortune
-# containing a ".
-# This might be related to the above TODO.
-# So run in a terminal to see error messages.
-# Also, may need to escape any "" in a fortune.
-
-#TODO Example fail on Wayland.
-# Correction does much, but encouragement does more.
-#         -- Goethe
-#
-# /bin/sh: 2: --: not found
-
-
-
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import codecs
