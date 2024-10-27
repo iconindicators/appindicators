@@ -828,6 +828,8 @@ class IndicatorBase( ABC ):
 # indicatoronthisday
 # indicatorpunycode
 # indicatortest
+#
+# Clipboard should now work on X11 and Wayland, so no issue here.
 
 
 #TODO For wmctrl and Wayland, which indicators use this?
