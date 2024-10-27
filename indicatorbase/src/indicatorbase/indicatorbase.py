@@ -804,9 +804,11 @@ class IndicatorBase( ABC ):
 # indicatorfortune
 # indicatorppadownloadstatistics
 # indicatorpunycode
-# indicatorscriptrunner
+# indicatorscriptrunner - Critical for running default script.
 # indicatortest
 # indicatorvirtualbox
+#
+# Seems that all distros support middle mouse button click...so no issue here.
 
 
 #TODO Where is mouse wheel scroll used?
