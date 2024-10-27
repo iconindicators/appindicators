@@ -51,6 +51,7 @@ import shutil
 import signal
 import subprocess
 import sys
+import tempfile
 import threading
 import webbrowser
 
@@ -802,10 +803,10 @@ class IndicatorBase( ABC ):
 
 
 #TODO On Ubuntu 20.04 Wayland, copy to clipboard/primary causes a logout!
+# Check on other distros....then mention in limitations in readme.
     def copy_to_selection( self, text, is_primary = False ):
         '''
         Copy text to clipboard or primary.
-        fortune > out.txt ;  wl-copy < out.txt
         '''
         if self.session_type_is_wayland():
             command = "wl-copy "
@@ -814,26 +815,10 @@ class IndicatorBase( ABC ):
 
             command += "< "
 
-            import tempfile
             with tempfile.NamedTemporaryFile( mode = 'w', delete = False ) as temporary_named_file:
                 temporary_named_file.write( text )
 
-                print( temporary_named_file.name )
             self.process_call( command + temporary_named_file.name )
-
-            '''
-            f = "/home/bernard/out.txt"
-            try:
-                with open( f, 'w' ) as f_out:
-                   f_out.write( text )
-
-            except Exception as e:
-#                logging.exception( e )
-#                logging.error( "Error writing to cache: " + cache_file )
-                print( e )
-
-            self.process_call( command + "/home/bernard/out.txt" )
-            '''
 
         else:
             selection = Gdk.SELECTION_CLIPBOARD
