@@ -430,7 +430,7 @@ class IndicatorBase( ABC ):
                 desktop_file_virtual_environment,
                 self.desktop_file_user_home )
 
-            error_message = None #TODO Check this is correct!
+            error_message = None
 
         else:
             wheel_in_release, error_message = \
