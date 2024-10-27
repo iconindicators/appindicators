@@ -223,7 +223,6 @@ class IndicatorBase( ABC ):
         self.creditz = creditz
         self.debug = debug
 
-#TODO Can/should this be changed to execute on demand?  Who calls this and how often?
         self.current_desktop = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
 
         self.authors_and_emails = self.get_authors_emails( project_metadata )
