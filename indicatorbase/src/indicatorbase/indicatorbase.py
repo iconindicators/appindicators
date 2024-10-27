@@ -429,6 +429,8 @@ class IndicatorBase( ABC ):
                 desktop_file_virtual_environment,
                 self.desktop_file_user_home )
 
+            error_message = None #TODO Check this is correct!
+
         else:
             wheel_in_release, error_message = \
                 IndicatorBase._get_wheel_in_release( self.indicator_name )
@@ -799,6 +801,7 @@ class IndicatorBase( ABC ):
                 menuitem.set_sensitive( toggle )
 
 
+#TODO On Ubuntu 20.04 Wayland, copy to clipboard/primary causes a logout!
     def copy_to_selection( self, text, is_primary = False ):
         '''
         Copy text to clipboard or primary.
