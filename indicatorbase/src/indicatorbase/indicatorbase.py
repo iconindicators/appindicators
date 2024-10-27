@@ -802,6 +802,10 @@ class IndicatorBase( ABC ):
 
 #TODO On Ubuntu 20.04 Wayland, copy to clipboard/primary causes a logout!
 # Check on other distros....then mention in limitations in readme.
+#
+#TODO For indicators where the copy on Wayland causes the desktop to log out, perhaps either
+#   1) Perhaps disable and show a notification to the user about the reason for disabling?
+#   2) Hide the option/functionality from the user?
     def copy_to_selection( self, text, is_primary = False ):
         '''
         Copy text to clipboard or primary.
