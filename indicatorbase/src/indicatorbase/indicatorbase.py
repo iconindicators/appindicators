@@ -808,6 +808,20 @@ class IndicatorBase( ABC ):
         fortune > out.txt ;  wl-copy < out.txt
         '''
         if self.session_type_is_wayland():
+            command = "wl-copy "
+            if is_primary:
+                command += "--primary "
+
+            command += "< "
+
+            import tempfile
+            with tempfile.NamedTemporaryFile( mode = 'w', delete = False ) as temporary_named_file:
+                temporary_named_file.write( text )
+
+                print( temporary_named_file.name )
+            self.process_call( command + temporary_named_file.name )
+
+            '''
             f = "/home/bernard/out.txt"
             try:
                 with open( f, 'w' ) as f_out:
@@ -818,13 +832,8 @@ class IndicatorBase( ABC ):
 #                logging.error( "Error writing to cache: " + cache_file )
                 print( e )
 
-#            self.process_call( text + " > /home/bernard/out.txt" )
-
-            command = "wl-copy "
-            if is_primary:
-                command += "--primary "
-
-#            self.process_call( command + " < /home/bernard/out.txt" )
+            self.process_call( command + "/home/bernard/out.txt" )
+            '''
 
         else:
             selection = Gdk.SELECTION_CLIPBOARD
