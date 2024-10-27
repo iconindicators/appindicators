@@ -852,7 +852,7 @@ class IndicatorBase( ABC ):
             # However this is not possible under X11.
             # So that the caller does not need to know whether running under
             # Wayland or X11, the caller must provide a callback function as is
-            # required for X11, despite being redunant for Wayland.
+            # required for X11, despite being redundant for Wayland.
             primary_received_callback_function(
                 self.process_get( "wl-paste --primary" ) )
 
