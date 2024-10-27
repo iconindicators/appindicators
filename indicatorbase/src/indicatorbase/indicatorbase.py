@@ -819,6 +819,8 @@ class IndicatorBase( ABC ):
 #
 # KDE does not support mouse wheel scroll.
 # Not an issue; mouse wheel scroll is not a critical function.
+#
+# Perhaps, however, stop the action from happening under Wayland? 
 
 
 #TODO Where is clipboard used?
