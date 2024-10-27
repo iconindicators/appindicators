@@ -408,6 +408,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         # General settings.
         grid = self.create_grid()
 
+#TODO This does not work under Wayland.
+# So either hide this from the Preferences, or add to the tooltip.
         window_name = \
             self.create_entry(
                 self.virtualbox_manager_window_name,
