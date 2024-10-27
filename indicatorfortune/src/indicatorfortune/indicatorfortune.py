@@ -87,6 +87,11 @@ class IndicatorFortune( IndicatorBase ):
             is_secondary_activate_target = (
                 self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
+#TODO This causes the desktop to log out on Ubuntu 20.04 Wayland.
+# Test for other distros too.
+# What can/should be done...?
+#   1) Perhaps disable and show a notification to the user about the reason for disabling?
+#   2) Hide the option/functionality from the user?
         self.create_and_append_menuitem(
             menu,
             _( "Copy Last Fortune" ),
