@@ -815,6 +815,40 @@ class IndicatorBase( ABC ):
 # Tell the user in a tooltip?
 # Show a notification?
 # Hide the option/functionality from the user?
+#
+# Works on both X11 and Wayland for distro...
+#   Debian 11
+#   Debian 12
+#   Fedora 38
+#   Fedora 39
+#   Fedora 40
+#   Ubuntu 22.04
+#   Ubuntu 24.04
+#
+#   Ubuntu 20.04  Works on X11 but logs out on Wayland.  TODO Need to prevent this from happening?
+
+
+    def _is_wayland_clipboard_supported( self ):
+        '''
+        On Ubuntu 20.04 when calling wl-copy/wl-paste under Wayland,
+        due to a bug in GNOME, the destkop session crashes:
+        
+        https://gitlab.gnome.org/GNOME/mutter/-/issues/1690
+
+        Unfortunately this issue never got fixed for the version of
+        GNOME used in Ubuntu 20.04.
+        '''
+        wayland_clipboard_supported = True
+
+        etc_os_release = self.process_get( "cat /etc/os-release" )
+        if etc_os_release is None:
+            etc_os_release = ""
+
+        if "ID=ubuntu" in etc_os_release and "VERSION_ID=\"20.04\"" in etc_os_release:
+            print( "Ubuntu 20.04 on Wayland") #TODO Test this!
+            wayland_clipboard_supported = False
+
+        return wayland_clipboard_supported
 
 
     def copy_to_selection( self, text, is_primary = False ):
@@ -822,17 +856,18 @@ class IndicatorBase( ABC ):
         Copy text to clipboard or primary.
         '''
         if self.session_type_is_wayland():
-            with tempfile.NamedTemporaryFile( mode = 'w', delete = False ) as temporary_named_file:
-                temporary_named_file.write( text )
+            if self._is_wayland_clipboard_supported():
+                with tempfile.NamedTemporaryFile( mode = 'w', delete = False ) as temporary_named_file:
+                    temporary_named_file.write( text )
 
-            command = "wl-copy "
-            if is_primary:
-                command += "--primary "
+                command = "wl-copy "
+                if is_primary:
+                    command += "--primary "
 
-            command += "< "
+                command += "< "
 
-            self.process_call( command + temporary_named_file.name )
-            Path( temporary_named_file.name ).unlink( missing_ok = True )
+                self.process_call( command + temporary_named_file.name )
+                Path( temporary_named_file.name ).unlink( missing_ok = True )
 
         else:
             selection = Gdk.SELECTION_CLIPBOARD
@@ -843,8 +878,10 @@ class IndicatorBase( ABC ):
 
 
     def copy_from_selection_clipboard( self ):
+        text_in_clipboard = ""
         if self.session_type_is_wayland():
-            text_in_clipboard = self.process_get( "wl-paste" )
+            if self._is_wayland_clipboard_supported():
+                text_in_clipboard = self.process_get( "wl-paste" )
 
         else:
             text_in_clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
@@ -861,13 +898,22 @@ class IndicatorBase( ABC ):
                 print( text )
         '''
         if self.session_type_is_wayland():
-            # Could simply return the text from the primary source immediately to the user.
-            # However this is not possible under X11.
-            # So that the caller does not need to know whether running under
-            # Wayland or X11, the caller must provide a callback function as is
-            # required for X11, despite being redundant for Wayland.
-            primary_received_callback_function(
-                self.process_get( "wl-paste --primary" ) )
+            # The X11 clipboard mechanism requires a user callback function to
+            # receive the selection, whereas under Wayland, this is not the case.
+            #
+            # To keep the function call the same from the user's perspective,
+            # irrespective of Wayland or X11, use a callback function here too.
+            if self._is_wayland_clipboard_supported():
+#TODO Test this!                
+                text = self.process_get( "wl-paste --primary" )
+
+            else:
+                # On Ubuntu 20.04 under Wayland, the clipboard is not supported.
+                # So return empty text to the user through the callback.
+#TODO Test this!                
+                text = ""
+
+            primary_received_callback_function( text )
 
         else:
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
