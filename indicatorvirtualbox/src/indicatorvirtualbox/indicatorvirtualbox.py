@@ -280,21 +280,34 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def on_launch_virtual_box_manager( self ):
-        # The executable for VirtualBox manager does not necessarily appear in the process
-        # list because the executable might be a script which calls another executable.
-        # Instead, have the user specify the title of the VirtualBox manager window into
-        # the preferences and find the window by the window title.
-        window_id = None
-#TODO Under Wayland, perhaps skip this code?        
-        result = self.process_get( "wmctrl -l | grep \"" + self.virtualbox_manager_window_name + "\"" )
-        if result:
-            window_id = result.split()[ 0 ]
-
-        if window_id is None or window_id == "":
+        if self.session_type_is_wayland():
+            # Under Wayland, wmctrl does not work and so there is no manner in
+            # which to determine if the VirtualBox manager is running and if so,
+            # bring to the front.
             self.process_call( self.process_get( "which VirtualBox" ) + " &" )
 
         else:
-            self.process_call( "wmctrl -ia " + window_id )
+            # Only want one instance of VirtualBox manager to be running
+            # (as a convenience to the user to avoidable multiple versions).
+            #
+            # The executable for VirtualBox manager does not necessarily appear
+            # in the process list because the executable might be a script which
+            # calls another executable.
+            #
+            # Instead, the user specifies the title of the VirtualBox manager
+            # window in the preferences and using that, find the window by the
+            # window title.
+            window_id = None
+            command = "wmctrl -l | grep \"" + self.virtualbox_manager_window_name + "\""
+            result = self.process_get( command )
+            if result:
+                window_id = result.split()[ 0 ]
+    
+            if window_id is None or window_id == "":
+                self.process_call( self.process_get( "which VirtualBox" ) + " &" )
+    
+            else:
+                self.process_call( "wmctrl -ia " + window_id )
 
 
     # Returns a list of running VM names and list of corresponding running VM UUIDs.
@@ -409,8 +422,6 @@ class IndicatorVirtualBox( IndicatorBase ):
         # General settings.
         grid = self.create_grid()
 
-#TODO This does not work under Wayland.
-# So either hide this from the Preferences, or add to the tooltip.
         window_name = \
             self.create_entry(
                 self.virtualbox_manager_window_name,
@@ -420,12 +431,15 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "This is used to bring the VirtualBox™ Manager\n" +
                     "window to the front if already running." ) )
 
-        grid.attach(
-            self.create_box(
-                (
-                    ( Gtk.Label.new( _( "VirtualBox™ Manager" ) ), False ),
-                    ( window_name, True ) ) ),
-            0, 0, 1, 1 )
+        if not self.session_type_is_wayland():
+            # Under Wayland, cannot use wmctrl to find the VirtualBox Manager
+            # window, so there is no point showing/capturing the window title.
+            grid.attach(
+                self.create_box(
+                    (
+                        ( Gtk.Label.new( _( "VirtualBox™ Manager" ) ), False ),
+                        ( window_name, True ) ) ),
+                0, 0, 1, 1 )
 
         sort_groups_and_virtual_machines_equally_checkbox = \
             self.create_checkbutton(

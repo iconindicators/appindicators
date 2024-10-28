@@ -282,16 +282,19 @@ class IndicatorTest( IndicatorBase ):
             "fortune",
             "ls",
             "notify-send",
-            "paplay",
-            "wmctrl" )
+            "paplay" )
 
         commands = (
             "calendar -f /usr/share/calendar/calendar.all -A 3",
             "fortune",
             "ls -la",
             f"notify-send -i { self.get_icon_name() } 'summary' 'body'",
-            "paplay /usr/share/sounds/freedesktop/stereo/complete.oga",
-            "wmctrl -l" )
+            "paplay /usr/share/sounds/freedesktop/stereo/complete.oga" )
+
+        # No point showing a command that does not work!
+        if not self.session_type_is_wayland():
+            labels.append( "wmctrl" )
+            commands.append( "wmctrl -l" )
 
         for label, command in zip( labels, commands ):
             self.create_and_append_menuitem(
