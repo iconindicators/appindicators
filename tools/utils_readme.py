@@ -322,6 +322,8 @@ def _get_uninstall_for_operating_system(
 
 
 #TODO Work out wl-clipboard  for each distro/indicator combination.
+# Debian : wl-clipboard
+# Fedora : wl-clipboard
 def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
@@ -582,7 +584,7 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
         f"indicator={ indicator_name } && \\\n"
         f"venv=$HOME/.local/venv_indicators && \\\n"
         f". ${{venv}}/bin/activate && \\\n"
-        f"python3 $(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/{ indicator_name }/{ indicator_name }.py && \\\n"
+        f"python3 $(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/${{indicator}}/${{indicator}}.py && \\\n"
         f"deactivate\n"
         f"```\n\n" )
 
