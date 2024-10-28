@@ -878,10 +878,12 @@ class IndicatorBase( ABC ):
 
 
     def copy_from_selection_clipboard( self ):
-        text_in_clipboard = ""
         if self.session_type_is_wayland():
             if self._is_wayland_clipboard_supported():
                 text_in_clipboard = self.process_get( "wl-paste" )
+
+            else:
+                text_in_clipboard = ""
 
         else:
             text_in_clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
