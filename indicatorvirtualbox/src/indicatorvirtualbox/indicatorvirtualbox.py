@@ -68,6 +68,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         self.scroll_direction_is_up = True
         self.scroll_uuid = None
 
+#TODO Perhaps only do this if not running under Wayland?
         self.request_mouse_wheel_scroll_events( ( self.on_mouse_wheel_scroll, ) )
 
 
@@ -226,6 +227,8 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.process_call( self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &" )
 
 
+#TODO I think this function needs the same treatment for Wayland as the VirtualBox manager window.
+# Should this function just do nothing if running under Wayland?
     def bring_window_to_front( self, virtual_machine_name, delay_in_seconds = 0 ):
         number_of_windows_with_the_same_name = \
             self.process_get( 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' )
