@@ -293,8 +293,8 @@ class IndicatorTest( IndicatorBase ):
 
         # No point showing a command that does not work!
         if not self.session_type_is_wayland():
-            labels.append( "wmctrl" )
-            commands.append( "wmctrl -l" )
+            labels += ( "wmctrl", )
+            commands += ( "wmctrl -l", )
 
         for label, command in zip( labels, commands ):
             self.create_and_append_menuitem(
