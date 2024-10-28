@@ -799,32 +799,6 @@ class IndicatorBase( ABC ):
             for menuitem in self.indicator.get_menu().get_children():
                 menuitem.set_sensitive( toggle )
 
-#TODO Where is middle mouse button click used?
-# Determine which indicators use it and should it be disabled for any distro found not to support?
-# indicatorfortune
-# indicatorppadownloadstatistics
-# indicatorpunycode
-# indicatorscriptrunner - Critical for running default script.
-# indicatortest
-# indicatorvirtualbox
-#
-# Seems that all distros support middle mouse button click...so no issue here.
-
-
-#TODO Where is mouse wheel scroll used?
-# Determine which indicators use it and should it be disabled for any distro that does not support it?
-# indicatorstardate
-# indicatortest
-# indicatorvirtualbox
-#
-# KDE does not support mouse wheel scroll.
-# Not an issue; mouse wheel scroll is not a critical function.
-#
-# Perhaps, however, stop the action from happening under KDE?
-# How to determine if running under KDE?
-#
-# Probably not worth the trouble of checking for KDE and then not calling mouse wheel scroll code. 
-
 
 #TODO Where is clipboard used?
 # indicatorfortune
@@ -841,11 +815,6 @@ class IndicatorBase( ABC ):
 # Tell the user in a tooltip?
 # Show a notification?
 # Hide the option/functionality from the user?
-
-
-#TODO wmctrl does not work under Wayland. For
-# indicatortest - Do not add to menu.
-# indicatorvirtualbox - Do not call wmctrl code.  What about Preference for VBoxManager name?  Hide or add tooltip?
 
 
     def copy_to_selection( self, text, is_primary = False ):
