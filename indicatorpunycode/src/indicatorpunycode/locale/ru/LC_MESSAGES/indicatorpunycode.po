@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorpunycode 1.0.16\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-29 16:31+1000\n"
+"POT-Creation-Date: 2024-10-28 12:33+1100\n"
 "PO-Revision-Date: 2024-07-09 09:48+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -26,6 +26,9 @@ msgstr "Преобразователь доменных имён, содержа
 msgid "Convert"
 msgstr "Преобразовать"
 
+msgid "Convert via dialog"
+msgstr ""
+
 msgid "Unicode:  "
 msgstr "Уникод:  "
 
@@ -40,6 +43,15 @@ msgstr "Буфер обмена пуст."
 
 msgid "No text is highlighted/selected."
 msgstr "Буфер выделения пуст."
+
+msgid "TODO"
+msgstr ""
+
+msgid "Original Text"
+msgstr ""
+
+msgid "The text to convert cannot be empty."
+msgstr ""
 
 msgid "Error converting..."
 msgstr "Ошибка преобразования..."
