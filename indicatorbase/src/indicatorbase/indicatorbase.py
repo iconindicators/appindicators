@@ -820,7 +820,10 @@ class IndicatorBase( ABC ):
 # KDE does not support mouse wheel scroll.
 # Not an issue; mouse wheel scroll is not a critical function.
 #
-# Perhaps, however, stop the action from happening under Wayland? 
+# Perhaps, however, stop the action from happening under KDE?
+# How to determine if running under KDE?
+#
+# Probably not worth the trouble of checking for KDE and then not calling mouse wheel scroll code. 
 
 
 #TODO Where is clipboard used?
@@ -842,7 +845,7 @@ class IndicatorBase( ABC ):
 
 #TODO wmctrl does not work under Wayland. For
 # indicatortest - Do not add to menu.
-# indicatorvirtualbox - Do not call wmtrl code.
+# indicatorvirtualbox - Do not call wmctrl code.  What about Preference for VBoxManager name?  Hide or add tooltip?
 
 
     def copy_to_selection( self, text, is_primary = False ):
