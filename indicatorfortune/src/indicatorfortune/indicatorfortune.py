@@ -63,6 +63,8 @@ class IndicatorFortune( IndicatorBase ):
 #TODO If this is an else but we are not on manjaro/opensuse, then what?
 # Otherwise, if this is left as is, then what should the else be?
 # Maybe just default to fortune_debian?
+# Maybe see what happens if the default fortune is a path which does not exist.
+# Test by removing preferences and then put in a bogus path.
     elif Path( fortune_manjaro_opensuse ).exists():
         DEFAULT_FORTUNE = [ fortune_manjaro_opensuse, Gtk.STOCK_APPLY ]
 
