@@ -104,6 +104,11 @@ Releases:
 
 # Long Term
 
+# Icons which do not utilise symbolic
+Some distros/desktops do not utilise the symbolic icon system as does GNOME.
+Determine which distros/desktops these are and if anything can be done.
+
+
 ## Migrate to GTK4
 May need to continue to run as GTK3 simulataneously.
 - https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159
