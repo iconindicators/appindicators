@@ -953,7 +953,11 @@ class IndicatorBase( ABC ):
                 self._clipboard_text_received_function, primary_received_callback_function )
 
 
-    def _clipboard_text_received_function( self, clipboard, text, primary_received_callback_function ):
+    def _clipboard_text_received_function(
+            self,
+            clipboard,
+            text,
+            primary_received_callback_function ):
         '''
         For X11 to obtain text from the primary input, a callback is needed.
         https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
