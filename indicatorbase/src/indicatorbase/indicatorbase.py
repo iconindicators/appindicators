@@ -959,8 +959,14 @@ class IndicatorBase( ABC ):
             text,
             primary_received_callback_function ):
         '''
-        For X11 to obtain text from the primary input, a callback is needed.
-        https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
+        A callback function is required by GTK to obtain text from the primary
+        when running under X11:
+            https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
+        When running under Wayland, the package wl-paste is called directly
+        and no callback is required.
+        However, so that a user can retrieve the text from the primary without
+        having to know whether running under X11 or Wayland, the Wayland method
+        also uses the same callback mechanism.
         '''
         print( "call to callback" )#TODO Testing
         primary_received_callback_function( text )
