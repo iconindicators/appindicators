@@ -324,6 +324,8 @@ def _get_uninstall_for_operating_system(
 #TODO Work out wl-clipboard  for each distro/indicator combination.
 # Debian : wl-clipboard
 # Fedora : wl-clipboard
+# Manjaro : wl-clipboard
+# openSUSE : wl-clipboard
 def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
@@ -695,6 +697,7 @@ def _get_limitations( indicator_name ):
 
     # Kubuntu 24.04     No autostart.
     # Manjaro 24.04.7   No autostart.
+#TODO Need to change this...does not apply for manjaro and indicatoronthisday.    
     if _is_indicator(
         indicator_name,
         Indicator_Name.INDICATORFORTUNE,
