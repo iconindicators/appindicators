@@ -60,6 +60,9 @@ class IndicatorPunycode( IndicatorBase ):
 
 
     def update( self, menu ):
+        # The mouse middle button click kicks off a convert, but to do so must
+        # be bound to a menu item (which in reality kicks off the convert).
+        # Therefore this menu item must be present.
         self.create_and_append_menuitem(
             menu,
             _( "Convert" ),
@@ -68,10 +71,10 @@ class IndicatorPunycode( IndicatorBase ):
 
 
 #TODO May not be needed now Wayland works.  Maybe only needed for old Budgie 20.04?
-        self.create_and_append_menuitem(
-            menu,
-            _( "Convert via dialog" ),
-            activate_functionandarguments = ( lambda menuitem: self.on_convert_via_dialog( menuitem ), ) )
+        # self.create_and_append_menuitem(
+        #     menu,
+        #     _( "Convert via dialog" ),
+        #     activate_functionandarguments = ( lambda menuitem: self.on_convert_via_dialog( menuitem ), ) )
 
         for result in self.results:
             menu.append( Gtk.SeparatorMenuItem() )
@@ -93,6 +96,20 @@ class IndicatorPunycode( IndicatorBase ):
                 indent = ( 1, 1 ) )
 
 
+#TODO Test data
+# ü     tda   
+# α     mxa   
+# 例     fsq  
+# αβγ     mxacd   
+# München     Mnchen-3ya 
+# Mnchen-3ya     Mnchen-3ya-  
+# München-Ost     Mnchen-Ost-9db    
+# Bahnhof München-Ost     Bahnhof Mnchen-Ost-u6b 
+# abæcdöef     abcdef-qua4k     
+# правда     80aafi6cg     
+# ยจฆฟคฏข     22cdfh1b8fsa 
+# 도메인     hq1bm8jm9l     
+# ドメイン名例     eckwd4c7cu47r2wf
     def on_convert( self ):
         summary =_( "Nothing to convert..." )
         if self.input_clipboard:
@@ -115,44 +132,44 @@ class IndicatorPunycode( IndicatorBase ):
 
 
 #TODO May not be needed now Wayland works...only for distros with no response to middle mouse click perhaps?
-    def on_convert_via_dialog( self, menuitem ):
-        self.set_menu_sensitivity( False )
-        self.indicator.set_secondary_activate_target( None )
-
-        dialog = self.create_dialog( menuitem, _( "Convert via dialog" ) )
-
-        grid = self.create_grid()
-
-        original_text_entry = \
-            self.create_entry(
-                "",
-                tooltip_text = _( "TODO" ) )  #TODO Need to let the user know that punycoded text must start with xn--
-
-        grid.attach(
-            self.create_box(
-                (
-                    ( Gtk.Label.new( _( "Original Text" ) ), False ),
-                    ( original_text_entry, False ) ) ),
-            0, 0, 1, 1 )
-
-        dialog.get_content_area().pack_start( grid, True, True, 0 )
-
-        while True:
-            dialog.show_all()
-            if dialog.run() == Gtk.ResponseType.OK:
-                if original_text_entry.get_text().strip() == "":
-                    self.show_dialog_ok( dialog, _( "The text to convert cannot be empty." ) )
-                    original_text_entry.grab_focus()
-                    continue
-
-                else:
-                    self._do_conversion( original_text_entry.get_text().strip() )
-
-            break
-
-        dialog.destroy()
-        self.set_menu_sensitivity( True )
-        self.indicator.set_secondary_activate_target( self.secondary_activate_target )
+    # def on_convert_via_dialog( self, menuitem ):
+    #     self.set_menu_sensitivity( False )
+    #     self.indicator.set_secondary_activate_target( None )
+    #
+    #     dialog = self.create_dialog( menuitem, _( "Convert via dialog" ) )
+    #
+    #     grid = self.create_grid()
+    #
+    #     original_text_entry = \
+    #         self.create_entry(
+    #             "",
+    #             tooltip_text = _( "TODO" ) )  #TODO Need to let the user know that punycoded text must start with xn--
+    #
+    #     grid.attach(
+    #         self.create_box(
+    #             (
+    #                 ( Gtk.Label.new( _( "Original Text" ) ), False ),
+    #                 ( original_text_entry, False ) ) ),
+    #         0, 0, 1, 1 )
+    #
+    #     dialog.get_content_area().pack_start( grid, True, True, 0 )
+    #
+    #     while True:
+    #         dialog.show_all()
+    #         if dialog.run() == Gtk.ResponseType.OK:
+    #             if original_text_entry.get_text().strip() == "":
+    #                 self.show_dialog_ok( dialog, _( "The text to convert cannot be empty." ) )
+    #                 original_text_entry.grab_focus()
+    #                 continue
+    #
+    #             else:
+    #                 self._do_conversion( original_text_entry.get_text().strip() )
+    #
+    #         break
+    #
+    #     dialog.destroy()
+    #     self.set_menu_sensitivity( True )
+    #     self.indicator.set_secondary_activate_target( self.secondary_activate_target )
 
 
     def _do_conversion( self, text ):
