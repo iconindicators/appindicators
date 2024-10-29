@@ -864,7 +864,7 @@ class IndicatorBase( ABC ):
 
     def copy_to_selection( self, text, is_primary = False ):
         '''
-        Copy text to clipboard or primary.
+        Send text to the clipboard or primary.
         '''
         if self.session_type_is_wayland():
             if self._is_wayland_clipboard_supported():
@@ -889,12 +889,20 @@ class IndicatorBase( ABC ):
 
 
     def copy_from_selection_clipboard( self ):
+        '''
+        Obtains text from the clipboard.
+        If there was no text copied or an error occurred,
+        None is returned.
+        '''
         if self.session_type_is_wayland():
             if self._is_wayland_clipboard_supported():
                 text_in_clipboard = self.process_get( "wl-paste" )
+                if text_in_clipboard == "":
+                    text_in_clipboard = None
 
             else:
-                text_in_clipboard = ""
+                print( "ubuntu 20.04 setting text to none from clipboard")#TODO Test
+                text_in_clipboard = None
 
         else:
             text_in_clipboard = \
@@ -905,29 +913,40 @@ class IndicatorBase( ABC ):
 
     def copy_from_selection_primary( self, primary_received_callback_function ):
         '''
-        To receive the text from the primary input, a callback function is required.
-        The simplest of which is:
+        To receive the text from the primary input, a callback function
+        is required, the simplest of which for example is:
 
             def primary_received_callback_function( text ):
                 print( text )
+
+        On success, the text parameter to the callback function
+        will contain the primary text; otherwise None.
         '''
         if self.session_type_is_wayland():
-            # The X11 clipboard mechanism requires a user callback function to
-            # receive the selection, whereas under Wayland, this is not the case.
+            # GTK interacts with the X11 clipboard mechanism via a user callback
+            # function to receive the selection, whereas under Wayland, this is
+            # not the case.
             #
-            # To keep the function call the same from the user's perspective,
-            # irrespective of Wayland or X11, use a callback function here too.
+            # There is presently no GTK method for accessing the clipboard
+            # under Wayland.  Instead, the package wl-clipboard is used directly
+            # via a terminal, requiring no callback function.
+            #
+            # To shield the user from having to know whether Wayland or X11 is
+            # in use, access to the primary is wrapped within a callback function.
             if self._is_wayland_clipboard_supported():
-#TODO Test this!                
-                text = self.process_get( "wl-paste --primary" )
+                text_in_primary = self.process_get( "wl-paste --primary" )
+                print( "wayland primary text:" )#TODO Testing
+                if text_in_primary == "":
+                    print( "wayland primary text is none so set to empty text" )#TODO Testing
+                    text_in_primary = None
 
             else:
                 # On Ubuntu 20.04 under Wayland, the clipboard is not supported.
                 # So return empty text to the user through the callback.
-#TODO Test this!                
-                text = ""
+                print( "wayland primary on ubuntu 20.04...returning None" )#TODO Testing
+                text_in_primary = None
 
-            primary_received_callback_function( text )
+            primary_received_callback_function( text_in_primary )
 
         else:
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
@@ -939,6 +958,7 @@ class IndicatorBase( ABC ):
         For X11 to obtain text from the primary input, a callback is needed.
         https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
         '''
+        print( "call to callback" )#TODO Testing
         primary_received_callback_function( text )
 
 
