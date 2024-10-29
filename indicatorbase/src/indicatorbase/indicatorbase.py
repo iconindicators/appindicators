@@ -822,10 +822,21 @@ class IndicatorBase( ABC ):
 #   Fedora 38
 #   Fedora 39
 #   Fedora 40
+#   Manjaro KDE
+#   openSUSE
 #   Ubuntu 22.04
 #   Ubuntu 24.04
 #
 #   Ubuntu 20.04  Works on X11 but logs out on Wayland.  TODO Need to prevent this from happening?
+
+
+#TODO Where the clipboard is stopped from working (ubuntu 20.04 under wayland)
+# cannot hide the functionality at the UI level because the user may run under x11
+# and set the preference to enable and somehow kick off a clipboard operation
+# under wayland that crashes.
+# So might have to use tooltips to explain a particular operation will be a no-op
+# such as indicatorfortune and copy last fortune.
+# Could show the tooltip conditionally (running on wayland and ubuntu 20.04).
 
 
     def _is_wayland_clipboard_supported( self ):
@@ -886,7 +897,8 @@ class IndicatorBase( ABC ):
                 text_in_clipboard = ""
 
         else:
-            text_in_clipboard = Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
+            text_in_clipboard = \
+                Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
 
         return text_in_clipboard
 
