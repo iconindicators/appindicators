@@ -972,6 +972,10 @@ class IndicatorBase( ABC ):
         primary_received_callback_function( text )
 
 
+    def get_play_sound_complete_command( self ):
+        return "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
+
+
     def create_dialog(
             self,
             parent_widget,

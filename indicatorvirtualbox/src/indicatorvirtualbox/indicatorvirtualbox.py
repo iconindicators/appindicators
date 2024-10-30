@@ -68,7 +68,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         self.scroll_direction_is_up = True
         self.scroll_uuid = None
 
-#TODO Perhaps only do this if not running under Wayland?
+#TODO Perhaps do not call this if running under Kubuntu 22.04/24.04 or Manjaro 24.0.7 KDE?
 # But I don't want the indicator to have to worry about this sort of thing.
 # So where to handle this, if at all?
         self.request_mouse_wheel_scroll_events( ( self.on_mouse_wheel_scroll, ) )
@@ -439,6 +439,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 #TODO Maybe change this now...always show.
 # Lets the user see what would be possible under X11.
 # But need to catch perhaps the call to wmctrl?
+# Add a tooltip telling user has no effect under wayland?
         if not self.session_type_is_wayland():
             # Under Wayland, cannot use wmctrl to find the VirtualBox Manager
             # window, so there is no point showing/capturing the window title.

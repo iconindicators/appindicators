@@ -77,9 +77,6 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     CALENDARS_FILENAME = "calendars.txt"
 
-#TODO Check location of default calendar on:
-#   Debian
-#   Fedora
     DEFAULT_CALENDAR = "/usr/share/calendar/calendar.history"
     TAG_EVENT = "["+ _( "EVENT" )+ "]"
     SEARCH_URL_DEFAULT = "https://www.google.com/search?q=" + TAG_EVENT

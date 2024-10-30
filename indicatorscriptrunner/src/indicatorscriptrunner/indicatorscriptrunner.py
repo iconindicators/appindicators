@@ -26,6 +26,7 @@ import copy
 import datetime
 import gi
 import math
+import indicatorbase
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
@@ -53,7 +54,6 @@ class IndicatorScriptRunner( IndicatorBase ):
 
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
     COMMAND_NOTIFY_TAG_SCRIPT_RESULT = "[SCRIPT_RESULT]"
-    COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"  #TODO Check this exists for Debian, Fedora, Manjaro, openSUSE.
 
     COLUMN_MODEL_GROUP = 0 # Group name when displaying a group; empty when displaying a script.
     COLUMN_MODEL_NAME = 1 # Script name.
@@ -198,7 +198,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 command += "; " + notification
 
             if script.get_play_sound():
-                command += "; " + IndicatorScriptRunner.COMMAND_SOUND
+                command += "; " + IndicatorBase.get_play_sound_complete_command()
 
             if script.get_terminal_open():
                 command += "; cd $HOME; ${SHELL}"
@@ -236,7 +236,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 command_result = self.background_script_results[ key ]
 
                 if script.get_play_sound() and command_result:
-                    self.process_call( IndicatorScriptRunner.COMMAND_SOUND )
+                    self.process_call( IndicatorBase.get_play_sound_complete_command() )
 
                 if script.get_show_notification() and command_result:
                     notification_command = self.command_notify_background

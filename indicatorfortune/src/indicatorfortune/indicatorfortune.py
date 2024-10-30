@@ -65,6 +65,11 @@ class IndicatorFortune( IndicatorBase ):
 # Maybe just default to fortune_debian?
 # Maybe see what happens if the default fortune is a path which does not exist.
 # Test by removing preferences and then put in a bogus path.
+#
+# When installing from .deb, the fortune package was guaranteed to be installed.
+# Now that the user is responsible for installing the fortune package,
+# what if they don't, but we have defined the default fortune location
+# which should be valid, but is not present?
     elif Path( fortune_manjaro_opensuse ).exists():
         DEFAULT_FORTUNE = [ fortune_manjaro_opensuse, Gtk.STOCK_APPLY ]
 
@@ -103,8 +108,10 @@ class IndicatorFortune( IndicatorBase ):
             is_secondary_activate_target = (
                 self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
-#TODO Should there be a check for clipboard support and if not, show a notification to the user?
-# Or in this case, just hide the menu item as this only applies (at present) to Ubuntu 20.04 on Wayland.
+#TODO Should there be a check for clipboard support and if unsupported,
+# show a notification to the user?
+# Or in this case, just hide the menu item as this only applies
+# (at present) to Ubuntu 20.04 on Wayland.
 # Maybe show a notification...easier.
         self.create_and_append_menuitem(
             menu,

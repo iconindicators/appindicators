@@ -1,12 +1,61 @@
 # Immediate
 
-# Test clipboard/primary stuff for...
-indicatorfortune
-indicatoronthisday
-indicatorpunycode
-indicatortest
+# Calendar not on Manjaro/openSUSE
+    indicatoronthisday
+        Nothing to do as the indicator readme
+        does not provide install instructions 
+        for Manjaro/openSUSE.
+        Maybe make a note however at top of readme?
+    indicatortest
+        Should the menu calendar be hidden on
+        Manjaro/openSUSE,
+        or instead show a notification?
 
-on all distros.
+
+# Clipboard/primary on Ubuntu 20.04 Wayland
+    indicatorfortune
+        Should the copy last fortune menu item be hidden,
+        or instead show a notification when clicked or
+        mouse middle click of icon?
+        Show a tooltip in the preferences for radio button mouse
+        mouse middle click copy telling the user this won't work
+        or hide the radio button?
+    indicatoronthisday
+        Cannot hide the 'copy' radio button in the preferences
+        as it would require making the 'search' radio button
+        now a checkbox, or worse/more complicated.
+        So maybe add a tooltip?
+        When a menu item is checked and preference is to copy,
+        do nothing or show a notification?
+    indicatorpunycode
+        Perhaps don't build the menu (with convert).
+        Or show a notification telling the user this will not work
+        when convert or mouse click happens?
+    indicatortest
+        Should the menu copy time to clipboard/primary
+        be hidden under Ubuntu 20.04 Wayland,
+        or instead show a notification?
+
+
+# wmctrl on Wayland
+    indicatortest
+        Avoid calling wmctrl?  Hide the option,
+        or show a notification saying it is unavailable?
+    indicatorvirtualbox
+        If a vm is selected in the menu but already running,
+        should the call to wmcrl be avoided? 
+        If mouse wheel scroll over icon, avoid calling wmctrl?  
+    
+
+# Mouse wheel scroll
+What to do when the mouse wheel scroll is invoked but unsupported
+on distros Kubuntu 22.04/24.04 and Manjaro 24.0.7?
+    indicatorstardate
+    indicatortest
+    indicatorvirtualbox
+        If no wmctrl and a vm is selected via menu,
+        and vm is running, then do nothing or
+        perhaps show a notification to user? 
 
 
 # No autostart on Kubuntu and Manjaro

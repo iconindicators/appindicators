@@ -286,28 +286,15 @@ class IndicatorTest( IndicatorBase ):
             "notify-send",
             "paplay" )
 
-
 #TODO Should probably NOT add the calendar for manjaro/openSUSE.
 # Or instead, show a notification?
-
-#TODO Check calendar path for debian.
-
-#TODO Check calendar path for fedora.
-
-#TODO Check complete.oga path for debian.
-
-#TODO Check complete.oga path for fedora.
-
-#TODO Check complete.oga path for manjaro.
-
-#TODO Check complete.oga path for openSUSE.
 
         commands = (
             "calendar -f /usr/share/calendar/calendar.all -A 3",
             "fortune",
             "ls -la",
             f"notify-send -i { self.get_icon_name() } 'summary' 'body'",
-            "paplay /usr/share/sounds/freedesktop/stereo/complete.oga" )
+            IndicatorBase.get_play_sound_complete_command() )
 
 #TODO Change this to clipboard supported on wayland.
 # Or instead show a notification?
