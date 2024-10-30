@@ -53,7 +53,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
     COMMAND_NOTIFY_TAG_SCRIPT_RESULT = "[SCRIPT_RESULT]"
-    COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
+    COMMAND_SOUND = "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"  #TODO Check this exists for Debian, Fedora, Manjaro, openSUSE.
 
     COLUMN_MODEL_GROUP = 0 # Group name when displaying a group; empty when displaying a script.
     COLUMN_MODEL_NAME = 1 # Script name.

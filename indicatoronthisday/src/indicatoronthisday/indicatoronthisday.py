@@ -77,6 +77,9 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     CALENDARS_FILENAME = "calendars.txt"
 
+#TODO Check location of default calendar on:
+#   Debian
+#   Fedora
     DEFAULT_CALENDAR = "/usr/share/calendar/calendar.history"
     TAG_EVENT = "["+ _( "EVENT" )+ "]"
     SEARCH_URL_DEFAULT = "https://www.google.com/search?q=" + TAG_EVENT
@@ -129,6 +132,8 @@ class IndicatorOnThisDay( IndicatorBase ):
                 menu_item_count += 1
 
             if self.copy_to_clipboard:
+#TODO Perhaps only do this if ALSO clipboard is supported?
+# That way, on Ubuntu 20.04 Wayland, will just defer to open browser search.                
                 name = event_date
                 activate_functionandarguments = ( 
                     lambda menuitem:
@@ -168,7 +173,8 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def get_events( self ):
-        # Write the path of each calendar file to a temporary file - allows for one call to calendar.
+        # Write the path of each calendar file to a temporary file;
+        # allows for one call to calendar.
         content = ""
         for calendar in self.calendars:
             if Path( calendar ).is_file():
@@ -309,6 +315,8 @@ class IndicatorOnThisDay( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 1, 1, 1 )
 
+#TODO If on Ubuntu 20.04 wayland, perhaps append to the tooltip
+# that clipboard does not work and so event browser will happen always. 
         radio_copy_to_clipboard = \
             self.create_radiobutton(
                 None,

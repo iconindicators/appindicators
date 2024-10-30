@@ -60,6 +60,12 @@ class IndicatorPunycode( IndicatorBase ):
 
 
     def update( self, menu ):
+#TODO Perhaps on Ubuntu 20.04 Wayland,
+# don't build the menu below.
+# Instead, show a notification telling the user this will not work.
+# Maybe need a single menu item saying Unsupported on Ubuntu 20.04 Wayland.
+
+        
         # The mouse middle button click kicks off a convert, but to do so must
         # be bound to a menu item (which in reality kicks off the convert).
         # Therefore this menu item must be present.

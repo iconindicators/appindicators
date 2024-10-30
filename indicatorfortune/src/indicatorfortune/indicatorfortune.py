@@ -103,6 +103,9 @@ class IndicatorFortune( IndicatorBase ):
             is_secondary_activate_target = (
                 self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
+#TODO Should there be a check for clipboard support and if not, show a notification to the user?
+# Or in this case, just hide the menu item as this only applies (at present) to Ubuntu 20.04 on Wayland.
+# Maybe show a notification...easier.
         self.create_and_append_menuitem(
             menu,
             _( "Copy Last Fortune" ),
@@ -368,6 +371,8 @@ class IndicatorFortune( IndicatorBase ):
 
         grid.attach( radio_middle_mouse_click_new_fortune, 0, 4, 1, 1 )
 
+#TODO Add a tooltip here for ONLY when running under Ubuntu 20.04 on Wayland?
+# Would this negate the need to show a notification when selecting via menu or mouse middle button click?
         radio_middle_mouse_click_copy_last_fortune = \
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,

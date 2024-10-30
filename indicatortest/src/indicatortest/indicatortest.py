@@ -248,6 +248,8 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
+#TODO What to do here for Ubuntu 20.04 on wayland?
+# Hide the whole submenu?
     def _build_menu_clipboard( self, menu ):
         submenu = Gtk.Menu()
 
@@ -284,6 +286,22 @@ class IndicatorTest( IndicatorBase ):
             "notify-send",
             "paplay" )
 
+
+#TODO Should probably NOT add the calendar for manjaro/openSUSE.
+# Or instead, show a notification?
+
+#TODO Check calendar path for debian.
+
+#TODO Check calendar path for fedora.
+
+#TODO Check complete.oga path for debian.
+
+#TODO Check complete.oga path for fedora.
+
+#TODO Check complete.oga path for manjaro.
+
+#TODO Check complete.oga path for openSUSE.
+
         commands = (
             "calendar -f /usr/share/calendar/calendar.all -A 3",
             "fortune",
@@ -291,6 +309,8 @@ class IndicatorTest( IndicatorBase ):
             f"notify-send -i { self.get_icon_name() } 'summary' 'body'",
             "paplay /usr/share/sounds/freedesktop/stereo/complete.oga" )
 
+#TODO Change this to clipboard supported on wayland.
+# Or instead show a notification?
         # No point showing a command that does not work!
         if not self.session_type_is_wayland():
             labels += ( "wmctrl", )
