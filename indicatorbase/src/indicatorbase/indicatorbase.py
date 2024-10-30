@@ -803,7 +803,7 @@ class IndicatorBase( ABC ):
 
     def is_calendar_supported( self ):
         '''
-        TODO Fill in...
+        The calendar package is unavailable on some distributions.
         '''
         etc_os_release = self.process_get( "cat /etc/os-release" )
         if etc_os_release is None:
@@ -842,16 +842,7 @@ class IndicatorBase( ABC ):
 #   Ubuntu 22.04
 #   Ubuntu 24.04
 #
-#   Ubuntu 20.04  Works on X11 but logs out on Wayland.  TODO Need to prevent this from happening?
-
-
-#TODO Where the clipboard is stopped from working (ubuntu 20.04 under wayland)
-# cannot hide the functionality at the UI level because the user may run under x11
-# and set the preference to enable and somehow kick off a clipboard operation
-# under wayland that crashes.
-# So might have to use tooltips to explain a particular operation will be a no-op
-# such as indicatorfortune and copy last fortune.
-# Could show the tooltip conditionally (running on wayland and ubuntu 20.04).
+#   Ubuntu 20.04  Works on X11 but logs out on Wayland.
 
 
     def is_clipboard_supported( self ):
@@ -871,7 +862,6 @@ class IndicatorBase( ABC ):
                 etc_os_release = ""
 
             if "ID=ubuntu" in etc_os_release and "VERSION_ID=\"20.04\"" in etc_os_release:
-                print( "Ubuntu 20.04 on Wayland") #TODO Test this!
                 clipboard_supported = False
 
         return clipboard_supported
@@ -946,9 +936,7 @@ class IndicatorBase( ABC ):
                 # To shield the user from having to know whether Wayland or X11 is
                 # in use, access to the primary is wrapped within a callback function.
                 text_in_primary = self.process_get( "wl-paste --primary" )
-                print( "wayland primary text:" )#TODO Testing
                 if text_in_primary == "":
-                    print( "wayland primary text is none so set to empty text" )#TODO Testing
                     text_in_primary = None
 
                 primary_received_callback_function( text_in_primary )
@@ -973,7 +961,6 @@ class IndicatorBase( ABC ):
         having to know whether running under X11 or Wayland, the Wayland method
         also uses the same callback mechanism.
         '''
-        print( "call to callback" )#TODO Testing
         primary_received_callback_function( text )
 
 
