@@ -285,7 +285,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def on_launch_virtual_box_manager( self ):
-        if self.session_type_is_wayland():
+        if self.is_session_type_wayland():
             # Under Wayland, wmctrl does not work and so there is no manner in
             # which to determine if the VirtualBox manager is running and if so,
             # bring to the front.
@@ -440,7 +440,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 # Lets the user see what would be possible under X11.
 # But need to catch perhaps the call to wmctrl?
 # Add a tooltip telling user has no effect under wayland?
-        if not self.session_type_is_wayland():
+        if not self.is_session_type_wayland():
             # Under Wayland, cannot use wmctrl to find the VirtualBox Manager
             # window, so there is no point showing/capturing the window title.
             grid.attach(

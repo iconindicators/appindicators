@@ -27,10 +27,6 @@
         Perhaps don't build the menu (with convert).
         Or show a notification telling the user this will not work
         when convert or mouse click happens?
-    indicatortest
-        Should the menu copy time to clipboard/primary
-        be hidden under Ubuntu 20.04 Wayland,
-        or instead show a notification?
 
 
 # wmctrl on Wayland

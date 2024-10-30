@@ -685,15 +685,16 @@ class IndicatorBase( ABC ):
             else:
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction, *functionandarguments[ 1 : ] )
 
+
     def get_session_type( self ):
         return self.process_get( "echo $XDG_SESSION_TYPE" )
 
 
-    def session_type_is_wayland( self ):
+    def is_session_type_wayland( self ):
         return self.get_session_type() == IndicatorBase.SESSION_TYPE_WAYLAND
 
 
-    def session_type_is_x11( self ):
+    def is_session_type_x11( self ):
         return self.get_session_type() == IndicatorBase.SESSION_TYPE_X11
 
 
@@ -802,16 +803,16 @@ class IndicatorBase( ABC ):
 
     def is_calendar_supported( self ):
         '''
+        TODO Fill in...
         '''
         etc_os_release = self.process_get( "cat /etc/os-release" )
         if etc_os_release is None:
             etc_os_release = ""
 
-        calendar_supported = True
-        if "NAME=\"Manjaro Linux\"" in etc_os_release or "NAME=\"openSUSE Tumbleweed\"" in etc_os_release:
-            calendar_supported = False
+        is_manjaro = "NAME=\"Manjaro Linux\"" in etc_os_release
+        is_opensuse_tumbleweed = "NAME=\"openSUSE Tumbleweed\"" in etc_os_release
 
-        return calendar_supported
+        return not is_manjaro and not is_opensuse_tumbleweed
 
 
 #TODO Where is clipboard used?
@@ -853,7 +854,7 @@ class IndicatorBase( ABC ):
 # Could show the tooltip conditionally (running on wayland and ubuntu 20.04).
 
 
-    def is_wayland_clipboard_supported( self ):
+    def is_clipboard_supported( self ):
         '''
         On Ubuntu 20.04 when calling wl-copy/wl-paste under Wayland,
         due to a bug in GNOME, the destkop session crashes:
@@ -863,25 +864,25 @@ class IndicatorBase( ABC ):
         Unfortunately this issue never got fixed for the version of
         GNOME used in Ubuntu 20.04.
         '''
-        wayland_clipboard_supported = True
+        clipboard_supported = True
+        if self.is_session_type_wayland():
+            etc_os_release = self.process_get( "cat /etc/os-release" )
+            if etc_os_release is None:
+                etc_os_release = ""
 
-        etc_os_release = self.process_get( "cat /etc/os-release" )
-        if etc_os_release is None:
-            etc_os_release = ""
+            if "ID=ubuntu" in etc_os_release and "VERSION_ID=\"20.04\"" in etc_os_release:
+                print( "Ubuntu 20.04 on Wayland") #TODO Test this!
+                clipboard_supported = False
 
-        if "ID=ubuntu" in etc_os_release and "VERSION_ID=\"20.04\"" in etc_os_release:
-            print( "Ubuntu 20.04 on Wayland") #TODO Test this!
-            wayland_clipboard_supported = False
-
-        return wayland_clipboard_supported
+        return clipboard_supported
 
 
     def copy_to_selection( self, text, is_primary = False ):
         '''
         Send text to the clipboard or primary.
         '''
-        if self.session_type_is_wayland():
-            if self.is_wayland_clipboard_supported():
+        if self.is_clipboard_supported():
+            if self.is_session_type_wayland():
                 with tempfile.NamedTemporaryFile( mode = 'w', delete = False ) as temporary_named_file:
                     temporary_named_file.write( text )
 
@@ -894,33 +895,29 @@ class IndicatorBase( ABC ):
                 self.process_call( command + temporary_named_file.name )
                 Path( temporary_named_file.name ).unlink( missing_ok = True )
 
-        else:
-            selection = Gdk.SELECTION_CLIPBOARD
-            if is_primary:
-                selection = Gdk.SELECTION_PRIMARY
-
-            Gtk.Clipboard.get( selection ).set_text( text, -1 )
+            else:
+                selection = Gdk.SELECTION_CLIPBOARD
+                if is_primary:
+                    selection = Gdk.SELECTION_PRIMARY
+    
+                Gtk.Clipboard.get( selection ).set_text( text, -1 )
 
 
     def copy_from_selection_clipboard( self ):
         '''
         Obtains text from the clipboard.
-        If there was no text copied or an error occurred,
-        None is returned.
+        If there was no text copied or an error occurred, None is returned.
         '''
-        if self.session_type_is_wayland():
-            if self.is_wayland_clipboard_supported():
+        text_in_clipboard = None
+        if self.is_clipboard_supported():
+            if self.is_session_type_wayland():
                 text_in_clipboard = self.process_get( "wl-paste" )
                 if text_in_clipboard == "":
                     text_in_clipboard = None
 
             else:
-                print( "ubuntu 20.04 setting text to none from clipboard")#TODO Test
-                text_in_clipboard = None
-
-        else:
-            text_in_clipboard = \
-                Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
+                text_in_clipboard = \
+                    Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
 
         return text_in_clipboard
 
@@ -936,35 +933,29 @@ class IndicatorBase( ABC ):
         On success, the text parameter to the callback function
         will contain the primary text; otherwise None.
         '''
-        if self.session_type_is_wayland():
-            # GTK interacts with the X11 clipboard mechanism via a user callback
-            # function to receive the selection, whereas under Wayland, this is
-            # not the case.
-            #
-            # There is presently no GTK method for accessing the clipboard
-            # under Wayland.  Instead, the package wl-clipboard is used directly
-            # via a terminal, requiring no callback function.
-            #
-            # To shield the user from having to know whether Wayland or X11 is
-            # in use, access to the primary is wrapped within a callback function.
-            if self.is_wayland_clipboard_supported():
+        if self.is_clipboard_supported():
+            if self.is_session_type_wayland():
+                # GTK interacts with the X11 clipboard mechanism via a user callback
+                # function to receive the selection, whereas under Wayland, this is
+                # not the case.
+                #
+                # There is presently no GTK method for accessing the clipboard
+                # under Wayland.  Instead, the package wl-clipboard is used directly
+                # via a terminal, requiring no callback function.
+                #
+                # To shield the user from having to know whether Wayland or X11 is
+                # in use, access to the primary is wrapped within a callback function.
                 text_in_primary = self.process_get( "wl-paste --primary" )
                 print( "wayland primary text:" )#TODO Testing
                 if text_in_primary == "":
                     print( "wayland primary text is none so set to empty text" )#TODO Testing
                     text_in_primary = None
 
+                primary_received_callback_function( text_in_primary )
+
             else:
-                # On Ubuntu 20.04 under Wayland, the clipboard is not supported.
-                # So return empty text to the user through the callback.
-                print( "wayland primary on ubuntu 20.04...returning None" )#TODO Testing
-                text_in_primary = None
-
-            primary_received_callback_function( text_in_primary )
-
-        else:
-            Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
-                self._clipboard_text_received_function, primary_received_callback_function )
+                Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
+                    self._clipboard_text_received_function, primary_received_callback_function )
 
 
     def _clipboard_text_received_function(

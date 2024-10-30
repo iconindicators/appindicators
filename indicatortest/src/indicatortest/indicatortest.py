@@ -248,49 +248,31 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-#TODO Launches a console...why?
     def _build_menu_clipboard( self, menu ):
         submenu = Gtk.Menu()
 
-        '''
-        command = \
-            self.copy_to_selection( self._get_current_time() ) \
-            if not self.is_wayland_clipboard_supported() else \
-            self._execute_command( f"notify-send -i { self.get_icon_name() } \"Unsupported\" \"Clipboard unsupported.\"" )
-        '''
+        message_clipboard_unsupported = \
+            f"notify-send -i { self.get_icon_name() } \"Unsupported\" \"Clipboard unsupported.\""
 
-        '''
         self.create_and_append_menuitem(
             submenu,
             _( "Copy current time to clipboard" ),
             activate_functionandarguments = (
-                lambda menuitem: ( command ), ),
+                lambda menuitem: ( 
+                    self.copy_to_selection( self._get_current_time() ) \
+                    if self.is_clipboard_supported() else \
+                    self._execute_command( message_clipboard_unsupported ) ), ),
             indent = ( 2, 0 ) )
-        '''
 
-        '''
-        self.create_and_append_menuitem(
-            submenu,
-            _( "Copy current time to clipboard ORIG" ),
-            activate_functionandarguments = (
-                lambda menuitem: (
-                    self.copy_to_selection( self._get_current_time() ) ), ),
-            indent = ( 2, 0 ) )
-        '''
-
-        command = \
-            self.copy_to_selection( self._get_current_time(), is_primary = True ) \
-            if not self.is_wayland_clipboard_supported() else \
-            self._execute_command( f"notify-send -i { self.get_icon_name() } \"Unsupported\" \"Clipboard unsupported.\"" )
-
-        '''
         self.create_and_append_menuitem(
             submenu,
             _( "Copy current time to primary" ),
             activate_functionandarguments = (
-                lambda menuitem: ( command ), ),
+                lambda menuitem: ( 
+                    self.copy_to_selection( self._get_current_time(), is_primary = True ) \
+                    if self.is_clipboard_supported() else \
+                    self._execute_command( message_clipboard_unsupported ) ), ),
             indent = ( 2, 0 ) )
-        '''
 
         self.create_and_append_menuitem(
             menu,
@@ -318,7 +300,7 @@ class IndicatorTest( IndicatorBase ):
             f"notify-send -i { self.get_icon_name() } \"summary 1 2 3\" \"body 4 5 6\"",
             self.get_play_sound_complete_command(),
             f"notify-send -i { self.get_icon_name() } \"Unsupported\" \"Wayland does not support wmctrl.\"" \
-            if self.session_type_is_wayland() else \
+            if self.is_session_type_wayland() else \
             "wmctrl -l" )
 
         for label, command in zip( labels, commands ):
