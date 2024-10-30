@@ -248,27 +248,49 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-#TODO What to do here for Ubuntu 20.04 on wayland?
-# Hide the whole submenu?
+#TODO Launches a console...why?
     def _build_menu_clipboard( self, menu ):
         submenu = Gtk.Menu()
 
+        '''
+        command = \
+            self.copy_to_selection( self._get_current_time() ) \
+            if not self.is_wayland_clipboard_supported() else \
+            self._execute_command( f"notify-send -i { self.get_icon_name() } \"Unsupported\" \"Clipboard unsupported.\"" )
+        '''
+
+        '''
         self.create_and_append_menuitem(
             submenu,
             _( "Copy current time to clipboard" ),
             activate_functionandarguments = (
+                lambda menuitem: ( command ), ),
+            indent = ( 2, 0 ) )
+        '''
+
+        '''
+        self.create_and_append_menuitem(
+            submenu,
+            _( "Copy current time to clipboard ORIG" ),
+            activate_functionandarguments = (
                 lambda menuitem: (
                     self.copy_to_selection( self._get_current_time() ) ), ),
             indent = ( 2, 0 ) )
+        '''
 
+        command = \
+            self.copy_to_selection( self._get_current_time(), is_primary = True ) \
+            if not self.is_wayland_clipboard_supported() else \
+            self._execute_command( f"notify-send -i { self.get_icon_name() } \"Unsupported\" \"Clipboard unsupported.\"" )
+
+        '''
         self.create_and_append_menuitem(
             submenu,
             _( "Copy current time to primary" ),
             activate_functionandarguments = (
-                lambda menuitem: (
-                    self.copy_to_selection(
-                        self._get_current_time(), is_primary = True ) ), ),
+                lambda menuitem: ( command ), ),
             indent = ( 2, 0 ) )
+        '''
 
         self.create_and_append_menuitem(
             menu,
@@ -284,24 +306,20 @@ class IndicatorTest( IndicatorBase ):
             "fortune",
             "ls",
             "notify-send",
-            "paplay" )
-
-#TODO Should probably NOT add the calendar for manjaro/openSUSE.
-# Or instead, show a notification?
+            "paplay",
+            "wmctrl" )
 
         commands = (
-            "calendar -f /usr/share/calendar/calendar.all -A 3",
+            "calendar -f /usr/share/calendar/calendar.all -A 3" \
+            if self.is_calendar_supported() else \
+            f"notify-send -i { self.get_icon_name() } \"Unsupported\" \"The calendar package is unavailable.\"",
             "fortune",
             "ls -la",
-            f"notify-send -i { self.get_icon_name() } 'summary' 'body'",
-            IndicatorBase.get_play_sound_complete_command() )
-
-#TODO Change this to clipboard supported on wayland.
-# Or instead show a notification?
-        # No point showing a command that does not work!
-        if not self.session_type_is_wayland():
-            labels += ( "wmctrl", )
-            commands += ( "wmctrl -l", )
+            f"notify-send -i { self.get_icon_name() } \"summary 1 2 3\" \"body 4 5 6\"",
+            self.get_play_sound_complete_command(),
+            f"notify-send -i { self.get_icon_name() } \"Unsupported\" \"Wayland does not support wmctrl.\"" \
+            if self.session_type_is_wayland() else \
+            "wmctrl -l" )
 
         for label, command in zip( labels, commands ):
             self.create_and_append_menuitem(

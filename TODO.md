@@ -3,13 +3,9 @@
 # Calendar not on Manjaro/openSUSE
     indicatoronthisday
         Nothing to do as the indicator readme
-        does not provide install instructions 
+        does not provide install instructions
         for Manjaro/openSUSE.
         Maybe make a note however at top of readme?
-    indicatortest
-        Should the menu calendar be hidden on
-        Manjaro/openSUSE,
-        or instead show a notification?
 
 
 # Clipboard/primary on Ubuntu 20.04 Wayland
@@ -38,24 +34,19 @@
 
 
 # wmctrl on Wayland
-    indicatortest
-        Avoid calling wmctrl?  Hide the option,
-        or show a notification saying it is unavailable?
     indicatorvirtualbox
         If a vm is selected in the menu but already running,
-        should the call to wmcrl be avoided? 
-        If mouse wheel scroll over icon, avoid calling wmctrl?  
-    
+        should the call to wmcrl be avoided?
+        If mouse wheel scroll over icon, avoid calling wmctrl?
+
 
 # Mouse wheel scroll
 What to do when the mouse wheel scroll is invoked but unsupported
 on distros Kubuntu 22.04/24.04 and Manjaro 24.0.7?
-    indicatorstardate
-    indicatortest
     indicatorvirtualbox
         If no wmctrl and a vm is selected via menu,
         and vm is running, then do nothing or
-        perhaps show a notification to user? 
+        perhaps show a notification to user?
 
 
 # No autostart on Kubuntu and Manjaro

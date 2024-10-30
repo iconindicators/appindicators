@@ -800,6 +800,20 @@ class IndicatorBase( ABC ):
                 menuitem.set_sensitive( toggle )
 
 
+    def is_calendar_supported( self ):
+        '''
+        '''
+        etc_os_release = self.process_get( "cat /etc/os-release" )
+        if etc_os_release is None:
+            etc_os_release = ""
+
+        calendar_supported = True
+        if "NAME=\"Manjaro Linux\"" in etc_os_release or "NAME=\"openSUSE Tumbleweed\"" in etc_os_release:
+            calendar_supported = False
+
+        return calendar_supported
+
+
 #TODO Where is clipboard used?
 # indicatorfortune
 # indicatoronthisday
@@ -839,11 +853,11 @@ class IndicatorBase( ABC ):
 # Could show the tooltip conditionally (running on wayland and ubuntu 20.04).
 
 
-    def _is_wayland_clipboard_supported( self ):
+    def is_wayland_clipboard_supported( self ):
         '''
         On Ubuntu 20.04 when calling wl-copy/wl-paste under Wayland,
         due to a bug in GNOME, the destkop session crashes:
-        
+
         https://gitlab.gnome.org/GNOME/mutter/-/issues/1690
 
         Unfortunately this issue never got fixed for the version of
@@ -867,7 +881,7 @@ class IndicatorBase( ABC ):
         Send text to the clipboard or primary.
         '''
         if self.session_type_is_wayland():
-            if self._is_wayland_clipboard_supported():
+            if self.is_wayland_clipboard_supported():
                 with tempfile.NamedTemporaryFile( mode = 'w', delete = False ) as temporary_named_file:
                     temporary_named_file.write( text )
 
@@ -895,7 +909,7 @@ class IndicatorBase( ABC ):
         None is returned.
         '''
         if self.session_type_is_wayland():
-            if self._is_wayland_clipboard_supported():
+            if self.is_wayland_clipboard_supported():
                 text_in_clipboard = self.process_get( "wl-paste" )
                 if text_in_clipboard == "":
                     text_in_clipboard = None
@@ -933,7 +947,7 @@ class IndicatorBase( ABC ):
             #
             # To shield the user from having to know whether Wayland or X11 is
             # in use, access to the primary is wrapped within a callback function.
-            if self._is_wayland_clipboard_supported():
+            if self.is_wayland_clipboard_supported():
                 text_in_primary = self.process_get( "wl-paste --primary" )
                 print( "wayland primary text:" )#TODO Testing
                 if text_in_primary == "":
