@@ -26,7 +26,6 @@ import copy
 import datetime
 import gi
 import math
-import indicatorbase
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
