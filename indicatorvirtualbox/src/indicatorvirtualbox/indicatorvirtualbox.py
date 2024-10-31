@@ -68,10 +68,12 @@ class IndicatorVirtualBox( IndicatorBase ):
         self.scroll_direction_is_up = True
         self.scroll_uuid = None
 
-#TODO Perhaps do not call this if running under Kubuntu 22.04/24.04 or Manjaro 24.0.7 KDE?
-# But I don't want the indicator to have to worry about this sort of thing.
-# So where to handle this, if at all?
-        self.request_mouse_wheel_scroll_events( ( self.on_mouse_wheel_scroll, ) )
+        # A mouse wheel scroll event will use wmctrl to cycle through running
+        # virtual machines and attempt to bring each to the front.
+        # Under Wayland, wmctrl is not implemented and so it is pointless
+        # listening for events which will result in nothing.        
+        if not self.is_session_type_wayland():
+            self.request_mouse_wheel_scroll_events( ( self.on_mouse_wheel_scroll, ) )
 
 
     def update( self, menu ):
@@ -229,28 +231,27 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.process_call( self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &" )
 
 
-#TODO I think this function needs the same treatment for Wayland as the VirtualBox manager window.
-# Should this function just do nothing if running under Wayland?
     def bring_window_to_front( self, virtual_machine_name, delay_in_seconds = 0 ):
-        number_of_windows_with_the_same_name = \
-            self.process_get( 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' )
+        if not self.is_session_type_wayland():
+            number_of_windows_with_the_same_name = \
+                self.process_get( 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' )
 
-        if number_of_windows_with_the_same_name == "0":
-            message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtual_machine_name )
-            summary = _( "Warning" )
-            self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
+            if number_of_windows_with_the_same_name == "0":
+                message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtual_machine_name )
+                summary = _( "Warning" )
+                self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
 
-        elif number_of_windows_with_the_same_name == "1":
-            for line in self.process_get( "wmctrl -l" ).splitlines():
-                if virtual_machine_name in line:
-                    window_id = line[ 0 : line.find( " " ) ]
-                    self.process_call( "wmctrl -i -a " + window_id )
-                    break
+            elif number_of_windows_with_the_same_name == "1":
+                for line in self.process_get( "wmctrl -l" ).splitlines():
+                    if virtual_machine_name in line:
+                        window_id = line[ 0 : line.find( " " ) ]
+                        self.process_call( "wmctrl -i -a " + window_id )
+                        break
 
-        else:
-            message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window with overlapping names." ).format( virtual_machine_name )
-            summary = _( "Warning" )
-            self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
+            else:
+                message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window with overlapping names." ).format( virtual_machine_name )
+                summary = _( "Warning" )
+                self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
 
 
     # Zealous mouse wheel scrolling can cause too many notifications, subsequently popping the graphics stack!
@@ -285,11 +286,17 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def on_launch_virtual_box_manager( self ):
-        if self.is_session_type_wayland():
-            # Under Wayland, wmctrl does not work and so there is no manner in
-            # which to determine if the VirtualBox manager is running and if so,
-            # bring to the front.
+        
+        def start_virtualbox_manager():
             self.process_call( self.process_get( "which VirtualBox" ) + " &" )
+        
+        
+        if self.is_session_type_wayland():
+            # Wayland does not support wmctrl.
+            # If the VirtualBox manager is already running,
+            # there is no ability to bring to the front.
+            # Can only run VirtualBox manager again and again...
+            start_virtualbox_manager()
 
         else:
             # Only want one instance of VirtualBox manager to be running
@@ -309,7 +316,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 window_id = result.split()[ 0 ]
     
             if window_id is None or window_id == "":
-                self.process_call( self.process_get( "which VirtualBox" ) + " &" )
+                start_virtualbox_manager()
     
             else:
                 self.process_call( "wmctrl -ia " + window_id )
@@ -434,21 +441,15 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "The window title of VirtualBox™ Manager.\n" +
                     "You may have to adjust for your local language.\n\n" +
                     "This is used to bring the VirtualBox™ Manager\n" +
-                    "window to the front if already running." ) )
+                    "window to the front if already running.\n\n" +
+                    "This is unsupported under Wayland." ) )
 
-#TODO Maybe change this now...always show.
-# Lets the user see what would be possible under X11.
-# But need to catch perhaps the call to wmctrl?
-# Add a tooltip telling user has no effect under wayland?
-        if not self.is_session_type_wayland():
-            # Under Wayland, cannot use wmctrl to find the VirtualBox Manager
-            # window, so there is no point showing/capturing the window title.
-            grid.attach(
-                self.create_box(
-                    (
-                        ( Gtk.Label.new( _( "VirtualBox™ Manager" ) ), False ),
-                        ( window_name, True ) ) ),
-                0, 0, 1, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "VirtualBox™ Manager" ) ), False ),
+                    ( window_name, True ) ) ),
+            0, 0, 1, 1 )
 
         sort_groups_and_virtual_machines_equally_checkbox = \
             self.create_checkbutton(
