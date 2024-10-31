@@ -45,22 +45,13 @@ class IndicatorFortune( IndicatorBase ):
     CONFIG_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
 
 
-#TODO
-# on Ubuntu 20.04 Wayland
-# Should the copy last fortune menu item be hidden,
-# or instead show a notification when clicked or
-# mouse middle click of icon?
-# Show a tooltip in the preferences for radio button mouse
-# mouse middle click copy telling the user this won't work
-# or hide the radio button?
-
-
 #TODO When selecting a fortune (via directory, not sure if also via file)
 # ensure the fortune checkbox is enabled.
 
 
-#TODO Manjaro default fortune is in /usr/share/fortune
-#TODO openSUSE default fortune is in /usr/share/fortune
+#TODO
+# Manjaro default fortune is in /usr/share/fortune
+# openSUSE default fortune is in /usr/share/fortune
     fortune_debian = "/usr/share/games/fortunes"
     fortune_fedora = "/usr/share/games/fortune"
     fortune_manjaro_opensuse = "/usr/share/fortune"
@@ -118,16 +109,15 @@ class IndicatorFortune( IndicatorBase ):
             is_secondary_activate_target = (
                 self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
-#TODO Should there be a check for clipboard support and if unsupported,
-# show a notification to the user?
-# Or in this case, just hide the menu item as this only applies
-# (at present) to Ubuntu 20.04 on Wayland.
-# Maybe show a notification...easier.
+        activate_functionandarguments = None
+        if self.is_clipboard_supported():
+            activate_functionandarguments = (
+                lambda menuitem: self.copy_to_selection( self.fortune ), )
+
         self.create_and_append_menuitem(
             menu,
             _( "Copy Last Fortune" ),
-            activate_functionandarguments = (
-                lambda menuitem: self.copy_to_selection( self.fortune ), ),
+            activate_functionandarguments = activate_functionandarguments,
             is_secondary_activate_target = (
                 self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
 
@@ -381,19 +371,21 @@ class IndicatorFortune( IndicatorBase ):
         radio_middle_mouse_click_new_fortune = \
             self.create_radiobutton(
                 None,
-                _( "Show a new fortune" ),
+                tooltip_text = _( "Show a new fortune" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = \
                     self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
 
         grid.attach( radio_middle_mouse_click_new_fortune, 0, 4, 1, 1 )
 
-#TODO Add a tooltip here for ONLY when running under Ubuntu 20.04 on Wayland?
-# Would this negate the need to show a notification when selecting via menu or mouse middle button click?
+        tooltip_text = _( "Copy current fortune to clipboard" )
+        if self.is_clipboard_supported():
+            tooltip_text += _( "\n\nUnsupported on Ubuntun 20.04 on Wayland." )
+
         radio_middle_mouse_click_copy_last_fortune = \
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,
-                _( "Copy current fortune to clipboard" ),
+                tooltip_text = tooltip_text,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = \
                     self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
@@ -403,7 +395,7 @@ class IndicatorFortune( IndicatorBase ):
         radio_middle_mouse_click_show_last_fortune = \
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,
-                _( "Show current fortune" ),
+                tooltip_text = _( "Show current fortune" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = \
                     self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )

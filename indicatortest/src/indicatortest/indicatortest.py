@@ -258,7 +258,7 @@ class IndicatorTest( IndicatorBase ):
             submenu,
             _( "Copy current time to clipboard" ),
             activate_functionandarguments = (
-                lambda menuitem: ( 
+                lambda menuitem: (
                     self.copy_to_selection( self._get_current_time() ) \
                     if self.is_clipboard_supported() else \
                     self._execute_command( message_clipboard_unsupported ) ), ),
@@ -268,7 +268,7 @@ class IndicatorTest( IndicatorBase ):
             submenu,
             _( "Copy current time to primary" ),
             activate_functionandarguments = (
-                lambda menuitem: ( 
+                lambda menuitem: (
                     self.copy_to_selection( self._get_current_time(), is_primary = True ) \
                     if self.is_clipboard_supported() else \
                     self._execute_command( message_clipboard_unsupported ) ), ),
