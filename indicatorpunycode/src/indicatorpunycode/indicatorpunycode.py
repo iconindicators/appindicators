@@ -89,24 +89,6 @@ class IndicatorPunycode( IndicatorBase ):
                 indent = ( 1, 1 ) )
 
 
-#TODO Test data
-# ü     tda
-# α     mxa
-# 例     fsq
-# αβγ     mxacd
-# München     Mnchen-3ya
-# Mnchen-3ya     Mnchen-3ya-
-# München-Ost     Mnchen-Ost-9db
-# Bahnhof München-Ost     Bahnhof Mnchen-Ost-u6b
-# abæcdöef     abcdef-qua4k
-# правда     80aafi6cg
-# ยจฆฟคฏข     22cdfh1b8fsa
-# 도메인     hq1bm8jm9l
-# ドメイン名例     eckwd4c7cu47r2wf
-
-#TODO Need to test clipboard input and primary input,
-# via menu item and mouse middle button click.
-# Seems to be an issue with primary on Debian 12 on laptop.
     def on_convert( self ):
         if self.is_clipboard_supported():
             summary =_( "Nothing to convert..." )
