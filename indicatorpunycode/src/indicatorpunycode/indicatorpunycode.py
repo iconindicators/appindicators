@@ -17,10 +17,7 @@
 
 
 # Application indicator which converts domain names between Unicode and ASCII.
-#
-# Testing on Ubuntu 22.04 / 24.04, Debian 11 / 12 and Fedora 38 / 38 / 40
-# reveals the clipboard/primary input and output works on Wayland
-# intermittently (at best) and therefore is deemed unsupported.
+
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
@@ -30,10 +27,6 @@ import re
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
-
-
-#TODO Maybe put into a tooltip somewhere that
-# text in punycode text must start with xn-- if to be recognised as punycode.
 
 
 class IndicatorPunycode( IndicatorBase ):
