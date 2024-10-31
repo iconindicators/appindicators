@@ -129,18 +129,12 @@ class IndicatorOnThisDay( IndicatorBase ):
                 menu_item_count += 1
 
             if self.copy_to_clipboard:
-#TODO Perhaps only do this if ALSO clipboard is supported?
-# That way, on Ubuntu 20.04 Wayland, will just defer to open browser search.
-
-#TODO
-# on Ubuntu 20.04 Wayland
-# When a menu item is checked and preference is to copy,
-# do nothing or show a notification?
-                
                 name = event_date
-                activate_functionandarguments = ( 
-                    lambda menuitem:
-                        self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), )
+                activate_functionandarguments = None
+                if self.is_clipboard_supported():
+                    activate_functionandarguments = (
+                        lambda menuitem:
+                            self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), )
 
             else:
                 if len( self.search_url ) > 0:
@@ -168,7 +162,7 @@ class IndicatorOnThisDay( IndicatorBase ):
     def remove_leading_zero_from_date( self, date ):
         if date[ -2 ] == '0':
             _date = date[ 0 : -3 ] + ' ' + date[ -1 ]
-        
+
         else:
             _date = date[ 0 : -3 ] + ' ' + date[ -2 : ]
 
@@ -290,7 +284,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     ( self.on_calendar_add, treeview ),
                     ( self.on_calendar_remove, treeview ),
                     ( self.on_calendar_reset, treeview ) ) )
-        
+
         grid.attach( box, 0, 26, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Calendars" ) ) )
@@ -318,13 +312,15 @@ class IndicatorOnThisDay( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 1, 1, 1 )
 
-#TODO If on Ubuntu 20.04 wayland, perhaps append to the tooltip
-# that clipboard does not work and so event browser will happen always. 
+        tooltip_text = _( "Copy the event text and date to the clipboard." )
+        if self.is_clipboard_supported():
+            tooltip_text += _( "\n\nUnsupported on Ubuntun 20.04 on Wayland." )
+
         radio_copy_to_clipboard = \
             self.create_radiobutton(
                 None,
                 _( "Copy event to clipboard" ),
-                 tooltip_text = _( "Copy the event text and date to the clipboard." ),
+                tooltip_text = tooltip_text,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.copy_to_clipboard )
 
@@ -580,7 +576,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 if dialog.get_filename() in system_calendars:
                     self.show_dialog_ok(
                         dialog,
-                        _( "The calendar is part of your system\nand is already included." ), 
+                        _( "The calendar is part of your system\nand is already included." ),
                         nessage_type = Gtk.MessageType.INFO )
 
                 else:
