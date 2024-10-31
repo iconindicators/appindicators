@@ -44,14 +44,6 @@ class IndicatorFortune( IndicatorBase ):
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     CONFIG_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
 
-
-#TODO When selecting a fortune (via directory, not sure if also via file)
-# ensure the fortune checkbox is enabled.
-
-
-#TODO
-# Manjaro default fortune is in /usr/share/fortune
-# openSUSE default fortune is in /usr/share/fortune
     fortune_debian = "/usr/share/games/fortunes"
     fortune_fedora = "/usr/share/games/fortune"
     fortune_manjaro_opensuse = "/usr/share/fortune"
@@ -61,17 +53,7 @@ class IndicatorFortune( IndicatorBase ):
     elif Path( fortune_fedora ).exists():
         DEFAULT_FORTUNE = [ fortune_fedora, Gtk.STOCK_APPLY ]
 
-#TODO If this is an else but we are not on manjaro/opensuse, then what?
-# Otherwise, if this is left as is, then what should the else be?
-# Maybe just default to fortune_debian?
-# Maybe see what happens if the default fortune is a path which does not exist.
-# Test by removing preferences and then put in a bogus path.
-#
-# When installing from .deb, the fortune package was guaranteed to be installed.
-# Now that the user is responsible for installing the fortune package,
-# what if they don't, but we have defined the default fortune location
-# which should be valid, but is not present?
-    elif Path( fortune_manjaro_opensuse ).exists():
+    else: # Assume to be Manjaro/openSUSE.
         DEFAULT_FORTUNE = [ fortune_manjaro_opensuse, Gtk.STOCK_APPLY ]
 
     HISTORY_FILE = "fortune-history.txt"
