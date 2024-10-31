@@ -137,6 +137,10 @@ def _get_introduction( indicator_name ):
     if not _is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
         introduction += f", `openSUSE`, `Manjaro`"
 
+#TODO Somewhere/somehow, mention ONLY for indicatoronthisday
+# that indicatoronthisday is unavailable on Manjaro/openSUSE
+# because the calendar package is unavailable.
+
     introduction += f" and theoretically, any platform which supports the "
     introduction += f"`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n"
 
@@ -714,6 +718,9 @@ def _get_limitations( indicator_name ):
             f"- `Kubuntu 24.04`: No autostart.\n" )
         messages.append(
             f"- `Manjaro 24`: No autostart.\n" )
+
+#TODO For indicatoronthisday and wayland and ubuntu 20.04
+# need to mention that clicking on an event will not copy to clipboard.
 
     message = ""
     if messages:

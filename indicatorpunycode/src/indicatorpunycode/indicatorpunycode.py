@@ -75,6 +75,12 @@ class IndicatorPunycode( IndicatorBase ):
             activate_functionandarguments = ( lambda menuitem: self.on_convert(), ),
             is_secondary_activate_target = True )
 
+#TODO
+# Perhaps don't build the menu (with convert) on Ubuntu 20.04 Wayland
+# Or show a notification telling the user this will not work
+# when convert or mouse click happens?
+
+
 
 #TODO May not be needed now Wayland works.  Maybe only needed for old Budgie 20.04?
         # self.create_and_append_menuitem(

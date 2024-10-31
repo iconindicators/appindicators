@@ -45,6 +45,16 @@ class IndicatorFortune( IndicatorBase ):
     CONFIG_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
 
 
+#TODO
+# on Ubuntu 20.04 Wayland
+# Should the copy last fortune menu item be hidden,
+# or instead show a notification when clicked or
+# mouse middle click of icon?
+# Show a tooltip in the preferences for radio button mouse
+# mouse middle click copy telling the user this won't work
+# or hide the radio button?
+
+
 #TODO When selecting a fortune (via directory, not sure if also via file)
 # ensure the fortune checkbox is enabled.
 

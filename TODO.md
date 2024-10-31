@@ -29,13 +29,6 @@
         when convert or mouse click happens?
 
 
-# wmctrl on Wayland
-    indicatorvirtualbox
-        If a vm is selected in the menu but already running,
-        should the call to wmcrl be avoided?
-        If mouse wheel scroll over icon, avoid calling wmctrl?
-
-
 # Mouse wheel scroll
 What to do when the mouse wheel scroll is invoked but unsupported
 on distros Kubuntu 22.04/24.04 and Manjaro 24.0.7?

@@ -130,7 +130,13 @@ class IndicatorOnThisDay( IndicatorBase ):
 
             if self.copy_to_clipboard:
 #TODO Perhaps only do this if ALSO clipboard is supported?
-# That way, on Ubuntu 20.04 Wayland, will just defer to open browser search.                
+# That way, on Ubuntu 20.04 Wayland, will just defer to open browser search.
+
+#TODO
+# on Ubuntu 20.04 Wayland
+# When a menu item is checked and preference is to copy,
+# do nothing or show a notification?
+                
                 name = event_date
                 activate_functionandarguments = ( 
                     lambda menuitem:
