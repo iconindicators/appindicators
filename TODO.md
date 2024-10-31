@@ -1,19 +1,5 @@
 # Immediate
 
-# Clipboard/primary on Ubuntu 20.04 Wayland
-    indicatorfortune
-        Should the copy last fortune menu item be hidden,
-        or instead show a notification when clicked or
-        mouse middle click of icon?
-        Show a tooltip in the preferences for radio button mouse
-        mouse middle click copy telling the user this won't work
-        or hide the radio button?
-    indicatorpunycode
-        Perhaps don't build the menu (with convert).
-        Or show a notification telling the user this will not work
-        when convert or mouse click happens?
-
-
 # No autostart on Kubuntu and Manjaro
 Given there is no autostart on Kubuntu 24.04 and Manjaro 24.04.7,
 should the autostart checkbox and delay spinner be hidden?

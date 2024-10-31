@@ -325,11 +325,6 @@ def _get_uninstall_for_operating_system(
     return uninstall
 
 
-#TODO Work out wl-clipboard  for each distro/indicator combination.
-# Debian : wl-clipboard
-# Fedora : wl-clipboard
-# Manjaro : wl-clipboard
-# openSUSE : wl-clipboard
 def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
@@ -348,8 +343,11 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
+        dependencies.append( "wl-clipboard" )
 
     if indicator_name == Indicator_Name.INDICATORONTHISDAY:
+        dependencies.append( "wl-clipboard" )
+
         applicable_operating_systems = {
             Operating_System.DEBIAN_11,
             Operating_System.DEBIAN_12,
@@ -369,6 +367,9 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         if operating_system.issubset( applicable_operating_systems ):
             dependencies.append( "calendar" )
 
+    if indicator_name == Indicator_Name.INDICATORPUNYCODE:
+        dependencies.append( "wl-clipboard" )
+
     if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
         dependencies.append( "libnotify-bin" )
         dependencies.append( "pulseaudio-utils" )
@@ -378,6 +379,7 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         dependencies.append( "fortunes" )
         dependencies.append( "libnotify-bin" )
         dependencies.append( "pulseaudio-utils" )
+        dependencies.append( "wl-clipboard" )
         dependencies.append( "wmctrl" )
 
         applicable_operating_systems = {
@@ -416,9 +418,14 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
 
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
+        dependencies.append( "wl-clipboard" )
 
     if indicator_name == Indicator_Name.INDICATORONTHISDAY:
         dependencies.append( "calendar" )
+        dependencies.append( "wl-clipboard" )
+
+    if indicator_name == Indicator_Name.INDICATORPUNYCODE:
+        dependencies.append( "wl-clipboard" )
 
     if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
         applicable_operating_systems = {
@@ -431,6 +438,7 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
     if indicator_name == Indicator_Name.INDICATORTEST:
         dependencies.append( "calendar" )
         dependencies.append( "fortune-mod" )
+        dependencies.append( "wl-clipboard" )
         dependencies.append( "wmctrl" )
 
         applicable_operating_systems = {
@@ -455,9 +463,17 @@ def _get_operating_system_dependencies_manjaro( operating_system, indicator_name
 
     if indicator_name == Indicator_Name.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
+        dependencies.append( "wl-clipboard" )
+
+    if indicator_name == Indicator_Name.INDICATORONTHISDAY:
+        dependencies.append( "wl-clipboard" )
+
+    if indicator_name == Indicator_Name.INDICATORPUNYCODE:
+        dependencies.append( "wl-clipboard" )
 
     if indicator_name == Indicator_Name.INDICATORTEST:
         dependencies.append( "fortune-mod" )
+        dependencies.append( "wl-clipboard" )
         dependencies.append( "wmctrl" )
 
     if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
@@ -701,7 +717,7 @@ def _get_limitations( indicator_name ):
 
     # Kubuntu 24.04     No autostart.
     # Manjaro 24.04.7   No autostart.
-#TODO Need to change this...does not apply for manjaro and indicatoronthisday.    
+#TODO Need to change this...does not apply for manjaro and indicatoronthisday.
     if _is_indicator(
         indicator_name,
         Indicator_Name.INDICATORFORTUNE,

@@ -889,7 +889,7 @@ class IndicatorBase( ABC ):
                 selection = Gdk.SELECTION_CLIPBOARD
                 if is_primary:
                     selection = Gdk.SELECTION_PRIMARY
-    
+
                 Gtk.Clipboard.get( selection ).set_text( text, -1 )
 
 
