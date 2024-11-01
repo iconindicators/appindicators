@@ -59,9 +59,9 @@ def get_stars_and_hips( iau_catalog_file ):
     return stars_and_hips_from_iau
 
 
-def print_formatted_stars( stars_and_hips ):
-    print( "Printing formatted stars from", star_information_url )
-    for name, hip in stars_and_hips:
+def print_formatted_stars( stars_and_hips_, star_information_url_ ):
+    print( "Printing formatted stars from", star_information_url_ )
+    for name, hip in stars_and_hips_:
         print(
             "        [ " + \
             "\"" + name.upper() + "\"," + \
@@ -75,9 +75,9 @@ def print_formatted_stars( stars_and_hips ):
     print( "Done" )
 
 
-def create_ephemeris_skyfield( out_file, star_ephemeris, stars_and_hips ):
+def create_ephemeris_skyfield( out_file, star_ephemeris, stars_and_hips_ ):
     print( "Creating", out_file, "for Skyfield..." )
-    hipparcos_identifiers = [ star_and_hip[ 1 ] for star_and_hip in stars_and_hips ]
+    hipparcos_identifiers = [ star_and_hip[ 1 ] for star_and_hip in stars_and_hips_ ]
     with load.open( star_ephemeris, "rb" ) as in_file, open( out_file, "wb" ) as f:
         for line in in_file:
             hip = int( line.decode()[ 9 - 1 : 14 - 1 + 1 ].strip() ) # HIP is located at bytes 9 - 14, http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
@@ -88,7 +88,7 @@ def create_ephemeris_skyfield( out_file, star_ephemeris, stars_and_hips ):
 
 
 # Mostly taken from https://github.com/brandon-rhodes/pyephem/blob/master/bin/rebuild-star-data
-def print_ephemeris_pyephem( bsp_file , star_ephemeris, stars_and_hips ):
+def print_ephemeris_pyephem( bsp_file , star_ephemeris, stars_and_hips_ ):
     print( "Printing ephemeris for PyEphem..." )
     with load.open( star_ephemeris, "rb" ) as f:
         stars = hipparcos.load_dataframe( f )
@@ -104,7 +104,7 @@ def print_ephemeris_pyephem( bsp_file , star_ephemeris, stars_and_hips ):
 
     stars_with_spectral_type = stars_with_spectral_type.set_index( "HIP" )
     sun_at = load( bsp_file )[ "Sun" ].at( load.timescale().J( 2000.0 ) )
-    for name, hip in stars_and_hips:
+    for name, hip in stars_and_hips_:
         row = stars.loc[ hip ]
         star = Star.from_dataframe( row )
         right_ascension, declination, _ = sun_at.observe( star ).radec()
@@ -165,11 +165,11 @@ if __name__ == "__main__":
     parser.add_argument( "planet_ephemeris", help = _help )
 
     _help = "The output filename for the Skyfield star ephemeris."
-    parser.add_argument( "output_filename_for_skyfield_star_ephemeris", help = _help ) 
+    parser.add_argument( "output_filename_for_skyfield_star_ephemeris", help = _help )
 
     args = parser.parse_args()
 
     stars_and_hips = get_stars_and_hips( args.star_information )
-    print_formatted_stars( stars_and_hips )
+    print_formatted_stars( stars_and_hips, star_information_url )
     create_ephemeris_skyfield( args.output_filename_for_skyfield_star_ephemeris, args.star_ephemeris, stars_and_hips )
     print_ephemeris_pyephem( args.planet_ephemeris, args.star_ephemeris, stars_and_hips )

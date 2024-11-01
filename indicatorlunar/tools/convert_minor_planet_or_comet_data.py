@@ -417,12 +417,12 @@ if __name__ == "__main__":
         argparse.ArgumentParser(
             formatter_class = argparse.RawDescriptionHelpFormatter,
             description = description )
-    
+
     parser.add_argument( "option", type = int, choices = [ 1, 2, 3, 4 ] )
-    
+
     parser.add_argument( "in_file", help = "File to convert" )
-    
+
     parser.add_argument( "out_file", help = "Output file to be created" )
-    
+
     args = parser.parse_args()
     convert( args.option, args.in_file, args.out_file )
