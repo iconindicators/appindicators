@@ -411,7 +411,7 @@ class IndicatorFortune( IndicatorBase ):
 
             self.fortunes = [ ]
             treeiter = store.get_iter_first()
-            while treeiter != None:
+            while treeiter is not None:
                 if store[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == Gtk.STOCK_APPLY:
                     self.fortunes.append( [ store[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ], True ] )
 
@@ -594,7 +594,7 @@ class IndicatorFortune( IndicatorBase ):
                 fortune_file_directory.get_text(),
                 action = action )
 
-        while( True ):
+        while True:
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] ):
