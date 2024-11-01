@@ -131,11 +131,11 @@ class DataProviderOrbitalElement( DataProvider ):
             data = response.json()
             minor_planets = data[ "data" ][ "query_closest_orbelements" ]
 
-            with open( filename, 'w' ) as f:
+            with open( filename, 'w' ) as f: #TODO Encodeing
                 for minor_planet in minor_planets:
                     asteroid_number = minor_planet[ "minorplanet" ][ "ast_number" ]
                     if asteroid_number is None:
-                        continue # Not all asteroids / minor planets have a number. 
+                        continue # Not all asteroids / minor planets have a number.
 
                     if minor_planet[ "minorplanet" ][ "designameByIdDesignationName" ] is None:
                         continue # Not all asteroids / minor planets have names.
@@ -318,7 +318,7 @@ class DataProviderOrbitalElement( DataProvider ):
                 valid_indices = [ 8, 14, 20, 26, 36, 37, 47, 48, 58, 59, 69, 70, 80, 92, 104, 105, 107, 117, 123, 127, 137, 142, 146, 150, 161, 166 ] # Ignore 132.
 
             try:
-                with open( filename, 'r' ) as f:
+                with open( filename, 'r' ) as f: #TODO Encodeing
                     for line in f.read().splitlines():
                         keep = True
                         for i in valid_indices:
@@ -338,13 +338,13 @@ class DataProviderOrbitalElement( DataProvider ):
 
         elif orbital_element_data_type == OE.DataType.XEPHEM_COMET or orbital_element_data_type == OE.DataType.XEPHEM_MINOR_PLANET:
             try:
-                with open( filename, 'r' ) as f:
+                with open( filename, 'r' ) as f: #TODO Encodeing
                     for line in f.read().splitlines():
                         if not line.startswith( '{' ):
                             # Sometimes the COBS download emits an error message of the form:
                             #   {"code": "400",
-                            #    "message": "Invalid integer value provided in the parameter.", 
-                            #    "moreInfo": "invalid literal for int() with base 10: 'false'", 
+                            #    "message": "Invalid integer value provided in the parameter.",
+                            #    "moreInfo": "invalid literal for int() with base 10: 'false'",
                             #    "signature": {"source": "COBS Query API", "version": "1.3", "date": "2024 May"}}
                             # In this event, keep the download file as is for bug tracking if needed,
                             # but skip loading the data (there is no data to load).

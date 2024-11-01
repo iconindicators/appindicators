@@ -462,10 +462,10 @@ class IndicatorLunar( IndicatorBase ):
         i = 0
         last_separator_index = -1 # Track the last insertion point of the separator so it can be removed.
         tag_regular_expression = "\[[^\[\]]*\]"
-        while( i < len( processed_text ) ):
+        while i < len( processed_text ):
             if processed_text[ i ] == '{':
                 j = i + 1
-                while( j < len( processed_text ) ):
+                while j < len( processed_text ):
                     if processed_text[ j ] == '}':
                         text = processed_text[ i + 1 : j ] # Text between braces.
                         text_minus_unknown_tags = re.sub( tag_regular_expression, "", text ) # Text between braces with outstanding/unknown tags removed.
@@ -900,10 +900,11 @@ class IndicatorLunar( IndicatorBase ):
 
     def get_on_click_function_comet( self ):
         try:
+            #TODO Is the return needed?  If so, need a return on the exception...but what?
             return lambda menuitem: (
                 webbrowser.open(
                     IndicatorLunar.SEARCH_URL_COMET_ID + \
-                    str( requests.get( menuitem.get_name() ).json()[ "object" ][ "id" ] ) ) )
+                    str( requests.get( menuitem.get_name() ).json()[ "object" ][ "id" ] ) ) )  #TODO Add timeout
 
         except Exception:
             pass # Ignore as the network/site may be down, or is a bad comet designation.
@@ -1414,7 +1415,7 @@ class IndicatorLunar( IndicatorBase ):
 
                 data = \
                     self.format_data(
-                        IndicatorLunar.astro_backend.DATA_TAG_RISE_AZIMUTH, 
+                        IndicatorLunar.astro_backend.DATA_TAG_RISE_AZIMUTH,
                         info[ IndicatorLunar.SATELLITE_MENU_RISE_AZIMUTH ] )
 
                 self.create_and_append_menuitem(
@@ -2073,7 +2074,7 @@ class IndicatorLunar( IndicatorBase ):
                     ( city, False ) ),
                     margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2 ),
             0, 0, 1, 1 )
-        
+
         latitude = \
             self.create_entry(
                 str( self.latitude ),
@@ -2573,7 +2574,7 @@ class IndicatorLunar( IndicatorBase ):
                     ( self.create_scrolledwindow( message_text_view ), True ) ),
                 sensitive = checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT )
-        
+
         grid.attach( box, 0, grid_start_index + 2, 1, 1 )
 
         checkbutton.connect( "toggled", self.on_radio_or_checkbox, True, box )
@@ -2587,7 +2588,7 @@ class IndicatorLunar( IndicatorBase ):
                     self.on_test_notification_clicked,
                     summary_text_entry, message_text_view, is_moon_notification ) )
 
-        test.set_halign( Gtk.Align.END )       
+        test.set_halign( Gtk.Align.END )
         grid.attach( test, 0, grid_start_index + 3, 1, 1 )
 
         checkbutton.connect( "toggled", self.on_radio_or_checkbox, True, test )

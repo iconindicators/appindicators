@@ -195,7 +195,7 @@ def _get_eclipse(
             if longitude.endswith( 'E' ):
                 the_longitude = '-' + the_longitude
 
-            eclipse_information = ( 
+            eclipse_information = (
                 date_time,
                 _get_eclipse_type_from_table_value( eclipse_type ),
                 the_latitude,

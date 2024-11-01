@@ -97,11 +97,11 @@ class DataProviderApparentMagnitude( DataProvider ):
             data = response.json()
             minor_planets = data[ "data" ][ "minorplanet" ]
 
-            with open( filename, 'w' ) as f:
+            with open( filename, 'w' ) as f: #TODO Encodeing
                 for minor_planet in minor_planets:
                     asteroid_number = minor_planet[ "ast_number" ]
                     if asteroid_number is None:
-                        continue # Not all asteroids / minor planets have a number. 
+                        continue # Not all asteroids / minor planets have a number.
 
                     if minor_planet[ "designameByIdDesignationName" ] is None:
                         continue # Not all asteroids / minor planets have names.
@@ -132,7 +132,7 @@ class DataProviderApparentMagnitude( DataProvider ):
     def load( filename, logging ):
         am_data = { }
         try:
-            with open( filename, 'r' ) as f:
+            with open( filename, 'r' ) as f:  #TODO Encodeing
                 for line in f.read().splitlines():
                     last_comma = line.rfind( ',' )
                     name = line[ 0 : last_comma ]
@@ -149,7 +149,7 @@ class DataProviderApparentMagnitude( DataProvider ):
 
 
 # Hold apparent magnitude for a comet or minor planet.
-class AM( object ):
+class AM():
 
     def __init__( self, name, apparent_magnitude ):
         self.name = name

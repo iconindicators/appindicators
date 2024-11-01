@@ -54,7 +54,7 @@ class DataProviderGeneralPerturbation( DataProvider ):
         return data
 
 
-class GP( object ):
+class GP():
     '''Hold general perturbation for a satellite.'''
 
     def __init__( self, xml_fields_from_omm ):
