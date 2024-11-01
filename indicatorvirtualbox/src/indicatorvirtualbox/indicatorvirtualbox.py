@@ -71,7 +71,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         # A mouse wheel scroll event will use wmctrl to cycle through running
         # virtual machines and attempt to bring each to the front.
         # Under Wayland, wmctrl is not implemented and so it is pointless
-        # listening for events which will result in nothing.        
+        # listening for events which will result in nothing.
         if not self.is_session_type_wayland():
             self.request_mouse_wheel_scroll_events( ( self.on_mouse_wheel_scroll, ) )
 
@@ -260,7 +260,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         date_time_of_last_notification_plus_delay = \
             self.date_time_of_last_notification + datetime.timedelta( seconds = delay_in_seconds )
 
-        if( date_time_of_last_notification_plus_delay < datetime.datetime.now() ):
+        if date_time_of_last_notification_plus_delay < datetime.datetime.now():
             self.show_notification( summary, message )
             self.date_time_of_last_notification = datetime.datetime.now()
 
@@ -286,11 +286,11 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def on_launch_virtual_box_manager( self ):
-        
+
         def start_virtualbox_manager():
             self.process_call( self.process_get( "which VirtualBox" ) + " &" )
-        
-        
+
+
         if self.is_session_type_wayland():
             # Wayland does not support wmctrl.
             # If the VirtualBox manager is already running,
@@ -314,10 +314,10 @@ class IndicatorVirtualBox( IndicatorBase ):
             result = self.process_get( command )
             if result:
                 window_id = result.split()[ 0 ]
-    
+
             if window_id is None or window_id == "":
                 start_virtualbox_manager()
-    
+
             else:
                 self.process_call( "wmctrl -ia " + window_id )
 
@@ -509,7 +509,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.create_box(
                 (
                     ( Gtk.Label.new( _( "Startup delay (seconds)" ) ), False ),
-                    ( spinner_delay, False ) ), 
+                    ( spinner_delay, False ) ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, row, 1, 1 )
         row += 1

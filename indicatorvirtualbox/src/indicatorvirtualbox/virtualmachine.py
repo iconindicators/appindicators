@@ -19,7 +19,7 @@
 # Virtual Machine information.
 
 
-class VirtualMachine( object ):
+class VirtualMachine():
 
     def __init__( self, name, uuid ):
         self.name = name
@@ -49,7 +49,7 @@ class VirtualMachine( object ):
             self.get_uuid() == other.get_uuid()
 
 
-class Group( object ):
+class Group():
 
     def __init__( self, name ):
         self.name = name
