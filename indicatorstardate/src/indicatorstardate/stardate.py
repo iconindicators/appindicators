@@ -349,7 +349,7 @@ def get_gregorian_from_stardate_2009_revised( stardate_integer, stardate_fractio
             raise Exception( "Integer cannot exceed 365." )
 
     gregorian_date_time = datetime.date( stardate_integer, 1, 1 )
-    gregorian_date_time += datetime.timedelta( days = ( stardate_fraction - 1 ) )
+    gregorian_date_time += datetime.timedelta( days = stardate_fraction - 1 )
     return gregorian_date_time
 
 
