@@ -191,16 +191,16 @@ class IndicatorOnThisDay( IndicatorBase ):
                 continue
 
             if line.startswith( "\t" ): # Continuation of the previous event.
-                date = events_sorted_by_date[ -1 ].get_date()
+                date_ = events_sorted_by_date[ -1 ].get_date()
                 description = events_sorted_by_date[ -1 ].get_description() + " " + line.strip()
                 del events_sorted_by_date[ -1 ]
-                events_sorted_by_date.append( Event( date, description ) )
+                events_sorted_by_date.append( Event( date_, description ) )
 
             else:
                 line = line.split( "\t" ) # Start of event: the month/day are separated from the event by a TAB.
-                date = line[ 0 ].replace( "*", "" ).strip()
+                date_ = line[ 0 ].replace( "*", "" ).strip()
                 description = line[ -1 ].strip() # Take the last element as there may be more than one TAB character throwing out the index of the event in the line.
-                events_sorted_by_date.append( Event( date, description ) )
+                events_sorted_by_date.append( Event( date_, description ) )
 
         # Sort events further by description.
         i = 0
@@ -398,7 +398,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
             self.calendars = [ ]
             treeiter = store.get_iter_first()
-            while treeiter != None:
+            while treeiter is not None:
                 if store[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ]:
                     self.calendars.append( store[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
 
@@ -570,7 +570,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 add_edit_dialog,
                 calendar_file.get_text() )
 
-        while( True ):
+        while True:
             response = dialog.run()
             if response == Gtk.ResponseType.OK:
                 if dialog.get_filename() in system_calendars:
