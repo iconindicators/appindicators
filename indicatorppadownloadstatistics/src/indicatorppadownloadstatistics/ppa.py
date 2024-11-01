@@ -24,7 +24,7 @@ import operator
 from enum import Enum
 
 
-class Filters( object ):
+class Filters():
 
     INDEX_USER = 0
     INDEX_NAME = 1
@@ -61,16 +61,19 @@ class Filters( object ):
         return user + " | " + name + " | " + series + " | " + architecture
 
 
-    def __str__( self ): return str( self.__dict__ )
+    def __str__( self ): 
+        return str( self.__dict__ )
 
 
-    def __repr__( self ): return self.__str__()
+    def __repr__( self ):
+        return self.__str__()
 
 
-    def __eq__( self, filters ): return self.__dict__ == filters.__dict__
+    def __eq__( self, filters ):
+        return self.__dict__ == filters.__dict__
 
 
-class PublishedBinary( object ):
+class PublishedBinary():
 
     # Package name, package version (string)
     # Download count (integer)
@@ -119,7 +122,7 @@ class PublishedBinary( object ):
             self.is_architecture_specific() == other.is_architecture_specific()
 
 
-class PPA( object ):
+class PPA():
 
     class Status( Enum ):
         ERROR_RETRIEVING_PPA = 0
@@ -146,7 +149,7 @@ class PPA( object ):
 
     def set_status( self, status ):
         self.status = status
-        if not ( status == PPA.Status.OK ): # Any other status implies the underlying published binaries are reset.
+        if not status == PPA.Status.OK: # Any other status implies the underlying published binaries are reset.
             self.published_binaries = [ ]
 
 

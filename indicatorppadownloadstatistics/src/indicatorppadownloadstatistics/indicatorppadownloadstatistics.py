@@ -363,7 +363,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
                             break # No point continuing with each filter.
 
-                    if not( ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA ):
+                    if not ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
                         if ppa.get_published_binaries():
                             ppa.set_status( PPA.Status.OK )
 
@@ -375,7 +375,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             else:
                 self.get_published_binaries( ppa, "" )
-                if not ( ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA ):
+                if not ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
                     if ppa.get_published_binaries():
                         ppa.set_status( PPA.Status.OK )
 
@@ -742,7 +742,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             self.ppas = [ ]
             treeiter = ppa_store.get_iter_first()
-            while treeiter != None:
+            while treeiter is not None:
                 self.ppas.append(
                     PPA(
                         ppa_store[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ],
@@ -756,7 +756,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             self.filters = Filters()
             treeiter = filter_store.get_iter_first()
-            while treeiter != None:
+            while treeiter is not None:
                 self.filters.add_filter(
                     filter_store[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ],
                     filter_store[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ],
@@ -1026,7 +1026,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         textview = \
             self.create_textview(
                 text =
-                    filter_model[ filter_treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] 
+                    filter_model[ filter_treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ]
                     if row_number else "",
                 tooltip_text = _(
                     "Each line of text is a single\n" +
