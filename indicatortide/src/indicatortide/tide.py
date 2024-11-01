@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-class Reading( object ):
+class Reading():
     # date: Date of reading, as a string.
     # time: Time of reading, as a string.
     # location: Name of port or place.

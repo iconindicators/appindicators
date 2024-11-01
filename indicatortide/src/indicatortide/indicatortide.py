@@ -75,7 +75,7 @@ class IndicatorTide( IndicatorBase ):
                 klazz = getattr( module, self.user_script_class_name )
                 tidal_readings = \
                     klazz.get_tide_data( 
-                        logging = self.get_logging(), 
+                        logging = self.get_logging(),
                         url_timeout_in_seconds = 20 )
 
                 self.build_menu( menu, tidal_readings )
