@@ -620,10 +620,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                    '—'
                    if type( script ) is Background else
                    ( '✔' if script.get_terminal_open() else None ),
-                   str( script.get_interval_in_minutes() ) 
+                   str( script.get_interval_in_minutes() )
                    if type( script ) is Background else
                    '—',
-                   ( '✔' if script.get_force_update() else None ) 
+                   ( '✔' if script.get_force_update() else None )
                    if type( script ) is Background else
                    '—' ]
 
