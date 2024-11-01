@@ -58,10 +58,11 @@ import webbrowser
 from abc import ABC
 from bisect import bisect_right
 
+
 try:
     gi.require_version( "AyatanaAppIndicator3", "0.1" )
     from gi.repository import AyatanaAppIndicator3 as AppIndicator
-except:
+except: #TODO On Fedora, run this but change to except Exception as e: and print the e then can specify the exception. 
     try:
         gi.require_version( "AppIndicator3", "0.1" )
         from gi.repository import AppIndicator3 as AppIndicator # Needed for Fedora.
@@ -268,7 +269,7 @@ class IndicatorBase( ABC ):
     def _check_for_newer_version( self ):
         try:
             url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
-            data_json = json.loads( urlopen( url ).read() )
+            data_json = json.loads( urlopen( url ).read() )  #TODO Convert to with
             version_latest = data_json[ "info" ][ "version" ]
             if version_latest != str( self.version ):
                 self.new_version_available = True
@@ -276,7 +277,7 @@ class IndicatorBase( ABC ):
                     _( "New version of {0} available..." ).format( self.indicator_name ),
                     _( "Refer to the Preferences for details." ) )
 
-        except Exception as e:
+        except Exception as e: #TODO What is the specific exception which may occur?
             logging.exception( e )
 
 
@@ -294,8 +295,11 @@ class IndicatorBase( ABC ):
 
     @staticmethod
     def get_project_metadata( indicator_name ):
-        # https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
-        # https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
+        '''
+        TODO Add description.
+        https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
+        https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
+        '''
         try:
             # Obtain pyproject.toml information from pip.
             project_metadata = metadata.metadata( indicator_name )
@@ -344,77 +348,77 @@ class IndicatorBase( ABC ):
 
     def _process_existing_dot_desktop_file_to_home_config_autostart(
             self, desktop_file_virtual_environment ):
-            # The .desktop may be an older version with an Exec without a sleep,
-            # or tags no longer used such as X-GNOME-Autostart-Delay.
-            # Comment out unused tags and get the delay if present.
-            output = ""
-            delay = ""
-            autostart_enabled_present = False
-            exec_with_sleep_present = False
-            terminal_present = False
-            made_a_change = False
-            with open( self.desktop_file_user_home, 'r' ) as f:
-                for line in f:
-                    if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ):
-                        output += line
-                        autostart_enabled_present = True
+        # The .desktop may be an older version with an Exec without a sleep,
+        # or tags no longer used such as X-GNOME-Autostart-Delay.
+        # Comment out unused tags and get the delay if present.
+        output = ""
+        delay = ""
+        autostart_enabled_present = False
+        exec_with_sleep_present = False
+        terminal_present = False
+        made_a_change = False
+        with open( self.desktop_file_user_home, 'r' ) as f: #TODO Should I add encoding?
+            for line in f:
+                if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ):
+                    output += line
+                    autostart_enabled_present = True
 
-                    elif line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_DELAY + '=' ):
-                        # Does not work in Debian et al; capture delay and comment line.
-                        delay = line.split( '=' )[ 1 ].strip()
+                elif line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_DELAY + '=' ):
+                    # Does not work in Debian et al; capture delay and comment line.
+                    delay = line.split( '=' )[ 1 ].strip()
+                    output += '#' + line
+                    made_a_change = True
+
+                elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC + '=' ):
+                    if "sleep" in line:
+                        # Assume to be part of the install and not user created.
+                        output += line
+                        exec_with_sleep_present = True
+
+                    else:
+                        # Comment out and eventually replace with a sleep version.
                         output += '#' + line
                         made_a_change = True
 
-                    elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC + '=' ):
-                        if "sleep" in line:
-                            # Assume to be part of the install and not user created.
-                            output += line
-                            exec_with_sleep_present = True
-
-                        else:
-                            # Comment out and eventually replace with a sleep version.
-                            output += '#' + line
-                            made_a_change = True
-
-                    elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL + '=' ):
-                        output += line
-                        terminal_present = True
-
-                    else:
-                        output += line
-
-            if not autostart_enabled_present or not exec_with_sleep_present or not terminal_present:
-                # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled line
-                # from the original .desktop file (either production or development).
-                if desktop_file_virtual_environment.exists():
-                    desktop_file_original = desktop_file_virtual_environment
+                elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL + '=' ):
+                    output += line
+                    terminal_present = True
 
                 else:
-                    desktop_file_original = \
-                        Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop"
+                    output += line
 
-                with open( desktop_file_original, 'r' ) as f:
-                    for line in f:
-                        if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ) and not autostart_enabled_present:
-                            output += line
-                            made_a_change = True
+        if not autostart_enabled_present or not exec_with_sleep_present or not terminal_present:
+            # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled line
+            # from the original .desktop file (either production or development).
+            if desktop_file_virtual_environment.exists():
+                desktop_file_original = desktop_file_virtual_environment
 
-                        elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) and not exec_with_sleep_present:
-                            if delay:
-                                output += line.replace( "{indicator_name}", self.indicator_name ).replace( '0', delay )
+            else:
+                desktop_file_original = \
+                    Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop"
 
-                            else:
-                                output += line.replace( "{indicator_name}", self.indicator_name )
+            with open( desktop_file_original, 'r' ) as f: #TODO Should I add encoding?
+                for line in f:
+                    if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ) and not autostart_enabled_present:
+                        output += line
+                        made_a_change = True
 
-                            made_a_change = True
+                    elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) and not exec_with_sleep_present:
+                        if delay:
+                            output += line.replace( "{indicator_name}", self.indicator_name ).replace( '0', delay )
 
-                        elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL ) and not terminal_present:
-                            output += line
-                            made_a_change = True
+                        else:
+                            output += line.replace( "{indicator_name}", self.indicator_name )
 
-            if made_a_change:
-                with open( self.desktop_file_user_home, 'w' ) as f:
-                    f.write( output )
+                        made_a_change = True
+
+                    elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL ) and not terminal_present:
+                        output += line
+                        made_a_change = True
+
+        if made_a_change:
+            with open( self.desktop_file_user_home, 'w' ) as f: #TODO Should I add encoding?
+                f.write( output )
 
 
     def _copy_dot_desktop_file_to_home_config_autostart(
@@ -459,7 +463,10 @@ class IndicatorBase( ABC ):
 
     @staticmethod
     def get_authors_emails( project_metadata ):
-        # https://stackoverflow.com/a/75803208/2156453
+        '''
+        TODO Add description
+        https://stackoverflow.com/a/75803208/2156453
+        '''
         email_message_object = \
             email.message_from_string(
                 f'To: { project_metadata[ "Author-email" ] }',
@@ -479,7 +486,7 @@ class IndicatorBase( ABC ):
         otherwise retrieves the most recent year.
         '''
         year = ""
-        with open( changelog_markdown, 'r' ) as f:
+        with open( changelog_markdown, 'r' ) as f: #TODO Should I add encoding?
             lines = f.readlines()
             if first_year:
                 lines = reversed( lines )
@@ -1055,7 +1062,7 @@ class IndicatorBase( ABC ):
 
     def _get_parent( self, widget ):
         parent = widget # Sometimes the widget itself is a Dialog/Window, so no need to get the parent.
-        while( parent is not None ):
+        while parent is not None:
             if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
                 break
 
@@ -1067,7 +1074,7 @@ class IndicatorBase( ABC ):
     def create_preferences_common_widgets( self ):
         autostart = False
         delay = 0
-        with open( self.desktop_file_user_home, 'r' ) as f:
+        with open( self.desktop_file_user_home, 'r' ) as f: #TODO Encoding?
             for line in f:
                 if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" ):
                     autostart = True
@@ -1646,7 +1653,7 @@ class IndicatorBase( ABC ):
         self.check_latest_version = check_latest_version
 
         output = ""
-        with open( self.desktop_file_user_home, 'r' ) as f:
+        with open( self.desktop_file_user_home, 'r' ) as f:#TODO Encoding
             for line in f:
                 if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
                     output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
@@ -1659,7 +1666,7 @@ class IndicatorBase( ABC ):
                 else:
                     output += line
 
-        with open( self.desktop_file_user_home, 'w' ) as f:
+        with open( self.desktop_file_user_home, 'w' ) as f:#TODO Encoding
             f.write( output )
 
 
@@ -1792,18 +1799,18 @@ class IndicatorBase( ABC ):
 
     # Download the contents of the given URL and save to file.
     @staticmethod
-    def download( url, filename, logging ):
+    def download( url, filename, logging_ ):
         downloaded = False
         try:
             response = urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode()
-            with open( filename, 'w' ) as f_out:
+            with open( filename, 'w' ) as f_out:#TODO Encoding
                 f_out.write( response )
 
             downloaded = True
 
         except Exception as e:
-            logging.error( "Error downloading from " + str( url ) )
-            logging.exception( e )
+            logging_.error( "Error downloading from " + str( url ) )
+            logging_.exception( e )
 
         return downloaded
 
@@ -1818,7 +1825,7 @@ class IndicatorBase( ABC ):
         config = { }
         if config_file.is_file():
             try:
-                with open( config_file, 'r' ) as f_in:
+                with open( config_file, 'r' ) as f_in:#TODO Encoding
                     config = json.load( f_in )
 
             except Exception as e:
@@ -1878,7 +1885,7 @@ class IndicatorBase( ABC ):
             self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
 
         try:
-            with open( config_file, 'w' ) as f_out:
+            with open( config_file, 'w' ) as f_out:#TODO Encoding
                 f_out.write( json.dumps( config ) )
 
         except Exception as e:
@@ -2112,7 +2119,7 @@ class IndicatorBase( ABC ):
         text = ""
         if cache_file.is_file():
             try:
-                with open( cache_file, 'r' ) as f_in:
+                with open( cache_file, 'r' ) as f_in:#TODO Encoding
                     text = f_in.read()
 
             except Exception as e:
@@ -2154,7 +2161,7 @@ class IndicatorBase( ABC ):
 
     def _write_cache_text( self, text, cache_file ):
         try:
-            with open( cache_file, 'w' ) as f_out:
+            with open( cache_file, 'w' ) as f_out:#TODO Encoding
                 f_out.write( text )
 
         except Exception as e:
@@ -2191,9 +2198,9 @@ class IndicatorBase( ABC ):
             subprocess.call( command, shell = True )
 
         except subprocess.CalledProcessError as e:
-            self.get_logging().error( e )
+            logging.error( e )
             if e.stderr:
-                self.get_logging().error( e.stderr )
+                logging.error( e.stderr )
 
 
     # Executes the command and returns the result.
@@ -2219,22 +2226,24 @@ class IndicatorBase( ABC ):
                 result = None
 
         except subprocess.CalledProcessError as e:
-            self.get_logging().error( e )
+            logging.error( e )
             if e.stderr:
-                self.get_logging().error( e.stderr )
+                logging.error( e.stderr )
 
             result = None
 
         return result
 
 
-# Log file handler which truncates the file when the file size limit is reached.
-#
-# References:
-#   https://docs.python.org/3/library/logging.handlers.html
-#   https://stackoverflow.com/questions/24157278/limit-python-log-file
-#   https://github.com/python/cpython/blob/main/Lib/logging/handlers.py
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
+    '''
+    Log file handler which truncates the file when the file size limit is reached.
+
+    References:
+        https://docs.python.org/3/library/logging.handlers.html
+        https://stackoverflow.com/questions/24157278/limit-python-log-file
+        https://github.com/python/cpython/blob/main/Lib/logging/handlers.py
+    '''
 
     def __init__( self, filename, maxBytes = 10000 ):
         super().__init__(
