@@ -898,18 +898,6 @@ class IndicatorLunar( IndicatorBase ):
                 indent = ( 2, 1 ) )
 
 
-    def get_on_click_function_comet( self ):
-        try:
-            #TODO Is the return needed?  If so, need a return on the exception...but what?
-            return lambda menuitem: (
-                webbrowser.open(
-                    IndicatorLunar.SEARCH_URL_COMET_ID + \
-                    str( requests.get( menuitem.get_name() ).json()[ "object" ][ "id" ] ) ) )  #TODO Add timeout
-
-        except Exception:
-            pass # Ignore as the network/site may be down, or is a bad comet designation.
-
-
     def update_menu_planets_minor_planets_comets_stars( self, menu, menu_label, bodies, bodies_data, body_type ):
 
         def get_menuitem_name_function():
@@ -940,8 +928,17 @@ class IndicatorLunar( IndicatorBase ):
 
         def get_on_click_function():
             on_click_function = ( self.get_on_click_menuitem_open_browser_function(), )
+
             if body_type == IndicatorLunar.astro_backend.BodyType.COMET:
-                on_click_function = ( self.get_on_click_function_comet(), )
+                try:
+                    on_click_function = (
+                        lambda menuitem: (
+                            webbrowser.open(
+                                IndicatorLunar.SEARCH_URL_COMET_ID + \
+                                str( requests.get( menuitem.get_name(), timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).json()[ "object" ][ "id" ] ) ) ), )
+        
+                except Exception:
+                    on_click_function = None # The network/site may be down or is a bad comet designation.
 
             return on_click_function
 
