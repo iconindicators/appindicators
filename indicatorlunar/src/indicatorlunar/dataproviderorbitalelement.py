@@ -131,7 +131,7 @@ class DataProviderOrbitalElement( DataProvider ):
             data = response.json()
             minor_planets = data[ "data" ][ "query_closest_orbelements" ]
 
-            with open( filename, 'w' ) as f: #TODO Encodeing
+            with open( filename, 'w', encoding = "utf-8" ) as f:
                 for minor_planet in minor_planets:
                     asteroid_number = minor_planet[ "minorplanet" ][ "ast_number" ]
                     if asteroid_number is None:
@@ -318,7 +318,7 @@ class DataProviderOrbitalElement( DataProvider ):
                 valid_indices = [ 8, 14, 20, 26, 36, 37, 47, 48, 58, 59, 69, 70, 80, 92, 104, 105, 107, 117, 123, 127, 137, 142, 146, 150, 161, 166 ] # Ignore 132.
 
             try:
-                with open( filename, 'r' ) as f: #TODO Encodeing
+                with open( filename, 'r', encoding = "utf-8" ) as f:
                     for line in f.read().splitlines():
                         keep = True
                         for i in valid_indices:
@@ -338,7 +338,7 @@ class DataProviderOrbitalElement( DataProvider ):
 
         elif orbital_element_data_type == OE.DataType.XEPHEM_COMET or orbital_element_data_type == OE.DataType.XEPHEM_MINOR_PLANET:
             try:
-                with open( filename, 'r' ) as f: #TODO Encodeing
+                with open( filename, 'r', encoding = "utf-8" ) as f:
                     for line in f.read().splitlines():
                         if not line.startswith( '{' ):
                             # Sometimes the COBS download emits an error message of the form:

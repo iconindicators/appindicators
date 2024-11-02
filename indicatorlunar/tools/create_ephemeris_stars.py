@@ -40,7 +40,7 @@ iaucsn_hip_end = 96
 def get_stars_and_hips( iau_catalog_file ):
     stars_from_pyephem = stars.stars.keys()
     stars_and_hips_from_iau = [ ]
-    f_in = open( iau_catalog_file, 'r' )
+    f_in = open( iau_catalog_file, 'r', encoding = "utf-8" )
     for line in f_in:
         if line.startswith( '#' ) or line.startswith( '$' ):
             continue

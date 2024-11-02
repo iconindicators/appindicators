@@ -68,7 +68,7 @@ def _run_checks_on_indicator( indicator_name ):
     message = ""
     for path in paths:
         for path_ in ( path_.resolve() for path_ in path.glob( '**/*' ) if path_.is_file() and not any( [ exclusion in str( path_ ) for exclusion in exclusions ] ) ):
-            with open( path_, 'r' ) as f:
+            with open( path_, 'r', encoding = "utf-8" ) as f:
                 if t_o_d_o in f.read().lower():
                     message += f"\t{ path_ }\n"
 
@@ -86,7 +86,7 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
     indicator_pyproject_toml = Path( '.' ) / indicator_name / "pyproject.toml"
 
     config = configparser.ConfigParser()
-    with open( indicator_pyproject_toml ) as stream:
+    with open( indicator_pyproject_toml, encoding = "utf-8" ) as stream:
         config.read_string( "[top]\n" + stream.read() )
 
     version = config[ "top" ][ "version" ].replace( '\"', '' ).strip()
@@ -105,7 +105,7 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
 
     indicatorbase_pyproject_toml = Path( '.' ) / "indicatorbase" / "pyprojectbase.toml"
     text = ""
-    with open( indicatorbase_pyproject_toml ) as f:
+    with open( indicatorbase_pyproject_toml, encoding = "utf-8" ) as f:
         for line in f:
             if not line.startswith( '#' ):
                 if line.startswith( "version = " ):
@@ -127,7 +127,7 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
         "description = \'" + description + '\'' )
 
     out_pyproject_toml = directory_out / indicator_name / "pyproject.toml"
-    with open( out_pyproject_toml, 'w' ) as f:
+    with open( out_pyproject_toml, 'w', encoding = "utf-8" ) as f:
         f.write( text + '\n' )
 
     _chmod(
@@ -146,7 +146,7 @@ def _get_name_categories_comments_from_indicator( indicator_name, directory_indi
     categories = ""
     comments = ""
     message = ""
-    with open( indicator_source, 'r' ) as f:
+    with open( indicator_source, 'r', encoding = "utf-8" ) as f:
         for line in f:
             if re.search( r"indicator_name_for_desktop_file = _\( ", line ):
                 name = line.split( '\"' )[ 1 ].replace( '\"', '' ).strip()
@@ -182,12 +182,12 @@ def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
             source_script_name,
             destination_script_name ):
 
-        with open( indicatorbase_platform_linux_path / source_script_name, 'r' ) as f:
+        with open( indicatorbase_platform_linux_path / source_script_name, 'r', encoding = "utf-8" ) as f:
             script_text = f.read()
 
         script_text = script_text.format_map( SafeDict( indicator_name = indicator_name ) )
 
-        with open( directory_platform_linux / destination_script_name, 'w' ) as f:
+        with open( directory_platform_linux / destination_script_name, 'w', encoding = "utf-8" ) as f:
             f.write( script_text + '\n' )
 
         _chmod(
@@ -223,7 +223,7 @@ def _create_symbolic_icons( directory_wheel, indicator_name ):
     for hicolor_icon in list( ( Path( '.' ) / directory_icons ).glob( "*.svg" ) ):
         symbolic_icon = directory_icons / ( str( hicolor_icon.name )[ 0 : -4 ] + "-symbolic.svg" )
         shutil.copy( hicolor_icon, symbolic_icon )
-        with open( symbolic_icon, 'r' ) as f:
+        with open( symbolic_icon, 'r', encoding = "utf-8" ) as f:
             svg_text = f.read()
             for m in re.finditer( r"fill:#", svg_text ):
                 svg_text = svg_text[ 0 : m.start() + 6 ] + "777777" + svg_text[ m.start() + 6 + 6 : ]
@@ -231,7 +231,7 @@ def _create_symbolic_icons( directory_wheel, indicator_name ):
             for m in re.finditer( r"stroke:#", svg_text ):
                 svg_text = svg_text[ 0 : m.start() + 6 ] + "777777" + svg_text[ m.start() + 6 + 6 : ]
 
-        with open( symbolic_icon, 'w' ) as f:
+        with open( symbolic_icon, 'w', encoding = "utf-8" ) as f:
             f.write( svg_text + '\n' )
 
 
@@ -248,7 +248,7 @@ def _create_dot_desktop(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" / "indicatorbase.py.desktop"
 
     dot_desktop_text = ""
-    with open( indicatorbase_dot_desktop_path, 'r' ) as f:
+    with open( indicatorbase_dot_desktop_path, 'r', encoding = "utf-8" ) as f:
         while line := f.readline():
             if not line.startswith( '#' ):
                 dot_desktop_text += line
@@ -274,7 +274,7 @@ def _create_dot_desktop(
 
     indicator_dot_desktop_path = directory_platform_linux / ( indicator_name + ".py.desktop" )
 
-    with open( indicator_dot_desktop_path, 'w' ) as f:
+    with open( indicator_dot_desktop_path, 'w', encoding = "utf-8" ) as f:
         f.write( dot_desktop_text + '\n' )
 
     _chmod(
@@ -321,7 +321,7 @@ def get_pyproject_toml_version( pyproject_toml ):
 
 def _get_version_in_changelog_markdown( changelog_markdown ):
     version = ""
-    with open( changelog_markdown, 'r' ) as f:
+    with open( changelog_markdown, 'r', encoding = "utf-8" ) as f:
         for line in f.readlines():
             if line.startswith( "## v" ):
                 version = line.split( ' ' )[ 1 ][ 1 : ]

@@ -29,7 +29,7 @@ from pathlib import Path
 
 def _get_linguas_codes( indicator_name ):
     lingua_codes = [ ]
-    with open( _get_linguas( indicator_name ), 'r' ) as f:
+    with open( _get_linguas( indicator_name ), 'r', encoding = "utf-8" ) as f:
         for line in f:
             if not line.startswith( '#' ):
                 lingua_codes = line.split()

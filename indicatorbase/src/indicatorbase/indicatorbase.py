@@ -357,7 +357,7 @@ class IndicatorBase( ABC ):
         exec_with_sleep_present = False
         terminal_present = False
         made_a_change = False
-        with open( self.desktop_file_user_home, 'r' ) as f: #TODO Should I add encoding?
+        with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
             for line in f:
                 if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ):
                     output += line
@@ -397,7 +397,7 @@ class IndicatorBase( ABC ):
                 desktop_file_original = \
                     Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop"
 
-            with open( desktop_file_original, 'r' ) as f: #TODO Should I add encoding?
+            with open( desktop_file_original, 'r', encoding = "utf-8" ) as f:
                 for line in f:
                     if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ) and not autostart_enabled_present:
                         output += line
@@ -417,7 +417,7 @@ class IndicatorBase( ABC ):
                         made_a_change = True
 
         if made_a_change:
-            with open( self.desktop_file_user_home, 'w' ) as f: #TODO Should I add encoding?
+            with open( self.desktop_file_user_home, 'w', encoding = "utf-8" ) as f:
                 f.write( output )
 
 
@@ -486,7 +486,7 @@ class IndicatorBase( ABC ):
         otherwise retrieves the most recent year.
         '''
         year = ""
-        with open( changelog_markdown, 'r' ) as f: #TODO Should I add encoding?
+        with open( changelog_markdown, 'r', encoding = "utf-8" ) as f:
             lines = f.readlines()
             if first_year:
                 lines = reversed( lines )
@@ -1074,7 +1074,7 @@ class IndicatorBase( ABC ):
     def create_preferences_common_widgets( self ):
         autostart = False
         delay = 0
-        with open( self.desktop_file_user_home, 'r' ) as f: #TODO Encoding?
+        with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
             for line in f:
                 if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" ):
                     autostart = True
@@ -1653,7 +1653,7 @@ class IndicatorBase( ABC ):
         self.check_latest_version = check_latest_version
 
         output = ""
-        with open( self.desktop_file_user_home, 'r' ) as f:#TODO Encoding
+        with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
             for line in f:
                 if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
                     output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
@@ -1666,7 +1666,7 @@ class IndicatorBase( ABC ):
                 else:
                     output += line
 
-        with open( self.desktop_file_user_home, 'w' ) as f:#TODO Encoding
+        with open( self.desktop_file_user_home, 'w', encoding = "utf-8" ) as f:
             f.write( output )
 
 
@@ -1803,7 +1803,7 @@ class IndicatorBase( ABC ):
         downloaded = False
         try:
             response = urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode()
-            with open( filename, 'w' ) as f_out:#TODO Encoding
+            with open( filename, 'w', encoding = "utf-8" ) as f_out:
                 f_out.write( response )
 
             downloaded = True
@@ -1825,7 +1825,7 @@ class IndicatorBase( ABC ):
         config = { }
         if config_file.is_file():
             try:
-                with open( config_file, 'r' ) as f_in:#TODO Encoding
+                with open( config_file, 'r', encoding = "utf-8" ) as f_in:
                     config = json.load( f_in )
 
             except Exception as e:
@@ -1885,7 +1885,7 @@ class IndicatorBase( ABC ):
             self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
 
         try:
-            with open( config_file, 'w' ) as f_out:#TODO Encoding
+            with open( config_file, 'w', encoding = "utf-8" ) as f_out:
                 f_out.write( json.dumps( config ) )
 
         except Exception as e:
@@ -2119,7 +2119,7 @@ class IndicatorBase( ABC ):
         text = ""
         if cache_file.is_file():
             try:
-                with open( cache_file, 'r' ) as f_in:#TODO Encoding
+                with open( cache_file, 'r', encoding = "utf-8" ) as f_in:
                     text = f_in.read()
 
             except Exception as e:
@@ -2161,7 +2161,7 @@ class IndicatorBase( ABC ):
 
     def _write_cache_text( self, text, cache_file ):
         try:
-            with open( cache_file, 'w' ) as f_out:#TODO Encoding
+            with open( cache_file, 'w', encoding = "utf-8" ) as f_out:
                 f_out.write( text )
 
         except Exception as e:

@@ -120,7 +120,7 @@ def _get_indicator_names_sans_current( indicator_name ):
 
 def _get_introduction( indicator_name ):
     pattern_tag = re.compile( f".*comments = _\(.*" )
-    for line in open( indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py" ).readlines():
+    for line in open( indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py", encoding = "utf-8" ).readlines():
         matches = pattern_tag.search( line )
         if matches:
             comments = matches.group().split( "\"" )[ 1 ].replace( '\\n', ' ' )[ 0 : -1 ] # Remove \n and drop ending.
@@ -770,7 +770,7 @@ def create_readme(
 
     Path( directory ).mkdir( parents = True, exist_ok = True )
 
-    with open( Path( directory, "README.md" ), 'w' ) as f:
+    with open( Path( directory, "README.md" ), 'w', encoding = "utf-8" ) as f:
         f.write( _get_introduction( indicator_name ) )
         f.write( _get_install_uninstall( indicator_name ) )
         f.write( _get_usage( indicator_name, indicator_name_human_readable ) )

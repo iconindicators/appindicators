@@ -359,9 +359,9 @@ def convert( option, in_file, out_file ):
         f_in = gzip.open( in_file, 'rt' )
 
     else:
-        f_in = open( in_file, 'r' )
+        f_in = open( in_file, 'r', encoding = "utf-8" )
 
-    f_out = open( out_file, 'w' )
+    f_out = open( out_file, 'w', encoding = "utf-8" )
 
     if option == 1:
         for line in f_in:
