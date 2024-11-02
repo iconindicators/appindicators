@@ -232,6 +232,16 @@ Additional operating system packages may be needed; refer to the installation in
 Additional indicators may be appended to the above command.
 
 
+## Pylint
+
+Assuming the project is located within the directory `Indicators`, run within the directory one level above `Indicators`:
+
+```
+    pylint --recursive=y --ignore=development,release,venv Indicators --output=pylint.txt ; \
+    sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2 pylint.txt
+```
+
+
 ## Convert this Document from MD to HTML
 
 ```
