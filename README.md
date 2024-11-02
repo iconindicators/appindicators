@@ -238,7 +238,7 @@ Assuming the project is located within the directory `Indicators`, run within th
 
 ```
     pylint --recursive=y --ignore=development,release,venv Indicators --output=pylint.txt ; \
-    sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2 pylint.txt
+    sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2n pylint.txt
 ```
 
 
