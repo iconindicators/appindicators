@@ -19,10 +19,6 @@
 """ Application indicator to test stuff. """
 
 
-#TODO SHould be safe to remove this in favour of the version below...
-from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
-
-
 import datetime
 import gi
 import os
@@ -36,8 +32,7 @@ from gi.repository import Pango
 
 from threading import Thread
 
-#TODO Should be safe to use this here rather than at the top.
-# from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
+from indicatorbase import IndicatorBase
 
 
 class IndicatorTest( IndicatorBase ):
