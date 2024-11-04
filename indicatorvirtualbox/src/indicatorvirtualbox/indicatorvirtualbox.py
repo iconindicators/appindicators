@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator for VirtualBox™ virtual machines.
+""" Application indicator for VirtualBox™ virtual machines. """
 
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
@@ -35,6 +35,8 @@ from virtualmachine import Group, VirtualMachine
 
 
 class IndicatorVirtualBox( IndicatorBase ):
+    ''' Main class which encapsulates the indicator. '''
+
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator VirtualBox™" )
     indicator_categories = "Categories=Utility"

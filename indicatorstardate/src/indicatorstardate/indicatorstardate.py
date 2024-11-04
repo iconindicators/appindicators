@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays the current Star Trek™ stardate.
+""" Application indicator which displays the current Star Trek™ stardate. """
 
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
@@ -31,6 +31,8 @@ import stardate
 
 
 class IndicatorStardate( IndicatorBase ):
+    ''' Main class which encapsulates the indicator. '''
+
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Stardate" )
     indicator_categories = "Categories=Utility;Amusement"

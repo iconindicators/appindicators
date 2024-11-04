@@ -16,10 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Virtual Machine information.
+""" Virtual Machine information. """
 
 
 class VirtualMachine():
+    ''' Information about a virtual machine. '''
 
     def __init__( self, name, uuid ):
         self.name = name
@@ -50,6 +51,7 @@ class VirtualMachine():
 
 
 class Group():
+    ''' Information about a group of one or more virtual machines. '''
 
     def __init__( self, name ):
         self.name = name

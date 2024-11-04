@@ -16,12 +16,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Create a README.md for an indicator.
-#
-# References:
-#   https://pygobject.gnome.org/getting_started.html
-#   https://stackoverflow.com/questions/70508775/error-could-not-build-wheels-for-pycairo-which-is-required-to-install-pyprojec
-#   https://stackoverflow.com/questions/60779139/trouble-installing-pycairo-any-suggestions-on-what-to-try-next
+"""
+Create a README.md for an indicator.
+
+References:
+    https://pygobject.gnome.org/getting_started.html
+    https://stackoverflow.com/questions/70508775/error-could-not-build-wheels-for-pycairo-which-is-required-to-install-pyprojec
+    https://stackoverflow.com/questions/60779139/trouble-installing-pycairo-any-suggestions-on-what-to-try-next
+"""
 
 
 import datetime
@@ -31,7 +33,8 @@ from enum import auto, Enum
 from pathlib import Path
 
 
-class Operating_System( Enum ):
+class OperatingSystem( Enum ):
+    ''' Supported operating systems. '''
     DEBIAN_11 = auto()
     DEBIAN_12 = auto()
     FEDORA_38 = auto()
@@ -54,7 +57,8 @@ class Operating_System( Enum ):
     XUBUNTU_2404 = auto()
 
 
-class Indicator_Name( Enum ):
+class IndicatorName( Enum ):
+    ''' Indicators. '''
     INDICATORFORTUNE = auto()
     INDICATORLUNAR = auto()
     INDICATORONTHISDAY = auto()
@@ -119,7 +123,7 @@ def _get_indicator_names_sans_current( indicator_name ):
 
 
 def _get_introduction( indicator_name ):
-    pattern_tag = re.compile( f".*comments = _\(.*" )
+    pattern_tag = re.compile( r".*comments = _\(.*" )#TODO Check this works (was an f").  https://docs.python.org/3.8/howto/regex.html
     for line in open( indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py", encoding = "utf-8" ).readlines():
         matches = pattern_tag.search( line )
         if matches:
@@ -134,7 +138,7 @@ def _get_introduction( indicator_name ):
     # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
     # Want to still have indicatortest for openSUSE/Manjaro!
-    if not _is_indicator( indicator_name, Indicator_Name.INDICATORONTHISDAY ):
+    if not _is_indicator( indicator_name, IndicatorName.INDICATORONTHISDAY ):
         introduction += f", `openSUSE`, `Manjaro`"
 
 #TODO Somewhere/somehow, mention ONLY for indicatoronthisday
@@ -164,13 +168,13 @@ def _get_installation_additional_python_modules( indicator_name ):
         f"    deactivate\n"
         f"    ```\n" )
 
-    if indicator_name.upper() == Indicator_Name.INDICATORSCRIPTRUNNER.name:
+    if indicator_name.upper() == IndicatorName.INDICATORSCRIPTRUNNER.name:
         message += (
             f"If you have added any `Python` scripts to `{ indicator_name }`, "
             f"you may need to install additional `Python` modules. "
             f"{ common }" )
 
-    if indicator_name.upper() == Indicator_Name.INDICATORTIDE.name:
+    if indicator_name.upper() == IndicatorName.INDICATORTIDE.name:
         message += (
             f"Your `Python` script which retrieves your tidal data may need additional `Python` modules. "
             f"{ common }" )
@@ -198,8 +202,8 @@ def _get_extension( operating_system ):
     extension = ''
 
     applicable_operating_systems = {
-        Operating_System.DEBIAN_11,
-        Operating_System.DEBIAN_12 }
+        OperatingSystem.DEBIAN_11,
+        OperatingSystem.DEBIAN_12 }
 
     if operating_system.issubset( applicable_operating_systems ):
         extension = (
@@ -210,11 +214,11 @@ def _get_extension( operating_system ):
             f"    ```\n" )
 
     applicable_operating_systems = {
-        Operating_System.FEDORA_38,
-        Operating_System.FEDORA_39,
-        Operating_System.KUBUNTU_2204,
-        Operating_System.FEDORA_40,
-        Operating_System.OPENSUSE_TUMBLEWEED }
+        OperatingSystem.FEDORA_38,
+        OperatingSystem.FEDORA_39,
+        OperatingSystem.KUBUNTU_2204,
+        OperatingSystem.FEDORA_40,
+        OperatingSystem.OPENSUSE_TUMBLEWEED }
 
     if operating_system.issubset( applicable_operating_systems ):
         extension = (
@@ -234,13 +238,13 @@ def _get_installation_for_operating_system(
     # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
     os_has_no_calendar = \
         operating_system.issubset( {
-            Operating_System.MANJARO_240X,
-            Operating_System.OPENSUSE_TUMBLEWEED } )
+            OperatingSystem.MANJARO_240X,
+            OperatingSystem.OPENSUSE_TUMBLEWEED } )
 
     indicator_uses_calendar = \
         _is_indicator(
             indicator_name,
-            Indicator_Name.INDICATORONTHISDAY )
+            IndicatorName.INDICATORONTHISDAY )
 
     if indicator_uses_calendar and os_has_no_calendar:
         installation = ''
@@ -249,7 +253,7 @@ def _get_installation_for_operating_system(
         operating_system_packages = \
             _get_operating_system_dependencies_function_name(
                 operating_system,
-                Indicator_Name[ indicator_name.upper() ] )
+                IndicatorName[ indicator_name.upper() ] )
 
         # Reference on installing some of the operating system packages:
         #   https://stackoverflow.com/a/61164149/2156453
@@ -285,13 +289,13 @@ def _get_uninstall_for_operating_system(
     # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
     os_has_no_calendar = \
         operating_system.issubset( {
-            Operating_System.MANJARO_240X,
-            Operating_System.OPENSUSE_TUMBLEWEED } )
+            OperatingSystem.MANJARO_240X,
+            OperatingSystem.OPENSUSE_TUMBLEWEED } )
 
     indicator_uses_calendar = \
         _is_indicator(
             indicator_name,
-            Indicator_Name.INDICATORONTHISDAY )
+            IndicatorName.INDICATORONTHISDAY )
 
     if indicator_uses_calendar and os_has_no_calendar:
         uninstall = ''
@@ -304,7 +308,7 @@ def _get_uninstall_for_operating_system(
             f"1. Uninstall operating system packages:\n\n"
             f"    ```\n"
             f"    { uninstall_command } "
-            f"{ _get_operating_system_dependencies_function_name( operating_system, Indicator_Name[ indicator_name.upper() ] ) }\n"
+            f"{ _get_operating_system_dependencies_function_name( operating_system, IndicatorName[ indicator_name.upper() ] ) }\n"
             f"    ```\n\n"
 
             f"2. Uninstall the indicator from virtual environment:\n"
@@ -334,47 +338,47 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         "python3-venv" ]
 
     applicable_operating_systems = {
-        Operating_System.DEBIAN_11,
-        Operating_System.DEBIAN_12 }
+        OperatingSystem.DEBIAN_11,
+        OperatingSystem.DEBIAN_12 }
 
     if operating_system.issubset( applicable_operating_systems ):
         dependencies.append( "gnome-shell-extension-appindicator" )
 
-    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+    if indicator_name == IndicatorName.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == Indicator_Name.INDICATORONTHISDAY:
+    if indicator_name == IndicatorName.INDICATORONTHISDAY:
         dependencies.append( "wl-clipboard" )
 
         applicable_operating_systems = {
-            Operating_System.DEBIAN_11,
-            Operating_System.DEBIAN_12,
-            Operating_System.KUBUNTU_2204,
-            Operating_System.KUBUNTU_2404,
-            Operating_System.LINUX_MINT_CINNAMON_22,
-            Operating_System.LUBUNTU_2204,
-            Operating_System.LUBUNTU_2404,
-            Operating_System.UBUNTU_2204,
-            Operating_System.UBUNTU_2404,
-            Operating_System.UBUNTU_BUDGIE_2404,
-            Operating_System.UBUNTU_MATE_2404,
-            Operating_System.UBUNTU_UNITY_2204,
-            Operating_System.UBUNTU_UNITY_2404,
-            Operating_System.XUBUNTU_2404 }
+            OperatingSystem.DEBIAN_11,
+            OperatingSystem.DEBIAN_12,
+            OperatingSystem.KUBUNTU_2204,
+            OperatingSystem.KUBUNTU_2404,
+            OperatingSystem.LINUX_MINT_CINNAMON_22,
+            OperatingSystem.LUBUNTU_2204,
+            OperatingSystem.LUBUNTU_2404,
+            OperatingSystem.UBUNTU_2204,
+            OperatingSystem.UBUNTU_2404,
+            OperatingSystem.UBUNTU_BUDGIE_2404,
+            OperatingSystem.UBUNTU_MATE_2404,
+            OperatingSystem.UBUNTU_UNITY_2204,
+            OperatingSystem.UBUNTU_UNITY_2404,
+            OperatingSystem.XUBUNTU_2404 }
 
         if operating_system.issubset( applicable_operating_systems ):
             dependencies.append( "calendar" )
 
-    if indicator_name == Indicator_Name.INDICATORPUNYCODE:
+    if indicator_name == IndicatorName.INDICATORPUNYCODE:
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
+    if indicator_name == IndicatorName.INDICATORSCRIPTRUNNER:
         dependencies.append( "libnotify-bin" )
         dependencies.append( "pulseaudio-utils" )
 
-    if indicator_name == Indicator_Name.INDICATORTEST:
+    if indicator_name == IndicatorName.INDICATORTEST:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
         dependencies.append( "libnotify-bin" )
@@ -383,25 +387,25 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
         dependencies.append( "wmctrl" )
 
         applicable_operating_systems = {
-            Operating_System.DEBIAN_11,
-            Operating_System.DEBIAN_12,
-            Operating_System.KUBUNTU_2204,
-            Operating_System.KUBUNTU_2404,
-            Operating_System.LINUX_MINT_CINNAMON_22,
-            Operating_System.LUBUNTU_2204,
-            Operating_System.LUBUNTU_2404,
-            Operating_System.UBUNTU_2204,
-            Operating_System.UBUNTU_2404,
-            Operating_System.UBUNTU_BUDGIE_2404,
-            Operating_System.UBUNTU_MATE_2404,
-            Operating_System.UBUNTU_UNITY_2204,
-            Operating_System.UBUNTU_UNITY_2404,
-            Operating_System.XUBUNTU_2404 }
+            OperatingSystem.DEBIAN_11,
+            OperatingSystem.DEBIAN_12,
+            OperatingSystem.KUBUNTU_2204,
+            OperatingSystem.KUBUNTU_2404,
+            OperatingSystem.LINUX_MINT_CINNAMON_22,
+            OperatingSystem.LUBUNTU_2204,
+            OperatingSystem.LUBUNTU_2404,
+            OperatingSystem.UBUNTU_2204,
+            OperatingSystem.UBUNTU_2404,
+            OperatingSystem.UBUNTU_BUDGIE_2404,
+            OperatingSystem.UBUNTU_MATE_2404,
+            OperatingSystem.UBUNTU_UNITY_2204,
+            OperatingSystem.UBUNTU_UNITY_2404,
+            OperatingSystem.XUBUNTU_2404 }
 
         if operating_system.issubset( applicable_operating_systems ):
             dependencies.append( "calendar" )
 
-    if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
+    if indicator_name == IndicatorName.INDICATORVIRTUALBOX:
         dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
@@ -416,39 +420,39 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
         "python3-devel",
         "python3-pip" ]
 
-    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+    if indicator_name == IndicatorName.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == Indicator_Name.INDICATORONTHISDAY:
+    if indicator_name == IndicatorName.INDICATORONTHISDAY:
         dependencies.append( "calendar" )
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == Indicator_Name.INDICATORPUNYCODE:
+    if indicator_name == IndicatorName.INDICATORPUNYCODE:
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == Indicator_Name.INDICATORSCRIPTRUNNER:
+    if indicator_name == IndicatorName.INDICATORSCRIPTRUNNER:
         applicable_operating_systems = {
-            Operating_System.FEDORA_39,
-            Operating_System.FEDORA_40 }
+            OperatingSystem.FEDORA_39,
+            OperatingSystem.FEDORA_40 }
 
         if operating_system.issubset( applicable_operating_systems ):
             dependencies.append( "pulseaudio-utils" )
 
-    if indicator_name == Indicator_Name.INDICATORTEST:
+    if indicator_name == IndicatorName.INDICATORTEST:
         dependencies.append( "calendar" )
         dependencies.append( "fortune-mod" )
         dependencies.append( "wl-clipboard" )
         dependencies.append( "wmctrl" )
 
         applicable_operating_systems = {
-            Operating_System.FEDORA_39,
-            Operating_System.FEDORA_40 }
+            OperatingSystem.FEDORA_39,
+            OperatingSystem.FEDORA_40 }
 
         if operating_system.issubset( applicable_operating_systems ):
             dependencies.append( "pulseaudio-utils" )
 
-    if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
+    if indicator_name == IndicatorName.INDICATORVIRTUALBOX:
         dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
@@ -461,22 +465,22 @@ def _get_operating_system_dependencies_manjaro( operating_system, indicator_name
         "libayatana-appindicator",
         "pkgconf" ]
 
-    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+    if indicator_name == IndicatorName.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == Indicator_Name.INDICATORONTHISDAY:
+    if indicator_name == IndicatorName.INDICATORONTHISDAY:
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == Indicator_Name.INDICATORPUNYCODE:
+    if indicator_name == IndicatorName.INDICATORPUNYCODE:
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == Indicator_Name.INDICATORTEST:
+    if indicator_name == IndicatorName.INDICATORTEST:
         dependencies.append( "fortune-mod" )
         dependencies.append( "wl-clipboard" )
         dependencies.append( "wmctrl" )
 
-    if indicator_name == Indicator_Name.INDICATORVIRTUALBOX:
+    if indicator_name == IndicatorName.INDICATORVIRTUALBOX:
         dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
@@ -490,10 +494,10 @@ def _get_operating_system_dependencies_opensuse( operating_system, indicator_nam
         "python3-devel",
         "typelib-1_0-AyatanaAppIndicator3-0_1" ]
 
-    if indicator_name == Indicator_Name.INDICATORFORTUNE:
+    if indicator_name == IndicatorName.INDICATORFORTUNE:
         dependencies.append( "fortune" )
 
-    if indicator_name == Indicator_Name.INDICATORTEST:
+    if indicator_name == IndicatorName.INDICATORTEST:
         dependencies.append( "fortune" )
 
     return ' '.join( sorted( dependencies ) )
@@ -506,11 +510,11 @@ def _get_install_uninstall( indicator_name, install = True ):
         command_fedora = "sudo dnf -y install"
 
         additional_text = ""
-        if _is_indicator( indicator_name, Indicator_Name.INDICATORSCRIPTRUNNER ):
+        if _is_indicator( indicator_name, IndicatorName.INDICATORSCRIPTRUNNER ):
             additional_text = (
                 f"3. Any `Python` scripts you add to `{ indicator_name }` may require additional modules.\n" )
 
-        if _is_indicator( indicator_name, Indicator_Name.INDICATORTIDE ):
+        if _is_indicator( indicator_name, IndicatorName.INDICATORTIDE ):
             additional_text = (
                 f"3. You will need to write a `Python` script to retrieve your tidal data.\n" )
 
@@ -535,58 +539,58 @@ def _get_install_uninstall( indicator_name, install = True ):
 
         function(
             {
-                Operating_System.DEBIAN_11,
-                Operating_System.DEBIAN_12 },
+                OperatingSystem.DEBIAN_11,
+                OperatingSystem.DEBIAN_12 },
             indicator_name,
             command_debian,
             _get_operating_system_dependencies_debian ) +
 
         function(
-            { Operating_System.FEDORA_38 },
+            { OperatingSystem.FEDORA_38 },
             indicator_name,
             command_fedora,
             _get_operating_system_dependencies_fedora ) +
 
         function(
             {
-                Operating_System.FEDORA_39,
-                Operating_System.FEDORA_40 },
+                OperatingSystem.FEDORA_39,
+                OperatingSystem.FEDORA_40 },
             indicator_name,
             command_fedora,
             _get_operating_system_dependencies_fedora ) +
 
         function(
-            { Operating_System.MANJARO_240X },
+            { OperatingSystem.MANJARO_240X },
             indicator_name,
             "sudo pacman -S --noconfirm" if install else "sudo pacman -R --noconfirm",
             _get_operating_system_dependencies_manjaro ) +
 
         function(
-            { Operating_System.OPENSUSE_TUMBLEWEED },
+            { OperatingSystem.OPENSUSE_TUMBLEWEED },
             indicator_name,
             "sudo zypper install -y" if install else "sudo zypper remove -y",
             _get_operating_system_dependencies_opensuse ) +
 
         function(
-            { Operating_System.UBUNTU_2004 },
+            { OperatingSystem.UBUNTU_2004 },
             indicator_name,
             command_debian,
             _get_operating_system_dependencies_debian ) +
 
         function(
             {
-                Operating_System.KUBUNTU_2204,
-                Operating_System.KUBUNTU_2404,
-                Operating_System.LINUX_MINT_CINNAMON_22,
-                Operating_System.LUBUNTU_2204,
-                Operating_System.LUBUNTU_2404,
-                Operating_System.UBUNTU_2204,
-                Operating_System.UBUNTU_2404,
-                Operating_System.UBUNTU_BUDGIE_2404,
-                Operating_System.UBUNTU_MATE_2404,
-                Operating_System.UBUNTU_UNITY_2204,
-                Operating_System.UBUNTU_UNITY_2404,
-                Operating_System.XUBUNTU_2404 },
+                OperatingSystem.KUBUNTU_2204,
+                OperatingSystem.KUBUNTU_2404,
+                OperatingSystem.LINUX_MINT_CINNAMON_22,
+                OperatingSystem.LUBUNTU_2204,
+                OperatingSystem.LUBUNTU_2404,
+                OperatingSystem.UBUNTU_2204,
+                OperatingSystem.UBUNTU_2404,
+                OperatingSystem.UBUNTU_BUDGIE_2404,
+                OperatingSystem.UBUNTU_MATE_2404,
+                OperatingSystem.UBUNTU_UNITY_2204,
+                OperatingSystem.UBUNTU_UNITY_2404,
+                OperatingSystem.XUBUNTU_2404 },
             indicator_name,
             command_debian,
             _get_operating_system_dependencies_debian ) )
@@ -616,22 +620,22 @@ def _get_limitations( indicator_name ):
 
     if _is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORPUNYCODE ):
+        IndicatorName.INDICATORPUNYCODE ):
         messages.append(
             f"- `Wayland`: Clipboard/Primary input and output function intermittently at best; effectively unsupported.\n" )
 
     if _is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORFORTUNE,
-        Indicator_Name.INDICATORONTHISDAY,
-        Indicator_Name.INDICATORTEST ):
+        IndicatorName.INDICATORFORTUNE,
+        IndicatorName.INDICATORONTHISDAY,
+        IndicatorName.INDICATORTEST ):
         messages.append(
             f"- `Wayland`: Clipboard copy/paste is unsupported.\n" )
 
     if _is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORTEST,
-        Indicator_Name.INDICATORVIRTUALBOX ):
+        IndicatorName.INDICATORTEST,
+        IndicatorName.INDICATORVIRTUALBOX ):
         messages.append(
             f"- `Wayland`: The command `wmctrl` is unsupported.\n" )
 
@@ -640,9 +644,9 @@ def _get_limitations( indicator_name ):
     # Manjaro 24.0.7    KDE     No mouse wheel scroll.
     if _is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORSTARDATE,
-        Indicator_Name.INDICATORTEST,
-        Indicator_Name.INDICATORVIRTUALBOX ):
+        IndicatorName.INDICATORSTARDATE,
+        IndicatorName.INDICATORTEST,
+        IndicatorName.INDICATORVIRTUALBOX ):
         messages.append(
             f"- `KDE`: Mouse wheel scroll over icon is unsupported.\n" )
 
@@ -656,10 +660,10 @@ def _get_limitations( indicator_name ):
     # Xubuntu 24.04         XFCE        Tooltip in lieu of label.
     if _is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORLUNAR,
-        Indicator_Name.INDICATORSCRIPTRUNNER,
-        Indicator_Name.INDICATORSTARDATE,
-        Indicator_Name.INDICATORTEST ):
+        IndicatorName.INDICATORLUNAR,
+        IndicatorName.INDICATORSCRIPTRUNNER,
+        IndicatorName.INDICATORSTARDATE,
+        IndicatorName.INDICATORTEST ):
         messages.append(
             f"- `KDE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
         messages.append(
@@ -676,8 +680,8 @@ def _get_limitations( indicator_name ):
     # Lubuntu 24.04     LXQt        Cannot change the icon once initially set.
     if _is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORLUNAR,
-        Indicator_Name.INDICATORTEST ):
+        IndicatorName.INDICATORLUNAR,
+        IndicatorName.INDICATORTEST ):
         messages.append(
             f"- `LXQt`: The icon cannot be changed once set.\n" )
         messages.append(
@@ -687,8 +691,8 @@ def _get_limitations( indicator_name ):
     # Lubuntu 24.04     LXQt    Default terminal (qterminal) all good.
     if _is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORSCRIPTRUNNER,
-        Indicator_Name.INDICATORTEST ):
+        IndicatorName.INDICATORSCRIPTRUNNER,
+        IndicatorName.INDICATORTEST ):
         messages.append(
             f"- `LXQt`: Commands cannot be sent to `qterminal` with version < `1.2.0` as the "
             f"arguments are not [preserved](https://github.com/lxqt/qterminal/issues/335). "
@@ -697,21 +701,21 @@ def _get_limitations( indicator_name ):
     # openSUSE Tumbleweed   No `calendar` command.
     if _is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORTEST ):
+        IndicatorName.INDICATORTEST ):
         messages.append(
             f"- `openSUSE Tumbleweed`: Does not contain the `calendar` command.\n" )
 
     # openSUSE Tumbleweed    ICEWM      No notifications.
     if _is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORFORTUNE,
-        Indicator_Name.INDICATORLUNAR,
-        Indicator_Name.INDICATORONTHISDAY,
-        Indicator_Name.INDICATORPUNYCODE,
-        Indicator_Name.INDICATORSCRIPTRUNNER,
-        Indicator_Name.INDICATORTEST,
-        Indicator_Name.INDICATORTIDE,
-        Indicator_Name.INDICATORVIRTUALBOX ):
+        IndicatorName.INDICATORFORTUNE,
+        IndicatorName.INDICATORLUNAR,
+        IndicatorName.INDICATORONTHISDAY,
+        IndicatorName.INDICATORPUNYCODE,
+        IndicatorName.INDICATORSCRIPTRUNNER,
+        IndicatorName.INDICATORTEST,
+        IndicatorName.INDICATORTIDE,
+        IndicatorName.INDICATORVIRTUALBOX ):
         messages.append(
             f"- `ICEWM`: Notifications are unsupported.\n" )
 
@@ -720,16 +724,16 @@ def _get_limitations( indicator_name ):
 #TODO Need to change this...does not apply for manjaro and indicatoronthisday.
     if _is_indicator(
         indicator_name,
-        Indicator_Name.INDICATORFORTUNE,
-        Indicator_Name.INDICATORLUNAR,
-        Indicator_Name.INDICATORONTHISDAY,
-        Indicator_Name.INDICATORPPADOWNLOADSTATISTICS,
-        Indicator_Name.INDICATORPUNYCODE,
-        Indicator_Name.INDICATORSCRIPTRUNNER,
-        Indicator_Name.INDICATORSTARDATE,
-        Indicator_Name.INDICATORTEST,
-        Indicator_Name.INDICATORTIDE,
-        Indicator_Name.INDICATORVIRTUALBOX ):
+        IndicatorName.INDICATORFORTUNE,
+        IndicatorName.INDICATORLUNAR,
+        IndicatorName.INDICATORONTHISDAY,
+        IndicatorName.INDICATORPPADOWNLOADSTATISTICS,
+        IndicatorName.INDICATORPUNYCODE,
+        IndicatorName.INDICATORSCRIPTRUNNER,
+        IndicatorName.INDICATORSTARDATE,
+        IndicatorName.INDICATORTEST,
+        IndicatorName.INDICATORTIDE,
+        IndicatorName.INDICATORVIRTUALBOX ):
         messages.append(
             f"- `Kubuntu 24.04`: No autostart.\n" )
         messages.append(

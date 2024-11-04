@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays PPA download statistics.
+""" Application indicator which displays PPA download statistics. """
 
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
@@ -38,6 +38,8 @@ from ppa import Filters, PPA, PublishedBinary
 
 
 class IndicatorPPADownloadStatistics( IndicatorBase ):
+    ''' Main class which encapsulates the indicator. '''
+
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator PPA Download Statistics" )
     indicator_categories = "Categories=Utility"

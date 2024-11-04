@@ -16,8 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Download from URL, load from file and hold in memory,
-# general perturbations for satellites.
+"""
+Download from URL, load from file and hold in memory,
+general perturbations for satellites.
+"""
 
 
 from sgp4 import alpha5, exporter, omm
@@ -28,6 +30,7 @@ from indicatorbase import IndicatorBase
 
 
 class DataProviderGeneralPerturbation( DataProvider ):
+    ''' Download and persist general pertubation for satellites. '''
 
     # Download general perturbation data from Celestrak
     # and save to the given filename.

@@ -16,51 +16,53 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Converts between Star Trek™ stardates and Gregorian date/times.
-# There are two types of stardates: 'classic' and '2009 revised'.
-#
-#
-# 'classic' stardates
-# ===================
-#
-# The 'classic' stardate is based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main.
-#
-# Stardates are related to Julian/Gregorian dates as depicted on the following time line:
-#
-#      <------x------x------x------x------x------x------x------>
-#             |      |      |      |     |       |      |
-#             |      |      |      |     |       |      |
-#          6000 BC   |   1582 AD   | 2270-01-26  |  2323-01-01
-#                    |             |             |
-#                  46 BC       2162-01-04    2283-10-05
-#
-# From 6000 BC up to 46 BC, the Egyptian-developed calendar was used.
-# Initially based on counting lunar cycles, it was eventually changed to a solar calendar.
-#
-# Between 46 BC to 1582 AD, the Julian calendar was used.
-# This was the first calendar to introduce the "leap year".
-#
-# The Gregorian calendar commenced in 1582 and is in use to this day.
-# It is based on a modified version of the Julian calendar.
-#
-# In 2162, stardates were developed by Starfleet.
-# Stardate [0]0000.0 commenced on midnight 2162/1/4.
-# The stardate rate from this date to 2270/1/26 was 5 units per day.
-#
-# Between 2270/1/26 and 2283/10/5 ([19]7340.0 and [19]7840.0, respectively)
-# the rate changes to 0.1 units per day.
-#
-# Between 2283/10/5 to 2323/1/1 ([19]7840.0 and [20]5006.0, respectively),
-# the rate changes to 0.5 units per day.
-#
-# From 2323/1/1 ([20]5006.0) the rate changed to 1000 units per mean solar year.
-# Also, stardate [20]5006.0 becomes [21]00000.0.
-#
-#
-# '2009 revised'
-# ==============
-#
-# The '2009 revised' stardate is based on https://en.wikipedia.org/wiki/Stardate.
+"""
+Converts between Star Trek™ stardates and Gregorian date/times.
+There are two types of stardates: 'classic' and '2009 revised'.
+
+
+ 'classic' stardates
+===================
+
+The 'classic' stardate is based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main.
+
+Stardates are related to Julian/Gregorian dates as depicted on the following time line:
+
+     <------x------x------x------x------x------x------x------>
+            |      |      |      |     |       |      |
+            |      |      |      |     |       |      |
+         6000 BC   |   1582 AD   | 2270-01-26  |  2323-01-01
+                   |             |             |
+                 46 BC       2162-01-04    2283-10-05
+
+From 6000 BC up to 46 BC, the Egyptian-developed calendar was used.
+Initially based on counting lunar cycles, it was eventually changed to a solar calendar.
+
+Between 46 BC to 1582 AD, the Julian calendar was used.
+This was the first calendar to introduce the "leap year".
+
+The Gregorian calendar commenced in 1582 and is in use to this day.
+It is based on a modified version of the Julian calendar.
+
+In 2162, stardates were developed by Starfleet.
+Stardate [0]0000.0 commenced on midnight 2162/1/4.
+The stardate rate from this date to 2270/1/26 was 5 units per day.
+
+Between 2270/1/26 and 2283/10/5 ([19]7340.0 and [19]7840.0, respectively)
+the rate changes to 0.1 units per day.
+
+Between 2283/10/5 to 2323/1/1 ([19]7840.0 and [20]5006.0, respectively),
+the rate changes to 0.5 units per day.
+
+From 2323/1/1 ([20]5006.0) the rate changed to 1000 units per mean solar year.
+Also, stardate [20]5006.0 becomes [21]00000.0.
+
+
+'2009 revised'
+==============
+
+The '2009 revised' stardate is based on https://en.wikipedia.org/wiki/Stardate.
+"""
 
 
 import datetime

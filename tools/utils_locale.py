@@ -16,8 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Create/update the .pot/.po files for an indicator's source.
-# Build the .pot/.po files for an indicator's wheel release.
+"""
+Create/update the .pot/.po files for an indicator's source.
+Build the .pot/.po files for an indicator's wheel release.
+"""
 
 
 import datetime
@@ -182,9 +184,9 @@ def _create_update_po(
     pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
     for lingua_code in linguas_codes:
         po_file = (
-            _get_locale_directory( indicator_name ) / 
-            lingua_code / 
-            "LC_MESSAGES" / 
+            _get_locale_directory( indicator_name ) /
+            lingua_code /
+            "LC_MESSAGES" /
             ( indicator_name + ".po" ) )
 
         if po_file.exists():
@@ -283,19 +285,19 @@ def _validate_locale_source( indicator_name ):
 
     potfiles_dot_in = _get_potfiles_dot_in( "indicatorbase" )
     if not potfiles_dot_in.exists():
-        message += f"ERROR: Cannot find { potfiles_dot_in }\n" 
+        message += f"ERROR: Cannot find { potfiles_dot_in }\n"
 
     potfiles_dot_in = _get_potfiles_dot_in( indicator_name )
     if not potfiles_dot_in.exists():
-        message += f"ERROR: Cannot find { potfiles_dot_in }\n" 
+        message += f"ERROR: Cannot find { potfiles_dot_in }\n"
 
     linguas = _get_linguas( "indicatorbase" )
     if not linguas.exists():
-        message += f"ERROR: Cannot find { linguas }\n" 
+        message += f"ERROR: Cannot find { linguas }\n"
 
     linguas = _get_linguas( indicator_name )
     if not linguas.exists():
-        message += f"ERROR: Cannot find { linguas }\n" 
+        message += f"ERROR: Cannot find { linguas }\n"
 
     return message
 

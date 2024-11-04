@@ -16,8 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Download from URL, load from file and hold in memory,
-# apparent magnitude for comets and minor planets.
+"""
+Download from URL, load from file and hold in memory,
+apparent magnitude for comets and minor planets.
+"""
 
 
 import datetime
@@ -27,6 +29,7 @@ from dataprovider import DataProvider
 
 
 class DataProviderApparentMagnitude( DataProvider ):
+    ''' Download and persist apparent magnitude for comets and minor planets. '''
 
     # Download apparent magnitude data for comets and minor planets
     # and save to the given filename.
@@ -148,8 +151,8 @@ class DataProviderApparentMagnitude( DataProvider ):
         return am_data
 
 
-# Hold apparent magnitude for a comet or minor planet.
 class AM():
+    ''' Apparent magnitude for a comet or minor planet. '''
 
     def __init__( self, name, apparent_magnitude ):
         self.name = name

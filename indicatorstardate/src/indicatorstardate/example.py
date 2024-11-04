@@ -16,12 +16,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+""" Exercise the Stardate API. """
+
+
 import datetime
 
 import stardate
 
 
-# Exercise the Stardate API.
 print( f"Stardate API version: {stardate.get_version() }\n" )
 
 utc_now = datetime.datetime.now( datetime.timezone.utc )

@@ -16,21 +16,25 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Base class for downloading from a URL and loading from file,
-# data for comets, minor planets and satellites.
+"""
+Base class for downloading from a URL and loading from file,
+data for comets minor planets and satellites.
+"""
 
 
 from abc import ABC, abstractmethod
 
 
 class DataProvider( ABC ):
+    ''' Base class for downloading and persisting data for astronomical objects. '''
 
     # Download data and save to file.
     #
     # Return True on success; false otherwise and may log.
     @staticmethod
     @abstractmethod
-    def download( filename, logging, *args ): return True
+    def download( filename, logging, *args ):
+        return True
 
 
     # Load data from file and return in a dictionary.
@@ -38,4 +42,5 @@ class DataProvider( ABC ):
     # Return dictionary which may be empty and may log.
     @staticmethod
     @abstractmethod
-    def load( filename, logging, *args ): return { }
+    def load( filename, logging, *args ):
+        return { }

@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays calendar events.
+""" Application indicator which displays calendar events. """
 
 
 # Neither openSUSE nor Manjaro have the 'calendar' package.
@@ -48,7 +48,7 @@ import fnmatch
 import gi
 import os
 
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 
 gi.require_version( "Gtk", "3.0" )
@@ -61,6 +61,8 @@ from event import Event
 
 
 class IndicatorOnThisDay( IndicatorBase ):
+    ''' Main class which encapsulates the indicator. '''
+
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator On This Day" )
     indicator_categories = "Categories=Utility;Amusement"
@@ -159,12 +161,12 @@ class IndicatorOnThisDay( IndicatorBase ):
                 break
 
 
-    def remove_leading_zero_from_date( self, date ):
-        if date[ -2 ] == '0':
-            _date = date[ 0 : -3 ] + ' ' + date[ -1 ]
+    def remove_leading_zero_from_date( self, date_ ):
+        if date_[ -2 ] == '0':
+            _date = date_[ 0 : -3 ] + ' ' + date_[ -1 ]
 
         else:
-            _date = date[ 0 : -3 ] + ' ' + date[ -2 : ]
+            _date = date_[ 0 : -3 ] + ' ' + date_[ -2 : ]
 
         return _date
 

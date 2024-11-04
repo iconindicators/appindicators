@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Functions common to scripts.
+""" Functions common to scripts. """
 
 
 import argparse
@@ -45,7 +45,7 @@ def is_correct_directory( example_arguments = None ):
 def initialiase_parser_and_get_arguments(
         description,
         argument_names,
-        argument_helps = { },
+        argument_helps = { }, #TODO Can these be None as default and if so, then assign to { } as first line?
         argument_nargs = { } ):
 
     parser = argparse.ArgumentParser( description = description )

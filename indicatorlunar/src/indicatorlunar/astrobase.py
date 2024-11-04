@@ -16,27 +16,28 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Base class for calculating astronomical information.
+"""
+Base class for calculating astronomical information.
 
-
-# References:
-#   https://ssd.jpl.nasa.gov/horizons.cgi
-#   https://stellarium-web.org/
-#   https://theskylive.com/
-#   https://www.wolframalpha.com
-#   https://www.ga.gov.au/scientific-topics/astronomical
-#   https://futureboy.us/fsp/moon.fsp
-#   https://futureboy.us/fsp/sun.fsp
-#   https://www.satellite-calculations.com/
-#   https://aa.usno.navy.mil/data/docs/mrst.php
-#   https://celestrak.org/columns/v03n01
-#   https://celestrak.org/NORAD/elements
-#   https://www.n2yo.com
-#   https://www.heavens-above.com
-#   https://in-the-sky.org
-#   https://uphere.space
-#   https://www.amsat.org/track
-#   https://tracksat.space
+References:
+	https://ssd.jpl.nasa.gov/horizons.cgi
+	https://stellarium-web.org/
+	https://theskylive.com/
+	https://www.wolframalpha.com
+	https://www.ga.gov.au/scientific-topics/astronomical
+	https://futureboy.us/fsp/moon.fsp
+	https://futureboy.us/fsp/sun.fsp
+	https://www.satellite-calculations.com/
+	https://aa.usno.navy.mil/data/docs/mrst.php
+	https://celestrak.org/columns/v03n01
+	https://celestrak.org/NORAD/elements
+	https://www.n2yo.com
+	https://www.heavens-above.com
+	https://in-the-sky.org
+	https://uphere.space
+	https://www.amsat.org/track
+	https://tracksat.space
+"""
 
 
 import datetime
@@ -47,8 +48,10 @@ from enum import Enum
 
 
 class AstroBase( ABC ):
+    ''' Base class for classes which access PyEphem and Skyfield. '''
 
     class BodyType( Enum ):
+        ''' Astronomical objects. '''
         COMET = 0
         MINOR_PLANET = 1
         MOON = 2
@@ -544,14 +547,14 @@ class AstroBase( ABC ):
         beta = math.acos( numerator / denominator )
 
         psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 0.63 )
-        Psi_1 = math.exp( -3.33 * psi_t )
+        psi_1 = math.exp( -3.33 * psi_t )
         psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
-        Psi_2 = math.exp( -1.87 * psi_t )
+        psi_2 = math.exp( -1.87 * psi_t )
 
         apparent_magnitude = \
             h_absolute_magnitude + \
             5.0 * math.log10( body_sun_distance_au * body_earth_distance_au ) - \
-            2.5 * math.log10( ( 1 - g_slope ) * Psi_1 + g_slope * Psi_2 )
+            2.5 * math.log10( ( 1 - g_slope ) * psi_1 + g_slope * psi_2 )
 
         return apparent_magnitude
 
@@ -617,19 +620,19 @@ class AstroBase( ABC ):
             y_prime = y
             m_prime = m
 
-        A = int( y_prime / 100 )
-        B = 2 - A + int( A / 4 )
-        C = int( 365.25 * y_prime )
-        D = int( 30.6001 * ( m_prime + 1 ) )
-        julian_date = B + C + D + d + 1720994.5
+        a = int( y_prime / 100 )
+        b = 2 - a + int( a / 4 )
+        c = int( 365.25 * y_prime )
+        d = int( 30.6001 * ( m_prime + 1 ) )
+        julian_date = b + c + d + d + 1720994.5
 
         # Find universal time.  Section 12 of the reference.
-        S = julian_date - 2451545.0
-        T = S / 36525.0
-        T0 = ( 6.697374558 + ( 2400.051336 * T ) + ( 0.000025862 * T * T ) ) % 24
+        s = julian_date - 2451545.0
+        t = s / 36525.0
+        t0 = ( 6.697374558 + ( 2400.051336 * t ) + ( 0.000025862 * t * t ) ) % 24
         universal_time_decimal = ( ( ( utc_now.second / 60 ) + utc_now.minute ) / 60 ) + utc_now.hour
-        A = universal_time_decimal * 1.002737909
-        greenwich_sidereal_time_decimal = ( A + T0 ) % 24
+        a = universal_time_decimal * 1.002737909
+        greenwich_sidereal_time_decimal = ( a + t0 ) % 24
 
         # Find local sidereal time.  Section 14 of the reference.
         longitude_in_hours = math.degrees( longitude ) / 15

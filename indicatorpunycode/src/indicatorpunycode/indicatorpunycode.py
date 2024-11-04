@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator which converts domain names between Unicode and ASCII.
+""" Application indicator which converts domain names between Unicode and ASCII. """
 
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
@@ -30,6 +30,8 @@ from gi.repository import Gtk
 
 
 class IndicatorPunycode( IndicatorBase ):
+    ''' Main class which encapsulates the indicator. '''
+
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Punycode" )
     indicator_categories = "Categories=Utility"

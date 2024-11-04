@@ -16,13 +16,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Build a Python .whl / .tar.gz for one or more indicators.
-#
-# To view the contents of a .whl:
-#    unzip -l indicatortest-1.0.7-py3-none-any.whl
-#
-# To view the contents of a .tar.gz:
-#    tar tf indicatortest-1.0.7.tar.gz
+"""
+Build a Python .whl / .tar.gz for one or more indicators.
+
+To view the contents of a .whl:
+   unzip -l indicatortest-1.0.7-py3-none-any.whl
+
+To view the contents of a .tar.gz:
+   tar tf indicatortest-1.0.7.tar.gz
+"""
 
 
 import configparser
@@ -168,11 +170,14 @@ def _get_name_categories_comments_from_indicator( indicator_name, directory_indi
 
 def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
 
-    # If a shell script contains a variable (of the form ${}),
-    # the formatter views this as a missing key (unknown text to replace).
-    # In this case, ignore and return the key so the shell variable remains intact.
-    # https://stackoverflow.com/a/17215533/2156453
     class SafeDict( dict ):
+        '''
+        If a shell script contains a variable (of the form ${}),
+        the formatter views this as a missing key (unknown text to replace).
+        In this case, ignore and return the key so the shell variable remains intact.
+        https://stackoverflow.com/a/17215533/2156453
+        '''
+
         def __missing__( self, key ):
             return '{' + key + '}'
 
@@ -448,7 +453,7 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
 
 if __name__ == "__main__":
-    correct_directory, message = \
+    correct_directory, error_message = \
         utils.is_correct_directory( example_arguments = "release indicatorfortune" )
 
     if correct_directory:
@@ -474,18 +479,18 @@ if __name__ == "__main__":
             "PyGObject",
             "readme_renderer[md]" )
 
-        for indicator_name in args.indicators:
-            message = _build_wheel_for_indicator( args.directory_release, indicator_name )
-            if message:
-                print( message )
+        for indicator in args.indicators:
+            error_message = _build_wheel_for_indicator( args.directory_release, indicator )
+            if error_message:
+                print( error_message )
 
         # As a convenience, convert the project README.md to README.html
-        command = (
+        command_ = (
             f". venv/bin/activate && " +
             f"python3 -m readme_renderer README.md -o README.html && " +
             f"deactivate" )
 
-        subprocess.call( command, shell = True )
+        subprocess.call( command_, shell = True )
 
     else:
-        print( message )
+        print( error_message )

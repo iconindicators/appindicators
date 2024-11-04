@@ -16,9 +16,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Lunar/solar eclipse tables up to and including the year 2040.
-# Eclipse Predictions by Fred Espenak, NASA/GSFC Emeritus
-# https://eclipse.gsfc.nasa.gov/eclipse.html
+"""
+Lunar/solar eclipse tables up to and including the year 2040.
+
+Eclipse Predictions by Fred Espenak, NASA/GSFC Emeritus
+https://eclipse.gsfc.nasa.gov/eclipse.html
+"""
 
 
 import datetime
@@ -27,6 +30,7 @@ from enum import Enum
 
 
 class EclipseType( Enum ):
+    ''' Types of eclipses. '''
     ANNULAR = 0
     HYBRID = 1
     PARTIAL = 2
@@ -51,7 +55,7 @@ _months = {
 
 # https://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
 # https://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
-_eclipses_lunar = \
+_ECLIPSES_LUNAR = \
 ''' 09706   2025 Mar 14  06:59:56     75    311  123   T   -p   0.3484  2.2595  1.1784  362.6  218.3   65.4    3N  102W
     09707   2025 Sep 07  18:12:58     75    317  128   T   -p  -0.2752  2.3440  1.3619  326.7  209.4   82.1    6S   87E
     09708   2026 Mar 03  11:34:52     75    323  133   T   a-  -0.3765  2.1838  1.1507  338.6  207.2   58.3    6N  171W
@@ -93,7 +97,7 @@ _eclipses_lunar = \
 
 # https://eclipse.gsfc.nasa.gov/5MCSE/5MKSEcatalog.txt
 # https://eclipse.gsfc.nasa.gov/SEcat5/catkey.html
-_eclipses_solar = \
+_ECLIPSES_SOLAR = \
 '''  9563  479   2025 Mar 29  10:48:36     75    312  149   P   t-   1.0405  0.9376  61.1N  77.1W   0   83
      9564  479   2025 Sep 21  19:43:04     75    318  154   P   t-  -1.0651  0.8550  60.9S 153.5E   0   89
      9565  479   2026 Feb 17  12:13:06     75    323  121   A   -t  -0.9743  0.9630  64.7S  86.8E  12  268  616  02m20s
@@ -140,7 +144,7 @@ _eclipses_solar = \
 #    latitude (south is negative)
 #    longitude (east is negative)
 def get_eclipse_lunar( utc_now ):
-    return _get_eclipse( utc_now, _eclipses_lunar, 1, 2, 3, 4, 5, 8, 16, 17 )
+    return _get_eclipse( utc_now, _ECLIPSES_LUNAR, 1, 2, 3, 4, 5, 8, 16, 17 )
 
 
 # Gets the upcoming solar eclipse.
@@ -151,7 +155,7 @@ def get_eclipse_lunar( utc_now ):
 #    latitude (south is negative)
 #    longitude (east is negative)
 def get_eclipse_solar( utc_now ):
-    return _get_eclipse( utc_now, _eclipses_solar, 2, 3, 4, 5, 6, 9, 13, 14 )
+    return _get_eclipse( utc_now, _ECLIPSES_SOLAR, 2, 3, 4, 5, 6, 9, 13, 14 )
 
 
 def _get_eclipse(

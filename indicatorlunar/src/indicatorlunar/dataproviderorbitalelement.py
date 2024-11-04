@@ -16,20 +16,24 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Download from URL, load from file and hold in memory,
-# orbital elements for comets and minor planets.
+"""
+Download from URL, load from file and hold in memory,
+orbital elements for comets and minor planets.
+"""
 
 
 import datetime
-import requests
 
 from enum import Enum
+
+import requests
 
 from dataprovider import DataProvider
 from indicatorbase import IndicatorBase
 
 
 class DataProviderOrbitalElement( DataProvider ):
+    ''' Download and persist orbital elements for comets and minor planets. '''
 
     # Download orbital element data and save to the given filename.
     @staticmethod
@@ -367,9 +371,11 @@ class DataProviderOrbitalElement( DataProvider ):
 
 
 # Hold orbital element for a comet or minor planet.
-class OE( object ):
+class OE():
+    ''' Orbital element for a comet or minor planet. '''
 
     class DataType( Enum ):
+        ''' Data types for supported real objects. '''
         SKYFIELD_COMET = 0
         SKYFIELD_MINOR_PLANET = 1
         XEPHEM_COMET = 2

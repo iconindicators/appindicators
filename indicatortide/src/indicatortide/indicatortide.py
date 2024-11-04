@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays tidal information.
+""" Application indicator which displays tidal information. """
 
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
@@ -33,6 +33,8 @@ from pathlib import Path
 
 
 class IndicatorTide( IndicatorBase ):
+    ''' Main class which encapsulates the indicator. '''
+
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Tide" )
     indicator_categories = "Categories=Utility"
@@ -74,7 +76,7 @@ class IndicatorTide( IndicatorBase ):
                 spec.loader.exec_module( module )
                 klazz = getattr( module, self.user_script_class_name )
                 tidal_readings = \
-                    klazz.get_tide_data( 
+                    klazz.get_tide_data(
                         logging = self.get_logging(),
                         url_timeout_in_seconds = 20 )
 
@@ -325,10 +327,9 @@ class IndicatorTide( IndicatorBase ):
                         user_script_path_and_filename.grab_focus()
                         continue
 
-                    else:
-                        self.show_dialog_ok( dialog, _( "The user script class name cannot be empty." ) )
-                        user_script_class_name.grab_focus()
-                        continue
+                    self.show_dialog_ok( dialog, _( "The user script class name cannot be empty." ) )
+                    user_script_class_name.grab_focus()
+                    continue
 
                 self.user_script_path_and_filename = user_script_path_and_filename.get_text().strip()
                 self.user_script_class_name = user_script_class_name.get_text().strip()

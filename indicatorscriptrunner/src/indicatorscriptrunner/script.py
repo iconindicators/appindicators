@@ -16,16 +16,19 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Script information.
-#
-# Base class encapsulating basic script information.
-# Implementation classes for background and non-background scripts.
+"""
+Script information.
+
+Base class encapsulating basic script information.
+Implementation classes for background and non-background scripts.
+"""
 
 
 from abc import ABC
 
 
 class Info( ABC ):
+    ''' Base class for script information. '''
 
     # Group to which a script belongs.
     # Name of script.
@@ -84,6 +87,7 @@ class Info( ABC ):
 
 
 class Background( Info ):
+    ''' Background script information. '''
 
     # Group to which a script belongs.
     # Name of script.
@@ -126,6 +130,7 @@ class Background( Info ):
 
 
 class NonBackground( Info ):
+    ''' Non-background (foreground) script information. '''
 
     # Group to which a script belongs.
     # Name of script.

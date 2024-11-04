@@ -16,9 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Uninstall one or more indicators, removing the .desktop, run script
-# and icons and .config/.cache.  Finally, remove the virtual environment
-# if no more indicators are installed.
+"""
+Uninstall one or more indicators, removing the .desktop, run script
+and icons and .config/.cache.  Finally, remove the virtual environment
+if no more indicators are installed.
+"""
 
 
 import subprocess

@@ -16,10 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# An event comprises a date and description.
+""" An event comprises a date and description. """
 
 
-class Event( object ):
+class Event():
+    ''' A single calendar event. '''
 
     # Date - String format 'MMM DD'.  For example, 'Jul 05'.
     # Description - String description of the event.

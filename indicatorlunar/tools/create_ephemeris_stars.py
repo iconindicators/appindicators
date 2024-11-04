@@ -16,8 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Create a star ephemeris for use in both PyEphem and Skyfield using stars from PyEphem,
-# keeping only those present in the IAU CSN Catalog with accompanying HIP and absolute magnitude.
+"""
+Create a star ephemeris for use in both PyEphem and Skyfield
+using stars from PyEphem, keeping only those present in the
+IAU CSN Catalog with accompanying HIP and absolute magnitude.
+"""
 
 
 import argparse
@@ -31,10 +34,10 @@ from ephem import stars
 
 
 # Indices for columns at http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt.
-iaucsn_name_start = 19
-iaucsn_name_end = 36
-iaucsn_hip_start = 91
-iaucsn_hip_end = 96
+IAUCSN_NAME_START = 19
+IAUCSN_NAME_END = 36
+IAUCSN_HIP_START = 91
+IAUCSN_HIP_END = 96
 
 
 def get_stars_and_hips( iau_catalog_file ):
@@ -46,9 +49,9 @@ def get_stars_and_hips( iau_catalog_file ):
             continue
 
         try:
-            name_utf8 = line[ iaucsn_name_start - 1 : iaucsn_name_end - 1 + 1 ].strip()
+            name_utf8 = line[ IAUCSN_NAME_START - 1 : IAUCSN_NAME_END - 1 + 1 ].strip()
             if name_utf8 in stars_from_pyephem:
-                hip = int( line[ iaucsn_hip_start - 1 : iaucsn_hip_end - 1 + 1 ] )
+                hip = int( line[ IAUCSN_HIP_START - 1 : IAUCSN_HIP_END - 1 + 1 ] )
                 stars_and_hips_from_iau.append( [ name_utf8, hip ] )
 
         except ValueError:
@@ -59,17 +62,17 @@ def get_stars_and_hips( iau_catalog_file ):
     return stars_and_hips_from_iau
 
 
-def print_formatted_stars( stars_and_hips_, star_information_url_ ):
-    print( "Printing formatted stars from", star_information_url_ )
+def print_formatted_stars( stars_and_hips_, star_information_url ):
+    print( "Printing formatted stars from", star_information_url )
     for name, hip in stars_and_hips_:
         print(
             "        [ " + \
             "\"" + name.upper() + "\"," + \
-            ( ' ' * ( iaucsn_name_end - iaucsn_name_start - len( name ) + 1 ) ) + \
+            ( ' ' * ( IAUCSN_NAME_END - IAUCSN_NAME_START - len( name ) + 1 ) ) + \
             str( hip ) + ", " + \
-            ( ' ' * ( iaucsn_hip_end - iaucsn_hip_start - len( str( hip ) ) + 1 ) ) + \
+            ( ' ' * ( IAUCSN_HIP_END - IAUCSN_HIP_START - len( str( hip ) ) + 1 ) ) + \
             "_( \"" + name.title() + "\" )," + \
-            ( ' ' * ( iaucsn_name_end - iaucsn_name_start - len( name ) + 1 ) ) + \
+            ( ' ' * ( IAUCSN_NAME_END - IAUCSN_NAME_START - len( name ) + 1 ) ) + \
             "_( \"" + name.upper() + "\" ) ]," )
 
     print( "Done" )
@@ -80,7 +83,9 @@ def create_ephemeris_skyfield( out_file, star_ephemeris, stars_and_hips_ ):
     hipparcos_identifiers = [ star_and_hip[ 1 ] for star_and_hip in stars_and_hips_ ]
     with load.open( star_ephemeris, "rb" ) as in_file, open( out_file, "wb" ) as f:
         for line in in_file:
-            hip = int( line.decode()[ 9 - 1 : 14 - 1 + 1 ].strip() ) # HIP is located at bytes 9 - 14, http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
+            # HIP is located at bytes 9 - 14
+            # http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
+            hip = int( line.decode()[ 9 - 1 : 14 - 1 + 1 ].strip() )
             if hip in hipparcos_identifiers:
                 f.write( line )
 
@@ -91,7 +96,7 @@ def create_ephemeris_skyfield( out_file, star_ephemeris, stars_and_hips_ ):
 def print_ephemeris_pyephem( bsp_file , star_ephemeris, stars_and_hips_ ):
     print( "Printing ephemeris for PyEphem..." )
     with load.open( star_ephemeris, "rb" ) as f:
-        stars = hipparcos.load_dataframe( f )
+        stars_ = hipparcos.load_dataframe( f )
         f.seek( 0 )
         stars_with_spectral_type = \
             read_csv(
@@ -105,7 +110,7 @@ def print_ephemeris_pyephem( bsp_file , star_ephemeris, stars_and_hips_ ):
     stars_with_spectral_type = stars_with_spectral_type.set_index( "HIP" )
     sun_at = load( bsp_file )[ "Sun" ].at( load.timescale().J( 2000.0 ) )
     for name, hip in stars_and_hips_:
-        row = stars.loc[ hip ]
+        row = stars_.loc[ hip ]
         star = Star.from_dataframe( row )
         right_ascension, declination, _ = sun_at.observe( star ).radec()
 
@@ -120,13 +125,14 @@ def print_ephemeris_pyephem( bsp_file , star_ephemeris, stars_and_hips_ ):
             name.upper(),
             "f|S|" +
             spectral_type,
-            '%.8f' % right_ascension.hours + '|' + str( star.ra_mas_per_year ),
-            '%.8f' % declination.degrees + '|' + str( star.dec_mas_per_year ),
+            f"{right_ascension.hours:.8f}|{ star.ra_mas_per_year }",
+            f"{declination.degrees:.8f}|{ star.dec_mas_per_year }",
             row[ "magnitude" ],
         ]
 
         line = ','.join( str( item ) for item in components )
-        print( "        \"" + name.upper() + "\"" + ( ' ' * ( iaucsn_name_end - iaucsn_name_start - len( name ) + 1 ) ) + ": \"" + line + "\"," )
+        padding = ' ' * ( IAUCSN_NAME_END - IAUCSN_NAME_START - len( name ) + 1 )
+        print( "        \"" + name.upper() + "\"" + padding + ": \"" + line + "\"," )
 
     print( "Done" )
 
@@ -152,24 +158,29 @@ if __name__ == "__main__":
             formatter_class = argparse.RawDescriptionHelpFormatter,
             description = description )
 
-    star_information_url = "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt"
-    _help = "A text file containing the list of stars, downloaded from " + star_information_url + "."
-    parser.add_argument( "star_information", help = _help )
+    STAR_INFORMATION_URL = "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt"
 
-    star_ephemeris_url = "https://cdsarc.cds.unistra.fr/ftp/cats/I/239/"
-    _help = "A star ephemeris file, typically hip_main.dat and downloaded from " + star_ephemeris_url + "."
-    parser.add_argument( "star_ephemeris", help = _help )
+    parser.add_argument(
+        "star_information",
+        help = "A text file containing the list of stars, downloaded from " + STAR_INFORMATION_URL + "." )
 
-    planet_ephemeris_url = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets"
-    _help = "A planet ephemeris file in .bsp format, downloaded from " + planet_ephemeris_url + "."
-    parser.add_argument( "planet_ephemeris", help = _help )
+    STAR_EPHEMERIS_URL = "https://cdsarc.cds.unistra.fr/ftp/cats/I/239/"
+    parser.add_argument(
+        "star_ephemeris",
+        help = "A star ephemeris file, typically hip_main.dat and downloaded from " + STAR_EPHEMERIS_URL + "." )
 
-    _help = "The output filename for the Skyfield star ephemeris."
-    parser.add_argument( "output_filename_for_skyfield_star_ephemeris", help = _help )
+    PLANET_EPHEMERIS_URL = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets"
+    parser.add_argument(
+        "planet_ephemeris",
+        help = "A planet ephemeris file in .bsp format, downloaded from " + PLANET_EPHEMERIS_URL + "." )
+
+    parser.add_argument(
+        "output_filename_for_skyfield_star_ephemeris",
+        help = "The output filename for the Skyfield star ephemeris." )
 
     args = parser.parse_args()
 
     stars_and_hips = get_stars_and_hips( args.star_information )
-    print_formatted_stars( stars_and_hips, star_information_url )
+    print_formatted_stars( stars_and_hips, STAR_INFORMATION_URL )
     create_ephemeris_skyfield( args.output_filename_for_skyfield_star_ephemeris, args.star_ephemeris, stars_and_hips )
     print_ephemeris_pyephem( args.planet_ephemeris, args.star_ephemeris, stars_and_hips )

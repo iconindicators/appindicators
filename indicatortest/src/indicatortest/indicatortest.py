@@ -16,10 +16,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator to test stuff.
+""" Application indicator to test stuff. """
 
 
+#TODO SHould be safe to remove this in favour of the version below...
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
+
 
 import datetime
 import gi
@@ -34,8 +36,13 @@ from gi.repository import Pango
 
 from threading import Thread
 
+#TODO Should be safe to use this here rather than at the top.
+# from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
+
 
 class IndicatorTest( IndicatorBase ):
+    ''' Main class which encapsulates the indicator. '''
+
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Test" )
     indicator_categories = "Categories=Utility"

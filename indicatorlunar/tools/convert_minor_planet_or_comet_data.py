@@ -16,21 +16,23 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Convert:
-#   Minor planets from Lowell Observatory to Skyfield / XEphem format.
-#   Minor planets file from Minor Planet Center to XEphem format.
-#   Comets file from Minor Planet Center to XEphem format.
-#
-# Formats:
-#   https://asteroid.lowell.edu/main/astorb/
-#   https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
-#   https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
-#   https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
-#
-# References:
-#   https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/astorb2edb.pl
-#   https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/mpcorb2edb.pl
-#   https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
+"""
+Convert:
+    Minor planets from Lowell Observatory to Skyfield / XEphem format.
+    Minor planets file from Minor Planet Center to XEphem format.
+    Comets file from Minor Planet Center to XEphem format.
+
+Formats:
+    https://asteroid.lowell.edu/main/astorb/
+    https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
+    https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
+    https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
+
+  References:
+    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/astorb2edb.pl
+    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/mpcorb2edb.pl
+    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
+"""
 
 
 import argparse
@@ -113,16 +115,16 @@ def process_and_write_one_line_lowell_minorplanet( line, output_file, to_skyfiel
 
     number = fields[ 1 ].strip()
     name = fields[ 2 ].strip()
-    H = fields[ 4 ].strip()
-    G = fields[ 5 ].strip()
+    h = fields[ 4 ].strip()
+    g = fields[ 5 ].strip()
 
     if len( name ) == 0:
         print( "Missing name:\n" + line )
 
-    elif len( H ) == 0:
+    elif len( h ) == 0:
         print( "Missing H:\n" + line )
 
-    elif len( G ) == 0:
+    elif len( g ) == 0:
         print( "Missing G:\n" + line )
 
     else:
@@ -139,9 +141,9 @@ def process_and_write_one_line_lowell_minorplanet( line, output_file, to_skyfiel
             components = [
                 ' ' * 7, # number or designation packed
                 ' ', # 8
-                str( round( float( H ), 2 ) ).rjust( 5 ),
+                str( round( float( h ), 2 ) ).rjust( 5 ),
                 ' ', # 14
-                str( round( float( G ), 2 ) ).rjust( 5 ),
+                str( round( float( g ), 2 ) ).rjust( 5 ),
                 ' ', # 20
                 get_packed_date( epoch_date[ 0 : 4 ], epoch_date[ 4 : 6 ], epoch_date[ 6 : 8 ] ).rjust( 5 ),
                 ' ', # 26
@@ -202,8 +204,8 @@ def process_and_write_one_line_lowell_minorplanet( line, output_file, to_skyfiel
                 mean_anomaly_epoch,
                 epoch_date[ 4 : 6 ] + '/' + epoch_date[ 6 : 8 ] + '/' + epoch_date[ 0 : 4 ],
                 "2000.0",
-                H,
-                G ]
+                h,
+                g ]
 
             separator = ','
 
@@ -227,16 +229,16 @@ def process_and_write_one_line_minorplanetcenter_minorplanet_to_xephem( line, ou
     fields = [ line[ i : j + 1 ] for i, j in zip( start_indices, end_indices ) ]
 
     name = fields[ 21 ].replace( '(', '' ).replace( ')', '' ).strip()
-    H = fields[ 1 ].strip()
-    G = fields[ 2 ].strip()
+    h = fields[ 1 ].strip()
+    g = fields[ 2 ].strip()
 
     if len( name ) == 0:
         print( "Missing name:\n" + line )
 
-    elif len( H ) == 0:
+    elif len( h ) == 0:
         print( "Missing H:\n" + line )
 
-    elif len( G ) == 0:
+    elif len( g ) == 0:
         print( "Missing G:\n" + line )
 
     else:
@@ -260,8 +262,8 @@ def process_and_write_one_line_minorplanetcenter_minorplanet_to_xephem( line, ou
             mean_anomaly_epoch,
             get_unpacked_date( epoch_packed ),
             "2000.0",
-            H,
-            G ]
+            h,
+            g ]
 
         output_file.write( ','.join( components ) + '\n' )
 
@@ -284,16 +286,16 @@ def process_and_write_one_line_minorplanetcenter_comet_to_xephem( line, output_f
     name = fields[ 16 ].replace( '(', '' ).replace( ')', '' ).strip()
 
     # The perl script reference refers to H, G in reverse to that specified in the comet format.
-    H = fields[ 14 ].strip()
-    G = fields[ 15 ].strip()
+    h = fields[ 14 ].strip()
+    g = fields[ 15 ].strip()
 
     if len( name ) == 0:
         print( "Missing name:\n" + line )
 
-    elif len( H ) == 0:
+    elif len( h ) == 0:
         print( "Missing H:\n" + line )
 
-    elif len( G ) == 0:
+    elif len( g ) == 0:
         print( "Missing G:\n" + line )
 
     else:
@@ -321,8 +323,8 @@ def process_and_write_one_line_minorplanetcenter_comet_to_xephem( line, output_f
                 '0',
                 epoch_date,
                 "2000.0",
-                H,
-                G ]
+                h,
+                g ]
 
         elif float( orbital_eccentricity ) > 1.0: # Hyperbolic orbit.
             components = [
@@ -335,8 +337,8 @@ def process_and_write_one_line_minorplanetcenter_comet_to_xephem( line, output_f
                 orbital_eccentricity,
                 perihelion_distance,
                 "2000.0",
-                H,
-                G ]
+                h,
+                g ]
 
         else: # Parabolic orbit.
             components = [
@@ -348,8 +350,8 @@ def process_and_write_one_line_minorplanetcenter_comet_to_xephem( line, output_f
                 perihelion_distance,
                 longitude_ascending_node,
                 "2000.0",
-                H,
-                G ]
+                h,
+                g ]
 
         output_file.write( ','.join( components ) + '\n' )
 

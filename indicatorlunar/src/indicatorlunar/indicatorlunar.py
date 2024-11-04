@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator for the home astronomer.
+""" Application indicator for the home astronomer. """
 
 
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
@@ -40,6 +40,8 @@ import eclipse
 
 
 class IndicatorLunar( IndicatorBase ):
+    ''' Main class which encapsulates the indicator. '''
+
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Lunar" )
     indicator_categories = "Categories=Science;Astronomy"
@@ -637,20 +639,21 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def notification_satellites( self ):
-        INDEX_NUMBER = 0
-        INDEX_RISE_TIME = 1
+        index_number = 0
+        index_rise_time = 1
         satellite_current_notifications = [ ]
 
         utc_now = datetime.datetime.now( datetime.timezone.utc )
         for number in self.satellites:
             key = ( IndicatorLunar.astro_backend.BodyType.SATELLITE, number )
+#TODO Test without extra ( )
             if ( key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_AZIMUTH, ) ) in self.data and number not in self.satellite_previous_notifications: # About to rise and no notification already sent.
                 rise_time = self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ]
                 if ( rise_time - datetime.timedelta( minutes = 2 ) ) <= utc_now: # Two minute buffer.
                     satellite_current_notifications.append( [ number, rise_time ] )
                     self.satellite_previous_notifications.append( number )
 
-            if ( key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ) in self.data:
+            if ( key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ) in self.data:#TODO Test without extra ( )
                 set_time = self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ]
                 if number in self.satellite_previous_notifications and set_time < utc_now: # Notification has been sent and satellite has now set.
                     self.satellite_previous_notifications.remove( number )
@@ -658,7 +661,7 @@ class IndicatorLunar( IndicatorBase ):
         satellite_current_notifications = \
             sorted(
                 satellite_current_notifications,
-                key = lambda x: ( x[ INDEX_RISE_TIME ], x[ INDEX_NUMBER ] ) )
+                key = lambda x: ( x[ index_rise_time ], x[ index_number ] ) )
 
         for number, rise_time in satellite_current_notifications:
             self._notification_satellite( number )
@@ -936,7 +939,7 @@ class IndicatorLunar( IndicatorBase ):
                             webbrowser.open(
                                 IndicatorLunar.SEARCH_URL_COMET_ID + \
                                 str( requests.get( menuitem.get_name(), timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).json()[ "object" ][ "id" ] ) ) ), )
-        
+
                 except Exception:
                     on_click_function = None # The network/site may be down or is a bad comet designation.
 
@@ -1480,14 +1483,15 @@ class IndicatorLunar( IndicatorBase ):
              data_tag == IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME or \
              data_tag == IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE or \
              data_tag == IndicatorLunar.astro_backend.DATA_TAG_THIRD_QUARTER:
-                if date_time_format is None:
-                    display_data = \
-                        self.to_local_date_time_string(
-                            data,
-                            IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM )
 
-                else:
-                    display_data = self.to_local_date_time_string( data, date_time_format )
+            if date_time_format is None:
+                display_data = \
+                    self.to_local_date_time_string(
+                        data,
+                        IndicatorLunar.DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM )
+
+            else:
+                display_data = self.to_local_date_time_string( data, date_time_format )
 
         elif data_tag == IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE:
             latitude = data
@@ -1606,12 +1610,12 @@ class IndicatorLunar( IndicatorBase ):
     def on_preferences( self, dialog ):
         notebook = Gtk.Notebook()
 
-        PAGE_ICON = 0
-        PAGE_MENU = 1
-        PAGE_NATURAL_BODIES = 2
-        PAGE_SATELLITES = 3
-        PAGE_NOTIFICATIONS = 4
-        PAGE_LOCATION = 5
+        page_icon = 0
+        page_menu = 1
+        page_natural_bodies = 2
+        page_satellites = 3
+        page_notifications = 4
+        page_location = 5
 
         # Icon text.
         grid = self.create_grid()
@@ -1657,12 +1661,12 @@ class IndicatorLunar( IndicatorBase ):
         # If a body's magnitude passes through the magnitude filter,
         # all attributes (rise/set/az/alt) will be displayed in this table,
         # irrespective of the setting to hide bodies below the horizon.
-        COLUMN_MODEL_TAG = 0
-        COLUMN_MODEL_TRANSLATED_TAG = 1
-        COLUMN_MODEL_VALUE = 2
+        column_model_tag = 0
+        column_model_translated_tag = 1
+        column_model_value = 2
 
-        COLUMN_VIEW_TAG = 0
-        COLUMN_VIEW_VALUE = 1
+        column_view_tag = 0
+        column_view_value = 1
 
         display_tags_store = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
         self.initialise_display_tags_store( display_tags_store )
@@ -1678,13 +1682,13 @@ class IndicatorLunar( IndicatorBase ):
                 Gtk.TreeModelSort( model = display_tags_store ),
                 ( _( "Tag" ), _( "Value" ) ),
                 (
-                    ( Gtk.CellRendererText(), "text", COLUMN_MODEL_TRANSLATED_TAG ),
-                    ( Gtk.CellRendererText(), "text", COLUMN_MODEL_VALUE ) ),
+                    ( Gtk.CellRendererText(), "text", column_model_translated_tag ),
+                    ( Gtk.CellRendererText(), "text", column_model_value ) ),
                 sortcolumnviewids_columnmodelids = (
-                    ( COLUMN_VIEW_TAG, COLUMN_MODEL_TRANSLATED_TAG ),
-                    ( COLUMN_VIEW_VALUE, COLUMN_MODEL_VALUE ) ),
+                    ( column_view_tag, column_model_translated_tag ),
+                    ( column_view_value, column_model_value ) ),
                 tooltip_text = _( "Double click to add a tag to the icon text." ),
-                rowactivatedfunctionandarguments = ( self.on_tags_values_double_click, COLUMN_MODEL_TRANSLATED_TAG, indicator_text ) )
+                rowactivatedfunctionandarguments = ( self.on_tags_values_double_click, column_model_translated_tag, indicator_text ) )
 
         grid.attach( scrolledwindow, 0, 2, 1, 1 )
 
@@ -1803,12 +1807,12 @@ class IndicatorLunar( IndicatorBase ):
         notebook.append_page( grid, Gtk.Label.new( _( "Menu" ) ) )
 
         # Planets / minor planets / comets / stars.
-        NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW = 0
-        NATURAL_BODY_MODEL_COLUMN_NAME = 1
-        NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME = 2
+        natural_body_model_column_hide_show = 0
+        natural_body_model_column_name = 1
+        natural_body_model_column_translated_name = 2
 
-        NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW = 0
-        NATURAL_BODY_VIEW_COLUMN_TRANSLATED_NAME = 1
+        natural_body_view_column_hide_show = 0
+        natural_body_view_column_translated_name = 1
 
         planet_store = Gtk.ListStore( bool, str, str ) # Show/hide, planet name (not displayed), translated planet name.
         for planet_name in IndicatorLunar.astro_backend.PLANETS:
@@ -1825,9 +1829,9 @@ class IndicatorLunar( IndicatorBase ):
                     "Check a planet to display in the menu.\n\n" +
                     "Clicking the header of the first column\n" +
                     "will toggle all checkboxes." ),
-                NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW,
-                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME,
-                NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW )
+                natural_body_model_column_hide_show,
+                natural_body_model_column_translated_name,
+                natural_body_view_column_hide_show )
 
         minor_planet_store = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
 
@@ -1850,9 +1854,9 @@ class IndicatorLunar( IndicatorBase ):
                     "the source could not be reached,\n" +
                     "or no data was available, or the data\n" +
                     "was completely filtered by magnitude." ),
-                NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW,
-                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME,
-                NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW )
+                natural_body_model_column_hide_show,
+                natural_body_model_column_translated_name,
+                natural_body_view_column_hide_show )
 
         comet_store = Gtk.ListStore( bool, str, str ) # Show/hide, comet name, human readable name.
 
@@ -1875,9 +1879,9 @@ class IndicatorLunar( IndicatorBase ):
                     "could not be reached, or no data was\n" +
                     "available from the source, or the data\n" +
                     "was completely filtered by magnitude." ),
-                NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW,
-                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME,
-                NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW )
+                natural_body_model_column_hide_show,
+                natural_body_model_column_translated_name,
+                natural_body_view_column_hide_show )
 
         stars = [ ]
         for star_name in IndicatorLunar.astro_backend.get_star_names():
@@ -1898,9 +1902,9 @@ class IndicatorLunar( IndicatorBase ):
                     "Check a star to display in the menu.\n\n" +
                     "Clicking the header of the first column\n" +
                     "will toggle all checkboxes." ),
-                NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW,
-                NATURAL_BODY_MODEL_COLUMN_TRANSLATED_NAME,
-                NATURAL_BODY_VIEW_COLUMN_HIDE_SHOW )
+                natural_body_model_column_hide_show,
+                natural_body_model_column_translated_name,
+                natural_body_view_column_hide_show )
 
         notebook.append_page(
             self.create_box(
@@ -1913,15 +1917,15 @@ class IndicatorLunar( IndicatorBase ):
             Gtk.Label.new( _( "Natural Bodies" ) ) )
 
         # Satellites.
-        SATELLITE_MODEL_COLUMN_HIDE_SHOW = 0
-        SATELLITE_MODEL_COLUMN_NAME = 1
-        SATELLITE_MODEL_COLUMN_NUMBER = 2
-        SATELLITE_MODEL_COLUMN_INTERNATIONAL_DESIGNATOR = 3
+        satellite_model_column_hide_show = 0
+        satellite_model_column_name = 1
+        satellite_model_column_number = 2
+        satellite_model_column_international_designator = 3
 
-        SATELLITE_VIEW_COLUMN_HIDE_SHOW = 0
-        SATELLITE_VIEW_COLUMN_NAME = 1
-        SATELLITE_VIEW_COLUMN_NUMBER = 2
-        SATELLITE_VIEW_COLUMN_INTERNATIONAL_DESIGNATOR = 3
+        satellite_view_column_hide_show = 0
+        satellite_view_column_name = 1
+        satellite_view_column_number = 2
+        satellite_view_column_international_designator = 3
 
         satellite_store = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
         for satellite in self.satellite_general_perturbation_data:
@@ -1939,22 +1943,22 @@ class IndicatorLunar( IndicatorBase ):
             self.on_satellite_checkbox,
             satellite_store,
             satellite_store_sort,
-            SATELLITE_MODEL_COLUMN_HIDE_SHOW )
+            satellite_model_column_hide_show )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 satellite_store_sort,
                 ( "", _( "Name" ), _( "Number" ), _( "International Designator" ) ),
                 (
-                    ( renderer_toggle, "active", SATELLITE_MODEL_COLUMN_HIDE_SHOW ),
-                    ( Gtk.CellRendererText(), "text", SATELLITE_MODEL_COLUMN_NAME ),
-                    ( Gtk.CellRendererText(), "text", SATELLITE_MODEL_COLUMN_NUMBER ),
-                    ( Gtk.CellRendererText(), "text", SATELLITE_MODEL_COLUMN_INTERNATIONAL_DESIGNATOR ) ),
-                alignments_columnviewids = ( ( 0.5, SATELLITE_VIEW_COLUMN_HIDE_SHOW ), ),
+                    ( renderer_toggle, "active", satellite_model_column_hide_show ),
+                    ( Gtk.CellRendererText(), "text", satellite_model_column_name ),
+                    ( Gtk.CellRendererText(), "text", satellite_model_column_number ),
+                    ( Gtk.CellRendererText(), "text", satellite_model_column_international_designator ) ),
+                alignments_columnviewids = ( ( 0.5, satellite_view_column_hide_show ), ),
                 sortcolumnviewids_columnmodelids = (
-                    ( SATELLITE_VIEW_COLUMN_NAME, SATELLITE_MODEL_COLUMN_NAME ),
-                    ( SATELLITE_VIEW_COLUMN_NUMBER, SATELLITE_MODEL_COLUMN_NUMBER ),
-                    ( SATELLITE_VIEW_COLUMN_INTERNATIONAL_DESIGNATOR, SATELLITE_MODEL_COLUMN_INTERNATIONAL_DESIGNATOR ) ),
+                    ( satellite_view_column_name, satellite_model_column_name ),
+                    ( satellite_view_column_number, satellite_model_column_number ),
+                    ( satellite_view_column_international_designator, satellite_model_column_international_designator ) ),
                 tooltip_text = _(
                     "Check a satellite to display in the menu.\n\n" +
                     "Clicking the header of the first column\n" +
@@ -1965,8 +1969,8 @@ class IndicatorLunar( IndicatorBase ):
                     "or data was available." ),
                 clickablecolumnviewids_functionsandarguments = (
                 (
-                    SATELLITE_VIEW_COLUMN_HIDE_SHOW,
-                    ( self.on_columnheader, satellite_store, SATELLITE_MODEL_COLUMN_HIDE_SHOW ), ), ) )
+                    satellite_view_column_hide_show,
+                    ( self.on_columnheader, satellite_store, satellite_model_column_hide_show ), ), ) )
 
         notebook.append_page(
             self.create_box( ( ( scrolledwindow, True ), ) ),
@@ -2143,7 +2147,7 @@ class IndicatorLunar( IndicatorBase ):
 
             city_value = city.get_active_text()
             if city_value == "":
-                notebook.set_current_page( PAGE_LOCATION )
+                notebook.set_current_page( page_location )
                 self.show_dialog_ok( dialog, _( "City cannot be empty." ) )
                 city.grab_focus()
                 continue
@@ -2157,7 +2161,7 @@ class IndicatorLunar( IndicatorBase ):
                 float( latitude_value ) < -90
 
             if bad:
-                notebook.set_current_page( PAGE_LOCATION )
+                notebook.set_current_page( page_location )
                 self.show_dialog_ok( dialog, _( "Latitude must be a number between 90 and -90 inclusive." ) )
                 latitude.grab_focus()
                 continue
@@ -2171,7 +2175,7 @@ class IndicatorLunar( IndicatorBase ):
                 float( longitude_value ) < -180
 
             if bad:
-                notebook.set_current_page( PAGE_LOCATION )
+                notebook.set_current_page( page_location )
                 self.show_dialog_ok( dialog, _( "Longitude must be a number between 180 and -180 inclusive." ) )
                 longitude.grab_focus()
                 continue
@@ -2185,13 +2189,13 @@ class IndicatorLunar( IndicatorBase ):
                 float( elevation_value ) < 0
 
             if bad:
-                notebook.set_current_page( PAGE_LOCATION )
+                notebook.set_current_page( page_location )
                 self.show_dialog_ok( dialog, _( "Elevation must be a number between 0 and 10000 inclusive." ) )
                 elevation.grab_focus()
                 continue
 
             if spinner_satellite_limit_start.get_value_as_int() >= spinner_satellite_limit_end.get_value_as_int():
-                notebook.set_current_page( PAGE_MENU )
+                notebook.set_current_page( page_menu )
                 self.show_dialog_ok( dialog, _( "The start hour for satellite passes must be lower than the end hour." ) )
                 spinner_satellite_limit_start.grab_focus()
                 continue
@@ -2221,33 +2225,33 @@ class IndicatorLunar( IndicatorBase ):
 
             self.planets = [ ]
             for row in planet_store:
-                if row[ NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ]:
-                    self.planets.append( row[ NATURAL_BODY_MODEL_COLUMN_NAME ] )
+                if row[ natural_body_model_column_hide_show ]:
+                    self.planets.append( row[ natural_body_model_column_name ] )
 
             self.stars = [ ]
             for row in star_store:
-                if row[ NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ]:
-                    self.stars.append( row[ NATURAL_BODY_MODEL_COLUMN_NAME ] )
+                if row[ natural_body_model_column_hide_show ]:
+                    self.stars.append( row[ natural_body_model_column_name ] )
 
             # If the option to add new comets is checked, this will be handled out in the main update loop.
             # Otherwise, update the list of checked comets (ditto for minor planets and satellites).
             self.comets = [ ]
             if not self.comets_add_new:
                 for comet in comet_store:
-                    if comet[ NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ]:
-                        self.comets.append( comet[ NATURAL_BODY_MODEL_COLUMN_NAME ] )
+                    if comet[ natural_body_model_column_hide_show ]:
+                        self.comets.append( comet[ natural_body_model_column_name ] )
 
             self.minor_planets = [ ]
             if not self.minor_planets_add_new:
                 for minor_planet in minor_planet_store:
-                    if minor_planet[ NATURAL_BODY_MODEL_COLUMN_HIDE_SHOW ]:
-                        self.minor_planets.append( minor_planet[ NATURAL_BODY_MODEL_COLUMN_NAME ] )
+                    if minor_planet[ natural_body_model_column_hide_show ]:
+                        self.minor_planets.append( minor_planet[ natural_body_model_column_name ] )
 
             self.satellites = [ ]
             if not self.satellites_add_new:
                 for satellite in satellite_store:
-                    if satellite[ SATELLITE_MODEL_COLUMN_HIDE_SHOW ]:
-                        self.satellites.append( satellite[ SATELLITE_MODEL_COLUMN_NUMBER ] )
+                    if satellite[ satellite_model_column_hide_show ]:
+                        self.satellites.append( satellite[ satellite_model_column_number ] )
 
             self.show_satellite_notification = show_satellite_notification_checkbox.get_active()
             if not show_satellite_notification_checkbox.get_active():

@@ -16,32 +16,34 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Create a planet ephemeris for use in Skyfield which commences from
-# today's date to end at the specified number of years from today.
-#
-# The start date is actually wound back one month to take into account
-# a quirk of the Skyfield lunar eclipse algorithm.
-#
-# This script essentially wraps up the following command:
-#
-#    python3 -m jplephem excerpt start_date end_date in_file.bsp out_file.bsp
-#
-# Requires jplephem:
-#    https://pypi.org/project/jplephem
-#
-# BSP files:
-#    https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
-#
-# References:
-#    https://github.com/skyfielders/python-skyfield/issues/123
-#    https://github.com/skyfielders/python-skyfield/issues/531
-#    ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
-#    ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
-#
-# Alternately to running this script, download a .bsp and
-# use spkmerge to create a smaller subset:
-#    https://github.com/skyfielders/python-skyfield/issues/123
-#    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
+"""
+Create a planet ephemeris for use in Skyfield which commences from
+today's date to end at the specified number of years from today.
+
+The start date is actually wound back one month to take into account
+a quirk of the Skyfield lunar eclipse algorithm.
+
+This script essentially wraps up the following command:
+
+    python3 -m jplephem excerpt start_date end_date in_file.bsp out_file.bsp
+
+Requires jplephem:
+    https://pypi.org/project/jplephem
+
+BSP files:
+    https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
+
+References:
+    https://github.com/skyfielders/python-skyfield/issues/123
+    https://github.com/skyfielders/python-skyfield/issues/531
+    ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
+    ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
+
+Alternately to running this script, download a .bsp and
+use spkmerge to create a smaller subset:
+    https://github.com/skyfielders/python-skyfield/issues/123
+    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
+"""
 
 
 import argparse

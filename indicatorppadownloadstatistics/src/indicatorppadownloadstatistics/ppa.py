@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Store a PPA's details, published binaries and filters.
+""" Store a PPA's details, published binaries and filters. """
 
 
 import operator
@@ -25,6 +25,7 @@ from enum import Enum
 
 
 class Filters():
+    ''' Filter used to screen out PPAs. '''
 
     INDEX_USER = 0
     INDEX_NAME = 1
@@ -36,7 +37,10 @@ class Filters():
         self.filters = { }
 
 
-    def add_filter( self, user, name, series, architecture, text = [ ] ):
+    def add_filter( self, user, name, series, architecture, text = [ ] ):  #TODO Test to see if text = None can be used...
+        # TODO...then first line should be:
+        # if text is None:
+        #     text = [ ]
         self.filters[ self._get_key( user, name, series, architecture ) ] = text
 
 
@@ -61,7 +65,7 @@ class Filters():
         return user + " | " + name + " | " + series + " | " + architecture
 
 
-    def __str__( self ): 
+    def __str__( self ):
         return str( self.__dict__ )
 
 
@@ -74,6 +78,7 @@ class Filters():
 
 
 class PublishedBinary():
+    ''' PPA data. '''
 
     # Package name, package version (string)
     # Download count (integer)
@@ -123,8 +128,10 @@ class PublishedBinary():
 
 
 class PPA():
+    ''' Specifies a PPA. '''
 
     class Status( Enum ):
+        ''' Download status of a PPA. '''
         ERROR_RETRIEVING_PPA = 0
         NEEDS_DOWNLOAD = 1
         NO_PUBLISHED_BINARIES = 2

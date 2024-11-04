@@ -16,9 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-# Application indicator which displays fortunes.
+""" Application indicator which displays fortunes. """
 
 
+#TODO Does this have to be the case now...? Can it be the last import?
 from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
 
 import codecs
@@ -31,6 +32,8 @@ from pathlib import Path
 
 
 class IndicatorFortune( IndicatorBase ):
+    ''' Main class which encapsulates the indicator. '''
+
     # Unused within the indicator; used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Fortune" )
     indicator_categories = "Categories=Utility;Amusement"
@@ -191,7 +194,7 @@ class IndicatorFortune( IndicatorBase ):
 
                         break
 
-                    elif len( self.fortune ) <= self.skip_fortune_character_count: # If the fortune is within the character limit keep it...
+                    if len( self.fortune ) <= self.skip_fortune_character_count: # If the fortune is within the character limit keep it...
                         history = self.read_cache_text_without_timestamp( IndicatorFortune.HISTORY_FILE )
                         if history is None:
                             history = ""
