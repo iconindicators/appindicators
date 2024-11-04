@@ -19,8 +19,6 @@
 """ Application indicator to run a terminal command or script from an indicator. """
 
 
-from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
-
 import concurrent.futures
 import copy
 import datetime
@@ -34,6 +32,8 @@ gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
 from threading import Thread
+
+from indicatorbase import IndicatorBase
 
 from script import Background, NonBackground
 

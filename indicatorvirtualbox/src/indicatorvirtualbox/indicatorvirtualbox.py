@@ -19,8 +19,6 @@
 """ Application indicator for VirtualBox™ virtual machines. """
 
 
-from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
-
 import datetime
 import gi
 import time
@@ -30,6 +28,8 @@ from gi.repository import Gdk
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
+
+from indicatorbase import IndicatorBase
 
 from virtualmachine import Group, VirtualMachine
 

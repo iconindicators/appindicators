@@ -19,14 +19,14 @@
 """ Application indicator which converts domain names between Unicode and ASCII. """
 
 
-from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
-
 import encodings.idna
 import gi
 import re
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
+
+from indicatorbase import IndicatorBase
 
 
 class IndicatorPunycode( IndicatorBase ):

@@ -19,9 +19,6 @@
 """ Application indicator which displays fortunes. """
 
 
-#TODO Does this have to be the case now...? Can it be the last import?
-from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
-
 import codecs
 import gi
 
@@ -29,6 +26,8 @@ gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
 from pathlib import Path
+
+from indicatorbase import IndicatorBase
 
 
 class IndicatorFortune( IndicatorBase ):

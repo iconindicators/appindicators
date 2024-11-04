@@ -16,33 +16,32 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-""" Application indicator which displays calendar events. """
+'''
+Application indicator which displays calendar events.
 
+Neither openSUSE nor Manjaro have the 'calendar' package.
+Possible options...
 
-# Neither openSUSE nor Manjaro have the 'calendar' package.
-# Possible options...
-#
-# 1. For openSUSE/Manjaro (and any others yet to be found),
-#    this indicator is unsupported.
-#
-# 2. From the post
-#       https://forums.opensuse.org/t/debian-calendar-equivalent-in-opensuse/171251
-#    the recommendation is obtain the source code
-#       https://github.com/openbsd/src/tree/master/usr.bin/calendar
-#       https://salsa.debian.org/meskes/bsdmainutils/-/tree/master/usr.bin/calendar
-#    and include the source code/calendars as part of the pip installation,
-#    then run make as part of the copy files set of instructions.
-#
-# 3. Have found
-#       https://pypi.org/project/bsd-calendar/
-#    which covers some of the original calendar program, but modifies date formats.
-#    This code could be used as a basis create a standalone Python calendar module,
-#    ultimately releasing to PyPI.
-#    Alternatively, incorporate some version of this implementation into the indicator,
-#    along with calendar files.
+1. For openSUSE/Manjaro (and any others yet to be found),
+   this indicator is unsupported.
 
+2. From the post
+      https://forums.opensuse.org/t/debian-calendar-equivalent-in-opensuse/171251
+   the recommendation is obtain the source code
+      https://github.com/openbsd/src/tree/master/usr.bin/calendar
+      https://salsa.debian.org/meskes/bsdmainutils/-/tree/master/usr.bin/calendar
+   and include the source code/calendars as part of the pip installation,
+   then run make as part of the copy files set of instructions.
 
-from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
+3. Have found
+      https://pypi.org/project/bsd-calendar/
+   which covers some of the original calendar program, but modifies date formats.
+   This code could be used as a basis create a standalone Python calendar module,
+   ultimately releasing to PyPI.
+   Alternatively, incorporate some version of this implementation into the indicator,
+   along with calendar files.
+'''
+
 
 import fnmatch
 import gi
@@ -56,6 +55,8 @@ from gi.repository import Gtk
 
 import threading
 import time
+
+from indicatorbase import IndicatorBase
 
 from event import Event
 

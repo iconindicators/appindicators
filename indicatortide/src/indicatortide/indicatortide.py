@@ -19,8 +19,6 @@
 """ Application indicator which displays tidal information. """
 
 
-from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
-
 import datetime
 import gi
 import importlib.util
@@ -30,6 +28,8 @@ gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
 from pathlib import Path
+
+from indicatorbase import IndicatorBase
 
 
 class IndicatorTide( IndicatorBase ):

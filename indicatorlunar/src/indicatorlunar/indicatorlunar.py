@@ -19,8 +19,6 @@
 """ Application indicator for the home astronomer. """
 
 
-from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
-
 import datetime
 import gi
 import locale
@@ -32,11 +30,13 @@ import webbrowser
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
+from indicatorbase import IndicatorBase
+
+import eclipse
+
 from dataproviderapparentmagnitude import DataProviderApparentMagnitude
 from dataprovidergeneralperturbation import DataProviderGeneralPerturbation
 from dataproviderorbitalelement import DataProviderOrbitalElement, OE
-
-import eclipse
 
 
 class IndicatorLunar( IndicatorBase ):

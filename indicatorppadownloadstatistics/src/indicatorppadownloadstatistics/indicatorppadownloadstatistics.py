@@ -19,8 +19,6 @@
 """ Application indicator which displays PPA download statistics. """
 
 
-from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
-
 import concurrent.futures
 import gi
 import json
@@ -33,6 +31,8 @@ gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
 from urllib.request import urlopen
+
+from indicatorbase import IndicatorBase
 
 from ppa import Filters, PPA, PublishedBinary
 

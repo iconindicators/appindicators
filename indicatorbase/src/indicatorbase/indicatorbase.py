@@ -21,23 +21,23 @@ Base class for application indicators.
 
 References
     https://lazka.github.io/pgi-docs/AyatanaAppIndicator3-0.1
-	https://github.com/AyatanaIndicators/libayatana-appindicator
-	https://wiki.ayatana-indicators.org/AyatanaIndicatorApplication
-	https://wiki.ubuntu.com/DesktopExperienceTeam/ApplicationIndicators
-	https://askubuntu.com/questions/108035/writing-indicators-with-python-gir-and-gtk3
-	https://python-gtk-3-tutorial.readthedocs.org
-	https://pygobject.gnome.org/guide/threading.html
-	https://stackoverflow.com/q/73665239/2156453
-	https://wiki.ubuntu.com/NotifyOSD
-	https://lazka.github.io/pgi-docs/Gtk-3.0
-	https://pygobject.readthedocs.io/en/latest/getting_started.html
-	https://twine.readthedocs.io/en/latest/
-	https://packaging.python.org/en/latest/tutorials/packaging-projects/
-	https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
-	https://pypi.org/project/pystray/
-	https://peps.python.org/pep-0008/
-	https://docs.python-guide.org/writing/style/
-	https://guicommits.com/organize-python-code-like-a-pro/
+    https://github.com/AyatanaIndicators/libayatana-appindicator
+    https://wiki.ayatana-indicators.org/AyatanaIndicatorApplication
+    https://wiki.ubuntu.com/DesktopExperienceTeam/ApplicationIndicators
+    https://askubuntu.com/questions/108035/writing-indicators-with-python-gir-and-gtk3
+    https://python-gtk-3-tutorial.readthedocs.org
+    https://pygobject.gnome.org/guide/threading.html
+    https://stackoverflow.com/q/73665239/2156453
+    https://wiki.ubuntu.com/NotifyOSD
+    https://lazka.github.io/pgi-docs/Gtk-3.0
+    https://pygobject.readthedocs.io/en/latest/getting_started.html
+    https://twine.readthedocs.io/en/latest/
+    https://packaging.python.org/en/latest/tutorials/packaging-projects/
+    https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
+    https://pypi.org/project/pystray/
+    https://peps.python.org/pep-0008/
+    https://docs.python-guide.org/writing/style/
+    https://guicommits.com/organize-python-code-like-a-pro/
 """
 
 
@@ -156,29 +156,17 @@ class IndicatorBase( ABC ):
     URL_TIMEOUT_IN_SECONDS = 20
 
     # Obtain name of indicator from the call stack and initialise gettext.
-    # For a given indicator, indicatorbase MUST be imported FIRST!
     INDICATOR_NAME = None
     for frame_record in inspect.stack():
-        found_indicatorbase_import = \
-            "from indicatorbase import IndicatorBase" in str( frame_record.code_context ) and \
-            Path( frame_record.filename ).stem.startswith( "indicator" )
-
-        if found_indicatorbase_import:
-            print( "found indicatorbase import" )#TODO Testing
+        if "from indicatorbase import IndicatorBase" in str( frame_record.code_context ):
             INDICATOR_NAME = Path( frame_record.filename ).stem
-            print( f"indicatorname { INDICATOR_NAME }" )#TODO Testing
-            print( f"__file__ { Path( __file__ ) }")#TODO Testing
-
             if INDICATOR_NAME == Path( __file__ ).parent.stem: # Running installed under a virtual environment.
                 locale_directory = Path( __file__ ).parent / "locale"
-                print( f"venv: locale_directory { locale_directory }" )#TODO Testing
 
             else:
                 # Running in development.
                 locale_directory = \
                     Path( __file__ ).parent.parent.parent.parent / INDICATOR_NAME / "src" / INDICATOR_NAME / "locale"
-
-                print( f"dev: locale_directory { locale_directory }" )#TODO Testing
 
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break

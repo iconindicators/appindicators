@@ -19,13 +19,13 @@
 """ Application indicator which displays the current Star Trek™ stardate. """
 
 
-from indicatorbase import IndicatorBase # MUST BE THE FIRST IMPORT!
-
 import datetime
 import gi
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
+
+from indicatorbase import IndicatorBase
 
 import stardate
 
