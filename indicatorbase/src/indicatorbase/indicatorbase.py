@@ -687,7 +687,7 @@ class IndicatorBase( ABC ):
         if icon is None:
             _icon = self.get_icon_name()
 
-        if isinstance( _icon ) is PosixPath:
+        if isinstance( _icon, PosixPath ):
             _icon = str( _icon )
 
         Notify.Notification.new( summary, message, _icon ).show()
@@ -1101,7 +1101,7 @@ class IndicatorBase( ABC ):
         dialog.set_title( self.indicator_name if title is None else title )
 
         for child in dialog.get_message_area().get_children():
-            if isinstance( child ) is Gtk.Label:
+            if isinstance( child, Gtk.Label ):
                 # Allow the label to be highlighted for copy/paste.
                 child.set_selectable( True )
 
@@ -1631,12 +1631,12 @@ class IndicatorBase( ABC ):
             # Expand the column unless the column contains a single checkbox
             # and no column header title.
             is_checkbox_column = \
-                isinstance( renderer_attribute_columnmodelid[ 0 ] ) is Gtk.CellRendererToggle and not title
+                isinstance( renderer_attribute_columnmodelid[ 0 ], Gtk.CellRendererToggle ) and not title
 
             treeviewcolumn.set_expand( not is_checkbox_column )
 
             # Add the renderer / attribute / column model id for each column.
-            is_single_tuple = isinstance( renderer_attribute_columnmodelid[ 0 ] ) is not tuple
+            is_single_tuple = not isinstance( renderer_attribute_columnmodelid[ 0 ], tuple )
             if is_single_tuple:
                 treeviewcolumn.pack_start( renderer_attribute_columnmodelid[ 0 ], False )
                 treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )

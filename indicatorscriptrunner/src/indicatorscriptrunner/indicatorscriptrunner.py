@@ -124,7 +124,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         for script in self.scripts:
             key = self._create_key( script.get_group(), script.get_name() )
 
-            if isinstance( script ) is Background and \
+            if isinstance( script, Background ) and \
                self.background_script_next_update_time[ key ] < next_update and \
                self.is_background_script_in_indicator_text( script ):
                 next_update = self.background_script_next_update_time[ key ]
@@ -144,7 +144,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         else:
             if self.hide_groups:
                 for script in sorted( self.scripts, key = lambda script: script.get_name().lower() ):
-                    if isinstance( script ) is NonBackground:
+                    if isinstance( script, NonBackground ):
                         self.add_scripts_to_menu( [ script ], menu, indent = ( 0, 0 ) )
 
             else:
@@ -216,7 +216,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     def update_background_scripts( self, now ):
         background_scripts_to_execute = [ ]
         for script in self.scripts:
-            if isinstance( script ) is Background and self.is_background_script_in_indicator_text( script ):
+            if isinstance( script, Background ) and self.is_background_script_in_indicator_text( script ):
                 # Script is background AND present in the indicator text, so is a potential candidate to be updated...
                 key = self._create_key( script.get_group(), script.get_name() )
                 if ( self.background_script_next_update_time[ key ] < now ) or \
@@ -273,7 +273,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         indicator_text_processed = self.indicator_text
         for script in self.scripts:
             key = self._create_key( script.get_group(), script.get_name() )
-            if isinstance( script ) is Background and "[" + key + "]" in indicator_text_processed:
+            if isinstance( script, Background ) and "[" + key + "]" in indicator_text_processed:
                 command_result = self.background_script_results[ key ]
                 if command_result is None: # Background script failed so leave the tag in place for the user to see.
                     indicator_text_processed = \
@@ -591,7 +591,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     IndicatorScriptRunner.COLUMN_MODEL_GROUP )
 
             script = self.get_script( scripts, group, name )
-            if isinstance( script ) is NonBackground and script.get_default():
+            if isinstance( script, NonBackground ) and script.get_default():
                 cell_renderer.set_property( "weight", Pango.Weight.BOLD )
 
 
@@ -619,15 +619,15 @@ class IndicatorScriptRunner( IndicatorBase ):
                    script.get_name(),
                    '✔' if script.get_play_sound() else None,
                    '✔' if script.get_show_notification() else None,
-                   '✔' if isinstance( script ) is Background else None,
+                   '✔' if isinstance( script, Background ) else None,
                    '—'
-                   if isinstance( script ) is Background else
+                   if isinstance( script, Background ) else
                    ( '✔' if script.get_terminal_open() else None ),
                    str( script.get_interval_in_minutes() )
-                   if isinstance( script ) is Background else
+                   if isinstance( script, Background ) else
                    '—',
                    ( '✔' if script.get_force_update() else None )
-                   if isinstance( script ) is Background else
+                   if isinstance( script, Background ) else
                    '—' ]
 
                 treestore.append( parent, row )
@@ -794,7 +794,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         script_group_combo.grab_focus()
                         continue
 
-                    if isinstance( script ) is Background:
+                    if isinstance( script, Background ):
                         new_script = Background(
                             script_group_combo.get_active_text().strip(),
                             script_name_entry.get_text().strip(),
@@ -892,7 +892,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     background_scripts_treeview )
 
             if edited_script:
-                if isinstance( the_script ) is Background and isinstance( edited_script ) is NonBackground:
+                if isinstance( the_script, Background ) and isinstance( edited_script, NonBackground ):
                     old_tag = self._create_key( group, name )
                     self.update_indicator_textentry( textentry, old_tag, "" )
 
@@ -1004,7 +1004,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "Non-background scripts are displayed\n" +
                     "in the menu and run when the user\n" +
                     "clicks on the corresponding menu item." ),
-                active = True if add else isinstance( script ) is NonBackground )
+                active = True if add else isinstance( script, NonBackground ) )
 
         grid.attach( script_non_background_radio, 0, 15, 1, 1 )
 
@@ -1012,9 +1012,9 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_checkbutton(
                 _( "Leave terminal open" ),
                 tooltip_text = _( "Leave the terminal open on script completion." ),
-                sensitive = True if add else isinstance( script ) is NonBackground,
+                sensitive = True if add else isinstance( script, NonBackground ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = False if add else isinstance( script ) is NonBackground and script.get_terminal_open() )
+                active = False if add else isinstance( script, NonBackground ) and script.get_terminal_open() )
 
         grid.attach( terminal_checkbutton, 0, 16, 1, 1 )
 
@@ -1026,9 +1026,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "which is run on a middle mouse\n" +
                     "click of the indicator icon.\n\n" +
                     "Not supported on all desktops." ),
-                sensitive = True if add else isinstance( script ) is NonBackground,
+                sensitive = True if add else isinstance( script, NonBackground ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = False if add else isinstance( script ) is NonBackground and script.get_default() )
+                active = False if add else isinstance( script, NonBackground ) and script.get_default() )
 
         grid.attach( default_script_checkbutton, 0, 17, 1, 1 )
 
@@ -1044,13 +1044,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "execution will be logged to a file in the\n" +
                     "user's home directory and the script tag\n" +
                     "will remain in the icon text." ),
-                active = False if add else isinstance( script ) is Background )
+                active = False if add else isinstance( script, Background ) )
 
         grid.attach( script_background_radio, 0, 18, 1, 1 )
 
         interval_spinner = \
             self.create_spinbutton(
-                script.get_interval_in_minutes() if isinstance( script ) is Background else 60,
+                script.get_interval_in_minutes() if isinstance( script, Background ) else 60,
                 1,
                 10000,
                 page_increment = 100,
@@ -1061,7 +1061,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Interval" ) ), False ),
                     ( interval_spinner, False ) ),
-                sensitive = False if add else isinstance( script ) is Background,
+                sensitive = False if add else isinstance( script, Background ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
 
         grid.attach( label_and_interval_spinner_box, 0, 19, 1, 1 )
@@ -1073,7 +1073,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "If the script returns non-empty text\n" +
                     "on its update, the script will run\n" +
                     "on the next update of ANY script." ),
-                sensitive = True if add else isinstance( script ) is Background,
+                sensitive = True if add else isinstance( script, Background ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = False if add else isinstance( script ) is Background and script.get_force_update() )
 
@@ -1156,7 +1156,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 if script_non_background_radio.get_active() and default_script_checkbutton.get_active():
                     i = 0
                     for skript in scripts:
-                        if isinstance( skript ) is NonBackground and skript.get_default():
+                        if isinstance( skript, NonBackground ) and skript.get_default():
                             undefault_script = NonBackground(
                                 skript.get_group(),
                                 skript.get_name(),
@@ -1221,7 +1221,10 @@ class IndicatorScriptRunner( IndicatorBase ):
     def get_scripts_by_group( self, scripts, non_background = True, background = True ):
         scripts_by_group = { }
         for script in scripts:
-            if ( non_background and isinstance( script ) is NonBackground ) or ( background and isinstance( script ) is Background ):
+            if
+                ( non_background and isinstance( script, NonBackground ) ) or \
+                ( background and isinstance( script, Background ) ):
+
                 if script.get_group() not in scripts_by_group:
                     scripts_by_group[ script.get_group() ] = [ ]
 
