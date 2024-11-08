@@ -20,17 +20,18 @@
 
 
 import datetime
-import gi
 import os
 import platform
+
+from threading import Thread
+
+import gi
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
-
-from threading import Thread
 
 from indicatorbase import IndicatorBase
 

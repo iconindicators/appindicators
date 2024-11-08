@@ -33,6 +33,7 @@ from astrobase import AstroBase
 
 
 class AstroPyEphem( AstroBase ):
+    ''' Wrapper frontend to the PyEphem library. '''
 
     # DO NOT EDIT: Content must be created using 'create_ephemeris_stars.py'.
     _EPHEMERIS_STARS = {

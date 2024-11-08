@@ -20,8 +20,9 @@
 
 
 import datetime
-import gi
 import time
+
+import gi
 
 gi.require_version( "Gdk", "3.0" )
 from gi.repository import Gdk
@@ -129,10 +130,10 @@ class IndicatorVirtualBox( IndicatorBase ):
             sorted_items = \
                 sorted(
                     items,
-                    key = lambda x: ( type( x ) is not Group, x.get_name().lower() ) ) # Checking if an item is a group results in True (1) or False (0).
+                    key = lambda x: ( isinstance( x ) is not Group, x.get_name().lower() ) ) # Checking if an item is a group results in True (1) or False (0).
 
         for item in sorted_items:
-            if type( item ) is Group:
+            if isinstance( item ) is Group:
                 self._build_menu(
                     self._add_group_to_menu( menu, item, indent ),
                     item.get_items(),
@@ -213,7 +214,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             virtual_machines_for_autostart ):
 
         for item in virtual_machines:
-            if type( item ) is Group:
+            if isinstance( item ) is Group:
                 self._get_virtual_machines_for_autostart(
                     item.get_items(),
                     virtual_machines_for_autostart )
@@ -351,7 +352,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         try:
             def add_virtual_machine( group, name, uuid, groups ):
                 for group_name in groups:
-                    the_group = next( ( x for x in group.get_items() if type( x ) is Group and x.get_name() == group_name ), None )
+                    the_group = next( ( x for x in group.get_items() if isinstance( x ) is Group and x.get_name() == group_name ), None )
                     if the_group is None:
                         the_group = Group( group_name )
                         group.add_item( the_group )
@@ -551,10 +552,10 @@ class IndicatorVirtualBox( IndicatorBase ):
             sorted_items = sorted( items, key = lambda x: ( x.get_name().lower() ) )
 
         else:
-            sorted_items = sorted( items, key = lambda x: ( type( x ) is not Group, x.get_name().lower() ) ) # Checking if an item is a group results in True (1) or False (0).
+            sorted_items = sorted( items, key = lambda x: ( isinstance( x ) is not Group, x.get_name().lower() ) ) # Checking if an item is a group results in True (1) or False (0).
 
         for item in sorted_items:
-            if type( item ) is Group:
+            if isinstance( item ) is Group:
                 groups_exist = True
                 self._add_items_to_store(
                     treestore,

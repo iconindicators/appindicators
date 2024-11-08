@@ -87,7 +87,7 @@ try:
 except: #TODO On Fedora, run this but change to except Exception as e: and print the e then can specify the exception.
     try:
         gi.require_version( "AppIndicator3", "0.1" )
-        from gi.repository import AppIndicator3 as AppIndicator # Needed for Fedora.
+        from gi.repository import AppIndicator3 as AppIndicator # For Fedora.
     except:
         print( "Unable to find neither AyatanaAppIndicator3 nor AppIndicator3.")
         sys.exit( 1 )
@@ -125,7 +125,7 @@ class IndicatorBase( ABC ):
 
     _EXTENSION_JSON = ".json"
 
-    _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ] # ALWAYS first to be the default.
+    _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ]
     _TERMINALS_AND_EXECUTION_FLAGS.extend( [
         [ "konsole", "-e" ],
         [ "lxterminal", "-e" ],
@@ -172,7 +172,12 @@ class IndicatorBase( ABC ):
             break
 
 
-    def __init__( self, comments, artwork = None, creditz = None, debug = False ):
+    def __init__(
+            self,
+            comments,
+            artwork = None,
+            creditz = None,
+            debug = False ):
         '''
         The comments argument is used in two places:
             1) The comments are passed directly to the About dialog.
@@ -237,7 +242,8 @@ class IndicatorBase( ABC ):
         self.lock_save_config = Lock()
         self.id_save_config = 0 # ID returned when scheduling a config save.
 
-        signal.signal( signal.SIGINT, signal.SIG_DFL ) # Responds to CTRL+C when running from terminal.
+        # Respond to CTRL+C when running from terminal.
+        signal.signal( signal.SIGINT, signal.SIG_DFL )
 
         Notify.init( self.indicator_name )
 
@@ -371,7 +377,7 @@ class IndicatorBase( ABC ):
                         exec_with_sleep_present = True
 
                     else:
-                        # Comment out and eventually replace with a sleep version.
+                        # Comment out and eventually replace with sleep version.
                         output += '#' + line
                         made_a_change = True
 
@@ -383,8 +389,8 @@ class IndicatorBase( ABC ):
                     output += line
 
         if not autostart_enabled_present or not exec_with_sleep_present or not terminal_present:
-            # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled line
-            # from the original .desktop file (either production or development).
+            # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled
+            # line from the original .desktop file (production or development).
             if desktop_file_virtual_environment.exists():
                 desktop_file_original = desktop_file_virtual_environment
 
@@ -420,9 +426,11 @@ class IndicatorBase( ABC ):
             self,
             desktop_file_virtual_environment,
             desktop_file ):
-        # The .desktop file is not present in $HOME/.config/autostart
-        # so copy from the virtual environment (when running in production)
-        # or a .whl from the release directory (when running in development).
+        '''
+        The .desktop file is not present in $HOME/.config/autostart
+        so copy from the virtual environment (when running in production)
+        or a .whl from the release directory (when running in development).
+        '''
         if desktop_file_virtual_environment.exists():
             shutil.copy(
                 desktop_file_virtual_environment,
@@ -442,7 +450,9 @@ class IndicatorBase( ABC ):
                         desktop_file
 
                     if desktop_file_in_wheel in z.namelist():
-                        desktop_file_in_tmp = z.extract( desktop_file_in_wheel, path = "/tmp" )
+                        desktop_file_in_tmp = \
+                            z.extract( desktop_file_in_wheel, path = "/tmp" )
+
                         shutil.copy(
                             desktop_file_in_tmp,
                             self.desktop_file_user_home )
@@ -497,9 +507,12 @@ class IndicatorBase( ABC ):
 
     @staticmethod
     def get_changelog_markdown_path():
-        changelog = Path( __file__ ).parent / "CHANGELOG.md" # Path under virtual environment.
+        # Path under virtual environment.
+        changelog = Path( __file__ ).parent / "CHANGELOG.md"
+
         if not Path( changelog ).exists():
-            changelog = Path( '.' ).absolute() / "CHANGELOG.md" # Assume running in development.
+            # Assume running in development.
+            changelog = Path( '.' ).absolute() / "CHANGELOG.md"
 
         return changelog
 
@@ -509,22 +522,24 @@ class IndicatorBase( ABC ):
         Gtk.main()
 
 
-    # The typical flow of events is:
-    #   Indicator starts up and kicks off an initial update.
-    #
-    #   Subsequent updates are scheduled either by:
-    #       The indicator returning the amount of seconds from
-    #       now until the next update needs to occur.
-    #
-    #       The user clicks OK in the Preferences.
-    #
-    #       An indicator experiences and event and requests an update
-    #       (for example starting a virtual machine will request an
-    #       update to refresh the menu).
-    #
-    #   If there is a pending (future) update and a request for an update comes along,
-    #   need to remove the "old" pending update.
     def request_update( self, delay = 1 ):
+        '''
+        The typical flow of events is:
+            Indicator starts up and kicks off an initial update.
+
+            Subsequent updates are scheduled either by:
+                The indicator returning the amount of seconds from now until the
+                next update needs to occur.
+
+                The user clicks OK in the Preferences.
+
+                An indicator experiences and event and requests an update.
+                For example, starting a virtual machine will request an update
+                to refresh the menu.
+
+            If there is a pending (future) update and a request for an update
+            comes along, need to remove the "old" pending update.
+        '''
         if self.lock_update.acquire( blocking = False ):
             if self.id_update > 0:
                 GLib.source_remove( self.id_update )
@@ -539,16 +554,22 @@ class IndicatorBase( ABC ):
     def _update( self ):
         update_start = datetime.datetime.now()
 
-        self.set_menu_sensitivity( False ) # Menu will be rebuilt as part of the update, so no need to set back to True.
+        # Disable the menu so the user cannot interact and possible wreak havoc.
+        # The menu will be rebuilt as part of the update so there is no need to
+        # set back to True.
+        self.set_menu_sensitivity( False )
 
-        # The user can nominate any menuitem as a secondary activate target during menu construction.
-        # However the secondary activate target can only be set once the menu is built.
-        # Therefore, keep a variable for the user to set as needed.
-        # Then set the secondary activate target once the menu is built/shown.
+        # The user can nominate any menuitem as a secondary activate target
+        # during menu construction.  However the secondary activate target can
+        # only be set once the menu is built.  Therefore, keep a variable for
+        # the user to set as needed.  Then set the secondary activate target
+        # once the menu is built/shown.
         self.secondary_activate_target = None
 
         menu = Gtk.Menu()
-        next_update_in_seconds = self.update( menu ) # Call to implementation in indicator.
+
+        # Call to implementation in indicator.        
+        next_update_in_seconds = self.update( menu )
 
         if self.is_debug():
             menu_has_children = len( menu.get_children() ) > 0
@@ -556,11 +577,19 @@ class IndicatorBase( ABC ):
             menu.prepend( Gtk.SeparatorMenuItem() )
 
             if next_update_in_seconds:
-                next_update_date_time = datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds )
-                label = "Next update: " + str( next_update_date_time ).split( '.' )[ 0 ]
+                next_update_date_time = \
+                    datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds )
+
+                label = \
+                    "Next update: " + \
+                    str( next_update_date_time ).split( '.', maxsplit = 1 )[ 0 ]
+
                 menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
-            label = "Time to update: " + str( datetime.datetime.now() - update_start )
+            label = \
+                "Time to update: " + \
+                str( datetime.datetime.now() - update_start )
+
             menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
             if menu_has_children:
@@ -573,7 +602,10 @@ class IndicatorBase( ABC ):
         titles = ( _( "Preferences" ), _( "About" ), _( "Quit" ) )
         functions = ( self._on_preferences, self._on_about, Gtk.main_quit )
         for title, function in zip( titles, functions ):
-            self.create_and_append_menuitem( menu, title, activate_functionandarguments = ( function, ) )
+            self.create_and_append_menuitem(
+                menu,
+                title,
+                activate_functionandarguments = ( function, ) )
 
         self.indicator.set_menu( menu )
         menu.show_all()
@@ -591,8 +623,9 @@ class IndicatorBase( ABC ):
         '''
         Sets the label and tooltip assuming this is supported.
         Returns True if the operation is supported; False otherwise.
-        For example, on Lubuntu 22.04 LXQt, there is no icon label and the tooltip
-        contains the indicator source filename and so would return a False value.
+        For example, on Lubuntu 22.04 LXQt, there is no icon label and the
+        tooltip contains the indicator source filename and so would return a
+        False value.
         '''
         label_or_tooltip_update_supported = self._is_label_or_tooltip_update_supported()
         if label_or_tooltip_update_supported:
@@ -616,25 +649,32 @@ class IndicatorBase( ABC ):
         return icon_update_supported
 
 
-    # Get the name of the icon for the indicator
-    # to be passed to the desktop environment for display.
-    #
-    # GTK will take an icon and display it as expected.
-    #
-    # The exception is if the icon filename ends with "-symbolic" (before the extension).
-    # In this case, GTK will take the colour in the icon (say a generic flat #777777)
-    # and replace it with a suitable colour to make the current theme/background/colour.
-    # Refer to this discussion:
-    #   https://discourse.gnome.org/t/what-colour-to-use-for-a-custom-adwaita-icon/19064
-    #
-    # If the icon with "-symbolic" cannot be found, it appears the desktop environment as
-    # a fallback will look for the icon name without the "-symbolic" which is the hicolor.
-    #
-    # When updating/replacing an icon, the desktop environment appears to cache.
-    # So perhaps first try:
-    #   sudo touch $HOME/.local/share/icons/hicolor && sudo gtk-update-icon-cache
-    # and if that fails, either log out/in or restart.
     def get_icon_name( self ):
+        '''
+        Get the name of the icon for the indicator to be passed to the desktop
+        environment for display.
+
+        GTK will take an icon and display it as expected.
+
+        The exception is if the icon filename ends with "-symbolic" (before the
+        extension).
+
+        In this case, GTK will take the colour in the icon (say a generic flat
+        #777777) and replace it with a suitable colour to make the current
+        theme/background/colour.
+
+        Refer to this discussion:
+            https://discourse.gnome.org/t/what-colour-to-use-for-a-custom-adwaita-icon/19064
+
+        If the icon with "-symbolic" cannot be found, it appears the desktop
+        environment as a fallback will look for the icon name without the
+        "-symbolic" which is the hicolor.
+
+        When updating/replacing an icon, the desktop environment appears to
+        cache.  So perhaps first try:
+            sudo touch $HOME/.local/share/icons/hicolor && sudo gtk-update-icon-cache
+        and if that fails, either log out/in or restart.
+        '''
         return self.indicator_name + "-symbolic"
 
 
@@ -647,7 +687,7 @@ class IndicatorBase( ABC ):
         if icon is None:
             _icon = self.get_icon_name()
 
-        if type( _icon ) is PosixPath:
+        if isinstance( _icon ) is PosixPath:
             _icon = str( _icon )
 
         Notify.Notification.new( summary, message, _icon ).show()
@@ -657,16 +697,18 @@ class IndicatorBase( ABC ):
         self.secondary_activate_target = menuitem
 
 
-    # Registers a function (and arguments) to be called on mouse wheel scroll.
-    #
-    # The function must have the form:
-    #
-    #   def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction )
-    #
-    # The name of the function may be any name.
-    # The arguments must be present as specified.
-    # Additional arguments may be specified.
     def request_mouse_wheel_scroll_events( self, functionandarguments ):
+        '''
+        Registers a function (and arguments) to be called on mouse wheel scroll.
+
+        The function must have the form:
+
+            def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction )
+
+        The name of the function may be any name.
+        The arguments must be present as specified.
+        Additional arguments may be specified.
+        '''
         self.indicator.connect(
             "scroll-event",
             self._on_mouse_wheel_scroll,
@@ -680,12 +722,16 @@ class IndicatorBase( ABC ):
             scroll_direction,
             functionandarguments ):
 
-        if self.indicator.get_menu().get_children()[ 0 ].get_sensitive(): # Disable during update/Preferences/About
+        if self.indicator.get_menu().get_children()[ 0 ].get_sensitive():# Disabled during update/Preferences/About
             if len( functionandarguments ) == 1:
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction )
 
             else:
-                functionandarguments[ 0 ]( indicator, delta, scroll_direction, *functionandarguments[ 1 : ] )
+                functionandarguments[ 0 ](
+                    indicator,
+                    delta,
+                    scroll_direction,
+                    *functionandarguments[ 1 : ] )
 
 
     def get_session_type( self ):
@@ -784,12 +830,16 @@ class IndicatorBase( ABC ):
         self.indicator.set_secondary_activate_target( None )
 
         dialog = self.create_dialog( menuitem, _( "Preferences" ) )
-        response_type = self.on_preferences( dialog ) # Call to implementation in indicator.
+
+        # Call to implementation in indicator.
+        response_type = self.on_preferences( dialog )
         dialog.destroy()
 
         if response_type == Gtk.ResponseType.OK:
             self.request_save_config()
-            self.request_update( 1 ) # Allow one second for the lock to release so the update will proceed.
+
+            # Allow a second for the lock to release so the update will proceed.            
+            self.request_update( 1 )
 
         else:
             self.set_menu_sensitivity( True )
@@ -798,7 +848,9 @@ class IndicatorBase( ABC ):
 
     def set_menu_sensitivity( self, toggle ):
         menuitems = self.indicator.get_menu().get_children()
-        if len( menuitems ) > 1: # On the first update, the menu only contains the "initialising" menu item, so ignore.
+        # On the first update, the menu only contains the "initialising"
+        # menu item, so ignore.
+        if len( menuitems ) > 1:
             for menuitem in self.indicator.get_menu().get_children():
                 menuitem.set_sensitive( toggle )
 
@@ -927,16 +979,17 @@ class IndicatorBase( ABC ):
         '''
         if self.is_clipboard_supported():
             if self.is_session_type_wayland():
-                # GTK interacts with the X11 clipboard mechanism via a user callback
-                # function to receive the selection, whereas under Wayland, this is
-                # not the case.
+                # GTK interacts with the X11 clipboard mechanism via a user
+                # callback function to receive the selection, whereas under
+                # Wayland, this is not the case.
                 #
                 # There is presently no GTK method for accessing the clipboard
-                # under Wayland.  Instead, the package wl-clipboard is used directly
-                # via a terminal, requiring no callback function.
+                # under Wayland.  Instead, the package wl-clipboard is used
+                # directly via a terminal, requiring no callback function.
                 #
-                # To shield the user from having to know whether Wayland or X11 is
-                # in use, access to the primary is wrapped within a callback function.
+                # To shield the user from having to know whether Wayland or X11
+                # is in use, access to the primary is wrapped within a callback
+                # function.
                 text_in_primary = self.process_get( "wl-paste --primary" )
                 if text_in_primary == "":
                     text_in_primary = None
@@ -945,7 +998,8 @@ class IndicatorBase( ABC ):
 
             else:
                 Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
-                    self._clipboard_text_received_function, primary_received_callback_function )
+                    self._clipboard_text_received_function,
+                    primary_received_callback_function )
 
 
     def _clipboard_text_received_function(
@@ -1047,8 +1101,9 @@ class IndicatorBase( ABC ):
         dialog.set_title( self.indicator_name if title is None else title )
 
         for child in dialog.get_message_area().get_children():
-            if type( child ) is Gtk.Label:
-                child.set_selectable( True ) # Allow the label to be highlighted for copy/paste.
+            if isinstance( child ) is Gtk.Label:
+                # Allow the label to be highlighted for copy/paste.
+                child.set_selectable( True )
 
         response = dialog.run()
         dialog.destroy()
@@ -1056,7 +1111,7 @@ class IndicatorBase( ABC ):
 
 
     def _get_parent( self, widget ):
-        parent = widget # Sometimes the widget itself is a Dialog/Window, so no need to get the parent.
+        parent = widget # Sometimes the widget is a Dialog/Window so don't get the parent.
         while parent is not None:
             if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
                 break
@@ -1091,7 +1146,11 @@ class IndicatorBase( ABC ):
                 tooltip_text = _( "Start up delay (seconds)." ),
                 sensitive = autostart_checkbox.get_active() )
 
-        autostart_checkbox.connect( "toggled", self.on_radio_or_checkbox, True, autostart_spinner )
+        autostart_checkbox.connect(
+            "toggled",
+            self.on_radio_or_checkbox,
+            True,
+            autostart_spinner )
 
         box_autostart = \
             self.create_box(
@@ -1185,14 +1244,16 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
-    # Creates a single (isolated, not part of a group)
-    # RadioMenuItem that is enabled/active.
     def create_and_append_radiomenuitem(
         self,
         menu,
         label,
         activate_functionandarguments = None,
         indent = ( 0, 0 ) ): # First element: indent level when adding to a non-detachable menu; Second element: equivalent for a detachable menu.
+        '''
+        Creates a single (isolated, not part of a group)
+        RadioMenuItem that is enabled/active.
+        '''
 
         indent_amount = self._get_menu_indent_amount( indent )
         menuitem = Gtk.RadioMenuItem.new_with_label( [ ], indent_amount + label )
@@ -1250,9 +1311,11 @@ class IndicatorBase( ABC ):
         return lambda menuitem: webbrowser.open( menuitem.get_name() )
 
 
-    # Takes a Gtk.TextView and returns the containing text,
-    # avoiding the additional calls to get the start/end positions.
     def get_textview_text( self, textview ):
+        '''
+        Takes a Gtk.TextView and returns the containing text, avoiding the
+        additional calls to get the start/end positions.
+        '''
         textview_buffer = textview.get_buffer()
         return \
             textview_buffer.get_text(
@@ -1261,9 +1324,11 @@ class IndicatorBase( ABC ):
                 True )
 
 
-    # Listens to radio/checkbox "toggled" events and toggles the visibility
-    # of the widgets according to the boolean value of 'sense'.
     def on_radio_or_checkbox( self, radio_or_checkbox, sense, *widgets ):
+        '''
+        Listens to radio/checkbox "toggled" events and toggles the visibility
+        of the widgets according to the boolean value of 'sense'.
+        '''
         for widget in widgets:
             widget.set_sensitive( sense and radio_or_checkbox.get_active() )
 
@@ -1525,50 +1590,59 @@ class IndicatorBase( ABC ):
         titles: Tuple of strings for each column's title.
 
         renderers_attributes_columnmodelids:
-            Tuple of tuples, each of which contains the Gtk.CellRenderer, data type and model column id
-            for the column view.
+            Tuple of tuples, each contains the Gtk.CellRenderer,
+            data type and model column id for the column view.
             Columns will not be expanded: treeviewcolumn.pack_start( renderer, False ).
-            A tuple (for a given model column id) may contain tuples, each of which is for a different renderer.
+            A tuple (for a given model column id) may contain tuples,
+            each of which is for a different renderer.
 
-        alignments_columnviewids: Tuple of tuples, each of which contains the xalign and view column id.
+        alignments_columnviewids:
+            Tuple of tuples, each contains the xalign and view column id.
 
         sortcolumnviewids_columnmodelids:
-            Tuple of tuples, each of which contains the view column id and corresponding model column id.
-            The first column will be set as default sorted ascendingly.
+            Tuple of tuples, each of which contains the view column id and
+            corresponding model column id.  The first column will be set as
+            default sorted ascendingly.
 
         celldatafunctionandarguments_renderers_columnviewids:
-            Tuple of tuples, each of which contains a cell data renderer function, parameters to the function,
-            a cell data renderer (the SAME renderer passed in to the renderers_attributes_columnmodelids) and
-            the view column id.
+            Tuple of tuples, each contains a cell data renderer function,
+            parameters to the function, a cell data renderer (the SAME renderer
+            passed in to the renderers_attributes_columnmodelids) and the view
+            column id.
 
         clickablecolumnviewids_functionsandarguments:
-            Tuple of tuples, each of which contains the view column id and a corresponding function (and parameters)
-            to be called on column header click.
+            Tuple of tuples, each contains the view column id and a
+            corresponding function (and parameters) to be called on column
+            header click.
 
         tooltip_text: Tooltip text for the entire TreeView.
 
-        cursorchangedfunctionandarguments: A function (and parameters) to call on row selection.
+        cursorchangedfunctionandarguments:
+            A function (and parameters) to call on row selection.
 
-        rowactivatedfunctionandarguments: A function (and parameters) to call on row double click.
+        rowactivatedfunctionandarguments:
+            A function (and parameters) to call on row double click.
         '''
         treeview = Gtk.TreeView.new_with_model( treemodel )
 
         for index, ( title, renderer_attribute_columnmodelid ) in enumerate( zip( titles, renderers_attributes_columnmodelids ) ):
             treeviewcolumn = Gtk.TreeViewColumn( title )
 
-            # Expand the column unless the column contains a single checkbox and no column header title.
+            # Expand the column unless the column contains a single checkbox
+            # and no column header title.
             is_checkbox_column = \
-                type( renderer_attribute_columnmodelid[ 0 ] ) is Gtk.CellRendererToggle and not title
+                isinstance( renderer_attribute_columnmodelid[ 0 ] ) is Gtk.CellRendererToggle and not title
 
             treeviewcolumn.set_expand( not is_checkbox_column )
 
             # Add the renderer / attribute / column model id for each column.
-            is_single_tuple = type( renderer_attribute_columnmodelid[ 0 ] ) is not tuple
+            is_single_tuple = isinstance( renderer_attribute_columnmodelid[ 0 ] ) is not tuple
             if is_single_tuple:
                 treeviewcolumn.pack_start( renderer_attribute_columnmodelid[ 0 ], False )
                 treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
 
-            else: # Assume to be a tuple of tuples of renderer, attribute, column model id.
+            else:
+                # Assume a tuple of tuples of renderer, attribute, column model id.
                 for renderer, attribute, columnmodelid in renderer_attribute_columnmodelid:
                     treeviewcolumn.pack_start( renderer, False )
                     treeviewcolumn.add_attribute( renderer, attribute, columnmodelid )
@@ -1582,7 +1656,9 @@ class IndicatorBase( ABC ):
                 if alignment:
                     treeviewcolumn.set_alignment( alignment[ 0 ] )
                     current_alignment = renderer_attribute_columnmodelid[ 0 ].get_alignment()
-                    renderer_attribute_columnmodelid[ 0 ].set_alignment( alignment[ 0 ], current_alignment[ 1 ] )
+                    renderer_attribute_columnmodelid[ 0 ].set_alignment(
+                        alignment[ 0 ],
+                        current_alignment[ 1 ] )
 
             treeview.append_column( treeviewcolumn )
 
@@ -1592,20 +1668,27 @@ class IndicatorBase( ABC ):
                     if columnviewid == indexcolumn:
                         treeviewcolumn.set_sort_column_id( columnmodelid )
                         if sortcolumnviewids_columnmodelids.index( ( columnviewid, columnmodelid ) ) == 0:
-                            treemodel.set_sort_column_id( columnmodelid, Gtk.SortType.ASCENDING ) # Set first sorted column as default ascending.
+                            # Set first sorted column as default ascending.
+                            treemodel.set_sort_column_id(
+                                columnmodelid,
+                                Gtk.SortType.ASCENDING )
 
         if celldatafunctionandarguments_renderers_columnviewids:
             for data_function_and_arguments, renderer, columnviewid in celldatafunctionandarguments_renderers_columnviewids:
                 for index, treeviewcolumn in enumerate( treeview.get_columns() ):
                     if columnviewid == index:
-                        treeviewcolumn.set_cell_data_func( renderer, *data_function_and_arguments )
+                        treeviewcolumn.set_cell_data_func(
+                            renderer,
+                            *data_function_and_arguments )
 
         if clickablecolumnviewids_functionsandarguments:
             for columnviewid_functionandarguments in clickablecolumnviewids_functionsandarguments:
                 for index, treeviewcolumn in enumerate( treeview.get_columns() ):
                     if columnviewid_functionandarguments[ 0 ] == index:
                         treeviewcolumn.set_clickable( True )
-                        treeviewcolumn.connect( "clicked", *columnviewid_functionandarguments[ 1 ] )
+                        treeviewcolumn.connect(
+                            "clicked",
+                            *columnviewid_functionandarguments[ 1 ] )
 
         treeview.set_tooltip_text( tooltip_text )
         treeview.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
@@ -1638,13 +1721,23 @@ class IndicatorBase( ABC ):
                 parent = parent,
                 action = action )
 
-        dialog.add_buttons( Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL, Gtk.STOCK_OPEN, Gtk.ResponseType.OK )
+        dialog.add_buttons(
+            Gtk.STOCK_CANCEL,
+            Gtk.ResponseType.CANCEL,
+            Gtk.STOCK_OPEN,
+            Gtk.ResponseType.OK )
+
         dialog.set_transient_for( parent )
         dialog.set_filename( filename )
         return dialog
 
 
-    def set_preferences_common_attributes( self, is_set, delay, check_latest_version ):
+    def set_preferences_common_attributes(
+            self,
+            is_set,
+            delay,
+            check_latest_version ):
+
         self.check_latest_version = check_latest_version
 
         output = ""
@@ -1736,8 +1829,11 @@ class IndicatorBase( ABC ):
         return self.current_desktop
 
 
-    # Lubuntu 20.04/22.04 does not support setting/updating of icon label/tooltip.
     def _is_label_or_tooltip_update_supported( self ):
+        '''
+        Lubuntu 20.04/22.04 does not support setting/updating of icon
+        label/tooltip.
+        '''
         desktop_environment = self.get_current_desktop()
         label_or_tooltip_update_unsupported = \
             desktop_environment is None or \
@@ -1747,8 +1843,8 @@ class IndicatorBase( ABC ):
         return not label_or_tooltip_update_unsupported
 
 
-    # Lubuntu 20.04/22.04 does not support updating of icon once set.
     def _is_icon_update_supported( self ):
+        ''' Lubuntu 20.04/22.04 does not support updating of icon once set. '''
         desktop_environment = self.get_current_desktop()
         icon_update_unsupported = \
             desktop_environment is None or \
@@ -1757,12 +1853,14 @@ class IndicatorBase( ABC ):
         return not icon_update_unsupported
 
 
-    # As a result of
-    #   https://github.com/lxqt/qterminal/issues/335
-    # determine if qterminal is the current terminal and of a broken version.
-    # Fixed in version 1.2.0
-    #   https://github.com/lxqt/qterminal/releases
     def is_qterminal_and_broken( self, terminal ):
+        '''
+        As a result of
+            https://github.com/lxqt/qterminal/issues/335
+        determine if qterminal is the current terminal and of a broken version.
+        Fixed in version 1.2.0
+            https://github.com/lxqt/qterminal/releases
+        '''
         qterminal_and_broken = False
         if terminal is not None and "qterminal" in terminal:
             qterminal_and_broken = self.process_get( "qterminal --version" ) < "1.2.0"
@@ -1770,10 +1868,11 @@ class IndicatorBase( ABC ):
         return qterminal_and_broken
 
 
-    # Return the full path and name of the executable for the
-    # current terminal and the corresponding execution flag;
-    # None otherwise.
     def get_terminal_and_execution_flag( self ):
+        '''
+        Return the full path and name of the executable for the current terminal
+        and the corresponding execution flag; None otherwise.
+        '''
         terminal = None
         execution_flag = None
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
@@ -1792,9 +1891,9 @@ class IndicatorBase( ABC ):
         return terminal, execution_flag
 
 
-    # Download the contents of the given URL and save to file.
     @staticmethod
     def download( url, filename, logging_ ):
+        ''' Download the contents of the given URL and save to file. '''
         downloaded = False
         try:
             response = urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode()
@@ -1810,8 +1909,8 @@ class IndicatorBase( ABC ):
         return downloaded
 
 
-    # Read a dictionary of configuration from a JSON text file.
     def _load_config( self ):
+        ''' Read a dictionary of configuration from a JSON text file. '''
         config_file = \
             self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
 
@@ -1833,12 +1932,15 @@ class IndicatorBase( ABC ):
         if IndicatorBase._CONFIG_CHECK_LATEST_VERSION not in config:
             config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] = False
 
-        self.check_latest_version = config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ]
+        self.check_latest_version = \
+            config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ]
 
 
-    # Copies .config using the old indicator name format (using hyphens)
-    # to the new format, sans hyphens.
     def _copy_config_to_new_directory( self, config_file ):
+        '''
+        Copies .config using the old indicator name format (using hyphens)
+        to the new format, sans hyphens.
+        '''
         mapping = {
             "indicatorfortune":                 "indicator-fortune",
             "indicatorlunar":                   "indicator-lunar",
@@ -1863,15 +1965,17 @@ class IndicatorBase( ABC ):
             if self.id_save_config > 0:
                 GLib.source_remove( self.id_save_config )
 
-            self.id_save_config = GLib.timeout_add_seconds( delay, self._save_config )
+            self.id_save_config = \
+                GLib.timeout_add_seconds( delay, self._save_config )
+
             self.lock_save_config.release()
 
         else:
             self.request_save_config( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
 
 
-    # Write a dictionary of user configuration to a JSON text file.
     def _save_config( self ):
+        ''' Write a dictionary of user configuration to a JSON text file. '''
         config = self.save_config() # Call to implementation in indicator.
         config[ IndicatorBase._CONFIG_VERSION ] = self.version
         config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] = self.check_latest_version
@@ -1891,16 +1995,20 @@ class IndicatorBase( ABC ):
         return False
 
 
-    # Return the full directory path to the user config directory for the current indicator.
     def _get_config_directory( self ):
+        '''
+        Return the full directory path to the user config directory for the
+        current indicator.
+        '''
         return self._get_user_directory( ".config", self.indicator_name )
 
 
-    # Finds the most recent file in the cache with the given basename
-    # and if the timestamp is older than the current date/time
-    # plus the maximum age, returns True, otherwise False.
-    # If no file can be found, returns True.
     def is_cache_stale( self, basename, maximum_age_in_hours ):
+        '''
+        Finds the most recent file in the cache with the given basename and if
+        the timestamp is older than the current date/time plus the maximum age,
+        returns True, otherwise False. If no file can be found, returns True.
+        '''
         cache_date_time = self.get_cache_date_time( basename )
         if cache_date_time is None:
             stale = True
@@ -1912,12 +2020,14 @@ class IndicatorBase( ABC ):
         return stale
 
 
-    # Find the date/time of the newest file in the cache matching the basename.
-    #
-    # basename: The text used to form the file name, typically the name of the calling application.
-    #
-    # Returns the datetime of the newest file in the cache; None if no file can be found.
     def get_cache_date_time( self, basename ):
+        '''
+        Find the date/time of the newest file in the cache matching the
+        basename, where the basename is the text used to form the file name,
+        typically the name of the calling application.
+        Returns the datetime of the newest file in the cache;
+        None if no file can be found.
+        '''
         expiry = None
         the_file = ""
         for file in self.get_cache_directory().iterdir():
@@ -1925,7 +2035,8 @@ class IndicatorBase( ABC ):
                 the_file = file.name
 
         if the_file: # A value of "" evaluates to False.
-            date_time_component = the_file[ len( basename ) : len( basename ) + 14 ] # YYYYMMDDHHMMSS is 14 characters.
+            # YYYYMMDDHHMMSS is 14 characters.
+            date_time_component = the_file[ len( basename ) : len( basename ) + 14 ]
 
             expiry = \
                 datetime.datetime.strptime(
@@ -1937,8 +2048,11 @@ class IndicatorBase( ABC ):
         return expiry
 
 
-    # Create a filename with timestamp and extension to be used to save data to the cache.
     def get_cache_filename_with_timestamp( self, basename, extension = EXTENSION_TEXT ):
+        '''
+        Create a filename with timestamp and extension to be used to save data
+        to the cache.
+        '''
         filename = \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
@@ -1947,10 +2061,12 @@ class IndicatorBase( ABC ):
         return self.get_cache_directory() / filename
 
 
-    # Search through the cache for all files matching the basename.
-    #
-    # Returns the newest filename matching the basename on success; None otherwise.
     def get_cache_newest_filename( self, basename ):
+        '''
+        Search through the cache for all files matching the basename.
+        Returns the newest filename matching the basename on success;
+        None otherwise.
+        '''
         cache_directory = self.get_cache_directory()
         cache_file = ""
         for file in cache_directory.iterdir():
@@ -1966,36 +2082,43 @@ class IndicatorBase( ABC ):
         return cache_file
 
 
-    # Remove a file from the cache.
-    #
-    # filename: The file to remove.
-    #
-    # The file removed will be
-    #     ~/.cache/application_base_directory/filename
     def remove_file_from_cache( self, filename ):
+        '''
+        The file removed will be
+            ~/.cache/application_base_directory/filename
+        '''
         for file in self.get_cache_directory().iterdir():
             if file.name == filename:
                 file.unlink()
                 break
 
 
-    # Removes out of date cache files for a given basename.
-    #
-    # basename: The text used to form the file name, typically the name of the calling application.
-    # maximum_age_in_hours: Anything older than the maximum age (hours) is deleted.
-    #
-    # Any file in the cache directory matching the pattern
-    #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    #
-    # and is older than the cache maximum age is discarded.
-    #
-    # Any file extension is ignored in determining if the file should be deleted or not.
     def flush_cache( self, basename, maximum_age_in_hours ):
+        '''
+        Removes out of date cache files for a given basename.
+
+        basename:
+            The text used to form the file name, typically the name of the
+            calling application.
+        maximum_age_in_hours:
+            Anything older than the maximum age (hours) is deleted.
+
+        Any file in the cache directory matching the pattern
+            ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+
+        and is older than the cache maximum age is discarded.
+
+        Any file extension is ignored in determining if the file should be
+        deleted or not.
+        '''
         cache_maximum_age_date_time = \
             datetime.datetime.now() - datetime.timedelta( hours = maximum_age_in_hours )
 
         for file in self.get_cache_directory().iterdir():
-            if file.name.startswith( basename ): # Sometimes the base name is shared ("icon-" versus "icon-fullmoon-") so use the date/time to ensure the correct group of files.
+            # Sometimes the base name is shared
+            # ("icon-" versus "icon-fullmoon-")
+            # so use the date/time to ensure the correct group of files.
+            if file.name.startswith( basename ):
                 date_time = file.name[ len( basename ) : len( basename ) + 14 ] # len( YYYYMMDDHHMMSS ) = 14.
                 if date_time.isdigit():
                     file_date_time = \
@@ -2007,21 +2130,28 @@ class IndicatorBase( ABC ):
                         file.unlink()
 
 
-    # Read the most recent binary file from the cache.
-    #
-    # basename: The text used to form the file name, typically the name of the calling application.
-    #
-    # All files in cache directory are filtered based on the pattern
-    #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    #
-    # For example, for an application 'apple', the first file will pass through, whilst the second is filtered out
-    #    ~/.cache/fred/apple-20170629174950
-    #    ~/.cache/fred/orange-20170629174951
-    #
-    # Files which pass the filter are sorted by date/time and the most recent file is read.
-    #
-    # Returns the binary object; None when no suitable cache file exists; None on error and logs.
     def read_cache_binary( self, basename ):
+        '''
+        Read the most recent binary file from the cache.
+
+        basename:
+            The text used to form the file name, typically the name of the
+            calling application.
+
+        All files in cache directory are filtered based on the pattern
+            ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+
+        For example, for an application 'apple', the first file will pass
+        through, whilst the second is filtered out
+            ~/.cache/fred/apple-20170629174950
+            ~/.cache/fred/orange-20170629174951
+
+        Files which pass the filter are sorted by date/time and the most recent
+        file is read.
+
+        Returns the binary object; None when no suitable cache file exists;
+        None on error and logs.
+        '''
         cache_file = ""
         cache_directory = self.get_cache_directory()
         for file in cache_directory.iterdir():
@@ -2043,17 +2173,23 @@ class IndicatorBase( ABC ):
         return data
 
 
-    # Writes an object as a binary file to the cache.
-    #
-    # binary_data: The object to write.
-    # basename: The text used to form the file name, typically the name of the calling application.
-    # extension: Added to the end of the basename and date/time.
-    #
-    # The object will be written to the cache directory using the pattern
-    #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
-    #
-    # Returns filename written on success; None otherwise.
     def write_cache_binary( self, binary_data, basename, extension = "" ):
+        '''
+        Writes an object as a binary file to the cache.
+
+        binary_data:
+            The object to write.
+        basename:
+        The text used to form the file name, typically the name of the
+        calling application.
+        extension:
+            Added to the end of the basename and date/time.
+
+        The object will be written to the cache directory using the pattern
+            ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS
+
+        Returns filename written on success; None otherwise.
+        '''
         filename = \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
@@ -2073,31 +2209,39 @@ class IndicatorBase( ABC ):
         return cache_file
 
 
-    # Read the named text file from the cache.
-    #
-    # filename: The name of the file.
-    #
-    # Returns the contents of the text file; None on error and logs.
     def read_cache_text_without_timestamp( self, filename ):
+        '''
+        Read the named text file from the cache.
+
+        filename: The name of the file.
+
+        Returns the contents of the text file; None on error and logs.
+        '''
         return self._read_cache_text( self.get_cache_directory() / filename )
 
 
-    # Read the most recent text file from the cache.
-    #
-    # basename: The text used to form the file name, typically the name of the calling application.
-    #
-    # All files in cache directory are filtered based on the pattern
-    #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
-    #
-    # For example, for an application 'apple', the first file will be caught,
-    # whilst the second is filtered out:
-    #    ~/.cache/fred/apple-20170629174950
-    #    ~/.cache/fred/orange-20170629174951
-    #
-    # Files which pass the filter are sorted by date/time and the most recent file is read.
-    #
-    # Returns the contents of the text; None when no suitable cache file exists; None on error and logs.
     def read_cache_text( self, basename ):
+        '''
+        Read the most recent text file from the cache.
+
+        basename:
+            The text used to form the file name, typically the name of the
+            calling application.
+
+        All files in cache directory are filtered based on the pattern
+            ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
+
+        For example, for an application 'apple', the first file will be caught,
+        whilst the second is filtered out:
+            ~/.cache/fred/apple-20170629174950
+            ~/.cache/fred/orange-20170629174951
+
+        Files which pass the filter are sorted by date/time and the most
+        recent file is read.
+
+        Returns the contents of the text; None when no suitable cache
+        file exists; None on error and logs.
+        '''
         cache_file = ""
         cache_directory = self.get_cache_directory()
         for file in cache_directory.iterdir():
@@ -2125,27 +2269,35 @@ class IndicatorBase( ABC ):
         return text
 
 
-    # Writes text to a file in the cache.
-    #
-    # text: The text to write.
-    # filename: The name of the file.
-    #
-    # Returns filename written on success; None otherwise.
     def write_cache_text_without_timestamp( self, text, filename ):
+        '''
+        Writes text to a file in the cache.
+        
+        text: The text to write.
+        filename: The name of the file.
+
+        Returns filename written on success; None otherwise.
+        '''
         return self._write_cache_text( text, self.get_cache_directory() / filename )
 
 
-    # Writes text to a file in the cache.
-    #
-    # text: The text to write.
-    # basename: The text used to form the file name, typically the name of the calling application.
-    # extension: Added to the end of the basename and date/time.
-    #
-    # The text will be written to the cache directory using the pattern
-    #     ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
-    #
-    # Returns filename written on success; None otherwise.
     def write_cache_text( self, text, basename, extension = EXTENSION_TEXT ):
+        '''
+        Writes text to a file in the cache.
+
+        text:
+            The text to write.
+        basename:
+            The text used to form the file name, typically the name of the
+            calling application.
+        extension:
+            Added to the end of the basename and date/time.
+
+        The text will be written to the cache directory using the pattern
+            ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
+
+        Returns filename written on success; None otherwise.
+        '''
         filename = \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
@@ -2166,29 +2318,38 @@ class IndicatorBase( ABC ):
         return cache_file
 
 
-    # Return the full directory path to the user cache directory for the current indicator.
     def get_cache_directory( self ):
+        '''
+        Return the full directory path to the user cache directory for
+        the current indicator.
+        '''
         return self._get_user_directory( ".cache", self.indicator_name )
 
 
-    # Obtain (and create if not present) the directory for configuration, cache or similar.
-    #
-    # user_base_directory:
-    #   The directory name used to hold the configuration/cache.
-    # application_base_directory:
-    #   The directory name at the end of the final user directory to specify the application.
-    #
-    # The full directory path will be
-    #    ~/user_base_directory/application_base_directory
     def _get_user_directory( self, user_base_directory, application_base_directory ):
+        '''
+        Obtain (and create if not present) the directory for configuration,
+        cache or similar.
+
+        user_base_directory:
+            The directory name used to hold the configuration/cache.
+        application_base_directory:
+            The directory name at the end of the final user directory to specify
+            the application.
+
+        The full directory path will be
+            ~/user_base_directory/application_base_directory
+        '''
         directory = Path.home() / user_base_directory / application_base_directory
         directory.mkdir( parents = True, exist_ok = True )
         return directory
 
 
-    # Executes the command in a new process.
-    # On exception, logs to file.
     def process_call( self, command ):
+        '''
+        Executes the command in a new process.
+        On exception, logs to file.
+        '''
         try:
             subprocess.call( command, shell = True )
 
@@ -2198,12 +2359,16 @@ class IndicatorBase( ABC ):
                 logging.error( e.stderr )
 
 
-    # Executes the command and returns the result.
-    #
-    # logNonZeroErrorCode If True, will log any exception arising from a non-zero return code; otherwise will ignore.
-    #
-    # On exception, logs to file.
     def process_get( self, command, log_non_zero_error_code = False ):
+        '''
+        Executes the command and returns the result.
+
+        logNonZeroErrorCode:
+            If True, will log any exception arising from a non-zero return code;
+            otherwise will ignore.
+
+        On exception, logs to file.
+        '''
         result = None
         try:
             result = \

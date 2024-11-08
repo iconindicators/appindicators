@@ -20,17 +20,17 @@
 
 
 import concurrent.futures
-import gi
 import json
 import locale
 import webbrowser
 
 from copy import deepcopy
+from urllib.request import urlopen
+
+import gi
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
-
-from urllib.request import urlopen
 
 from indicatorbase import IndicatorBase
 

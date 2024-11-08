@@ -116,6 +116,7 @@ from astrobase import AstroBase
 
 
 class AstroSkyfield( AstroBase ):
+    ''' Wrapper frontend to the Skyfield library. '''
 
     # Planets ephemeris must be created using create_ephemeris_planets.py.
     _EPHEMERIS_PLANETS = load( str( Path( __file__ ).parent / "data" / "planets.bsp" ) )

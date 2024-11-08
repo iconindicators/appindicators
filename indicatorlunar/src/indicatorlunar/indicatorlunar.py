@@ -20,12 +20,13 @@
 
 
 import datetime
-import gi
 import locale
 import math
 import re
-import requests
 import webbrowser
+
+import gi
+import requests
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk

@@ -44,17 +44,17 @@ Possible options...
 
 
 import fnmatch
-import gi
 import os
+import threading
+import time
 
 from datetime import datetime, timedelta
 from pathlib import Path
 
+import gi
+
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
-
-import threading
-import time
 
 from indicatorbase import IndicatorBase
 
