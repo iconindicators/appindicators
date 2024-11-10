@@ -156,6 +156,7 @@ class IndicatorPunycode( IndicatorBase ):
             self.send_results_to_output( protocol + converted_text + path_query )
             self.request_update()
 
+#TODO Can the exception be more specific?
         except Exception as e:
             self.get_logging().exception( e )
             self.get_logging().error( "Error converting '" + protocol + text + path_query + "'." )

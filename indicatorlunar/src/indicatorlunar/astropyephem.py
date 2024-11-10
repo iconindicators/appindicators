@@ -444,7 +444,7 @@ class AstroPyEphem( AstroBase ):
                 math.isnan( body.size ) or \
                 math.isnan( body.sun_distance ) # Have found MPC data may contain ***** in lieu of actual data!
 
-        except Exception:
+        except RunTimeError:
             # Some comets with a near-parabolic orbit will trigger an error:
             #   https://github.com/brandon-rhodes/pyephem/issues/239
             bad = True

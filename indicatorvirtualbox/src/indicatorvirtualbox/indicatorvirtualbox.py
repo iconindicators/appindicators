@@ -393,6 +393,9 @@ class IndicatorVirtualBox( IndicatorBase ):
 
             virtual_machines = top_group.get_items()
 
+#TODO Why is this exception here?
+#Is this from way back when a text file was parsed?
+#Maybe go back in the repository and see...if possible, and if so, remove the exception.
         except Exception as e:
             self.get_logging().exception( e )
             virtual_machines = [ ]

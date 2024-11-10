@@ -1274,16 +1274,16 @@ class IndicatorLunar( IndicatorBase ):
         show next rise/set.  Otherwise, show next rise.
 
         Next rise/set:
-        
+
                       R       S                           Satellite will rise within the five minute window; display next rise/set.
                       R               S                   Satellite will rise within the five minute window; display next rise/set.
                                       R       S           Satellite will rise after five minute window; display next rise; check if in previous transit.
              ^                    ^
           utc_now             utc_now + 5
-        
+
         When ( R < utc_now + 5 ) display next rise/set.
         Otherwise, display next rise and check previous transit in case still underway.
-        
+
         Previous rise/set:
 
            R       S                                                   Satellite has set; display next rise/set.
@@ -1294,7 +1294,7 @@ class IndicatorLunar( IndicatorBase ):
                                                        R       S       Satellite will rise after five minute window; display next rise.
                           ^                    ^
                        utc_now             utc_now + 5
-        
+
         When ( R < utc_now + 5 ) AND ( S > utc_now ) display previous rise/set.
         '''
         satellites = [ ]
@@ -2740,6 +2740,8 @@ class IndicatorLunar( IndicatorBase ):
             elevation.set_text( str( the_elevation ) )
 
 
+#TODO Check the /etc/timezone exists on non Debian
+# https://superuser.com/questions/309034/how-to-check-which-timezone-in-linux
     def get_default_city( self ):
         try:
             timezone = self.process_get( "cat /etc/timezone" )

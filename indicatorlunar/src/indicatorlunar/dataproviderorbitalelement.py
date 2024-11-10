@@ -344,47 +344,35 @@ class DataProviderOrbitalElement( DataProvider ):
                 name_end = 194
                 valid_indices = [ 8, 14, 20, 26, 36, 37, 47, 48, 58, 59, 69, 70, 80, 92, 104, 105, 107, 117, 123, 127, 137, 142, 146, 150, 161, 166 ] # Ignore 132.
 
-            try:
-                with open( filename, 'r', encoding = "utf-8" ) as f:
-                    for line in f.read().splitlines():
-                        keep = True
-                        for i in valid_indices:
-                            if len( line [ i - 1 ].strip() ) > 0:
-                                keep = False
-                                break
+            with open( filename, 'r', encoding = "utf-8" ) as f:
+                for line in f.read().splitlines():
+                    keep = True
+                    for i in valid_indices:
+                        if len( line [ i - 1 ].strip() ) > 0:
+                            keep = False
+                            break
 
-                        if keep:
-                            name = line[ name_start - 1 : name_end - 1 + 1 ].strip()
-                            oe = OE( name, line, orbital_element_data_type )
-                            oe_data[ oe.get_name().upper() ] = oe
-
-            except Exception as e:
-                oe_data = { }
-                logging.exception( e )
-                logging.error( "Error reading orbital element data from: " + filename )
+                    if keep:
+                        name = line[ name_start - 1 : name_end - 1 + 1 ].strip()
+                        oe = OE( name, line, orbital_element_data_type )
+                        oe_data[ oe.get_name().upper() ] = oe
 
         elif is_xephem_data:
-            try:
-                with open( filename, 'r', encoding = "utf-8" ) as f:
-                    for line in f.read().splitlines():
-                        if not line.startswith( '{' ):
-                            # Sometimes the COBS download emits an error message of the form:
-                            #   {"code": "400",
-                            #    "message": "Invalid integer value provided in the parameter.",
-                            #    "moreInfo": "invalid literal for int() with base 10: 'false'",
-                            #    "signature": {"source": "COBS Query API", "version": "1.3", "date": "2024 May"}}
-                            # In this event, keep the download file as is for bug tracking if needed,
-                            # but skip loading the data (there is no data to load).
-                            # When the cache becomes stale,
-                            # a fresh (and hopefully successful) download will occur.
-                            name = line[ : line.find( ',' ) ].strip()
-                            oe = OE( name, line, orbital_element_data_type )
-                            oe_data[ oe.get_name().upper() ] = oe
-
-            except Exception as e:
-                oe_data = { }
-                logging.exception( e )
-                logging.error( "Error reading orbital element data from: " + filename )
+            with open( filename, 'r', encoding = "utf-8" ) as f:
+                for line in f.read().splitlines():
+                    if not line.startswith( '{' ):
+                        # Sometimes the COBS download emits an error message of the form:
+                        #   {"code": "400",
+                        #    "message": "Invalid integer value provided in the parameter.",
+                        #    "moreInfo": "invalid literal for int() with base 10: 'false'",
+                        #    "signature": {"source": "COBS Query API", "version": "1.3", "date": "2024 May"}}
+                        # In this event, keep the download file as is for bug tracking if needed,
+                        # but skip loading the data (there is no data to load).
+                        # When the cache becomes stale,
+                        # a fresh (and hopefully successful) download will occur.
+                        name = line[ : line.find( ',' ) ].strip()
+                        oe = OE( name, line, orbital_element_data_type )
+                        oe_data[ oe.get_name().upper() ] = oe
 
         else:
             oe_data = { }

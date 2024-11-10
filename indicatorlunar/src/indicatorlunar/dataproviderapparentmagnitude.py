@@ -143,19 +143,13 @@ class DataProviderApparentMagnitude( DataProvider ):
         Otherwise, returns an empty dictionary and may write to the log.
         '''
         am_data = { }
-        try:
-            with open( filename, 'r', encoding = "utf-8" ) as f:
-                for line in f.read().splitlines():
-                    last_comma = line.rfind( ',' )
-                    name = line[ 0 : last_comma ]
-                    apparent_magnitude = line[ last_comma + 1 : ]
-                    am = AM( name, apparent_magnitude )
-                    am_data[ am.get_name().upper() ] = am
-
-        except Exception as e:
-            am_data = { }
-            logging.exception( e )
-            logging.error( "Error reading apparent magnitude data from: " + filename )
+        with open( filename, 'r', encoding = "utf-8" ) as f:
+            for line in f.read().splitlines():
+                last_comma = line.rfind( ',' )
+                name = line[ 0 : last_comma ]
+                apparent_magnitude = line[ last_comma + 1 : ]
+                am = AM( name, apparent_magnitude )
+                am_data[ am.get_name().upper() ] = am
 
         return am_data
 

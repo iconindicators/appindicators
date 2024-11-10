@@ -84,11 +84,11 @@ from gi.repository import Notify
 try:
     gi.require_version( "AyatanaAppIndicator3", "0.1" )
     from gi.repository import AyatanaAppIndicator3 as AppIndicator
-except: #TODO On Fedora, run this but change to except Exception as e: and print the e then can specify the exception.
+except ValueError:
     try:
         gi.require_version( "AppIndicator3", "0.1" )
         from gi.repository import AppIndicator3 as AppIndicator # For Fedora.
-    except:
+    except ValueError:
         print( "Unable to find neither AyatanaAppIndicator3 nor AppIndicator3.")
         sys.exit( 1 )
 
@@ -1932,14 +1932,8 @@ class IndicatorBase( ABC ):
 
         config = { }
         if config_file.is_file():
-            try:
-                with open( config_file, 'r', encoding = "utf-8" ) as f_in:
-                    config = json.load( f_in )
-
-            except Exception as e:
-                config = { }
-                logging.exception( e )
-                logging.error( "Error reading configuration: " + config_file )
+            with open( config_file, 'r', encoding = "utf-8" ) as f_in:
+                config = json.load( f_in )
 
         self.load_config( config ) # Call to implementation in indicator.
 
@@ -2002,13 +1996,8 @@ class IndicatorBase( ABC ):
         config_file = \
             self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
 
-        try:
-            with open( config_file, 'w', encoding = "utf-8" ) as f_out:
-                f_out.write( json.dumps( config ) )
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing configuration: " + config_file )
+        with open( config_file, 'w', encoding = "utf-8" ) as f_out:
+            f_out.write( json.dumps( config ) )
 
         self.id_save_config = 0
         return False
@@ -2180,14 +2169,8 @@ class IndicatorBase( ABC ):
         data = None
         if cache_file: # A value of "" evaluates to False.
             filename = cache_directory / cache_file
-            try:
-                with open( filename, 'rb' ) as f_in:
-                    data = pickle.load( f_in )
-
-            except Exception as e:
-                data = None
-                logging.exception( e )
-                logging.error( "Error reading from cache: " + filename )
+            with open( filename, 'rb' ) as f_in:
+                data = pickle.load( f_in )
 
         return data
 
@@ -2215,15 +2198,8 @@ class IndicatorBase( ABC ):
             extension
 
         cache_file = self.get_cache_directory() / filename
-
-        try:
-            with open( cache_file, 'wb' ) as f_out:
-                pickle.dump( binary_data, f_out )
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing to cache: " + cache_file )
-            cache_file = None
+        with open( cache_file, 'wb' ) as f_out:
+            pickle.dump( binary_data, f_out )
 
         return cache_file
 
@@ -2276,14 +2252,8 @@ class IndicatorBase( ABC ):
     def _read_cache_text( self, cache_file ):
         text = ""
         if cache_file.is_file():
-            try:
-                with open( cache_file, 'r', encoding = "utf-8" ) as f_in:
-                    text = f_in.read()
-
-            except Exception as e:
-                text = ""
-                logging.exception( e )
-                logging.error( "Error reading from cache: " + cache_file )
+            with open( cache_file, 'r', encoding = "utf-8" ) as f_in:
+                text = f_in.read()
 
         return text
 
@@ -2291,7 +2261,7 @@ class IndicatorBase( ABC ):
     def write_cache_text_without_timestamp( self, text, filename ):
         '''
         Writes text to a file in the cache.
-        
+
         text: The text to write.
         filename: The name of the file.
 
@@ -2326,13 +2296,8 @@ class IndicatorBase( ABC ):
 
 
     def _write_cache_text( self, text, cache_file ):
-        try:
-            with open( cache_file, 'w', encoding = "utf-8" ) as f_out:
-                f_out.write( text )
-
-        except Exception as e:
-            logging.exception( e )
-            logging.error( "Error writing to cache: " + cache_file )
+        with open( cache_file, 'w', encoding = "utf-8" ) as f_out:
+            f_out.write( text )
 
         return cache_file
 
