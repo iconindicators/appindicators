@@ -398,21 +398,6 @@ class AstroBase( ABC ):
     MAGNITUDE_MINIMUM = -10.0 # Have found (erroneous) magnitudes in comet OE data which are brighter than the sun, so set a lower limit.
 
 
-    # Returns a dictionary with astronomical information:
-    #     Key is a tuple of a BodyType, a name tag and a data tag.
-    #     Value is the calculated astronomical information as a string.
-    #
-    # Latitude, longitude are floating point numbers representing decimal degrees.
-    # Elevation is a floating point number representing metres above sea level.
-    # Maximum magnitude applies to planets, stars, comets and minor planets.
-    #
-    # If a body is never up, no data is added.
-    # If a body is always up, the current azimuth/altitude are added.
-    # If the body will rise/set, the next rise date/time, next set date/time and current azimuth/altitude are added.
-    # For satellites, a satellite which is yet to rise or in transit will have the rise and set date/time and azimuth/altitude.
-    # For a polar satellite, only the azimuth/altitude is added.
-    #
-    # NOTE: Any error when computing a body no result is added for that body.
     @staticmethod
     @abstractmethod
     def calculate(
@@ -425,36 +410,65 @@ class AstroBase( ABC ):
             minor_planets, minor_planet_data, minor_planet_apparent_magnitude_data,
             apparent_magnitude_maximum,
             logging = None ):
+        '''
+        Returns a dictionary with astronomical information:
+            Key is a tuple of a BodyType, a name tag and a data tag.
+            Value is the calculated astronomical information as a string.
+
+        Latitude, longitude are floating point numbers in decimal degrees.
+        Elevation is a floating point number for metres above sea level.
+        Maximum magnitude applies to planets, stars, comets and minor planets.
+        
+        If a body is never up, no data is added.
+        If a body is always up, the current azimuth/altitude are added.
+        If the body will rise/set, the next rise date/time, next set date/time
+        and current azimuth/altitude are added.
+        For satellites, a satellite which is yet to rise or in transit will
+        have the rise and set date/time and azimuth/altitude.
+        For a polar satellite, only the azimuth/altitude is added.
+
+        NOTE: Any error when computing a body no result is added for that body.
+        '''
 
         return { }
 
 
-    # Return a list of cities, sorted alphabetically, sensitive to locale.
     @staticmethod
     @abstractmethod
     def get_cities():
+        '''
+        Return a list of cities, sorted alphabetically, sensitive to locale.
+        '''
+
         return [ ]
 
 
-    # Returns a string specifying third party credit; otherwise an empty string.
-    # Format is a credit string followed by an optional URL.
     @staticmethod
     @abstractmethod
     def get_credit():
+        '''
+        Returns a string specifying third party credit; otherwise an
+        empty string.  Format is a credit string followed by an optional URL.
+        '''
         return ""
 
 
-    # Returns a tuple of floats of the latitude, longitude and elevation for the city.
     @staticmethod
     @abstractmethod
     def get_latitude_longitude_elevation( city ):
+        '''
+        Returns a tuple of floats of the latitude, longitude and elevation for
+        the city.
+        '''
         return 0.0, 0.0, 0.0
 
 
-    # Returns the version of the underlying astronomical library.
     @staticmethod
     @abstractmethod
     def get_version():
+        '''
+        Returns the version of the underlying astronomical library.
+        '''
         return None
 
 
@@ -493,17 +507,18 @@ class AstroBase( ABC ):
         return [ i[ AstroBase._STARS_INDEX_TAG_TRANSLATION ] for i in AstroBase.STARS ]
 
 
-    # Calculate apparent magnitude.
-    #
-    # May throw a value error or similar if bad numbers/calculations occur.
-    #
-    # https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId564354
     @staticmethod
     def get_apparent_magnitude_gk(
             g_absolute_magnitude,
             k_luminosity_index,
             body_earth_distance_au,
             body_sun_distance_au ):
+        '''
+        Calculate apparent magnitude.
+        May throw a value error or similar if bad numbers/calculations occur.
+
+        https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId564354
+        '''
 
         return \
             g_absolute_magnitude + \
@@ -511,12 +526,6 @@ class AstroBase( ABC ):
             2.5 * k_luminosity_index * math.log10( body_sun_distance_au )
 
 
-    # Calculate apparent magnitude.
-    #
-    # May throw a value error or similar if bad numbers/calculations occur.
-    #
-    # https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId564354
-    # https://www.britastro.org/asteroids/dymock4.pdf
     @staticmethod
     def get_apparent_magnitude_hg(
             h_absolute_magnitude,
@@ -524,9 +533,16 @@ class AstroBase( ABC ):
             body_earth_distance_au,
             body_sun_distance_au,
             earth_sun_distance_au ):
+        '''
+        Calculate apparent magnitude.
+        May throw a value error or similar if bad numbers/calculations occur.
 
-        # The division may result in a number greater than 1 in the fifth or sixth decimal place
-        # and when the arccos is executed, throws:
+        https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId564354
+        https://www.britastro.org/asteroids/dymock4.pdf        
+        '''
+
+        # The division below may result in a number greater than 1 in the fifth
+        # or sixth decimal place and when the arccos is executed, throws:
         #
         #    'ValueError: math domain error'
         #
@@ -535,7 +551,8 @@ class AstroBase( ABC ):
         #    https://math.stackexchange.com/questions/4060964/floating-point-division-resulting-in-a-value-exceeding-1-but-should-be-equal-to
         #
         # suggests setting an upper bound to the division with a value +/- 1.0.
-        # However, the subsequent value for beta is zero and feeding into tan( 0 ) yields zero and the immediate logarithm is undefined!
+        # However, the subsequent value for beta is zero and feeding into
+        # tan( 0 ) yields zero and the immediate logarithm is undefined!
         # Not really sure what can be done, or should be done;
         # leave things as they are and the caller can catch the error/exception.
         numerator = \
@@ -559,13 +576,18 @@ class AstroBase( ABC ):
         return apparent_magnitude
 
 
-    # Get the lunar phase.
-    #
-    #    illumination_percentage The brightness from 0 to 100 inclusive.
-    #    next_full_moon_date The date of the next full moon.
-    #    next_new_moon_date The date of the next new moon.
     @staticmethod
-    def get_lunar_phase( illumination_percentage, next_full_moon_date, next_new_moon_date ):
+    def get_lunar_phase(
+            illumination_percentage,
+            next_full_moon_date,
+            next_new_moon_date ):
+        '''
+        Get the lunar phase.
+
+        illumination_percentage The brightness from 0 to 100 inclusive.
+        next_full_moon_date The date of the next full moon.
+        next_new_moon_date The date of the next new moon.
+        '''
         if illumination_percentage >= 99:
             phase = AstroBase.LUNAR_PHASE_FULL_MOON
 
@@ -595,12 +617,15 @@ class AstroBase( ABC ):
         return phase
 
 
-    # Compute the sidereal decimal time for the given longitude (in floating point radians).
-    #
-    # Reference:
-    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
     @staticmethod
     def get_sidereal_time( utc_now, longitude ):
+        '''
+        Compute the sidereal decimal time for the given longitude (in
+        floating point radians).
+
+        Reference
+            Practical Astronomy with Your Calculator by Peter Duffett-Smith.
+        '''
         # Find the Julian date.  Section 4 of the reference.
         # Assume the date is always later than 15th October, 1582.
         y = utc_now.year
@@ -612,7 +637,7 @@ class AstroBase( ABC ):
             ( utc_now.second / ( 60 * 60 * 24 ) ) + \
             ( utc_now.microsecond / ( 60 * 60 * 24 * 1000 ) )
 
-        if m == 1 or m == 2:
+        if m in { 1, 2 }:
             y_prime = y - 1
             m_prime = m + 12
 
@@ -640,27 +665,6 @@ class AstroBase( ABC ):
         return ( greenwich_sidereal_time_decimal + longitude_in_hours ) % 24 # Local sidereal time as a decimal time.
 
 
-    # Compute the bright limb angle (relative to zenith) between the sun and a planetary body (typically the moon).
-    # Measured in radians, counter clockwise from a positive y axis.
-    #
-    # Right ascension, declination, latitude and longitude are floating point radians.
-    #
-    # References:
-    #  'Astronomical Algorithms' Second Edition by Jean Meeus (chapters 14 and 48).
-    #  'Practical Astronomy with Your Calculator' by Peter Duffett-Smith.
-    #  http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
-    #  http://www.geoastro.de/SME/
-    #  http://futureboy.us/fsp/moon.fsp
-    #  http://www.timeanddate.com/moon/australia/sydney
-    #  https://www.calsky.com/cs.cgi?cha=6&sec=1
-    #
-    # Other references...
-    #  http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
-    #  https://sites.google.com/site/astronomicalalgorithms
-    #  http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
-    #  https://github.com/brandon-rhodes/pyephem/issues/24
-    #  http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitudeInDegrees/13425515#13425515
-    #  http://astro.ukho.gov.uk/data/tn/naotn74.pdf
     @staticmethod
     def get_zenith_angle_of_bright_limb(
             utc_now,
@@ -670,7 +674,31 @@ class AstroBase( ABC ):
             body_dec,
             observer_lat,
             observer_lon ):
+        '''
+        Compute the bright limb angle (relative to zenith) between the sun and
+        a planetary body (typically the moon), measured in radians, counter
+        clockwise from a positive y axis.
 
+        Right ascension, declination, latitude and longitude are floating
+        point radians.
+
+        References
+            Astronomical Algorithms Second Edition by Jean Meeus (chapters 14 and 48).
+            Practical Astronomy with Your Calculator by Peter Duffett-Smith.
+            http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
+            http://www.geoastro.de/SME/
+            http://futureboy.us/fsp/moon.fsp
+            http://www.timeanddate.com/moon/australia/sydney
+            https://www.calsky.com/cs.cgi?cha=6&sec=1
+
+        Other references
+            http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
+            https://sites.google.com/site/astronomicalalgorithms
+            http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
+            https://github.com/brandon-rhodes/pyephem/issues/24
+            http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitudeInDegrees/13425515#13425515
+            http://astro.ukho.gov.uk/data/tn/naotn74.pdf
+        '''
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
         y = math.cos( sun_dec ) * math.sin( sun_ra - body_ra )
         x = math.sin( sun_dec ) * math.cos( body_dec ) - math.cos( sun_dec ) * math.sin( body_dec ) * math.cos( sun_ra - body_ra )
@@ -693,18 +721,21 @@ class AstroBase( ABC ):
         return ( position_angle_of_bright_limb - parallactic_angle ) % ( 2.0 * math.pi )
 
 
-    # Take a start/end date/time in UTC to define a search window for a satellite transit
-    # and determine where a given start/end hour will overlap.
-    #
-    # Used, for example, to limit satellite passes dusk.
-    #
-    # The start hour (as date/time in UTC) < end hour (as date/time UTC).
     @staticmethod
     def get_start_end_windows(
             start_date_time,
             end_date_time,
             start_hour_as_date_time,
             end_hour_as_date_time ):
+        '''
+        Take a start/end date/time in UTC to define a search window for a
+        satellite transit and determine where a given start/end hour will
+        overlap.
+
+        Used, for example, to limit satellite passes dusk.
+
+        The start hour (as date/time in UTC) < end hour (as date/time UTC).
+        '''
 
         #   SH            EH
         #                 SH            EH

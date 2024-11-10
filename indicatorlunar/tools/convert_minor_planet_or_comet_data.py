@@ -40,8 +40,10 @@ import gzip
 import textwrap
 
 
-# https://www.minorplanetcenter.net/iau/info/PackedDates.html
 def get_unpacked_date( packed_date ):
+    '''
+    https://www.minorplanetcenter.net/iau/info/PackedDates.html
+    '''
 
     def get_month_or_day_from_packed( packed_month_or_day ):
         if packed_month_or_day.isdigit():
@@ -70,8 +72,10 @@ def get_unpacked_date( packed_date ):
 
 
 
-# https://www.minorplanetcenter.net/iau/info/PackedDates.html
 def get_packed_date( year, month, day ):
+    '''
+    https://www.minorplanetcenter.net/iau/info/PackedDates.html
+    '''
     packed_year = year[ 2 : ]
     if int( year ) < 1900:
         packed_year = 'I' + packed_year
@@ -98,12 +102,16 @@ def get_packed_date( year, month, day ):
     return packed_year + packed_month + packed_day
 
 
-# References:
-#   https://asteroid.lowell.edu/astorb/
-#   https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
-#   https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
-#   https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/astorb2edb.pl
-def process_and_write_one_line_lowell_minorplanet( line, output_file, to_skyfield ):
+def process_and_write_one_line_lowell_minorplanet(
+        line,
+        output_file,
+        to_skyfield ):
+    '''
+    https://asteroid.lowell.edu/astorb/
+    https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
+    https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
+    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/astorb2edb.pl
+    '''
     # Field numbers:  1  2   3   4   5   6   7   8   9  10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25
     start_indices = [ 1, 8, 27, 43, 50, 55, 60, 66, 74, 96, 101, 107, 116, 127, 138, 149, 159, 170, 182, 191, 200, 208, 217, 234, 251 ]
     start_indices = [ x - 1 for x in start_indices ] # Offset back to zero to match each line read into a string.
@@ -212,11 +220,14 @@ def process_and_write_one_line_lowell_minorplanet( line, output_file, to_skyfiel
         output_file.write( separator.join( components ) + '\n' )
 
 
-# References:
-#   https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
-#   https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
-#   https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/mpcorb2edb.pl
-def process_and_write_one_line_minorplanetcenter_minorplanet_to_xephem( line, output_file ):
+def process_and_write_one_line_minorplanetcenter_minorplanet_to_xephem(
+        line,
+        output_file ):
+    '''
+    https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
+    https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
+    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/mpcorb2edb.pl
+    '''
     # Field numbers:  0   1   2   3   4   5   6   7   8   9   10   11   12   13   14   15   16   17   18   19   20   21   22
     start_indices = [ 1,  9, 15, 21, 27, 38, 49, 60, 71, 81,  93, 106, 108, 118, 124, 128, 138, 143, 147, 151, 162, 167, 195 ]
     end_indices =   [ 7, 13, 19, 25, 35, 46, 57, 68, 79, 91, 103, 106, 116, 122, 126, 136, 141, 145, 149, 160, 165, 194, 202 ]
@@ -268,11 +279,14 @@ def process_and_write_one_line_minorplanetcenter_minorplanet_to_xephem( line, ou
         output_file.write( ','.join( components ) + '\n' )
 
 
-# References:
-#   https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
-#   https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
-#   https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
-def process_and_write_one_line_minorplanetcenter_comet_to_xephem( line, output_file ):
+def process_and_write_one_line_minorplanetcenter_comet_to_xephem(
+        line,
+        output_file ):
+    '''
+    https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
+    https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
+    https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
+    '''
     # Field numbers:  0  1   2   3   4   5   6   7   8   9  10  11  12  13  14   15   16   17
     start_indices = [ 1, 5,  6, 15, 20, 23, 31, 42, 52, 62, 72, 82, 86, 88, 92,  97, 103, 160 ]
     end_indices =   [ 4, 5, 12, 18, 21, 29, 39, 49, 59, 69, 79, 85, 87, 89, 95, 100, 158, 168 ]

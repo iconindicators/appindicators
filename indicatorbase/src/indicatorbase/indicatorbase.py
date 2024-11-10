@@ -56,7 +56,7 @@ import tempfile
 import threading
 import webbrowser
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from bisect import bisect_right
 from importlib import metadata
 from pathlib import Path, PosixPath
@@ -551,6 +551,11 @@ class IndicatorBase( ABC ):
             self.request_update( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
 
 
+    @abstractmethod
+    def update( self, menu ):
+        raise NotImplementedError()
+
+
     def _update( self ):
         update_start = datetime.datetime.now()
 
@@ -568,7 +573,7 @@ class IndicatorBase( ABC ):
 
         menu = Gtk.Menu()
 
-        # Call to implementation in indicator.        
+        # Call to implementation in indicator.
         next_update_in_seconds = self.update( menu )
 
         if self.is_debug():
@@ -825,6 +830,11 @@ class IndicatorBase( ABC ):
         about_dialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
 
 
+    @abstractmethod
+    def on_preferences( self, dialog ):
+        raise NotImplementedError()
+
+
     def _on_preferences( self, menuitem ):
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
@@ -838,7 +848,7 @@ class IndicatorBase( ABC ):
         if response_type == Gtk.ResponseType.OK:
             self.request_save_config()
 
-            # Allow a second for the lock to release so the update will proceed.            
+            # Allow a second for the lock to release so the update will proceed.
             self.request_update( 1 )
 
         else:
@@ -1792,8 +1802,7 @@ class IndicatorBase( ABC ):
         '''
         Reference: https://stackoverflow.com/a/56233642/2156453
         '''
-
-        if not ( x_values[ 0 ] <= x <= x_values[ -1 ] ):
+        if not x_values[ 0 ] <= x <= x_values[ -1 ]:
             raise ValueError( "x out of bounds!" )
 
         if any( y - x <= 0 for x, y in zip( x_values, x_values[ 1 : ] ) ):
@@ -1909,6 +1918,11 @@ class IndicatorBase( ABC ):
         return downloaded
 
 
+    @abstractmethod
+    def load_config( self, config ):
+        raise NotImplementedError()
+
+
     def _load_config( self ):
         ''' Read a dictionary of configuration from a JSON text file. '''
         config_file = \
@@ -1972,6 +1986,11 @@ class IndicatorBase( ABC ):
 
         else:
             self.request_save_config( IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
+
+
+    @abstractmethod
+    def save_config( self ):
+        raise NotImplementedError()
 
 
     def _save_config( self ):

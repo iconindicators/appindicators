@@ -31,14 +31,16 @@ from dataprovider import DataProvider
 class DataProviderApparentMagnitude( DataProvider ):
     ''' Download and persist apparent magnitude for comets and minor planets. '''
 
-    # Download apparent magnitude data for comets and minor planets
-    # and save to the given filename.
     @staticmethod
     def download(
             filename,
             logging,
             is_comet,
             apparent_magnitude_maximum ):
+        '''
+        Download apparent magnitude data for comets and minor planets and save
+        to the given filename.
+        '''
 
         if is_comet:
             downloaded = False # COBS does not directly provide apparent magnitude data.
@@ -50,10 +52,15 @@ class DataProviderApparentMagnitude( DataProvider ):
         return downloaded
 
 
-    # Download apparent magnitude data for minor planets from Lowell Minor Planet Services
-    # and saves to the given filename.
     @staticmethod
-    def _download_from_lowell_minor_planet_services( filename, logging, apparent_magnitude_maximum ):
+    def _download_from_lowell_minor_planet_services(
+            filename,
+            logging,
+            apparent_magnitude_maximum ):
+        '''
+        Download apparent magnitude data for minor planets from Lowell Minor
+        Planet Services and saves to the given filename.
+        '''
         try:
             variables = {
                 "date": datetime.date.today().isoformat(),
@@ -124,15 +131,17 @@ class DataProviderApparentMagnitude( DataProvider ):
         return downloaded
 
 
-    # Load apparent magnitude data from the given filename.
-    #
-    # Returns a dictionary:
-    #    Key: Object/body name
-    #    Value: AM object
-    #
-    # Otherwise, returns an empty dictionary and may write to the log.
     @staticmethod
     def load( filename, logging ):
+        '''
+        Load apparent magnitude data from the given filename.
+
+        Returns a dictionary
+            Key: Object/body name
+            Value: AM object
+
+        Otherwise, returns an empty dictionary and may write to the log.
+        '''
         am_data = { }
         try:
             with open( filename, 'r', encoding = "utf-8" ) as f:

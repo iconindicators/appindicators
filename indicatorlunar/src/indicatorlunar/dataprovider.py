@@ -28,19 +28,23 @@ from abc import ABC, abstractmethod
 class DataProvider( ABC ):
     ''' Base class for downloading and persisting data for astronomical objects. '''
 
-    # Download data and save to file.
-    #
-    # Return True on success; false otherwise and may log.
     @staticmethod
     @abstractmethod
     def download( filename, logging, *args ):
+        '''
+        Download data and save to file.
+
+        Return True on success; false otherwise and may log.
+        '''
         return True
 
 
-    # Load data from file and return in a dictionary.
-    #
-    # Return dictionary which may be empty and may log.
     @staticmethod
     @abstractmethod
     def load( filename, logging, *args ):
+        '''
+        Load data from file and return in a dictionary.
+
+        Return dictionary which may be empty and may log.
+        '''
         return { }

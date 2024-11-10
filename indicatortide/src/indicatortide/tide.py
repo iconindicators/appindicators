@@ -22,13 +22,15 @@
 class Reading():
     ''' Information for a single tidal event. '''
 
-    # date: Date of reading, as a string.
-    # time: Time of reading, as a string.
-    # location: Name of port or place.
-    # level: The tide level, as a string.
-    # is_high: True if the tide is high; false otherwise.
-    # url: The URL used to source the tide information.
     def __init__( self, date, time, location, is_high, level, url ):
+        '''
+        date: Date of reading, as a string.
+        time: Time of reading, as a string.
+        location: Name of port or place.
+        level: The tide level, as a string.
+        is_high: True if the tide is high; false otherwise.
+        url: The URL used to source the tide information.
+        '''
         self.date = date
         self.time = time
         self.location = location
@@ -49,13 +51,13 @@ class Reading():
         return self.location
 
 
-    # Returns true if tide is high; false otherwise.
     def is_high( self ):
+        ''' Returns true if tide is high; false otherwise. '''
         return self._is_high
 
 
-    # Returns the level of this tide.
     def get_level( self ):
+        ''' Returns the level of this tide. '''
         return self.level
 
 

@@ -279,8 +279,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 ppas.append( PPA( ppa.get_user(), ppa.get_name(), None, None ) )
                 ppas[ -1 ].set_status( PPA.Status.OK )
-                for key in temp:
-                    ppas[ -1 ].add_published_binary( temp[ key ] )
+                for key, value in temp.items():
+                    ppas[ -1 ].add_published_binary( value )
 
         PPA.sort( self.ppas )
         return ppas
@@ -312,46 +312,49 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         webbrowser.open( url )
 
 
-    # Get a list of the published binaries for each PPA.
-    # From that extract the ID for each binary which is then used to get the download count for each binary.
-    # The ID is the number at the end of self_link.
-    # The published binary object looks like this...
-    # {
-    #     "total_size": 4,
-    #     "start": 0,
-    #     "entries": [
-    #     {
-    #         "distro_arch_series_link": "https://api.launchpad.net/1.0/ubuntu/precise/i386",
-    #         "removal_comment": null,
-    #         "display_name": "indicator-lunar 1.0.9-1 in precise i386",
-    #         "date_made_pending": null,
-    #         "date_superseded": null,
-    #         "priority_name": "OPTIONAL",
-    #         "http_etag": "\"94b9873b47426c010c4117854c67c028f1acc969-771acce030b1683dc367b5cbf79376d386e7f3b3\"",
-    #         "self_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/28105302",
-    #         "binary_package_version": "1.0.9-1",
-    #         "resource_type_link": "https://api.launchpad.net/1.0/#binary_package_publishing_history",
-    #         "component_name": "main",
-    #         "status": "Published",
-    #         "date_removed": null,
-    #         "pocket": "Release",
-    #         "date_published": "2012-08-09T10:30:49.572656+00:00",
-    #         "removed_by_link": null, "section_name": "python",
-    #         "date_created": "2012-08-09T10:27:31.762212+00:00",
-    #         "binary_package_name": "indicator-lunar",
-    #         "archive_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa",
-    #         "architecture_specific": false,
-    #         "scheduled_deletion_date": null
-    #     }
-    #     {
-    #     ,...
-    # }
-    #
-    # References:
-    #     http://launchpad.net/+apidoc
-    #     http://help.launchpad.net/API/launchpadlib
-    #     http://help.launchpad.net/API/Hacking
     def download_ppa_statistics( self ):
+        '''
+        Get a list of the published binaries for each PPA.
+        From that extract the ID for each binary which is then used to get the download count for each binary.
+        The ID is the number at the end of self_link.
+        The published binary object looks like this...
+
+        {
+          "total_size": 4,
+          "start": 0,
+          "entries": [
+          {
+            "distro_arch_series_link": "https://api.launchpad.net/1.0/ubuntu/precise/i386",
+            "removal_comment": null,
+            "display_name": "indicator-lunar 1.0.9-1 in precise i386",
+            "date_made_pending": null,
+            "date_superseded": null,
+            "priority_name": "OPTIONAL",
+            "http_etag": "\"94b9873b47426c010c4117854c67c028f1acc969-771acce030b1683dc367b5cbf79376d386e7f3b3\"",
+            "self_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/28105302",
+            "binary_package_version": "1.0.9-1",
+            "resource_type_link": "https://api.launchpad.net/1.0/#binary_package_publishing_history",
+            "component_name": "main",
+            "status": "Published",
+            "date_removed": null,
+            "pocket": "Release",
+            "date_published": "2012-08-09T10:30:49.572656+00:00",
+            "removed_by_link": null, "section_name": "python",
+            "date_created": "2012-08-09T10:27:31.762212+00:00",
+            "binary_package_name": "indicator-lunar",
+            "archive_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa",
+            "architecture_specific": false,
+            "scheduled_deletion_date": null
+          }
+          {
+          ,...
+        }
+
+        References
+            http://launchpad.net/+apidoc
+            http://help.launchpad.net/API/launchpadlib
+            http://help.launchpad.net/API/Hacking
+        '''
         for ppa in self.ppas:
             ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
             if self.filters.has_filter( ppa.get_user(), ppa.get_name(), ppa.get_series(), ppa.get_architecture() ):
@@ -411,12 +414,16 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return has_publised_binaries
 
 
-    # Use a thread pool executer to get the download counts for each published binary.
-    # References:
-    #    https://docs.python.org/3/library/concurrent.futures.html
-    #    https://pymotw.com/3/concurrent.futures
-    #    http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
     def get_published_binaries( self, ppa, filter_text ):
+        '''
+        Use a thread pool executer to get the download counts for each
+        published binary.
+
+        References
+            https://docs.python.org/3/library/concurrent.futures.html
+            https://pymotw.com/3/concurrent.futures
+            http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
+        '''
         url = \
             "https://api.launchpad.net/1.0/~" + \
             ppa.get_user() + "/+archive/ubuntu/" + \
@@ -802,9 +809,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         if len( model ) > 0:
             ppa_users = [ ]
-            for row in range( len( model ) ):
-                if model[ row ][ IndicatorPPADownloadStatistics.COLUMN_USER ] not in ppa_users:
-                    ppa_users.append( model[ row ][ IndicatorPPADownloadStatistics.COLUMN_USER ] )
+            for i, row in enumerate( model ):
+                if model[ i ][ IndicatorPPADownloadStatistics.COLUMN_USER ] not in ppa_users:
+                    ppa_users.append( model[ i ][ IndicatorPPADownloadStatistics.COLUMN_USER ] )
 
             ppa_users.sort( key = locale.strxfrm )
 
@@ -827,9 +834,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         if len( model ) > 0:
             ppa_names = [ ]
-            for row in range( len( model ) ):
-                if model[ row ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] not in ppa_names:
-                    ppa_names.append( model[ row ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] )
+            for i, row in enumerate( model ):
+                if model[ i ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] not in ppa_names:
+                    ppa_names.append( model[ i ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] )
 
             ppa_names.sort( key = locale.strxfrm )
 
@@ -915,11 +922,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                     if data_has_been_changed:
                         duplicate = False
-                        for row in range( len( model ) ):
-                            if ppa_user_value == model[ row ][ IndicatorPPADownloadStatistics.COLUMN_USER ] and \
-                               ppa_name_value == model[ row ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] and \
-                               series.get_active_text() == model[ row ][ IndicatorPPADownloadStatistics.COLUMN_SERIES ] and \
-                               architectures.get_active_text() == model[ row ][ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ]:
+                        for i, row in enumerate( model ):
+                            if ppa_user_value == model[ i ][ IndicatorPPADownloadStatistics.COLUMN_USER ] and \
+                               ppa_name_value == model[ i ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] and \
+                               series.get_active_text() == model[ i ][ IndicatorPPADownloadStatistics.COLUMN_SERIES ] and \
+                               architectures.get_active_text() == model[ i ][ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ]:
 
                                 duplicate = True
                                 break
@@ -980,6 +987,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 self.on_filter_double_click( filter_treeview, None, None, ppa_treeview )
 
 
+#TODO Double click on an existing filter.
+# The filter text says 'ppa'.
+# I would have thought the filter text would be the list of filter text shown in the display...?
+
     def on_filter_double_click( self, filter_treeview, row_number, treeviewcolumnm, ppa_treeview ):
         filter_model, filter_treeiter = filter_treeview.get_selection().get_selected()
         ppa_model, ppa_treeiter = ppa_treeview.get_selection().get_selected()
@@ -993,18 +1004,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         ppa_users_names = Gtk.ComboBoxText.new()
         if row_number is None: # Adding
             temp = [ ] # Used to ensure duplicates are not added.
-            for ppa in range( len( ppa_model ) ): # List of PPA User/Names from the list of PPAs in the preferences.
+            for i, row in enumerate( ppa_model ):
                 ppa_user_name = \
-                    ppa_model[ ppa ][ IndicatorPPADownloadStatistics.COLUMN_USER ] + " | " + \
-                    ppa_model[ ppa ][ IndicatorPPADownloadStatistics.COLUMN_NAME ]
+                    ppa_model[ i ][ IndicatorPPADownloadStatistics.COLUMN_USER ] + " | " + \
+                    ppa_model[ i ][ IndicatorPPADownloadStatistics.COLUMN_NAME ]
+
+#TODO Testing...
+                print( "---------------" )
+                print( ppa_model[ i ][ IndicatorPPADownloadStatistics.COLUMN_USER ] )
+                print( ppa_model[ i ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] )
+                print( ppa_model[ row ] )
 
                 if ppa_user_name in temp:
                     continue
 
                 # Ensure the PPA User/Name is not present in the list of filters in the preferences.
                 in_filter_list = False
-                for the_filter in range( len( filter_model ) ):
-                    if ppa_user_name in filter_model[ the_filter ][ IndicatorPPADownloadStatistics.COLUMN_USER ]:
+                for i, row in enumerate( filter_model ):
+                    if ppa_user_name in filter_model[ i ][ IndicatorPPADownloadStatistics.COLUMN_USER ]:
                         in_filter_list = True
                         break
 

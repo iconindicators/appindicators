@@ -241,6 +241,18 @@ Assuming the project is located within the directory `Indicators`, run within th
     sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2n pylint.txt
 ```
 
+To disable a particular check, say `line-too-long`, include in the command:
+
+```
+pylint --disable=line-too-long --recursive=y ...
+```
+
+To disable further checks, repeat the `--disable` option in the command: 
+
+```
+pylint --disable=line-too-long --disable=unused-argument --recursive=y ...
+```
+
 
 ## Convert this Document from MD to HTML
 

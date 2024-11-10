@@ -22,9 +22,13 @@
 class Event():
     ''' A single calendar event. '''
 
-    # Date - String format 'MMM DD'.  For example, 'Jul 05'.
-    # Description - String description of the event.
     def __init__( self, date, description ):
+        '''
+        Date
+            String format 'MMM DD'.  For example, 'Jul 05'.
+        Description
+            String description of the event.
+        '''
         self.date = date
         self.description = description
 

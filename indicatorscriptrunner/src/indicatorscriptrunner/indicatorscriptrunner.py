@@ -573,7 +573,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         return show
 
 
-    # If/when a non-background script is default, render the script name bold.
     def data_function_column_name_renderer(
         self,
         treeviewcolumn,
@@ -581,6 +580,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         treemodel,
         treeiter,
         scripts ):
+        '''
+        If/when a non-background script is default, render the script name bold.
+        '''
 
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
         name = treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
@@ -595,8 +597,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 cell_renderer.set_property( "weight", Pango.Weight.BOLD )
 
 
-    # For when migrating to GTK4...
-    #   https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159/2
     def populate_treestore_and_select_script(
         self,
         treeview_all_scripts,
@@ -604,7 +604,10 @@ class IndicatorScriptRunner( IndicatorBase ):
         scripts,
         select_group,
         select_script ):
-
+        '''
+        For when migrating to GTK4...
+        https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159/2
+        '''
         treestore = treeview_all_scripts.get_model()
         treestore.clear()
 
@@ -911,7 +914,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         groups = sorted( self.get_scripts_by_group( scripts ).keys(), key = str.lower )
 
-        add = True if script is None else False
+        add = script is None
         if add:
             index = 0
             model, treeiter = scripts_treeview.get_selection().get_selected()
@@ -1221,9 +1224,14 @@ class IndicatorScriptRunner( IndicatorBase ):
     def get_scripts_by_group( self, scripts, non_background = True, background = True ):
         scripts_by_group = { }
         for script in scripts:
-            if
-                ( non_background and isinstance( script, NonBackground ) ) or \
-                ( background and isinstance( script, Background ) ):
+            script_is_non_background_and_want_non_background = \
+                non_background and isinstance( script, NonBackground )
+
+            script_is_background_and_want_background = \
+                background and isinstance( script, Background )
+
+            if script_is_non_background_and_want_non_background or \
+               script_is_background_and_want_background:
 
                 if script.get_group() not in scripts_by_group:
                     scripts_by_group[ script.get_group() ] = [ ]
@@ -1247,15 +1255,17 @@ class IndicatorScriptRunner( IndicatorBase ):
         return group, name
 
 
-    # Each time a background script is run, cache the result.
-    #
-    # If for example, one script has an interval of five minutes and another script is hourly,
-    # the hourly script should only be run hourly,
-    # so use a cached result when the quicker script is run.
-    #
-    # Initialise the cache results and set a next update time in the past
-    # to force all (background) scripts to update first time.
     def initialise_background_scripts( self ):
+        '''
+        Each time a background script is run, cache the result.
+
+        If for example, one script has an interval of five minutes and another
+        script is hourly, the hourly script should only be run hourly, so use a
+        cached result when the quicker script is run.
+
+        Initialise the cache results and set a next update time in the past to
+        force all (background) scripts to update first time.        
+        '''
         self.background_script_results = { }
         self.background_script_next_update_time = { }
         today = datetime.datetime.now()

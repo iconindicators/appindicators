@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Converts between Star Trek™ stardates and Gregorian date/times.
 There are two types of stardates: 'classic' and '2009 revised'.
 
@@ -24,9 +24,11 @@ There are two types of stardates: 'classic' and '2009 revised'.
  'classic' stardates
 ===================
 
-The 'classic' stardate is based on STARDATES IN STAR TREK FAQ V1.6 by Andrew Main.
+The 'classic' stardate is based on STARDATES IN STAR TREK FAQ V1.6
+by Andrew Main.
 
-Stardates are related to Julian/Gregorian dates as depicted on the following time line:
+Stardates are related to Julian/Gregorian dates as depicted on the following
+time line:
 
      <------x------x------x------x------x------x------x------>
             |      |      |      |     |       |      |
@@ -36,7 +38,8 @@ Stardates are related to Julian/Gregorian dates as depicted on the following tim
                  46 BC       2162-01-04    2283-10-05
 
 From 6000 BC up to 46 BC, the Egyptian-developed calendar was used.
-Initially based on counting lunar cycles, it was eventually changed to a solar calendar.
+Initially based on counting lunar cycles, it was eventually changed to a solar
+calendar.
 
 Between 46 BC to 1582 AD, the Julian calendar was used.
 This was the first calendar to introduce the "leap year".
@@ -62,25 +65,28 @@ Also, stardate [20]5006.0 becomes [21]00000.0.
 ==============
 
 The '2009 revised' stardate is based on https://en.wikipedia.org/wiki/Stardate.
-"""
+'''
 
 
 import datetime
 import math
 
 
-# The Gregorian dates which reflect the start date for each rate in the 'classic' stardate era.
-# For example, an index of 3 (Gregorian date of 2283/10/5) corresponds to the rate of 0.5 stardate units per day.
+# The Gregorian dates which reflect the start date for each rate in the
+# 'classic' stardate era.
+# For example, an index of 3 (Gregorian date of 2283/10/5) corresponds to
+# the rate of 0.5 stardate units per day.
 # The month is one-based (January = 1).
+tzinfo_ = datetime.timezone( datetime.timedelta( hours = 0 ) )
 _gregorian_dates = [
-    datetime.datetime( 2162, 1, 4, tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) ),
-    datetime.datetime( 2162, 1, 4, tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) ),
-    datetime.datetime( 2270, 1, 26, tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) ),
-    datetime.datetime( 2283, 10, 5, tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) ),
-    datetime.datetime( 2323, 1, 1, tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) ) ]
+    datetime.datetime( 2162, 1, 4, tzinfo = tzinfo_ ),
+    datetime.datetime( 2162, 1, 4, tzinfo = tzinfo_ ),
+    datetime.datetime( 2270, 1, 26, tzinfo = tzinfo_ ),
+    datetime.datetime( 2283, 10, 5, tzinfo = tzinfo_ ),
+    datetime.datetime( 2323, 1, 1, tzinfo = tzinfo_ ) ]
 
 
-# Rates (in stardate units per day) for each 'classic' stardate era.
+''' Rates (in stardate units per day) for each 'classic' stardate era. '''
 _stardate_rates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
 
 
@@ -88,19 +94,21 @@ def get_version():
     return "Version 6.0 (2024-06-11)"
 
 
-# Convert a Gregorian datetime.datetime in UTC to a 'classic' stardate.
-#
-#  The Gregorian datetime.datetime in UTC (1900 <= year <= 9500).
-#
-# Raises an exception if the Gregorian year is out the defined range.
-#
-# Returns a 'classic' stardate with the components:
-#    stardate issue
-#    stardate integer
-#    stardate fraction
 def get_stardate_classic( gregorian_date_time ):
-    if ( gregorian_date_time.year < 1900 ) or ( gregorian_date_time.year > 9500 ):
-        raise Exception( "Gregorian year out of range: 1900 <= year <= 9500." )
+    '''
+    Convert a Gregorian datetime.datetime in UTC to a 'classic' stardate.
+
+    The Gregorian datetime.datetime in UTC (1900 <= year <= 9500).
+
+    Raises an exception if the Gregorian year is out the defined range.
+
+    Returns a 'classic' stardate with the components:
+        stardate issue
+        stardate integer
+        stardate fraction
+    '''
+    if gregorian_date_time.year < 1900 or gregorian_date_time.year > 9500:
+        raise ValueError( "Gregorian year out of range: 1900 <= year <= 9500." )
 
     stardate_issues = [ -1, 0, 19, 19, 21 ]
     stardate_integers = [ 0, 0, 7340, 7840, 0 ]
@@ -114,14 +122,19 @@ def get_stardate_classic( gregorian_date_time ):
     if ( year < 2162 ) or ( year == 2162 and month == 1 and day < 4 ):
         # Pre-stardate era; do the conversion here as a negative time is generated.
         index = 0
-        number_of_seconds = ( _gregorian_dates[ index ] - gregorian_date_time ).total_seconds()
+        number_of_seconds = \
+            ( _gregorian_dates[ index ] - gregorian_date_time ).total_seconds()
+
         number_of_days = number_of_seconds / 60.0 / 60.0 / 24.0
         rate = _stardate_rates[ index ]
         units = number_of_days * rate
 
-        stardate_issue = stardate_issues[ index ] - int( units / stardate_ranges[ index ] )
+        stardate_issue = \
+            stardate_issues[ index ] - int( units / stardate_ranges[ index ] )
 
-        remainder = stardate_ranges[ index ] - ( units % stardate_ranges[ index ] )
+        remainder = \
+            stardate_ranges[ index ] - ( units % stardate_ranges[ index ] )
+
         stardate_integer = int( remainder )
         stardate_fraction = int( remainder * 10.0 ) - ( int( remainder ) * 10 )
 
@@ -130,14 +143,14 @@ def get_stardate_classic( gregorian_date_time ):
         first_period = \
             ( year == 2162 and month == 1 and day >= 4 ) or \
             ( year == 2162 and month > 1 ) or \
-            ( year > 2162 and year < 2270 ) or \
+            ( 2162 < year < 2270 ) or \
             ( year == 2270 and month == 1 and day < 26 )
 
         # Second period of stardates (2270/1/26 - 2283/10/5).
         second_period = \
             ( year == 2270 and month == 1 and day >= 26 ) or \
             ( year == 2270 & month > 1 ) or \
-            ( year > 2270 and year < 2283 ) or \
+            ( 2270 < year < 2283 ) or \
             ( year == 2283 and month < 10 ) or \
             ( year == 2283 and month == 10 and day < 5 )
 
@@ -145,7 +158,7 @@ def get_stardate_classic( gregorian_date_time ):
         third_period = \
             ( year == 2283 and month == 10 and day >= 5 ) or \
             ( year == 2283 and month > 10 ) or \
-            ( year > 2283 and year < 2323 )
+            ( 2283 < year < 2323 )
 
         # Fourth period of stardates (2323/1/1 - ).
         fourth_period = year >= 2323
@@ -163,7 +176,9 @@ def get_stardate_classic( gregorian_date_time ):
             index = 4
 
         else:
-            raise Exception( "Invalid year/month/day: " + str( year ) + "/" + str( month ) + "/" + str( day ) )
+            raise ValueError(
+                "Invalid year/month/day: " + 
+                str( year ) + "/" + str( month ) + "/" + str( day ) )
 
         # Now convert...
         number_of_seconds = (
@@ -171,7 +186,9 @@ def get_stardate_classic( gregorian_date_time ):
 
         number_of_days = number_of_seconds / 60.0 / 60.0 / 24.0
         units = number_of_days * _stardate_rates[ index ]
-        stardate_issue = int( units / stardate_ranges[ index ] ) + stardate_issues[ index ]
+        stardate_issue = \
+            int( units / stardate_ranges[ index ] ) + stardate_issues[ index ]
+
         remainder = units % stardate_ranges[ index ]
         stardate_integer = int( remainder ) + stardate_integers[ index ]
         stardate_fraction = int( remainder * 10.0 ) - ( int( remainder ) * 10 )
@@ -179,39 +196,47 @@ def get_stardate_classic( gregorian_date_time ):
     return stardate_issue, stardate_integer, stardate_fraction
 
 
-# Convert a Gregorian datetime.datetime in UTC to a '2009 revised' stardate.
-#
-#  The Gregorian datetime.datetime in UTC (1900 <= year <= 9500).
-#
-# Raises an exception if the Gregorian year is out the defined range.
-#
-# Returns a '2009 revised' stardate with the components:
-#    stardate integer
-#    stardate fraction
 def get_stardate_2009_revised( gregorian_date_time ):
-    if ( gregorian_date_time.year < 1900 ) or ( gregorian_date_time.year > 9500 ):
-        raise Exception( "Gregorian year out of range: 1900 <= year <= 9500." )
+    '''
+    Convert a Gregorian datetime.datetime in UTC to a '2009 revised' stardate.
+
+    The Gregorian datetime.datetime in UTC (1900 <= year <= 9500).
+
+    Raises an exception if the Gregorian year is out the defined range.
+
+    Returns a '2009 revised' stardate with the components:
+        stardate integer
+        stardate fraction
+    '''
+    if gregorian_date_time.year < 1900 or gregorian_date_time.year > 9500:
+        raise ValueError( "Gregorian year out of range: 1900 <= year <= 9500." )
 
     stardate_integer = gregorian_date_time.year
     stardate_fraction = (
-        datetime.date( gregorian_date_time.year, gregorian_date_time.month, gregorian_date_time.day ) - \
+        datetime.date(
+            gregorian_date_time.year,
+            gregorian_date_time.month,
+            gregorian_date_time.day ) -
         datetime.date( gregorian_date_time.year, 1, 1 ) ).days + 1
 
     return stardate_integer, stardate_fraction
 
 
-# Converts the date/time to the corresponding stardate and determines
-# how many seconds will elapse until that stardate will change.
-#
-#  The Gregorian datetime.datetime must be in UTC (1900 <= year <= 9500).
-#  If classic is True, the classic stardate will be calculated; otherwise '2009 revised'.
-#
-# Raises an exception if the Gregorian year is out the defined range.
-#
-# Returns the number of seconds until the corresponding stardate will change.
 def get_next_update_in_seconds( gregorian_date_time, is_classic ):
-    if ( gregorian_date_time.year < 1900 ) or ( gregorian_date_time.year > 9500 ):
-        raise Exception( "Gregorian year out of range: 1900 <= year <= 9500." )
+    '''
+    Converts the date/time to the corresponding stardate and determines how
+    many seconds will elapse until that stardate will change.
+
+    The Gregorian datetime.datetime must be in UTC (1900 <= year <= 9500).
+    If classic is True, the classic stardate will be calculated;
+    otherwise '2009 revised'.
+
+    Raises an exception if the Gregorian year is out the defined range.
+
+    Returns the number of seconds until the corresponding stardate will change.
+    '''
+    if gregorian_date_time.year < 1900 or gregorian_date_time.year > 9500:
+        raise ValueError( "Gregorian year out of range: 1900 <= year <= 9500." )
 
     if is_classic:
         stardate_issue, stardate_integer, stardate_fraction = \
@@ -246,30 +271,36 @@ def get_next_update_in_seconds( gregorian_date_time, is_classic ):
     return number_of_seconds_to_next_update
 
 
-# Convert a 'classic' stardate to a Gregorian datetime.datetime.
-#
-# Rules:
-#  issue <= 19: 0 <= integer <= 9999, fraction >= 0.
-#  issue == 20: 0 <= integer < 5006, fraction >= 0.
-#  issue >= 21: 0 <= integer <= 99999, fraction >= 0.
-#
-#  The issue number for the stardate can be negative.
-#
-# Raises an exception if the issue/integer/fraction are out of the defined ranges.
-#
-# Returns a Gregorian datetime.datetime.
-def get_gregorian_from_stardate_classic( stardate_issue, stardate_integer, stardate_fraction ):
+def get_gregorian_from_stardate_classic(
+        stardate_issue,
+        stardate_integer,
+        stardate_fraction ):
+    '''
+    Convert a 'classic' stardate to a Gregorian datetime.datetime.
+
+    Rules:
+        issue <= 19: 0 <= integer <= 9999, fraction >= 0.
+        issue == 20: 0 <= integer < 5006, fraction >= 0.
+        issue >= 21: 0 <= integer <= 99999, fraction >= 0.
+
+    The issue number for the stardate can be negative.
+
+    Raises an exception if the issue/integer/fraction are out of the
+    defined ranges.
+
+    Returns a Gregorian datetime.datetime.
+    '''
     if stardate_issue <= 19 and ( stardate_integer < 0 or stardate_integer > 9999 ):
-        raise Exception( "Integer out of range: 0 <= integer <= 9999" )
+        raise ValueError( "Integer out of range: 0 <= integer <= 9999" )
 
     if stardate_issue == 20 and ( stardate_integer < 0 or stardate_integer >= 5006 ):
-        raise Exception( "Integer out of range: 0 <= integer < 5006" )
+        raise ValueError( "Integer out of range: 0 <= integer < 5006" )
 
     if stardate_issue >= 21 and ( stardate_integer < 0 or stardate_integer > 99999 ):
-        raise Exception( "Integer out of range: 0 <= integer <= 99999" )
+        raise ValueError( "Integer out of range: 0 <= integer <= 99999" )
 
     if stardate_fraction < 0:
-        raise Exception( "Fraction cannot be negative." )
+        raise ValueError( "Fraction cannot be negative." )
 
     fraction_length = len( str( stardate_fraction ) )
     fraction_divisor = math.pow( 10.0, fraction_length )
@@ -278,7 +309,7 @@ def get_gregorian_from_stardate_classic( stardate_issue, stardate_integer, stard
         index = 0
         units = stardate_issue * 10000.0 + stardate_integer + stardate_fraction / fraction_divisor
 
-    elif stardate_issue >= 0 and stardate_issue < 19: # First period of stardates (2162/1/4 - 2270/1/26).
+    elif 0 <= stardate_issue < 19: # First period of stardates (2162/1/4 - 2270/1/26).
         index = 1
         units = stardate_issue * 1000.0 + stardate_integer + stardate_fraction / fraction_divisor
 
@@ -286,7 +317,7 @@ def get_gregorian_from_stardate_classic( stardate_issue, stardate_integer, stard
         index = 1
         units = stardate_issue * 19.0 * 1000.0 + stardate_integer + stardate_fraction / fraction_divisor
 
-    elif stardate_issue == 19 and stardate_integer >= 7340 and stardate_integer < 7840: # Second period of stardates (2270/1/26 - 2283/10/5).
+    elif stardate_issue == 19 and 7340 <= stardate_integer < 7840: # Second period of stardates (2270/1/26 - 2283/10/5).
         index = 2
         units = stardate_integer + stardate_fraction / fraction_divisor - 7340
 
@@ -303,7 +334,7 @@ def get_gregorian_from_stardate_classic( stardate_issue, stardate_integer, stard
         units = ( stardate_issue - 21 ) * 10000.0 + stardate_integer + stardate_fraction / fraction_divisor
 
     else:
-        raise Exception( "Illegal issue/integer: " + str( stardate_issue ) + "/" + str( stardate_integer ) )
+        raise ValueError( "Illegal issue/integer: " + str( stardate_issue ) + "/" + str( stardate_integer ) )
 
     days = units / _stardate_rates[ index ]
     hours = ( days - int( days ) ) * 24.0
@@ -329,40 +360,54 @@ def get_gregorian_from_stardate_classic( stardate_issue, stardate_integer, stard
     return gregorian_date_time
 
 
-# Convert a '2009 revised' stardate to a Gregorian datetime.datetime.
-#
-#  The integer part of a stardate corresponds to the Gregorian year.
-#  The fractional part of a stardate (0 <= fraction <= 365, or 366 if integer corresponds to a leap year).
-#
-# Raises an exception if the integer/fraction are out of the defined ranges.
-#
-# Returns a Gregorian datetime.datetime.
-def get_gregorian_from_stardate_2009_revised( stardate_integer, stardate_fraction ):
+def get_gregorian_from_stardate_2009_revised(
+        stardate_integer,
+        stardate_fraction ):
+    '''
+    Convert a '2009 revised' stardate to a Gregorian datetime.datetime.
+
+    The integer part of a stardate corresponds to the Gregorian year.
+    The fractional part of a stardate (0 <= fraction <= 365, or 366 if integer
+    corresponds to a leap year).
+
+    Raises an exception if the integer/fraction are out of the defined ranges.
+
+    Returns a Gregorian datetime.datetime.
+    '''
     if stardate_fraction < 0:
-        raise Exception( "Fraction cannot be negative." )
+        raise ValueError( "Fraction cannot be negative." )
 
     is_leap_year = ( stardate_integer % 4 == 0 and stardate_integer % 100 != 0 ) or stardate_integer % 400 == 0
     if is_leap_year:
         if stardate_fraction > 366:
-            raise Exception( "Integer cannot exceed 366." )
+            raise ValueError( "Integer cannot exceed 366." )
 
     else:
         if stardate_fraction > 365:
-            raise Exception( "Integer cannot exceed 365." )
+            raise ValueError( "Integer cannot exceed 365." )
 
     gregorian_date_time = datetime.date( stardate_integer, 1, 1 )
     gregorian_date_time += datetime.timedelta( days = stardate_fraction - 1 )
     return gregorian_date_time
 
 
-# Returns a stardate in string format.
-#
-#  The stardate issue must be set to None for '2009 revised'.
-#  If show_issue is True, the issue will be included in the string (ignored for '2009 revised').
-#  If padded is True, the integer part of the string will be zero padded (if required).
-#
-# Returns A stardate in string format.
-def to_stardate_string( stardate_issue, stardate_integer, stardate_fraction, show_issue, pad_integer ):
+def to_stardate_string(
+        stardate_issue,
+        stardate_integer,
+        stardate_fraction,
+        show_issue,
+        pad_integer ):
+    '''
+    Returns a stardate in string format.
+
+    The stardate issue must be set to None for '2009 revised'.
+    If show_issue is True, the issue will be included in the string
+    (ignored for '2009 revised').
+    If padded is True, the integer part of the string will be zero padded
+    (if required).
+
+    Returns A stardate in string format.
+    '''
     string_builder = ""
     if stardate_issue is None:
         string_builder = str( stardate_integer ) + "." + str( stardate_fraction )
@@ -392,17 +437,21 @@ def to_stardate_string( stardate_issue, stardate_integer, stardate_fraction, sho
     return string_builder
 
 
-# Determines if a 'classic' stardate requires zero padding.
-#
-# A 'classic' stardate with issue < 21 will have up to four digits in the integer part.
-# However the integer part could be a single digit.
-# If the integer part has fewer than four digits, the stardate is deemed to
-# require padding.
-#
-# Similarly for a 'classic' stardate with issue >= 21, but there are five digits.
-#
-# Returns True if the integer part contains fewer digits than the maximum for the particular issue.
 def requires_padding( stardate_issue, stardate_integer ):
+    '''
+    Determines if a 'classic' stardate requires zero padding.
+
+    A 'classic' stardate with issue < 21 will have up to four digits in the
+    integer part.  However the integer part could be a single digit.
+    If the integer part has fewer than four digits, the stardate is deemed to
+    require padding.
+
+    Similarly for a 'classic' stardate with issue >= 21, but there are
+    five digits.
+
+    Returns True if the integer part contains fewer digits than the maximum
+    for the particular issue.
+    '''
     if stardate_issue < 21:
         padding_required = len( str( stardate_integer ) ) < 4
 

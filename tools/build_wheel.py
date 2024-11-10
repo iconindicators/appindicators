@@ -69,7 +69,8 @@ def _run_checks_on_indicator( indicator_name ):
 
     message = ""
     for path in paths:
-        for path_ in ( path_.resolve() for path_ in path.glob( '**/*' ) if path_.is_file() and not any( [ exclusion in str( path_ ) for exclusion in exclusions ] ) ):
+        for path_ in ( path_.resolve() for path_ in path.glob( '**/*' ) if path_.is_file() and not any( exclusion in str( path_ ) for exclusion in exclusions ) ):
+            print( path_ )
             with open( path_, 'r', encoding = "utf-8" ) as f:
                 if t_o_d_o in f.read().lower():
                     message += f"\t{ path_ }\n"
@@ -77,7 +78,7 @@ def _run_checks_on_indicator( indicator_name ):
     if message:
         message = f"Found one or more { t_o_d_o.upper() }s:\n" + message
 
-    return ""#message
+    return ""#message #TODO Remove the "" and return the message.
 
 
 def _chmod( file, user_permission, group_permission, other_permission ):

@@ -92,8 +92,11 @@ def create_ephemeris_skyfield( out_file, star_ephemeris, stars_and_hips_ ):
     print( "Done" )
 
 
-# Mostly taken from https://github.com/brandon-rhodes/pyephem/blob/master/bin/rebuild-star-data
 def print_ephemeris_pyephem( bsp_file , star_ephemeris, stars_and_hips_ ):
+    '''
+    Mostly taken from
+        https://github.com/brandon-rhodes/pyephem/blob/master/bin/rebuild-star-data
+    '''
     print( "Printing ephemeris for PyEphem..." )
     with load.open( star_ephemeris, "rb" ) as f:
         stars_ = hipparcos.load_dataframe( f )

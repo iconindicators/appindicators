@@ -452,11 +452,14 @@ class AstroPyEphem( AstroBase ):
         return bad
 
 
-    # Calculates common attributes such as rise/set date/time, azimuth/altitude.
-    #
-    # Returns True if the body is never up; false otherwise.
     @staticmethod
     def _calculate_common( data, key, observer, body ):
+        '''
+        Calculates common attributes such as rise/set date/time,
+        azimuth/altitude.
+
+        Returns True if the body is never up; false otherwise.
+        '''
         never_up = False
         try:
             # Must compute az/alt BEFORE rise/set otherwise results will be incorrect.
@@ -593,12 +596,14 @@ class AstroPyEphem( AstroBase ):
         return found_pass
 
 
-    # Ensure:
-    #    The satellite pass is numerically valid.
-    #    Rise time exceeds transit time.
-    #    Transit time exceeds set time.
     @staticmethod
     def _is_satellite_pass_valid( satellite_pass ):
+        '''
+        Ensure
+            The satellite pass is numerically valid.
+            Rise time exceeds transit time.
+            Transit time exceeds set time.
+        '''
         return \
             satellite_pass and \
             len( satellite_pass ) == 6 and \
@@ -612,13 +617,18 @@ class AstroPyEphem( AstroBase ):
             satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ] > satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_CULMINATION_DATE ]
 
 
-    # Determine if a satellite pass is visible.
-    #
-    #    https://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
-    #    https://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
-    #    https://celestrak.org/columns/v03n01
     @staticmethod
-    def _is_satellite_pass_visible( observer_visible_passes, satellite, pass_date_time ):
+    def _is_satellite_pass_visible(
+            observer_visible_passes,
+            satellite,
+            pass_date_time ):
+        '''
+        Determine if a satellite pass is visible.
+
+            https://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
+            https://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
+            https://celestrak.org/columns/v03n01
+        '''
         observer_visible_passes.date = pass_date_time
         satellite.compute( observer_visible_passes )
         sun = ephem.Sun()

@@ -32,23 +32,27 @@ from indicatorbase import IndicatorBase
 class DataProviderGeneralPerturbation( DataProvider ):
     ''' Download and persist general pertubation for satellites. '''
 
-    # Download general perturbation data from Celestrak
-    # and save to the given filename.
     @staticmethod
     def download( filename, logging ):
+        '''
+        Download general perturbation data from Celestrak and save to the
+        given filename.
+        '''
         url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=xml"
         return IndicatorBase.download( url, filename, logging )
 
 
-    # Load general perturbation data from the given filename.
-    #
-    # Returns a dictionary:
-    #    Key: Satellite catalog number (NORAD number)
-    #    Value: GP object
-    #
-    # Otherwise, returns an empty dictionary and may write to the log.
     @staticmethod
     def load( filename, logging ):
+        '''
+        Load general perturbation data from the given filename.
+
+        Returns a dictionary:
+            Key: Satellite catalog number (NORAD number)
+            Value: GP object
+
+        Otherwise, returns an empty dictionary and may write to the log.
+        '''
         data = { }
         for fields in omm.parse_xml( filename ):
             gp = GP( fields )

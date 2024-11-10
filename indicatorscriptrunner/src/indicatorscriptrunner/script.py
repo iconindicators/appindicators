@@ -30,12 +30,14 @@ from abc import ABC
 class Info( ABC ):
     ''' Base class for script information. '''
 
-    # Group to which a script belongs.
-    # Name of script.
-    # The command or script with any arguments as needed.
-    # True to play a sound on completion of script/command execution.
-    # True to show a notification on completion of script/command execution.
     def __init__( self, group, name, command, play_sound, show_notification ):
+        '''
+        Group to which a script belongs.
+        Name of script.
+        The command or script with any arguments as needed.
+        True to play a sound on completion of script/command execution.
+        True to show a notification on completion of script/command execution.
+        '''
         self.group = group
         self.name = name
         self.command = command
@@ -89,14 +91,24 @@ class Info( ABC ):
 class Background( Info ):
     ''' Background script information. '''
 
-    # Group to which a script belongs.
-    # Name of script.
-    # The command or script with any arguments as needed.
-    # True to play a sound on completion of script/command execution.
-    # True to show a notification on completion of script/command execution.
-    # Update interval (in minutes).
-    # Force update; script will update when the next update occurs for ANY background script.
-    def __init__( self, group, name, command, play_sound, show_notification, interval_in_minutes, force_update ):
+    def __init__(
+            self,
+            group,
+            name,
+            command,
+            play_sound,
+            show_notification,
+            interval_in_minutes,
+            force_update ):
+        '''
+        Group to which a script belongs.
+        Name of script.
+        The command or script with any arguments as needed.
+        True to play a sound on completion of script/command execution.
+        True to show a notification on completion of script/command execution.
+        Update interval (in minutes).
+        Force update; script will update on the next update for ANY background script.        
+        '''
         super().__init__( group, name, command, play_sound, show_notification )
         self.interval_in_minutes = interval_in_minutes
         self.force_update = force_update
@@ -132,14 +144,24 @@ class Background( Info ):
 class NonBackground( Info ):
     ''' Non-background (foreground) script information. '''
 
-    # Group to which a script belongs.
-    # Name of script.
-    # The command or script with any arguments as needed.
-    # True to play a sound on completion of script/command execution.
-    # True to show a notification on completion of script/command execution.
-    # True to leave the terminal open on completion of script/command execution.
-    # True if the script is default (only one non-background script can be default).
-    def __init__( self, group, name, command, play_sound, show_notification, terminal_open, default ):
+    def __init__(
+            self,
+            group,
+            name,
+            command,
+            play_sound,
+            show_notification,
+            terminal_open,
+            default ):
+        '''
+        Group to which a script belongs.
+        Name of script.
+        The command or script with any arguments as needed.
+        True to play a sound on completion of script/command execution.
+        True to show a notification on completion of script/command execution.
+        True to leave the terminal open on completion of script/command execution.
+        True if the script is default (only one non-background script can be default).
+        '''
         super().__init__( group, name, command, play_sound, show_notification )
         self.terminal_open = terminal_open
         self.default = default

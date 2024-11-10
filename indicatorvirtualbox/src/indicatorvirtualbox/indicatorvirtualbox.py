@@ -257,9 +257,17 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
 
 
-    # Zealous mouse wheel scrolling can cause too many notifications, subsequently popping the graphics stack!
-    # Prevent notifications from appearing until a set time has elapsed since the previous notification.
-    def show_notification_with_delay( self, summary, message, delay_in_seconds = 0 ):
+    def show_notification_with_delay(
+            self,
+            summary,
+            message,
+            delay_in_seconds = 0 ):
+        '''
+        Zealous mouse wheel scrolling can cause too many notifications,
+        subsequently popping the graphics stack!
+        Prevent notifications from appearing until a set time has elapsed since
+        the previous notification.
+        '''
         date_time_of_last_notification_plus_delay = \
             self.date_time_of_last_notification + datetime.timedelta( seconds = delay_in_seconds )
 
@@ -325,8 +333,11 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self.process_call( "wmctrl -ia " + window_id )
 
 
-    # Returns a list of running VM names and list of corresponding running VM UUIDs.
     def get_running_virtual_machines( self ):
+        '''
+        Returns a list of running VM names and list of corresponding
+        running VM UUIDs.
+        '''
         names = [ ]
         uuids = [ ]
         result = self.process_get( "VBoxManage list runningvms" )
