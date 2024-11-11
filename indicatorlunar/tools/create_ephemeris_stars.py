@@ -33,7 +33,8 @@ from skyfield.data import hipparcos
 from ephem import stars
 
 
-# Indices for columns at http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt.
+# Indices for columns at
+#   http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt
 IAUCSN_NAME_START = 19
 IAUCSN_NAME_END = 36
 IAUCSN_HIP_START = 91
@@ -43,21 +44,24 @@ IAUCSN_HIP_END = 96
 def get_stars_and_hips( iau_catalog_file ):
     stars_from_pyephem = stars.stars.keys()
     stars_and_hips_from_iau = [ ]
-    f_in = open( iau_catalog_file, 'r', encoding = "utf-8" )
-    for line in f_in:
-        if line.startswith( '#' ) or line.startswith( '$' ):
-            continue
+    with open( iau_catalog_file, 'r', encoding = "utf-8" ) as f_in:
+        for line in f_in:
+            if line.startswith( '#' ) or line.startswith( '$' ):
+                continue
 
-        try:
-            name_utf8 = line[ IAUCSN_NAME_START - 1 : IAUCSN_NAME_END - 1 + 1 ].strip()
-            if name_utf8 in stars_from_pyephem:
-                hip = int( line[ IAUCSN_HIP_START - 1 : IAUCSN_HIP_END - 1 + 1 ] )
-                stars_and_hips_from_iau.append( [ name_utf8, hip ] )
+            try:
+                start = IAUCSN_NAME_START - 1
+                end = IAUCSN_NAME_END - 1 + 1
+                name_utf8 = line[ start : end ].strip()
+                if name_utf8 in stars_from_pyephem:
+                    start = IAUCSN_HIP_START - 1
+                    end = IAUCSN_HIP_END - 1 + 1
+                    hip = int( line[ start : end ] )
 
-        except ValueError:
-            pass
+                    stars_and_hips_from_iau.append( [ name_utf8, hip ] )
 
-    f_in.close()
+            except ValueError:
+                pass
 
     return stars_and_hips_from_iau
 
@@ -80,7 +84,9 @@ def print_formatted_stars( stars_and_hips_, star_information_url ):
 
 def create_ephemeris_skyfield( out_file, star_ephemeris, stars_and_hips_ ):
     print( "Creating", out_file, "for Skyfield..." )
-    hipparcos_identifiers = [ star_and_hip[ 1 ] for star_and_hip in stars_and_hips_ ]
+    hipparcos_identifiers = \
+        [ star_and_hip[ 1 ] for star_and_hip in stars_and_hips_ ]
+
     with load.open( star_ephemeris, "rb" ) as in_file, open( out_file, "wb" ) as f:
         for line in in_file:
             # HIP is located at bytes 9 - 14
@@ -122,7 +128,8 @@ def print_ephemeris_pyephem( bsp_file , star_ephemeris, stars_and_hips_ ):
             spectral_type = spectral_type[ : 2 ]
 
         else:
-            spectral_type = "  "  # Is NaN; to fix, set to two blank characters (see _libastro.c).
+            # Is NaN; to fix, set to two blank characters (see _libastro.c).
+            spectral_type = "  "
 
         components = [
             name.upper(),
@@ -142,40 +149,53 @@ def print_ephemeris_pyephem( bsp_file , star_ephemeris, stars_and_hips_ ):
 
 if __name__ == "__main__":
     description = \
-        textwrap.dedent( '''\
+        textwrap.dedent(
+            r'''
             Takes the star information and:
-            1) Prints a list of star names, corresponding HIP and star name for translation (as a Python list of lists).
+            1) Prints a list of star names, corresponding HIP and star name
+               for translation (as a Python list of lists).
             2) Creates a star ephemeris file for Skyfield.
             3) Prints a star ephemeris for PyEphem as a Python dictionary.
-        
-            For example: python3 %(prog)s IAU-CSN.txt hip_main.dat de421.bsp stars.dat
+
+            For example:
+                python3 %(prog)s IAU-CSN.txt hip_main.dat de421.bsp stars.dat
 
             -------------------------------------------------------
             --- INPUT & OUTPUT PATHNAMES CONTAINING SPACES MUST ---
             ---     * BE DOUBLE QUOTED                          ---
             ---     * HAVE SPACES ESCAPED WITH A \              ---
-            -------------------------------------------------------''' )
+            -------------------------------------------------------
+            ''' )
 
     parser = \
         argparse.ArgumentParser(
             formatter_class = argparse.RawDescriptionHelpFormatter,
             description = description )
 
-    STAR_INFORMATION_URL = "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt"
+    STAR_INFORMATION_URL = \
+        "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt"
 
     parser.add_argument(
         "star_information",
-        help = "A text file containing the list of stars, downloaded from " + STAR_INFORMATION_URL + "." )
+        help =
+            "A text file containing the list of stars, downloaded from " +
+            STAR_INFORMATION_URL + "." )
 
     STAR_EPHEMERIS_URL = "https://cdsarc.cds.unistra.fr/ftp/cats/I/239/"
     parser.add_argument(
         "star_ephemeris",
-        help = "A star ephemeris file, typically hip_main.dat and downloaded from " + STAR_EPHEMERIS_URL + "." )
+        help =
+            "A star ephemeris file, typically hip_main.dat downloaded from " +
+            STAR_EPHEMERIS_URL + "." )
 
-    PLANET_EPHEMERIS_URL = "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets"
+    PLANET_EPHEMERIS_URL = \
+        "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets"
+
     parser.add_argument(
         "planet_ephemeris",
-        help = "A planet ephemeris file in .bsp format, downloaded from " + PLANET_EPHEMERIS_URL + "." )
+        help =
+            "A planet ephemeris file in .bsp format, downloaded from " +
+            PLANET_EPHEMERIS_URL + "." )
 
     parser.add_argument(
         "output_filename_for_skyfield_star_ephemeris",
@@ -185,5 +205,12 @@ if __name__ == "__main__":
 
     stars_and_hips = get_stars_and_hips( args.star_information )
     print_formatted_stars( stars_and_hips, STAR_INFORMATION_URL )
-    create_ephemeris_skyfield( args.output_filename_for_skyfield_star_ephemeris, args.star_ephemeris, stars_and_hips )
-    print_ephemeris_pyephem( args.planet_ephemeris, args.star_ephemeris, stars_and_hips )
+    create_ephemeris_skyfield(
+        args.output_filename_for_skyfield_star_ephemeris,
+        args.star_ephemeris,
+        stars_and_hips )
+
+    print_ephemeris_pyephem(
+        args.planet_ephemeris,
+        args.star_ephemeris,
+        stars_and_hips )

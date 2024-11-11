@@ -61,6 +61,7 @@ from bisect import bisect_right
 from importlib import metadata
 from pathlib import Path, PosixPath
 from threading import Lock
+from urllib.error import URLError
 from urllib.request import urlopen
 from zipfile import ZipFile
 
@@ -270,7 +271,9 @@ class IndicatorBase( ABC ):
     def _check_for_newer_version( self ):
         try:
             url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
-            data_json = json.loads( urlopen( url ).read() )  #TODO Convert to with
+            with urlopen( url ) as f:
+                data_json = json.loads( f.read() )
+
             version_latest = data_json[ "info" ][ "version" ]
             if version_latest != str( self.version ):
                 self.new_version_available = True
@@ -278,7 +281,7 @@ class IndicatorBase( ABC ):
                     _( "New version of {0} available..." ).format( self.indicator_name ),
                     _( "Refer to the Preferences for details." ) )
 
-        except Exception as e: #TODO What is the specific exception which may occur?
+        except URLError as e:
             logging.exception( e )
 
 
@@ -1905,13 +1908,13 @@ class IndicatorBase( ABC ):
         ''' Download the contents of the given URL and save to file. '''
         downloaded = False
         try:
-            response = urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode()
-            with open( filename, 'w', encoding = "utf-8" ) as f_out:
-                f_out.write( response )
+            with urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f_in:
+                with open( filename, 'w', encoding = "utf-8" ) as f_out:
+                    f_out.write( f_in.read().decode() )
 
             downloaded = True
 
-        except Exception as e:
+        except URLError as e:
             logging_.error( "Error downloading from " + str( url ) )
             logging_.exception( e )
 

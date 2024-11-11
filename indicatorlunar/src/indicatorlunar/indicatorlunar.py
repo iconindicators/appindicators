@@ -437,7 +437,7 @@ class IndicatorLunar( IndicatorBase ):
     def process_tags( self ):
         '''
         Process text containing pairs of [ ], optionally surrounded by { },
-        typically used for display in the indicator's label.
+        used for display in the indicator's label.
 
         The text may contain tags, delimited by '[' and ']' to be processed by
         the caller.  The caller must provide a 'process tags' function,
@@ -446,14 +446,15 @@ class IndicatorLunar( IndicatorBase ):
         Free text may be associated with any number of tags, all of which are
         to be enclosed with '{' and '}'.  If all tags within '{' and '}' are
         not replaced, all text (and tags) within is removed.  This ensures a
-        tag which cannot be processed does not cause the text to hang around.
+        tag which cannot be processed does not cause the text to remain.
 
         The 'process tags' function is passed the text along with optional
         arguments and must then return the processed text.
         '''
         # Handle [ ].
-        # There may still be tags left in as a result of say a satellite or comet dropping out.
-        # Remaining tags are moped up at the end.
+        # There may still be tags left in as a result of say a satellite
+        # or comet dropping out.
+        # Remaining tags are mopped up at the end.
         processed_text = self.indicator_text
         for key in self.data.keys():
             tag = \
@@ -464,12 +465,16 @@ class IndicatorLunar( IndicatorBase ):
                 "]"
 
             if tag in processed_text:
-                data = self.format_data( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] )
+                data = \
+                    self.format_data(
+                        key[ IndicatorLunar.DATA_INDEX_DATA_NAME ],
+                        self.data[ key ] )
+
                 processed_text = processed_text.replace( tag, data )
 
-        # Handle text enclosed by { }.
+        # Handle free text enclosed by { }.
         i = 0
-        last_separator_index = -1 # Track the last insertion point of the separator so it can be removed.
+        last_separator_index = -1 # Allows the last separator to be removed.
         tag_regular_expression = "\[[^\[\]]*\]"
         while i < len( processed_text ):
             if processed_text[ i ] == '{':
@@ -477,8 +482,14 @@ class IndicatorLunar( IndicatorBase ):
                 while j < len( processed_text ):
                     if processed_text[ j ] == '}':
                         text = processed_text[ i + 1 : j ] # Text between braces.
-                        text_minus_unknown_tags = re.sub( tag_regular_expression, "", text ) # Text between braces with outstanding/unknown tags removed.
-                        if len( text ) and text == text_minus_unknown_tags: # Text is not empty and no unknown tags found, so keep this text.
+
+                        # Text between braces with outstanding tags removed.
+                        text_minus_unknown_tags = \
+                            re.sub( tag_regular_expression, "", text )
+
+                        # Text is not empty and no unknown tags found,
+                        # so keep this text.
+                        if len( text ) and text == text_minus_unknown_tags:
                             processed_text = \
                                 processed_text[ 0 : i ] + \
                                 processed_text[ i + 1 : j ] + \
@@ -487,8 +498,11 @@ class IndicatorLunar( IndicatorBase ):
 
                             last_separator_index = j - 1
 
-                        else: # Empty text or there was one or more unknown tags found, so drop the text.
-                            processed_text = processed_text[ 0 : i ] + processed_text[ j + 1 : ]
+                        else:
+                            # Empty text or there was one or more unknown tags,
+                            # so drop the text.
+                            processed_text = \
+                                processed_text[ 0 : i ] + processed_text[ j + 1 : ]
 
                         i -= 1
                         break
@@ -497,12 +511,15 @@ class IndicatorLunar( IndicatorBase ):
 
             i += 1
 
+        # Remove the last separator if present.
         if last_separator_index > -1:
             processed_text = \
                 processed_text[ 0 : last_separator_index ] + \
-                processed_text[ last_separator_index + len( self.indicator_text_separator ) : ] # Remove the last separator.
+                processed_text[ last_separator_index + len( self.indicator_text_separator ) : ]
 
-        processed_text = re.sub( tag_regular_expression, "", processed_text ) # Remove remaining tags (not removed because they were not contained within { }).
+        # Remove remaining tags (will not have been removed because they were
+        # not contained within { }.
+        processed_text = re.sub( tag_regular_expression, "", processed_text )
         return processed_text
 
 

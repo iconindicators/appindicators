@@ -124,12 +124,21 @@ def _get_indicator_names_sans_current( indicator_name ):
 
 def _get_introduction( indicator_name ):
     pattern_tag = re.compile( r".*comments = _\(.*" )#TODO Check this works (was an f").  https://docs.python.org/3.8/howto/regex.html
-    for line in open( indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py", encoding = "utf-8" ).readlines():
-        matches = pattern_tag.search( line )
-        if matches:
-            comments = matches.group().split( "\"" )[ 1 ].replace( '\\n', ' ' )[ 0 : -1 ] # Remove \n and drop ending.
-            comments = comments[ 0 ].lower() + comments[ 1 : ] # Lower case leading character.
-            break
+
+    filename = \
+        indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py"
+
+    with open( filename, encoding = "utf-8" ) as f_in:
+        for line in f_in:
+            matches = pattern_tag.search( line )
+            if matches:
+                # Remove \n and drop ending.
+                comments = matches.group().split( "\"" )[ 1 ].replace( '\\n', ' ' )[ 0 : -1 ]
+
+                # Lower case leading character.
+                comments = comments[ 0 ].lower() + comments[ 1 : ]
+
+                break
 
     introduction = (
         f"`{ indicator_name }` { comments } on "

@@ -20,8 +20,8 @@
 Create a planet ephemeris for use in Skyfield which commences from
 today's date to end at the specified number of years from today.
 
-The start date is actually wound back one month to take into account
-a quirk of the Skyfield lunar eclipse algorithm.
+The start date is wound back one month to take into account a quirk
+in the Skyfield lunar eclipse algorithm.
 
 This script essentially wraps up the following command:
 
@@ -72,14 +72,20 @@ def create_ephemeris_planets( in_bsp, out_bsp, years ):
 
 if __name__ == "__main__":
     description = \
-        textwrap.dedent( '''\
-            Reduce the date range of a .bsp from today to a specified number of years from today.
+        textwrap.dedent(
+            r'''
+            From an existing .bsp, create a new .bsp with a date range
+            from today to a specified number of years from today.
+
+            For example:
+                python3 %(prog)s de421.bsp planets.bsp 5
 
             -------------------------------------------------------
             --- INPUT & OUTPUT PATHNAMES CONTAINING SPACES MUST ---
             ---     * BE DOUBLE QUOTED                          ---
             ---     * HAVE SPACES ESCAPED WITH A \              ---
-            -------------------------------------------------------''' )
+            -------------------------------------------------------
+            ''' )
 
     parser = \
         argparse.ArgumentParser(
@@ -88,11 +94,11 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "in_bsp",
-        help = "The .bsp file to reduce, such as de440s.bsp." )
+        help = "The input .bsp file." )
 
     parser.add_argument(
         "out_bsp",
-        help = "The .bsp file to be created with reduced date range, such as planets.bsp." )
+        help = "The output .bsp file with reduced date range." )
 
     parser.add_argument(
         "years",
@@ -100,4 +106,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    create_ephemeris_planets( args.in_bsp, args.out_bsp, int( args.years ) )
+    create_ephemeris_planets(
+        args.in_bsp,
+        args.out_bsp,
+        int( args.years ) )

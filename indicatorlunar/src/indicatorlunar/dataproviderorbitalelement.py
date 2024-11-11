@@ -295,9 +295,8 @@ class DataProviderOrbitalElement( DataProvider ):
         Database and save to the given filename.
         '''
 
-        url = \
-            "https://cobs.si/api/elements.api?mag=obs&is-active=true&is-observed=true&cur-mag=" + \
-            str( int( apparent_magnitude_maximum ) )
+        url = "https://cobs.si/api/elements.api?mag=obs&is-active=true&is-observed=true&cur-mag="
+        url += str( int( apparent_magnitude_maximum ) )
 
         if orbital_element_data_type == OE.DataType.SKYFIELD_COMET:
             url += "&format=mpc"

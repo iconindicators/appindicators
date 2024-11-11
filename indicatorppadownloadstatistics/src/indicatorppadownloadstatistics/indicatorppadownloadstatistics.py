@@ -512,7 +512,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def on_preferences( self, dialog ):
-            notebook = Gtk.Notebook()
+        notebook = Gtk.Notebook()
 
         # PPAs.
         grid = self.create_grid()
