@@ -25,6 +25,8 @@ import math
 import re
 import webbrowser
 
+from urllib.error import URLError
+
 import gi
 import requests
 
@@ -971,19 +973,31 @@ class IndicatorLunar( IndicatorBase ):
             return menuitem_name_function
 
 
+        def comet_on_click_function( menuitem ):
+            try:
+                response = \
+                    requests.get(
+                        menuitem.get_name(),
+                        timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS )
+
+                url = \
+                    IndicatorLunar.SEARCH_URL_COMET_ID + \
+                    str( response.json()[ "object" ][ "id" ] )                
+
+                webbrowser.open( url )
+
+            except URLError:
+                pass
+
+
         def get_on_click_function():
-            on_click_function = ( self.get_on_click_menuitem_open_browser_function(), )
-
             if body_type == IndicatorLunar.astro_backend.BodyType.COMET:
-                try:
-                    on_click_function = (
-                        lambda menuitem: (
-                            webbrowser.open(
-                                IndicatorLunar.SEARCH_URL_COMET_ID + \
-                                str( requests.get( menuitem.get_name(), timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).json()[ "object" ][ "id" ] ) ) ), )
+                on_click_function = (
+                    lambda menuitem: comet_on_click_function( menuitem ), )
 
-                except Exception:
-                    on_click_function = None # The network/site may be down or is a bad comet designation.
+            else:
+                on_click_function = (
+                    self.get_on_click_menuitem_open_browser_function(), )
 
             return on_click_function
 
@@ -2757,25 +2771,20 @@ class IndicatorLunar( IndicatorBase ):
             elevation.set_text( str( the_elevation ) )
 
 
-#TODO Check the /etc/timezone exists on non Debian
-# https://superuser.com/questions/309034/how-to-check-which-timezone-in-linux
     def get_default_city( self ):
-        try:
-            timezone = self.process_get( "cat /etc/timezone" )
-            the_city = None
-            cities = IndicatorLunar.astro_backend.get_cities()
-            for city in cities:
-                if city in timezone:
-                    the_city = city
-                    break
+        timezone = self.process_get( "timedatectl show | grep Timezone" )
+        if timezone and timezone.startswith( "Timezone=" ):
+            timezone = timezone.split( '=' )[ 1 ]
 
-            if the_city is None or not the_city:
-                the_city = cities[ 0 ] # No city found, so choose first city by default.
+        else:
+            timezone = ""
 
-        except Exception as e:
-            self.get_logging().exception( e )
-            self.get_logging().error( "Error getting default city." )
-            the_city = cities[ 0 ] # Some error occurred, so choose first city by default.
+        cities = IndicatorLunar.astro_backend.get_cities()
+        the_city = cities[ 0 ] # Default to first city.
+        for city in cities:
+            if city in timezone:
+                the_city = city
+                break
 
         return the_city
 

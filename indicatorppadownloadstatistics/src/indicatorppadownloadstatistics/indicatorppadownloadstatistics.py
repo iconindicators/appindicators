@@ -398,13 +398,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             "&exact_match=false&ordered=false"
 
         try:
-            published_binaries = \
-                json.loads(
-                    urlopen(
-                        url,
-                        timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+            with urlopen(
+                url,
+                timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f:
 
-            has_publised_binaries = published_binaries[ "total_size" ] > 0
+                published_binaries = json.loads( f.read().decode( "utf8" ) )
+                has_publised_binaries = published_binaries[ "total_size" ] > 0
 
         except Exception as e:
             has_publised_binaries = None
@@ -439,11 +438,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         while( published_binary_counter < total_published_binaries and ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
             try:
                 current_url =  url + "&ws.start=" + str( published_binary_counter )
-                published_binaries = \
-                    json.loads(
-                        urlopen(
-                            current_url,
-                            timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+                with urlopen(
+                    current_url,
+                    timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f:
+
+                    published_binaries = json.loads( f.read().decode( "utf8" ) )
 
             except Exception as e:
                 self.get_logging().error( "Problem with " + current_url )
@@ -484,11 +483,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa.get_name() + "/+binarypub/" + \
                     package_id + "?ws.op=getDownloadCount"
 
-                download_count = \
-                    json.loads(
-                        urlopen(
-                            url,
-                            timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ).read().decode( "utf8" ) )
+                with urlopen(
+                    url,
+                    timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f:
+    
+                    download_count = json.loads( f.read().decode( "utf8" ) )
 
                 if str( download_count ).isnumeric():
                     package_name = published_binaries[ "entries" ][ i ][ "binary_package_name" ]

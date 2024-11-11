@@ -1,3 +1,9 @@
+#TODO Change venv to be 
+    Path.home() / ".local" / "venv_indicators"
+which is probably
+    $HOME/.localvenv_indicators 
+
+
 # AppIndicators for Ubuntu et al...
 
 
@@ -77,7 +83,7 @@ Ensure `indicatortest` runs in a terminal from source as per the earlier section
 Assuming the source code is located in `/home/bernard/Programming/Indicators`, create a `Python` interpreter:
 
 ```
-    Window > Preferences > PyDev > Python Interpreter > Python Interpreters > New > Browse for python/pypy exe
+    Window > Preferences > PyDev > Interpreters > Python Interpreter > New > Browse for python/pypy exe
         Browse to /home/bernard/Programming/Indicators/venv/bin/python3
         Interpreter Name: python3 venv
         Ensure site-packages within the venv is checked

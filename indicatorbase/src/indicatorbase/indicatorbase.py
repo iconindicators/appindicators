@@ -154,7 +154,7 @@ class IndicatorBase( ABC ):
     SESSION_TYPE_WAYLAND = "wayland"
     SESSION_TYPE_X11 = "x11"
 
-    URL_TIMEOUT_IN_SECONDS = 20
+    URL_TIMEOUT_IN_SECONDS = 5
 
     # Obtain name of indicator from the call stack and initialise gettext.
     INDICATOR_NAME = None
@@ -271,15 +271,17 @@ class IndicatorBase( ABC ):
     def _check_for_newer_version( self ):
         try:
             url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
-            with urlopen( url ) as f:
-                data_json = json.loads( f.read() )
+            with urlopen(
+                url,
+                timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f:
 
-            version_latest = data_json[ "info" ][ "version" ]
-            if version_latest != str( self.version ):
-                self.new_version_available = True
-                self.show_notification(
-                    _( "New version of {0} available..." ).format( self.indicator_name ),
-                    _( "Refer to the Preferences for details." ) )
+                data_json = json.loads( f.read() )
+                version_latest = data_json[ "info" ][ "version" ]
+                if version_latest != str( self.version ):
+                    self.new_version_available = True
+                    self.show_notification(
+                        _( "New version of {0} available..." ).format( self.indicator_name ),
+                        _( "Refer to the Preferences for details." ) )
 
         except URLError as e:
             logging.exception( e )
@@ -300,7 +302,10 @@ class IndicatorBase( ABC ):
     @staticmethod
     def get_project_metadata( indicator_name ):
         '''
-        TODO Add description.
+        Read in the project metadata,
+            either via pip if the indicator is installed,
+            or parsing a .whl in the release folder running under development.
+
         https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
         https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
         '''
@@ -472,7 +477,7 @@ class IndicatorBase( ABC ):
     @staticmethod
     def get_authors_emails( project_metadata ):
         '''
-        TODO Add description
+        Extract the authors (and emails) from the project metadata.
         https://stackoverflow.com/a/75803208/2156453
         '''
         email_message_object = \

@@ -53,6 +53,9 @@ except ModuleNotFoundError:
         "ensure you are running this script from the correct directory!" )
 
 
+VENV = Path.home() / ".local" / "venv_indicators"
+
+
 def _run_checks_on_indicator( indicator_name ):
     paths = [
         Path( '.' ) / "indicatorbase",
@@ -78,7 +81,8 @@ def _run_checks_on_indicator( indicator_name ):
     if message:
         message = f"Found one or more { t_o_d_o.upper() }s:\n" + message
 
-    return ""#message #TODO Remove the "" and return the message.
+    return ""
+    # return message #TODO Uncomment in final release.
 
 
 def _chmod( file, user_permission, group_permission, other_permission ):
@@ -395,7 +399,7 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
                     start_year )
 
                 command = (
-                    f". venv/bin/activate && " +
+                    f". { VENV }/bin/activate && " +
                     f"python3 -m readme_renderer" +
                     f"    { directory_dist }/{ indicator_name }/README.md" +
                     f"    -o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html && " +
@@ -443,7 +447,7 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
         message = _package_source_for_build_wheel_process( directory_dist, indicator_name )
         if not message:
             command = (
-                f". venv/bin/activate && " +
+                f". { VENV }/bin/activate && " +
                 f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }" )
 
             subprocess.call( command, shell = True )
@@ -474,7 +478,7 @@ if __name__ == "__main__":
                         "+" } )
 
         utils.initialise_virtual_environment(
-            Path( '.' ) / "venv",
+            VENV,
             "build",
             "pip",
             "PyGObject",
@@ -487,7 +491,7 @@ if __name__ == "__main__":
 
         # As a convenience, convert the project README.md to README.html
         command_ = (
-            f". venv/bin/activate && " +
+            f". { VENV }/bin/activate && " +
             f"python3 -m readme_renderer README.md -o README.html && " +
             f"deactivate" )
 

@@ -359,48 +359,37 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def get_virtual_machines( self ):
-        virtual_machines = [ ]
-        try:
-            def add_virtual_machine( group, name, uuid, groups ):
-                for group_name in groups:
-                    the_group = \
-                        next(
-                            ( x for x in group.get_items()
-                              if isinstance( x, Group ) and x.get_name() == group_name ), None )
+        def add_virtual_machine( group, name, uuid, groups ):
+            for group_name in groups:
+                the_group = \
+                    next(
+                        ( x for x in group.get_items()
+                          if isinstance( x, Group ) and x.get_name() == group_name ), None )
 
-                    if the_group is None:
-                        the_group = Group( group_name )
-                        group.add_item( the_group )
+                if the_group is None:
+                    the_group = Group( group_name )
+                    group.add_item( the_group )
 
-                    group = the_group
+                group = the_group
 
-                group.add_item( VirtualMachine( name, uuid ) )
+            group.add_item( VirtualMachine( name, uuid ) )
 
 
-            top_group = Group( "" ) # Only needed whilst parsing results from VBoxManage...
-            for line in self.process_get( "VBoxManage list vms --long" ).splitlines():
-                if line.startswith( "Name:" ):
-                    name = line.split( "Name:" )[ 1 ].strip()
+        top_group = Group( "" )
+        for line in self.process_get( "VBoxManage list vms --long" ).splitlines():
+            if line.startswith( "Name:" ):
+                name = line.split( "Name:" )[ 1 ].strip()
 
-                elif line.startswith( "Groups:" ):
-                    groups = line.split( '/' )[ 1 : ]
-                    if groups[ 0 ] == '':
-                        del groups[ 0 ]
+            elif line.startswith( "Groups:" ):
+                groups = line.split( '/' )[ 1 : ]
+                if groups[ 0 ] == '':
+                    del groups[ 0 ]
 
-                elif line.startswith( "UUID:" ):
-                    uuid = line.split( "UUID:" )[ 1 ].strip()
-                    add_virtual_machine( top_group, name, uuid, groups )
+            elif line.startswith( "UUID:" ):
+                uuid = line.split( "UUID:" )[ 1 ].strip()
+                add_virtual_machine( top_group, name, uuid, groups )
 
-            virtual_machines = top_group.get_items()
-
-#TODO Why is this exception here?
-#Is this from way back when a text file was parsed?
-#Maybe go back in the repository and see...if possible, and if so, remove the exception.
-        except Exception as e:
-            self.get_logging().exception( e )
-            virtual_machines = [ ]
-
-        return virtual_machines
+        return top_group.get_items()
 
 
     def is_vbox_manage_installed( self ):

@@ -123,7 +123,7 @@ def _get_indicator_names_sans_current( indicator_name ):
 
 
 def _get_introduction( indicator_name ):
-    pattern_tag = re.compile( r".*comments = _\(.*" )#TODO Check this works (was an f").  https://docs.python.org/3.8/howto/regex.html
+    pattern_tag = re.compile( r".*comments = _\(.*" )
 
     filename = \
         indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py"

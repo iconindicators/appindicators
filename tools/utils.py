@@ -45,8 +45,14 @@ def is_correct_directory( example_arguments = None ):
 def initialiase_parser_and_get_arguments(
         description,
         argument_names,
-        argument_helps = { }, #TODO Can these be None as default and if so, then assign to { } as first line?
-        argument_nargs = { } ):
+        argument_helps = None,
+        argument_nargs = None ):
+
+    if argument_helps is None:
+        argument_helps = { }
+
+    if argument_nargs is None:
+        argument_nargs = { }
 
     parser = argparse.ArgumentParser( description = description )
     for argument_name in argument_names:
