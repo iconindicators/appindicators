@@ -25,6 +25,7 @@ import locale
 import webbrowser
 
 from copy import deepcopy
+from urllib.error import URLError
 from urllib.request import urlopen
 
 import gi
@@ -405,7 +406,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 published_binaries = json.loads( f.read().decode( "utf8" ) )
                 has_publised_binaries = published_binaries[ "total_size" ] > 0
 
-        except Exception as e:
+        except URLError as e:
             has_publised_binaries = None
             self.get_logging().error( "Problem with " + url )
             self.get_logging().exception( e )
@@ -444,7 +445,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                     published_binaries = json.loads( f.read().decode( "utf8" ) )
 
-            except Exception as e:
+            except URLError as e:
                 self.get_logging().error( "Problem with " + current_url )
                 self.get_logging().exception( e )
                 ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
@@ -486,7 +487,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 with urlopen(
                     url,
                     timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f:
-    
+
                     download_count = json.loads( f.read().decode( "utf8" ) )
 
                 if str( download_count ).isnumeric():
@@ -504,7 +505,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     self.get_logging().error( "The download count at the URL was not numeric: " + url )
                     ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
 
-            except Exception as e:
+            except URLError as e:
                 self.get_logging().error( "Problem with " + url )
                 self.get_logging().exception( e )
                 ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )

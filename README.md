@@ -35,8 +35,9 @@ To run `indicatortest` in a terminal at the source root:
 
 ```
     indicator=indicatortest && \
-    if [ ! -d venv ]; then python3 -m venv venv; fi && \
-    . venv/bin/activate && \
+    venv=$HOME/.local/venv_indicators && \
+    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+    . ${venv}/bin/activate && \
     python3 -m pip install PyGObject && \
     PYTHONPATH="indicatorbase/src/indicatorbase" python3 ${indicator}/src/${indicator}/${indicator}.py && \
     deactivate
@@ -51,6 +52,8 @@ Ensure `indicatortest` runs in a terminal from source as per the earlier section
 
 Assuming the source code is located in `/home/bernard/Programming/Indicators`, create the project et al:
 
+#TODO Check if Geany will accept $HOME
+
 ```
     Project > New
         Name: Indicators
@@ -58,7 +61,7 @@ Assuming the source code is located in `/home/bernard/Programming/Indicators`, c
         Basepath: /home/bernard/Programming/Indicators
 
     Build > Set Build Commands > Execute Commands
-        Execute: /home/bernard/Programming/Indicators/venv/bin/python3 "%f"
+        Execute: /home/bernard/.local/venv_indicators/bin/python3 "%f"
 
     Edit > Preferences > Tools > Tool Paths > Terminal
         x-terminal-emulator -e "env PYTHONPATH=/home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase /bin/sh %c"
@@ -66,9 +69,9 @@ Assuming the source code is located in `/home/bernard/Programming/Indicators`, c
 
 `indicatortest` should now run under `Geany`.
 
-Note: If editing `README.md` or any `markdown` document under `Geany`, using two spaces to insert an empty line may not work as `Geany` removes trailing spaces by default.
+NOTE: If editing `README.md` or any `markdown` document under `Geany`, using two spaces to insert an empty line may not work as `Geany` removes trailing spaces by default.
 
-Note: Appears to be no way to execute any of the `tools` scripts within `Geany`.
+NOTE: Appears to be no way to execute any of the `tools` scripts within `Geany`.
 
 References:
 
@@ -82,9 +85,12 @@ Ensure `indicatortest` runs in a terminal from source as per the earlier section
 
 Assuming the source code is located in `/home/bernard/Programming/Indicators`, create a `Python` interpreter:
 
+#TODO Check if Eclipse will accept $HOME
+# https://help.eclipse.org/latest/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2Fconcepts%2Fconcepts-exttools.htm
+
 ```
     Window > Preferences > PyDev > Interpreters > Python Interpreter > New > Browse for python/pypy exe
-        Browse to /home/bernard/Programming/Indicators/venv/bin/python3
+        Browse to /home/bernard/.local/venv_indicators/bin/python3
         Interpreter Name: python3 venv
         Ensure site-packages within the venv is checked
         Set as Default
@@ -104,7 +110,7 @@ Create the project:
         PyDev - PYTHONPATH
             External Libraries > Add Source Folder
                 Add...
-                    /home/bernard/Programming/Indicators/indicatorobase/src/indicatorbase
+                    /home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase
 ```
 
 Run `indicatortest`:
@@ -185,8 +191,9 @@ To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
 
 ```
     indicator=indicatortest && \
-    if [ ! -d venv ]; then python3 -m venv venv; fi && \
-    . venv/bin/activate && \
+    venv=$HOME/.local/venv_indicators && \
+    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+    . ${venv}/bin/activate && \
     python3 -m pip install pip twine && \
     python3 -m twine upload --username __token__ release/wheel/dist_${indicator}/* && \
     deactivate
@@ -207,8 +214,9 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
 
 ```
     indicator=indicatortest && \
-    if [ ! -d venv ]; then python3 -m venv venv; fi && \
-    . venv/bin/activate && \
+    venv=$HOME/.local/venv_indicators && \
+    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+    . ${venv}/bin/activate && \
     python3 -m pip install pip twine && \
     python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_${indicator}/* && \
     deactivate
@@ -242,6 +250,8 @@ Additional indicators may be appended to the above command.
 
 Assuming the project is located within the directory `Indicators`, run within the directory one level above `Indicators`:
 
+#TODO Might need to add install command via OS.  Or perhaps always install via pip...but to what venv?  venv_indicators?
+
 ```
     pylint --recursive=y --ignore=development,release,venv Indicators --output=pylint.txt ; \
     sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2n pylint.txt
@@ -263,8 +273,9 @@ pylint --disable=line-too-long --disable=unused-argument --recursive=y ...
 ## Convert this Document from MD to HTML
 
 ```
-    if [ ! -d venv ]; then python3 -m venv venv; fi && \
-    . venv/bin/activate && \
+    venv=$HOME/.local/venv_indicators && \
+    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+    . ${venv}/bin/activate && \
     python3 -m pip install readme_renderer[md] && \
     python3 -m readme_renderer README.md -o README.html && \
     deactivate

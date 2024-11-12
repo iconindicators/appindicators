@@ -343,13 +343,12 @@ class IndicatorVirtualBox( IndicatorBase ):
         result = self.process_get( "VBoxManage list runningvms" )
         if result:
             for line in result.splitlines():
-                try:
+                if line.startswith( '\"' ) and line.endswith( '}' ):
+                    # VBoxManage may emit a warning message along with the VM
+                    # information, so check each line as best as possible.
                     info = line[ 1 : -1 ].split( "\" {" )
                     names.append( info[ 0 ] )
                     uuids.append( info[ 1 ] )
-
-                except Exception:
-                    pass # Sometimes VBoxManage emits a warning message along with the VM information.
 
         return names, uuids
 
