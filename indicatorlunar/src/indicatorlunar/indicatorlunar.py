@@ -980,7 +980,7 @@ class IndicatorLunar( IndicatorBase ):
                         menuitem.get_name(),
                         timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS )
 
-                object_id = str( response.json()[ "object" ][ "id" ] )                
+                object_id = str( response.json()[ "object" ][ "id" ] )
                 webbrowser.open( IndicatorLunar.SEARCH_URL_COMET_ID + object_id )
 
             except URLError:

@@ -41,7 +41,8 @@ from ppa import Filters, PPA, PublishedBinary
 class IndicatorPPADownloadStatistics( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator; used by build_wheel.py when building the .desktop file.
+    # Unused within the indicator; used by build_wheel.py when building
+    # the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator PPA Download Statistics" )
     indicator_categories = "Categories=Utility"
 
@@ -125,23 +126,30 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def build_menu( self, menu ):
-        ppas = deepcopy( self.ppas ) # Take a copy as the combine mechanism can alter the PPA series/architecture.
+        # Take a copy as the combine mechanism can alter the
+        # PPA series/architecture.
+        ppas = deepcopy( self.ppas )
 
         if self.combine_ppas:
             ppas = self.combine( ppas )
 
         if self.sort_by_download:
             for ppa in ppas:
-                ppa.sort_published_binaries_by_download_count_and_clip( self.sort_by_download_amount )
+                ppa.sort_published_binaries_by_download_count_and_clip(
+                    self.sort_by_download_amount )
 
         if self.show_submenu:
             for ppa in ppas:
                 submenu = Gtk.Menu()
-                self.create_and_append_menuitem( menu, ppa.get_descriptor() ).set_submenu( submenu )
+                self.create_and_append_menuitem(
+                    menu,
+                    ppa.get_descriptor() ).set_submenu( submenu )
+
                 if ppa.get_status() == PPA.Status.OK:
                     published_binaries = ppa.get_published_binaries( True )
                     for published_binary in published_binaries:
-                        self.create_menuitem_for_published_binary( submenu, ( 1, 0 ), ppa, published_binary )
+                        self.create_menuitem_for_published_binary(
+                            submenu, ( 1, 0 ), ppa, published_binary )
 
                 else:
                     self.create_and_append_menuitem(
@@ -160,7 +168,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if ppa.get_status() == PPA.Status.OK:
                     published_binaries = ppa.get_published_binaries( True )
                     for published_binary in published_binaries:
-                        self.create_menuitem_for_published_binary( menu, ( 1, 1 ), ppa, published_binary )
+                        self.create_menuitem_for_published_binary(
+                            menu, ( 1, 1 ), ppa, published_binary )
 
                 else:
                     self.create_and_append_menuitem(
@@ -174,7 +183,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 self.set_secondary_activate_target( menu.get_children()[ 0 ] )
 
 
-    def create_menuitem_for_published_binary( self, menu, indent, ppa, published_binary ):
+    def create_menuitem_for_published_binary(
+        self, menu, indent, ppa, published_binary ):
+
         label = published_binary.get_package_name()
         if published_binary.get_package_version() is None:
             label += ":  " + str( published_binary.get_download_count() )
@@ -209,7 +220,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def combine( self, ppas ):
-        # Match up identical PPAs: two PPAs are deemed to match if their 'PPA User | PPA Name' are identical.
+        # Match up identical PPAs: two PPAs are deemed to match if
+        # their 'PPA User | PPA Name' are identical.
         combined_ppas = { }
         for ppa in ppas:
             key = ppa.get_user() + " | " + ppa.get_name()
@@ -221,18 +233,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     combined_ppas[ key ].add_published_binaries( ppa.get_published_binaries() )
                     combined_ppas[ key ].set_status( PPA.Status.OK )
 
-                elif ppa.get_status() == combined_ppas[ key ].get_status(): # Both are filtered or both have no published binaries.
-                    pass # Nothing to do.
+                elif ppa.get_status() == combined_ppas[ key ].get_status():
+                    # Both are filtered or both have no
+                    # published binaries; nothing to do.
+                    pass
 
-                else: # One is completely filtered and the other has no published binaries.
+                else:
+                    # One is completely filtered and the other has
+                    # no published binaries.
                     combined_ppas[ key ].set_status( PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED )
 
             else: # No previous match for this PPA.
                 combined_ppas[ key ] = ppa
 
         # The combined PPAs either have:
-        #    A status of error, or completely filtered, or no published binaries or,
-        #    a status of OK with a concatenation of all published binaries from PPAs with the same PPA user/name.
+        #    A status of error, or completely filtered,
+        #    or no published binaries or,
+        #    A status of OK with a concatenation of all published
+        #    binaries from PPAs with the same PPA user/name.
         ppas = [ ]
         for ppa in combined_ppas.values():
             if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA or \
@@ -249,9 +267,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     key = published_binary.get_package_name() + " | " + published_binary.get_package_version()
                     if published_binary.is_architecture_specific():
                         if self.ignore_version_architecture_specific:
-                            key = published_binary.get_package_name() # Key only contains name.
+                            # Key only contains name.
+                            key = published_binary.get_package_name()
 
-                        # Add up the download count from each published binary of the same key (package name OR package name and package version).
+                        # Add up the download count from each published
+                        # binary of the same key (package name OR
+                        # package name and package version).
                         if key in temp:
                             new_published_binary = \
                                 PublishedBinary(
@@ -278,7 +299,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         if key not in temp:
                             temp[ key ] = published_binary
 
-                ppas.append( PPA( ppa.get_user(), ppa.get_name(), None, None ) )
+                ppas.append(
+                    PPA( ppa.get_user(), ppa.get_name(), None, None ) )
+
                 ppas[ -1 ].set_status( PPA.Status.OK )
                 for key, value in temp.items():
                     ppas[ -1 ].add_published_binary( value )
@@ -296,8 +319,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             # This is a combined PPA...
             ppa_name = menuitem.get_name()[ first_pipe + 1 : ].strip()
             url += ppa_user + "/+archive/ubuntu/" + ppa_name
-            if menuitem.get_name() != menuitem.get_label(): # Use the menu item label to specify the package name.
-                url += "/+packages?field.name_filter=" + menuitem.get_label().split()[ 0 ] + "&field.status_filter=published&field.series_filter="
+            if menuitem.get_name() != menuitem.get_label():
+                # Use the menu item label to specify the package name.
+                url += "/+packages?field.name_filter=" + \
+                        menuitem.get_label().split()[ 0 ] + \
+                        "&field.status_filter=published&field.series_filter="
 
         else:
             ppa_name = menuitem.get_name()[ first_pipe + 1 : second_pipe ].strip()
@@ -308,7 +334,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 url += "?field.series_filter=" + series
 
             else: # Use the menu item label to specify the package name.
-                url += "/+packages?field.name_filter=" + menuitem.get_label().split()[ 0 ] + "&field.status_filter=published&field.series_filter=" + series
+                url += "/+packages?field.name_filter=" + \
+                       menuitem.get_label().split()[ 0 ] + \
+                       "&field.status_filter=published&field.series_filter=" + series
 
         webbrowser.open( url )
 
@@ -374,7 +402,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                             ppa.set_status( PPA.Status.OK )
 
                         else:
-                            ppa.set_status( PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
+                            ppa.set_status(
+                                PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED )
 
                 else:
                     ppa.set_status( PPA.Status.NO_PUBLISHED_BINARIES )
@@ -386,17 +415,18 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         ppa.set_status( PPA.Status.OK )
 
                     else:
-                        ppa.set_status( PPA.Status.NO_PUBLISHED_BINARIES )
+                        ppa.set_status(
+                            PPA.Status.NO_PUBLISHED_BINARIES )
 
 
     def has_published_binaries( self, ppa ):
         url = \
             "https://api.launchpad.net/1.0/~" + \
             ppa.get_user() + "/+archive/ubuntu/" + \
-            ppa.get_name() + "?ws.op=getPublishedBinaries" + \
-            "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.get_series() + "/" + \
-            ppa.get_architecture() + "&status=Published" + \
-            "&exact_match=false&ordered=false"
+            ppa.get_name() + "?ws.op=getPublishedBinaries&" + \
+            "distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + \
+            ppa.get_series() + "/" + ppa.get_architecture() + \
+            "&status=Published&exact_match=false&ordered=false"
 
         try:
             with urlopen(
@@ -427,16 +457,18 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         url = \
             "https://api.launchpad.net/1.0/~" + \
             ppa.get_user() + "/+archive/ubuntu/" + \
-            ppa.get_name() + "?ws.op=getPublishedBinaries" + \
-            "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + ppa.get_series() + "/" + \
-            ppa.get_architecture() + "&status=Published" + \
-            "&exact_match=false&ordered=false&binary_name=" + filter_text # A filter_text of "" equates to no filter_text.
+            ppa.get_name() + "?ws.op=getPublishedBinaries&" + \
+            "distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + \
+            ppa.get_series() + "/" + ppa.get_architecture() + \
+            "&status=Published&exact_match=false&ordered=false&binary_name=" + \
+            filter_text # A filter_text of "" equates to no filter_text.
 
         page_number = 1
-        published_binaries_per_page = 75 # Results are presented in at most 75 per page.
+        published_binaries_per_page = 75
         published_binary_counter = 0
         total_published_binaries = published_binary_counter + 1 # Set to a value greater than published_binary_counter to ensure the loop executes at least once.
-        while( published_binary_counter < total_published_binaries and ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD ): # Keep going if there are more downloads and no error has occurred.
+        while( published_binary_counter < total_published_binaries and ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD ):
+            # Continue if there are more downloads and no error has occurred.
             try:
                 current_url =  url + "&ws.start=" + str( published_binary_counter )
                 with urlopen(
@@ -474,7 +506,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def get_download_count( self, ppa, published_binaries, i ):
-        if ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD: # Use the status to cancel downloads if an error occurred.
+        if ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD:
+            # Use the status to cancel downloads if an error occurred.
             try:
                 index_last_slash = published_binaries[ "entries" ][ i ][ "self_link" ].rfind( "/" )
                 package_id = published_binaries[ "entries" ][ i ][ "self_link" ][ index_last_slash + 1 : ]
@@ -517,9 +550,15 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         # PPAs.
         grid = self.create_grid()
 
-        ppa_store = Gtk.ListStore( str, str, str, str ) # PPA user, name, series, architecture.
+        # PPA user, name, series, architecture.
+        ppa_store = Gtk.ListStore( str, str, str, str )
+
         for ppa in self.ppas:
-            ppa_store.append( [ ppa.get_user(), ppa.get_name(), ppa.get_series(), ppa.get_architecture() ] )
+            ppa_store.append( [
+                ppa.get_user(),
+                ppa.get_name(),
+                ppa.get_series(),
+                ppa.get_architecture() ] )
 
         ppa_treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -557,7 +596,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         # Filters.
         grid = self.create_grid()
 
-        filter_store = Gtk.ListStore( str, str, str, str, str ) # PPA user, name, series, architecture, filter text.
+        # PPA user, name, series, architecture, filter text.
+        filter_store = Gtk.ListStore( str, str, str, str, str )
+
         for user, name, series, architecture in self.filters.get_user_name_series_architecture():
             filter_text = \
                 self.filters.get_filter_text(
@@ -674,7 +715,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.ignore_version_architecture_specific )
 
-        grid.attach( ignore_version_architecture_specific_checkbutton, 0, 2, 1, 1 )
+        grid.attach(
+            ignore_version_architecture_specific_checkbutton,
+            0, 2, 1, 1 )
 
         combine_ppas_checkbutton.connect(
             "toggled",
@@ -786,10 +829,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def on_ppa_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            self.show_dialog_ok( treeview, _( "No PPA has been selected for removal." ) )
+            self.show_dialog_ok(
+                treeview,
+                _( "No PPA has been selected for removal." ) )
 
         else:
-            # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+            # Prompt the user to remove - only one row can be selected
+            # since single selection mode has been set.
             if self.show_dialog_ok_cancel( treeview, _( "Remove the selected PPA?" ) ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
 
@@ -798,7 +844,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self.on_ppa_double_click( treeview, None, None )
 
 
-    def on_ppa_double_click( self, treeview, row_number, treeviewcolumn ):
+    def on_ppa_double_click(
+        self,
+        treeview,
+        row_number,
+        treeviewcolumn ):
+
         model, treeiter = treeview.get_selection().get_selected()
 
         grid = self.create_grid()
@@ -811,7 +862,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             ppa_users = [ ]
             for i, row in enumerate( model ):
                 if model[ i ][ IndicatorPPADownloadStatistics.COLUMN_USER ] not in ppa_users:
-                    ppa_users.append( model[ i ][ IndicatorPPADownloadStatistics.COLUMN_USER ] )
+                    ppa_users.append(
+                        model[ i ][ IndicatorPPADownloadStatistics.COLUMN_USER ] )
 
             ppa_users.sort( key = locale.strxfrm )
 
@@ -824,7 +876,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         -1 )
 
         else:
-            ppa_user = self.create_entry( "" ) # There are no PPAs present - adding the first PPA.
+            # There are no PPAs present - adding the first PPA.
+            ppa_user = self.create_entry( "" )
 
         grid.attach( ppa_user, 1, 0, 1, 1 )
 
@@ -836,7 +889,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             ppa_names = [ ]
             for i, row in enumerate( model ):
                 if model[ i ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] not in ppa_names:
-                    ppa_names.append( model[ i ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] )
+                    ppa_names.append(
+                        model[ i ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] )
 
             ppa_names.sort( key = locale.strxfrm )
 
@@ -849,7 +903,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         -1 )
 
         else:
-            ppa_name = self.create_entry( "" ) # There are no PPAs present - adding the first PPA.
+            # There are no PPAs present - adding the first PPA.
+            ppa_name = self.create_entry( "" )
 
         grid.attach( ppa_name, 1, 1, 1, 1 )
 
@@ -885,7 +940,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if row_number:
             title = _( "Edit PPA" )
 
-        dialog = self.create_dialog( treeview, title, content_widget = grid )
+        dialog = \
+            self.create_dialog(
+             treeview,
+             title,
+             content_widget = grid )
+
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -898,22 +958,32 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa_name_value = ppa_name.get_text().strip()
 
                 if ppa_user_value == "":
-                    self.show_dialog_ok( dialog, _( "PPA user cannot be empty." )  )
+                    self.show_dialog_ok(
+                        dialog,
+                        _( "PPA user cannot be empty." )  )
+
                     ppa_user.grab_focus()
                     continue
 
                 if ppa_name_value == "":
-                    self.show_dialog_ok( dialog, _( "PPA name cannot be empty." ) )
+                    self.show_dialog_ok(
+                        dialog,
+                        _( "PPA name cannot be empty." ) )
+
                     ppa_name.grab_focus()
                     continue
 
                 # Ensure there is no duplicate...
                 if ( row_number is None and len( model ) > 0 ) or ( row_number and len( model ) > 1 ):
-                    # Doing an add and there's at least one PPA OR doing an edit and there's at least two PPAs...
-                    if row_number is None: # Doing an add, so data has changed.
+                    # Doing an add and there's at least one PPA OR
+                    # doing an edit and there's at least two PPAs...
+                    if row_number is None:
+                        # Doing an add, so data has changed.
                         data_has_been_changed = True
 
-                    else: # Doing an edit, so check to see if there the data has actually been changed...
+                    else:
+                        # Doing an edit, so check to see if there the
+                        # data has actually been changed...
                         data_has_been_changed = not ( \
                             ppa_user_value == model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] and \
                             ppa_name_value == model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] and \
@@ -932,12 +1002,17 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                                 break
 
                         if duplicate:
-                            self.show_dialog_ok( dialog, _( "Duplicates disallowed - there is an identical PPA!" ) )
+                            self.show_dialog_ok(
+                                dialog,
+                                _( "Duplicates disallowed - there is an identical PPA!" ) )
+
                             continue
 
                 # Update the model...
                 if row_number:
-                    model.remove( treeiter ) # This is an edit...remove the old value and append new value.
+                    # This is an edit...remove the old value and
+                    # append new value.
+                    model.remove( treeiter )
 
                 model.append( [
                     ppa_user_value,
@@ -953,20 +1028,26 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def on_filter_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            self.show_dialog_ok( treeview, _( "No filter has been selected for removal." ) )
+            self.show_dialog_ok(
+                treeview,
+                _( "No filter has been selected for removal." ) )
 
         else:
-            # Prompt the user to remove - only one row can be selected since single selection mode has been set.
+            # Prompt the user to remove - only one row can be selected
+            # since single selection mode has been set.
             if self.show_dialog_ok_cancel( treeview, _( "Remove the selected filter?" ) ) == Gtk.ResponseType.OK:
                 model.remove( treeiter )
 
 
     def on_filter_add( self, button, filter_treeview, ppa_treeview ):
         if len( ppa_treeview.get_model() ) == 0:
-            self.show_dialog_ok( filter_treeview, _( "Please add a PPA first!" ) )
+            self.show_dialog_ok(
+                filter_treeview,
+                _( "Please add a PPA first!" ) )
 
         else:
-            # If the number of filters equals the number of PPA User/Names, cannot add a filter!
+            # If the number of filters equals the number of
+            # PPA User/Names, cannot add a filter!
             ppa_users_names = [ ]
             for ppa in range( len( ppa_treeview.get_model() ) ):
                 ppa_user_name = \
@@ -984,16 +1065,29 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     message_type = Gtk.MessageType.INFO )
 
             else:
-                self.on_filter_double_click( filter_treeview, None, None, ppa_treeview )
+                self.on_filter_double_click(
+                    filter_treeview,
+                    None,
+                    None,
+                    ppa_treeview )
 
 
 #TODO Double click on an existing filter.
 # The filter text says 'ppa'.
 # I would have thought the filter text would be the list of filter text shown in the display...?
 
-    def on_filter_double_click( self, filter_treeview, row_number, treeviewcolumnm, ppa_treeview ):
-        filter_model, filter_treeiter = filter_treeview.get_selection().get_selected()
-        ppa_model, ppa_treeiter = ppa_treeview.get_selection().get_selected()
+    def on_filter_double_click(
+        self,
+        filter_treeview,
+        row_number,
+        treeviewcolumnm,
+        ppa_treeview ):
+
+        filter_model, filter_treeiter = \
+            filter_treeview.get_selection().get_selected()
+
+        ppa_model, ppa_treeiter = \
+            ppa_treeview.get_selection().get_selected()
 
         grid = self.create_grid()
 
@@ -1018,7 +1112,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if ppa_user_name in temp:
                     continue
 
-                # Ensure the PPA User/Name is not present in the list of filters in the preferences.
+                # Ensure the PPA User/Name is not present in the list
+                # of filters in the preferences.
                 in_filter_list = False
                 for i, row in enumerate( filter_model ):
                     if ppa_user_name in filter_model[ i ][ IndicatorPPADownloadStatistics.COLUMN_USER ]:
@@ -1069,20 +1164,35 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if row_number is None:
             title = _( "Add Filter" )
 
-        dialog = self.create_dialog( filter_treeview, title, content_widget = grid )
+        dialog = \
+            self.create_dialog(
+                filter_treeview,
+                title,
+                content_widget = grid )
+
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
                 buffer = textview.get_buffer()
-                filter_text = buffer.get_text( buffer.get_start_iter(), buffer.get_end_iter(), False )
+                filter_text = \
+                    buffer.get_text(
+                        buffer.get_start_iter(),
+                        buffer.get_end_iter(),
+                        False )
+
                 filter_text = "\n".join( filter_text.split() )
                 if len( filter_text ) == 0:
-                    self.show_dialog_ok( dialog, _( "Please enter filter text!" ) )
+                    self.show_dialog_ok(
+                        dialog,
+                        _( "Please enter filter text!" ) )
+
                     continue
 
                 # Update the model...
                 if row_number:
-                    filter_model.remove( filter_treeiter ) # This is an edit...remove the old value and append new value.
+                    # This is an edit...remove the old value and
+                    # append new value.
+                    filter_model.remove( filter_treeiter )
 
                 filter_model.append( [
                     ppa_users_names.get_active_text(),
@@ -1125,7 +1235,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         else:
             self.ppas = [ ]
-            self.ppas.append( PPA( "thebernmeister", "ppa", "jammy", "amd64" ) )
+            self.ppas.append(
+                PPA( "thebernmeister", "ppa", "jammy", "amd64" ) )
 
             filter_text = [
                 "indicator-fortune",
@@ -1139,19 +1250,32 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 "indicator-virtual-box" ]
 
             self.filters = Filters()
-            self.filters.add_filter( "thebernmeister", "ppa", "jammy", "amd64", filter_text )
+            self.filters.add_filter(
+                "thebernmeister", "ppa", "jammy", "amd64", filter_text )
+
             self.request_save_config()
 
 
     def save_config( self ):
         ppas = [ ]
         for ppa in self.ppas:
-            ppas.append( [ ppa.get_user(), ppa.get_name(), ppa.get_series(), ppa.get_architecture() ] )
+            ppas.append( [
+                ppa.get_user(),
+                ppa.get_name(),
+                ppa.get_series(),
+                ppa.get_architecture() ] )
 
         filters = [ ]
         for user, name, series, architecture in self.filters.get_user_name_series_architecture():
-            filter_text = self.filters.get_filter_text( user, name, series, architecture )
-            filters.append( [ user, name, series, architecture, filter_text ] )
+            filter_text = \
+                self.filters.get_filter_text( user, name, series, architecture )
+
+            filters.append( [
+                user,
+                name,
+                series,
+                architecture,
+                filter_text ] )
 
         return {
             IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS : self.combine_ppas,
