@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorppadownloadstatistics 1.0.81\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-29 16:31+1000\n"
+"POT-Creation-Date: 2024-11-18 18:02+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,10 +26,10 @@ msgstr ""
 msgid "(no published binaries)"
 msgstr ""
 
-msgid "(no published binaries and/or completely filtered)"
+msgid "(published binaries completely filtered)"
 msgstr ""
 
-msgid "(published binaries completely filtered)"
+msgid "(multiple messages; uncheck combine to view)"
 msgstr ""
 
 msgid "Displays the total downloads of PPAs."
@@ -174,9 +174,6 @@ msgstr ""
 msgid "Add PPA"
 msgstr ""
 
-msgid "Edit PPA"
-msgstr ""
-
 msgid "PPA user cannot be empty."
 msgstr ""
 
@@ -184,6 +181,9 @@ msgid "PPA name cannot be empty."
 msgstr ""
 
 msgid "Duplicates disallowed - there is an identical PPA!"
+msgstr ""
+
+msgid "Edit PPA"
 msgstr ""
 
 msgid "No filter has been selected for removal."

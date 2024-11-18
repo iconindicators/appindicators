@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorppadownloadstatistics 1.0.81\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-29 16:31+1000\n"
+"POT-Creation-Date: 2024-11-18 18:02+1100\n"
 "PO-Revision-Date: 2024-07-09 00:24+1100\n"
 "Last-Translator: Pavel Rehak <pavel-rehak@email.cz>\n"
 "Language-Team: \n"
@@ -26,12 +26,11 @@ msgstr "(chyba při vyhledávání PPA)"
 msgid "(no published binaries)"
 msgstr "(žádné uveřejněné binární soubory)"
 
-#, fuzzy
-msgid "(no published binaries and/or completely filtered)"
-msgstr "(uveřejněné binární soubory jsou zcela vyfiltrovány)"
-
 msgid "(published binaries completely filtered)"
 msgstr "(uveřejněné binární soubory jsou zcela vyfiltrovány)"
+
+msgid "(multiple messages; uncheck combine to view)"
+msgstr ""
 
 msgid "Displays the total downloads of PPAs."
 msgstr "Zobrazuje celkový počet stažení z PPA repozitářů."
@@ -176,9 +175,6 @@ msgstr "Odstranit vybraný PPA repozitář?"
 msgid "Add PPA"
 msgstr "Přidat PPA repozitář"
 
-msgid "Edit PPA"
-msgstr "Upravit PPA repozitář"
-
 msgid "PPA user cannot be empty."
 msgstr "Uživatel PPA nemůže zůstat nevyplněný."
 
@@ -187,6 +183,9 @@ msgstr "Název PPA repozitáře nemůže zůstat nevyplněný."
 
 msgid "Duplicates disallowed - there is an identical PPA!"
 msgstr "Duplicity nejsou povoleny - stejný PPA repozitář již existuje!"
+
+msgid "Edit PPA"
+msgstr "Upravit PPA repozitář"
 
 msgid "No filter has been selected for removal."
 msgstr "Nebyl vybrán filtr, který se má odstranit."
@@ -228,6 +227,10 @@ msgstr "Přidat filtr"
 
 msgid "Please enter filter text!"
 msgstr "Zadejte prosím text filtru!"
+
+#, fuzzy
+#~ msgid "(no published binaries and/or completely filtered)"
+#~ msgstr "(uveřejněné binární soubory jsou zcela vyfiltrovány)"
 
 #~ msgid "PPA"
 #~ msgstr "PPA"

@@ -24,66 +24,98 @@ import operator
 from enum import Enum
 
 
-class Filters():
-    ''' Filter used to screen out PPAs. '''
-
-    INDEX_USER = 0
-    INDEX_NAME = 1
-    INDEX_SERIES = 2
-    INDEX_ARCHITECTURE = 3
+class Filter():
+    ''' A filter screens out unwanted PPAs on download. '''
 
 
-    def __init__( self ):
-        self.filters = { }
+#TODO Delete
+    # INDEX_USER = 0
+    # INDEX_NAME = 1
+    # INDEX_TEXT = 2
 
 
-    def add_filter( self, user, name, series, architecture, text = [ ] ):  #TODO Test to see if text = None can be used...
-        # TODO...then first line should be:
-        # if text is None:
-        #     text = [ ]
-        self.filters[ self._get_key( user, name, series, architecture ) ] = text
+    def __init__( self, user, name, text ):
+        self.user = user
+        self.name = name
+        self.text = text
 
 
-    def has_filter( self, user, name, series, architecture ):
-        return self._get_key( user, name, series, architecture ) in self.filters
+    def get_user( self ):
+        return self.user
 
 
-    def get_filter_text( self, user, name, series, architecture ):
-        return self.filters[ self._get_key( user, name, series, architecture ) ]
+    def get_name( self ):
+        return self.name
 
 
-    def get_user_name_series_architecture( self ):
+    def get_text( self ):
+        return self.text
+
+
+#TODO Delete
+    def add_filter( self, user, name, text = None ):
+        self.filters[ self._get_key( user, name ) ] = text
+
+
+#TODO Make this a static version if needed.
+#TODO Delete
+    def has_filter( self, user, name ):
+        return self._get_key( user, name ) in self.filters
+
+
+#TODO Delete
+    def get_filter_text( self, user, name ):
+        return self.filters[ self._get_key( user, name ) ]
+
+
+#TODO Delete
+    def get_user_name( self ):
         for key in sorted( self.filters.keys() ):
             key_components = key.split( " | " )
-            yield key_components[ Filters.INDEX_USER ], \
-                  key_components[ Filters.INDEX_NAME ], \
-                  key_components[ Filters.INDEX_SERIES ], \
-                  key_components[ Filters.INDEX_ARCHITECTURE ]
+            # yield \
+            #     key_components[ Filters.INDEX_USER ], \
+            #     key_components[ Filters.INDEX_NAME ]
 
 
-    def _get_key( self, user, name, series, architecture ):
-        return user + " | " + name + " | " + series + " | " + architecture
+#TODO Delete
+    def _get_key( self, user, name, ):
+        return user + " | " + name
 
 
     def __str__( self ):
-        return str( self.__dict__ )
+        return \
+            self.user + " | " + \
+            self.name + " | " + \
+            self.text
 
 
     def __repr__( self ):
         return self.__str__()
 
 
-    def __eq__( self, filters ):
-        return self.__dict__ == filters.__dict__
+    def __eq__( self, other ):
+        return \
+            self.__class__ == other.__class__ and \
+            self.get_user() == other.get_user() and \
+            self.get_name() == other.get_name() and \
+            self.get_text() == other.get_text()
 
 
 class PublishedBinary():
-    ''' PPA data. '''
+    ''' PPA downloaded data. '''
 
-    # Package name, package version (string)
-    # Download count (integer)
-    # Architecture specific (boolean)
-    def __init__( self, package_name, package_version, download_count, architecture_specific ):
+    def __init__(
+            self,
+            package_name,
+            package_version,
+            download_count,
+            architecture_specific ):
+        '''
+        Package name, package version (string)
+        Download count (integer)
+        Architecture specific (boolean)
+        '''
+
         self.package_name = package_name
         self.package_version = package_version
         self.download_count = download_count
@@ -132,12 +164,12 @@ class PPA():
 
     class Status( Enum ):
         ''' Download status of a PPA. '''
-        ERROR_RETRIEVING_PPA = 0
-        NEEDS_DOWNLOAD = 1
-        NO_PUBLISHED_BINARIES = 2
-        NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED = 3
-        OK = 4
-        PUBLISHED_BINARIES_COMPLETELY_FILTERED = 5
+        NEEDS_DOWNLOAD = 0
+        ERROR_RETRIEVING_PPA = 1
+        OK = 2
+        NO_PUBLISHED_BINARIES = 3
+        COMPLETELY_FILTERED = 4
+        MIX_OF_OK_FILTERED_NO_PUBLISHED_BINARIES = 5
 
 
     def __init__( self, user, name, series, architecture ):
@@ -196,6 +228,10 @@ class PPA():
         self.published_binaries.extend( published_binaries )
 
 
+    def has_published_binaries( self ):
+        return len( self.published_binaries ) > 0
+
+
     def get_published_binaries( self, sort = False ):
         if sort:
             self.published_binaries.sort( key = operator.methodcaller( "__str__" ) )
@@ -204,7 +240,10 @@ class PPA():
 
 
     def sort_published_binaries_by_download_count_and_clip( self, clip_amount ):
-        self.published_binaries.sort( key = operator.methodcaller( "get_download_count" ), reverse = True )
+        self.published_binaries.sort(
+            key = operator.methodcaller( "get_download_count" ),
+            reverse = True )
+
         if clip_amount > 0:
             del self.published_binaries[ clip_amount : ]
 
@@ -238,7 +277,10 @@ class PPA():
 
         equal &= len( self.get_published_binaries() ) == len( other.get_published_binaries() )
         if equal:
-            for published_binary_self, published_binary_other in zip( self.get_published_binaries(), other.get_published_binaries() ):
+            for \
+                published_binary_self, published_binary_other in \
+                zip( self.get_published_binaries(), other.get_published_binaries() ):
+
                 equal &= published_binary_self.__eq__( published_binary_other )
 
         return equal

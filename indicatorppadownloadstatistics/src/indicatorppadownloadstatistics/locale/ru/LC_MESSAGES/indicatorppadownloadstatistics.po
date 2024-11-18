@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorppadownloadstatistics 1.0.81\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-29 16:31+1000\n"
+"POT-Creation-Date: 2024-11-18 18:02+1100\n"
 "PO-Revision-Date: 2024-07-09 00:24+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -26,13 +26,11 @@ msgstr "(невозможно найти PPA)"
 msgid "(no published binaries)"
 msgstr "(нет опубликованных двоичных файлов)"
 
-msgid "(no published binaries and/or completely filtered)"
-msgstr ""
-"(нет опубликованных двоичных файлов,\n"
-"либо они полностью отфильтрованы)"
-
 msgid "(published binaries completely filtered)"
 msgstr "(двоичные файлы полностью отфильтрованы)"
+
+msgid "(multiple messages; uncheck combine to view)"
+msgstr ""
 
 msgid "Displays the total downloads of PPAs."
 msgstr "Показать статистику закачек из PPA."
@@ -218,9 +216,6 @@ msgstr "Удалить выбранный PPA?"
 msgid "Add PPA"
 msgstr "Добавить PPA"
 
-msgid "Edit PPA"
-msgstr "Редактировать PPA"
-
 msgid "PPA user cannot be empty."
 msgstr "Пользователь PPA не может быть пустым."
 
@@ -229,6 +224,9 @@ msgstr "Название PPA не может быть пустым."
 
 msgid "Duplicates disallowed - there is an identical PPA!"
 msgstr "Дубликаты не допускаются - существует идентичный PPA!"
+
+msgid "Edit PPA"
+msgstr "Редактировать PPA"
 
 msgid "No filter has been selected for removal."
 msgstr "Не выбран фильтр для удаления."
@@ -280,3 +278,8 @@ msgstr "Добавить фильтр"
 
 msgid "Please enter filter text!"
 msgstr "Пожалуйста, введите текст фильтра!"
+
+#~ msgid "(no published binaries and/or completely filtered)"
+#~ msgstr ""
+#~ "(нет опубликованных двоичных файлов,\n"
+#~ "либо они полностью отфильтрованы)"
