@@ -106,7 +106,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     MESSAGE_COMPLETELY_FILTERED = _( "(published binaries completely filtered)" )
     MESSAGE_MIX_OF_OK_FILTERED_NO_PUBLISHED_BINARIES = _( "(multiple messages; uncheck combine to view)" )
 
-    # Data model columns used in the Preferences dialog.
+    # Data model columns used in the Preferences dialog and json config.
     COLUMN_USER = 0
     COLUMN_NAME = 1
     COLUMN_SERIES = 2
@@ -256,7 +256,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             # else:
             #     combined_ppas[ key ] = ppa
 
-#TODO New version below...hopefully better.            
+#TODO New version below...hopefully better.
             if key in combined_ppas:
                 error = \
                     ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA or \
@@ -281,13 +281,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if ok or filtered or no_published_binaries:
                     continue
 
-                # Some mix of status of ok, filtered or no published binaries.
+                # Mix of statuses (ok, filtered, no published binaries).
                 combined_ppas[ key ].set_status(
                     PPA.Status.MIX_OF_OK_FILTERED_NO_PUBLISHED_BINARIES )
 
             else:
                 combined_ppas[ key ] = ppa
-            
+
         # ppas = [ ]
         # for ppa in combined_ppas.values():
         #     if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA or \
@@ -349,7 +349,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         #
         # PPA.sort( self.ppas )
 
-#TODO New        
+#TODO New
         ppas = [ ]
         for ppa in combined_ppas.values():
             if ppa.get_status() == PPA.OK:
@@ -403,7 +403,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppas[ -1 ].add_published_binary( value )
 
             else:
-                # Status of error or a mix of ok, filtered or no published binaries.
+                # Status of error or mix of
+                # ok, filtered, no published binaries.
                 ppas.append( PPA( ppa.get_user(), ppa.get_name(), None, None ) )
                 ppas[ -1 ].set_status( ppa.get_status() )
 
@@ -419,25 +420,27 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if second_pipe == -1:
             # This is a combined PPA...
             ppa_name = menuitem.get_name()[ first_pipe + 1 : ].strip()
-            url += ppa_user + "/+archive/ubuntu/" + ppa_name
+            url += f"{ ppa_user }/+archive/ubuntu/{ ppa_name }"
             if menuitem.get_name() != menuitem.get_label():
                 # Use the menu item label to specify the package name.
-                url += "/+packages?field.name_filter=" + \
-                        menuitem.get_label().split()[ 0 ] + \
-                        "&field.status_filter=published&field.series_filter="
+                url +=
+                    f"/+packages?field.name_filter=" + \
+                    f"{ menuitem.get_label().split()[ 0 ] }" + \
+                    "&field.status_filter=published&field.series_filter="
 
         else:
             ppa_name = menuitem.get_name()[ first_pipe + 1 : second_pipe ].strip()
             third_pipe = str.find( menuitem.get_name(), "|", second_pipe + 1 )
             series = menuitem.get_name()[ second_pipe + 1 : third_pipe ].strip()
-            url += ppa_user + "/+archive/ubuntu/" + ppa_name
+            url += f"{ ppa_user }/+archive/ubuntu/{ ppa_name }"
             if menuitem.get_name() == menuitem.get_label():
-                url += "?field.series_filter=" + series
+                url += f"?field.series_filter={ series }"
 
             else: # Use the menu item label to specify the package name.
-                url += "/+packages?field.name_filter=" + \
-                       menuitem.get_label().split()[ 0 ] + \
-                       "&field.status_filter=published&field.series_filter=" + series
+                url +=
+                    "/+packages?field.name_filter=" + \
+                    f"{ menuitem.get_label().split()[ 0 ] }"+ \
+                    f"&field.status_filter=published&field.series_filter={ series }"
 
         webbrowser.open( url )
 
@@ -551,7 +554,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         def extract_attributes():
             for entry in published_binaries[ "entries" ]: #TODO Test for no entries (filter out with bogus indicator name.
-                self_links.append( entry[ "self_link" ] )                
+                self_links.append( entry[ "self_link" ] )
                 binary_package_names.append( entry[ "binary_package_name" ] )
                 binary_package_versions.append( entry[ "binary_package_version" ] )
                 architecture_specifics.append( entry[ "architecture_specific" ] )
@@ -1471,7 +1474,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         label.set_halign( Gtk.Align.START )
         grid.attach( label, 0, 0, 1, 1 )
 
-        ppa_users_names = Gtk.ComboBoxText.new()  #TODO This should use indicatorbase 
+        ppa_users_names = Gtk.ComboBoxText.new()  #TODO This should use indicatorbase
         if row_number is None: # Adding
             temp = [ ] # Used to ensure duplicates are not added.
             for i, row in enumerate( ppa_model ):
@@ -1601,21 +1604,27 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 user = filter_[ IndicatorPPADownloadStatistics.COLUMN_USER ]
                 name = filter_[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
                 filter_text = filter_[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ]
-                self.filters.append( Filter( user, name, filter_text ) )
 
                 # Prior to version 81, filters erroneously included the
                 # series/architecture.  Remove the series/architecture if
                 # present and schedule a save.
                 if len( filter_ ) == 5:
+                    filter_text = filter_[ 4 ]
                     save_required = True
+
+                self.filters.append( Filter( user, name, filter_text ) )
 
             if save_required:
                 self.request_save_config()
 
 #TODO
-'''
-{"combinePPAs": false, "filters": [["canonical-kernel-team", "ppa", ["linux-image-oem"]]], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"],["canonical-kernel-team","ppa","focal","amd64"],["thebernmeister", "ppa", "focal", "amd64"]], "showSubmenu": false, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.81", "checklatestversion": false}
-'''
+            '''
+            {"combinePPAs": false, "filters": [["canonical-kernel-team", "ppa", ["linux-image-oem"]]], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"],["canonical-kernel-team","ppa","focal","amd64"],["thebernmeister", "ppa", "focal", "amd64"]], "showSubmenu": false, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.81", "checklatestversion": false}
+
+
+            {"combinePPAs": false, "filters": [["thebernmeister", "ppa", "jammy", "amd64", ["indicator-fortune", "indicator-lunar", "indicator-on-this-day", "indicator-ppa-download-statistics", "indicator-punycode", "indicator-script-runner", "indicator-stardate", "indicator-tide", "indicator-virtual-box"]]], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"]], "showSubmenu": false, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.80"}
+
+            '''
 
         else:
             user = "thebernmeister"
