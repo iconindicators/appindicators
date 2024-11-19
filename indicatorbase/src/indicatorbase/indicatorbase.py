@@ -154,7 +154,7 @@ class IndicatorBase( ABC ):
     SESSION_TYPE_WAYLAND = "wayland"
     SESSION_TYPE_X11 = "x11"
 
-    URL_TIMEOUT_IN_SECONDS = 5
+    TIMEOUT_IN_SECONDS = 5
 
     # Obtain name of indicator from the call stack and initialise gettext.
     INDICATOR_NAME = None
@@ -269,22 +269,28 @@ class IndicatorBase( ABC ):
 
 
     def _check_for_newer_version( self ):
-        try:
-            url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
-            with urlopen(
-                url,
-                timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f:
+        url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
+        data_json = self.get_json( url )
+        if data_json:
+            version_latest = data_json[ "info" ][ "version" ]
+            if version_latest != str( self.version ):
+                self.new_version_available = True
+                self.show_notification(
+                    _( "New version of {0} available..." ).format( self.indicator_name ),
+                    _( "Refer to the Preferences for details." ) )
 
-                data_json = json.loads( f.read() )
-                version_latest = data_json[ "info" ][ "version" ]
-                if version_latest != str( self.version ):
-                    self.new_version_available = True
-                    self.show_notification(
-                        _( "New version of {0} available..." ).format( self.indicator_name ),
-                        _( "Refer to the Preferences for details." ) )
+
+    def get_json( self, url ):
+        try:
+            with urlopen( url, timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) as f:
+                json_ = json.loads( f.read().decode( "utf8" ) )
 
         except URLError as e:
-            logging.exception( e )
+            self.get_logging().error( f"Problem with { url }" )  #TODO URL is underscored...an error/warning?  What does pylint say?
+            self.get_logging().exception( e )
+            json_ = None
+
+        return json_
 
 
     @staticmethod
@@ -1453,9 +1459,14 @@ class IndicatorBase( ABC ):
             self,
             data,
             tooltip_text = "",
-            active = -1 ):
+            active = -1,
+            editable = False ):
 
-        comboboxtext = Gtk.ComboBoxText.new_with_entry()
+        if editable:
+            comboboxtext = Gtk.ComboBoxText.new_with_entry()
+
+        else:
+            comboboxtext = Gtk.ComboBoxText.new()
 
         for d in data:
             comboboxtext.append_text( d )
@@ -1913,7 +1924,7 @@ class IndicatorBase( ABC ):
         ''' Download the contents of the given URL and save to file. '''
         downloaded = False
         try:
-            with urlopen( url, timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f_in:
+            with urlopen( url, timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) as f_in:
                 with open( filename, 'w', encoding = "utf-8" ) as f_out:
                     f_out.write( f_in.read().decode() )
 

@@ -978,7 +978,7 @@ class IndicatorLunar( IndicatorBase ):
                 response = \
                     requests.get(
                         menuitem.get_name(),
-                        timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS )
+                        timeout = IndicatorBase.TIMEOUT_IN_SECONDS )
 
                 object_id = str( response.json()[ "object" ][ "id" ] )
                 webbrowser.open( IndicatorLunar.SEARCH_URL_COMET_ID + object_id )
@@ -2165,7 +2165,8 @@ class IndicatorLunar( IndicatorBase ):
                 cities,
                 tooltip_text = _(
                     "Choose a city from the list.\n" +
-                    "Or, add in your own city name." ) )
+                    "Or, add in your own city name." ),
+                editable = True )
 
         grid.attach(
             self.create_box(

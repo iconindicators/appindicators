@@ -751,7 +751,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                       tooltip_text = _(
                           "The group to which the script belongs.\n\n" +
                           "Choose an existing group or enter a new one." ),
-                      active = groups.index( script.get_group() ) )
+                      active = groups.index( script.get_group() ),
+                      editable = True )
 
             grid.attach(
                 self.create_box(
@@ -935,7 +936,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 tooltip_text = _(
                     "The group to which the script belongs.\n\n" +
                     "Choose an existing group or enter a new one." ),
-                active = index )
+                active = index,
+                editable = True )
 
         grid = self.create_grid()
 
@@ -1372,8 +1374,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                     False, False, 5, False ) )
 
             self.indicator_text = " [Network::Internet Down][System::Available Memory]"
-
-            self.request_save_config()
 
         self.initialise_background_scripts()
 

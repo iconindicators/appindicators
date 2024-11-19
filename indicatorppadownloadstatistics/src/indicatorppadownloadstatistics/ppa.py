@@ -239,6 +239,10 @@ class PPA():
         return self.published_binaries
 
 
+    def remove_published_binaries( self ):
+        self.published_binaries = [ ]
+
+
     def sort_published_binaries_by_download_count_and_clip( self, clip_amount ):
         self.published_binaries.sort(
             key = operator.methodcaller( "get_download_count" ),

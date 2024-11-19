@@ -498,12 +498,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 filter_ = [ "" ]
 
             for f in filter_:
-                self.get_published_binariesNEW( ppa, f )
+                self.get_published_binaries( ppa, f )
                 if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
                     break
 
             if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-                pass #TODO Flush all published binaries.
+                ppa.remove_published_binaries() #TODO Test.
 
             elif ppa.has_published_binaries():
                 ppa.set_status( PPA.Status.OK )
@@ -518,153 +518,22 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa.set_status( PPA.Status.COMPLETELY_FILTERED )
 
 
-
-            # if filter_:
-            #     for f in filter_:
-            #         self.get_published_binariesNEW( ppa, f )
-            #         if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-            #             break # No point continuing with each filter.
-            #
-            #     if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-            #         pass #TODO Flush all published binaries.
-            #
-            #     else:
-            #         pass #TODO
-            #         if ppa.has_published_binaries():
-            #             ppa.set_status( PPA.Status.OK )
-            #
-            #         else:
-            #             ppa.set_status( PPA.Status.COMPLETELY_FILTERED )
-            #
-            # else:
-            #     filter_ = [ "" ]
-            #     self.get_published_binariesNEW( ppa, "" )
-            #     if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-            #         pass #TODO Flush all published binaries.
-            #
-            #     else:
-            #         if ppa.has_published_binaries():
-            #             ppa.set_status( PPA.Status.OK )
-            #
-            #         else:
-            #             ppa.set_status( PPA.Status.NO_PUBLISHED_BINARIES )
-
-
-#TODO Delete
-    # def download_ppa_statisticsORIG( self ):
-    #     '''
-    #     Get a list of the published binaries for each PPA.
-    #     From that extract the ID for each binary which is then used to get the download count for each binary.
-    #     The ID is the number at the end of self_link.
-    #     The published binary object looks like this...
-    #
-    #     {
-    #       "total_size": 4,
-    #       "start": 0,
-    #       "entries": [
-    #       {
-    #         "distro_arch_series_link": "https://api.launchpad.net/1.0/ubuntu/precise/i386",
-    #         "removal_comment": null,
-    #         "display_name": "indicator-lunar 1.0.9-1 in precise i386",
-    #         "date_made_pending": null,
-    #         "date_superseded": null,
-    #         "priority_name": "OPTIONAL",
-    #         "http_etag": "\"94b9873b47426c010c4117854c67c028f1acc969-771acce030b1683dc367b5cbf79376d386e7f3b3\"",
-    #         "self_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/28105302",
-    #         "binary_package_version": "1.0.9-1",
-    #         "resource_type_link": "https://api.launchpad.net/1.0/#binary_package_publishing_history",
-    #         "component_name": "main",
-    #         "status": "Published",
-    #         "date_removed": null,
-    #         "pocket": "Release",
-    #         "date_published": "2012-08-09T10:30:49.572656+00:00",
-    #         "removed_by_link": null, "section_name": "python",
-    #         "date_created": "2012-08-09T10:27:31.762212+00:00",
-    #         "binary_package_name": "indicator-lunar",
-    #         "archive_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa",
-    #         "architecture_specific": false,
-    #         "scheduled_deletion_date": null
-    #       }
-    #       {
-    #       ,...
-    #     }
-    #
-    #     References
-    #         http://launchpad.net/+apidoc
-    #         http://help.launchpad.net/API/launchpadlib
-    #         http://help.launchpad.net/API/Hacking
-    #     '''
-    #     for ppa in self.ppas:
-    #         ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
-    #
-    #         filter_ = [
-    #             filter_ for filter_ in self.filters \
-    #             if filter_.get_user() == ppa.get_user() and filter_.get_name() == ppa.get_name() ]
-    #
-    #         if filter_:
-    #             has_published_binaries = self.has_published_binaries( ppa )
-    #             if has_published_binaries is None:
-    #                 ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-    #
-    #             elif has_published_binaries:
-    #                 the_filters = \
-    #                     self.filters.get_filter_text(
-    #                         ppa.get_user(),
-    #                         ppa.get_name() )
-    #
-    #                 for the_filter in the_filters:
-    #                     self.get_published_binaries( ppa, the_filter )
-    #                     if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-    #                         break # No point continuing with each filter.
-    #
-    #                 if not ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-    #                     if ppa.get_published_binaries():
-    #                         ppa.set_status( PPA.Status.OK )
-    #
-    #                     else:
-    #                         ppa.set_status(
-    #                             PPA.Status.COMPLETELY_FILTERED )
-    #
-    #             else:
-    #                 ppa.set_status( PPA.Status.NO_PUBLISHED_BINARIES )
-    #
-    #         else:
-    #             self.get_published_binaries( ppa, "" )
-    #             if not ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-    #                 if ppa.get_published_binaries():
-    #                     ppa.set_status( PPA.Status.OK )
-    #
-    #                 else:
-    #                     ppa.set_status(
-    #                         PPA.Status.NO_PUBLISHED_BINARIES )
-
-
-
-    # def has_published_binaries( self, ppa ):
-    #     url = \
-    #         "https://api.launchpad.net/1.0/~" + \
-    #         ppa.get_user() + "/+archive/ubuntu/" + \
-    #         ppa.get_name() + "?ws.op=getPublishedBinaries&" + \
-    #         "distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + \
-    #         ppa.get_series() + "/" + ppa.get_architecture() + \
-    #         "&status=Published&exact_match=false&ordered=false"
-    #
-    #     print( url )
-    #
-    #     try:
-    #         with urlopen(
-    #             url,
-    #             timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f:
-    #
-    #             published_binaries = json.loads( f.read().decode( "utf8" ) )
-    #             has_publised_binaries = published_binaries[ "total_size" ] > 0
-    #
-    #     except URLError as e:
-    #         has_publised_binaries = None
-    #         self.get_logging().error( f"Problem with { url }" )#TODO Why is url underscored?
-    #         self.get_logging().exception( e )
-    #
-    #     return has_publised_binaries
+#TODO For testing.
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
+#
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273074?ws.op=getDownloadCount
+#
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273018
+#
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273018?ws.op=getDownloadCount
+#
+# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
+#
+# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image
+#
+# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
+#
+# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
 
 
     def get_published_binaries( self, ppa, filter_text ):
@@ -689,9 +558,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
         url = (
-            f"https://api.launchpad.net/1.0/~" +
-            f"{ ppa.get_user() }/+archive/ubuntu/" +
-            f"{ ppa.get_name() }?ws.op=getPublishedBinaries&" +
+            f"https://api.launchpad.net/1.0/~{ ppa.get_user() }" +
+            f"/+archive/ubuntu/{ ppa.get_name() }?ws.op=getPublishedBinaries&" +
             f"distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" +
             f"{ ppa.get_series() }/{ ppa.get_architecture() }" +
             f"&status=Published&exact_match=false&ordered=false" +
@@ -702,32 +570,30 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         binary_package_versions = [ ]
         architecture_specifics = [ ]
 
-        try:
-            with urlopen(
-                url,
-                timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f:
-
-                published_binaries = json.loads( f.read().decode( "utf8" ) )
-
+        published_binaries = self.get_json( url )
+        if published_binaries:
             extract_attributes()
-
-            if "next_collection_link" in published_binaries:
-                url = published_binaries[ "next_collection_link" ]
+            next_collection_link = "next_collection_link"
+            if next_collection_link in published_binaries:
+                url = published_binaries[ next_collection_link ]
                 while True:
-                    with urlopen(
-                        url,
-                        timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f:
+                    published_binaries = self.get_json( url )
+                    if published_binaries:
+                        extract_attributes()
+                        if next_collection_link in published_binaries:
+                            url = published_binaries[ next_collection_link ]
+                            continue
 
-                        published_binaries = json.loads( f.read().decode( "utf8" ) )
+                        break
 
-                    extract_attributes()
+                    else:
+                        ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
+                        break
 
-                    if "next_collection_link" in published_binaries:
-                        url = published_binaries[ "next_collection_link" ]
-                        continue
+        else:
+            ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
 
-                    break
-
+        if not ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
             max_workers = 1 if self.low_bandwidth else 3
             with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
                 {
@@ -736,90 +602,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         ppa,
                         self_links[ i ],
                         binary_package_names[ i ],
-                        binary_package_versions[ i],
+                        binary_package_versions[ i ],
                         architecture_specifics[ i ] ):
 
                         i for i in range( len( self_links ) )
                 }
-
-        except URLError as e:
-            self.get_logging().error( f"Problem with { url }" )
-            self.get_logging().exception( e )
-            ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-
-
-    # def get_published_binariesORIG( self, ppa, filter_text ):
-    #     '''
-    #     Use a thread pool executer to get the download counts for each
-    #     published binary.
-    #
-    #     A filter_text of "" equates to no filtering.
-    #
-    #     References
-    #         https://docs.python.org/3/library/concurrent.futures.html
-    #         https://pymotw.com/3/concurrent.futures
-    #         http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
-    #     '''
-    #     url = \
-    #         "https://api.launchpad.net/1.0/~" + \
-    #         ppa.get_user() + "/+archive/ubuntu/" + \
-    #         ppa.get_name() + "?ws.op=getPublishedBinaries&" + \
-    #         "distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" + \
-    #         ppa.get_series() + "/" + ppa.get_architecture() + \
-    #         "&status=Published&exact_match=false&ordered=false&binary_name=" + \
-    #         filter_text
-    #
-    #     page_number = 1
-    #     published_binaries_per_page = 75
-    #     published_binary_counter = 0
-    #
-    #     # Set to a value greater than published_binary_counter to ensure the
-    #     # loop executes at least once.
-    #     total_published_binaries = published_binary_counter + 1
-    #
-    #     while (
-    #         published_binary_counter < total_published_binaries and \
-    #         ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD ):
-    #
-    #         # Continue if there are more downloads and no error has occurred.
-    #         try:
-    #             current_url = url + "&ws.start=" + str( published_binary_counter )
-    #             with urlopen(
-    #                 current_url,
-    #                 timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f:
-    #
-    #                 published_binaries = json.loads( f.read().decode( "utf8" ) )
-    #
-    #         except URLError as e:
-    #             self.get_logging().error( "Problem with " + current_url )
-    #             self.get_logging().exception( e )
-    #             ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-    #             published_binary_counter = total_published_binaries
-    #             continue
-    #
-    #         total_published_binaries = published_binaries[ "total_size" ]
-    #         if total_published_binaries == 0:
-    #             published_binary_counter = total_published_binaries
-    #             continue
-    #
-    #         number_published_binaries_current_page = published_binaries_per_page
-    #         if( page_number * published_binaries_per_page ) > total_published_binaries:
-    #             number_published_binaries_current_page = \
-    #                 total_published_binaries - ( ( page_number - 1 ) * published_binaries_per_page )
-    #
-    #         max_workers = 1 if self.low_bandwidth else 3
-    #         with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-    #             {
-    #                 executor.submit(
-    #                     self.get_download_count,
-    #                     ppa,
-    #                     published_binaries[ "entries" ][ i ] ):
-    #
-    #                     i for i in range( number_published_binaries_current_page )
-    #             }
-    #
-    #         published_binary_counter += published_binaries_per_page
-    #         page_number += 1
 
 
     def get_download_count(
@@ -831,13 +618,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             architecture_specific ):
 
         if ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD:
-            try:
-                with urlopen(
-                    url + "?ws.op=getDownloadCount",
-                    timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f:
-
-                    download_count = json.loads( f.read().decode( "utf8" ) )
-
+            download_count = self.get_json( url + "?ws.op=getDownloadCount" )
+            if download_count is not None:
                 ppa.add_published_binary(
                     PublishedBinary(
                         binary_package_name,
@@ -845,47 +627,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         download_count,
                         architecture_specific ) )
 
-            except URLError as e:
+            else:
                 ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-                self.get_logging().error( f"Problem with { url }" )  #TODO Why is url underscored? On testing, the url prints okay...
-                self.get_logging().exception( e )
-
-
-    # def get_download_count( self, ppa, published_binary ):
-    #     if ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD:
-    #         index_last_slash = published_binary[ "self_link" ].rfind( "/" )
-    #         package_id = published_binary[ "self_link" ][ index_last_slash + 1 : ]
-    #         url = \
-    #             "https://api.launchpad.net/1.0/~" + \
-    #             ppa.get_user() + "/+archive/ubuntu/" + \
-    #             ppa.get_name() + "/+binarypub/" + \
-    #             package_id + "?ws.op=getDownloadCount"
-    #
-    #         try:
-    #             with urlopen(
-    #                 url,
-    #                 timeout = IndicatorBase.URL_TIMEOUT_IN_SECONDS ) as f:
-    #
-    #                 download_count = json.loads( f.read().decode( "utf8" ) )
-    #
-    #             if str( download_count ).isnumeric():
-    #                 ppa.add_published_binary(
-    #                     PublishedBinary(
-    #                         published_binary[ "binary_package_name" ],
-    #                         published_binary[ "binary_package_version" ],
-    #                         download_count,
-    #                         published_binary[ "architecture_specific" ] ) )
-    #
-    #             else:
-    #                 self.get_logging().error(
-    #                     f"Non-numeric download count at { url }" )  #TODO Why is url underscored? On testing, the url prints okay...
-    #
-    #                 ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-    #
-    #         except URLError as e:
-    #             self.get_logging().error( f"Problem with { url }" )  #TODO Why is url underscored? On testing, the url prints okay...
-    #             self.get_logging().exception( e )
-    #             ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
 
 
     def on_preferences( self, dialog ):
@@ -943,12 +686,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         # PPA user, name, filter text.
         filter_store = Gtk.ListStore( str, str, str )
 
-        for user, name in self.filters.get_user_name():
-            filter_text = self.filters.get_filter_text( user, name )
+        for filter_ in self.filters:
             filter_store.append( [
-                user,
-                name,
-                "\n".join( filter_text ) ] )
+                filter_.get_user(),
+                filter_.get_name(),
+                "\n".join( filter_.get_text() ) ] )
 
         filter_treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -1844,8 +1586,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.ppas = [ ]
             ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
             for ppa in ppas:
-                user = ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ]#TODO Put back
-                # user = "canonical-kernel-team"
+                user = ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ]
                 name = ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
                 series = ppa[ IndicatorPPADownloadStatistics.COLUMN_SERIES ]
                 architecture = ppa[ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ]
@@ -1871,10 +1612,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             if save_required:
                 self.request_save_config()
 
-            self.filters = [ ] #TODO Testing...remove!
-            user = "thebernmeister"
-            name = "ppa"
-            self.filters.append( Filter( user, name, [ "bogus" ] ) )
+#TODO
+'''
+{"combinePPAs": false, "filters": [["canonical-kernel-team", "ppa", ["linux-image-oem"]]], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"],["canonical-kernel-team","ppa","focal","amd64"],["thebernmeister", "ppa", "focal", "amd64"]], "showSubmenu": false, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.81", "checklatestversion": false}
+'''
 
         else:
             user = "thebernmeister"
