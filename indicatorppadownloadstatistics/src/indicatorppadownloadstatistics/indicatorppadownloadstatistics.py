@@ -20,7 +20,6 @@
 
 
 import concurrent.futures
-import json
 import locale
 import webbrowser
 
@@ -55,6 +54,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     CONFIG_SORT_BY_DOWNLOAD = "sortByDownload"
     CONFIG_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
 
+#TODO Can this list be obtained from PPA/LaunchPad?
+# What happens if internet is down?
+# Can/should the list be cached?
     SERIES = [
         "plucky",
         "oracular",
@@ -122,9 +124,86 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def update( self, menu ):
-        self.download_ppa_statistics()
-        self.build_menu( menu )
-        return 6 * 60 * 60 # Update every six hours.
+
+        # url = (
+        #     f"https://api.launchpad.net/1.0/~thebernmeister" +
+        #     f"/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&" +
+        #     f"distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" +
+        #     f"jammy/amd64" +
+        #     f"&status=Published&exact_match=false&ordered=false" )
+        #
+        # print( url )
+        #
+        # published_binaries = self.get_json( url )
+
+
+        # url = (
+        #     "https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa" +
+        #     "?ws.op=getPublishedBinaries" +
+        #     "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/jammy/amd64" +
+        #     "&status=Published" +
+        #     "&exact_match=false" +
+        #     "&ordered=false" )
+        #
+        # print( url )
+        #
+        # published_binaries_2 = self.get_json( url )
+
+        # url = (
+        #     "https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa" +
+        #     "?ws.op=getPublishedBinaries" +
+        #     "&status=Published" +
+        #     "&exact_match=false" +
+        #     "&ordered=false" )
+        #
+        # print( url )
+        #
+        # published_binaries_3 = self.get_json( url )
+
+
+        # url = (
+        #     "https://api.launchpad.net/1.0/~ubuntu/+archive/ubuntu/ppa" +
+        #     "?ws.op=getArchive" +
+        #     "&name=main_archive" )
+        #
+        # print( url )
+        #
+        # archive = self.get_json( url )
+
+
+
+        def get_series( url ):
+            try:
+                with urlopen(
+                    url,
+                    timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) as f:
+
+                    for line in f.read().decode().splitlines():
+                        if "Dist:" in line:
+                            s = line.split()[ 1 ]
+                            if s not in series:
+                                series.insert( 0, s )
+
+            except URLError as e:
+                print( e )
+                # logging_.error( "Error downloading from " + str( url ) )
+                # logging_.exception( e )
+
+
+        series = [ ]
+        get_series( "https://changelogs.ubuntu.com/meta-release" )
+        get_series( "https://changelogs.ubuntu.com/meta-release-development" )
+        print( series )
+        
+        
+        import sys
+        sys.exit()
+
+        
+        
+        # self.download_ppa_statistics()
+        # self.build_menu( menu )
+        # return 6 * 60 * 60 # Update every six hours.
 
 
     def build_menu( self, menu ):
@@ -423,7 +502,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             url += f"{ ppa_user }/+archive/ubuntu/{ ppa_name }"
             if menuitem.get_name() != menuitem.get_label():
                 # Use the menu item label to specify the package name.
-                url +=
+                url += \
                     f"/+packages?field.name_filter=" + \
                     f"{ menuitem.get_label().split()[ 0 ] }" + \
                     "&field.status_filter=published&field.series_filter="
@@ -437,7 +516,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 url += f"?field.series_filter={ series }"
 
             else: # Use the menu item label to specify the package name.
-                url +=
+                url += \
                     "/+packages?field.name_filter=" + \
                     f"{ menuitem.get_label().split()[ 0 ] }"+ \
                     f"&field.status_filter=published&field.series_filter={ series }"
@@ -871,24 +950,27 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.ppas = [ ]
             treeiter = ppa_store.get_iter_first()
             while treeiter is not None:
+                ppa = ppa_store[ treeiter ]
                 self.ppas.append(
                     PPA(
-                        ppa_store[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ],
-                        ppa_store[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ],
-                        ppa_store[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_SERIES ],
-                        ppa_store[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ] ) )
+                        ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ],
+                        ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ],
+                        ppa[ IndicatorPPADownloadStatistics.COLUMN_SERIES ],
+                        ppa[ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ] ) )
 
                 treeiter = ppa_store.iter_next( treeiter )
 
             PPA.sort( self.ppas )
 
-            self.filters = Filters()
+            self.filters = [ ]
             treeiter = filter_store.get_iter_first()
             while treeiter is not None:
-                self.filters.add_filter(
-                    filter_store[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ],
-                    filter_store[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ],
-                    filter_store[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ].split() )
+                filter_ = filter_store[ treeiter ]
+                self.filters.append(
+                    Filter(
+                        filter_[ IndicatorPPADownloadStatistics.COLUMN_USER ],
+                        filter_[ IndicatorPPADownloadStatistics.COLUMN_NAME ],
+                        filter_[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ].split() ) )
 
                 treeiter = filter_store.iter_next( treeiter )
 
@@ -1626,7 +1708,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             '''
 
+            #TODO Test data.
+            self.ppas = [ ]
+            self.filters = [ ]
+
         else:
+#TODO Once Ubuntu 20.04 is EOL,
+# should really find an alternate default/example PPA and filter.
             user = "thebernmeister"
             name = "ppa"
 
