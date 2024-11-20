@@ -21,6 +21,7 @@
 
 import concurrent.futures
 import locale
+import threading
 import webbrowser
 
 from copy import deepcopy
@@ -54,52 +55,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     CONFIG_SORT_BY_DOWNLOAD = "sortByDownload"
     CONFIG_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
 
-#TODO Can this list be obtained from PPA/LaunchPad?
-# What happens if internet is down?
+# What happens if internet is down and the series cannot be downloaded?
 # Can/should the list be cached?
-    SERIES = [
-        "plucky",
-        "oracular",
-        "noble",
-        "mantic",
-        "lunar",
-        "kinetic",
-        "jammy",
-        "impish",
-        "hirsute",
-        "groovy",
-        "focal",
-        "eoan",
-        "disco",
-        "cosmic",
-        "bionic",
-        "artful",
-        "zesty",
-        "yakkety",
-        "xenial",
-        "wily",
-        "vivid",
-        "utopic",
-        "trusty",
-        "saucy",
-        "raring",
-        "quantal",
-        "precise",
-        "oneiric",
-        "natty",
-        "maverick",
-        "lucid",
-        "karmic",
-        "jaunty",
-        "intrepid",
-        "hardy",
-        "gutsy",
-        "feisty",
-        "edgy",
-        "dapper",
-        "breezy",
-        "hoary",
-        "warty" ]
+# If the internet is down, cannot get PPA data...
+# ...so maybe caching is a waste of time.
 
     ARCHITECTURES = [ "amd64", "i386" ]
 
@@ -124,86 +83,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def update( self, menu ):
-
-        # url = (
-        #     f"https://api.launchpad.net/1.0/~thebernmeister" +
-        #     f"/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&" +
-        #     f"distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" +
-        #     f"jammy/amd64" +
-        #     f"&status=Published&exact_match=false&ordered=false" )
-        #
-        # print( url )
-        #
-        # published_binaries = self.get_json( url )
-
-
-        # url = (
-        #     "https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa" +
-        #     "?ws.op=getPublishedBinaries" +
-        #     "&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/jammy/amd64" +
-        #     "&status=Published" +
-        #     "&exact_match=false" +
-        #     "&ordered=false" )
-        #
-        # print( url )
-        #
-        # published_binaries_2 = self.get_json( url )
-
-        # url = (
-        #     "https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa" +
-        #     "?ws.op=getPublishedBinaries" +
-        #     "&status=Published" +
-        #     "&exact_match=false" +
-        #     "&ordered=false" )
-        #
-        # print( url )
-        #
-        # published_binaries_3 = self.get_json( url )
-
-
-        # url = (
-        #     "https://api.launchpad.net/1.0/~ubuntu/+archive/ubuntu/ppa" +
-        #     "?ws.op=getArchive" +
-        #     "&name=main_archive" )
-        #
-        # print( url )
-        #
-        # archive = self.get_json( url )
-
-
-
-        def get_series( url ):
-            try:
-                with urlopen(
-                    url,
-                    timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) as f:
-
-                    for line in f.read().decode().splitlines():
-                        if "Dist:" in line:
-                            s = line.split()[ 1 ]
-                            if s not in series:
-                                series.insert( 0, s )
-
-            except URLError as e:
-                print( e )
-                # logging_.error( "Error downloading from " + str( url ) )
-                # logging_.exception( e )
-
-
-        series = [ ]
-        get_series( "https://changelogs.ubuntu.com/meta-release" )
-        get_series( "https://changelogs.ubuntu.com/meta-release-development" )
-        print( series )
-        
-        
-        import sys
-        sys.exit()
-
-        
-        
-        # self.download_ppa_statistics()
-        # self.build_menu( menu )
-        # return 6 * 60 * 60 # Update every six hours.
+        self.download_ppa_statistics()
+        self.build_menu( menu )
+        return 6 * 60 * 60 # Update every six hours.
 
 
     def build_menu( self, menu ):
@@ -714,6 +596,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def on_preferences( self, dialog ):
+        thread = threading.Thread( target = self.initialise_series )
+        thread.start()
+
         notebook = Gtk.Notebook()
 
         # PPAs.
@@ -756,7 +641,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     _( "Add a new PPA." ),
                     _( "Remove the selected PPA." ) ),
                 (
-                    ( self.on_ppa_add, ppa_treeview ),
+                    ( self.on_ppa_add, ppa_treeview, thread ),
                     ( self.on_ppa_remove, ppa_treeview ) ) ),
             0, 1, 1, 1 )
 
@@ -982,6 +867,29 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return response_type
 
 
+    def initialise_series( self ):
+        urls = [
+            "https://changelogs.ubuntu.com/meta-release",
+            "https://changelogs.ubuntu.com/meta-release-development" ]
+
+        series = [ ]
+        try:
+            for url in urls:
+                with urlopen( url ) as f:
+                    for line in f.read().decode().splitlines():
+                        if "Dist:" in line:
+                            s = line.split()[ 1 ]
+                            if s not in series:
+                                series.insert( 0, s )
+
+            self.series = series
+
+        except URLError as e:
+            self.series = [ ]
+            self.get_logging().error( "Error downloading from " + str( url ) )
+            self.get_logging().exception( e )
+
+
     def on_ppa_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
@@ -999,7 +907,17 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 model.remove( treeiter )
 
 
-    def on_ppa_add( self, button, treeview ):
+    def on_ppa_add( self, button, treeview, thread ):
+#TODO Need to pass in the thread and then do a thread.join()
+# Maybe join with a timeout?
+# Then check that self.series is not None and proceed to add,
+# otherwise message user and return/fail/abort.
+        thread.join( 10 ) #TODO Not sure how long to wait...but MUST wait.
+#ALSO need to somehow test the thread not finishing in time and then
+# somehow catch that and report to the user...
+#( does the join timeout and so self.series is empty?)
+        print( self.series )
+
         # self.on_ppa_double_click( treeview, None, None ) #TODO Original...
         grid = self.create_grid()
 
@@ -1045,7 +963,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         ppa_series = \
             self.create_comboboxtext(
-                IndicatorPPADownloadStatistics.SERIES,
+                self.series,
                 active = 0 )
 
         grid.attach( ppa_series, 1, 2, 1, 1 )
@@ -1122,6 +1040,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         treeview,
         row_number,
         treeviewcolumn ):
+#TODO Need to pass in the thread and then do a thread.join()
+# Maybe join with a timeout?
+# Then check that self.series is not None and proceed to edit,
+# otherwise message user and return/fail/abort.
+
 
         model, treeiter = treeview.get_selection().get_selected()
 
@@ -1189,9 +1112,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         series = \
             self.create_comboboxtext(
-                IndicatorPPADownloadStatistics.SERIES,
+                self.series,
                 active =
-                    IndicatorPPADownloadStatistics.SERIES.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_SERIES ] )
+                    self.series.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_SERIES ] )
                     if row_number else
                     0 )
 
@@ -1373,9 +1296,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         series = \
             self.create_comboboxtext(
-                IndicatorPPADownloadStatistics.SERIES,
+                self.series,
                 active =
-                    IndicatorPPADownloadStatistics.SERIES.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_SERIES ] )
+                    self.series.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_SERIES ] )
                     if row_number else
                     0 )
 
