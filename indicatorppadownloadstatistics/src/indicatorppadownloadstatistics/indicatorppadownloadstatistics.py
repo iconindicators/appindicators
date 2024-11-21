@@ -55,17 +55,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     CONFIG_SORT_BY_DOWNLOAD = "sortByDownload"
     CONFIG_SORT_BY_DOWNLOAD_AMOUNT = "sortByDownloadAmount"
 
-# What happens if internet is down and the series cannot be downloaded?
-# Can/should the list be cached?
-# If the internet is down, cannot get PPA data...
-# ...so maybe caching is a waste of time.
-
     ARCHITECTURES = [ "amd64", "i386" ]
-
-    MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
-    MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
-    MESSAGE_COMPLETELY_FILTERED = _( "(published binaries completely filtered)" )
-    MESSAGE_MIX_OF_OK_FILTERED_NO_PUBLISHED_BINARIES = _( "(multiple messages; uncheck combine to view)" )
 
     # Data model columns used in the Preferences dialog and json config.
     COLUMN_USER = 0
@@ -74,12 +64,21 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     COLUMN_ARCHITECTURE = 3
     COLUMN_FILTER_TEXT = 2 # Filters share user and name.
 
+    MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
+    MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
+    MESSAGE_COMPLETELY_FILTERED = _( "(published binaries completely filtered)" )
+    MESSAGE_MIX_OF_OK_FILTERED_NO_PUBLISHED_BINARIES = _( "(multiple messages; uncheck combine to view)" )
+
     USER_NAME_SEPARATOR = ' | '
 
 
     def __init__( self ):
         super().__init__(
             comments = _( "Displays the total downloads of PPAs." ) )
+
+        # The series (name for each Ubuntu release) will be downloaded when the
+        # user initiates Add PPA or Edit PPA in the Preferences.
+        self.series = [ ]
 
 
     def update( self, menu ):
@@ -596,8 +595,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def on_preferences( self, dialog ):
-        thread = threading.Thread( target = self.initialise_series )
-        thread.start()
+        series_download_thread = None
+        if not self.series:
+            series_download_thread = \
+                threading.Thread( target = self.initialise_series )
+
+            series_download_thread.start()
 
         notebook = Gtk.Notebook()
 
@@ -628,7 +631,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ( Gtk.CellRendererText(), "text", IndicatorPPADownloadStatistics.COLUMN_SERIES ),
                     ( Gtk.CellRendererText(), "text", IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ) ),
                 tooltip_text = _( "Double click to edit a PPA." ),
-                rowactivatedfunctionandarguments = ( self.on_ppa_double_click, ) )
+                rowactivatedfunctionandarguments = (
+                    self.on_ppa_double_click, series_download_thread ) )
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
@@ -641,7 +645,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     _( "Add a new PPA." ),
                     _( "Remove the selected PPA." ) ),
                 (
-                    ( self.on_ppa_add, ppa_treeview, thread ),
+                    ( self.on_ppa_add, ppa_treeview, series_download_thread ),
                     ( self.on_ppa_remove, ppa_treeview ) ) ),
             0, 1, 1, 1 )
 
@@ -872,8 +876,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             "https://changelogs.ubuntu.com/meta-release",
             "https://changelogs.ubuntu.com/meta-release-development" ]
 
-        series = [ ]
         try:
+            series = [ ]
             for url in urls:
                 with urlopen( url ) as f:
                     for line in f.read().decode().splitlines():
@@ -888,6 +892,22 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.series = [ ]
             self.get_logging().error( "Error downloading from " + str( url ) )
             self.get_logging().exception( e )
+
+
+    def check_series_download( self, series_download_thread, treeview ):
+        series_is_downloaded_or_did_not_require_downloading = True
+        if series_download_thread is not None:
+            series_download_thread.join( 5.0 )
+            if series_download_thread.is_alive():
+                series_is_downloaded_or_did_not_require_downloading = False
+                self.show_dialog_ok(
+                    treeview,
+                    _( f"TODO Need message to say series is unavailable and"
+                    f"maybe check log and/or check internet connection or is a slow connection?" ),
+                    title = self.indicator_name,
+                    message_type = Gtk.MessageType.ERROR )
+
+        return series_is_downloaded_or_did_not_require_downloading
 
 
     def on_ppa_remove( self, button, treeview ):
@@ -907,17 +927,19 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 model.remove( treeiter )
 
 
-    def on_ppa_add( self, button, treeview, thread ):
-#TODO Need to pass in the thread and then do a thread.join()
-# Maybe join with a timeout?
-# Then check that self.series is not None and proceed to add,
-# otherwise message user and return/fail/abort.
-        thread.join( 10 ) #TODO Not sure how long to wait...but MUST wait.
-#ALSO need to somehow test the thread not finishing in time and then
-# somehow catch that and report to the user...
-#( does the join timeout and so self.series is empty?)
-        print( self.series )
+    def on_ppa_add( self, button, treeview, series_download_thread ):
+        if self.check_series_download( series_download_thread, treeview ):
+            self.on_ppa_add_( button, treeview )
+        #TODO Wait until add and edit are finalised and then hopefully
+        # the call to check series download is done in only one place.
+        #
+        # If add and edit are not eventually combined into one function
+        # then have on_ppa_add which is called on the Add button press
+        # and does the check and if the check passes, calls on_ppa_add_ 
+        # which does the actual add (ditto for edit).
 
+
+    def on_ppa_add_( self, button, treeview ):
         # self.on_ppa_double_click( treeview, None, None ) #TODO Original...
         grid = self.create_grid()
 
@@ -1039,7 +1061,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self,
         treeview,
         row_number,
-        treeviewcolumn ):
+        treeviewcolumn,
+        series_download_thread ):
 #TODO Need to pass in the thread and then do a thread.join()
 # Maybe join with a timeout?
 # Then check that self.series is not None and proceed to edit,
