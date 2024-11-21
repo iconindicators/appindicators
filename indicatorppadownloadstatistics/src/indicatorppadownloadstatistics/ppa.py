@@ -53,33 +53,33 @@ class Filter():
 
 
 #TODO Delete
-    def add_filter( self, user, name, text = None ):
-        self.filters[ self._get_key( user, name ) ] = text
+#    def add_filter( self, user, name, text = None ):
+#        self.filters[ self._get_key( user, name ) ] = text
 
 
 #TODO Make this a static version if needed.
 #TODO Delete
-    def has_filter( self, user, name ):
-        return self._get_key( user, name ) in self.filters
+#    def has_filter( self, user, name ):
+#        return self._get_key( user, name ) in self.filters
 
 
 #TODO Delete
-    def get_filter_text( self, user, name ):
-        return self.filters[ self._get_key( user, name ) ]
+#    def get_filter_text( self, user, name ):
+#        return self.filters[ self._get_key( user, name ) ]
 
 
 #TODO Delete
-    def get_user_name( self ):
-        for key in sorted( self.filters.keys() ):
-            key_components = key.split( " | " )
-            # yield \
-            #     key_components[ Filters.INDEX_USER ], \
-            #     key_components[ Filters.INDEX_NAME ]
+#    def get_user_name( self ):
+#        for key in sorted( self.filters.keys() ):
+#            key_components = key.split( " | " )
+#            # yield \
+#            #     key_components[ Filters.INDEX_USER ], \
+#            #     key_components[ Filters.INDEX_NAME ]
 
 
 #TODO Delete
-    def _get_key( self, user, name, ):
-        return user + " | " + name
+#    def _get_key( self, user, name, ):
+#        return user + " | " + name
 
 
     def __str__( self ):
@@ -139,11 +139,13 @@ class PublishedBinary():
 
 
     def __str__( self ):
+        # Requires str() as Noe will be returned when
+        # published binaries are combined.
         return \
             self.get_package_name() + " | " + \
             str( self.get_package_version() ) + " | " + \
             str( self.get_download_count() ) + " | " + \
-            str( self.is_architecture_specific() ) # Requires str() as it will return None when published binaries are combined.
+            str( self.is_architecture_specific() )
 
 
     def __repr__( self ):
@@ -188,7 +190,7 @@ class PPA():
 
     def set_status( self, status ):
         self.status = status
-        if not status == PPA.Status.OK: # Any other status implies the underlying published binaries are reset.
+        if not status == PPA.Status.OK: # Any other status implies the underlying published binaries are reset.   #TODO What does this mean????
             self.published_binaries = [ ]
 
 
@@ -208,14 +210,15 @@ class PPA():
         return self.architecture
 
 
-    # Returns a string description of the PPA of the form 'user | name | series | architecture'
-    # or 'user | name' if series/architecture are undefined.
+    # Returns a string description of the PPA of the form
+    #   user | name | series | architecture
+    # or
+    #   user | name
+    # if series/architecture are undefined.
     def get_descriptor( self ):
-        if self.series is None or self.architecture is None:
-            descriptor = self.user + " | " + self.name
-
-        else:
-            descriptor = self.user + " | " + self.name + " | " + self.series + " | " + self.architecture
+        descriptor = self.user + ' | ' + self.name
+        if self.series is not None and self.architecture is not None:
+            descriptor += ' | ' + self.series + ' | ' + self.architecture
 
         return descriptor
 
@@ -224,8 +227,9 @@ class PPA():
         self.published_binaries.append( published_binary )
 
 
-    def add_published_binaries( self, published_binaries ):
-        self.published_binaries.extend( published_binaries )
+#TODO Is this used?
+#    def add_published_binaries( self, published_binaries ):
+#        self.published_binaries.extend( published_binaries )
 
 
     def has_published_binaries( self ):
@@ -234,7 +238,8 @@ class PPA():
 
     def get_published_binaries( self, sort = False ):
         if sort:
-            self.published_binaries.sort( key = operator.methodcaller( "__str__" ) )
+            self.published_binaries.sort(
+                key = operator.methodcaller( "__str__" ) )
 
         return self.published_binaries
 
@@ -243,7 +248,9 @@ class PPA():
         self.published_binaries = [ ]
 
 
-    def sort_published_binaries_by_download_count_and_clip( self, clip_amount ):
+    def sort_published_binaries_by_download_count_and_clip(
+        self, clip_amount ):
+
         self.published_binaries.sort(
             key = operator.methodcaller( "get_download_count" ),
             reverse = True )
@@ -254,16 +261,17 @@ class PPA():
 
     @staticmethod
     def sort( list_of_ppas ):
-        list_of_ppas.sort( key = operator.methodcaller( "get_descriptor" ) )
+        list_of_ppas.sort(
+            key = operator.methodcaller( "get_descriptor" ) )
 
 
     def __str__( self ):
         return \
-            self.user + " | " + \
-            self.name + " | " + \
-            str( self.series ) + " | " + \
-            str( self.architecture ) + " | " + \
-            self.published_binaries
+            self.user + ' | ' + \
+            self.name + ' | ' + \
+            str( self.series ) + ' | ' + \
+            str( self.architecture ) + ' | ' + \
+            self.published_binaries #TODO Should there be a str() around this?
 
 
     def __repr__( self ):
@@ -277,9 +285,9 @@ class PPA():
             self.get_name() == other.get_name() and \
             self.get_series() == other.get_series() and \
             self.get_architecture() == other.get_architecture() and \
-            self.get_status() == other.get_status()
+            self.get_status() == other.get_status() and \
+            len( self.get_published_binaries() ) == len( other.get_published_binaries() )
 
-        equal &= len( self.get_published_binaries() ) == len( other.get_published_binaries() )
         if equal:
             for \
                 published_binary_self, published_binary_other in \

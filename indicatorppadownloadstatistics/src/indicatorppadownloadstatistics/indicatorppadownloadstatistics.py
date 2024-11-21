@@ -38,6 +38,10 @@ from indicatorbase import IndicatorBase
 from ppa import Filter, PPA, PublishedBinary
 
 
+#TODO If the dynamic series works...remove the note in the project README.md
+# about updating every six months.
+
+
 class IndicatorPPADownloadStatistics( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
@@ -68,8 +72,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
     MESSAGE_COMPLETELY_FILTERED = _( "(published binaries completely filtered)" )
     MESSAGE_MIX_OF_OK_FILTERED_NO_PUBLISHED_BINARIES = _( "(multiple messages; uncheck combine to view)" )
-
-    USER_NAME_SEPARATOR = ' | '
 
 
     def __init__( self ):
@@ -187,36 +189,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         '''
         combined_ppas = { }
         for ppa in ppas:
-            key = \
-                ppa.get_user() + \
-                IndicatorPPADownloadStatistics.USER_NAME_SEPARATOR + \
-                ppa.get_name()
-
-#TODO Rethink this status setting/combining.
-# Will affect the loop below too.
-            # if key in combined_ppas:
-            #     if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA or combined_ppas[ key ].get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-            #         combined_ppas[ key ].set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-            #
-            #     elif ppa.get_status() == PPA.Status.OK or combined_ppas[ key ].get_status() == PPA.Status.OK:
-            #         combined_ppas[ key ].add_published_binaries( ppa.get_published_binaries() )
-            #         combined_ppas[ key ].set_status( PPA.Status.OK )
-            #
-            #     elif ppa.get_status() == combined_ppas[ key ].get_status():
-            #         # Both are filtered or both have no published binaries;
-            #         # nothing to do.
-            #         pass
-            #
-            #     else:
-            #         # One is completely filtered and the other has no
-            #         # published binaries.
-            #         combined_ppas[ key ].set_status(
-            #             PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED )
-            #
-            # else:
-            #     combined_ppas[ key ] = ppa
-
-#TODO New version below...hopefully better.
+            key = ppa.get_user() + ' | ' + ppa.get_name()
             if key in combined_ppas:
                 error = \
                     ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA or \
@@ -309,16 +282,15 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         #
         # PPA.sort( self.ppas )
 
-#TODO New
+#TODO Read through this...see if it is correct...!
         ppas = [ ]
         for ppa in combined_ppas.values():
             if ppa.get_status() == PPA.OK:
                 temp = { }
                 for published_binary in ppa.get_published_binaries():
-#TODO Read through this...see if it is correct...!
                     key = \
                         published_binary.get_package_name() + \
-                        IndicatorPPADownloadStatistics.USER_NAME_SEPARATOR + \
+                        ' | ' + \
                         published_binary.get_package_version()
 
                     if published_binary.is_architecture_specific():
@@ -363,8 +335,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppas[ -1 ].add_published_binary( value )
 
             else:
-                # Status of error or mix of
-                # ok, filtered, no published binaries.
+                # Status of
+                #   error
+                # or
+                #   ok, filtered, no published binaries.
                 ppas.append( PPA( ppa.get_user(), ppa.get_name(), None, None ) )
                 ppas[ -1 ].set_status( ppa.get_status() )
 
@@ -372,6 +346,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return ppas
 
 
+#TODO Double check this...
+# Seems to be searching for | but I don't see
+# when creating the menu items adding in a | ...
+#
+# Check ppa.py
     def on_ppa( self, menuitem ):
         url = "https://launchpad.net/~"
         first_pipe = str.find( menuitem.get_name(), "|" )
@@ -935,7 +914,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         #
         # If add and edit are not eventually combined into one function
         # then have on_ppa_add which is called on the Add button press
-        # and does the check and if the check passes, calls on_ppa_add_ 
+        # and does the check and if the check passes, calls on_ppa_add_
         # which does the actual add (ditto for edit).
 
 
@@ -1458,7 +1437,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             for i, row in enumerate( ppa_treeview.get_model() ):
                 ppa_user_name = \
                     row[ IndicatorPPADownloadStatistics.COLUMN_USER ] + \
-                    IndicatorPPADownloadStatistics.USER_NAME_SEPARATOR + \
+                    ' | ' + \
                     row[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
 
                 if not ppa_user_name in ppa_users_names:
@@ -1508,7 +1487,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             for i, row in enumerate( ppa_model ):
                 ppa_user_name = \
                     row[ IndicatorPPADownloadStatistics.COLUMN_USER ] + \
-                    IndicatorPPADownloadStatistics.USER_NAME_SEPARATOR + \
+                    ' | ' + \
                     row[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
 
                 if ppa_user_name in temp:
@@ -1525,9 +1504,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     temp.append( ppa_user_name )
 
         else:
+            #TODO Why can I use the row_number rather than filter_treeiter?
             ppa_users_names.append_text(
                 filter_model[ filter_treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] + \
-                IndicatorPPADownloadStatistics.USER_NAME_SEPARATOR + \
+                ' | ' + \
                 filter_model[ filter_treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] )
 
         ppa_users_names.set_hexpand( True )
