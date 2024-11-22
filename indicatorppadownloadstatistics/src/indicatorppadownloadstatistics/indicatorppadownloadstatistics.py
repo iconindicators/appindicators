@@ -659,6 +659,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             f"&status=Published&exact_match=false&ordered=false" +
             f"&binary_name={ filter_text }" )
 
+        print( url )
+
         self_links = [ ]
         binary_package_names = [ ]
         binary_package_versions = [ ]
@@ -1790,8 +1792,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             # self.ppas = [ ]
             self.filters = [ ]
             self.combine_ppas = True
-            
-#,["canonical-kernel-team","ppa","focal","amd64"]            
+
+#,["canonical-kernel-team","ppa","focal","amd64"]
 
         else:
 #TODO Once Ubuntu 20.04 is EOL,
@@ -1846,3 +1848,68 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
 IndicatorPPADownloadStatistics().main()
+
+
+
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+# https://help.launchpad.net/API/launchpadlib
+
+# python3 -m pip install launchpadlib
+from launchpadlib.launchpad import Launchpad
+
+
+def print_published_binaries( archive, series, architecture ):
+    distro_arch_series = (
+        "https://api.launchpad.net/devel/ubuntu/" + series + '/' + architecture )
+
+    published_binaries = archive.getPublishedBinaries(
+            status = "Published",
+            distro_arch_series = distro_arch_series )
+
+    for published_binary in published_binaries:
+        print(
+            published_binary.binary_package_name + "\t" +
+            published_binary.binary_package_version + "\t" +
+            str( published_binary.getDownloadCount() ) )
+
+
+indicator_name = "indicatorppadownloadstatistics"
+
+user = "thebernmeister"
+name = "ppa"
+
+cache_directory = "~/.cache/launchpadlib"
+
+launchpad = \
+    Launchpad.login_anonymously(
+        indicator_name, "production", cache_directory, version = "devel" )
+
+ppa = launchpad.people[ user ].getPPAByName( name = name )
+
+
+series = "focal"
+architecture = "amd64"
+print_published_binaries( ppa, series, architecture )
+
+print()
+
+series = "focal"
+architecture = "i386"
+print_published_binaries( archive, series, architecture )
+
+
+'''
+print( archive.lp_attributes )
+print()
+print( sorted( archive.lp_operations ) )
+'''
+
+'''
+print( archive.lp_attributes )
+print()
+print( sorted( archive.lp_operations ) )
+'''
+
+
