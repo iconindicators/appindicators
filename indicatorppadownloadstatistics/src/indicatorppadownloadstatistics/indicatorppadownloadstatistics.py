@@ -70,8 +70,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
     MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
-    MESSAGE_COMPLETELY_FILTERED = _( "(published binaries completely filtered)" )
-    MESSAGE_MIX_OF_OK_FILTERED_NO_PUBLISHED_BINARIES = _( "(multiple messages; uncheck combine to view)" )
+    MESSAGE_FILTERED = _( "(published binaries completely filtered)" )
+    MESSAGE_MIX_OF_OK_NO_PUBLISHED_BINARIES_FILTERED = _( "(multiple messages; uncheck combine to view)" )
 
 
     def __init__( self ):
@@ -151,12 +151,15 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         label = published_binary.get_package_name()
         if published_binary.get_package_version() is None:
+            #TODO When will this happen...?  Under combine?
             label += ":  " + str( published_binary.get_download_count() )
 
         else:
-            label += \
-                " " + published_binary.get_package_version() + ":  " + \
-                str( published_binary.get_download_count() )
+#TODO Test without the " " below.
+            label = (
+                " " + published_binary.get_package_version() +
+                ":  " +
+                str( published_binary.get_download_count() ) )
 
         self.create_and_append_menuitem(
             menu,
@@ -173,16 +176,165 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         elif ppa.get_status() == PPA.Status.NO_PUBLISHED_BINARIES:
             message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
 
-        elif ppa.get_status() == PPA.Status.COMPLETELY_FILTERED:
-            message = IndicatorPPADownloadStatistics.MESSAGE_COMPLETELY_FILTERED
+        elif ppa.get_status() == PPA.Status.FILTERED:
+            message = IndicatorPPADownloadStatistics.MESSAGE_FILTERED
 
-        elif ppa.get_status() == PPA.Status.MIX_OF_OK_FILTERED_NO_PUBLISHED_BINARIES:
-            message = IndicatorPPADownloadStatistics.MESSAGE_MIX_OF_OK_FILTERED_NO_PUBLISHED_BINARIES
+        elif ppa.get_status() == PPA.Status.MIX_OF_OK_NO_PUBLISHED_BINARIES_FILTERED:
+            message = IndicatorPPADownloadStatistics.MESSAGE_MIX_OF_OK_NO_PUBLISHED_BINARIES_FILTERED
 
         return message
 
 
     def combine( self, ppas ):
+        '''
+        Match up identical PPAs:
+            PPAs are deemed to match if the 'PPA User | PPA Name' are identical.
+        '''
+
+        def process_ppa_into_combined_ppa( ppa, combined_ppa ):
+            for published_binary in ppa.get_published_binaries():
+                key = \
+                    published_binary.get_package_name() + \
+                    ' | ' + \
+                    published_binary.get_package_version()
+
+                if published_binary.is_architecture_specific():
+                    if self.ignore_version_architecture_specific:
+                        # Key only contains name.
+                        key = published_binary.get_package_name()
+
+                    # Add up the download count from each published
+                    # binary of the same key
+                    # (package name OR package name and package version).
+                    if key in temp:
+                        new_published_binary = \
+                            PublishedBinary(
+                                temp[ key ].get_package_name(),
+                                temp[ key ].get_package_version(),
+                                temp[ key ].get_download_count() + published_binary.get_download_count(),
+                                temp[ key ].is_architecture_specific )
+
+                        temp[ key ] = new_published_binary
+
+                    else:
+                        temp[ key ] = published_binary
+                        if self.ignore_version_architecture_specific:
+                            new_published_binary = \
+                                PublishedBinary(
+                                    temp[ key ].get_package_name(),
+                                    None,
+                                    temp[ key ].get_download_count(),
+                                    temp[ key ].is_architecture_specific )
+
+                            temp[ key ] = new_published_binary
+
+                else:
+                    if key not in temp:
+                        temp[ key ] = published_binary
+
+
+        combined_ppas = { }
+        for ppa in ppas:
+            key = ppa.get_user() + ' | ' + ppa.get_name()
+            if key in combined_ppas:
+                error = \
+                    ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA or \
+                    combined_ppas[ key ].get_status() == PPA.Status.ERROR_RETRIEVING_PPA
+
+                ok = \
+                    ppa.get_status() == PPA.Status.OK and \
+                    combined_ppas[ key ].get_status() == PPA.Status.OK
+
+                filtered = \
+                    ppa.get_status() == PPA.Status.FILTERED and \
+                    combined_ppas[ key ].get_status() == PPA.Status.FILTERED
+
+                no_published_binaries = \
+                    ppa.get_status() == PPA.Status.NO_PUBLISHED_BINARIES and \
+                    combined_ppas[ key ].get_status() == PPA.Status.NO_PUBLISHED_BINARIES
+
+                if error:
+                    combined_ppas[ key ].set_status( PPA.Status.ERROR_RETRIEVING_PPA )
+
+                elif filtered or no_published_binaries:
+                    pass
+
+                elif ok:
+                    process_ppa_into_combined_ppa( ppa, combined_ppas[ key ] )
+
+                else:
+                    # Mix of ok, no published binaries, filtered.
+                    combined_ppas[ key ].set_status(
+                        PPA.Status.MIX_OF_OK_NO_PUBLISHED_BINARIES_FILTERED )
+
+            else:
+                combined_ppas[ key ] = ppa
+
+#TODO Read through this...see if it is correct...!
+        ppas = [ ]
+        for ppa in combined_ppas.values():
+            if ppa.get_status() == PPA.OK:
+                temp = { }
+                for published_binary in ppa.get_published_binaries():
+                    key = \
+                        published_binary.get_package_name() + \
+                        ' | ' + \
+                        published_binary.get_package_version()
+
+                    if published_binary.is_architecture_specific():
+                        if self.ignore_version_architecture_specific:
+                            # Key only contains name.
+                            key = published_binary.get_package_name()
+
+                        # Add up the download count from each published
+                        # binary of the same key
+                        # (package name OR package name and package version).
+                        if key in temp:
+                            new_published_binary = \
+                                PublishedBinary(
+                                    temp[ key ].get_package_name(),
+                                    temp[ key ].get_package_version(),
+                                    temp[ key ].get_download_count() + published_binary.get_download_count(),
+                                    temp[ key ].is_architecture_specific )
+
+                            temp[ key ] = new_published_binary
+
+                        else:
+                            temp[ key ] = published_binary
+                            if self.ignore_version_architecture_specific:
+                                new_published_binary = \
+                                    PublishedBinary(
+                                        temp[ key ].get_package_name(),
+                                        None,
+                                        temp[ key ].get_download_count(),
+                                        temp[ key ].is_architecture_specific )
+
+                                temp[ key ] = new_published_binary
+
+                    else:
+                        if key not in temp:
+                            temp[ key ] = published_binary
+
+                ppas.append(
+                    PPA( ppa.get_user(), ppa.get_name(), None, None ) )
+
+                ppas[ -1 ].set_status( PPA.Status.OK )
+                for key, value in temp.items():
+                    ppas[ -1 ].add_published_binary( value )
+
+            else:
+                # Status of
+                #   error
+                # or
+                #   mix of ok, no published binaries, filtered
+                ppas.append( PPA( ppa.get_user(), ppa.get_name(), None, None ) )
+                ppas[ -1 ].set_status( ppa.get_status() )
+
+        PPA.sort( self.ppas )
+        return ppas
+
+
+    def combineORIG( self, ppas ):
         '''
         Match up identical PPAs:
             PPAs are deemed to match if the 'PPA User | PPA Name' are identical.
@@ -204,8 +356,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     combined_ppas[ key ].get_status() == PPA.Status.OK
 
                 filtered = \
-                    ppa.get_status() == PPA.Status.COMPLETELY_FILTERED and \
-                    combined_ppas[ key ].get_status() == PPA.Status.COMPLETELY_FILTERED
+                    ppa.get_status() == PPA.Status.FILTERED and \
+                    combined_ppas[ key ].get_status() == PPA.Status.FILTERED
 
                 no_published_binaries = \
                     ppa.get_status() == PPA.Status.NO_PUBLISHED_BINARIES and \
@@ -214,9 +366,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if ok or filtered or no_published_binaries:
                     continue
 
-                # Mix of statuses (ok, filtered, no published binaries).
+                # Mix of statuses (ok, no published binaries, filtered).
                 combined_ppas[ key ].set_status(
-                    PPA.Status.MIX_OF_OK_FILTERED_NO_PUBLISHED_BINARIES )
+                    PPA.Status.MIX_OF_OK_NO_PUBLISHED_BINARIES_FILTERED )
 
             else:
                 combined_ppas[ key ] = ppa
@@ -225,8 +377,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         # for ppa in combined_ppas.values():
         #     if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA or \
         #        ppa.get_status() == PPA.Status.NO_PUBLISHED_BINARIES or \
-        #        ppa.get_status() == PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_COMPLETELY_FILTERED or \
-        #        ppa.get_status() == PPA.Status.PUBLISHED_BINARIES_COMPLETELY_FILTERED:
+        #        ppa.get_status() == PPA.Status.NO_PUBLISHED_BINARIES_AND_OR_FILTERED or \
+        #        ppa.get_status() == PPA.Status.PUBLISHED_BINARIES_ILTERED:
         #
         #         ppas.append( PPA( ppa.get_user(), ppa.get_name(), None, None ) )
         #         ppas[ -1 ].set_status( ppa.get_status() )
@@ -338,7 +490,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 # Status of
                 #   error
                 # or
-                #   ok, filtered, no published binaries.
+                #   ok, no published binaries, filtered.
                 ppas.append( PPA( ppa.get_user(), ppa.get_name(), None, None ) )
                 ppas[ -1 ].set_status( ppa.get_status() )
 
@@ -457,7 +609,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 else:
                     # No results passed through filtering.
-                    ppa.set_status( PPA.Status.COMPLETELY_FILTERED )
+                    ppa.set_status( PPA.Status.FILTERED )
 
 
 #TODO For testing.
@@ -1635,8 +1787,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             '''
 
             #TODO Test data.
-            self.ppas = [ ]
+            # self.ppas = [ ]
             self.filters = [ ]
+            self.combine_ppas = True
+            
+#,["canonical-kernel-team","ppa","focal","amd64"]            
 
         else:
 #TODO Once Ubuntu 20.04 is EOL,

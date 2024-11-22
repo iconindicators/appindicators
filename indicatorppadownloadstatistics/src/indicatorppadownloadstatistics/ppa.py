@@ -139,7 +139,7 @@ class PublishedBinary():
 
 
     def __str__( self ):
-        # Requires str() as Noe will be returned when
+        # Requires str() as None will be returned when
         # published binaries are combined.
         return \
             self.get_package_name() + " | " + \
@@ -170,8 +170,8 @@ class PPA():
         ERROR_RETRIEVING_PPA = 1
         OK = 2
         NO_PUBLISHED_BINARIES = 3
-        COMPLETELY_FILTERED = 4
-        MIX_OF_OK_FILTERED_NO_PUBLISHED_BINARIES = 5
+        FILTERED = 4
+        MIX_OF_OK_NO_PUBLISHED_BINARIES_FILTERED = 5
 
 
     def __init__( self, user, name, series, architecture ):
@@ -236,6 +236,7 @@ class PPA():
         return len( self.published_binaries ) > 0
 
 
+#TODO When would we NOT want to sort?
     def get_published_binaries( self, sort = False ):
         if sort:
             self.published_binaries.sort(
