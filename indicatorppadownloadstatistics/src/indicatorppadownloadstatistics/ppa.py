@@ -83,10 +83,10 @@ class Filter():
 
 
     def __str__( self ):
-        return \
-            self.user + " | " + \
-            self.name + " | " + \
-            self.text
+        return (
+            self.user + " | " +
+            self.name + " | " +
+            self.text )
 
 
     def __repr__( self ):
@@ -138,14 +138,15 @@ class PublishedBinary():
         return self.architecture_specific
 
 
+#TODO Check the comment below after combine is sorted.
     def __str__( self ):
         # Requires str() as None will be returned when
         # published binaries are combined.
-        return \
-            self.get_package_name() + " | " + \
-            str( self.get_package_version() ) + " | " + \
-            str( self.get_download_count() ) + " | " + \
-            str( self.is_architecture_specific() )
+        return (
+            self.get_package_name() + " | " +
+            str( self.get_package_version() ) + " | " +
+            str( self.get_download_count() ) + " | " +
+            str( self.is_architecture_specific() ) )
 
 
     def __repr__( self ):
@@ -245,7 +246,7 @@ class PPA():
         return self.published_binaries
 
 
-    def remove_published_binaries( self ):
+    def flush_published_binaries( self ):
         self.published_binaries = [ ]
 
 
@@ -267,12 +268,12 @@ class PPA():
 
 
     def __str__( self ):
-        return \
-            self.user + ' | ' + \
-            self.name + ' | ' + \
-            str( self.series ) + ' | ' + \
-            str( self.architecture ) + ' | ' + \
-            self.published_binaries #TODO Should there be a str() around this?
+        return (
+            self.user + ' | ' +
+            self.name + ' | ' +
+            str( self.series ) + ' | ' +
+            str( self.architecture ) + ' | ' +
+            str( self.published_binaries ) )
 
 
     def __repr__( self ):
