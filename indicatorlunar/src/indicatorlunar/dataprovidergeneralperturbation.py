@@ -147,10 +147,10 @@ class GP():
 
 
     def __str__( self ):
-        return \
-            self.name + " | " + \
-            str( self.get_number() ) + " | " + \
-            self.get_international_designator()
+        return (
+            self.name + " | " +
+            str( self.get_number() ) + " | " +
+            self.get_international_designator() )
 
 
     def __repr__( self ):

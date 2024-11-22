@@ -66,13 +66,13 @@ class Reading():
 
 
     def __str__( self ):
-        return \
-            self.date + " | " + \
-            self.time + " | " + \
-            self.location + " | " + \
-            str( self._is_high ) + " | " + \
-            str( self.level ) + " | " + \
-            self.url
+        return (
+            self.date + " | " +
+            self.time + " | " +
+            self.location + " | " +
+            str( self._is_high ) + " | " +
+            str( self.level ) + " | " +
+            self.url )
 
 
     def __repr__( self ):

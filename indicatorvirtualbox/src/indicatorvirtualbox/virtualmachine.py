@@ -71,7 +71,9 @@ class Group():
 
 
     def __str__( self ):
-        return self.get_name() + ": " + ' | '.join( [ str( x.get_name() ) for x in self.get_items() ] )
+        return (
+            self.get_name() + ": " +
+            ' | '.join( [ str( x.get_name() ) for x in self.get_items() ] ) )
 
 
     def __repr__( self ):

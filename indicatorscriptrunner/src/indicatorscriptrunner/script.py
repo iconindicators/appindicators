@@ -76,12 +76,12 @@ class Info( ABC ):
 
 
     def __str__( self ):
-        return \
-            self.group + " | " + \
-            self.name + " | " + \
-            self.command + " | " + \
-            str( self.play_sound ) + " | " + \
-            str( self.show_notification )
+        return (
+            self.group + " | " +
+            self.name + " | " +
+            self.command + " | " +
+            str( self.play_sound ) + " | " +
+            str( self.show_notification ) )
 
 
     def __repr__( self ):
@@ -131,10 +131,10 @@ class Background( Info ):
 
 
     def __str__( self ):
-        return \
-            super().__str__() + " | " + \
-            str( self.interval_in_minutes ) + " | " + \
-            str( self.force_update )
+        return (
+            super().__str__() + " | " +
+            str( self.interval_in_minutes ) + " | " +
+            str( self.force_update ) )
 
 
     def __repr__( self ):
@@ -184,10 +184,10 @@ class NonBackground( Info ):
 
 
     def __str__( self ):
-        return \
-            super().__str__() + " | " + \
-            str( self.terminal_open ) + " | " + \
-            str( self.default )
+        return (
+            super().__str__() + " | " +
+            str( self.terminal_open ) + " | " +
+            str( self.default ) )
 
 
     def __repr__( self ):
