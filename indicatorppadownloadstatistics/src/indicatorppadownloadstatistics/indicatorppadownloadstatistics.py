@@ -619,25 +619,28 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 self.get_cache_directory(),
                 version = "devel" )
 
+        for ppa in self.ppas:
+             ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
+
         archives = { }
         max_workers = 1 if self.low_bandwidth else 3
+        lock = threading.Lock()
         with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
             for ppa in self.ppas:
-                ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
-
                 archives_key = ( ppa.get_user(), ppa.get_name() )
                 if archives_key not in archives:
                     person = launchpad.people[ ppa.get_user() ]
                     archive = person.getPPAByName( name = ppa.get_name() )
                     archives[ archives_key ] = archive
+                    print( f"Getting archive { archives_key }" )
 
                 for filter_ in self.get_filter( ppa ):
                     executor.submit(
                         self.get_download_counts,
                         archives[ archives_key ],
                         ppa,
-                        filter_ )
-
+                        filter_,
+                        lock )
 
         print( "---" )
         for ppa in self.ppas:
@@ -677,9 +680,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return filter_
 
 
-    def get_download_counts( self, archive, ppa, filter_ ):
-        print( f"{ ppa.get_user() } | { ppa.get_name() } | { ppa.get_series() } | { ppa.get_architecture() } | { filter_ }" )
-        if ppa.get_status() != PPA.Status.ERROR_RETRIEVING_PPA:
+    def get_download_counts( self, archive, ppa, filter_, lock ):
+        with lock:
+            status_is_error = \
+                ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA
+
+        if not status_is_error:
             url = (
                 "https://api.launchpad.net/devel/ubuntu/" +
                 ppa.get_series() + '/' + ppa.get_architecture() )
@@ -691,20 +697,22 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         distro_arch_series = url,
                         binary_name = filter_ )
 
-                for published_binary in published_binaries_for_arch_series:
-                    ppa.add_published_binary(
-                        PublishedBinary(
-                            published_binary.binary_package_name,
-                            published_binary.binary_package_version,
-                            str( published_binary.getDownloadCount() ),
-                            published_binary.architecture_specific ) )
+                with lock:
+                    for published_binary in published_binaries_for_arch_series:
+                        ppa.add_published_binary(
+                            PublishedBinary(
+                                published_binary.binary_package_name,
+                                published_binary.binary_package_version,
+                                str( published_binary.getDownloadCount() ),
+                                published_binary.architecture_specific ) )
 
-                print( f"{ ppa.get_user() } | { ppa.get_name() } | { ppa.get_series() } | { ppa.get_architecture() } | { filter_ }  DONE" )
+                print( f"{ ppa.get_user() } | { ppa.get_name() } | { ppa.get_series() } | { ppa.get_architecture() } | { filter_ }" )
 
             except HTTPError as e:
-                self.get_logging().error( "Error downloading from " + str( url ) )
-                self.get_logging().exception( e )
-                ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
+                with lock:
+                    self.get_logging().error( "Error downloading from " + str( url ) )
+                    self.get_logging().exception( e )
+                    ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
 
 
     def download_ppa_statisticsORIG( self ):
@@ -1963,9 +1971,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             # self.ppas = [ ]
             # self.filters = [ ]
             self.combine_ppas = True
-            print( "XXXXXXXXXXX")
-            print( self.filters )
-            print( "XXXXXXXXXXX")
 
 #,["canonical-kernel-team","ppa","focal","amd64"]
 
@@ -2082,5 +2087,3 @@ print( archive.lp_attributes )
 print()
 print( sorted( archive.lp_operations ) )
 '''
-
-
