@@ -538,7 +538,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         webbrowser.open( url )
 
 
-    def download_ppa_statistics( self ):
+    def download_ppa_statisticsKEEP( self ):
         '''
         Get the published binaries for each PPA and the subsequent download
         count for each published binary.
@@ -567,10 +567,22 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 archive = person.getPPAByName( name = ppa.get_name() )
                 archives[ archives_key ] = archive
 
-            for filter_ in self.get_filter( ppa ):
-                self.get_download_counts( archives[ archives_key ], ppa, filter_ )
-                if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-                    break
+            max_workers = 1 if self.low_bandwidth else 3
+            with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+                {
+                    executor.submit(
+                        self.get_download_counts,
+                        archives[ archives_key ],
+                        ppa,
+                        filter_ ):
+
+                        filter_ for filter_ in self.get_filter( ppa )
+                }
+
+            # for filter_ in self.get_filter( ppa ):
+            #     self.get_download_counts( archives[ archives_key ], ppa, filter_ )
+            #     if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
+            #         break
 
             if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
                 ppa.flush_published_binaries()
@@ -588,6 +600,70 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa.set_status( PPA.Status.FILTERED )
 
 
+    def download_ppa_statistics( self ):
+        '''
+        Get the published binaries for each PPA and the subsequent download
+        count for each published binary.
+
+        References
+            https://help.launchpad.net/API/launchpadlib
+            https://help.launchpad.net/API/Hacking
+            https://launchpadlib.readthedocs.io/en/stable/
+            https://launchpad.net/+apidoc/devel.html
+        '''
+
+        launchpad = \
+            Launchpad.login_anonymously(
+                self.indicator_name,
+                "production",
+                self.get_cache_directory(),
+                version = "devel" )
+
+        archives = { }
+        max_workers = 1 if self.low_bandwidth else 3
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            for ppa in self.ppas:
+                ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
+
+                archives_key = ( ppa.get_user(), ppa.get_name() )
+                if archives_key not in archives:
+                    person = launchpad.people[ ppa.get_user() ]
+                    archive = person.getPPAByName( name = ppa.get_name() )
+                    archives[ archives_key ] = archive
+
+                for filter_ in self.get_filter( ppa ):
+                    executor.submit(
+                        self.get_download_counts,
+                        archives[ archives_key ],
+                        ppa,
+                        filter_ )
+
+
+        print( "---" )
+        for ppa in self.ppas:
+            print( ppa )
+            print( "---" )
+
+            # if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
+            #     ppa.flush_published_binaries()
+            #
+            # elif ppa.has_published_binaries():
+            #     ppa.set_status( PPA.Status.OK )
+            #
+            # else:
+            #     if filter_ == '':
+            #         # No filter in place, so there are no published binaries.
+            #         ppa.set_status( PPA.Status.NO_PUBLISHED_BINARIES )
+            #
+            #     else:
+            #         # No results passed through filtering.
+            #         ppa.set_status( PPA.Status.FILTERED )
+
+        import sys
+        if True:
+            sys.exit()
+
+
     def get_filter( self, ppa ):
         filter_ = [ ]
         for f in self.filters:
@@ -602,29 +678,33 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def get_download_counts( self, archive, ppa, filter_ ):
-        url = (
-            "https://api.launchpad.net/devel/ubuntu/" +
-            ppa.get_series() + '/' + ppa.get_architecture() )
+        print( f"{ ppa.get_user() } | { ppa.get_name() } | { ppa.get_series() } | { ppa.get_architecture() } | { filter_ }" )
+        if ppa.get_status() != PPA.Status.ERROR_RETRIEVING_PPA:
+            url = (
+                "https://api.launchpad.net/devel/ubuntu/" +
+                ppa.get_series() + '/' + ppa.get_architecture() )
 
-        try:
-            published_binaries_for_arch_series = \
-                archive.getPublishedBinaries(
-                    status = "Published",
-                    distro_arch_series = url,
-                    binary_name = filter_ )
+            try:
+                published_binaries_for_arch_series = \
+                    archive.getPublishedBinaries(
+                        status = "Published",
+                        distro_arch_series = url,
+                        binary_name = filter_ )
 
-            for published_binary in published_binaries_for_arch_series:
-                ppa.add_published_binary(
-                    PublishedBinary(
-                        published_binary.binary_package_name,
-                        published_binary.binary_package_version,
-                        str( published_binary.getDownloadCount() ),
-                        published_binary.architecture_specific ) )
+                for published_binary in published_binaries_for_arch_series:
+                    ppa.add_published_binary(
+                        PublishedBinary(
+                            published_binary.binary_package_name,
+                            published_binary.binary_package_version,
+                            str( published_binary.getDownloadCount() ),
+                            published_binary.architecture_specific ) )
 
-        except HTTPError as e:
-            self.get_logging().error( "Error downloading from " + str( url ) )
-            self.get_logging().exception( e )
-            ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
+                print( f"{ ppa.get_user() } | { ppa.get_name() } | { ppa.get_series() } | { ppa.get_architecture() } | { filter_ }  DONE" )
+
+            except HTTPError as e:
+                self.get_logging().error( "Error downloading from " + str( url ) )
+                self.get_logging().exception( e )
+                ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
 
 
     def download_ppa_statisticsORIG( self ):
@@ -1881,8 +1961,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             #TODO Test data.
             # self.ppas = [ ]
-            self.filters = [ ]
+            # self.filters = [ ]
             self.combine_ppas = True
+            print( "XXXXXXXXXXX")
+            print( self.filters )
+            print( "XXXXXXXXXXX")
 
 #,["canonical-kernel-team","ppa","focal","amd64"]
 

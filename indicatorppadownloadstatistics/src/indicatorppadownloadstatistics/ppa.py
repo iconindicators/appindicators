@@ -86,7 +86,7 @@ class Filter():
         return (
             self.user + " | " +
             self.name + " | " +
-            self.text )
+            ' '.join( self.text ) )
 
 
     def __repr__( self ):
