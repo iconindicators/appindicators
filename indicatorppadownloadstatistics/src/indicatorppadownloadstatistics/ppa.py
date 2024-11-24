@@ -273,7 +273,7 @@ class PPA():
             self.name + ' | ' +
             str( self.series ) + ' | ' +
             str( self.architecture ) + ' | ' +
-            str( self.published_binaries ) )
+            str( self.published_binaries ) ) #TODO Think I need a join here as it is a list.
 
 
     def __repr__( self ):
