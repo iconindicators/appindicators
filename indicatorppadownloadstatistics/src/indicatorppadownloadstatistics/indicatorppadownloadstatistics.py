@@ -20,6 +20,7 @@
 
 
 import concurrent.futures
+import httplib2
 import locale
 import threading
 import webbrowser
@@ -42,6 +43,11 @@ from ppa import Filter, PPA, PublishedBinary
 
 #TODO If the dynamic series works...remove the note in the project README.md
 # about updating every six months.
+
+
+#TODO Consider putting in a check/limit for published binaries
+# with say 25 or more entries.
+# Will result in a request for the download count for each...
 
 
 class IndicatorPPADownloadStatistics( IndicatorBase ):
@@ -594,72 +600,96 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             http://help.launchpad.net/API/launchpadlib
             http://help.launchpad.net/API/Hacking
         '''
-        
-        import datetime
-        now = datetime.datetime.now()
-        
-        # 12 seconds
-        
-        launchpad = \
-            Launchpad.login_anonymously(
-                self.indicator_name,
-                "production",
-                self.get_cache_directory(),
-                version = "devel" )
 
-        self.archives = { }
-        self.persons = { }
-        # archives = { }
-        # persons = { }
-        # for ppa in self.ppas:
-        #     # persons_key = ( ppa.get_user() )
-        #     # if persons_key not in persons:
-        #     #     persons[ persons_key ] = launchpad.people[ ppa.get_user() ]
-        #
-        #     archives_key = ( ppa.get_user(), ppa.get_name() )
-        #     if archives_key not in archives:
-        #         person = launchpad.people[ ppa.get_user() ]
-        #         archive = person.getPPAByName( name = ppa.get_name() )
-        #         archives[ archives_key ] = archive
+#TODO What happens if there are no ppas defined?
 
-        # for ppa in self.ppas:
-        #     ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
-        #     for filter_ in self.get_filter( ppa ):
-        #         published_binaries = \
-        #             self.get_published_binaries(
-        #                 archives[ ( ppa.get_user(), ppa.get_name() ) ],
-        #                 ppa.get_user(),
-        #                 ppa.get_name(),
-        #                 ppa.get_series(),
-        #                 ppa.get_architecture(),
-        #                 filter_ )
-        #
-        #         print( ppa )
-        #         for published_binary in published_binaries:
-        #             print( published_binary )
-        #
-        #         print()
-
-        self.lock = threading.Lock()
-
+        lock = threading.Lock()
         max_workers = 1 if self.low_bandwidth else 3
+        persons = { }
+        archives = { }
 
-        # future_published_binaries = [ ]
-        # with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-        #     for ppa in self.ppas:
-        #         # ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
-        #         for filter_text in self.get_filter( ppa ):
-        #             future_published_binaries.append(
-        #                 executor.submit(
-        #                     self.get_published_binaries,
-        #                     launchpad,
-        #                     ppa.get_user(),
-        #                     ppa.get_name(),
-        #                     ppa.get_series(),
-        #                     ppa.get_architecture(),
-        #                     filter_text ) )
+        launchpad = self.get_launchpad()
+        if launchpad is not None:
+            success = \
+                self.get_persons( lock, max_workers, persons, launchpad ) and \
+                self.get_archives( lock, max_workers, archives, persons )
+
+            print( success )
 
 
+            '''
+            for key, value in self.persons.items():
+                print( key )
+                print( value )
+                print()
+            '''
+
+        else:
+            print( "launchpad failure" )
+
+        import sys
+        if True:
+            sys.exit()
+
+
+
+        '''
+        print()
+
+        for key, value in self.archives.items():
+            print( key )
+            print( value )
+            print()
+
+        print()
+        '''
+
+        future_published_binaries = [ ]
+        url = "https://api.launchpad.net/devel/ubuntu/"
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            for ppa in self.ppas:
+                url_ = url + ppa.get_series() + '/' + ppa.get_architecture()
+                for filter_text in self.get_filter( ppa ):
+                    future_published_binaries.append(
+                        [ ppa,
+                        executor.submit(
+                            self.get_published_binaries,
+                            self.archives[ ( ppa.get_user(), ppa.get_name() ) ],
+                            url_,
+                            filter_text ) ] )
+
+        '''
+        for future in future_published_binaries:
+            ppa = future[ 0 ]
+            published_binaries = future[ 1 ].result()
+            print( ppa )
+            for published_binary in published_binaries:
+                print( published_binary )
+            print()
+
+        print()
+        '''
+
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            for future in future_published_binaries:
+                ppa = future[ 0 ]
+                published_binaries = future[ 1 ].result()
+                for published_binary in published_binaries:
+                    executor.submit(
+                        self.get_download_count,
+                        ppa,
+                        published_binary )
+
+        '''
+        for ppa in self.ppas:
+            print( ppa )
+        '''
+
+
+#TODO How to handle exception such as a network dropout?
+# Then how to stop the process and abort cleanly?
+
+        '''
         future_published_binaries = [ ]
         with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
             for ppa in self.ppas:
@@ -671,47 +701,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                             launchpad,
                             ppa,
                             filter_text ) )
-
-        print( "Got ALL published binaries." )
-
-        for future in future_published_binaries:
-            ppa, published_binaries = future.result()
-            print( ppa )
-            for published_binary in published_binaries:
-                print( published_binary )
-
-            print()
-
-        # for future in futures:
-        #     user, name, series, architecture, published_binaries = future.result()
-        #     print( user )
-        #     print( name )
-        #     print( series )
-        #     print( architecture )
-        #     print()
-        #     for published_binary in published_binaries:
-        #         print( published_binary.binary_package_name )
-        #         print( published_binary.binary_package_version )
-        #         print( published_binary.architecture_specific )
-        #         print()
-        #
-        #     print()
-        #     print( "-------------" )
-        #     print()
-
-        # future_download_counts = [ ]
-        # with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-        #     for future in future_published_binaries:
-        #         user, name, series, architecture, published_binaries = future.result()
-        #         for published_binary in published_binaries:
-        #             future_download_counts.append(
-        #                 executor.submit(
-        #                     self.get_download_count,
-        #                     published_binary,
-        #                     user,
-        #                     name,
-        #                     series,
-        #                     architecture ) )
 
         future_download_counts = [ ]
         with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
@@ -727,126 +716,174 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         for future in future_download_counts:
             ppa = future.result()
             print( ppa )
-
-            print( "-------------" )
-
-
-        # for future in future_download_counts:
-        #     user, name, series, architecture, download_count = future.result()
-        #     print( user )
-        #     print( name )
-        #     print( series )
-        #     print( architecture )
-        #     print( download_count )
-        #     print()
-        #
-        #     print()
-        #     print( "-------------" )
-        #     print()
-
-        print( datetime.datetime.now() - now )
-
+        '''
 
         import sys
         if True:
             sys.exit()
 
 
-    def get_published_binaries( self, launchpad, ppa, filter_text ):
-        print( f" { threading.get_ident() } - Enter" )
+    def get_launchpad( self ):
+        try:
+            launchpad = \
+                Launchpad.login_anonymously(
+                    self.indicator_name,
+                    "production",
+                    self.get_cache_directory(),
+                    version = "devel" )
+
+        except httplib2.ServerNotFoundError:
+            launchpad = None
+            for ppa in self.ppas:
+                ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
+
+        return launchpad
+
+
+    def get_persons( self, lock, max_workers, persons, launchpad ):
+        futures = [ ]
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            for ppa in self.ppas:
+                futures.append(
+                    executor.submit(
+                        self.get_person,
+                        lock,
+                        launchpad,
+                        persons,
+                        ppa.get_user() ) )
+
+        success = True
+        for future in futures:
+            if future.exception() is not None:
+                success = False
+                break
+
+        return success
+
+
+    def get_person( self, lock, launchpad, persons, user ):
+        if lock.acquire( blocking = True ):
+            if user not in persons:
+                persons[ user ] = launchpad.people[ user ]
+
+            person = persons[ user ]
+            lock.release()
+
+
+    def get_archives( self, lock, max_workers, archives, persons ):
+        futures = [ ]
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            for ppa in self.ppas:
+                futures.append(
+                    executor.submit(
+                        self.get_archive,
+                        lock,
+                        archives,
+                        persons[ ppa.get_user() ],
+                        ppa.get_user(),
+                        ppa.get_name() ) )
+
+        success = True
+        for future in futures:
+            if future.exception() is not None:
+                success = False
+                break
+
+        return success
+
+
+    def get_archive( self, lock, archives, person, user, name ):
+        archives_key = ( user, name )
+        if lock.acquire( blocking = True ):
+            if archives_key not in archives:
+                archives[ archives_key ] = person.getPPAByName( name = name )
+
+            archive = archives[ archives_key ]
+            lock.release()
+
+
+    def get_published_binaries( self, lock, archives ):
+        future_published_binaries = [ ]
+        url = "https://api.launchpad.net/devel/ubuntu/"
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            for ppa in self.ppas:
+                url_ = url + ppa.get_series() + '/' + ppa.get_architecture()
+                for filter_text in self.get_filter( ppa ):
+                    future_published_binaries.append(
+                        [ ppa,
+                        executor.submit(
+                            self.get_published_binaries_for_archive,
+                            lock,
+                            archives[ ( ppa.get_user(), ppa.get_name() ) ],
+                            url_,
+                            filter_text ) ] )
+
+        for future in future_published_binaries:
+            ppa = future[ 0 ]
+            if future[ 1 ].exception() is not None:
+                ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
+
+
+    def get_published_binaries_for_archive( self, lock, archive, url, filter_text ):
         published_binaries = None
-        if self.lock.acquire( blocking = True ):
-            print( f" { threading.get_ident() } - Got first lock" )
-            if ppa.get_user() not in self.persons:
-                print( f" { threading.get_ident() } - Person not in dict" )
-                self.persons[ ppa.get_user() ] = launchpad.people[ ppa.get_user() ]
-                print( f" { threading.get_ident() } - Get person" )
-
-            person = self.persons[ ppa.get_user() ]
-            print( f" { threading.get_ident() } - Got person" )
-            self.lock.release()
-            print( f" { threading.get_ident() } - Release lock" )
-
-        if self.lock.acquire( blocking = True ):
-            archives_key = ( ppa.get_user(), ppa.get_name() )
-            if archives_key not in self.archives:
-                self.archives[ archives_key ] = person.getPPAByName( name = ppa.get_name() )
-                print( f" { threading.get_ident() } - Get archive" )
-
-            archive = self.archives[ archives_key ]
-            print( f" { threading.get_ident() } - Got archive" )
-            self.lock.release()
-            print( f" { threading.get_ident() } - Release lock" )
-            
-        url = "https://api.launchpad.net/devel/ubuntu/" + ppa.get_series() + '/' + ppa.get_architecture()
-        if self.lock.acquire( blocking = True ):
-            print( f" { threading.get_ident() } - Get published binaries" )
+        if lock.acquire( blocking = True ):
             published_binaries = \
                 archive.getPublishedBinaries(
                     status = "Published",
                     distro_arch_series = url,
                     binary_name = filter_text )
-            print( f" { threading.get_ident() } - Got published binaries" )
-            self.lock.release()
-            print( f" { threading.get_ident() } - Release lock" )
+
+            lock.release()
 
 #TODO If the published binaries are all filtered out, is the result None or [ ] ?
-
-        # print( published_binaries )
-        print( f" { threading.get_ident() } - Returning" )
-        return ppa, published_binaries    
+#TODO Instead of returning the ppa, perhaps add the ppa to the futures?
+        return published_binaries
 
 
-#     def get_published_binaries( self, launchpad, user, name, series, architecture, filter_text ):
-#         print( f" { threading.get_ident() } - Enter" )
-#         published_binaries = None
-#         if self.lock.acquire( blocking = True ):
-#             print( f" { threading.get_ident() } - Got first lock" )
-#             if user not in self.persons:
-#                 print( f" { threading.get_ident() } - Person not in dict" )
-#                 self.persons[ user ] = launchpad.people[ user ]
-#                 print( f" { threading.get_ident() } - Get person" )
-#
-#             person = self.persons[ user ]
-#             print( f" { threading.get_ident() } - Got person" )
-#             self.lock.release()
-#             print( f" { threading.get_ident() } - Release lock" )
-#
-#         if self.lock.acquire( blocking = True ):
-#             archives_key = ( user, name )
-#             if archives_key not in self.archives:
-#                 self.archives[ archives_key ] = person.getPPAByName( name = name )
-#                 print( f" { threading.get_ident() } - Get archive" )
-#
-#             archive = self.archives[ archives_key ]
-#             print( f" { threading.get_ident() } - Got archive" )
-#             self.lock.release()
-#             print( f" { threading.get_ident() } - Release lock" )
-#
-#         url = "https://api.launchpad.net/devel/ubuntu/" + series + '/' + architecture
-#         if self.lock.acquire( blocking = True ):
-#             print( f" { threading.get_ident() } - Get published binaries" )
-#             published_binaries = \
-#                 archive.getPublishedBinaries(
-#                     status = "Published",
-#                     distro_arch_series = url,
-#                     binary_name = filter_text )
-#             print( f" { threading.get_ident() } - Got published binaries" )
-#             self.lock.release()
-#             print( f" { threading.get_ident() } - Release lock" )
-#
-# #TODO If the published binaries are all filtered out, is the result None or [ ] ?
-#
-#         # print( published_binaries )
-#         print( f" { threading.get_ident() } - Returning" )
-#         return user, name, series, architecture, published_binaries    
+    def get_published_binariesORIG( self, launchpad, ppa, filter_text ):
+        published_binaries = None
+        if self.lock.acquire( blocking = True ):
+            if ppa.get_user() not in self.persons:
+                self.persons[ ppa.get_user() ] = launchpad.people[ ppa.get_user() ]
+
+            person = self.persons[ ppa.get_user() ]
+            self.lock.release()
+
+        if self.lock.acquire( blocking = True ):
+            archives_key = ( ppa.get_user(), ppa.get_name() )
+            if archives_key not in self.archives:
+                self.archives[ archives_key ] = person.getPPAByName( name = ppa.get_name() )
+
+            archive = self.archives[ archives_key ]
+            self.lock.release()
+
+        url = "https://api.launchpad.net/devel/ubuntu/" + ppa.get_series() + '/' + ppa.get_architecture()
+        if self.lock.acquire( blocking = True ):
+            published_binaries = \
+                archive.getPublishedBinaries(
+                    status = "Published",
+                    distro_arch_series = url,
+                    binary_name = filter_text )
+            self.lock.release()
+
+#TODO If the published binaries are all filtered out, is the result None or [ ] ?
+        return ppa, published_binaries
+
+
+    def get_download_counts( self, lock, max_workers ):
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            for future in future_published_binaries:
+                ppa = future[ 0 ]
+                published_binaries = future[ 1 ].result()
+                for published_binary in published_binaries:
+                    executor.submit(
+                        self.get_download_count,
+                        ppa,
+                        published_binary )
 
 
     def get_download_count( self, ppa, published_binary ):
-        print( f" { threading.get_ident() } - Enter" )
         if self.lock.acquire( blocking = True ):
-            print( f" { threading.get_ident() } - Got first lock" )
-
             ppa.add_published_binary(
                 PublishedBinary(
                     published_binary.binary_package_name,
@@ -854,34 +891,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     published_binary.getDownloadCount(),
                     published_binary.architecture_specific ) )
 
-            print( f" { threading.get_ident() } - Got download count and added published binary" )
             self.lock.release()
-            print( f" { threading.get_ident() } - Release lock" )
 
-        print( f" { threading.get_ident() } - Returning" )
-        return ppa    
-    
-    
-    # def get_download_count( self, published_binary, user, name, series, architecture  ):
-    #     print( f" { threading.get_ident() } - Enter" )
-    #     download_count = None
-    #     if self.lock.acquire( blocking = True ):
-    #         print( f" { threading.get_ident() } - Got first lock" )
-    #         download_count = published_binary.getDownloadCount()
-    #         print( f" { threading.get_ident() } - Got download count" )
-    #         self.lock.release()
-    #         print( f" { threading.get_ident() } - Release lock" )
-    #
-    #     print( f" { threading.get_ident() } - Returning" )
-    #     return user, name, series, architecture, download_count    
+
+    def get_download_countORIG( self, ppa, published_binary ):
+        if self.lock.acquire( blocking = True ):
+            ppa.add_published_binary(
+                PublishedBinary(
+                    published_binary.binary_package_name,
+                    published_binary.binary_package_version,
+                    published_binary.getDownloadCount(),
+                    published_binary.architecture_specific ) )
+
+            self.lock.release()
+
+        return ppa
 
 
 # {"combinePPAs": false, "filters": [["canonical-kernel-team", "ppa", ["linux-image-oem"]]], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"],["thebernmeister", "ppa", "focal", "amd64"],["canonical-kernel-team", "ppa", "focal", "amd64"]], "showSubmenu": false, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.81", "checklatestversion": false}
-
-
-    def hello( self ):
-        print( "hello" )
-        return "text"
 
 
 #TODO For testing.
