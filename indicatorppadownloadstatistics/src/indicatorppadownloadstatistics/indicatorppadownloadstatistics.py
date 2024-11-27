@@ -603,26 +603,26 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 #TODO What happens if there are no ppas defined?
 
-        lock = threading.Lock()
-        max_workers = 1 if self.low_bandwidth else 3
-        persons = { }
-        archives = { }
-
         launchpad = self.get_launchpad()
         if launchpad is not None:
+            lock = threading.Lock()
+            max_workers = 1 if self.low_bandwidth else 3
+            persons = { }
+            archives = { }
+
             success = \
-                self.get_persons( lock, max_workers, persons, launchpad ) and \
+                self.get_persons( lock, max_workers, launchpad, persons ) and \
                 self.get_archives( lock, max_workers, archives, persons )
 
-            print( success )
-
-
-            '''
-            for key, value in self.persons.items():
+            for key, value in persons.items():
                 print( key )
                 print( value )
                 print()
-            '''
+
+            for key, value in archives.items():
+                print( key )
+                print( value )
+                print()
 
         else:
             print( "launchpad failure" )
@@ -740,7 +740,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return launchpad
 
 
-    def get_persons( self, lock, max_workers, persons, launchpad ):
+    def get_persons( self, lock, max_workers, launchpad, persons ):
         futures = [ ]
         with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
             for ppa in self.ppas:
@@ -749,8 +749,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         self.get_person,
                         lock,
                         launchpad,
-                        persons,
-                        ppa.get_user() ) )
+                        ppa.get_user(),
+                        persons ) )
 
         success = True
         for future in futures:
@@ -761,12 +761,18 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return success
 
 
-    def get_person( self, lock, launchpad, persons, user ):
+    def get_person( self, lock, launchpad, user, persons ):
+        person = None
         if lock.acquire( blocking = True ):
             if user not in persons:
-                persons[ user ] = launchpad.people[ user ]
+                person = launchpad.people[ user ]
 
-            person = persons[ user ]
+            lock.release()
+
+        if person is not None and lock.acquire( blocking = True ):
+            if user not in persons:
+                persons[ user ] = person
+
             lock.release()
 
 
@@ -798,11 +804,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             if archives_key not in archives:
                 archives[ archives_key ] = person.getPPAByName( name = name )
 
-            archive = archives[ archives_key ]
             lock.release()
 
 
-    def get_published_binaries( self, lock, archives ):
+    def get_published_binaries( self, lock, max_workers, archives ):
         future_published_binaries = [ ]
         url = "https://api.launchpad.net/devel/ubuntu/"
         with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
@@ -870,16 +875,16 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return ppa, published_binaries
 
 
-    def get_download_counts( self, lock, max_workers ):
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for future in future_published_binaries:
-                ppa = future[ 0 ]
-                published_binaries = future[ 1 ].result()
-                for published_binary in published_binaries:
-                    executor.submit(
-                        self.get_download_count,
-                        ppa,
-                        published_binary )
+    # def get_download_counts( self, lock, max_workers ):
+    #     with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+    #         for future in future_published_binaries:
+    #             ppa = future[ 0 ]
+    #             published_binaries = future[ 1 ].result()
+    #             for published_binary in published_binaries:
+    #                 executor.submit(
+    #                     self.get_download_count,
+    #                     ppa,
+    #                     published_binary )
 
 
     def get_download_count( self, ppa, published_binary ):
