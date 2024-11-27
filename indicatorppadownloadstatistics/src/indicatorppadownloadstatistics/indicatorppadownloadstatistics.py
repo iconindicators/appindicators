@@ -557,6 +557,59 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return filter_
 
 
+    def get_personsNEW( self, launchpad ):
+        persons = { }
+        for ppa in self.ppas:
+            if ppa.get_user() not in persons:
+                persons[ ppa.get_user() ] = launchpad.people[ ppa.get_user() ]
+
+        return persons
+
+    '''
+    def get_archivesNEW( self, max_workers, persons ):
+        futures = [ ]
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            tmp = [ ]
+            for ppa in self.ppas:
+                key = ( ppa.get_user(), ppa.get_name() )
+                print( f"Key { key }" )
+                if key not in tmp:
+                    tmp.append( key )
+                    print( f"Append { key }" )
+                    futures.append(
+                        executor.submit(
+                            self.get_archiveNEW,
+                            persons[ ppa.get_user() ],
+                            ppa.get_name() ) )
+    '''
+
+    '''
+        archives = { }
+        for future in futures:
+            if future.exception() is None:
+                print( future.result() )
+            else:
+                print( future.exception() )
+    '''
+
+    def get_archivesNEW( self, persons ):
+        tmp = [ ]
+        archives = { }
+        for ppa in self.ppas:
+            key = ( ppa.get_user(), ppa.get_name() )
+            if key not in tmp:
+                tmp.append( key )
+                print( f"Get person for { key }" )
+                archives[ key ] = persons[ ppa.get_user() ].getPPAByName( name = ppa.get_name() )
+
+        return archives
+
+
+    def get_archiveNEW( self, person, name ):
+        print( f"Get person for { name }" )
+        print( person.getPPAByName( name = name ) )
+
+
     def download_ppa_statistics( self ):
         '''
         Get a list of the published binaries for each PPA.
@@ -601,7 +654,38 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             http://help.launchpad.net/API/Hacking
         '''
 
+        '''
+        https://launchpad.net/~151044-ppa/+archive/ubuntu/github-deploy
+        https://launchpad.net/~abelcheung-ppa/+archive/ubuntu/mup
+        https://launchpad.net/~aggelalex-ppa/+archive/ubuntu/ppa
+        https://launchpad.net/~ppa-you-genius/+archive/ubuntu/you-genius-ppa
+        https://launchpad.net/~ppa-o/+archive/ubuntu/salt
+        https://launchpad.net/~ppa-j/+archive/ubuntu/recordstream
+        https://launchpad.net/~ppa-q/+archive/ubuntu/ppa
+        https://launchpad.net/~chaocrator-ppa/+archive/ubuntu/anarchy
+        https://launchpad.net/~claranetitaliappa/+archive/ubuntu/ubuntu-patches
+        https://launchpad.net/~cloud-it/+archive/ubuntu/ppa
+        https://launchpad.net/~cubic-wizard/+archive/ubuntu/release
+        '''
+
+#,["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "i386"],["cubic-wizard", "release", "focal", "amd64"],["cloud-it", "ppa", "focal", "amd64"],["ppa-q", "ppa", "focal", "amd64"],["aggelalex-ppa", "ppa", "focal", "amd64"]
+
 #TODO What happens if there are no ppas defined?
+        max_workers = 1 if self.low_bandwidth else 5
+
+        launchpad = self.get_launchpad()
+        if launchpad is not None:
+            persons = self.get_personsNEW( launchpad )
+
+        print( persons )
+
+#        self.get_archivesNEW( max_workers, persons )
+        archives = self.get_archivesNEW( persons )
+
+        import sys
+        if True:
+            sys.exit()
+
 
         launchpad = self.get_launchpad()
         if launchpad is not None:
