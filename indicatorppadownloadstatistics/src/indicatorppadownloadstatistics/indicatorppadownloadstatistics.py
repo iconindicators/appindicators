@@ -2447,6 +2447,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             {"combinePPAs": false, "filters": [["thebernmeister", "ppa", "jammy", "amd64", ["indicator-fortune", "indicator-lunar", "indicator-on-this-day", "indicator-ppa-download-statistics", "indicator-punycode", "indicator-script-runner", "indicator-stardate", "indicator-tide", "indicator-virtual-box"]]], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"]], "showSubmenu": false, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.80"}
 
+
+{"combinePPAs": false, "filters": [["canonical-kernel-team", "ppa", "focal", "amd64", ["linux-image-oem"]]], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "focal", "i386"],["thebernmeister", "archive", "focal", "i386"],["thebernmeister", "testing", "focal", "i386"],["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "i386"],["cubic-wizard", "release", "focal", "amd64"],["cloud-it", "ppa", "focal", "amd64"],["ppa-q", "ppa", "focal", "amd64"],["aggelalex-ppa", "ppa", "focal", "amd64"]], "showSubmenu": false, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.81", "checklatestversion": false}
+
             '''
 
             #TODO Test data.
