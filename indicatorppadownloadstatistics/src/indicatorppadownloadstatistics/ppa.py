@@ -34,9 +34,11 @@ class Filter():
     # INDEX_TEXT = 2
 
 
-    def __init__( self, user, name, text ):
+    def __init__( self, user, name, series, architecture, text ):
         self.user = user
         self.name = name
+        self.series = series
+        self.architecture = architecture
         self.text = text
 
 
@@ -46,6 +48,14 @@ class Filter():
 
     def get_name( self ):
         return self.name
+
+
+    def get_series( self ):
+        return self.series
+
+
+    def get_architecture( self ):
+        return self.architecture
 
 
     def get_text( self ):
@@ -85,7 +95,9 @@ class Filter():
     def __str__( self ):
         return (
             self.user + " | " +
-            self.name + " | " +
+            self.name + ' | ' +
+            str( self.series ) + ' | ' +
+            str( self.architecture ) + ' | ' +
             ' '.join( self.text ) )
 
 
@@ -98,6 +110,8 @@ class Filter():
             self.__class__ == other.__class__ and \
             self.get_user() == other.get_user() and \
             self.get_name() == other.get_name() and \
+            self.get_series() == other.get_series() and \
+            self.get_architecture() == other.get_architecture() and \
             self.get_text() == other.get_text()
 
 
@@ -111,7 +125,8 @@ class PublishedBinary():
             download_count,
             architecture_specific ):
         '''
-        Package name, package version (string)
+        Package name (string)
+        Package version (string)
         Download count (integer)
         Architecture specific (boolean)
         '''
@@ -273,7 +288,7 @@ class PPA():
             self.name + ' | ' +
             str( self.series ) + ' | ' +
             str( self.architecture ) + ' | ' +
-            str( self.published_binaries ) ) #TODO Think I need a join here as it is a list.
+            ' '.join( str( self.published_binaries ) ) )
 
 
     def __repr__( self ):

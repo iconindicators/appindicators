@@ -74,7 +74,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     COLUMN_NAME = 1
     COLUMN_SERIES = 2
     COLUMN_ARCHITECTURE = 3
-    COLUMN_FILTER_TEXT = 2 # Filters share user and name.
+    COLUMN_FILTER_TEXT = 4
 
     MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
     MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
@@ -547,7 +547,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def get_filter( self, ppa ):
         filter_ = [ ]
         for f in self.filters:
-            if f.get_user() == ppa.get_user() and f.get_name() == ppa.get_name():
+            match = (
+                f.get_user() == ppa.get_user() and +
+                f.get_name() == ppa.get_name() and +
+                f.get_series() == ppa.get_series() and +
+                f.get_architecture() == ppa.get_architecture() )
+
+            if match:
                 filter_ = f.get_text()
                 break
 
@@ -557,13 +563,151 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return filter_
 
 
-    def get_personsNEW( self, launchpad ):
-        persons = { }
-        for ppa in self.ppas:
-            if ppa.get_user() not in persons:
-                persons[ ppa.get_user() ] = launchpad.people[ ppa.get_user() ]
+    def get_archivesNEWNEW( self, max_workers ):
+        ppa_user_and_name_to_archive = { }
+        tmp = [ ]
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            for ppa in self.ppas:
+                key = ( ppa.get_user(), ppa.get_name() )
+                if key not in tmp:
+                    tmp.append( key )
 
-        return persons
+                    print( f"Processing { key }" )
+                    ppa_user_and_name_to_archive[ key ] = \
+                        executor.submit(
+                            self.get_archive_for_user_name,
+                            ppa.get_user(),
+                            ppa.get_name() )
+
+                else:
+                    print( f"Skipping { key }" )
+
+        for ppa_user_and_name, result in ppa_user_and_name_to_archive.items():
+            exception_ = result.exception()
+            if exception_ is None:
+                ppa_user_and_name_to_archive[ ppa_user_and_name ] = result.result()
+
+            else:
+                ppa_user_and_name_to_archive[ ppa_user_and_name ] = None
+
+        return ppa_user_and_name_to_archive
+
+
+    def get_archive_for_user_name( self, user, name ):
+        print( "Connect to launchpad anonymously..." )
+        launchpad = \
+            Launchpad.login_anonymously(
+                self.indicator_name,
+                "production",
+                self.get_cache_directory(),
+                version = "devel" )
+
+        print( f"Get person for user { user }" )
+        person = launchpad.people[ user ]
+
+        print( f"Get archive for user | name { user } | { name }" )
+        return person.getPPAByName( name = name )
+
+
+#TODO I think filter text should be applied to a user,name,series,arch rather than only user,name...see if this is correct.
+    def get_published_binaries( self, max_workers, ppa_user_and_name_to_archive ):
+        future_published_binaries = { }
+        url = "https://api.launchpad.net/devel/ubuntu/"
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            for user_and_name, archive in ppa_user_and_name_to_archive.items():
+                if archive[ user_and_name ] is not None:
+                    for ppa in []: #TODO From self.ppas get all ppas which match the user/name
+                        key = (
+                            ppa.get_user(),
+                            ppa.get_name(),
+                            ppa.get_series(),
+                            ppa.get_architecture() )
+
+                        for filter_text in self.get_filter( ppa ):
+                            future_published_binaries[ key ] = \
+                                executor.submit(
+                                    self.get_published_binaries_for_archive,
+                                    archive,
+                                    url + ppa.get_series() + '/' + ppa.get_architecture(),
+                                    filter_text )
+
+
+    def get_published_binaries_for_archive( self, archive, url, filter_text ):
+        return \
+            archive.getPublishedBinaries(
+                status = "Published",
+                distro_arch_series = url,
+                binary_name = filter_text )
+
+
+    def get_personsNEW( self, max_workers ):
+        ppa_user_to_person = { }
+        tmp = [ ]
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            for ppa in self.ppas:
+                if ppa.get_user() not in tmp:
+                    tmp.append( ppa.get_user() )
+                    ppa_user_to_person[ ppa.get_user() ] = \
+                        executor.submit(
+                            self.get_personNew,
+                            ppa.get_user() )
+    
+        for ppa_user, future_result in ppa_user_to_person.items():
+            exception_ = future_result.exception()
+            if exception_ is None:
+                ppa_user_to_person[ ppa_user ] = future_result.result()
+    
+            else:
+                ppa_user_to_person[ ppa_user ] = None
+    
+        return ppa_user_to_person
+
+
+    def get_personNew( self, user ):
+        print( "Access launchpad" )
+        launchpad = \
+            Launchpad.login_anonymously(
+                self.indicator_name,
+                "production",
+                self.get_cache_directory(),
+                version = "devel" )
+    
+        print( f"Getting person for { user }" )
+        return launchpad.people[ user ]
+
+
+#TODO Cannot share the person...so get archive within get person (and launchpad).
+    def get_archivesNew( self, max_workers, ppa_user_to_person ):
+        user_name_to_archive = { }
+        tmp = [ ]
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            for ppa in self.ppas:
+                key = ( ppa.get_user(), ppa.get_name() )
+                if key not in tmp:
+                    tmp.append( key )
+                    person = ppa_user_to_person[ ppa.get_user() ]
+                    if person is not None:
+                        user_name_to_archive[ key ] = \
+                            executor.submit(
+                                self.get_archiveNEW,
+                                person,
+                                ppa.get_name() )
+
+        for user_name, future_result in user_name_to_archive.items():
+            exception_ = future_result.exception()
+            if exception_ is None:
+                user_name_to_archive[ user_name ] = future_result.result()
+    
+            else:
+                user_name_to_archive[ user_name ] = None
+                print( "-----")
+                print( user_name )
+                print( exception_ )
+                print( "-----")
+                print()
+
+        return user_name_to_archive
+
 
     '''
     def get_archivesNEW( self, max_workers, persons ):
@@ -592,6 +736,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 print( future.exception() )
     '''
 
+    '''
     def get_archivesNEW( self, persons ):
         tmp = [ ]
         archives = { }
@@ -603,11 +748,14 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 archives[ key ] = persons[ ppa.get_user() ].getPPAByName( name = ppa.get_name() )
 
         return archives
+    '''
 
 
     def get_archiveNEW( self, person, name ):
         print( f"Get person for { name }" )
-        print( person.getPPAByName( name = name ) )
+        archive = person.getPPAByName( name = name )
+        print( f"Archive for { name } is { archive }")
+        return archive
 
 
     def download_ppa_statistics( self ):
@@ -670,17 +818,41 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 #,["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "i386"],["cubic-wizard", "release", "focal", "amd64"],["cloud-it", "ppa", "focal", "amd64"],["ppa-q", "ppa", "focal", "amd64"],["aggelalex-ppa", "ppa", "focal", "amd64"]
 
+
+#TODO Need to test with a user and multiple names:
+#    thebernmeister
+#        ppa
+#        testing
+#        archive
+
 #TODO What happens if there are no ppas defined?
-        max_workers = 1 if self.low_bandwidth else 5
+        max_workers = 1 if self.low_bandwidth else 3
 
-        launchpad = self.get_launchpad()
-        if launchpad is not None:
-            persons = self.get_personsNEW( launchpad )
+        # ppa_user_to_person = self.get_personsNEW( max_workers ) #TODO Need to check as each person is used if the value is None.
+        # print()
+        # print( ppa_user_to_person )
+        # print()
+        #
+        # user_name_to_archive = self.get_archivesNew( max_workers, ppa_user_to_person )
+        # print()
+        # print( user_name_to_archive )
+        # print()
+        
+        ppa_user_and_name_to_archive = self.get_archivesNEWNEW( max_workers )
+        print()
+        print( ppa_user_and_name_to_archive )
+        print()
+        
 
-        print( persons )
 
-#        self.get_archivesNEW( max_workers, persons )
-        archives = self.get_archivesNEW( persons )
+#         launchpad = self.get_launchpad()
+#         if launchpad is not None:
+#             persons = self.get_personsNEW( launchpad )
+#
+#         print( persons )
+#
+# #        self.get_archivesNEW( max_workers, persons )
+#         archives = self.get_archivesNEW( persons )
 
         import sys
         if True:
@@ -2221,6 +2393,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         dialog.destroy()
 
 
+#TODO When all is sorted out with download and preferences, 
+# use an old .json from old indicator name with hyphens
+# and ensure the old is copied to new location (name without hyphens)
+# and loads up.
     def load_config( self, config ):
         self.combine_ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, False )
         self.ignore_version_architecture_specific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, True )
@@ -2247,19 +2423,22 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             for filter_ in filters:
                 user = filter_[ IndicatorPPADownloadStatistics.COLUMN_USER ]
                 name = filter_[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
+                series = filter_[ IndicatorPPADownloadStatistics.COLUMN_SERIES ]
+                architecture = filter_[ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ]
                 filter_text = filter_[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ]
 
-                # Prior to version 81, filters erroneously included the
-                # series/architecture.  Remove the series/architecture if
-                # present and schedule a save.
-                if len( filter_ ) == 5:
-                    filter_text = filter_[ 4 ]
-                    save_required = True
-
-                self.filters.append( Filter( user, name, filter_text ) )
-
-            if save_required:
-                self.request_save_config()
+#TODO I think this now needs to go!
+            #     # Prior to version 81, filters erroneously included the
+            #     # series/architecture.  Remove the series/architecture if
+            #     # present and schedule a save.
+            #     if len( filter_ ) == 5:
+            #         filter_text = filter_[ 4 ]
+            #         save_required = True
+            #
+            #     self.filters.append( Filter( user, name, filter_text ) )
+            #
+            # if save_required:
+            #     self.request_save_config()
 
 #TODO
             '''
@@ -2282,9 +2461,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 # should really find an alternate default/example PPA and filter.
             user = "thebernmeister"
             name = "ppa"
+            series = "jammy"
+            architecture = "amd64"
 
-            self.ppas = [ ]
-            self.ppas.append( PPA( user, name, "jammy", "amd64" ) )
+            self.ppas = [ PPA( user, name, series, architecture ) ]
 
             filter_text = [
                 "indicator-fortune",
@@ -2297,8 +2477,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 "indicator-tide",
                 "indicator-virtual-box" ]
 
-            self.filters = [ ]
-            self.filters.append( Filter( user, name, filter_text ) )
+            self.filters = [
+                Filter( user, name, series, architecture, filter_text ) ]
 
 
     def save_config( self ):
@@ -2315,17 +2495,19 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             filters.append( [
                 filter_.get_user(),
                 filter_.get_name(),
+                filter_.get_series(),
+                filter_.get_architecture(),
                 filter_.get_text() ] )
 
         return {
-            IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS : self.combine_ppas,
-            IndicatorPPADownloadStatistics.CONFIG_FILTERS : filters,
-            IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC : self.ignore_version_architecture_specific,
-            IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH : self.low_bandwidth,
-            IndicatorPPADownloadStatistics.CONFIG_PPAS : ppas,
-            IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU : self.show_submenu,
-            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD : self.sort_by_download,
-            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT : self.sort_by_download_amount
+            IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS: self.combine_ppas,
+            IndicatorPPADownloadStatistics.CONFIG_FILTERS: filters,
+            IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignore_version_architecture_specific,
+            IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH: self.low_bandwidth,
+            IndicatorPPADownloadStatistics.CONFIG_PPAS: ppas,
+            IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU: self.show_submenu,
+            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD: self.sort_by_download,
+            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT: self.sort_by_download_amount
         }
 
 
