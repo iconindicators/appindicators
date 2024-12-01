@@ -164,7 +164,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         else:
 #TODO Test without the " " below.
-            label = (
+            label += (
                 " " + published_binary.get_package_version() +
                 ":  " +
                 str( published_binary.get_download_count() ) )
@@ -544,635 +544,26 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         webbrowser.open( url )
 
 
-    def get_filter( self, ppa ):
-        filter_ = [ ]
+    def get_filters( self, ppa ):
+        filters = [ ]
         for f in self.filters:
             match = (
-                f.get_user() == ppa.get_user() and +
-                f.get_name() == ppa.get_name() and +
-                f.get_series() == ppa.get_series() and +
+                f.get_user() == ppa.get_user() and
+                f.get_name() == ppa.get_name() and
+                f.get_series() == ppa.get_series() and
                 f.get_architecture() == ppa.get_architecture() )
 
             if match:
-                filter_ = f.get_text()
+                filters = f.get_text()
                 break
 
-        if not filter_:
-            filter_ = [ "" ]
+        if not filters:
+            filters = [ "" ]
 
-        return filter_
+        return filters
 
 
-    def get_archivesNEWNEW( self, max_workers ):
-        ppa_user_and_name_to_archive = { }
-        tmp = [ ]
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for ppa in self.ppas:
-                key = ( ppa.get_user(), ppa.get_name() )
-                if key not in tmp:
-                    tmp.append( key )
-
-                    print( f"Processing { key }" )
-                    ppa_user_and_name_to_archive[ key ] = \
-                        executor.submit(
-                            self.get_archive_for_user_name,
-                            ppa.get_user(),
-                            ppa.get_name() )
-
-                else:
-                    print( f"Skipping { key }" )
-
-        for ppa_user_and_name, result in ppa_user_and_name_to_archive.items():
-            exception_ = result.exception()
-            if exception_ is None:
-                ppa_user_and_name_to_archive[ ppa_user_and_name ] = result.result()
-
-            else:
-                ppa_user_and_name_to_archive[ ppa_user_and_name ] = None
-
-        return ppa_user_and_name_to_archive
-
-
-    def get_archive_for_user_name( self, user, name ):
-        print( "Connect to launchpad anonymously..." )
-        launchpad = \
-            Launchpad.login_anonymously(
-                self.indicator_name,
-                "production",
-                self.get_cache_directory(),
-                version = "devel" )
-
-        print( f"Get person for user { user }" )
-        person = launchpad.people[ user ]
-
-        print( f"Get archive for user | name { user } | { name }" )
-        return person.getPPAByName( name = name )
-
-
-#TODO I think filter text should be applied to a user,name,series,arch rather than only user,name...see if this is correct.
-    def get_published_binaries( self, max_workers, ppa_user_and_name_to_archive ):
-        future_published_binaries = { }
-        url = "https://api.launchpad.net/devel/ubuntu/"
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for user_and_name, archive in ppa_user_and_name_to_archive.items():
-                if archive[ user_and_name ] is not None:
-                    for ppa in []: #TODO From self.ppas get all ppas which match the user/name
-                        key = (
-                            ppa.get_user(),
-                            ppa.get_name(),
-                            ppa.get_series(),
-                            ppa.get_architecture() )
-
-                        for filter_text in self.get_filter( ppa ):
-                            future_published_binaries[ key ] = \
-                                executor.submit(
-                                    self.get_published_binaries_for_archive,
-                                    archive,
-                                    url + ppa.get_series() + '/' + ppa.get_architecture(),
-                                    filter_text )
-
-
-    def get_published_binaries_for_archive( self, archive, url, filter_text ):
-        return \
-            archive.getPublishedBinaries(
-                status = "Published",
-                distro_arch_series = url,
-                binary_name = filter_text )
-
-
-    def get_personsNEW( self, max_workers ):
-        ppa_user_to_person = { }
-        tmp = [ ]
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for ppa in self.ppas:
-                if ppa.get_user() not in tmp:
-                    tmp.append( ppa.get_user() )
-                    ppa_user_to_person[ ppa.get_user() ] = \
-                        executor.submit(
-                            self.get_personNew,
-                            ppa.get_user() )
-    
-        for ppa_user, future_result in ppa_user_to_person.items():
-            exception_ = future_result.exception()
-            if exception_ is None:
-                ppa_user_to_person[ ppa_user ] = future_result.result()
-    
-            else:
-                ppa_user_to_person[ ppa_user ] = None
-    
-        return ppa_user_to_person
-
-
-    def get_personNew( self, user ):
-        print( "Access launchpad" )
-        launchpad = \
-            Launchpad.login_anonymously(
-                self.indicator_name,
-                "production",
-                self.get_cache_directory(),
-                version = "devel" )
-    
-        print( f"Getting person for { user }" )
-        return launchpad.people[ user ]
-
-
-#TODO Cannot share the person...so get archive within get person (and launchpad).
-    def get_archivesNew( self, max_workers, ppa_user_to_person ):
-        user_name_to_archive = { }
-        tmp = [ ]
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for ppa in self.ppas:
-                key = ( ppa.get_user(), ppa.get_name() )
-                if key not in tmp:
-                    tmp.append( key )
-                    person = ppa_user_to_person[ ppa.get_user() ]
-                    if person is not None:
-                        user_name_to_archive[ key ] = \
-                            executor.submit(
-                                self.get_archiveNEW,
-                                person,
-                                ppa.get_name() )
-
-        for user_name, future_result in user_name_to_archive.items():
-            exception_ = future_result.exception()
-            if exception_ is None:
-                user_name_to_archive[ user_name ] = future_result.result()
-    
-            else:
-                user_name_to_archive[ user_name ] = None
-                print( "-----")
-                print( user_name )
-                print( exception_ )
-                print( "-----")
-                print()
-
-        return user_name_to_archive
-
-
-    '''
-    def get_archivesNEW( self, max_workers, persons ):
-        futures = [ ]
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            tmp = [ ]
-            for ppa in self.ppas:
-                key = ( ppa.get_user(), ppa.get_name() )
-                print( f"Key { key }" )
-                if key not in tmp:
-                    tmp.append( key )
-                    print( f"Append { key }" )
-                    futures.append(
-                        executor.submit(
-                            self.get_archiveNEW,
-                            persons[ ppa.get_user() ],
-                            ppa.get_name() ) )
-    '''
-
-    '''
-        archives = { }
-        for future in futures:
-            if future.exception() is None:
-                print( future.result() )
-            else:
-                print( future.exception() )
-    '''
-
-    '''
-    def get_archivesNEW( self, persons ):
-        tmp = [ ]
-        archives = { }
-        for ppa in self.ppas:
-            key = ( ppa.get_user(), ppa.get_name() )
-            if key not in tmp:
-                tmp.append( key )
-                print( f"Get person for { key }" )
-                archives[ key ] = persons[ ppa.get_user() ].getPPAByName( name = ppa.get_name() )
-
-        return archives
-    '''
-
-
-    def get_archiveNEW( self, person, name ):
-        print( f"Get person for { name }" )
-        archive = person.getPPAByName( name = name )
-        print( f"Archive for { name } is { archive }")
-        return archive
-
-
-    def download_ppa_statistics( self ):
-        '''
-        Get a list of the published binaries for each PPA.
-        From that extract the ID for each binary which is then used to get the download count for each binary.
-        The ID is the number at the end of self_link.
-        The published binary object looks like this...
-
-        {
-          "total_size": 4,
-          "start": 0,
-          "entries": [
-          {
-            "distro_arch_series_link": "https://api.launchpad.net/1.0/ubuntu/precise/i386",
-            "removal_comment": null,
-            "display_name": "indicator-lunar 1.0.9-1 in precise i386",
-            "date_made_pending": null,
-            "date_superseded": null,
-            "priority_name": "OPTIONAL",
-            "http_etag": "\"94b9873b47426c010c4117854c67c028f1acc969-771acce030b1683dc367b5cbf79376d386e7f3b3\"",
-            "self_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/28105302",
-            "binary_package_version": "1.0.9-1",
-            "resource_type_link": "https://api.launchpad.net/1.0/#binary_package_publishing_history",
-            "component_name": "main",
-            "status": "Published",
-            "date_removed": null,
-            "pocket": "Release",
-            "date_published": "2012-08-09T10:30:49.572656+00:00",
-            "removed_by_link": null, "section_name": "python",
-            "date_created": "2012-08-09T10:27:31.762212+00:00",
-            "binary_package_name": "indicator-lunar",
-            "archive_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa",
-            "architecture_specific": false,
-            "scheduled_deletion_date": null
-          }
-          {
-          ,...
-        }
-
-        References
-            http://launchpad.net/+apidoc
-            http://help.launchpad.net/API/launchpadlib
-            http://help.launchpad.net/API/Hacking
-        '''
-
-        '''
-        https://launchpad.net/~151044-ppa/+archive/ubuntu/github-deploy
-        https://launchpad.net/~abelcheung-ppa/+archive/ubuntu/mup
-        https://launchpad.net/~aggelalex-ppa/+archive/ubuntu/ppa
-        https://launchpad.net/~ppa-you-genius/+archive/ubuntu/you-genius-ppa
-        https://launchpad.net/~ppa-o/+archive/ubuntu/salt
-        https://launchpad.net/~ppa-j/+archive/ubuntu/recordstream
-        https://launchpad.net/~ppa-q/+archive/ubuntu/ppa
-        https://launchpad.net/~chaocrator-ppa/+archive/ubuntu/anarchy
-        https://launchpad.net/~claranetitaliappa/+archive/ubuntu/ubuntu-patches
-        https://launchpad.net/~cloud-it/+archive/ubuntu/ppa
-        https://launchpad.net/~cubic-wizard/+archive/ubuntu/release
-        '''
-
-#,["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "i386"],["cubic-wizard", "release", "focal", "amd64"],["cloud-it", "ppa", "focal", "amd64"],["ppa-q", "ppa", "focal", "amd64"],["aggelalex-ppa", "ppa", "focal", "amd64"]
-
-
-#TODO Need to test with a user and multiple names:
-#    thebernmeister
-#        ppa
-#        testing
-#        archive
-
-#TODO What happens if there are no ppas defined?
-        max_workers = 1 if self.low_bandwidth else 3
-
-        # ppa_user_to_person = self.get_personsNEW( max_workers ) #TODO Need to check as each person is used if the value is None.
-        # print()
-        # print( ppa_user_to_person )
-        # print()
-        #
-        # user_name_to_archive = self.get_archivesNew( max_workers, ppa_user_to_person )
-        # print()
-        # print( user_name_to_archive )
-        # print()
-        
-        ppa_user_and_name_to_archive = self.get_archivesNEWNEW( max_workers )
-        print()
-        print( ppa_user_and_name_to_archive )
-        print()
-        
-
-
-#         launchpad = self.get_launchpad()
-#         if launchpad is not None:
-#             persons = self.get_personsNEW( launchpad )
-#
-#         print( persons )
-#
-# #        self.get_archivesNEW( max_workers, persons )
-#         archives = self.get_archivesNEW( persons )
-
-        import sys
-        if True:
-            sys.exit()
-
-
-        launchpad = self.get_launchpad()
-        if launchpad is not None:
-            lock = threading.Lock()
-            max_workers = 1 if self.low_bandwidth else 3
-            persons = { }
-            archives = { }
-
-            success = \
-                self.get_persons( lock, max_workers, launchpad, persons ) and \
-                self.get_archives( lock, max_workers, archives, persons )
-
-            for key, value in persons.items():
-                print( key )
-                print( value )
-                print()
-
-            for key, value in archives.items():
-                print( key )
-                print( value )
-                print()
-
-        else:
-            print( "launchpad failure" )
-
-        import sys
-        if True:
-            sys.exit()
-
-
-
-        '''
-        print()
-
-        for key, value in self.archives.items():
-            print( key )
-            print( value )
-            print()
-
-        print()
-        '''
-
-        future_published_binaries = [ ]
-        url = "https://api.launchpad.net/devel/ubuntu/"
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for ppa in self.ppas:
-                url_ = url + ppa.get_series() + '/' + ppa.get_architecture()
-                for filter_text in self.get_filter( ppa ):
-                    future_published_binaries.append(
-                        [ ppa,
-                        executor.submit(
-                            self.get_published_binaries,
-                            self.archives[ ( ppa.get_user(), ppa.get_name() ) ],
-                            url_,
-                            filter_text ) ] )
-
-        '''
-        for future in future_published_binaries:
-            ppa = future[ 0 ]
-            published_binaries = future[ 1 ].result()
-            print( ppa )
-            for published_binary in published_binaries:
-                print( published_binary )
-            print()
-
-        print()
-        '''
-
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for future in future_published_binaries:
-                ppa = future[ 0 ]
-                published_binaries = future[ 1 ].result()
-                for published_binary in published_binaries:
-                    executor.submit(
-                        self.get_download_count,
-                        ppa,
-                        published_binary )
-
-        '''
-        for ppa in self.ppas:
-            print( ppa )
-        '''
-
-
-#TODO How to handle exception such as a network dropout?
-# Then how to stop the process and abort cleanly?
-
-        '''
-        future_published_binaries = [ ]
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for ppa in self.ppas:
-                ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
-                for filter_text in self.get_filter( ppa ):
-                    future_published_binaries.append(
-                        executor.submit(
-                            self.get_published_binaries,
-                            launchpad,
-                            ppa,
-                            filter_text ) )
-
-        future_download_counts = [ ]
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for future in future_published_binaries:
-                ppa, published_binaries = future.result()
-                for published_binary in published_binaries:
-                    future_download_counts.append(
-                        executor.submit(
-                            self.get_download_count,
-                            ppa,
-                            published_binary ) )
-
-        for future in future_download_counts:
-            ppa = future.result()
-            print( ppa )
-        '''
-
-        import sys
-        if True:
-            sys.exit()
-
-
-    def get_launchpad( self ):
-        try:
-            launchpad = \
-                Launchpad.login_anonymously(
-                    self.indicator_name,
-                    "production",
-                    self.get_cache_directory(),
-                    version = "devel" )
-
-        except httplib2.ServerNotFoundError:
-            launchpad = None
-            for ppa in self.ppas:
-                ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-
-        return launchpad
-
-
-    def get_persons( self, lock, max_workers, launchpad, persons ):
-        futures = [ ]
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for ppa in self.ppas:
-                futures.append(
-                    executor.submit(
-                        self.get_person,
-                        lock,
-                        launchpad,
-                        ppa.get_user(),
-                        persons ) )
-
-        success = True
-        for future in futures:
-            if future.exception() is not None:
-                success = False
-                break
-
-        return success
-
-
-    def get_person( self, lock, launchpad, user, persons ):
-        person = None
-        if lock.acquire( blocking = True ):
-            if user not in persons:
-                person = launchpad.people[ user ]
-
-            lock.release()
-
-        if person is not None and lock.acquire( blocking = True ):
-            if user not in persons:
-                persons[ user ] = person
-
-            lock.release()
-
-
-    def get_archives( self, lock, max_workers, archives, persons ):
-        futures = [ ]
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for ppa in self.ppas:
-                futures.append(
-                    executor.submit(
-                        self.get_archive,
-                        lock,
-                        archives,
-                        persons[ ppa.get_user() ],
-                        ppa.get_user(),
-                        ppa.get_name() ) )
-
-        success = True
-        for future in futures:
-            if future.exception() is not None:
-                success = False
-                break
-
-        return success
-
-
-    def get_archive( self, lock, archives, person, user, name ):
-        archives_key = ( user, name )
-        if lock.acquire( blocking = True ):
-            if archives_key not in archives:
-                archives[ archives_key ] = person.getPPAByName( name = name )
-
-            lock.release()
-
-
-    def get_published_binaries( self, lock, max_workers, archives ):
-        future_published_binaries = [ ]
-        url = "https://api.launchpad.net/devel/ubuntu/"
-        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for ppa in self.ppas:
-                url_ = url + ppa.get_series() + '/' + ppa.get_architecture()
-                for filter_text in self.get_filter( ppa ):
-                    future_published_binaries.append(
-                        [ ppa,
-                        executor.submit(
-                            self.get_published_binaries_for_archive,
-                            lock,
-                            archives[ ( ppa.get_user(), ppa.get_name() ) ],
-                            url_,
-                            filter_text ) ] )
-
-        for future in future_published_binaries:
-            ppa = future[ 0 ]
-            if future[ 1 ].exception() is not None:
-                ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-
-
-    def get_published_binaries_for_archive( self, lock, archive, url, filter_text ):
-        published_binaries = None
-        if lock.acquire( blocking = True ):
-            published_binaries = \
-                archive.getPublishedBinaries(
-                    status = "Published",
-                    distro_arch_series = url,
-                    binary_name = filter_text )
-
-            lock.release()
-
-#TODO If the published binaries are all filtered out, is the result None or [ ] ?
-#TODO Instead of returning the ppa, perhaps add the ppa to the futures?
-        return published_binaries
-
-
-    def get_published_binariesORIG( self, launchpad, ppa, filter_text ):
-        published_binaries = None
-        if self.lock.acquire( blocking = True ):
-            if ppa.get_user() not in self.persons:
-                self.persons[ ppa.get_user() ] = launchpad.people[ ppa.get_user() ]
-
-            person = self.persons[ ppa.get_user() ]
-            self.lock.release()
-
-        if self.lock.acquire( blocking = True ):
-            archives_key = ( ppa.get_user(), ppa.get_name() )
-            if archives_key not in self.archives:
-                self.archives[ archives_key ] = person.getPPAByName( name = ppa.get_name() )
-
-            archive = self.archives[ archives_key ]
-            self.lock.release()
-
-        url = "https://api.launchpad.net/devel/ubuntu/" + ppa.get_series() + '/' + ppa.get_architecture()
-        if self.lock.acquire( blocking = True ):
-            published_binaries = \
-                archive.getPublishedBinaries(
-                    status = "Published",
-                    distro_arch_series = url,
-                    binary_name = filter_text )
-            self.lock.release()
-
-#TODO If the published binaries are all filtered out, is the result None or [ ] ?
-        return ppa, published_binaries
-
-
-    # def get_download_counts( self, lock, max_workers ):
-    #     with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-    #         for future in future_published_binaries:
-    #             ppa = future[ 0 ]
-    #             published_binaries = future[ 1 ].result()
-    #             for published_binary in published_binaries:
-    #                 executor.submit(
-    #                     self.get_download_count,
-    #                     ppa,
-    #                     published_binary )
-
-
-    def get_download_count( self, ppa, published_binary ):
-        if self.lock.acquire( blocking = True ):
-            ppa.add_published_binary(
-                PublishedBinary(
-                    published_binary.binary_package_name,
-                    published_binary.binary_package_version,
-                    published_binary.getDownloadCount(),
-                    published_binary.architecture_specific ) )
-
-            self.lock.release()
-
-
-    def get_download_countORIG( self, ppa, published_binary ):
-        if self.lock.acquire( blocking = True ):
-            ppa.add_published_binary(
-                PublishedBinary(
-                    published_binary.binary_package_name,
-                    published_binary.binary_package_version,
-                    published_binary.getDownloadCount(),
-                    published_binary.architecture_specific ) )
-
-            self.lock.release()
-
-        return ppa
-
-
-# {"combinePPAs": false, "filters": [["canonical-kernel-team", "ppa", ["linux-image-oem"]]], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"],["thebernmeister", "ppa", "focal", "amd64"],["canonical-kernel-team", "ppa", "focal", "amd64"]], "showSubmenu": false, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.81", "checklatestversion": false}
-
-
-#TODO For testing.
+#TODO For testing combine.
 # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
 #
 # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273074?ws.op=getDownloadCount
@@ -1192,193 +583,132 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
 
-#     def download_ppa_statistics( self ):
-#         '''
-#         Get a list of the published binaries for each PPA.
-#         From that extract the ID for each binary which is then used to get the download count for each binary.
-#         The ID is the number at the end of self_link.
-#         The published binary object looks like this...
-#
-#         {
-#           "total_size": 4,
-#           "start": 0,
-#           "entries": [
-#           {
-#             "distro_arch_series_link": "https://api.launchpad.net/1.0/ubuntu/precise/i386",
-#             "removal_comment": null,
-#             "display_name": "indicator-lunar 1.0.9-1 in precise i386",
-#             "date_made_pending": null,
-#             "date_superseded": null,
-#             "priority_name": "OPTIONAL",
-#             "http_etag": "\"94b9873b47426c010c4117854c67c028f1acc969-771acce030b1683dc367b5cbf79376d386e7f3b3\"",
-#             "self_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa/+binarypub/28105302",
-#             "binary_package_version": "1.0.9-1",
-#             "resource_type_link": "https://api.launchpad.net/1.0/#binary_package_publishing_history",
-#             "component_name": "main",
-#             "status": "Published",
-#             "date_removed": null,
-#             "pocket": "Release",
-#             "date_published": "2012-08-09T10:30:49.572656+00:00",
-#             "removed_by_link": null, "section_name": "python",
-#             "date_created": "2012-08-09T10:27:31.762212+00:00",
-#             "binary_package_name": "indicator-lunar",
-#             "archive_link": "https://api.launchpad.net/1.0/~thebernmeister/+archive/ppa",
-#             "architecture_specific": false,
-#             "scheduled_deletion_date": null
-#           }
-#           {
-#           ,...
-#         }
-#
-#         References
-#             http://launchpad.net/+apidoc
-#             http://help.launchpad.net/API/launchpadlib
-#             http://help.launchpad.net/API/Hacking
-#         '''
-#         for ppa in self.ppas:
-#             ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
-#
-#             filter_ = [ ]
-#             for f in self.filters:
-#                 if f.get_user() == ppa.get_user() and f.get_name() == ppa.get_name():
-#                     filter_ = f.get_text()
-#                     break
-#
-#             if not filter_:
-#                 filter_ = [ "" ]
-#
-#             for f in filter_:
-#                 self.get_published_binaries( ppa, f )
-#                 if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-#                     break
-#
-#             if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-#                 ppa.flush_published_binaries()
-#
-#             elif ppa.has_published_binaries():
-#                 ppa.set_status( PPA.Status.OK )
-#
-#             else:
-#                 if filter_[ 0 ] == "":
-#                     # No published binaries as there is no filter in place.
-#                     ppa.set_status( PPA.Status.NO_PUBLISHED_BINARIES )
-#
-#                 else:
-#                     # No results passed through filtering.
-#                     ppa.set_status( PPA.Status.FILTERED )
-#
-#
-# #TODO For testing.
-# # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
-# #
-# # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273074?ws.op=getDownloadCount
-# #
-# # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273018
-# #
-# # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273018?ws.op=getDownloadCount
-# #
-# # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
-# #
-# # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image
-# #
-# # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
-# #
-# # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
-#
-#
-#     def get_published_binaries( self, ppa, filter_text ):
-#         '''
-#         Use a thread pool executer to get the download counts for each
-#         published binary.
-#
-#         A filter_text of "" equates to no filtering.
-#
-#         References
-#             https://docs.python.org/3/library/concurrent.futures.html
-#             https://pymotw.com/3/concurrent.futures
-#             http://www.dalkescientific.com/writings/diary/archive/2012/01/19/concurrent.futures.html
-#         '''
-#
-#         def extract_attributes():
-#             for entry in published_binaries[ "entries" ]: #TODO Test for no entries (filter out with bogus indicator name.
-#                 self_links.append( entry[ "self_link" ] )
-#                 binary_package_names.append( entry[ "binary_package_name" ] )
-#                 binary_package_versions.append( entry[ "binary_package_version" ] )
-#                 architecture_specifics.append( entry[ "architecture_specific" ] )
-#
-#
-#         url = (
-#             f"https://api.launchpad.net/1.0/~{ ppa.get_user() }" +
-#             f"/+archive/ubuntu/{ ppa.get_name() }?ws.op=getPublishedBinaries&" +
-#             f"distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" +
-#             f"{ ppa.get_series() }/{ ppa.get_architecture() }" +
-#             f"&status=Published&exact_match=false&ordered=false" +
-#             f"&binary_name={ filter_text }" )
-#
-#         self_links = [ ]
-#         binary_package_names = [ ]
-#         binary_package_versions = [ ]
-#         architecture_specifics = [ ]
-#
-#         published_binaries = self.get_json( url )
-#         if published_binaries:
-#             extract_attributes()
-#             next_collection_link = "next_collection_link"
-#             if next_collection_link in published_binaries:
-#                 url = published_binaries[ next_collection_link ]
-#                 while True:
-#                     published_binaries = self.get_json( url )
-#                     if published_binaries:
-#                         extract_attributes()
-#                         if next_collection_link in published_binaries:
-#                             url = published_binaries[ next_collection_link ]
-#                             continue
-#
-#                         break
-#
-#                     else:
-#                         ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-#                         break
-#
-#         else:
-#             ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-#
-#         if not ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-#             max_workers = 1 if self.low_bandwidth else 3
-#             with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-#                 {
-#                     executor.submit(
-#                         self.get_download_count,
-#                         ppa,
-#                         self_links[ i ],
-#                         binary_package_names[ i ],
-#                         binary_package_versions[ i ],
-#                         architecture_specifics[ i ] ):
-#
-#                         i for i in range( len( self_links ) )
-#                 }
-#
-#
-#     def get_download_count(
-#             self,
-#             ppa,
-#             url,
-#             binary_package_name,
-#             binary_package_version,
-#             architecture_specific ):
-#
-#         if ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD:
-#             download_count = self.get_json( url + "?ws.op=getDownloadCount" )
-#             if download_count is not None:
-#                 ppa.add_published_binary(
-#                     PublishedBinary(
-#                         binary_package_name,
-#                         binary_package_version,
-#                         download_count,
-#                         architecture_specific ) )
-#
-#             else:
-#                 ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
+    def download_ppa_statistics( self ):
+        '''
+        Get a list of the published binaries for each PPA.
+
+        References
+            http://launchpad.net/+apidoc
+            http://help.launchpad.net/API/launchpadlib
+            http://help.launchpad.net/API/Hacking
+       '''
+        for ppa in self.ppas:
+            ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
+
+            for filter_text in self.get_filters( ppa ):
+                self.get_download_count( ppa, filter_text )
+                if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
+                    break
+
+            if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
+                ppa.flush_published_binaries()
+
+            elif ppa.has_published_binaries():
+                ppa.set_status( PPA.Status.OK )
+                print( "========" )  #TODO Testing
+                print( ppa ) #TODO Testing
+                print( "========" ) #TODO Testing
+
+            else:
+                if filter_text == "":
+                    # No published binaries as there is no filter in place.
+                    ppa.set_status( PPA.Status.NO_PUBLISHED_BINARIES )
+
+                else:
+                    # No results passed through filtering.
+                    ppa.set_status( PPA.Status.FILTERED )
+
+
+ #TODO For testing.
+ # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
+ #
+ # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273074?ws.op=getDownloadCount
+ #
+ # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273018
+ #
+ # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273018?ws.op=getDownloadCount
+ #
+ # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
+ #
+ # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image
+ #
+ # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
+ #
+ # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
+
+
+    def get_download_count( self, ppa, filter_text ):
+        '''
+        Use a thread pool executer to get the download counts for each
+        published binary.
+
+        A filter_text of "" equates to no filtering.
+        '''
+
+        def extract_attributes():
+            for entry in published_binaries[ "entries" ]: #TODO Test for no entries (filter out with bogus indicator name.
+                self_links.append( entry[ "self_link" ] )
+                binary_package_names.append( entry[ "binary_package_name" ] )
+                binary_package_versions.append( entry[ "binary_package_version" ] )
+                architecture_specifics.append( entry[ "architecture_specific" ] )
+
+
+        url = (
+            f"https://api.launchpad.net/1.0/~{ ppa.get_user() }" +
+            f"/+archive/ubuntu/{ ppa.get_name() }?ws.op=getPublishedBinaries&" +
+            f"distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" +
+            f"{ ppa.get_series() }/{ ppa.get_architecture() }" +
+            f"&status=Published&exact_match=false&ordered=false" +
+            f"&binary_name={ filter_text }" )
+
+        self_links = [ ]
+        binary_package_names = [ ]
+        binary_package_versions = [ ]
+        architecture_specifics = [ ]
+
+        i = 0 #TODO Testing
+        next_collection_link = "next_collection_link"
+        while True:
+            print( f"Get published binaries for { ppa } | { filter_text } | { i }" ) #TODO Testing
+            i += 1 #TODO Testing
+            published_binaries = self.get_json( url )  #TODO Test with a ppa/archive with NO published binaries....should not get an error...right?
+            if published_binaries: #TODO If we have multiple pages, will this be None and then set the status to error below?
+                extract_attributes()
+                if next_collection_link in published_binaries:
+                    url = published_binaries[ next_collection_link ]
+                    continue
+
+                break
+
+            else:
+                print( "here" ) #TODO Testing...ensure this is not set when the last published binaries page is downloaded.
+                ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
+                break
+
+        if not ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
+            max_workers = 1 if self.low_bandwidth else 4
+            download_counts = { }
+            with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+                for i, self_link in enumerate( self_links ):
+                    #TODO How to handle if a previous download count is None..
+                    # want to then abort all other downloads.
+                    download_counts[ i ] = \
+                        executor.submit(
+                            self.get_json,
+                            self_links[ i ] + "?ws.op=getDownloadCount" )
+
+            for i, result in download_counts.items():
+                if result.exception() is None:
+                    ppa.add_published_binary(
+                        PublishedBinary(
+                            binary_package_names[ i ],
+                            binary_package_versions[ i ],
+                            result.result(),
+                            architecture_specifics[ i ] ) )
+
+                else:
+                    ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
+                    break
 
 
     def on_preferences( self, dialog ):
@@ -2393,7 +1723,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         dialog.destroy()
 
 
-#TODO When all is sorted out with download and preferences, 
+#TODO When all is sorted out with download and preferences,
 # use an old .json from old indicator name with hyphens
 # and ensure the old is copied to new location (name without hyphens)
 # and loads up.
@@ -2415,30 +1745,20 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 architecture = ppa[ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ]
                 self.ppas.append( PPA( user, name, series, architecture ) )
 
+            #TODO Is this needed here?  Figure out when/where sort is needed / not needed.
             PPA.sort( self.ppas )
 
             self.filters = [ ]
             filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] )
-            save_required = False
             for filter_ in filters:
-                user = filter_[ IndicatorPPADownloadStatistics.COLUMN_USER ]
-                name = filter_[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
-                series = filter_[ IndicatorPPADownloadStatistics.COLUMN_SERIES ]
-                architecture = filter_[ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ]
-                filter_text = filter_[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ]
+                self.filters.append(
+                    Filter(
+                        filter_[ IndicatorPPADownloadStatistics.COLUMN_USER ],
+                        filter_[ IndicatorPPADownloadStatistics.COLUMN_NAME ],
+                        filter_[ IndicatorPPADownloadStatistics.COLUMN_SERIES ],
+                        filter_[ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ],
+                        filter_[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] ) )
 
-#TODO I think this now needs to go!
-            #     # Prior to version 81, filters erroneously included the
-            #     # series/architecture.  Remove the series/architecture if
-            #     # present and schedule a save.
-            #     if len( filter_ ) == 5:
-            #         filter_text = filter_[ 4 ]
-            #         save_required = True
-            #
-            #     self.filters.append( Filter( user, name, filter_text ) )
-            #
-            # if save_required:
-            #     self.request_save_config()
 
 #TODO
             '''
@@ -2452,11 +1772,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             '''
 
-            #TODO Test data.
+            #TODO Test with empty data.
             # self.ppas = [ ]
             # self.filters = [ ]
-            self.combine_ppas = True
-
+            # self.combine_ppas = True
+            self.show_submenu = True
 #,["canonical-kernel-team","ppa","focal","amd64"]
 
         else:
@@ -2515,63 +1835,3 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
 IndicatorPPADownloadStatistics().main()
-
-
-'''
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
-# https://help.launchpad.net/API/launchpadlib
-
-# python3 -m pip install launchpadlib
-from launchpadlib.launchpad import Launchpad
-
-
-def print_published_binaries( archive, series, architecture ):
-    distro_arch_series = (
-        "https://api.launchpad.net/devel/ubuntu/" + series + '/' + architecture )
-
-    published_binaries = archive.getPublishedBinaries(
-            status = "Published",
-            distro_arch_series = distro_arch_series )
-
-    for published_binary in published_binaries:
-        print(
-            published_binary.binary_package_name + "\t" +
-            published_binary.binary_package_version + "\t" +
-            str( published_binary.getDownloadCount() ) )
-
-
-indicator_name = "indicatorppadownloadstatistics"
-
-user = "thebernmeister"
-name = "ppa"
-
-cache_directory = "~/.cache/launchpadlib"
-
-launchpad = \
-    Launchpad.login_anonymously(
-        indicator_name, "production", cache_directory, version = "devel" )
-
-ppa = launchpad.people[ user ].getPPAByName( name = name )
-
-
-series = "focal"
-architecture = "amd64"
-print_published_binaries( ppa, series, architecture )
-
-print()
-
-series = "focal"
-architecture = "i386"
-print_published_binaries( archive, series, architecture )
-
-
-print( archive.lp_attributes )
-print()
-print( sorted( archive.lp_operations ) )
-
-print( archive.lp_attributes )
-print()
-print( sorted( archive.lp_operations ) )
-'''

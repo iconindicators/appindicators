@@ -288,7 +288,7 @@ class PPA():
             self.name + ' | ' +
             str( self.series ) + ' | ' +
             str( self.architecture ) + ' | ' +
-            ' '.join( str( self.published_binaries ) ) )
+            str( self.published_binaries ) )
 
 
     def __repr__( self ):
