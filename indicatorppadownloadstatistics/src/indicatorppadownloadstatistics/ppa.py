@@ -234,7 +234,7 @@ class PPA():
     def get_descriptor( self ):
         descriptor = self.user + ' | ' + self.name
         if self.series is not None and self.architecture is not None:
-            descriptor += ' | ' + self.series + ' | ' + self.architecture
+            descriptor += ' | ' + self.series + ' | ' + self.architecture #TODO Need a comment for why/when this happens.
 
         return descriptor
 
@@ -253,6 +253,7 @@ class PPA():
 
 
 #TODO When would we NOT want to sort?
+# Sorting is used when combining...
     def get_published_binaries( self, sort = False ):
         if sort:
             self.published_binaries.sort(
@@ -277,6 +278,7 @@ class PPA():
 
 
     @staticmethod
+#TODO This is called at the end of combine...where else?
     def sort( list_of_ppas ):
         list_of_ppas.sort(
             key = operator.methodcaller( "get_descriptor" ) )

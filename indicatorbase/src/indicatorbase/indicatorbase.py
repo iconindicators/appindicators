@@ -94,6 +94,10 @@ except ValueError:
         sys.exit( 1 )
 
 
+#TODO Go through all classes for an object like ppa or event or tide
+# and ensure the __str__ method works.
+
+
 class IndicatorBase( ABC ):
     '''
     Base class from which all indicators inherit.
