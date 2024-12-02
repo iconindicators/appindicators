@@ -24,11 +24,6 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 Each indicator shares the common code `indicatorbase`.
 
 
-## Reminder
-
-- `indicatorppadownloadstatistics` - requires updating approximately every six months with the latest `Ubuntu` series name.
-
-
 ## Run an Indicator (from Source)
 
 To run `indicatortest` in a terminal at the source root:
