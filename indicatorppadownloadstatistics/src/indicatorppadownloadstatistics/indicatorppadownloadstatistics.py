@@ -20,13 +20,12 @@
 
 
 import concurrent.futures
-import httplib2
 import locale
 import threading
 import webbrowser
 
 from copy import deepcopy
-from urllib.error import HTTPError, URLError
+from urllib.error import URLError
 from urllib.request import urlopen
 
 import gi
@@ -34,15 +33,9 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from launchpadlib.launchpad import Launchpad
-
 from indicatorbase import IndicatorBase
 
 from ppa import Filter, PPA, PublishedBinary
-
-
-#TODO If the dynamic series works...remove the note in the project README.md
-# about updating every six months.
 
 
 #TODO Consider putting in a check/limit for published binaries
@@ -581,11 +574,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
 
 
-
-
     def download_ppa_statistics( self ):
         '''
-        Get a list of the published binaries for each PPA.
+        For each PPA, get the download count for each binary package.
 
         References
             http://launchpad.net/+apidoc
@@ -596,7 +587,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
 
             for filter_text in self.get_filters( ppa ):
-                self.get_download_count( ppa, filter_text )
+                self.get_download_counts( ppa, filter_text )
                 if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
                     break
 
@@ -637,53 +628,25 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
  # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
 
 
-    def get_download_count( self, ppa, filter_text ):
+    def get_download_counts( self, ppa, filter_text ):
         '''
-        Use a thread pool executer to get the download counts for each
-        published binary.
+        Obtain the list of published binaries for the PPA and then the download
+        count for each published binary.
 
         A filter_text of "" equates to no filtering.
         '''
-
-        def extract_attributes():
-            for entry in published_binaries[ "entries" ]: #TODO Test for no entries (filter out with bogus indicator name.
-                self_links.append( entry[ "self_link" ] )
-                binary_package_names.append( entry[ "binary_package_name" ] )
-                binary_package_versions.append( entry[ "binary_package_version" ] )
-                architecture_specifics.append( entry[ "architecture_specific" ] )
-
-
-        url = (
-            f"https://api.launchpad.net/1.0/~{ ppa.get_user() }" +
-            f"/+archive/ubuntu/{ ppa.get_name() }?ws.op=getPublishedBinaries&" +
-            f"distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" +
-            f"{ ppa.get_series() }/{ ppa.get_architecture() }" +
-            f"&status=Published&exact_match=false&ordered=false" +
-            f"&binary_name={ filter_text }" )
-
         self_links = [ ]
         binary_package_names = [ ]
         binary_package_versions = [ ]
         architecture_specifics = [ ]
 
-        i = 0 #TODO Testing
-        next_collection_link = "next_collection_link"
-        while True:
-            print( f"Get published binaries for { ppa } | { filter_text } | { i }" ) #TODO Testing
-            i += 1 #TODO Testing
-            published_binaries = self.get_json( url )  #TODO Test with a ppa/archive with NO published binaries....should not get an error...right?
-            if published_binaries: #TODO If we have multiple pages, will this be None and then set the status to error below?
-                extract_attributes()
-                if next_collection_link in published_binaries:
-                    url = published_binaries[ next_collection_link ]
-                    continue
-
-                break
-
-            else:
-                print( "here" ) #TODO Testing...ensure this is not set when the last published binaries page is downloaded.
-                ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-                break
+        self.get_published_binaries(
+            ppa,
+            filter_text,
+            self_links,
+            binary_package_names,
+            binary_package_versions,
+            architecture_specifics )
 
         if not ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
             max_workers = 1 if self.low_bandwidth else 4
@@ -709,6 +672,48 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 else:
                     ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
                     break
+
+
+    def get_published_binaries(
+            self,
+            ppa,
+            filter_text,
+            self_links,
+            binary_package_names,
+            binary_package_versions,
+            architecture_specifics ):
+
+        url = (
+            f"https://api.launchpad.net/1.0/~{ ppa.get_user() }" +
+            f"/+archive/ubuntu/{ ppa.get_name() }?ws.op=getPublishedBinaries&" +
+            f"distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" +
+            f"{ ppa.get_series() }/{ ppa.get_architecture() }" +
+            f"&status=Published&exact_match=false&ordered=false" +
+            f"&binary_name={ filter_text }" )
+
+        i = 0 #TODO Testing
+        next_collection_link = "next_collection_link"
+        while True:
+            print( f"Get published binaries for { ppa } | { filter_text } | { i }" ) #TODO Testing
+            i += 1 #TODO Testing
+            published_binaries = self.get_json( url )  #TODO Test with a ppa/archive with NO published binaries....should not get an error...right?
+            if published_binaries: #TODO If we have multiple pages, will this be None and then set the status to error below?
+                for entry in published_binaries[ "entries" ]: #TODO Test for no entries (filter out with bogus indicator name.
+                    self_links.append( entry[ "self_link" ] )
+                    binary_package_names.append( entry[ "binary_package_name" ] )
+                    binary_package_versions.append( entry[ "binary_package_version" ] )
+                    architecture_specifics.append( entry[ "architecture_specific" ] )
+
+                if next_collection_link in published_binaries:
+                    url = published_binaries[ next_collection_link ]
+                    continue
+
+                break
+
+            else:
+                print( "here" ) #TODO Testing...ensure this is not set when the last published binaries page is downloaded.
+                ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
+                break
 
 
     def on_preferences( self, dialog ):
@@ -1776,7 +1781,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             # self.ppas = [ ]
             # self.filters = [ ]
             # self.combine_ppas = True
-            self.show_submenu = True
+            # self.show_submenu = True
 #,["canonical-kernel-team","ppa","focal","amd64"]
 
         else:
