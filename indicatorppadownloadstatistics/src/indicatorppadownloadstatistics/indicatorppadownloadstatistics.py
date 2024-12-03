@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from _ast import Or
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -41,6 +42,11 @@ from ppa import Filter, PPA, PublishedBinary
 #TODO Consider putting in a check/limit for published binaries
 # with say 25 or more entries.
 # Will result in a request for the download count for each...
+
+
+#TODO Do a search for | here and in ppa.py 
+# and see if it should be used for say keys (when a tuple should be used instead)
+# and where else used and if something better could be done...
 
 
 class IndicatorPPADownloadStatistics( IndicatorBase ):
@@ -187,7 +193,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         '''
         combined_ppas = { }
         for ppa in ppas:
-            key = ppa.get_user() + ' | ' + ppa.get_name()
+            key = ( ppa.get_user(), ppa.get_name() )
             if key in combined_ppas:
                 error = (
                     ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA or
@@ -212,7 +218,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     pass
 
                 elif ok:
-                    self.__combine_ppas( ppa, combined_ppas[ key ] )
+                    self.__merge_ppa( combined_ppas[ key ], ppa )
 
                 else:
                     # Mix of ok, no published binaries, filtered.
@@ -226,21 +232,25 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return combined_ppas.values()
 
 
-#TODO Read through this...see if it is correct...!
-    def __combine_ppas( self, ppa, combined_ppa ):
-        ppas = [ ]
-        temp = { }
-        for published_binary in ppa.get_published_binaries():
-            key = \
-                published_binary.get_package_name() + \
-                ' | ' + \
-                published_binary.get_package_version()
+#TODO Check and more check!
+    def __merge_ppa( self, combined_ppa, ppa ):
+        for published_binary_combined in combined_ppa.get_published_binaries():
+            for published_binary in ppa.get_published_binaries():
+                same_package_name_and_package_version = (
+                    published_binary_combined.get_package_name() ==
+                    published_binary.get_package_name()
+                    and
+                    published_binary_combined.get_package_version() ==
+                    published_binary.get_package_version() )
 
-            if published_binary.is_architecture_specific():
-                if self.ignore_version_architecture_specific:
+                if same_package_name_and_package_version:
+                    either_are_architecture_specific = (
+                        published_binary_combined.is_architecture_specific() or
+                        published_binary.is_architecture_specific() )
 
-                    # Key only contains name.
-                    key = published_binary.get_package_name()
+                    if either_are_architecture_specific:
+                        pass#TODO
+                
 
                 # Add up the download count from each published
                 # binary of the same key
@@ -268,11 +278,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         temp[ key ] = new_published_binary
 
             else:
-                if key not in temp:
-                    temp[ key ] = published_binary
+                if key not in combined_published_binaries:
+                    combined_published_binaries[ key ] = published_binary
 
-        PPA.sort( ppas )
-        return ppas
+        # PPA.sort( ppas )
+        # return ppas
 
 
 #TODO Double check this...
@@ -352,7 +362,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     def download_ppa_statistics( self ):
         '''
-        For each PPA, get the download count for each binary package.
+        For each PPA's binary packages, get the download count.
 
         References
             http://launchpad.net/+apidoc
@@ -403,8 +413,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     def get_download_counts( self, ppa, filter_text ):
         '''
-        Obtain the list of published binaries for the PPA and then the
-        download count for each published binary.
+        Get the published binaries for the PPA and then for each published
+        binary, get the download count.
 
         A filter_text of "" equates to no filtering.
         '''
@@ -422,27 +432,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             architecture_specifics )
 
         if not ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-            max_workers = 1 if self.low_bandwidth else 4
-            download_counts = { }
-            with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-                for i, self_link in enumerate( self_links ):
-                    download_counts[ i ] = \
-                        executor.submit(
-                            self.get_json,
-                            self_links[ i ] + "?ws.op=getDownloadCount" )
-
-            for i, result in download_counts.items():
-                if result.exception() is None:
-                    ppa.add_published_binary(
-                        PublishedBinary(
-                            binary_package_names[ i ],
-                            binary_package_versions[ i ],
-                            result.result(),
-                            architecture_specifics[ i ] ) )
-
-                else:
-                    ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-                    break
+            self.__get_download_counts(
+                ppa,
+                self_links,
+                binary_package_names,
+                binary_package_versions,
+                architecture_specifics )
 
 
     def __get_published_binaries(
@@ -483,6 +478,37 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             else:
                 print( "here" ) #TODO Testing...ensure this is not set when the last published binaries page is downloaded.
+                ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
+                break
+
+
+    def __get_download_counts(
+            self,
+            ppa,
+            self_links,
+            binary_package_names,
+            binary_package_versions,
+            architecture_specifics ):
+
+        max_workers = 1 if self.low_bandwidth else 4
+        download_counts = { }
+        with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
+            for i, self_link in enumerate( self_links ):
+                download_counts[ i ] = \
+                    executor.submit(
+                        self.get_json,
+                        self_links[ i ] + "?ws.op=getDownloadCount" )
+
+        for i, result in download_counts.items():
+            if result.exception() is None:
+                ppa.add_published_binary(
+                    PublishedBinary(
+                        binary_package_names[ i ],
+                        binary_package_versions[ i ],
+                        result.result(),
+                        architecture_specifics[ i ] ) )
+
+            else:
                 ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
                 break
 
