@@ -44,7 +44,7 @@ from ppa import Filter, PPA, PublishedBinary
 # Will result in a request for the download count for each...
 
 
-#TODO Do a search for | here and in ppa.py 
+#TODO Do a search for | here and in ppa.py
 # and see if it should be used for say keys (when a tuple should be used instead)
 # and where else used and if something better could be done...
 
@@ -236,53 +236,30 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def __merge_ppa( self, combined_ppa, ppa ):
         for published_binary_combined in combined_ppa.get_published_binaries():
             for published_binary in ppa.get_published_binaries():
-                same_package_name_and_package_version = (
+                same_package_name = (
                     published_binary_combined.get_package_name() ==
-                    published_binary.get_package_name()
-                    and
-                    published_binary_combined.get_package_version() ==
-                    published_binary.get_package_version() )
+                    published_binary.get_package_name() )
 
-                if same_package_name_and_package_version:
+                if same_package_name:
                     either_are_architecture_specific = (
                         published_binary_combined.is_architecture_specific() or
                         published_binary.is_architecture_specific() )
 
                     if either_are_architecture_specific:
-                        pass#TODO
-                
+                        if self.ignore_version_architecture_specific:
+                            published_binary_combined.set_download_count(
+                                published_binary_combined.get_download_count + \
+                                published_binary.get_download_count )
 
-                # Add up the download count from each published
-                # binary of the same key
-                # (package name OR package name and package version).
-                if key in temp:
-                    new_published_binary = \
-                        PublishedBinary(
-                            temp[ key ].get_package_name(),
-                            temp[ key ].get_package_version(),
-                            temp[ key ].get_download_count() + published_binary.get_download_count(),
-                            temp[ key ].is_architecture_specific )
+                        else:
+                            same_package_version = (
+                                published_binary_combined.get_package_version() ==
+                                published_binary.get_package_version() )
 
-                    temp[ key ] = new_published_binary
-
-                else:
-                    temp[ key ] = published_binary
-                    if self.ignore_version_architecture_specific:
-                        new_published_binary = \
-                            PublishedBinary(
-                                temp[ key ].get_package_name(),
-                                None,
-                                temp[ key ].get_download_count(),
-                                temp[ key ].is_architecture_specific )
-
-                        temp[ key ] = new_published_binary
-
-            else:
-                if key not in combined_published_binaries:
-                    combined_published_binaries[ key ] = published_binary
-
-        # PPA.sort( ppas )
-        # return ppas
+                            if same_package_version:
+                                published_binary_combined.set_download_count(
+                                    published_binary_combined.get_download_count + \
+                                    published_binary.get_download_count )
 
 
 #TODO Double check this...

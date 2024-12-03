@@ -149,6 +149,10 @@ class PublishedBinary():
         return self.download_count
 
 
+    def set_download_count( self, count ):
+        self.download_count = count
+
+
     def is_architecture_specific( self ):
         return self.architecture_specific
 
@@ -196,7 +200,7 @@ class PPA():
 
         self.user = user
         self.name = name
-#TODO Need to mention that series/arch can be None when a PPA is a combined PPA.        
+#TODO Need to mention that series/arch can be None when a PPA is a combined PPA.
         self.series = series
         self.architecture = architecture
 
