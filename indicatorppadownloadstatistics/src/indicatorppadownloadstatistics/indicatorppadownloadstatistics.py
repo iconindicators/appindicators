@@ -235,6 +235,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 #TODO Check and more check!
     def __merge_ppa( self, ppa, combined_ppa ):
         processed = [ ]
+        add_to_combined = [ ]
         for published_binary in ppa.get_published_binaries():
             for published_binary_combined in combined_ppa.get_published_binaries():
                 same_package_name = (
@@ -244,29 +245,31 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if same_package_name:
                     processed.append( published_binary )
 
-                    same_package_version = (
-                        published_binary_combined.get_package_version() ==
-                        published_binary.get_package_version() )
+                    both_binary_packages_are_architecture_independent = (
+                        not published_binary_combined.is_architecture_specific() and
+                        not published_binary.is_architecture_specific() )
 
-                    if same_package_version:
-
-
-
-                    else:
-
-
-
-                    either_binary_package_is_architecture_specific = (
-                        published_binary_combined.is_architecture_specific() or
+                    both_binary_packages_are_architecture_specific = (
+                        published_binary_combined.is_architecture_specific() and
                         published_binary.is_architecture_specific() )
 
-                    if either_binary_package_is_architecture_specific:
+                    if both_binary_packages_are_architecture_independent:
+                        same_package_version = (
+                            published_binary_combined.get_package_version() ==
+                            published_binary.get_package_version() )
+
+                        if not same_package_version:
+                            add_to_combined.append( published_binary )
+
+                    elif both_binary_packages_are_architecture_specific:
+                        pass #TODO
 
                     else:
+                        pass #TODO
 
-                    same_package_version = (
-                        published_binary_combined.get_package_version() ==
-                        published_binary.get_package_version() )
+
+
+
 
                     either_binary_package_is_architecture_specific = (
                         published_binary_combined.is_architecture_specific() or
@@ -284,6 +287,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                                 published_binary_combined.set_download_count(
                                     published_binary_combined.get_download_count + \
                                     published_binary.get_download_count )
+
+
+
+        for published_binary in add_to_combined:
+            #TODO Need to check if there is an existing same name/version (from a previously combined ppa)?
+            combined_ppa.add_published_binary( published_binary )
 
         for published_binary in ppa:
             if published_binary not in processed:
