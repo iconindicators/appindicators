@@ -244,45 +244,46 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if same_package_name:
                     processed.append( published_binary )
 
-                    # Two packages to be deemed identical if both have the same
-                    # version number and neither are architecture specific.
-                    both_packages_are_not_architecture_specific = (
-                        not published_binary_combined.is_architecture_specific()
-                        and
-                        not published_binary.is_architecture_specific() )
+                    same_package_version = (
+                        published_binary_combined.get_package_version() ==
+                        published_binary.get_package_version() )
+
+                    if same_package_version:
+
+
+
+                    else:
+
+
 
                     either_binary_package_is_architecture_specific = (
                         published_binary_combined.is_architecture_specific() or
                         published_binary.is_architecture_specific() )
 
                     if either_binary_package_is_architecture_specific:
-                        if self.ignore_version_architecture_specific:
+
+                    else:
+
+                    same_package_version = (
+                        published_binary_combined.get_package_version() ==
+                        published_binary.get_package_version() )
+
+                    either_binary_package_is_architecture_specific = (
+                        published_binary_combined.is_architecture_specific() or
+                        published_binary.is_architecture_specific() )
+
+                    if same_package_version:
+                        if either_binary_package_is_architecture_specific:
                             published_binary_combined.set_download_count(
                                 published_binary_combined.get_download_count + \
                                 published_binary.get_download_count )
 
-                        else:
-                            same_package_version = (
-                                published_binary_combined.get_package_version() ==
-                                published_binary.get_package_version() )
-
-                            if same_package_version:
+                    else:
+                        if either_binary_package_is_architecture_specific:
+                            if self.ignore_version_architecture_specific:
                                 published_binary_combined.set_download_count(
                                     published_binary_combined.get_download_count + \
                                     published_binary.get_download_count )
-
-                            else:
-                                pass #TODO We have two packages of the same name,
-                                     # either or both are architecture specific,
-                                     # we are not ignoring version number,
-                                     # the package versions are different,
-                                     # ...what to do?
-
-                    else:
-                        pass #TODO Neither package is architecture specific, so the packages are identical, so skip.
-
-                else:
-                    pass #TODO Ignore because the packages do not match.  Scoop up unmatched packages at the end.
 
         for published_binary in ppa:
             if published_binary not in processed:
