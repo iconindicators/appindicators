@@ -294,6 +294,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 # when creating the menu items adding in a | ...
 #
 # Check ppa.py
+#
+# I think look for all uses of | and work out how/when it is used.
+# Might be able to use a tuple instead (and a join for when used in display).
+# Might be able to have a single function to do all of this within ppa.py
     def on_ppa( self, menuitem ):
         url = "https://launchpad.net/~"
         first_pipe = str.find( menuitem.get_name(), "|" )
