@@ -5,6 +5,7 @@
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Added plucky to the list of series.
 - Added oracular to the list of series.
+- Removed the preference to combine PPAs; the algorithm breaks down for binary packages differing in version number and/or mixed architecture.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhauled to adhere to the pyproject.toml standard.
 - Deployment using the .deb format is superceded; PyPI (pip) is used with operating system packages and file copy.

@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from _ast import Or
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -25,7 +24,6 @@ import locale
 import threading
 import webbrowser
 
-from copy import deepcopy
 from urllib.error import URLError
 from urllib.request import urlopen
 
@@ -57,9 +55,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     indicator_name_for_desktop_file = _( "Indicator PPA Download Statistics" )
     indicator_categories = "Categories=Utility"
 
-    CONFIG_COMBINE_PPAS = "combinePPAs"
     CONFIG_FILTERS = "filters"
-    CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC = "ignoreVersionArchitectureSpecific"
     CONFIG_LOW_BANDWIDTH = "lowBandwidth"
     CONFIG_PPAS = "ppas"
     CONFIG_SHOW_SUBMENU = "showSubmenu"
@@ -76,17 +72,17 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     COLUMN_FILTER_TEXT = 4
 
     MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
-    MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
     MESSAGE_FILTERED = _( "(published binaries completely filtered)" )
-    MESSAGE_MIX_OF_OK_NO_PUBLISHED_BINARIES_FILTERED = _( "(multiple messages; uncheck combine to view)" )
+    MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
 
 
     def __init__( self ):
         super().__init__(
             comments = _( "Displays the total downloads of PPAs." ) )
 
-        # The series (name for each Ubuntu release) will be downloaded when the
-        # user initiates Add PPA or Edit PPA in the Preferences.
+        # The series (name for each Ubuntu release) will be downloaded the
+        # first time the Preferences are displayed:
+        #   https://askubuntu.com/questions/1533384/get-list-of-ubuntu-series
         self.series = [ ]
 
 
@@ -97,19 +93,15 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def build_menu( self, menu ):
-        # Pass a copy as combining can alter the series/architecture.
-        ppas = deepcopy( self.ppas )
-
-        if self.combine_ppas:
-            ppas = self.combine( ppas )
+        PPA.sort( self.ppas ) #TODO Check this does what it appears to do...
 
         if self.sort_by_download:
-            for ppa in ppas:
+            for ppa in self.ppas:
                 ppa.sort_published_binaries_by_download_count_and_clip(
                     self.sort_by_download_amount )
 
         if self.show_submenu:
-            for ppa in ppas:
+            for ppa in self.ppas:
                 submenu = Gtk.Menu()
                 self.create_and_append_menuitem(
                     menu,
@@ -128,7 +120,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         indent = ( 1, 1 ) )
 
         else:
-            for ppa in ppas:
+            for ppa in self.ppas:
                 self.create_and_append_menuitem(
                     menu,
                     ppa.get_descriptor(),
@@ -149,7 +141,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             # When only one PPA is present, enable a middle mouse click
             # on the icon to open the PPA in the browser.
-            if len( ppas ) == 1:
+            if len( self.ppas ) == 1:
                 self.set_secondary_activate_target( menu.get_children()[ 0 ] )
 
 
@@ -181,122 +173,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         elif ppa.get_status() == PPA.Status.FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_FILTERED
 
-        elif ppa.get_status() == PPA.Status.MIX_OF_OK_NO_PUBLISHED_BINARIES_FILTERED:
-            message = IndicatorPPADownloadStatistics.MESSAGE_MIX_OF_OK_NO_PUBLISHED_BINARIES_FILTERED
-
         return message
-
-
-    def combine( self, ppas ):
-        '''
-        Combine PPAs with the same user and name into a single PPA.
-        '''
-        combined_ppas = { }
-        for ppa in ppas:
-            key = ( ppa.get_user(), ppa.get_name() )
-            if key in combined_ppas:
-                error = (
-                    ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA or
-                    combined_ppas[ key ].get_status() == PPA.Status.ERROR_RETRIEVING_PPA )
-
-                ok = (
-                    ppa.get_status() == PPA.Status.OK and
-                    combined_ppas[ key ].get_status() == PPA.Status.OK )
-
-                filtered = (
-                    ppa.get_status() == PPA.Status.FILTERED and
-                    combined_ppas[ key ].get_status() == PPA.Status.FILTERED )
-
-                no_published_binaries = (
-                    ppa.get_status() == PPA.Status.NO_PUBLISHED_BINARIES and
-                    combined_ppas[ key ].get_status() == PPA.Status.NO_PUBLISHED_BINARIES )
-
-                if error:
-                    combined_ppas[ key ].set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-
-                elif filtered or no_published_binaries:
-                    pass
-
-                elif ok:
-                    self.__merge_ppa( ppa, combined_ppas[ key ] )
-
-                else:
-                    # Mix of ok, no published binaries, filtered.
-                    combined_ppas.flush_published_binaries()
-                    combined_ppas[ key ].set_status(
-                        PPA.Status.MIX_OF_OK_NO_PUBLISHED_BINARIES_FILTERED )
-
-            else:
-                combined_ppas[ key ] = ppa
-
-        return combined_ppas.values()
-
-
-#TODO Check and more check!
-    def __merge_ppa( self, ppa, combined_ppa ):
-        processed = [ ]
-        add_to_combined = [ ]
-        for published_binary in ppa.get_published_binaries():
-            for published_binary_combined in combined_ppa.get_published_binaries():
-                same_package_name = (
-                    published_binary_combined.get_package_name() ==
-                    published_binary.get_package_name() )
-
-                if same_package_name:
-                    processed.append( published_binary )
-
-                    both_binary_packages_are_architecture_independent = (
-                        not published_binary_combined.is_architecture_specific() and
-                        not published_binary.is_architecture_specific() )
-
-                    both_binary_packages_are_architecture_specific = (
-                        published_binary_combined.is_architecture_specific() and
-                        published_binary.is_architecture_specific() )
-
-                    if both_binary_packages_are_architecture_independent:
-                        same_package_version = (
-                            published_binary_combined.get_package_version() ==
-                            published_binary.get_package_version() )
-
-                        if not same_package_version:
-                            add_to_combined.append( published_binary )
-
-                    elif both_binary_packages_are_architecture_specific:
-                        pass #TODO
-
-                    else:
-                        pass #TODO
-
-
-
-
-
-                    either_binary_package_is_architecture_specific = (
-                        published_binary_combined.is_architecture_specific() or
-                        published_binary.is_architecture_specific() )
-
-                    if same_package_version:
-                        if either_binary_package_is_architecture_specific:
-                            published_binary_combined.set_download_count(
-                                published_binary_combined.get_download_count + \
-                                published_binary.get_download_count )
-
-                    else:
-                        if either_binary_package_is_architecture_specific:
-                            if self.ignore_version_architecture_specific:
-                                published_binary_combined.set_download_count(
-                                    published_binary_combined.get_download_count + \
-                                    published_binary.get_download_count )
-
-
-
-        for published_binary in add_to_combined:
-            #TODO Need to check if there is an existing same name/version (from a previously combined ppa)?
-            combined_ppa.add_published_binary( published_binary )
-
-        for published_binary in ppa:
-            if published_binary not in processed:
-                pass #TODO Need to add to combined ppa
 
 
 #TODO Double check this...
@@ -360,22 +237,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return filters
 
 
-#TODO For testing combine.
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
-#
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273074?ws.op=getDownloadCount
-#
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273018
-#
-# https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273018?ws.op=getDownloadCount
-#
-# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
-#
-# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image
-#
-# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
-#
-# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
+#TODO Testing new idea
+# https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&status=Published&binary_name=fortune
+# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&status=Published
+# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&status=Published&binary_name=bindgen
+# https://snapcraft.io/docs/reference-architectures
 
 
     def download_ppa_statistics( self ):
@@ -383,7 +249,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         For each PPA's binary packages, get the download count.
 
         References
-            http://launchpad.net/+apidoc
+            https://launchpad.net/+apidoc/devel.html
             http://help.launchpad.net/API/launchpadlib
             http://help.launchpad.net/API/Hacking
         '''
@@ -409,24 +275,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 else:
                     # No results passed through filtering.
                     ppa.set_status( PPA.Status.FILTERED )
-
-
- #TODO For testing.
- # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
- #
- # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273074?ws.op=getDownloadCount
- #
- # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273018
- #
- # https://api.launchpad.net/1.0/~thebernmeister/+archive/ubuntu/ppa/+binarypub/200273018?ws.op=getDownloadCount
- #
- # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
- #
- # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image
- #
- # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
- #
- # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
 
 
     def get_download_counts( self, ppa, filter_text ):
@@ -475,11 +323,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             f"&status=Published&exact_match=false&ordered=false" +
             f"&binary_name={ filter_text }" )
 
-        i = 0 #TODO Testing
         next_collection_link = "next_collection_link"
         while True:
-            print( f"Get published binaries for { ppa } | { filter_text } | { i }" ) #TODO Testing
-            i += 1 #TODO Testing
             published_binaries = self.get_json( url )  #TODO Test with a ppa/archive with NO published binaries....should not get an error...right?
             if published_binaries: #TODO If we have multiple pages, will this be None and then set the status to error below?
                 for entry in published_binaries[ "entries" ]: #TODO Test for no entries (filter out with bogus indicator name.
@@ -558,8 +403,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.create_treeview_within_scrolledwindow(
                 ppa_store,
                 (
-                    _( "PPA User" ),
-                    _( "PPA Name" ),
+                    _( "User" ),
+                    _( "Name" ),
                     _( "Series" ),
                     _( "Architecture" ) ),
                 (
@@ -591,25 +436,31 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         # Filters.
         grid = self.create_grid()
 
-        # PPA user, name, filter text.
-        filter_store = Gtk.ListStore( str, str, str )
+        # PPA user, name, series, architecture, filter text.
+        filter_store = Gtk.ListStore( str, str, str, str, str )
 
         for filter_ in self.filters:
             filter_store.append( [
                 filter_.get_user(),
                 filter_.get_name(),
+                ppa.get_series(),
+                ppa.get_architecture(),
                 "\n".join( filter_.get_text() ) ] )
 
         filter_treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 filter_store,
                 (
-                    _( "PPA User" ),
-                    _( "PPA Name" ),
+                    _( "User" ),
+                    _( "Name" ),
+                    _( "Series" ),
+                    _( "Architecture" ),
                     _( "Filter" ) ),
                 (
                     ( Gtk.CellRendererText(), "text", IndicatorPPADownloadStatistics.COLUMN_USER ),
                     ( Gtk.CellRendererText(), "text", IndicatorPPADownloadStatistics.COLUMN_NAME ),
+                    ( Gtk.CellRendererText(), "text", IndicatorPPADownloadStatistics.COLUMN_SERIES ),
+                    ( Gtk.CellRendererText(), "text", IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ),
                     ( Gtk.CellRendererText(), "text", IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ) ),
                 tooltip_text = _( "Double click to edit a filter." ),
                 rowactivatedfunctionandarguments = ( self.on_filter_double_click, ppa_treeview ) )
@@ -644,68 +495,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         grid.attach( show_as_submenus_checkbutton, 0, 0, 1, 1 )
 
-        combine_ppas_checkbutton = \
-            self.create_checkbutton(
-                _( "Combine PPAs" ),
-                tooltip_text = _(
-                    "Combine the statistics of binary\n" +
-                    "packages when the PPA user/name\n" +
-                    "are the same.\n\n" +
-                    "Non-architecture specific packages:\n" +
-                    "If the package names and version\n" +
-                    "numbers of two binary packages are\n" +
-                    "identical, the packages are treated\n" +
-                    "as the same package and the\n" +
-                    "download counts are NOT summed.\n" +
-                    "Packages such as Python fall into\n" +
-                    "this category.\n\n" +
-                    "Architecture specific packages:\n" +
-                    "If the package names and version\n" +
-                    "numbers of two binary packages are\n" +
-                    "identical, the packages are treated\n" +
-                    "as the same package and the download\n" +
-                    "counts ARE summed.\n" +
-                    "Packages such as compiled C fall into\n" +
-                    "this category." ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
-                active = self.combine_ppas )
-
-        grid.attach( combine_ppas_checkbutton, 0, 1, 1, 1 )
-
-        ignore_version_architecture_specific_checkbutton = \
-            self.create_checkbutton(
-                _( "Ignore version for architecture specific" ),
-                tooltip_text = _(
-                    "Sometimes architecture specific\n" +
-                    "packages with the same package\n" +
-                    "name but different version 'number'\n" +
-                    "are logically the SAME package.\n\n" +
-                    "For example, a C source package for\n" +
-                    "both Ubuntu Saucy and Ubuntu Trusty\n" +
-                    "will be compiled twice, each with a\n" +
-                    "different 'number', despite being\n" +
-                    "the SAME release.\n\n" +
-                    "Checking this option will ignore the\n" +
-                    "version number when determining if\n" +
-                    "two architecture specific packages\n" +
-                    "are identical.\n\n" +
-                    "The version number is retained only\n" +
-                    "if it is identical across ALL\n" +
-                    "instances of a published binary." ),
-                sensitive = combine_ppas_checkbutton.get_active(),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = self.ignore_version_architecture_specific )
-
-        grid.attach(
-            ignore_version_architecture_specific_checkbutton,
-            0, 2, 1, 1 )
-
-        combine_ppas_checkbutton.connect(
-            "toggled",
-            self.on_radio_or_checkbox,
-            True,
-            ignore_version_architecture_specific_checkbutton )
-
         sort_by_download_checkbutton = \
             self.create_checkbutton(
                 _( "Sort by download" ),
@@ -713,7 +502,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.sort_by_download )
 
-        grid.attach( sort_by_download_checkbutton, 0, 3, 1, 1 )
+        grid.attach( sort_by_download_checkbutton, 0, 1, 1, 1 )
 
         label = Gtk.Label.new( _( "Clip amount" ) )
         label.set_sensitive( sort_by_download_checkbutton.get_active() )
@@ -736,7 +525,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ( label, False ),
                     ( spinner, False ) ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT ),
-            0, 4, 1, 1 )
+            0, 2, 1, 1 )
 
         sort_by_download_checkbutton.connect(
             "toggled",
@@ -752,12 +541,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.low_bandwidth )
 
-        grid.attach( low_bandwidth_checkbutton, 0, 5, 1, 1 )
+        grid.attach( low_bandwidth_checkbutton, 0, 3, 1, 1 )
 
         autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
             self.create_preferences_common_widgets()
 
-        grid.attach( box, 0, 6, 1, 1 )
+        grid.attach( box, 0, 4, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
@@ -767,8 +556,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
             self.show_submenu = show_as_submenus_checkbutton.get_active()
-            self.combine_ppas = combine_ppas_checkbutton.get_active()
-            self.ignore_version_architecture_specific = ignore_version_architecture_specific_checkbutton.get_active()
             self.low_bandwidth = low_bandwidth_checkbutton.get_active()
             self.sort_by_download = sort_by_download_checkbutton.get_active()
             self.sort_by_download_amount = spinner.get_value_as_int()
@@ -785,8 +572,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         ppa[ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ] ) )
 
                 treeiter = ppa_store.iter_next( treeiter )
-
-            PPA.sort( self.ppas )
 
             self.filters = [ ]
             treeiter = filter_store.get_iter_first()
@@ -1548,8 +1333,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 # and ensure the old is copied to new location (name without hyphens)
 # and loads up.
     def load_config( self, config ):
-        self.combine_ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS, False )
-        self.ignore_version_architecture_specific = config.get( IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC, True )
         self.low_bandwidth = config.get( IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH, False )
         self.show_submenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, False )
         self.sort_by_download = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
@@ -1565,8 +1348,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 architecture = ppa[ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ]
                 self.ppas.append( PPA( user, name, series, architecture ) )
 
-            #TODO Is this needed here?  Figure out when/where sort is needed / not needed.
-            PPA.sort( self.ppas )
+                break #TODO For testing, only load first PPA as it will be quick to download...
 
             self.filters = [ ]
             filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] )
@@ -1580,28 +1362,14 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         filter_[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] ) )
 
 
-#TODO
-            '''
-            {"combinePPAs": false, "filters": [["canonical-kernel-team", "ppa", ["linux-image-oem"]]], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"],["canonical-kernel-team","ppa","focal","amd64"],["thebernmeister", "ppa", "focal", "amd64"]], "showSubmenu": false, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.81", "checklatestversion": false}
-
-
-            {"combinePPAs": false, "filters": [["thebernmeister", "ppa", "jammy", "amd64", ["indicator-fortune", "indicator-lunar", "indicator-on-this-day", "indicator-ppa-download-statistics", "indicator-punycode", "indicator-script-runner", "indicator-stardate", "indicator-tide", "indicator-virtual-box"]]], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"]], "showSubmenu": false, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.80"}
-
-
-{"combinePPAs": false, "filters": [["canonical-kernel-team", "ppa", "focal", "amd64", ["linux-image-oem"]]], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "focal", "i386"],["thebernmeister", "archive", "focal", "i386"],["thebernmeister", "testing", "focal", "i386"],["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "i386"],["cubic-wizard", "release", "focal", "amd64"],["cloud-it", "ppa", "focal", "amd64"],["ppa-q", "ppa", "focal", "amd64"],["aggelalex-ppa", "ppa", "focal", "amd64"]], "showSubmenu": false, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.81", "checklatestversion": false}
-
-            '''
-
-            #TODO Test with empty data.
-            # self.ppas = [ ]
-            # self.filters = [ ]
-            self.combine_ppas = True
-            self.show_submenu = True
-#,["canonical-kernel-team","ppa","focal","amd64"]
-
         else:
 #TODO Once Ubuntu 20.04 is EOL,
 # should really find an alternate default/example PPA and filter.
+# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
+# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image
+# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
+# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
+
             user = "thebernmeister"
             name = "ppa"
             series = "jammy"
@@ -1643,9 +1411,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 filter_.get_text() ] )
 
         return {
-            IndicatorPPADownloadStatistics.CONFIG_COMBINE_PPAS: self.combine_ppas,
             IndicatorPPADownloadStatistics.CONFIG_FILTERS: filters,
-            IndicatorPPADownloadStatistics.CONFIG_IGNORE_VERSION_ARCHITECTURE_SPECIFIC: self.ignore_version_architecture_specific,
             IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH: self.low_bandwidth,
             IndicatorPPADownloadStatistics.CONFIG_PPAS: ppas,
             IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU: self.show_submenu,

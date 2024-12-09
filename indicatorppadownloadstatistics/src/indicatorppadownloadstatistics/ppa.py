@@ -63,22 +63,6 @@ class Filter():
 
 
 #TODO Delete
-#    def add_filter( self, user, name, text = None ):
-#        self.filters[ self._get_key( user, name ) ] = text
-
-
-#TODO Make this a static version if needed.
-#TODO Delete
-#    def has_filter( self, user, name ):
-#        return self._get_key( user, name ) in self.filters
-
-
-#TODO Delete
-#    def get_filter_text( self, user, name ):
-#        return self.filters[ self._get_key( user, name ) ]
-
-
-#TODO Delete
 #    def get_user_name( self ):
 #        for key in sorted( self.filters.keys() ):
 #            key_components = key.split( " | " )
@@ -92,6 +76,7 @@ class Filter():
 #        return user + " | " + name
 
 
+#TODO Check this works.
     def __str__( self ):
         return (
             self.user + " | " +
@@ -158,6 +143,7 @@ class PublishedBinary():
 
 
 #TODO Check the comment below after combine is sorted.
+#TODO Check this works.
     def __str__( self ):
         # Requires str() as None will be returned when
         # published binaries are combined.
@@ -191,16 +177,13 @@ class PPA():
         OK = 2
         NO_PUBLISHED_BINARIES = 3
         FILTERED = 4
-        MIX_OF_OK_NO_PUBLISHED_BINARIES_FILTERED = 5
 
 
     def __init__( self, user, name, series, architecture ):
         self.status = PPA.Status.NEEDS_DOWNLOAD
         self.published_binaries = [ ]
-
         self.user = user
         self.name = name
-#TODO Need to mention that series/arch can be None when a PPA is a combined PPA.
         self.series = series
         self.architecture = architecture
 
@@ -231,6 +214,7 @@ class PPA():
         return self.architecture
 
 
+#TODO Check code/comments now that combine is gone.
     # Returns a string description of the PPA of the form
     #   user | name | series | architecture
     # or
@@ -246,11 +230,6 @@ class PPA():
 
     def add_published_binary( self, published_binary ):
         self.published_binaries.append( published_binary )
-
-
-#TODO Is this used?
-#    def add_published_binaries( self, published_binaries ):
-#        self.published_binaries.extend( published_binaries )
 
 
     def has_published_binaries( self ):
@@ -284,11 +263,13 @@ class PPA():
 
     @staticmethod
 #TODO This is called at the end of combine...where else?
+# Now that combine is gone, is this still used?
     def sort( list_of_ppas ):
         list_of_ppas.sort(
             key = operator.methodcaller( "get_descriptor" ) )
 
 
+#TODO Check this works.
     def __str__( self ):
         return (
             self.user + ' | ' +
