@@ -27,18 +27,9 @@ from enum import Enum
 class Filter():
     ''' A filter screens out unwanted PPAs on download. '''
 
-
-#TODO Delete
-    # INDEX_USER = 0
-    # INDEX_NAME = 1
-    # INDEX_TEXT = 2
-
-
-    def __init__( self, user, name, series, architecture, text ):
+    def __init__( self, user, name, text ):
         self.user = user
         self.name = name
-        self.series = series
-        self.architecture = architecture
         self.text = text
 
 
@@ -50,26 +41,8 @@ class Filter():
         return self.name
 
 
-    def get_series( self ):
-        return self.series
-
-
-    def get_architecture( self ):
-        return self.architecture
-
-
     def get_text( self ):
         return self.text
-
-
-#TODO Delete
-#    def get_user_name( self ):
-#        for key in sorted( self.filters.keys() ):
-#            key_components = key.split( " | " )
-#            # yield \
-#            #     key_components[ Filters.INDEX_USER ], \
-#            #     key_components[ Filters.INDEX_NAME ]
-
 
 #TODO Delete
 #    def _get_key( self, user, name, ):
@@ -81,8 +54,6 @@ class Filter():
         return (
             self.user + " | " +
             self.name + ' | ' +
-            str( self.series ) + ' | ' +
-            str( self.architecture ) + ' | ' +
             ' '.join( self.text ) )
 
 
@@ -95,8 +66,6 @@ class Filter():
             self.__class__ == other.__class__ and \
             self.get_user() == other.get_user() and \
             self.get_name() == other.get_name() and \
-            self.get_series() == other.get_series() and \
-            self.get_architecture() == other.get_architecture() and \
             self.get_text() == other.get_text()
 
 
@@ -105,15 +74,13 @@ class PublishedBinary():
 
     def __init__(
             self,
-            package_name,
-            package_version,
-            download_count,
-            architecture_specific ):
+            binary_package_name,
+            binary_package_version,
+            download_count ):
         '''
         Package name (string)
         Package version (string)
         Download count (integer)
-        Architecture specific (boolean)
         '''
 
         self.package_name = package_name
@@ -179,13 +146,11 @@ class PPA():
         FILTERED = 4
 
 
-    def __init__( self, user, name, series, architecture ):
+    def __init__( self, user, name ):
         self.status = PPA.Status.NEEDS_DOWNLOAD
         self.published_binaries = [ ]
         self.user = user
         self.name = name
-        self.series = series
-        self.architecture = architecture
 
 
     def get_status( self ):
@@ -206,26 +171,10 @@ class PPA():
         return self.name
 
 
-    def get_series( self ):
-        return self.series
-
-
-    def get_architecture( self ):
-        return self.architecture
-
-
-#TODO Check code/comments now that combine is gone.
     # Returns a string description of the PPA of the form
-    #   user | name | series | architecture
-    # or
     #   user | name
-    # if series/architecture are undefined.
     def get_descriptor( self ):
-        descriptor = self.user + ' | ' + self.name
-        if self.series is not None and self.architecture is not None:
-            descriptor += ' | ' + self.series + ' | ' + self.architecture #TODO Need a comment for why/when this happens.
-
-        return descriptor
+        return self.user + ' | ' + self.name
 
 
     def add_published_binary( self, published_binary ):
@@ -274,8 +223,6 @@ class PPA():
         return (
             self.user + ' | ' +
             self.name + ' | ' +
-            str( self.series ) + ' | ' +
-            str( self.architecture ) + ' | ' +
             str( self.published_binaries ) )
 
 
@@ -288,8 +235,6 @@ class PPA():
             self.__class__ == other.__class__ and \
             self.get_user() == other.get_user() and \
             self.get_name() == other.get_name() and \
-            self.get_series() == other.get_series() and \
-            self.get_architecture() == other.get_architecture() and \
             self.get_status() == other.get_status() and \
             len( self.get_published_binaries() ) == len( other.get_published_binaries() )
 

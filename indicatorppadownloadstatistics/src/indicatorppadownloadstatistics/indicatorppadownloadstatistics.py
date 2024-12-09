@@ -242,6 +242,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&status=Published
 # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&status=Published&binary_name=bindgen
 # https://snapcraft.io/docs/reference-architectures
+#
+# If a new published binary is architecture independant,
+# if the name and version are the same of an existing published binary,
+# which is also architecture independant,
+# keep the original and discard the new.
+# Otherwise, this is a new published binary.
+#
+# If a new published binary is architecture dependant,
+# if the name and version are the same of an existing published binary,
+# which is also architecture dependant,
+# add download count from new published binary to the existing.
+# Otherwise, this is a new published binary.
+#
+# What to do if existing published binary is architecture dependant
+# and the new published binary is architecture independant
+# or vice versa?
+#
+# Are these just two different packages?
 
 
     def download_ppa_statistics( self ):
@@ -284,19 +302,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         A filter_text of "" equates to no filtering.
         '''
+        published_binaries = [ ]
         self_links = [ ]
         binary_package_names = [ ]
         binary_package_versions = [ ]
         architecture_specifics = [ ]
 
-        self.__get_published_binaries(
-            ppa,
-            filter_text,
-            self_links,
-            binary_package_names,
-            binary_package_versions,
-            architecture_specifics )
-
+        published_binaries = self.__get_published_binaries( ppa, filter_text )
         if not ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
             self.__get_download_counts(
                 ppa,
@@ -306,28 +318,65 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 architecture_specifics )
 
 
-    def __get_published_binaries(
-            self,
-            ppa,
-            filter_text,
-            self_links,
-            binary_package_names,
-            binary_package_versions,
-            architecture_specifics ):
+    def __get_published_binaries( self, ppa filter_text ):
+
+        def exists(
+            binary_package_name, binary_package_version, architecture_specific ):
+
+            exists_ = False
+            for published_binary_ in published_binaries:
+                match = (
+                    published_binary[ 1 ] == binary_package_name
+                    and
+                    published_binary[ 2 ] == binary_package_version
+                    and
+                    published_binary[ 3 ] == architecture_specific )
+
+                if match:
+                    exists_ = True
+                    break
+
+            return exists_
+
 
         url = (
             f"https://api.launchpad.net/1.0/~{ ppa.get_user() }" +
-            f"/+archive/ubuntu/{ ppa.get_name() }?ws.op=getPublishedBinaries&" +
-            f"distro_arch_series=https://api.launchpad.net/1.0/ubuntu/" +
-            f"{ ppa.get_series() }/{ ppa.get_architecture() }" +
-            f"&status=Published&exact_match=false&ordered=false" +
+            f"/+archive/ubuntu/{ ppa.get_name() }" +
+            f"?ws.op=getPublishedBinaries" +
+            f"&status=Published" +
+            f"&exact_match=True" +
+            f"&ordered=False" +
             f"&binary_name={ filter_text }" )
 
+        published_binaries = [ ]
         next_collection_link = "next_collection_link"
         while True:
             published_binaries = self.get_json( url )  #TODO Test with a ppa/archive with NO published binaries....should not get an error...right?
             if published_binaries: #TODO If we have multiple pages, will this be None and then set the status to error below?
                 for entry in published_binaries[ "entries" ]: #TODO Test for no entries (filter out with bogus indicator name.
+                    published_binary = [
+                        entry[ "self_link" ],
+                        entry[ "binary_package_name" ],
+                        entry[ "binary_package_version" ],
+                        entry[ "architecture_specific" ] ]
+
+
+                    exists = (
+                        entry[ "binary_package_name" ] in binary_package_names
+                        and
+                        binary_package_names.index( entry[ "binary_package_name" ] )
+                        ==
+                        binary_package_versions.list( entry[ "binary_package_version" ] )
+
+                    if match_by_name_version_architecture_specific:
+                        match_by_index = (
+                            binary_package_names.list( entry[ "binary_package_name" ] ) ==
+                        binary_package_versions.append( entry[ "binary_package_version" ] )
+                        architecture_specifics.append( entry[ "architecture_specific" ] )
+
+                        )
+
+
                     self_links.append( entry[ "self_link" ] )
                     binary_package_names.append( entry[ "binary_package_name" ] )
                     binary_package_versions.append( entry[ "binary_package_version" ] )
@@ -343,6 +392,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 print( "here" ) #TODO Testing...ensure this is not set when the last published binaries page is downloaded.
                 ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
                 break
+
+
+
+    def __published_binary_exists(
+            self,
+            binary_package_name,
+            binary_package_version,
+            architecture_specific,
+            binary_package_names,
+            binary_package_versions,
+            architecture_specifics ):
+
+        for name, version, arch_specific in zip( )
+
+        binary_package_names.append( entry[ "binary_package_name" ] )
+        binary_package_versions.append( entry[ "binary_package_version" ] )
+        architecture_specifics.append( entry[ "architecture_specific" ] )
+        pass
 
 
     def __get_download_counts(
