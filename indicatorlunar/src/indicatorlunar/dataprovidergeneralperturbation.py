@@ -146,6 +146,7 @@ class GP():
         return self.tle_line_one, self.tle_line_two
 
 
+#TODO Check this works.
     def __str__( self ):
         return (
             self.name + " | " +

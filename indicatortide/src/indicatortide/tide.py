@@ -65,6 +65,7 @@ class Reading():
         return self.url
 
 
+#TODO Check this works.
     def __str__( self ):
         return (
             self.date + " | " +

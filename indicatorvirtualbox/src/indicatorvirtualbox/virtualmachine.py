@@ -35,6 +35,7 @@ class VirtualMachine():
         return self.uuid
 
 
+#TODO Check this works.
     def __str__( self ):
         return self.get_name() + " | " + self.get_uuid()
 
@@ -70,6 +71,7 @@ class Group():
         return self.items
 
 
+#TODO Check this works.
     def __str__( self ):
         return (
             self.get_name() + ": " +
