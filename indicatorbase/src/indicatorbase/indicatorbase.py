@@ -282,7 +282,7 @@ class IndicatorBase( ABC ):
 
     def get_json( self, url ):
         try:
-            with urlopen( url, timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) as f:
+            with urlopen( url, timeout = IndicatorBase.TIMEOUT_IN_SECONDS * 2 ) as f: #TODO Maybe allow the timeout to be passed in?
                 json_ = json.loads( f.read().decode( "utf8" ) )
 
         except URLError as e:
