@@ -28,6 +28,11 @@ class Filter():
     ''' A filter screens out unwanted PPAs on download. '''
 
     def __init__( self, user, name, text ):
+        '''
+        User (string)
+        Name (string)
+        Text (list of text)
+        '''
         self.user = user
         self.name = name
         self.text = text
@@ -44,6 +49,10 @@ class Filter():
     def get_text( self ):
         return self.text
 
+
+    def set_text( self, text ):
+        self.text = text
+
 #TODO Delete
 #    def _get_key( self, user, name, ):
 #        return user + " | " + name
@@ -54,7 +63,7 @@ class Filter():
         return (
             self.user + " | " +
             self.name + ' | ' +
-            ' '.join( self.text ) )
+            '[ ' + ' '.join( self.text ) + ' ]' )
 
 
     def __repr__( self ):
@@ -72,29 +81,30 @@ class Filter():
 class PublishedBinary():
     ''' PPA downloaded data. '''
 
-    def __init__(
-            self,
-            binary_package_name,
-            binary_package_version,
-            download_count ):
+    def __init__( self, name, version, architecture_specific, download_count ):
         '''
-        Package name (string)
-        Package version (string)
+        Name (string)
+        Version (string)
+        Architecture specific (boolean) 
         Download count (integer)
         '''
 
-        self.package_name = package_name
-        self.package_version = package_version
-        self.download_count = download_count
+        self.name = name
+        self.version = version
         self.architecture_specific = architecture_specific
+        self.download_count = download_count
 
 
-    def get_package_name( self ):
-        return self.package_name
+    def get_name( self ):
+        return self.name
 
 
-    def get_package_version( self ):
-        return self.package_version
+    def get_version( self ):
+        return self.version
+
+
+    def get_architecture_specific( self ):
+        return self.architecture_specific
 
 
     def get_download_count( self ):
@@ -105,20 +115,16 @@ class PublishedBinary():
         self.download_count = count
 
 
-    def is_architecture_specific( self ):
-        return self.architecture_specific
-
-
 #TODO Check the comment below after combine is sorted.
 #TODO Check this works.
     def __str__( self ):
         # Requires str() as None will be returned when
         # published binaries are combined.
         return (
-            self.get_package_name() + " | " +
-            str( self.get_package_version() ) + " | " +
-            str( self.get_download_count() ) + " | " +
-            str( self.is_architecture_specific() ) )
+            self.get_name() + " | " +
+            self.get_version() + " | " +
+            str( self.get_architecture_specific() ) + " | " +
+            str( self.get_download_count() ) )
 
 
     def __repr__( self ):
@@ -128,10 +134,10 @@ class PublishedBinary():
     def __eq__( self, other ):
         return \
             self.__class__ == other.__class__ and \
-            self.get_package_name() == other.get_package_name() and \
-            self.get_package_version() == other.get_package_version() and \
-            self.get_download_count() == other.get_download_count() and \
-            self.is_architecture_specific() == other.is_architecture_specific()
+            self.get_name() == other.get_name() and \
+            self.get_version() == other.get_version() and \
+            self.get_architecture_specific() == other.get_architecture_specific() and \
+            self.get_download_count() == other.get_download_count()
 
 
 class PPA():
@@ -147,10 +153,14 @@ class PPA():
 
 
     def __init__( self, user, name ):
-        self.status = PPA.Status.NEEDS_DOWNLOAD
-        self.published_binaries = [ ]
+        '''
+        User (string)
+        Name (string)
+        '''
         self.user = user
         self.name = name
+        self.published_binaries = [ ]
+        self.status = PPA.Status.NEEDS_DOWNLOAD
 
 
     def get_status( self ):
@@ -171,8 +181,6 @@ class PPA():
         return self.name
 
 
-    # Returns a string description of the PPA of the form
-    #   user | name
     def get_descriptor( self ):
         return self.user + ' | ' + self.name
 

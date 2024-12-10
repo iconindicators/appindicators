@@ -40,6 +40,13 @@ from ppa import Filter, PPA, PublishedBinary
 #TODO Consider putting in a check/limit for published binaries
 # with say 25 or more entries.
 # Will result in a request for the download count for each...
+# Suggest to user in message to use a filter.
+
+
+#TODO If a user puts in a ppa with a large number of published binaries (pages,
+# the user has no way to make a filter to reduce the result as the download will
+# take a long time and/or time out.
+# Maybe do some sort of check and bail out after 10 pages and/or 25 downloads counts?
 
 
 #TODO Do a search for | here and in ppa.py
@@ -67,9 +74,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     # Data model columns used in the Preferences dialog and json config.
     COLUMN_USER = 0
     COLUMN_NAME = 1
-    COLUMN_SERIES = 2
-    COLUMN_ARCHITECTURE = 3
-    COLUMN_FILTER_TEXT = 4
+    COLUMN_FILTER_TEXT = 2
 
     MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
     MESSAGE_FILTERED = _( "(published binaries completely filtered)" )
@@ -148,16 +153,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def create_menuitem_for_published_binary(
         self, menu, indent, ppa, published_binary ):
 
-        label = published_binary.get_package_name()
-        if published_binary.get_package_version() is not None:
-            label += " " + published_binary.get_package_version()
-
-#TODO Check that the space is needed when combined and not combined.
-        label += " :  " + str( published_binary.get_download_count() )
-
         self.create_and_append_menuitem(
             menu,
-            label,
+            published_binary.get_name() + "  " +
+            published_binary.get_version() + " :  " +
+            str( published_binary.get_download_count() ),
             name = ppa.get_descriptor(),
             activate_functionandarguments = ( self.on_ppa, ),
             indent = indent )
@@ -223,9 +223,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         for f in self.filters:
             match = (
                 f.get_user() == ppa.get_user() and
-                f.get_name() == ppa.get_name() and
-                f.get_series() == ppa.get_series() and
-                f.get_architecture() == ppa.get_architecture() )
+                f.get_name() == ppa.get_name() )
 
             if match:
                 filters = f.get_text()
@@ -275,7 +273,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
 
             for filter_text in self.get_filters( ppa ):
-                self.get_download_counts( ppa, filter_text )
+                print( f"Processing { ppa } { filter_text }" )#TODO Testing
+                self.__process_ppa( ppa, filter_text )
                 if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
                     break
 
@@ -295,95 +294,72 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa.set_status( PPA.Status.FILTERED )
 
 
-    def get_download_counts( self, ppa, filter_text ):
+    def __process_ppa( self, ppa, filter_text ):
         '''
         Get the published binaries for the PPA and then for each published
         binary, get the download count.
 
         A filter_text of "" equates to no filtering.
         '''
-        published_binaries = [ ]
-        self_links = [ ]
-        binary_package_names = [ ]
-        binary_package_versions = [ ]
-        architecture_specifics = [ ]
 
-        published_binaries = self.__get_published_binaries( ppa, filter_text )
+        print( "\tGetting published binaries..." )#TODO Test
+        self_links, binary_package_names, binary_package_versions, architectures = \
+            self.__get_published_binaries( ppa, filter_text )
+
         if not ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
+            print( f"\tGetting { len( self_links ) } download counts..." )#TODO Test
             self.__get_download_counts(
                 ppa,
                 self_links,
                 binary_package_names,
                 binary_package_versions,
-                architecture_specifics )
+                architectures )
 
 
-    def __get_published_binaries( self, ppa filter_text ):
-
-        def exists(
-            binary_package_name, binary_package_version, architecture_specific ):
-
-            exists_ = False
-            for published_binary_ in published_binaries:
-                match = (
-                    published_binary[ 1 ] == binary_package_name
-                    and
-                    published_binary[ 2 ] == binary_package_version
-                    and
-                    published_binary[ 3 ] == architecture_specific )
-
-                if match:
-                    exists_ = True
-                    break
-
-            return exists_
-
-
+    def __get_published_binaries( self, ppa, filter_text ):
         url = (
             f"https://api.launchpad.net/1.0/~{ ppa.get_user() }" +
             f"/+archive/ubuntu/{ ppa.get_name() }" +
             f"?ws.op=getPublishedBinaries" +
             f"&status=Published" +
-            f"&exact_match=True" +
-            f"&ordered=False" +
+            f"&exact_match=false" +
+            f"&ordered=false" +
             f"&binary_name={ filter_text }" )
 
-        published_binaries = [ ]
+        self_links = [ ]
+        binary_package_names = [ ]
+        binary_package_versions = [ ]
+        architectures = [ ]
+
+        page = 1#TODO Test
         next_collection_link = "next_collection_link"
         while True:
+            print( f"\tGetting page { page }" ) #TODO Test
             published_binaries = self.get_json( url )  #TODO Test with a ppa/archive with NO published binaries....should not get an error...right?
             if published_binaries: #TODO If we have multiple pages, will this be None and then set the status to error below?
                 for entry in published_binaries[ "entries" ]: #TODO Test for no entries (filter out with bogus indicator name.
-                    published_binary = [
-                        entry[ "self_link" ],
-                        entry[ "binary_package_name" ],
-                        entry[ "binary_package_version" ],
-                        entry[ "architecture_specific" ] ]
+                    architecture = None
+                    if entry[ "architecture_specific" ] == "true":
+                        architecture = entry[ "distro_arch_series_link" ].split( '/' )[ -1 ]
 
+                    published_binary_exists = \
+                        self.__published_binary_exists(
+                            entry[ "binary_package_name" ],
+                            entry[ "binary_package_version" ],
+                            architecture,
+                            binary_package_names,
+                            binary_package_versions,
+                            architectures )
 
-                    exists = (
-                        entry[ "binary_package_name" ] in binary_package_names
-                        and
-                        binary_package_names.index( entry[ "binary_package_name" ] )
-                        ==
-                        binary_package_versions.list( entry[ "binary_package_version" ] )
-
-                    if match_by_name_version_architecture_specific:
-                        match_by_index = (
-                            binary_package_names.list( entry[ "binary_package_name" ] ) ==
+                    if not published_binary_exists:
+                        self_links.append( entry[ "self_link" ] )
+                        binary_package_names.append( entry[ "binary_package_name" ] )
                         binary_package_versions.append( entry[ "binary_package_version" ] )
-                        architecture_specifics.append( entry[ "architecture_specific" ] )
-
-                        )
-
-
-                    self_links.append( entry[ "self_link" ] )
-                    binary_package_names.append( entry[ "binary_package_name" ] )
-                    binary_package_versions.append( entry[ "binary_package_version" ] )
-                    architecture_specifics.append( entry[ "architecture_specific" ] )
+                        architectures.append( architecture )
 
                 if next_collection_link in published_binaries:
                     url = published_binaries[ next_collection_link ]
+                    page += 1#TODO Test
                     continue
 
                 break
@@ -393,6 +369,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
                 break
 
+        return self_links, binary_package_names, binary_package_versions, architectures
 
 
     def __published_binary_exists(
@@ -404,12 +381,27 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             binary_package_versions,
             architecture_specifics ):
 
-        for name, version, arch_specific in zip( )
+        exists_ = False
 
-        binary_package_names.append( entry[ "binary_package_name" ] )
-        binary_package_versions.append( entry[ "binary_package_version" ] )
-        architecture_specifics.append( entry[ "architecture_specific" ] )
-        pass
+        zipped = \
+            zip(
+                binary_package_names,
+                binary_package_versions,
+                architecture_specifics )
+
+        for name, version, architecture in zipped:
+            match = (
+                binary_package_name == name
+                and
+                binary_package_version == version
+                and
+                architecture_specific == architecture )
+
+            if match:
+                exists_ = True
+                break
+
+        return exists_
 
 
     def __get_download_counts(
@@ -418,7 +410,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self_links,
             binary_package_names,
             binary_package_versions,
-            architecture_specifics ):
+            architectures ):
 
         max_workers = 1 if self.low_bandwidth else 4
         download_counts = { }
@@ -427,20 +419,55 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 download_counts[ i ] = \
                     executor.submit(
                         self.get_json,
-                        self_links[ i ] + "?ws.op=getDownloadCount" )
+                        self_link + "?ws.op=getDownloadCount" )
 
-        for i, result in download_counts.items():
-            if result.exception() is None:
-                ppa.add_published_binary(
-                    PublishedBinary(
-                        binary_package_names[ i ],
-                        binary_package_versions[ i ],
-                        result.result(),
-                        architecture_specifics[ i ] ) )
+        for key_i, value_result in download_counts.items():
+            if value_result.exception() is None:
+                self.__process_download_count(
+                    ppa,
+                    binary_package_names[ key_i ],
+                    binary_package_versions[ key_i ],
+                    False if architectures[ key_i ] is None else True,
+                    value_result.result() )
 
             else:
                 ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
                 break
+
+
+    def __process_download_count(
+            self,
+            ppa,
+            binary_package_name,
+            binary_package_version,
+            architecture_specific,
+            download_count ):
+
+        found = False
+        for published_binary in ppa.get_published_binaries():
+            match = (
+                binary_package_name == published_binary.get_name()
+                and
+                binary_package_version == published_binary.get_version()
+                and
+                architecture_specific == published_binary.get_architecture_specific() )
+
+            if match:
+                found = True
+                break
+
+        if found:
+            if architecture_specific:
+                published_binary.set_download_count(
+                    published_binary.get_download_count() + download_count )
+
+        else:
+            ppa.add_published_binary(
+                PublishedBinary(
+                    binary_package_name,
+                    binary_package_version,
+                    architecture_specific,
+                    download_count ) )
 
 
     def on_preferences( self, dialog ):
@@ -1405,29 +1432,55 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self.sort_by_download = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
         self.sort_by_download_amount = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, 5 )
 
+#TODO Wondering now if we need a filter class/object...
+# Why not just add the filter directly to the ppa object?
+
         if config:
             self.ppas = [ ]
             ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
             for ppa in ppas:
                 user = ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ]
                 name = ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
-                series = ppa[ IndicatorPPADownloadStatistics.COLUMN_SERIES ]
-                architecture = ppa[ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ]
-                self.ppas.append( PPA( user, name, series, architecture ) )
+                
+                # In version 81, the series/architecture were dropped; ensure
+                # duplicates are not added.
+                no_duplicate_found = True
+                for ppa_ in self.ppas:
+                    if ppa_.get_name() == name and ppa_.get_user() == user:
+                        no_duplicate_found = False
+                        break
 
-                break #TODO For testing, only load first PPA as it will be quick to download...
+                if no_duplicate_found:
+                    self.ppas.append( PPA( user, name ) )
 
             self.filters = [ ]
             filters = config.get( IndicatorPPADownloadStatistics.CONFIG_FILTERS, [ ] )
-            for filter_ in filters:
-                self.filters.append(
-                    Filter(
-                        filter_[ IndicatorPPADownloadStatistics.COLUMN_USER ],
-                        filter_[ IndicatorPPADownloadStatistics.COLUMN_NAME ],
-                        filter_[ IndicatorPPADownloadStatistics.COLUMN_SERIES ],
-                        filter_[ IndicatorPPADownloadStatistics.COLUMN_ARCHITECTURE ],
-                        filter_[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] ) )
+            if filters and len( filters[ 0 ] ) == 3:
+                for filter_ in filters:
+                    self.filters.append(
+                        Filter(
+                            filter_[ IndicatorPPADownloadStatistics.COLUMN_USER ],
+                            filter_[ IndicatorPPADownloadStatistics.COLUMN_NAME ],
+                            filter_[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] ) )
 
+            elif filters and len( filters[ 0 ] ) == 5:
+                # In version 81, the series/architecture were dropped; ensure
+                # duplicates are not added and filter text is combined for
+                # equivalent user/name filters.
+                for filter_ in filters:
+                    user = filter_[ IndicatorPPADownloadStatistics.COLUMN_USER ]
+                    name = filter_[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
+                    text = filter_[ 4 ] # Index in old filter format.
+
+                    no_duplicate_found = True
+                    for f in self.filters:
+                        if f.get_name() == name and f.get_user() == user:
+                            no_duplicate_found = False
+                            f.set_text( list( set( f.get_text() + text ) ) )
+                            break
+    
+                    if no_duplicate_found:
+                        self.filters.append( Filter( user, name, text ) )
 
         else:
 #TODO Once Ubuntu 20.04 is EOL,
@@ -1439,12 +1492,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             user = "thebernmeister"
             name = "ppa"
-            series = "jammy"
-            architecture = "amd64"
 
-            self.ppas = [ PPA( user, name, series, architecture ) ]
+            self.ppas = [ PPA( user, name ) ]
 
-            filter_text = [
+            text = [
                 "indicator-fortune",
                 "indicator-lunar",
                 "indicator-on-this-day",
@@ -1456,7 +1507,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 "indicator-virtual-box" ]
 
             self.filters = [
-                Filter( user, name, series, architecture, filter_text ) ]
+                Filter( user, name, text ) ]
 
 
     def save_config( self ):
@@ -1464,17 +1515,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         for ppa in self.ppas:
             ppas.append( [
                 ppa.get_user(),
-                ppa.get_name(),
-                ppa.get_series(),
-                ppa.get_architecture() ] )
+                ppa.get_name() ] )
 
         filters = [ ]
         for filter_ in self.filters:
             filters.append( [
                 filter_.get_user(),
                 filter_.get_name(),
-                filter_.get_series(),
-                filter_.get_architecture(),
                 filter_.get_text() ] )
 
         return {
