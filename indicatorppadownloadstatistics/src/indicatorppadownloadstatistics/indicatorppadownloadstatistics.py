@@ -133,11 +133,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     def update( self, menu ):
         self.download_ppa_statistics()
-        self.build_menu( menu )
-        return 6 * 60 * 60 # Update every six hours.
 
-
-    def build_menu( self, menu ):
         PPA.sort( self.ppas ) #TODO Check this does what it appears to do...
 
         if self.sort_by_download:
@@ -146,73 +142,78 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     self.sort_by_download_amount )
 
         if self.show_submenu:
-            for ppa in self.ppas:
-                submenu = Gtk.Menu()
-                self.create_and_append_menuitem(
-                    menu,
-                    ppa.get_descriptor() ).set_submenu( submenu )
-
-                if ppa.get_status() == PPA.Status.OK:
-                    published_binaries = ppa.get_published_binaries( True )
-                    for published_binary in published_binaries:
-                        self.create_menuitem_for_published_binary(
-                            submenu, ( 1, 0 ), ppa, published_binary )
-
-                else:
-                    self.create_and_append_menuitem(
-                        submenu,
-                        self.get_status_message( ppa ),
-                        name = self.get_url_for_ppa( ppa ),
-                        activate_functionandarguments = (
-                            self.get_on_click_menuitem_open_browser_function(), ),
-                        indent = ( 1, 1 ) )
+            self.__build_submenu( menu )
 
         else:
-            for ppa in self.ppas:
+            self.__build_menu( menu )
+
+        return 6 * 60 * 60 # Update every six hours.
+
+
+    def __build_submenu( self, menu ):
+        for ppa in self.ppas:
+            submenu = Gtk.Menu()
+            self.create_and_append_menuitem(
+                menu,
+                ppa.get_descriptor() ).set_submenu( submenu )
+
+            if ppa.get_status() == PPA.Status.OK:
+                published_binaries = ppa.get_published_binaries( True )
+                for published_binary in published_binaries:
+                    self.create_and_append_menuitem(
+                        submenu,
+                        self.__get_label( published_binary ),
+                        name = self.__get_url( ppa ),
+                        activate_functionandarguments = (
+                            self.get_on_click_menuitem_open_browser_function(), ),
+                        indent = ( 1, 0 ) )
+
+            else:
                 self.create_and_append_menuitem(
-                    menu,
-                    ppa.get_descriptor(),
-                    name = self.get_url_for_ppa( ppa ),
+                    submenu,
+                    self.__get_status_message( ppa ),
+                    name = self.__get_url( ppa ),
                     activate_functionandarguments = (
-                        self.get_on_click_menuitem_open_browser_function(), ) )
+                        self.get_on_click_menuitem_open_browser_function(), ),
+                    indent = ( 1, 1 ) )
 
-                if ppa.get_status() == PPA.Status.OK:
-                    published_binaries = ppa.get_published_binaries( True )
-                    for published_binary in published_binaries:
-                        self.create_menuitem_for_published_binary(
-                            menu, ( 1, 1 ), ppa, published_binary )
 
-                else:
+    def __build_menu( self, menu ):
+        for ppa in self.ppas:
+            self.create_and_append_menuitem(
+                menu,
+                ppa.get_descriptor(),
+                name = self.__get_url( ppa ),
+                activate_functionandarguments = (
+                    self.get_on_click_menuitem_open_browser_function(), ) )
+
+            if ppa.get_status() == PPA.Status.OK:
+                published_binaries = ppa.get_published_binaries( True )
+                for published_binary in published_binaries:
                     self.create_and_append_menuitem(
                         menu,
-                        self.get_status_message( ppa ),
-                        name = self.get_url_for_ppa( ppa ),
+                        self.__get_label( published_binary ),
+                        name = self.__get_url( ppa ),
                         activate_functionandarguments = (
                             self.get_on_click_menuitem_open_browser_function(), ),
                         indent = ( 1, 1 ) )
 
-            # When only one PPA is present, enable a middle mouse click on the
-            # icon to open the PPA in the browser.
-            if len( self.ppas ) == 1:
-#TODO Test this works!
-                self.set_secondary_activate_target( menu.get_children()[ 0 ] )
+            else:
+                self.create_and_append_menuitem(
+                    menu,
+                    self.__get_status_message( ppa ),
+                    name = self.__get_url( ppa ),
+                    activate_functionandarguments = (
+                        self.get_on_click_menuitem_open_browser_function(), ),
+                    indent = ( 1, 1 ) )
+
+        # When only one PPA is present, enable a middle mouse click on the
+        # icon to open the PPA in the browser.
+        if len( self.ppas ) == 1:
+            self.set_secondary_activate_target( menu.get_children()[ 0 ] )
 
 
-    def create_menuitem_for_published_binary(
-        self, menu, indent, ppa, published_binary ):
-
-        self.create_and_append_menuitem(
-            menu,
-            published_binary.get_name() + "  " +
-            published_binary.get_version() + " :  " +
-            str( published_binary.get_download_count() ),
-            name = self.get_url_for_ppa( ppa ),
-            activate_functionandarguments = (
-                self.get_on_click_menuitem_open_browser_function(), ),
-            indent = indent )
-
-
-    def get_status_message( self, ppa ):
+    def __get_status_message( self, ppa ):
         if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
             message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
 
@@ -225,11 +226,16 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return message
 
 
-    def get_url_for_ppa( self, ppa ):
-        user_name = ppa.get_descriptor().split( " | " )
+    def __get_label( self, published_binary ):
         return (
-            f"https://launchpad.net/~{ user_name[ 0 ] }" +
-            f"/+archive/ubuntu/{ user_name[ 1 ] }" )
+            published_binary.get_name() + "  " +
+            published_binary.get_version() + " :  " +
+            str( published_binary.get_download_count() ) )
+
+
+    def __get_url( self, ppa ):
+        user, name = ppa.get_descriptor().split( " | " )
+        return f"https://launchpad.net/~{ user }/+archive/ubuntu/{ name }"
 
 
     def download_ppa_statistics( self ):
@@ -247,7 +253,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             print( f"{ ppa }" )#TODO Testing
             for filter_text in ppa.get_filter_text():
                 print( f"\t{ filter_text }" )#TODO Testing
-                # self.__process_ppa( ppa, filter_text )#TODO Put back in
+                self.__process_ppa( ppa, filter_text )#TODO Put back in
                 if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
                     break
 
@@ -687,13 +693,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     # model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ],  #TODO Try with just this line (as above)...
                     # if row_number else "", #...hopefully don't need this.
                 tooltip_text = _(
-                    "Each line of plain text is a\n" +
-                    "single filter which is compared\n" +
-                    "against each published binary.\n\n" +
-                    "If a package name contains ANY\n" +
-                    "part of ANY filter, that package\n" +
-                    "is included in the download\n" +
-                    "statistics." ) )
+                    "Each line is a plain text filter which\n" +
+                    "is compared against each package name.\n\n" +
+                    "If a package name contains ANY part\n" +
+                    "of ANY filter, that package will be\n" +
+                    "included in the download statistics." ) )
 
         grid.attach(
             self.create_box(
@@ -731,6 +735,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa_user.grab_focus()
                     continue
 
+                if row_number is None and ppa_user_value
+
                 if ppa_name_value == "":
                     self.show_dialog_ok(
                         dialog,
@@ -738,6 +744,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                     ppa_name.grab_focus()
                     continue
+
+                if row_number:
+                    pass #TODO Edit
+
+                else:
+                    pass #TODO Add...ensure the ppa name
+
 
 #TODO everything below...
                 # Ensure there is no duplicate...
@@ -940,7 +953,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                             ppa[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] ) )
 
             if ppas and len( ppas[ 0 ] ) == 4:
-                # In version 81, a PPA changed from containing
+                # In version 81, PPAs changed from containing
                 #   user / name / series / architecture
                 # to
                 #   user / name / filter
@@ -974,7 +987,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                             ppa.set_filter_text( new_filter_text )
                             break
-    
+
         else:
 #TODO Once Ubuntu 20.04 is EOL,
 # should really find an alternate default/example PPA and filter.
