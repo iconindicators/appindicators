@@ -24,60 +24,6 @@ import operator
 from enum import Enum
 
 
-class Filter():
-    ''' A filter screens out unwanted PPAs on download. '''
-
-    def __init__( self, user, name, text ):
-        '''
-        User (string)
-        Name (string)
-        Text (list of text)
-        '''
-        self.user = user
-        self.name = name
-        self.text = text
-
-
-    def get_user( self ):
-        return self.user
-
-
-    def get_name( self ):
-        return self.name
-
-
-    def get_text( self ):
-        return self.text
-
-
-    def set_text( self, text ):
-        self.text = text
-
-#TODO Delete
-#    def _get_key( self, user, name, ):
-#        return user + " | " + name
-
-
-#TODO Check this works.
-    def __str__( self ):
-        return (
-            self.user + " | " +
-            self.name + ' | ' +
-            '[ ' + ' '.join( self.text ) + ' ]' )
-
-
-    def __repr__( self ):
-        return self.__str__()
-
-
-    def __eq__( self, other ):
-        return \
-            self.__class__ == other.__class__ and \
-            self.get_user() == other.get_user() and \
-            self.get_name() == other.get_name() and \
-            self.get_text() == other.get_text()
-
-
 class PublishedBinary():
     ''' PPA downloaded data. '''
 
@@ -115,11 +61,8 @@ class PublishedBinary():
         self.download_count = count
 
 
-#TODO Check the comment below after combine is sorted.
 #TODO Check this works.
     def __str__( self ):
-        # Requires str() as None will be returned when
-        # published binaries are combined.
         return (
             self.get_name() + " | " +
             self.get_version() + " | " +
@@ -159,6 +102,7 @@ class PPA():
         '''
         self.user = user
         self.name = name
+        self.filter_text = [ "" ]
         self.published_binaries = [ ]
         self.status = PPA.Status.NEEDS_DOWNLOAD
 
@@ -179,6 +123,14 @@ class PPA():
 
     def get_name( self ):
         return self.name
+
+
+    def get_filter_text( self ):
+        return self.filter_text
+
+
+    def set_filter_text( self, filter_text ):
+        self.filter_text = filter_text
 
 
     def get_descriptor( self ):
@@ -231,6 +183,7 @@ class PPA():
         return (
             self.user + ' | ' +
             self.name + ' | ' +
+            '[ ' + ' '.join( self.filter_text ) + ' ]' +
             str( self.published_binaries ) )
 
 
@@ -243,6 +196,7 @@ class PPA():
             self.__class__ == other.__class__ and \
             self.get_user() == other.get_user() and \
             self.get_name() == other.get_name() and \
+            self.get_filter_text() == other.get_filter_text() and \
             self.get_status() == other.get_status() and \
             len( self.get_published_binaries() ) == len( other.get_published_binaries() )
 
