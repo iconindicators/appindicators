@@ -102,7 +102,7 @@ class PPA():
         '''
         self.user = user
         self.name = name
-        self.filter_text = [ "" ]
+        self.filters = [ "" ]
         self.published_binaries = [ ]
         self.status = PPA.Status.NEEDS_DOWNLOAD
 
@@ -125,12 +125,16 @@ class PPA():
         return self.name
 
 
-    def get_filter_text( self ):
-        return self.filter_text
+    def get_filters( self ):
+        '''
+        Returns a list of strings, each of which is a filter.
+        When no filters have been added, the list contains a single empty string.
+        '''
+        return self.filters
 
 
-    def set_filter_text( self, filter_text ):
-        self.filter_text = filter_text
+    def set_filters( self, filters ):
+        self.filters = filters
 
 
     def get_descriptor( self ):
@@ -183,7 +187,7 @@ class PPA():
         return (
             self.user + ' | ' +
             self.name + ' | ' +
-            '[ ' + ' '.join( self.filter_text ) + ' ]' +
+            '[ ' + ' '.join( self.filters ) + ' ]' +
             str( self.published_binaries ) )
 
 
@@ -196,7 +200,7 @@ class PPA():
             self.__class__ == other.__class__ and \
             self.get_user() == other.get_user() and \
             self.get_name() == other.get_name() and \
-            self.get_filter_text() == other.get_filter_text() and \
+            self.get_filters() == other.get_filters() and \
             self.get_status() == other.get_status() and \
             len( self.get_published_binaries() ) == len( other.get_published_binaries() )
 
