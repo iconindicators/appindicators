@@ -105,6 +105,9 @@ from ppa import PPA, PublishedBinary
 #   File "/usr/lib/python3.8/ssl.py", line 1128, in read
 #     return self._sslobj.read(len, buffer)
 # socket.timeout: The read operation timed out
+#
+# https://stackoverflow.com/questions/72388829/request-urlopenurl-not-return-website-response-or-timeout
+# https://stackoverflow.com/questions/8763451/how-to-handle-urllibs-timeout-in-python-3
 
 
 class IndicatorPPADownloadStatistics( IndicatorBase ):
@@ -744,7 +747,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     if user_in_use and name_in_use:
                         self.show_dialog_ok(
                             dialog,
-                            _( "PPA user and name already in use." ) )  #TODO Maybe a better message?
+                            _( "PPA user and name already in use!" ) )
 
                         continue
 
@@ -771,7 +774,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         if user_in_use and name_in_use:    
                             self.show_dialog_ok(
                                 dialog,
-                                _( "Duplicates disallowed - there is an identical PPA!" ) )
+                                _( "PPA user and name already in use!" ) )
 
                             continue
 
@@ -793,130 +796,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     model.remove( treeiter )
 
                 model.append( [ user, name, '\n'.join( filter_text ) ] )
-
-            break
-
-        dialog.destroy()
-
-
-#TODO Delete
-    def on_filter_double_click(
-        self,
-        filter_treeview,
-        row_number,
-        treeviewcolumnm,
-        ppa_treeview ):
-
-        filter_model, filter_treeiter = \
-            filter_treeview.get_selection().get_selected()
-
-        ppa_model, ppa_treeiter = \
-            ppa_treeview.get_selection().get_selected()
-
-        grid = self.create_grid()
-
-        label = Gtk.Label.new( _( "PPA User/Name" ) )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 0, 1, 1 )
-
-        ppa_users_names = Gtk.ComboBoxText.new()  #TODO This should use indicatorbase
-        if row_number is None: # Adding
-            temp = [ ] # Used to ensure duplicates are not added.
-            for i, row in enumerate( ppa_model ):
-                ppa_user_name = \
-                    row[ IndicatorPPADownloadStatistics.COLUMN_USER ] + \
-                    ' | ' + \
-                    row[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
-
-                if ppa_user_name in temp:
-                    continue
-
-                in_filter_list = False
-                for i, row in enumerate( filter_model ):
-                    if ppa_user_name in row[ IndicatorPPADownloadStatistics.COLUMN_USER ]:
-                        in_filter_list = True
-                        break
-
-                if not in_filter_list:
-                    ppa_users_names.append_text( ppa_user_name )
-                    temp.append( ppa_user_name )
-
-        else:
-            #TODO Why can I use the row_number rather than filter_treeiter?
-            ppa_users_names.append_text(
-                filter_model[ filter_treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] + \
-                ' | ' + \
-                filter_model[ filter_treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] )
-
-        ppa_users_names.set_hexpand( True )
-        ppa_users_names.set_active( 0 )
-
-        grid.attach( ppa_users_names, 1, 0, 1, 1 )
-
-        label = Gtk.Label.new( _( "Filter Text" ) )
-        label.set_halign( Gtk.Align.START )
-        grid.attach( label, 0, 1, 2, 1 )
-
-        textview = \
-            self.create_textview(
-                text =
-                    filter_model[ filter_treeiter ][ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ]
-                    if row_number else "",
-                tooltip_text = _(
-                    "Each line of text is a single\n" +
-                    "filter which is compared against\n" +
-                    "each package during download.\n\n" +
-                    "If a package name contains ANY\n" +
-                    "part of ANY filter, that package\n" +
-                    "is included in the download\n" +
-                    "statistics.\n\n" +
-                    "Regular expressions and wild\n" +
-                    "cards are not accepted!" ) )
-
-        grid.attach(
-            self.create_box(
-                (
-                    ( Gtk.Label.new( "\n\n\n\n\n" ), False ), # Padding to ensure the textview for the message text is not too small.
-                    ( self.create_scrolledwindow( textview ), True ) ) ),
-                     0, 3, 2, 1 )
-
-        title = _( "Edit Filter" )
-        if row_number is None:
-            title = _( "Add Filter" )
-
-        dialog = \
-            self.create_dialog(
-                filter_treeview,
-                title,
-                content_widget = grid )
-
-        while True:
-            dialog.show_all()
-            if dialog.run() == Gtk.ResponseType.OK:
-                buffer = textview.get_buffer()
-                filter_text = \
-                    buffer.get_text(
-                        buffer.get_start_iter(),
-                        buffer.get_end_iter(),
-                        False )
-
-                filter_text = "\n".join( filter_text.split() )
-                if len( filter_text ) == 0:
-                    self.show_dialog_ok(
-                        dialog,
-                        _( "Please enter filter text!" ) )
-
-                    continue
-
-                # Update the model...
-                if row_number:
-                    # This is an edit...remove the old value and
-                    # append new value.
-                    filter_model.remove( filter_treeiter )
-
-                filter_model.append( [
-                    ppa_users_names.get_active_text(),
-                    filter_text ] )
 
             break
 
