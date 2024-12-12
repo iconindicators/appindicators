@@ -925,13 +925,13 @@ class IndicatorBase( ABC ):
 
     def is_clipboard_supported( self ):
         '''
-        On Ubuntu 20.04 when calling wl-copy/wl-paste under Wayland,
-        due to a bug in GNOME, the destkop session crashes:
+        On Ubuntu 20.04 when calling wl-copy/wl-paste under Wayland, due to a
+        bug in GNOME, the destkop session crashes:
 
-        https://gitlab.gnome.org/GNOME/mutter/-/issues/1690
+            https://gitlab.gnome.org/GNOME/mutter/-/issues/1690
 
-        Unfortunately this issue never got fixed for the version of
-        GNOME used in Ubuntu 20.04.
+        Unfortunately this issue never got fixed for the version of GNOME used
+        in Ubuntu 20.04.
         '''
         clipboard_supported = True
         if self.is_session_type_wayland():
