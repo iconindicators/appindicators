@@ -356,20 +356,21 @@ class IndicatorFortune( IndicatorBase ):
         radio_middle_mouse_click_new_fortune = \
             self.create_radiobutton(
                 None,
-                tooltip_text = _( "Show a new fortune" ),
+                _( "Show a new fortune" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = \
                     self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
 
         grid.attach( radio_middle_mouse_click_new_fortune, 0, 4, 1, 1 )
 
-        tooltip_text = _( "Copy current fortune to clipboard" )
-        if self.is_clipboard_supported():
-            tooltip_text += _( "\n\nUnsupported on Ubuntun 20.04 on Wayland." )
+        tooltip_text = ""
+        if not self.is_clipboard_supported():
+            tooltip_text += _( "Unsupported on Ubuntun 20.04 on Wayland." )
 
         radio_middle_mouse_click_copy_last_fortune = \
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,
+                _( "Copy current fortune to clipboard" ),
                 tooltip_text = tooltip_text,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = \
@@ -380,7 +381,7 @@ class IndicatorFortune( IndicatorBase ):
         radio_middle_mouse_click_show_last_fortune = \
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,
-                tooltip_text = _( "Show current fortune" ),
+                _( "Show current fortune" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = \
                     self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
