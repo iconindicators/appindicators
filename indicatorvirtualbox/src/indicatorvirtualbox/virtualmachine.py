@@ -35,7 +35,6 @@ class VirtualMachine():
         return self.uuid
 
 
-#TODO Check this works.
     def __str__( self ):
         return self.get_name() + " | " + self.get_uuid()
 
@@ -52,7 +51,9 @@ class VirtualMachine():
 
 
 class Group():
-    ''' Information about a group of one or more virtual machines. '''
+    '''
+    A group contains one or more groups and/or one or more virtual machines.
+    '''
 
     def __init__( self, name ):
         self.name = name
@@ -75,7 +76,7 @@ class Group():
     def __str__( self ):
         return (
             self.get_name() + ": " +
-            ' | '.join( [ str( x.get_name() ) for x in self.get_items() ] ) )
+            ' | '.join( [ x.get_name() for x in self.get_items() ] ) )
 
 
     def __repr__( self ):

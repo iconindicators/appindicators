@@ -31,6 +31,11 @@ from indicatorbase import IndicatorBase
 
 from ppa import PPA, PublishedBinary
 
+
+#TODO ppas user/name are lower case but how does that work with
+# non English say Chinese?
+
+
 #TODO Look at
 #    https://launchpad.net/~mirabilos/+archive/ubuntu/jdk/+packages
 # There are 12 source packages and 100 binary packages.
@@ -142,7 +147,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def update( self, menu ):
         self.download_ppa_statistics()
 
-        PPA.sort( self.ppas ) #TODO Check this does what it appears to do...
+        # PPA.sort( self.ppas ) #TODO Check this does what it appears to do...
 
         if self.sort_by_download:
             for ppa in self.ppas:
@@ -467,18 +472,45 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         ppa_store = Gtk.ListStore( str, str, str )
 
         for ppa in self.ppas:
-            print( ppa )
-            print( '\n'.join( ppa.get_filters() ) )
-            print()
-            
             ppa_store.append( [
                 ppa.get_user(),
                 ppa.get_name(),
                 '\n'.join( ppa.get_filters() ) ] )
 
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+
+
+#TODO When a ppa is added/edited/removed,
+# would be nice to re-sort and select the added/edited row
+# or first row on deletion.
+#
+# What about things like fortune when a new directory/file is added
+# or removed?  Is that treeview sorted?
+# Where else may this occur?
+# fortune
+# onthisday
+# scriptrunner
+#
+# https://stackoverflow.com/questions/18954160/sort-a-column-in-a-treeview-by-default-or-programmatically
+# https://stackoverflow.com/questions/18234513/python-sort-a-gtk-treeview
+#
+# scriptrunner does a select after add/edit/remove (I think)
+# by passing in the treeview to the add/edit/remove and select the sensible row.
+# Maybe this functionality can be made generic?
+
         ppa_treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
-                ppa_store,
+                # Gtk.TreeModelSort( model = ppa_store ),
+                ppa_store,#TODO Not sure if this stays/goes...
                 (
                     _( "User" ),
                     _( "Name" ),
@@ -487,9 +519,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ( Gtk.CellRendererText(), "text", IndicatorPPADownloadStatistics.COLUMN_USER ),
                     ( Gtk.CellRendererText(), "text", IndicatorPPADownloadStatistics.COLUMN_NAME ),
                     ( Gtk.CellRendererText(), "text", IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ) ),
+                default_sort_func = self.__ppa_sort,
+#TODO Don't think sortcolumnviewids_... is needed here...
+                # sortcolumnviewids_columnmodelids = (
+                #     ( IndicatorPPADownloadStatistics.COLUMN_USER, IndicatorPPADownloadStatistics.COLUMN_USER ), ),
+                # sortcolumnviewids_columnmodelids = (
+                #     ( IndicatorPPADownloadStatistics.COLUMN_USER, IndicatorPPADownloadStatistics.COLUMN_USER ),
+                #     ( IndicatorPPADownloadStatistics.COLUMN_NAME, IndicatorPPADownloadStatistics.COLUMN_NAME ) ),
                 tooltip_text = _( "Double click to edit a PPA." ),
                 rowactivatedfunctionandarguments = (
                     self.on_ppa_double_click, ) )
+
+#TODO Testing
+        if len( ppa_treeview.get_model() ):
+            treepath_to_select_first_ppa = Gtk.TreePath.new_from_string( "10" )
+            ppa_treeview.get_selection().select_path( treepath_to_select_first_ppa )
+            # ppa_treeview.set_cursor( treepath_to_select_first_ppa, None, False )
+            ppa_treeview.scroll_to_cell( treepath_to_select_first_ppa )
+
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
@@ -593,8 +640,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 self.ppas.append(
                     PPA(
                         ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ],
-                        ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ],
-                        ppa[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ].split() ) ) #TODO Check the filter text is correctly saved, etc.
+                        ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
+
+                self.ppas[ -1 ].set_filters(
+                    ppa[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ].split( '\n' ) )
 
                 treeiter = ppa_store.iter_next( treeiter )
 
@@ -606,22 +655,78 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return response_type
 
 
-    def on_ppa_remove( self, button, treeview ):
-        model, treeiter = treeview.get_selection().get_selected()
-        if treeiter is None:
-            self.show_dialog_ok(
-                treeview,
-                _( "No PPA has been selected for removal." ) )
+    def __ppa_sort( self, model, row1, row2, user_data ):
+        '''
+        Sort the rows of the ppa store, first by ppa user, then by ppa name.
+        '''
+        user1 = \
+            locale.strxfrm(
+                model.get_value(
+                    row1, IndicatorPPADownloadStatistics.COLUMN_USER ) )
+
+        name1 = \
+            locale.strxfrm(
+                model.get_value(
+                    row1, IndicatorPPADownloadStatistics.COLUMN_NAME ) )
+
+        user2 = \
+            locale.strxfrm(
+                model.get_value(
+                    row2, IndicatorPPADownloadStatistics.COLUMN_USER ) )
+
+        name2 = \
+            locale.strxfrm(
+                model.get_value(
+                    row2, IndicatorPPADownloadStatistics.COLUMN_NAME ) )
+
+        if user1 < user2:
+            sort_value = -1
+
+        elif user1 > user2:
+            sort_value = 1
 
         else:
-            response = \
-                self.show_dialog_ok_cancel(
+            if name1 < name2:
+                sort_value = -1
+
+            elif name1 > name2:
+                sort_value = 1
+
+            else:
+                sort_value = 0
+
+        return sort_value
+
+
+    def on_ppa_remove( self, button, treeview ):
+        model, treeiter = treeview.get_selection().get_selected()
+        if len( model ):
+            if treeiter is None:
+                self.show_dialog_ok(
                     treeview,
-                    _( "Remove the selected PPA?" ) )
+                    _( "No PPA has been selected for removal." ) )
+                #TODO Perhaps rather than have this message/check.
+                # always select the first item?
+                # Or disable the remove button...but then have to enable it...
+                #
+                # If always select an item (on init or after an add)
+                # then don't need to check that no PPA is selected.
+                # But still should disable the remove button on an empty list of ppas
+                # and then enable after an add.
 
-            if response == Gtk.ResponseType.OK:
-                model.remove( treeiter )
+            else:
+                response = \
+                    self.show_dialog_ok_cancel(
+                        treeview,
+                        _( "Remove the selected PPA?" ) )
+            
+                if response == Gtk.ResponseType.OK:
+                    model.remove( treeiter )
+                    #TODO Want to select first if not empty?  Or try to just scroll to top?
+                    # What happens with a long
 
+        else:
+            print( "emtpy")
 
     def on_ppa_add( self, button, treeview ):
         self.on_ppa_double_click( treeview, None, None )
@@ -779,7 +884,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                             continue
 
                 filter_text = self.get_textview_text( textview ).split( '\n' )
-                filter_text = [ f for f in filter_text if f ] # Remove blanks.
+                filter_text = [ f for f in filter_text if f ] # Remove blank lines.
                 duplicate_filter_text = (
                     len( filter_text )
                     >
@@ -791,6 +896,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         _( "Duplicates in filter text disallowed!" ) )
 
                     continue
+
+#TODO What about blanks within a filter text:  "a filter"?                
 
                 if not adding_ppa:
                     model.remove( treeiter )
@@ -825,11 +932,17 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                             ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ],
                             ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
 
+                    self.ppas[ -1 ].set_filters(
+                        ppa[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] )
+
             if ppas and len( ppas[ 0 ] ) == 4:
-                # In version 81, PPAs changed from containing
+                # Handle legacy data format. In version 81, PPAs changed from
                 #   user / name / series / architecture
                 # to
                 #   user / name / filter
+                # and filters which had the format 
+                #   user / name / series / architecture / filter text
+                # no longer exist.
                 for ppa in ppas:
                     user = ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ]
                     name = ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
@@ -851,14 +964,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                     for ppa in self.ppas:
                         if ppa.get_name() == name and ppa.get_user() == user:
-                            if len( ppa.get_filters()[ 0 ] ) == 0:
-                                new_filter_text = filter_text
+                            if ppa.has_default_filter():
+                                ppa.set_filters( filter_text )
 
                             else:
-                                new_filter_text = \
-                                    list( set( filter_text + ppa.get_filters() ) )
+                                ppa.set_filters(
+                                    list( set( filter_text + ppa.get_filters() ) ) )
 
-                            ppa.set_filters( new_filter_text )
                             break
 
         else:
@@ -869,9 +981,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
 # https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
 
-            user = "thebernmeister"
-            name = "ppa"
-            filter_text = [
+            self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
+            self.ppas[ 0 ].set_filters( [
                 "indicator-fortune",
                 "indicator-lunar",
                 "indicator-on-this-day",
@@ -880,9 +991,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 "indicator-script-runner",
                 "indicator-stardate",
                 "indicator-tide",
-                "indicator-virtual-box" ]
-
-            self.ppas = [ PPA( user, name ) ]
+                "indicator-virtual-box" ] )
 
 
     def save_config( self ):

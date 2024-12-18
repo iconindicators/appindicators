@@ -42,7 +42,8 @@ from script import Background, NonBackground
 class IndicatorScriptRunner( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator; used by build_wheel.py when building the .desktop file.
+    # Unused within the indicator;
+    # used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Script Runner" )
     indicator_categories = "Categories=Utility"
 
@@ -324,6 +325,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                 tooltip_text = _( "The terminal script/command, along with any arguments." ),
                 editable = False )
 
+        # For each script, show the...
+        #   Group
+        #   Name (of script)
+        #   TODO Finish...
         treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str )
 
         treestore_background_scripts_filter = treestore.filter_new()
@@ -526,11 +531,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
-        # Workaround for odd focus behaviour; in the Preferences dialog, when
-        # switching tabs, the TextEntry on the third tab would have the focus and
-        # highlight the text.  If the user hits the space bar (or any regular key),
-        # the text would be overwritten.
-        # Refer to:
+        # Workaround for odd focus behaviour; in the Preferences dialog,
+        # when switching tabs, the TextEntry on the third tab would have
+        # the focus and highlight the text. 
+        # If the user hits the space bar (or any regular key), the text would
+        # be overwritten.  Refer to:
         #    https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
         #    https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
         notebook.connect( "switch-page", lambda notebook, page, page_number: notebook.grab_focus() )
@@ -604,10 +609,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         scripts,
         select_group,
         select_script ):
-        '''
-        For when migrating to GTK4...
-        https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159/2
-        '''
+
         treestore = treeview_all_scripts.get_model()
         treestore.clear()
 
@@ -618,7 +620,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             parent = treestore.append( None, row )
             for script in sorted( scripts_by_group[ group ], key = lambda script: script.get_name().lower() ):
                 row = [
-                   None, # Don't add in the group name here as it will be displayed.
+                   None, # Don't add in the group name as it will be displayed.
                    script.get_name(),
                    '✔' if script.get_play_sound() else None,
                    '✔' if script.get_show_notification() else None,

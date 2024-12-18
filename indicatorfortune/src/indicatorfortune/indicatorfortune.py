@@ -34,7 +34,8 @@ from indicatorbase import IndicatorBase
 class IndicatorFortune( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator; used by build_wheel.py when building the .desktop file.
+    # Unused within the indicator;
+    # used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Fortune" )
     indicator_categories = "Categories=Utility;Amusement"
 
@@ -247,7 +248,11 @@ class IndicatorFortune( IndicatorBase ):
         # Fortune file.
         grid = self.create_grid()
 
-        store = Gtk.ListStore( str, str ) # Path to fortune; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
+        # For each fortune, show the...
+        #   Path to fortune
+        #   Gtk.STOCK_APPLY or Gtk.STOCK_DIALOG_ERROR or None
+#TODO Change from stockapply to text (don't use pixbuf)        
+        store = Gtk.ListStore( str, str )
         for location, enabled in self.fortunes:
             if Path( location ).is_file() or Path( location ).is_dir():
                 store.append( [ location, Gtk.STOCK_APPLY if enabled else None ] )
@@ -445,6 +450,11 @@ class IndicatorFortune( IndicatorBase ):
             self.show_dialog_ok( treeview, _( "No fortune has been selected for removal." ) )
 
         else:
+#TODO Check this...should it be treeiter or converted iter?
+# I suspect this should really be converted iter.            
+#...or perhaps not.  What is selected is the sorted model which is displayed...
+# which is correct.
+# But to update the underlying data, need the underlying model and then do a convert of treeiter.
             selected_fortune_path = \
                 model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ]
 

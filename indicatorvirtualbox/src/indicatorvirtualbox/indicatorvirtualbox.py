@@ -20,6 +20,7 @@
 
 
 import datetime
+import locale
 import time
 
 import gi
@@ -38,7 +39,8 @@ from virtualmachine import Group, VirtualMachine
 class IndicatorVirtualBox( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator; used by build_wheel.py when building the .desktop file.
+    # Unused within the indicator;
+    # used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator VirtualBox™" )
     indicator_categories = "Categories=Utility"
 
@@ -80,31 +82,34 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def update( self, menu ):
-        if self.auto_start_required: # Start VMs here so that the indicator icon is displayed immediately.
-            self.auto_start_required = False
-            if self.is_vbox_manage_installed():
-                self.auto_start_virtual_machines()
+        virtual_machines = [ ]
+        vbox_manage_installed = self.is_vbox_manage_installed()
+        if vbox_manage_installed:
+            virtual_machines = self.get_virtual_machines()
 
-        self.build_menu( menu )
+            # Autostart VMs here rather than in __init__ ensures the indicator
+            # icon/menu is displayed without delay.
+            if self.auto_start_required:
+                self.auto_start_required = False
+                self.auto_start_virtual_machines( virtual_machines )
+
+        self.build_menu( menu, vbox_manage_installed, virtual_machines )
 
         return int( 60 * self.refresh_interval_in_minutes )
 
 
-    def build_menu( self, menu ):
-        if self.is_vbox_manage_installed():
-            virtual_machines = self.get_virtual_machines()
+    def build_menu( self, menu, vbox_manage_installed, virtual_machines ):
+        if vbox_manage_installed:
             if virtual_machines:
-                running_names, running_uuids = self.get_running_virtual_machines()
+                running_names, running_uuids = \
+                    self.get_running_virtual_machines()
 
                 self._build_menu(
-                    menu, self.get_virtual_machines(),
+                    menu, virtual_machines,
                     ( 0, 0 ),
                     running_uuids )
 
-            else:
-                menu.append( Gtk.MenuItem.new_with_label( _( "(no virtual machines exist)" ) ) )
-
-            menu.append( Gtk.SeparatorMenuItem() )
+                menu.append( Gtk.SeparatorMenuItem() )
 
             self.create_and_append_menuitem(
                 menu,
@@ -120,17 +125,20 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def _build_menu( self, menu, items, indent, running_uuids ):
-        if self.sort_groups_and_virtual_machines_equally:
+        if not self.sort_groups_and_virtual_machines_equally:
+            
             sorted_items = \
                 sorted(
                     items,
-                    key = lambda x: ( x.get_name().lower() ) )
+                    key = lambda x: locale.strxfrm( x.get_name() ) )
 
         else:
             sorted_items = \
                 sorted(
                     items,
-                    key = lambda x: ( not isinstance( x, Group ), x.get_name().lower() ) ) # Checking if an item is a group results in True (1) or False (0).
+                    key = lambda x: (
+                        not isinstance( x, Group ),
+                        locale.strxfrm( x.get_name() ) ) )
 
         for item in sorted_items:
             if isinstance( item, Group ):
@@ -184,18 +192,20 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         else:
             self.start_virtual_machine( virtual_machine.get_uuid() )
-            self.request_update( delay = 10 ) # Delay the refresh as the VM will have been started in the background and VBoxManage will not have had time to update.
+            # Delay the refresh as the VM will have been started in the
+            # background and VBoxManage will not have had time to update.
+            self.request_update( delay = 10 )
 
 
-    def auto_start_virtual_machines( self ):
-        virtual_machines_for_autostart = [ ]
-        self._get_virtual_machines_for_autostart(
-            self.get_virtual_machines(),
-            virtual_machines_for_autostart )
+    def auto_start_virtual_machines( self, virtual_machines ):
+        virtual_machines_for_autostart = \
+            self._get_virtual_machines_for_autostart( virtual_machines )
 
+        # Start up each virtual machine and only insert the time delay if the
+        # machine was not already running.
         previous_virtual_machine_was_already_running = True
-        while len( virtual_machines_for_autostart ) > 0: # Start up each virtual machine and only insert the time delay if a machine was not already running.
-            virtual_machine = virtual_machines_for_autostart.pop()
+        need_one_last_sleep = False
+        for virtual_machine in virtual_machines_for_autostart:
             if self.is_virtual_machine_running( virtual_machine.get_uuid() ):
                 self.bring_window_to_front( virtual_machine.get_name() )
                 previous_virtual_machine_was_already_running = True
@@ -206,22 +216,25 @@ class IndicatorVirtualBox( IndicatorBase ):
 
                 self.start_virtual_machine( virtual_machine.get_uuid() )
                 previous_virtual_machine_was_already_running = False
+                need_one_last_sleep = True
+
+        if need_one_last_sleep:
+            # Small delay so that the running status of the last VM to start is
+            # captured (and displayed correctly in the subsequent menu build).
+            time.sleep( 10 )
 
 
-    def _get_virtual_machines_for_autostart(
-            self,
-            virtual_machines,
-            virtual_machines_for_autostart ):
-
+    def _get_virtual_machines_for_autostart( self, virtual_machines ):
+        virtual_machines_for_autostart = [ ]
         for item in virtual_machines:
             if isinstance( item, Group ):
-                self._get_virtual_machines_for_autostart(
-                    item.get_items(),
-                    virtual_machines_for_autostart )
+                self._get_virtual_machines_for_autostart( item.get_items() )
 
             else:
                 if self.is_autostart( item.get_uuid() ):
                     virtual_machines_for_autostart.append( item )
+
+        return virtual_machines_for_autostart
 
 
     def start_virtual_machine( self, uuid ):
@@ -417,8 +430,14 @@ class IndicatorVirtualBox( IndicatorBase ):
     def on_preferences( self, dialog ):
         notebook = Gtk.Notebook()
 
-        # List of groups and virtual machines.
-        treestore = Gtk.TreeStore( str, str, str, str ) # Group or virtual machine name, autostart, start command, UUID.
+#TODO Rewrite comment as per what is in fortune/onthisday/ppa
+#TODO Change stock_apply to text (pixbuf to text).  Can the tick be made bold?
+        # List of groups and virtual machines...
+        #   Group name or virtual machine name
+        #   Autostart
+        #   Start command
+        #   UUID
+        treestore = Gtk.TreeStore( str, str, str, str )
 
         items = [ ]
         if self.is_vbox_manage_installed():
@@ -555,10 +574,18 @@ class IndicatorVirtualBox( IndicatorBase ):
     def _add_items_to_store( self, treestore, parent, items ):
         groups_exist = False
         if self.sort_groups_and_virtual_machines_equally:
-            sorted_items = sorted( items, key = lambda x: ( x.get_name().lower() ) )
+            sorted_items = \
+                sorted(
+                    items,
+                    key = lambda x: locale.strxfrm( x.get_name() ) )
 
         else:
-            sorted_items = sorted( items, key = lambda x: ( not isinstance( x, Group ), x.get_name().lower() ) ) # Checking if an item is a group results in True (1) or False (0).
+            sorted_items = \
+                sorted(
+                    items,
+                    key = lambda x: (
+                        not isinstance( x, Group ),
+                        locale.strxfrm( x.get_name() ) ) )
 
         for item in sorted_items:
             if isinstance( item, Group ):

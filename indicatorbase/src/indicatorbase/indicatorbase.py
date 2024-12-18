@@ -1607,6 +1607,7 @@ class IndicatorBase( ABC ):
         titles,
         renderers_attributes_columnmodelids,
         alignments_columnviewids = None,
+        default_sort_func = None,
         sortcolumnviewids_columnmodelids = None,
         celldatafunctionandarguments_renderers_columnviewids = None,
         clickablecolumnviewids_functionsandarguments = None,
@@ -1631,6 +1632,9 @@ class IndicatorBase( ABC ):
 
         alignments_columnviewids:
             Tuple of tuples, each contains the xalign and view column id.
+
+        default_sort_func:
+            Name of a comparison function to sort rows.
 
         sortcolumnviewids_columnmodelids:
             Tuple of tuples, each of which contains the view column id and
@@ -1695,16 +1699,47 @@ class IndicatorBase( ABC ):
 
             treeview.append_column( treeviewcolumn )
 
+        if default_sort_func:
+            treemodel.set_default_sort_func( default_sort_func, None ) 
+            treemodel.set_sort_column_id(
+                Gtk.TREE_SORTABLE_DEFAULT_SORT_COLUMN_ID,
+                Gtk.SortType.ASCENDING )
+
+#TODO Need to look at sorting again...
+# Not sure what the difference is between 
+#    treeviewcolumn.set_sort_column_id
+# and
+#    treemodel.set_sort_column_id
+#...and how does it relate or not to clickable column view ids below?
+# https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html
+# https://lazka.github.io/pgi-docs/index.html#Gtk-4.0/classes/TreeSortable.html#Gtk.TreeSortable.set_sort_column_id
+# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeViewColumn.html#Gtk.TreeViewColumn.set_sort_column_id
+# https://stackoverflow.com/questions/18954160/sort-a-column-in-a-treeview-by-default-or-programmatically
+# https://stackoverflow.com/questions/55167884/python-gtk-3-sorting-a-treeview-by-clicking-on-column
+# https://stackoverflow.com/questions/53158803/gtk-tree-view-with-filter-and-sorting
+# https://stackoverflow.com/questions/18234513/python-sort-a-gtk-treeview
+# https://stackoverflow.com/questions/55167884/python-gtk-3-sorting-a-treeview-by-clicking-on-column/70108852
+        # if sortcolumnviewids_columnmodelids:
+        #     for columnviewid, columnmodelid in sortcolumnviewids_columnmodelids:
+        #         for indexcolumn, treeviewcolumn in enumerate( treeview.get_columns() ):
+        #             if columnviewid == indexcolumn:
+        #                 treeviewcolumn.set_sort_column_id( columnmodelid )
+        #                 if sortcolumnviewids_columnmodelids.index( ( columnviewid, columnmodelid ) ) == 0:
+        #                     # Set first sorted column as default ascending.
+        #                     treemodel.set_sort_column_id(
+        #                         columnmodelid,
+        #                         Gtk.SortType.ASCENDING )
         if sortcolumnviewids_columnmodelids:
             for columnviewid, columnmodelid in sortcolumnviewids_columnmodelids:
                 for indexcolumn, treeviewcolumn in enumerate( treeview.get_columns() ):
                     if columnviewid == indexcolumn:
-                        treeviewcolumn.set_sort_column_id( columnmodelid )
-                        if sortcolumnviewids_columnmodelids.index( ( columnviewid, columnmodelid ) ) == 0:
-                            # Set first sorted column as default ascending.
-                            treemodel.set_sort_column_id(
-                                columnmodelid,
-                                Gtk.SortType.ASCENDING )
+                        pass
+                        # treeviewcolumn.set_sort_column_id( columnmodelid )
+                        # if sortcolumnviewids_columnmodelids.index( ( columnviewid, columnmodelid ) ) == 0:
+                        #     # Set first sorted column as default ascending.
+                        #     treemodel.set_sort_column_id(
+                        #         columnmodelid,
+                        #         Gtk.SortType.ASCENDING )
 
         if celldatafunctionandarguments_renderers_columnviewids:
             for data_function_and_arguments, renderer, columnviewid in celldatafunctionandarguments_renderers_columnviewids:
@@ -1738,6 +1773,7 @@ class IndicatorBase( ABC ):
         scrolledwindow = Gtk.ScrolledWindow()
         scrolledwindow.set_policy( Gtk.PolicyType.NEVER, Gtk.PolicyType.AUTOMATIC )
         scrolledwindow.add( treeview )
+
         return treeview, scrolledwindow
 
 

@@ -97,6 +97,8 @@ class PPA():
 
     def __init__( self, user, name ):
         '''
+        Creates a PPA with a default single filter [ "" ].
+
         User (string)
         Name (string)
         '''
@@ -127,14 +129,26 @@ class PPA():
 
     def get_filters( self ):
         '''
-        Returns a list of strings, each of which is a filter.
-        When no filters have been added, the list contains a single empty string.
+        Returns the list of filter strings.
         '''
         return self.filters
 
 
+#TODO Not sure if to allow whitespace or not...
+# Seems to make no difference when hitting the url with binary_name=fortune versus binary_name=for tune  
     def set_filters( self, filters ):
+        '''
+        Set a list of one or more filter strings.
+        Each filter string must be plain text without whitespace.
+        '''
         self.filters = filters
+
+
+    def has_default_filter( self ):
+        '''
+        Returns True if only the default filter of [ "" ] exists.
+        '''
+        return len( self.filters ) == 1 and self.filters[ 0 ] == ''
 
 
     def get_descriptor( self ):

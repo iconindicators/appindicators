@@ -64,7 +64,8 @@ from event import Event
 class IndicatorOnThisDay( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator; used by build_wheel.py when building the .desktop file.
+    # Unused within the indicator;
+    # used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator On This Day" )
     indicator_categories = "Categories=Utility;Amusement"
 
@@ -245,7 +246,11 @@ class IndicatorOnThisDay( IndicatorBase ):
         # Calendar file settings.
         grid = self.create_grid()
 
-        store = Gtk.ListStore( str, str ) # Path to calendar file; tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
+        # For each calendar, show the...
+        #   Path to calendar file
+        #   Gtk.STOCK_APPLY or Gtk.STOCK_DIALOG_ERROR or None
+#TODO Change from stockapply to text (don't use pixbuf)        
+        store = Gtk.ListStore( str, str )
         for calendar in self.get_calendars():
             if calendar not in self.calendars:
                 store.append( [ calendar, None ] )

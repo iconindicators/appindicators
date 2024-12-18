@@ -33,7 +33,8 @@ from indicatorbase import IndicatorBase
 class IndicatorPunycode( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator; used by build_wheel.py when building the .desktop file.
+    # Unused within the indicator;
+    # used by build_wheel.py when building the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Punycode" )
     indicator_categories = "Categories=Utility"
 
