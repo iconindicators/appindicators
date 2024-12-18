@@ -39,7 +39,7 @@ from ppa import PPA, PublishedBinary
 #TODO Look at
 #    https://launchpad.net/~mirabilos/+archive/ubuntu/jdk/+packages
 # There are 12 source packages and 100 binary packages.
-# What are we downloading...the source or binary or what...find out! 
+# What are we downloading...the source or binary or what...find out!
 
 
 #TODO Consider putting in a check/limit for published binaries
@@ -477,6 +477,17 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa.get_name(),
                 '\n'.join( ppa.get_filters() ) ] )
 
+#TODO Testing
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
+        ppa_store.append( [ "zzz", "zzz", "" ] )
         ppa_store.append( [ "zzz", "zzz", "" ] )
         ppa_store.append( [ "zzz", "zzz", "" ] )
         ppa_store.append( [ "zzz", "zzz", "" ] )
@@ -530,14 +541,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 rowactivatedfunctionandarguments = (
                     self.on_ppa_double_click, ) )
 
-#TODO Testing
-        if len( ppa_treeview.get_model() ):
-            treepath_to_select_first_ppa = Gtk.TreePath.new_from_string( "10" )
-            ppa_treeview.get_selection().select_path( treepath_to_select_first_ppa )
-            # ppa_treeview.set_cursor( treepath_to_select_first_ppa, None, False )
-            ppa_treeview.scroll_to_cell( treepath_to_select_first_ppa )
-
-
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
         grid.attach(
@@ -552,6 +555,16 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ( self.on_ppa_add, ppa_treeview ),
                     ( self.on_ppa_remove, ppa_treeview ) ) ),
             0, 1, 1, 1 )
+
+        if len( ppa_treeview.get_model() ):
+            treepath_to_select_first_ppa = Gtk.TreePath.new_from_string( "0" )
+            ppa_treeview.get_selection().select_path( treepath_to_select_first_ppa )
+            ppa_treeview.scroll_to_cell(
+                path = treepath_to_select_first_ppa,
+                use_align = False )
+
+        else:
+            grid.get_children()[ 0 ].get_children()[ 1 ].set_sensitive( False )
 
         notebook.append_page( grid, Gtk.Label.new( _( "PPAs" ) ) )
 
@@ -656,9 +669,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def __ppa_sort( self, model, row1, row2, user_data ):
-        '''
-        Sort the rows of the ppa store, first by ppa user, then by ppa name.
-        '''
+        ''' Sort ppas, first by user, then by name. '''
         user1 = \
             locale.strxfrm(
                 model.get_value(
@@ -719,7 +730,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     self.show_dialog_ok_cancel(
                         treeview,
                         _( "Remove the selected PPA?" ) )
-            
+
                 if response == Gtk.ResponseType.OK:
                     model.remove( treeiter )
                     #TODO Want to select first if not empty?  Or try to just scroll to top?
@@ -730,6 +741,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     def on_ppa_add( self, button, treeview ):
         self.on_ppa_double_click( treeview, None, None )
+
+        remove_button = button.get_parent().get_children()[ 1 ]
+        remove_button.set_sensitive( False )
 
 
     def on_ppa_double_click( self, treeview, row_number, treeviewcolumn ):
@@ -873,10 +887,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                             name_in_use = \
                                 model[ row ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
 
-                            if user_in_use and name_in_use:    
+                            if user_in_use and name_in_use:
                                 break
 
-                        if user_in_use and name_in_use:    
+                        if user_in_use and name_in_use:
                             self.show_dialog_ok(
                                 dialog,
                                 _( "PPA user and name already in use!" ) )
@@ -897,7 +911,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                     continue
 
-#TODO What about blanks within a filter text:  "a filter"?                
+#TODO What about blanks within a filter text:  "a filter"?
 
                 if not adding_ppa:
                     model.remove( treeiter )
@@ -940,7 +954,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 #   user / name / series / architecture
                 # to
                 #   user / name / filter
-                # and filters which had the format 
+                # and filters which had the format
                 #   user / name / series / architecture / filter text
                 # no longer exist.
                 for ppa in ppas:
