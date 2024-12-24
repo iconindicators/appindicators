@@ -16,11 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Install a Python wheel package for one or more indicators to a virtual
 environment within $HOME/.local/venv_indicators and copy across the .desktop,
 run script and icons.
-"""
+'''
 
 
 import subprocess

@@ -16,10 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Base class for downloading from a URL and loading from file,
 data for comets minor planets and satellites.
-"""
+'''
 
 
 from abc import ABC, abstractmethod

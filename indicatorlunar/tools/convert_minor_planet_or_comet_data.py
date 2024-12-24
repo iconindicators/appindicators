@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Convert:
     Minor planets from Lowell Observatory to Skyfield / XEphem format.
     Minor planets file from Minor Planet Center to XEphem format.
@@ -32,7 +32,7 @@ Formats:
     https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/astorb2edb.pl
     https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/mpcorb2edb.pl
     https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
-"""
+'''
 
 
 import argparse
@@ -295,11 +295,13 @@ def process_and_write_one_line_minorplanetcenter_comet_to_xephem(
     start_indices = [ x - 1 for x in start_indices ]
     end_indices = [ x - 1 for x in end_indices ]
 
-    fields = [ line[ i : j + 1 ] for i, j in zip( start_indices, end_indices ) ] # Inspired by https://stackoverflow.com/a/10851479/2156453
+    # Inspired by https://stackoverflow.com/a/10851479/2156453
+    fields = [ line[ i : j + 1 ] for i, j in zip( start_indices, end_indices ) ]
 
     name = fields[ 16 ].replace( '(', '' ).replace( ')', '' ).strip()
 
-    # The perl script reference refers to H, G in reverse to that specified in the comet format.
+    # The perl script reference refers to H, G in reverse to that specified in
+    # the comet format.
     h = fields[ 14 ].strip()
     g = fields[ 15 ].strip()
 

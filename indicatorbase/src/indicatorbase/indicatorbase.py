@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Base class for application indicators.
 
 References
@@ -38,7 +38,7 @@ References
     https://peps.python.org/pep-0008/
     https://docs.python-guide.org/writing/style/
     https://guicommits.com/organize-python-code-like-a-pro/
-"""
+'''
 
 
 import datetime
@@ -50,6 +50,7 @@ import logging.handlers
 import pickle
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import tempfile
@@ -61,7 +62,7 @@ from bisect import bisect_right
 from importlib import metadata
 from pathlib import Path, PosixPath
 from threading import Lock
-from urllib.error import URLError
+from urllib.error import HTTPError, URLError
 from urllib.request import urlopen
 from zipfile import ZipFile
 
@@ -154,7 +155,7 @@ class IndicatorBase( ABC ):
     SESSION_TYPE_WAYLAND = "wayland"
     SESSION_TYPE_X11 = "x11"
 
-    TIMEOUT_IN_SECONDS = 5
+    TIMEOUT_IN_SECONDS = 10
 
     # Obtain name of indicator from the call stack and initialise gettext.
     INDICATOR_NAME = None
@@ -270,7 +271,7 @@ class IndicatorBase( ABC ):
 
     def _check_for_newer_version( self ):
         url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
-        data_json = self.get_json( url )
+        data_json, error_network, error_timeout = self.get_json( url )
         if data_json:
             version_latest = data_json[ "info" ][ "version" ]
             if version_latest != str( self.version ):
@@ -281,20 +282,42 @@ class IndicatorBase( ABC ):
 
 
     def get_json( self, url ):
+        '''
+        Retrieves the JSON content from a URL.
+
+        On success, returns a tuple of the JSON and two booleans set to false.
+
+        On exception (timeout, network error) returns a tuple with None for the
+        JSON followed by two booleans, one of which will be set to True.
+        The first boolean indicates a network error and the second boolean
+        indicates a timeout.
+
+        https://stackoverflow.com/questions/72388829/request-urlopenurl-not-return-website-response-or-timeout
+        https://stackoverflow.com/questions/8763451/how-to-handle-urllibs-timeout-in-python-3
+        '''
+        error_network = False
+        error_timeout = False
         try:
-            with urlopen( url, timeout = IndicatorBase.TIMEOUT_IN_SECONDS * 2 ) as f: #TODO Maybe allow the timeout to be passed in?
+            with urlopen( url, timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) as f:
                 json_ = json.loads( f.read().decode( "utf8" ) )
 
-#TODO See TODO in ppa...
-# Might need to catch socket.timeout or timeout.socket
-# and other errors (what erro 
+        except ( HTTPError, URLError ) as e:
+            if isinstance( e.reason, socket.timeout ):
+                error_timeout = True
+            else:
+                error_network = True
 
-        except URLError as e:
             self.get_logging().error( f"Problem with { url }" )  #TODO URL is underscored...an error/warning?  What does pylint say?
             self.get_logging().exception( e )
             json_ = None
 
-        return json_
+        except socket.timeout as e:
+            error_timeout = True
+            self.get_logging().error( f"Problem with { url }" )  #TODO URL is underscored...an error/warning?  What does pylint say?
+            self.get_logging().exception( e )
+            json_ = None
+
+        return json_, error_network, error_timeout
 
 
     @staticmethod
@@ -1601,6 +1624,14 @@ class IndicatorBase( ABC ):
         widget.set_margin_left( margin_left )
 
 
+#TODO Double check sorting...
+# https://stackoverflow.com/questions/18954160/sort-a-column-in-a-treeview-by-default-or-programmatically
+# https://stackoverflow.com/questions/18234513/python-sort-a-gtk-treeview
+# https://stackoverflow.com/questions/55167884/python-gtk-3-sorting-a-treeview-by-clicking-on-column/70108852
+# https://stackoverflow.com/questions/53158803/gtk-tree-view-with-filter-and-sorting
+# https://stackoverflow.com/questions/12368059/a-sorted-and-filtered-treemodel-in-python-gtk3
+# https://stackoverflow.com/questions/9194588/how-to-programmatically-sort-treeview
+# https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html
     def create_treeview_within_scrolledwindow(
         self,
         treemodel,
@@ -1662,7 +1693,8 @@ class IndicatorBase( ABC ):
         '''
         treeview = Gtk.TreeView.new_with_model( treemodel )
 
-        for index, ( title, renderer_attribute_columnmodelid ) in enumerate( zip( titles, renderers_attributes_columnmodelids ) ):
+        z = zip( titles, renderers_attributes_columnmodelids )
+        for index, ( title, renderer_attribute_columnmodelid ) in enumerate( z ):
             treeviewcolumn = Gtk.TreeViewColumn( title )
 
             # Expand the column unless the column contains a single checkbox

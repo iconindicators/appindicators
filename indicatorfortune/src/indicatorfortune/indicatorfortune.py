@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-""" Application indicator which displays fortunes. """
+''' Application indicator which displays fortunes. '''
 
 
 import codecs
@@ -34,8 +34,7 @@ from indicatorbase import IndicatorBase
 class IndicatorFortune( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator;
-    # used by build_wheel.py when building the .desktop file.
+    # Used when building the wheel to create the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Fortune" )
     indicator_categories = "Categories=Utility;Amusement"
 
@@ -260,6 +259,7 @@ class IndicatorFortune( IndicatorBase ):
             else:
                 store.append( [ location, Gtk.STOCK_DIALOG_ERROR ] )
 
+#TODO Check sorting...is user sorting really needed?
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 Gtk.TreeModelSort( model = store ),
@@ -461,6 +461,7 @@ class IndicatorFortune( IndicatorBase ):
             default_fortune_path = \
                 IndicatorFortune.DEFAULT_FORTUNE[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ]
 
+#TODO Maybe allow the user to remove the default fortune...?  Can always just do a reset.
             if selected_fortune_path == default_fortune_path:
                 self.show_dialog_ok(
                     treeview,

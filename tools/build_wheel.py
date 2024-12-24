@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Build a Python .whl / .tar.gz for one or more indicators.
 
 To view the contents of a .whl:
@@ -24,7 +24,7 @@ To view the contents of a .whl:
 
 To view the contents of a .tar.gz:
    tar tf indicatortest-1.0.7.tar.gz
-"""
+'''
 
 
 import configparser

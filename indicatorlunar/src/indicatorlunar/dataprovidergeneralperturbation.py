@@ -16,10 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Download from URL, load from file and hold in memory,
 general perturbations for satellites.
-"""
+'''
 
 
 from sgp4 import alpha5, exporter, omm

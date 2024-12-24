@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Create a planet ephemeris for use in Skyfield which commences from
 today's date to end at the specified number of years from today.
 
@@ -43,7 +43,7 @@ Alternately to running this script, download a .bsp and
 use spkmerge to create a smaller subset:
     https://github.com/skyfielders/python-skyfield/issues/123
     https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
-"""
+'''
 
 
 import argparse

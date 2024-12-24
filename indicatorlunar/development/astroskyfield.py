@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-""" Calculate astronomical information using Skyfield. """
+''' Calculate astronomical information using Skyfield. '''
 
 
 #TODO If/when included in the release,

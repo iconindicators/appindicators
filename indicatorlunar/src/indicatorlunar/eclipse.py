@@ -16,12 +16,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Lunar/solar eclipse tables up to and including the year 2040.
 
 Eclipse Predictions by Fred Espenak, NASA/GSFC Emeritus
 https://eclipse.gsfc.nasa.gov/eclipse.html
-"""
+'''
 
 
 import datetime

@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Base class for calculating astronomical information.
 
 References:
@@ -37,7 +37,7 @@ References:
 	https://uphere.space
 	https://www.amsat.org/track
 	https://tracksat.space
-"""
+'''
 
 
 import datetime

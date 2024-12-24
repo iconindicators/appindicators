@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-""" Virtual Machine information. """
+''' Virtual Machine information. '''
 
 
 class VirtualMachine():

@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-""" Encapsulates tidal readings. """
+''' Encapsulates tidal readings. '''
 
 
 class Reading():

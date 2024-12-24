@@ -16,14 +16,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Create a README.md for an indicator.
 
 References:
     https://pygobject.gnome.org/getting_started.html
     https://stackoverflow.com/questions/70508775/error-could-not-build-wheels-for-pycairo-which-is-required-to-install-pyprojec
     https://stackoverflow.com/questions/60779139/trouble-installing-pycairo-any-suggestions-on-what-to-try-next
-"""
+'''
 
 
 import datetime

@@ -19,8 +19,7 @@
 '''
 Application indicator which displays calendar events.
 
-Neither openSUSE nor Manjaro have the 'calendar' package.
-Possible options...
+Neither openSUSE nor Manjaro have the 'calendar' package.  Possible options...
 
 1. For openSUSE/Manjaro (and any others yet to be found),
    this indicator is unsupported.
@@ -35,11 +34,11 @@ Possible options...
 
 3. Have found
       https://pypi.org/project/bsd-calendar/
-   which covers some of the original calendar program, but modifies date formats.
-   This code could be used as a basis create a standalone Python calendar module,
+   based on the original calendar program, but modifies date formats.
+   This code could be used to create a standalone Python calendar module, say
    ultimately releasing to PyPI.
-   Alternatively, incorporate some version of this implementation into the indicator,
-   along with calendar files.
+   Alternatively, incorporate some version of this implementation into the
+   indicator, along with calendar files.
 '''
 
 
@@ -64,8 +63,7 @@ from event import Event
 class IndicatorOnThisDay( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator;
-    # used by build_wheel.py when building the .desktop file.
+    # Used when building the wheel to create the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator On This Day" )
     indicator_categories = "Categories=Utility;Amusement"
 
@@ -97,36 +95,52 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         # Set next update just after midnight.
         today = datetime.now()
-        just_after_midnight = ( today + timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 5 )
+        just_after_midnight = (
+            today + timedelta( days = 1 ) ).replace(
+                hour = 0, minute = 0, second = 5 )
+
         five_seconds_after_midnight = int( ( just_after_midnight - today ).total_seconds() )
         self.request_update( delay = five_seconds_after_midnight )
 
         if self.notify:
-            # Show notifications in a thread to avoid blocking initialisation/update.
-            threading.Thread( target = self._show_notifications, args = ( events, today ) ).start()
+            # Show notifications in a thread to avoid blocking update.
+            threading.Thread(
+                target = self._show_notifications,
+                args = ( events, today ) ).start()
 
 
     def _show_notifications( self, events, today ):
-        # It is assumed/hoped the dates in the calendar result are
-        # always short date format irrespective of locale.
+        # It is assumed/hoped the dates in the calendar result are always
+        # short date format irrespective of locale.
         today_in_short_date_format = today.strftime( '%b %d' )
 
         for event in events:
             if today_in_short_date_format == event.get_date():
-                self.show_notification( _( "On this day..." ), event.get_description() )
-                time.sleep( 3 ) # Without a delay some/most of the notifications disappear too quickly.
+                self.show_notification(
+                    _( "On this day..." ),
+                    event.get_description() )
+
+                # Without a delay some/most of the notifications disappear
+                # too quickly.
+                time.sleep( 3 )
 
 
     def build_menu( self, menu, events ):
-        menu_item_maximum = self.lines - 3 # Less three to account for About, Preferences and Quit.
+        menu_item_maximum = self.lines - 3 # Account for About, Preferences and Quit.
         menu_item_count = 0
         last_date = ""
         for event in events:
             if event.get_date() != last_date:
-                if ( menu_item_count + 2 ) > menu_item_maximum: # Ensure there is room for the date menu item and an event menu item.
-                    break # Don't add the menu item for the new date and don't add a subsequent event.
+                # Ensure sufficient room for the date menu item and an event
+                # menu item.
+                if ( menu_item_count + 2 ) > menu_item_maximum:
+                    # Don't add the menu item for the new date and don't add a
+                    # subsequent event.
+                    break
 
-                event_date = self.remove_leading_zero_from_date( event.get_date() )
+                event_date = \
+                 self.remove_leading_zero_from_date( event.get_date() )
+
                 self.create_and_append_menuitem( menu, event_date )
 
                 last_date = event.get_date()
@@ -147,7 +161,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     name = name.replace( ' ', '+' )
                     activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), )
 
-                else: # The user has entered an empty URL this means "no internet search".
+                else: # The user has entered an empty URL (no internet search).
                     name = ""
                     activate_functionandarguments = None
 
@@ -181,7 +195,8 @@ class IndicatorOnThisDay( IndicatorBase ):
             if Path( calendar ).is_file():
                 content += "#include <" + calendar + ">\n"
 
-        self.write_cache_text_without_timestamp( content, IndicatorOnThisDay.CALENDARS_FILENAME )
+        self.write_cache_text_without_timestamp(
+            content, IndicatorOnThisDay.CALENDARS_FILENAME )
 
         # Run the calendar command and parse the results.
         events_sorted_by_date = [ ]
@@ -201,9 +216,14 @@ class IndicatorOnThisDay( IndicatorBase ):
                 events_sorted_by_date.append( Event( date_, description ) )
 
             else:
-                line = line.split( "\t" ) # Start of event: the month/day are separated from the event by a TAB.
+                # Start of event: month/day and event are separated by a TAB.
+                line = line.split( "\t" )
                 date_ = line[ 0 ].replace( "*", "" ).strip()
-                description = line[ -1 ].strip() # Take the last element as there may be more than one TAB character throwing out the index of the event in the line.
+
+                # Take the last element as there may be more than one TAB
+                # character throwing out the index of the event in the line.
+                description = line[ -1 ].strip()
+
                 events_sorted_by_date.append( Event( date_, description ) )
 
         # Sort events further by description.
@@ -262,6 +282,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             else:
                 store.append( [ calendar, Gtk.STOCK_DIALOG_ERROR ] )
 
+#TODO Check sorting...is user sorting really needed?
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 Gtk.TreeModelSort( model = store ),
@@ -467,6 +488,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             selected_calendar_path = \
                 model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
 
+#TODO Maybe allow the user to remove the default calendar...?  Can always just do a reset.
             if selected_calendar_path in self.get_calendars():
                 self.show_dialog_ok(
                     treeview,

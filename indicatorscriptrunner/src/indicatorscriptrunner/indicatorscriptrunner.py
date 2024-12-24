@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-""" Application indicator to run a terminal command or script from an indicator. """
+''' Application indicator to run a terminal command or script from an indicator. '''
 
 
 import concurrent.futures
@@ -42,8 +42,7 @@ from script import Background, NonBackground
 class IndicatorScriptRunner( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator;
-    # used by build_wheel.py when building the .desktop file.
+    # Used when building the wheel to create the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Script Runner" )
     indicator_categories = "Categories=Utility"
 

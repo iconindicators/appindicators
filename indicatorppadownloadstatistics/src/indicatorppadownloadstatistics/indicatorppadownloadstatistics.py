@@ -16,11 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-""" Application indicator which displays PPA download statistics. """
+''' Application indicator which displays PPA download statistics. '''
 
 
 import concurrent.futures
 import locale
+
+from threading import Lock
 
 import gi
 
@@ -32,94 +34,10 @@ from indicatorbase import IndicatorBase
 from ppa import PPA, PublishedBinary
 
 
-#TODO ppas user/name are lower case but how does that work with
-# non English say Chinese?
-
-
-#TODO Look at
-#    https://launchpad.net/~mirabilos/+archive/ubuntu/jdk/+packages
-# There are 12 source packages and 100 binary packages.
-# What are we downloading...the source or binary or what...find out!
-
-
-#TODO Consider putting in a check/limit for published binaries
-# with say 25 or more entries.
-# Will result in a request for the download count for each...
-# Suggest to user in message to use a filter.
-
-
-#TODO If a user puts in a ppa with a large number of published binaries (pages,
-# the user has no way to make a filter to reduce the result as the download will
-# take a long time and/or time out and/or crash.
-# Maybe do some sort of check and bail out after 10 pages and/or 25 downloads counts?
-
-
-#TODO Need to handle a timeout:
-#
-# thebernmeister | ppa | [ test fortune tide lunar ][]
-#     test
-#         Getting published binaries...
-#         Getting page 1
-#         Getting 0 download counts...
-#     fortune
-#         Getting published binaries...
-#         Getting page 1
-#         Getting 1 download counts...
-#     tide
-#         Getting published binaries...
-#         Getting page 1
-#         Getting 1 download counts...
-#     lunar
-#         Getting published binaries...
-#         Getting page 1
-# Traceback (most recent call last):
-#   File "/home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase/indicatorbase.py", line 591, in _update
-#     next_update_in_seconds = self.update( menu )
-#   File "/home/bernard/Programming/Indicators/indicatorppadownloadstatistics/src/indicatorppadownloadstatistics/indicatorppadownloadstatistics.py", line 92, in update
-#     self.download_ppa_statistics()
-#   File "/home/bernard/Programming/Indicators/indicatorppadownloadstatistics/src/indicatorppadownloadstatistics/indicatorppadownloadstatistics.py", line 233, in download_ppa_statistics
-#     self.__process_ppa( ppa, filter_text )
-#   File "/home/bernard/Programming/Indicators/indicatorppadownloadstatistics/src/indicatorppadownloadstatistics/indicatorppadownloadstatistics.py", line 263, in __process_ppa
-#     self.__get_published_binaries( ppa, filter_text )
-#   File "/home/bernard/Programming/Indicators/indicatorppadownloadstatistics/src/indicatorppadownloadstatistics/indicatorppadownloadstatistics.py", line 294, in __get_published_binaries
-#     published_binaries = self.get_json( url )  #TODO Test with a ppa/archive with NO published binaries....should not get an error...right?
-#   File "/home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase/indicatorbase.py", line 285, in get_json
-#     with urlopen( url, timeout = IndicatorBase.TIMEOUT_IN_SECONDS * 2 ) as f: #TODO Maybe allow the timeout to be passed in?
-#   File "/usr/lib/python3.8/urllib/request.py", line 222, in urlopen
-#     return opener.open(url, data, timeout)
-#   File "/usr/lib/python3.8/urllib/request.py", line 525, in open
-#     response = self._open(req, data)
-#   File "/usr/lib/python3.8/urllib/request.py", line 542, in _open
-#     result = self._call_chain(self.handle_open, protocol, protocol +
-#   File "/usr/lib/python3.8/urllib/request.py", line 502, in _call_chain
-#     result = func(*args)
-#   File "/usr/lib/python3.8/urllib/request.py", line 1397, in https_open
-#     return self.do_open(http.client.HTTPSConnection, req,
-#   File "/usr/lib/python3.8/urllib/request.py", line 1358, in do_open
-#     r = h.getresponse()
-#   File "/usr/lib/python3.8/http/client.py", line 1348, in getresponse
-#     response.begin()
-#   File "/usr/lib/python3.8/http/client.py", line 316, in begin
-#     version, status, reason = self._read_status()
-#   File "/usr/lib/python3.8/http/client.py", line 277, in _read_status
-#     line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
-#   File "/usr/lib/python3.8/socket.py", line 669, in readinto
-#     return self._sock.recv_into(b)
-#   File "/usr/lib/python3.8/ssl.py", line 1270, in recv_into
-#     return self.read(nbytes, buffer)
-#   File "/usr/lib/python3.8/ssl.py", line 1128, in read
-#     return self._sslobj.read(len, buffer)
-# socket.timeout: The read operation timed out
-#
-# https://stackoverflow.com/questions/72388829/request-urlopenurl-not-return-website-response-or-timeout
-# https://stackoverflow.com/questions/8763451/how-to-handle-urllibs-timeout-in-python-3
-
-
 class IndicatorPPADownloadStatistics( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator; used by build_wheel.py when building
-    # the .desktop file.
+    # Used when building the wheel to create the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator PPA Download Statistics" )
     indicator_categories = "Categories=Utility"
 
@@ -134,7 +52,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     COLUMN_NAME = 1
     COLUMN_FILTER_TEXT = 2
 
-    MESSAGE_ERROR_RETRIEVING_PPA = _( "(error retrieving PPA)" )
+    MESSAGE_ERROR_NETWORK = _( "(network error)" ) #TODO Mention see tooltip in preferences and/or log?
+    MESSAGE_ERROR_OTHER = _( "(other error)" ) #TODO Mention see tooltip in preferences and/or log?
+    MESSAGE_ERROR_TIMEOUT = _( "(timeout error)" ) #TODO Mention see tooltip in preferences and/or log?
     MESSAGE_FILTERED = _( "(published binaries completely filtered)" )
     MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
 
@@ -160,7 +80,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         else:
             self.__build_menu( menu )
 
-        return 6 * 60 * 60 # Update every six hours.
+        return 12 * 60 * 60 # Update (at least) every twelve hours.
 
 
     def __build_submenu( self, menu ):
@@ -227,8 +147,14 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def __get_status_message( self, ppa ):
-        if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
-            message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_RETRIEVING_PPA
+        if ppa.get_status() == PPA.Status.ERROR_NETWORK:
+            message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_NETWORK
+
+        elif ppa.get_status() == PPA.Status.ERROR_OTHER:
+            message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_OTHER
+
+        elif ppa.get_status() == PPA.Status.ERROR_TIMEOUT:
+            message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_TIMEOUT
 
         elif ppa.get_status() == PPA.Status.NO_PUBLISHED_BINARIES:
             message = IndicatorPPADownloadStatistics.MESSAGE_NO_PUBLISHED_BINARIES
@@ -266,11 +192,25 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             print( f"{ ppa }" )#TODO Testing
             for filter_text in ppa.get_filters():
                 print( f"\t{ filter_text }" )#TODO Testing
-                # self.__process_ppa( ppa, filter_text )#TODO Put back in
-                if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
+                self.__process_ppa( ppa, filter_text )
+                error = (
+                    ppa.get_status() == PPA.Status.ERROR_NETWORK
+                    or
+                    ppa.get_status() == PPA.Status.ERROR_OTHER
+                    or
+                    ppa.get_status() == PPA.Status.ERROR_TIMEOUT )
+
+                if error:
                     break
 
-            if ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
+            error = (
+                ppa.get_status() == PPA.Status.ERROR_NETWORK
+                or
+                ppa.get_status() == PPA.Status.ERROR_OTHER
+                or
+                ppa.get_status() == PPA.Status.ERROR_TIMEOUT )
+
+            if error:
                 ppa.flush_published_binaries()
 
             elif ppa.has_published_binaries():
@@ -293,12 +233,16 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         A filter_text of "" equates to no filtering.
         '''
-
         print( "\t\tGetting published binaries..." )#TODO Test
         self_links, binary_package_names, binary_package_versions, architectures = \
             self.__get_published_binaries( ppa, filter_text )
 
-        if not ppa.get_status() == PPA.Status.ERROR_RETRIEVING_PPA:
+        error = (
+            ppa.get_status() == PPA.Status.ERROR_NETWORK
+            or
+            ppa.get_status() == PPA.Status.ERROR_TIMEOUT )
+
+        if not error:
             print( f"\t\tGetting { len( self_links ) } download counts..." )#TODO Test
             self.__get_download_counts(
                 ppa,
@@ -327,39 +271,41 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         next_collection_link = "next_collection_link"
         while True:
             print( f"\t\tGetting page { page }" ) #TODO Test
-            published_binaries = self.get_json( url )  #TODO Test with a ppa/archive with NO published binaries....should not get an error...right?
-            if published_binaries: #TODO If we have multiple pages, will this be None and then set the status to error below?
-                for entry in published_binaries[ "entries" ]: #TODO Test for no entries (filter out with bogus indicator name.
-                    architecture = None
-                    if entry[ "architecture_specific" ] == "true":
-                        architecture = entry[ "distro_arch_series_link" ].split( '/' )[ -1 ]
-
-                    published_binary_exists = \
-                        self.__published_binary_exists(
-                            entry[ "binary_package_name" ],
-                            entry[ "binary_package_version" ],
-                            architecture,
-                            binary_package_names,
-                            binary_package_versions,
-                            architectures )
-
-                    if not published_binary_exists:
-                        self_links.append( entry[ "self_link" ] )
-                        binary_package_names.append( entry[ "binary_package_name" ] )
-                        binary_package_versions.append( entry[ "binary_package_version" ] )
-                        architectures.append( architecture )
-
-                if next_collection_link in published_binaries:
-                    url = published_binaries[ next_collection_link ]
-                    page += 1#TODO Test
-                    continue
-
+            json, error_network, error_timeout = self.get_json( url )  #TODO Test with a ppa/archive with NO published binaries....should not get an error...right?
+            if error_network:
+                ppa.set_status( PPA.Status.ERROR_NETWORK )
                 break
 
-            else:
-                print( "here" ) #TODO Testing...ensure this is not set when the last published binaries page is downloaded.
-                ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
+            if error_timeout:
+                ppa.set_status( PPA.Status.ERROR_TIMEOUT )
                 break
+
+            for entry in json[ "entries" ]: #TODO Test for no entries (filter out with bogus indicator name.
+                architecture = None
+                if entry[ "architecture_specific" ] == "true":
+                    architecture = entry[ "distro_arch_series_link" ].split( '/' )[ -1 ]
+
+                published_binary_exists = \
+                    self.__published_binary_exists(
+                        entry[ "binary_package_name" ],
+                        entry[ "binary_package_version" ],
+                        architecture,
+                        binary_package_names,
+                        binary_package_versions,
+                        architectures )
+
+                if not published_binary_exists:
+                    self_links.append( entry[ "self_link" ] )
+                    binary_package_names.append( entry[ "binary_package_name" ] )
+                    binary_package_versions.append( entry[ "binary_package_version" ] )
+                    architectures.append( architecture )
+
+            if next_collection_link in json:
+                url = json[ next_collection_link ]
+                page += 1#TODO Test
+                continue
+
+            break
 
         return self_links, binary_package_names, binary_package_versions, architectures
 
@@ -375,13 +321,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         exists_ = False
 
-        zipped = \
+        z = \
             zip(
                 binary_package_names,
                 binary_package_versions,
                 architecture_specifics )
 
-        for name, version, architecture in zipped:
+        for name, version, architecture in z:
             match = (
                 binary_package_name == name
                 and
@@ -406,25 +352,72 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         max_workers = 1 if self.low_bandwidth else 3
         download_counts = { }
+        lock = Lock()
         with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
             for i, self_link in enumerate( self_links ):
                 download_counts[ i ] = \
                     executor.submit(
-                        self.get_json,
-                        self_link + "?ws.op=getDownloadCount" )
+                        self.__get_download_count,
+                        self_link + "?ws.op=getDownloadCount",
+                        ppa,
+                        lock )
 
-        for key_i, value_result in download_counts.items():
-            if value_result.exception() is None:
-                self.__process_download_count(
-                    ppa,
-                    binary_package_names[ key_i ],
-                    binary_package_versions[ key_i ],
-                    False if architectures[ key_i ] is None else True,
-                    value_result.result() )
+        error = (
+            ppa.get_status() == PPA.Status.ERROR_NETWORK
+            or
+            ppa.get_status() == PPA.Status.ERROR_TIMEOUT )
+
+        if not error:
+            print( "PROCESSING RESULTS" )
+            for key_i, value_result in download_counts.items():
+                if value_result.exception() is None:
+                    self.__process_download_count(
+                        ppa,
+                        binary_package_names[ key_i ],
+                        binary_package_versions[ key_i ],
+                        False if architectures[ key_i ] is None else True,
+                        value_result.result() )
+    
+                else:
+                    ppa.set_status( PPA.Status.ERROR_OTHER )
+                    self.get_logging().exception( value_result.exception() )
+                    break
+
+        print( "DONE" )
+
+
+    def __get_download_count( self, url, ppa, lock ):
+        id = url.split( '?' )[ 0 ].split( '/' )[ -1 ]
+        print( f"{ id }" )
+        with lock:
+            ppa_status = ppa.get_status()
+
+        json_ = None
+        error = (
+            ppa_status == PPA.Status.ERROR_NETWORK
+            or
+            ppa_status == PPA.Status.ERROR_TIMEOUT )
+
+        if not error:
+            print( f"{ id } Getting json..." )
+            json_, error_network, error_timeout = self.get_json( url )
+            if error_network:
+                with lock:
+                    ppa.set_status( PPA.Status.ERROR_NETWORK )
+                    print( f"{ id } ERROR NETWORK" )
+
+            elif error_timeout:
+                with lock:
+                    ppa.set_status( PPA.Status.ERROR_TIMEOUT )
+                    print( f"{ id } ERROR TIMEOUT" )
 
             else:
-                ppa.set_status( PPA.Status.ERROR_RETRIEVING_PPA )
-                break
+                print( f"{ id } ...done" )
+
+        else:
+            print( f"{ id } Aborting" )
+
+        return json_
 
 
     def __process_download_count(
@@ -477,48 +470,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa.get_name(),
                 '\n'.join( ppa.get_filters() ) ] )
 
-#TODO Testing
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-        ppa_store.append( [ "zzz", "zzz", "" ] )
-
-
-#TODO When a ppa is added/edited/removed,
-# would be nice to re-sort and select the added/edited row
-# or first row on deletion.
-#
-# What about things like fortune when a new directory/file is added
-# or removed?  Is that treeview sorted?
-# Where else may this occur?
-# fortune
-# onthisday
-# scriptrunner
-#
-# https://stackoverflow.com/questions/18954160/sort-a-column-in-a-treeview-by-default-or-programmatically
-# https://stackoverflow.com/questions/18234513/python-sort-a-gtk-treeview
-#
-# scriptrunner does a select after add/edit/remove (I think)
-# by passing in the treeview to the add/edit/remove and select the sensible row.
-# Maybe this functionality can be made generic?
-
-        ppa_treeview, scrolledwindow = \
+        treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 # Gtk.TreeModelSort( model = ppa_store ),
                 ppa_store,#TODO Not sure if this stays/goes...
@@ -552,19 +504,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     _( "Add a new PPA." ),
                     _( "Remove the selected PPA." ) ),
                 (
-                    ( self.on_ppa_add, ppa_treeview ),
-                    ( self.on_ppa_remove, ppa_treeview ) ) ),
+                    ( self.on_ppa_add, treeview ),
+                    ( self.on_ppa_remove, treeview ) ) ),
             0, 1, 1, 1 )
 
-        if len( ppa_treeview.get_model() ):
-            treepath_to_select_first_ppa = Gtk.TreePath.new_from_string( "0" )
-            ppa_treeview.get_selection().select_path( treepath_to_select_first_ppa )
-            ppa_treeview.scroll_to_cell(
-                path = treepath_to_select_first_ppa,
-                use_align = False )
-
-        else:
-            grid.get_children()[ 0 ].get_children()[ 1 ].set_sensitive( False )
+        self.__select_first_ppa_or_disable_remove(
+            treeview,
+            grid.get_children()[ 0 ].get_children()[ 1 ] )
 
         notebook.append_page( grid, Gtk.Label.new( _( "PPAs" ) ) )
 
@@ -709,41 +655,35 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return sort_value
 
 
-    def on_ppa_remove( self, button, treeview ):
-        model, treeiter = treeview.get_selection().get_selected()
-        if len( model ):
-            if treeiter is None:
-                self.show_dialog_ok(
-                    treeview,
-                    _( "No PPA has been selected for removal." ) )
-                #TODO Perhaps rather than have this message/check.
-                # always select the first item?
-                # Or disable the remove button...but then have to enable it...
-                #
-                # If always select an item (on init or after an add)
-                # then don't need to check that no PPA is selected.
-                # But still should disable the remove button on an empty list of ppas
-                # and then enable after an add.
-
-            else:
-                response = \
-                    self.show_dialog_ok_cancel(
-                        treeview,
-                        _( "Remove the selected PPA?" ) )
-
-                if response == Gtk.ResponseType.OK:
-                    model.remove( treeiter )
-                    #TODO Want to select first if not empty?  Or try to just scroll to top?
-                    # What happens with a long
+    def __select_first_ppa_or_disable_remove( self, treeview, button_remove ):
+        if len( treeview.get_model() ):
+            # Select the first ppa.
+            treepath_to_select_first_ppa = Gtk.TreePath.new_from_string( "0" )
+            treeview.get_selection().select_path( treepath_to_select_first_ppa )
+            treeview.scroll_to_cell(
+                path = treepath_to_select_first_ppa,
+                use_align = False )
 
         else:
-            print( "emtpy")
+            # No ppas; disable the Remove button.
+            button_remove.set_sensitive( False )
+
+
+    def on_ppa_remove( self, button, treeview ):
+        model, treeiter = treeview.get_selection().get_selected()
+        response = \
+            self.show_dialog_ok_cancel(
+                treeview,
+                _( "Remove the selected PPA?" ) )
+
+        if response == Gtk.ResponseType.OK:
+            model.remove( treeiter )
+            self.__select_first_ppa_or_disable_remove( treeview, button )
+
 
     def on_ppa_add( self, button, treeview ):
         self.on_ppa_double_click( treeview, None, None )
-
-        remove_button = button.get_parent().get_children()[ 1 ]
-        remove_button.set_sensitive( False )
+        button.get_parent().get_children()[ 1 ].set_sensitive( True ) # Enable remove.
 
 
     def on_ppa_double_click( self, treeview, row_number, treeviewcolumn ):
@@ -763,13 +703,16 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         else:
             ppa_users = list( set( [ row[ IndicatorPPADownloadStatistics.COLUMN_USER ] for row in model ] ) )
             ppa_users.sort( key = locale.strxfrm )
+            if adding_ppa:
+                ppa_users.insert( 0, "" )
 
             ppa_user = \
                 self.create_comboboxtext(
                     ppa_users,
                     active =
-                        ppa_users.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] )
-                        if not adding_ppa else 0,
+                        0
+                        if adding_ppa else
+                        ppa_users.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] ),
                         editable = True )
 
         grid.attach( ppa_user, 1, 0, 1, 1 )
@@ -784,13 +727,17 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         else:
             ppa_names = list( set( [ row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] for row in model ] ) )
             ppa_names.sort( key = locale.strxfrm )
+            if adding_ppa:
+                ppa_names.insert( 0, "" )
+
 
             ppa_name = \
                 self.create_comboboxtext(
                     ppa_names,
                     active =
-                        ppa_names.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] )
-                        if not adding_ppa else 0,
+                        0
+                        if adding_ppa else
+                        ppa_names.index( model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ),
                         editable = True )
 
         grid.attach( ppa_name, 1, 1, 1, 1 )
@@ -803,8 +750,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         textview = \
             self.create_textview(
                 text =
-                    model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ]
-                    if row_number else "",
+                    ""
+                    if adding_ppa else
+                    model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ],
                 tooltip_text = _(
                     "Each line is a plain text filter\n" +
                     "compared against each package name.\n\n" +
@@ -819,9 +767,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ( self.create_scrolledwindow( textview ), True ) ) ),
                      1, 2, 1, 1 )
 
-        title = _( "Add PPA" )
-        if row_number:
-            title = _( "Edit PPA" )
+        title = _( "Edit PPA" )
+        if adding_ppa:
+            title = _( "Add PPA" )
 
         dialog = \
             self.create_dialog(
@@ -843,7 +791,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if user == "":
                     self.show_dialog_ok(
                         dialog,
-                        _( "PPA user cannot be empty." )  )
+                        _( "User cannot be empty." )  )
 
                     ppa_user.grab_focus()
                     continue
@@ -851,22 +799,22 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if name == "":
                     self.show_dialog_ok(
                         dialog,
-                        _( "PPA name cannot be empty." ) )
+                        _( "Name cannot be empty." ) )
 
                     ppa_name.grab_focus()
                     continue
 
                 if adding_ppa:
-                    user_in_use = \
-                        any( row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user for row in model )
+                    user_and_name_in_use = (
+                        any( row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
+                             and
+                             row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
+                             for row in model ) )
 
-                    name_in_use = \
-                        any( row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name for row in model )
-
-                    if user_in_use and name_in_use:
+                    if user_and_name_in_use:
                         self.show_dialog_ok(
                             dialog,
-                            _( "PPA user and name already in use!" ) )
+                            _( "User and name already in use!" ) )
 
                         continue
 
@@ -878,45 +826,83 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
 
                     if not( user_is_unchanged and name_is_unchanged ):
-                        user_in_use = False
-                        name_in_use = False
+                        user_exists = False
+                        name_exists = False
                         for row in model:
-                            user_in_use = \
-                                model[ row ][ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
+                            user_exists = \
+                                row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
 
-                            name_in_use = \
-                                model[ row ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
+                            name_exists = \
+                                row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
 
-                            if user_in_use and name_in_use:
+                            if user_exists and name_exists:
                                 break
 
-                        if user_in_use and name_in_use:
+                        if user_exists and name_exists:
                             self.show_dialog_ok(
                                 dialog,
-                                _( "PPA user and name already in use!" ) )
+                                _( "User and name already in use!" ) )
 
                             continue
 
+                        continue
+                    continue
+
                 filter_text = self.get_textview_text( textview ).split( '\n' )
                 filter_text = [ f for f in filter_text if f ] # Remove blank lines.
-                duplicate_filter_text = (
-                    len( filter_text )
-                    >
-                    len( set( filter_text ) ) )
 
-                if duplicate_filter_text:
+                duplicates_in_filter_text = (
+                    len( filter_text ) > len( set( filter_text ) ) )
+
+                if duplicates_in_filter_text:
+                    # Could have removed the duplicates using a set().
+                    # Instead, assume the user made a mistake and allow for the
+                    # user to correct.
                     self.show_dialog_ok(
                         dialog,
-                        _( "Duplicates in filter text disallowed!" ) )
+                        _( "Remove duplicates in the filter text." ) )
 
                     continue
 
-#TODO What about blanks within a filter text:  "a filter"?
+                filter_text_contains_a_space = False
+                for filter_ in filter_text:
+                    if ' ' in filter_:
+                        filter_text_contains_a_space = True
+                        break
+
+                if filter_text_contains_a_space:
+                    self.show_dialog_ok(
+                        dialog,
+                        _( "Remove spaces from the filter text." ) )
+
+                    continue
 
                 if not adding_ppa:
                     model.remove( treeiter )
 
                 model.append( [ user, name, '\n'.join( filter_text ) ] )
+
+                # Select the added/edited PPA.
+                row_iter = treeview.get_model().get_iter_first()
+                while iter:
+                    user_ = \
+                        treeview.get_model().get_value(
+                            row_iter, IndicatorPPADownloadStatistics.COLUMN_USER )
+
+                    name_ = \
+                        treeview.get_model().get_value(
+                            row_iter, IndicatorPPADownloadStatistics.COLUMN_NAME )
+
+                    if user == user_ and name == name_:
+                        treepath_for_row = treeview.get_model().get_path( row_iter )
+                        treeview.get_selection().select_path( treepath_for_row )
+                        treeview.scroll_to_cell(
+                            path = treepath_for_row,
+                            use_align = False )
+
+                        break
+
+                    row_iter = treeview.get_model().iter_next( row_iter )
 
             break
 
@@ -925,6 +911,19 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 #TODO For testing:
 # {"combinePPAs": false, "filters": [["canonical-kernel-team", "ppa", "focal", "amd64", ["linux-image-oem"]], ["thebernmeister", "ppa", "jammy", "amd64", ["lunar","fortune"]], ["thebernmeister", "ppa", "focal", "amd64", ["tide","test"]] ], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "focal", "i386"],["thebernmeister", "archive", "focal", "i386"],["thebernmeister", "testing", "focal", "i386"],["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "i386"],["canonical-kernel-team", "ppa", "focal", "i386"]], "showSubmenu": true, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.81", "checklatestversion": false}
+#
+# https://launchpad.net/~mirabilos/+archive/ubuntu/jdk/+packages
+# https://launchpad.net/~t-schutter/+archive/ubuntu/ppa/+packages
+# https://launchpad.net/~skunk/+archive/ubuntu/pepper-flash/+packages
+# https://launchpad.net/~savoury1/+archive/ubuntu/scribus/+packages
+# https://launchpad.net/~cafuego/+archive/ubuntu/inkscape/+packages
+# https://launchpad.net/~cafuego/+archive/ubuntu/inkscape/+packages
+# https://launchpad.net/~csurbhi/+archive/ubuntu/ppa/+packages
+# https://launchpad.net/~guido-iodice/+archive/ubuntu/trusty-updates/+packages
+# https://launchpad.net/ubuntu/+ppas?name_filter=i386&batch=75&direction=backwards&memo=600&start=525
+# https://launchpad.net/~unity7maintainers/+archive/ubuntu/unity7-desktop/+packages?field.name_filter=&field.status_filter=published&field.series_filter=focal
+# https://launchpad.net/~mc3man/+archive/ubuntu/focal6/+packages
+
 
 #TODO When all is sorted out with download and preferences,
 # use an old .json from old indicator name with hyphens
@@ -950,7 +949,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         ppa[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] )
 
             if ppas and len( ppas[ 0 ] ) == 4:
-                # Handle legacy data format. In version 81, PPAs changed from
+                # In version 81, PPAs changed from
                 #   user / name / series / architecture
                 # to
                 #   user / name / filter
@@ -987,14 +986,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                             break
 
-        else:
-#TODO Once Ubuntu 20.04 is EOL,
-# should really find an alternate default/example PPA and filter.
-# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
-# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image
-# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false&binary_name=linux-image-oem
-# https://api.launchpad.net/1.0/~canonical-kernel-team/+archive/ubuntu/ppa?ws.op=getPublishedBinaries&distro_arch_series=https://api.launchpad.net/1.0/ubuntu/focal/amd64&status=Published&exact_match=false&ordered=false
+            self.ppas = [ PPA( "thebernmeister", "ppa" ) ]#TODO Testing
 
+        else:
             self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
             self.ppas[ 0 ].set_filters( [
                 "indicator-fortune",

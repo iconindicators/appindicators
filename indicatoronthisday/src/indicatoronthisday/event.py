@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-""" An event comprises a date and description. """
+''' An event comprises a date and description. '''
 
 
 class Event():
@@ -41,7 +41,6 @@ class Event():
         return self.description
 
 
-#TODO Check this works.
     def __str__( self ):
         return self.date + " | " + self.description
 

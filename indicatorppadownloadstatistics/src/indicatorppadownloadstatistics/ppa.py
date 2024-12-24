@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-""" Store a PPA's details, published binaries and filters. """
+''' Store a PPA's details, published binaries and filters. '''
 
 
 import operator
@@ -89,10 +89,12 @@ class PPA():
     class Status( Enum ):
         ''' Download status of a PPA. '''
         NEEDS_DOWNLOAD = 0
-        ERROR_RETRIEVING_PPA = 1
-        OK = 2
-        NO_PUBLISHED_BINARIES = 3
-        FILTERED = 4
+        ERROR_NETWORK = 1
+        ERROR_OTHER = 2
+        ERROR_TIMEOUT = 3
+        OK = 4
+        NO_PUBLISHED_BINARIES = 5
+        FILTERED = 6
 
 
     def __init__( self, user, name ):
@@ -191,6 +193,7 @@ class PPA():
     @staticmethod
 #TODO This is called at the end of combine...where else?
 # Now that combine is gone, is this still used?
+# TODO Need locale.strx...? IF so, how?
     def sort( list_of_ppas ):
         list_of_ppas.sort(
             key = operator.methodcaller( "get_descriptor" ) )

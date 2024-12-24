@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-""" Application indicator for the home astronomer. """
+''' Application indicator for the home astronomer. '''
 
 
 import datetime
@@ -45,8 +45,7 @@ from dataproviderorbitalelement import DataProviderOrbitalElement, OE
 class IndicatorLunar( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator;
-    # used by build_wheel.py when building the .desktop file.
+    # Used when building the wheel to create the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Lunar" )
     indicator_categories = "Categories=Science;Astronomy"
 
@@ -119,7 +118,9 @@ class IndicatorLunar( IndicatorBase ):
         dict(
             list( astro_backend.NAME_TAG_MOON_TRANSLATION.items() ) +
             list( astro_backend.PLANET_TAGS_TRANSLATIONS.items() ) +
-            list( zip( astro_backend.get_star_names(), astro_backend.get_star_tag_translations() ) ) +
+            list( zip(
+                astro_backend.get_star_names(),
+                astro_backend.get_star_tag_translations() ) ) +
             list( astro_backend.NAME_TAG_SUN_TRANSLATION.items() ) )
 
     CACHE_VERSION = "-96-"
@@ -1777,6 +1778,7 @@ class IndicatorLunar( IndicatorBase ):
                 True,
                 self.indicator_text ) ) # Translate tags into local language.
 
+#TODO Check sorting...is user sorting really needed?
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 Gtk.TreeModelSort( model = display_tags_store ),

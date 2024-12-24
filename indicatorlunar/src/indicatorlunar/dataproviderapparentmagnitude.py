@@ -16,10 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Download from URL, load from file and hold in memory,
 apparent magnitude for comets and minor planets.
-"""
+'''
 
 
 import datetime
@@ -66,7 +66,7 @@ class DataProviderApparentMagnitude( DataProvider ):
                 "date": datetime.date.today().isoformat(),
                 "apparentMagnitude": apparent_magnitude_maximum }
 
-            query = """
+            query = '''
                 query AsteroidsToday( $date: date!, $apparentMagnitude: float8! )
                 {
                     minorplanet
@@ -99,7 +99,7 @@ class DataProviderApparentMagnitude( DataProvider ):
                         }
                     }
                 }
-                """
+                '''
 
             url = "https://astorbdb.lowell.edu/v1/graphql"
             json = { "query": query, "variables": variables }

@@ -16,10 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Create/update the .pot/.po files for an indicator's source.
 Build the .pot/.po files for an indicator's wheel release.
-"""
+'''
 
 
 import datetime

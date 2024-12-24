@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-""" Application indicator which converts domain names between Unicode and ASCII. """
+''' Application indicator which converts domain names between Unicode and ASCII. '''
 
 
 import encodings.idna
@@ -33,8 +33,7 @@ from indicatorbase import IndicatorBase
 class IndicatorPunycode( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator;
-    # used by build_wheel.py when building the .desktop file.
+    # Used when building the wheel to create the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Punycode" )
     indicator_categories = "Categories=Utility"
 

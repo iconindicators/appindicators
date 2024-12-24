@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-""" Application indicator which displays tidal information. """
+''' Application indicator which displays tidal information. '''
 
 
 import datetime
@@ -36,8 +36,7 @@ from indicatorbase import IndicatorBase
 class IndicatorTide( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Unused within the indicator;
-    # used by build_wheel.py when building the .desktop file.
+    # Used when building the wheel to create the .desktop file.
     indicator_name_for_desktop_file = _( "Indicator Tide" )
     indicator_categories = "Categories=Utility"
 
@@ -78,9 +77,7 @@ class IndicatorTide( IndicatorBase ):
                 spec.loader.exec_module( module )
                 klazz = getattr( module, self.user_script_class_name )
                 tidal_readings = \
-                    klazz.get_tide_data(
-                        logging = self.get_logging(),
-                        url_timeout_in_seconds = 20 )
+                    klazz.get_tide_data( logging = self.get_logging() )
 
                 self.build_menu( menu, tidal_readings )
 

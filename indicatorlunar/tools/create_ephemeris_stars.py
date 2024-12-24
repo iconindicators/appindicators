@@ -16,11 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-"""
+'''
 Create a star ephemeris for use in both PyEphem and Skyfield
 using stars from PyEphem, keeping only those present in the
 IAU CSN Catalog with accompanying HIP and absolute magnitude.
-"""
+'''
 
 
 import argparse
