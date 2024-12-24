@@ -21,6 +21,7 @@
 
 import concurrent.futures
 import locale
+import operator
 
 from threading import Lock
 
@@ -67,7 +68,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def update( self, menu ):
         self.download_ppa_statistics()
 
-        # PPA.sort( self.ppas ) #TODO Check this does what it appears to do...
+        self.ppas.sort( key = operator.methodcaller( "get_descriptor" ) )
+sorted(
+        lastnames_firstnames_groups,
+        key=lambda t: (t[2], strxfrm(t[0]), strxfrm(t[1]))
+    )
 
         if self.sort_by_download:
             for ppa in self.ppas:
@@ -80,7 +85,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         else:
             self.__build_menu( menu )
 
-        return 12 * 60 * 60 # Update (at least) every twelve hours.
+        return 12 * 60 * 60 # Update every twelve hours.
 
 
     def __build_submenu( self, menu ):
@@ -91,7 +96,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa.get_descriptor() ).set_submenu( submenu )
 
             if ppa.get_status() == PPA.Status.OK:
-                published_binaries = ppa.get_published_binaries( True )
+                published_binaries = ppa.get_published_binaries_sorted()
                 for published_binary in published_binaries:
                     self.create_and_append_menuitem(
                         submenu,
@@ -121,7 +126,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     self.get_on_click_menuitem_open_browser_function(), ) )
 
             if ppa.get_status() == PPA.Status.OK:
-                published_binaries = ppa.get_published_binaries( True )
+                published_binaries = ppa.get_published_binaries_sorted()
                 for published_binary in published_binaries:
                     self.create_and_append_menuitem(
                         menu,
@@ -377,7 +382,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         binary_package_versions[ key_i ],
                         False if architectures[ key_i ] is None else True,
                         value_result.result() )
-    
+
                 else:
                     ppa.set_status( PPA.Status.ERROR_OTHER )
                     self.get_logging().exception( value_result.exception() )
@@ -472,8 +477,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
-                # Gtk.TreeModelSort( model = ppa_store ),
-                ppa_store,#TODO Not sure if this stays/goes...
+                ppa_store,
                 (
                     _( "User" ),
                     _( "Name" ),
@@ -483,12 +487,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ( Gtk.CellRendererText(), "text", IndicatorPPADownloadStatistics.COLUMN_NAME ),
                     ( Gtk.CellRendererText(), "text", IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ) ),
                 default_sort_func = self.__ppa_sort,
-#TODO Don't think sortcolumnviewids_... is needed here...
-                # sortcolumnviewids_columnmodelids = (
-                #     ( IndicatorPPADownloadStatistics.COLUMN_USER, IndicatorPPADownloadStatistics.COLUMN_USER ), ),
-                # sortcolumnviewids_columnmodelids = (
-                #     ( IndicatorPPADownloadStatistics.COLUMN_USER, IndicatorPPADownloadStatistics.COLUMN_USER ),
-                #     ( IndicatorPPADownloadStatistics.COLUMN_NAME, IndicatorPPADownloadStatistics.COLUMN_NAME ) ),
                 tooltip_text = _( "Double click to edit a PPA." ),
                 rowactivatedfunctionandarguments = (
                     self.on_ppa_double_click, ) )

@@ -19,6 +19,7 @@
 ''' Store a PPA's details, published binaries and filters. '''
 
 
+import locale
 import operator
 
 from enum import Enum
@@ -31,10 +32,9 @@ class PublishedBinary():
         '''
         Name (string)
         Version (string)
-        Architecture specific (boolean) 
+        Architecture specific (boolean)
         Download count (integer)
         '''
-
         self.name = name
         self.version = version
         self.architecture_specific = architecture_specific
@@ -61,7 +61,6 @@ class PublishedBinary():
         self.download_count = count
 
 
-#TODO Check this works.
     def __str__( self ):
         return (
             self.get_name() + " | " +
@@ -117,7 +116,7 @@ class PPA():
 
     def set_status( self, status ):
         self.status = status
-        if not status == PPA.Status.OK: # Any other status implies the underlying published binaries are reset.   #TODO What does this mean????
+        if not status == PPA.Status.OK:
             self.published_binaries = [ ]
 
 
@@ -137,7 +136,7 @@ class PPA():
 
 
 #TODO Not sure if to allow whitespace or not...
-# Seems to make no difference when hitting the url with binary_name=fortune versus binary_name=for tune  
+# Seems to make no difference when hitting the url with binary_name=fortune versus binary_name=for tune
     def set_filters( self, filters ):
         '''
         Set a list of one or more filter strings.
@@ -154,6 +153,16 @@ class PPA():
 
 
     def get_descriptor( self ):
+        # This function can be used when sorting PPAs.
+        # Unsure if a user/name can be non-ASCII, so safer to be locale aware.
+#        return locale.strxfrm( self.user ) + ' | ' + locale.strxfrm( self.name )
+        return self.user + ' | ' + self.name
+
+
+    def get_descriptor_( self ):
+        # This function can be used when sorting PPAs.
+        # Unsure if a user/name can be non-ASCII, so safer to be locale aware.
+#        return locale.strxfrm( self.user ) + ' | ' + locale.strxfrm( self.name )
         return self.user + ' | ' + self.name
 
 
@@ -165,12 +174,13 @@ class PPA():
         return len( self.published_binaries ) > 0
 
 
-#TODO When would we NOT want to sort?
-# Sorting is used when combining...
-    def get_published_binaries( self, sort = False ):
-        if sort:
-            self.published_binaries.sort(
-                key = operator.methodcaller( "__str__" ) )
+    def get_published_binaries( self ):
+        return self.published_binaries
+
+
+    def get_published_binaries_sorted( self ):
+        self.published_binaries.sort(
+            key = operator.methodcaller( "__str__" ) )
 
         return self.published_binaries
 
@@ -179,9 +189,7 @@ class PPA():
         self.published_binaries = [ ]
 
 
-    def sort_published_binaries_by_download_count_and_clip(
-        self, clip_amount ):
-
+    def sort_published_binaries_by_download_count_and_clip( self, clip_amount ):
         self.published_binaries.sort(
             key = operator.methodcaller( "get_download_count" ),
             reverse = True )
@@ -190,16 +198,6 @@ class PPA():
             del self.published_binaries[ clip_amount : ]
 
 
-    @staticmethod
-#TODO This is called at the end of combine...where else?
-# Now that combine is gone, is this still used?
-# TODO Need locale.strx...? IF so, how?
-    def sort( list_of_ppas ):
-        list_of_ppas.sort(
-            key = operator.methodcaller( "get_descriptor" ) )
-
-
-#TODO Check this works.
     def __str__( self ):
         return (
             self.user + ' | ' +
