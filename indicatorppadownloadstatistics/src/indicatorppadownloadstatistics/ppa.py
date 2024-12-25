@@ -16,10 +16,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-''' Store a PPA's details, published binaries and filters. '''
+'''
+Store a PPA's user, name, filters and published binaries (name, version,
+whether architecture specific and download count.
+'''
 
 
-import locale
 import operator
 
 from enum import Enum
@@ -129,14 +131,10 @@ class PPA():
 
 
     def get_filters( self ):
-        '''
-        Returns the list of filter strings.
-        '''
+        ''' Returns the list of filter strings. '''
         return self.filters
 
 
-#TODO Not sure if to allow whitespace or not...
-# Seems to make no difference when hitting the url with binary_name=fortune versus binary_name=for tune
     def set_filters( self, filters ):
         '''
         Set a list of one or more filter strings.
@@ -146,23 +144,11 @@ class PPA():
 
 
     def has_default_filter( self ):
-        '''
-        Returns True if only the default filter of [ "" ] exists.
-        '''
+        ''' Returns True if only the default filter of [ "" ] exists. '''
         return len( self.filters ) == 1 and self.filters[ 0 ] == ''
 
 
     def get_descriptor( self ):
-        # This function can be used when sorting PPAs.
-        # Unsure if a user/name can be non-ASCII, so safer to be locale aware.
-#        return locale.strxfrm( self.user ) + ' | ' + locale.strxfrm( self.name )
-        return self.user + ' | ' + self.name
-
-
-    def get_descriptor_( self ):
-        # This function can be used when sorting PPAs.
-        # Unsure if a user/name can be non-ASCII, so safer to be locale aware.
-#        return locale.strxfrm( self.user ) + ' | ' + locale.strxfrm( self.name )
         return self.user + ' | ' + self.name
 
 

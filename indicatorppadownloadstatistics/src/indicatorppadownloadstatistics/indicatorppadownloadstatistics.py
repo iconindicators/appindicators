@@ -21,7 +21,6 @@
 
 import concurrent.futures
 import locale
-import operator
 
 from threading import Lock
 
@@ -67,12 +66,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     def update( self, menu ):
         self.download_ppa_statistics()
-
-        self.ppas.sort( key = operator.methodcaller( "get_descriptor" ) )
-sorted(
-        lastnames_firstnames_groups,
-        key=lambda t: (t[2], strxfrm(t[0]), strxfrm(t[1]))
-    )
 
         if self.sort_by_download:
             for ppa in self.ppas:
@@ -197,7 +190,7 @@ sorted(
             print( f"{ ppa }" )#TODO Testing
             for filter_text in ppa.get_filters():
                 print( f"\t{ filter_text }" )#TODO Testing
-                self.__process_ppa( ppa, filter_text )
+                # self.__process_ppa( ppa, filter_text )#TODO Put back in!
                 error = (
                     ppa.get_status() == PPA.Status.ERROR_NETWORK
                     or
@@ -604,6 +597,9 @@ sorted(
 
                 treeiter = ppa_store.iter_next( treeiter )
 
+            self.ppas.sort(
+                key = lambda ppa: locale.strxfrm( ppa.get_descriptor() ) )
+
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),
                 delay_spinner.get_value_as_int(),
@@ -854,8 +850,7 @@ sorted(
 
                 if duplicates_in_filter_text:
                     # Could have removed the duplicates using a set().
-                    # Instead, assume the user made a mistake and allow for the
-                    # user to correct.
+                    # Assume the user made a mistake...
                     self.show_dialog_ok(
                         dialog,
                         _( "Remove duplicates in the filter text." ) )
@@ -878,6 +873,8 @@ sorted(
                 if not adding_ppa:
                     model.remove( treeiter )
 
+#TODO Should the filter text (list of texts) be sorted?
+# If so, need to do so also in load_config.
                 model.append( [ user, name, '\n'.join( filter_text ) ] )
 
                 # Select the added/edited PPA.
@@ -985,6 +982,13 @@ sorted(
                             break
 
             self.ppas = [ PPA( "thebernmeister", "ppa" ) ]#TODO Testing
+            self.ppas = [
+                PPA( "thebernmeister", "testing" ), 
+                PPA( "thebernmeister", "archive" ), 
+                PPA( "thebernmeister", "ppa" ) ]#TODO Testing
+
+            self.ppas.sort(
+                key = lambda ppa: locale.strxfrm( ppa.get_descriptor() ) )
 
         else:
             self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
