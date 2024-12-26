@@ -16,15 +16,14 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-'''
-Store a PPA's user, name, filters and published binaries (name, version,
-whether architecture specific and download count.
-'''
+''' Store a PPA's user, name, filters and published binaries. '''
 
 
+import locale
 import operator
 
 from enum import Enum
+from functools import cmp_to_key
 
 
 class PublishedBinary():
@@ -90,12 +89,12 @@ class PPA():
     class Status( Enum ):
         ''' Download status of a PPA. '''
         NEEDS_DOWNLOAD = 0
-        ERROR_NETWORK = 1
-        ERROR_OTHER = 2
-        ERROR_TIMEOUT = 3
-        OK = 4
-        NO_PUBLISHED_BINARIES = 5
-        FILTERED = 6
+        OK = 1
+        FILTERED = 2
+        NO_PUBLISHED_BINARIES = 3
+        ERROR_NETWORK = 4
+        ERROR_OTHER = 5
+        ERROR_TIMEOUT = 6
 
 
     def __init__( self, user, name ):
@@ -164,24 +163,84 @@ class PPA():
         return self.published_binaries
 
 
-    def get_published_binaries_sorted( self ):
-        self.published_binaries.sort(
-            key = operator.methodcaller( "__str__" ) )
-
-        return self.published_binaries
+#TODO Hopefully can delete
+    # def get_published_binaries_sorted( self ):
+    #     self.published_binaries.sort(
+    #         key = operator.methodcaller( "__str__" ) )
+    #
+    #     return self.published_binaries
 
 
     def flush_published_binaries( self ):
         self.published_binaries = [ ]
 
 
-    def sort_published_binaries_by_download_count_and_clip( self, clip_amount ):
-        self.published_binaries.sort(
-            key = operator.methodcaller( "get_download_count" ),
-            reverse = True )
+#TODO Hopefully can delete
+    # def sort_published_binaries_by_download_count_and_clip( self, clip_amount ):
+    #     self.published_binaries.sort(
+    #         key = operator.methodcaller( "get_download_count" ),
+    #         reverse = True )
+    #
+    #     if clip_amount > 0:
+    #         del self.published_binaries[ clip_amount : ]
 
-        if clip_amount > 0:
-            del self.published_binaries[ clip_amount : ]
+
+    @staticmethod
+    def sort_ppas_by_user_then_name_then_published_binaries(
+            ppas, sort_by_download, clip_amount ):
+
+        ppas_sorted = sorted( ppas, key = cmp_to_key( PPA.__compare ) )
+
+        if sort_by_download:
+            for ppa in ppas_sorted:
+                ppa.get_published_binaries().sort(
+                    key = operator.methodcaller( "get_download_count" ),
+                    reverse = True )
+
+                if clip_amount > 0:
+                    del ppa.get_published_binaries()[ clip_amount : ]
+
+        else:
+            for ppa in ppas_sorted:
+                ppa.get_published_binaries().sort(
+                    key = operator.methodcaller( "__str__" ) )
+
+        return ppas_sorted
+
+
+    @staticmethod
+    def __compare( ppa1, ppa2 ):
+        ''' Compare two PPAs, first by user, then by name. '''
+        return \
+            PPA.compare(
+                ppa1.get_user(), ppa1.get_name(),
+                ppa2.get_user(), ppa2.get_name() )
+
+
+    @staticmethod
+    def compare( user1, name1, user2, name2 ):
+        ''' Compare two PPAs, first by user, then by name. '''
+        user1_ = locale.strxfrm( user1 )
+        user2_ = locale.strxfrm( user2 )
+        if user1_ < user2_:
+            sort_value = -1
+
+        elif user1_ > user2_:
+            sort_value = 1
+
+        else:
+            name1_ = locale.strxfrm( name1 )
+            name2_ = locale.strxfrm( name2 )
+            if name1_ < name2_:
+                sort_value = -1
+
+            elif name1_ > name2_:
+                sort_value = 1
+
+            else:
+                sort_value = 0
+
+        return sort_value
 
 
     def __str__( self ):

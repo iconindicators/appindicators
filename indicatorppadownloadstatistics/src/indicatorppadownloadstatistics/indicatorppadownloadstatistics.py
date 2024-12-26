@@ -20,6 +20,7 @@
 
 
 import concurrent.futures
+import datetime
 import locale
 
 from threading import Lock
@@ -52,44 +53,92 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     COLUMN_NAME = 1
     COLUMN_FILTER_TEXT = 2
 
-    MESSAGE_ERROR_NETWORK = _( "(network error)" ) #TODO Mention see tooltip in preferences and/or log?
-    MESSAGE_ERROR_OTHER = _( "(other error)" ) #TODO Mention see tooltip in preferences and/or log?
-    MESSAGE_ERROR_TIMEOUT = _( "(timeout error)" ) #TODO Mention see tooltip in preferences and/or log?
+    MESSAGE_ERROR_NETWORK = _( "(network error - check the log)" )
+    MESSAGE_ERROR_OTHER = _( "(unknown error - check the log)" )
+    MESSAGE_ERROR_TIMEOUT = _( "(timeout error - check the log)" )
     MESSAGE_FILTERED = _( "(published binaries completely filtered)" )
     MESSAGE_NO_PUBLISHED_BINARIES = _( "(no published binaries)" )
+
+    UPDATE_PERIOD = 12 * 60 * 60 # 12 hours in seconds.
 
 
     def __init__( self ):
         super().__init__(
             comments = _( "Displays the total downloads of PPAs." ) )
 
+        self.set_download_required()
+
 
     def update( self, menu ):
-        self.download_ppa_statistics()
+#TODO Might be an idea to only download:
+#    On indicator startup
+#    If a change occurs in the preferences (ppa user/name/filter changes, ppa added)
+#    Every 12 hours
+#
+# For the sort by download AND CLIP, need to NOT delete the data,
+# but instead clip at the point of display.
+        if self.__is_download_required():
+            self.download_ppa_statistics()
+            self.last_download_datetime = datetime.datetime.utcnow()
 
-        if self.sort_by_download:
-            for ppa in self.ppas:
-                ppa.sort_published_binaries_by_download_count_and_clip(
-                    self.sort_by_download_amount )
+        print( "------" )
+        print( self.ppas )
+        print( "------" )
+
+        ppas_sorted = \
+            PPA.sort_ppas_by_user_then_name_then_published_binaries(
+                self.ppas, self.sort_by_download, self.sort_by_download_amount )
+        print( "------" )
+        print( ppas_sorted )
+        print( "------" )
+
+        ppas_sorted = \
+            PPA.sort_ppas_by_user_then_name_then_published_binaries(
+                self.ppas, not self.sort_by_download, 0 )
+        print( "------" )
+        print( ppas_sorted )
+        print( "------" )
+
+        ppas_sorted = \
+            PPA.sort_ppas_by_user_then_name_then_published_binaries(
+                self.ppas, not self.sort_by_download, self.sort_by_download_amount )
+        print( "------" )
+        print( ppas_sorted )
+        print( "------" )
+
+        # if self.sort_by_download:
+        #     for ppa in self.ppas:
+        #         ppa.sort_published_binaries_by_download_count_and_clip(
+        #             self.sort_by_download_amount )
 
         if self.show_submenu:
-            self.__build_submenu( menu )
+            self.__build_submenu( menu, ppas_sorted )
 
         else:
-            self.__build_menu( menu )
+            self.__build_menu( menu, ppas_sorted )
 
-        return 12 * 60 * 60 # Update every twelve hours.
+        return IndicatorPPADownloadStatistics.UPDATE_PERIOD
 
 
-    def __build_submenu( self, menu ):
-        for ppa in self.ppas:
+    def __is_download_required( self ):
+        next_download_datetime = (
+            self.last_download_datetime
+            +
+            datetime.timedelta(
+                seconds = IndicatorPPADownloadStatistics.UPDATE_PERIOD ) )
+
+        return next_download_datetime < datetime.datetime.utcnow()
+
+
+    def __build_submenu( self, menu, ppas_sorted ):
+        for ppa in ppas_sorted:
             submenu = Gtk.Menu()
             self.create_and_append_menuitem(
                 menu,
                 ppa.get_descriptor() ).set_submenu( submenu )
 
             if ppa.get_status() == PPA.Status.OK:
-                published_binaries = ppa.get_published_binaries_sorted()
+                published_binaries = ppa.get_published_binaries()
                 for published_binary in published_binaries:
                     self.create_and_append_menuitem(
                         submenu,
@@ -109,8 +158,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     indent = ( 1, 1 ) )
 
 
-    def __build_menu( self, menu ):
-        for ppa in self.ppas:
+    def __build_menu( self, menu, ppas_sorted ):
+        for ppa in ppas_sorted:
             self.create_and_append_menuitem(
                 menu,
                 ppa.get_descriptor(),
@@ -119,7 +168,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     self.get_on_click_menuitem_open_browser_function(), ) )
 
             if ppa.get_status() == PPA.Status.OK:
-                published_binaries = ppa.get_published_binaries_sorted()
+                published_binaries = ppa.get_published_binaries()
                 for published_binary in published_binaries:
                     self.create_and_append_menuitem(
                         menu,
@@ -190,7 +239,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             print( f"{ ppa }" )#TODO Testing
             for filter_text in ppa.get_filters():
                 print( f"\t{ filter_text }" )#TODO Testing
-                # self.__process_ppa( ppa, filter_text )#TODO Put back in!
+                self.__process_ppa( ppa, filter_text )#TODO Put back in!
                 error = (
                     ppa.get_status() == PPA.Status.ERROR_NETWORK
                     or
@@ -583,6 +632,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.sort_by_download = sort_by_download_checkbutton.get_active()
             self.sort_by_download_amount = spinner.get_value_as_int()
 
+            old_ppas = self.ppas
             self.ppas = [ ]
             treeiter = ppa_store.get_iter_first()
             while treeiter is not None:
@@ -597,56 +647,73 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 treeiter = ppa_store.iter_next( treeiter )
 
-            self.ppas.sort(
-                key = lambda ppa: locale.strxfrm( ppa.get_descriptor() ) )
+#TODO Needed?
+            # self.__sort_ppas_by_user_then_name()
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),
                 delay_spinner.get_value_as_int(),
                 latest_version_checkbox.get_active() )
 
+            if self.__published_binaries_affected( old_ppas, self.ppas ):
+                self.set_download_required()
+
         return response_type
 
 
+#TODO Should be safe to delete
+    # def __ppa_sort( self, model, row1, row2, user_data ):
+    #     ''' Sort ppas, first by user, then by name. '''
+    #     user1 = \
+    #         locale.strxfrm(
+    #             model.get_value(
+    #                 row1, IndicatorPPADownloadStatistics.COLUMN_USER ) )
+    #
+    #     name1 = \
+    #         locale.strxfrm(
+    #             model.get_value(
+    #                 row1, IndicatorPPADownloadStatistics.COLUMN_NAME ) )
+    #
+    #     user2 = \
+    #         locale.strxfrm(
+    #             model.get_value(
+    #                 row2, IndicatorPPADownloadStatistics.COLUMN_USER ) )
+    #
+    #     name2 = \
+    #         locale.strxfrm(
+    #             model.get_value(
+    #                 row2, IndicatorPPADownloadStatistics.COLUMN_NAME ) )
+    #
+    #     if user1 < user2:
+    #         sort_value = -1
+    #
+    #     elif user1 > user2:
+    #         sort_value = 1
+    #
+    #     else:
+    #         if name1 < name2:
+    #             sort_value = -1
+    #
+    #         elif name1 > name2:
+    #             sort_value = 1
+    #
+    #         else:
+    #             sort_value = 0
+    #
+    #     return sort_value
+
+
     def __ppa_sort( self, model, row1, row2, user_data ):
-        ''' Sort ppas, first by user, then by name. '''
-        user1 = \
-            locale.strxfrm(
+        return \
+            PPA.compare(
                 model.get_value(
-                    row1, IndicatorPPADownloadStatistics.COLUMN_USER ) )
-
-        name1 = \
-            locale.strxfrm(
+                    row1, IndicatorPPADownloadStatistics.COLUMN_USER ),
                 model.get_value(
-                    row1, IndicatorPPADownloadStatistics.COLUMN_NAME ) )
-
-        user2 = \
-            locale.strxfrm(
+                    row1, IndicatorPPADownloadStatistics.COLUMN_NAME ),
                 model.get_value(
-                    row2, IndicatorPPADownloadStatistics.COLUMN_USER ) )
-
-        name2 = \
-            locale.strxfrm(
+                    row2, IndicatorPPADownloadStatistics.COLUMN_USER ),
                 model.get_value(
                     row2, IndicatorPPADownloadStatistics.COLUMN_NAME ) )
-
-        if user1 < user2:
-            sort_value = -1
-
-        elif user1 > user2:
-            sort_value = 1
-
-        else:
-            if name1 < name2:
-                sort_value = -1
-
-            elif name1 > name2:
-                sort_value = 1
-
-            else:
-                sort_value = 0
-
-        return sort_value
 
 
     def __select_first_ppa_or_disable_remove( self, treeview, button_remove ):
@@ -853,7 +920,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     # Assume the user made a mistake...
                     self.show_dialog_ok(
                         dialog,
-                        _( "Remove duplicates in the filter text." ) )
+                        _( "Filter text may not contain duplicates." ) )
 
                     continue
 
@@ -866,15 +933,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if filter_text_contains_a_space:
                     self.show_dialog_ok(
                         dialog,
-                        _( "Remove spaces from the filter text." ) )
+                        _( "Filter text may not contain spaces." ) )
 
                     continue
 
                 if not adding_ppa:
                     model.remove( treeiter )
 
-#TODO Should the filter text (list of texts) be sorted?
-# If so, need to do so also in load_config.
                 model.append( [ user, name, '\n'.join( filter_text ) ] )
 
                 # Select the added/edited PPA.
@@ -904,6 +969,37 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         dialog.destroy()
 
 
+#TODO This might/could eventually be combined into a function to sort PPAs
+# by user/name and then internally (either by published binary name OR
+# download count with/without a clip) and then this function would be static
+# living within the PPA class.
+    def __sort_ppas_by_user_then_name( self ):
+        self.ppas.sort(
+            key = lambda ppa: locale.strxfrm( ppa.get_descriptor() ) )
+
+
+
+#TODO Finish this after sorting is finalised...
+# The sorting of PPAs by user/name when building the menu
+# must be the same as when sorting is done in the treeview of the Preferences.
+    def __published_binaries_affected( self, old_ppas, new_ppas ):
+        # published_binaries_affected = False
+        # if old_ppas
+        #
+        # for old_ppa, new_ppa in zip( old_ppas, new_ppas ):
+        #     pass
+
+        return False
+
+
+    def set_download_required( self ):
+        self.last_download_datetime = (
+            datetime.datetime.utcnow()
+            -
+            datetime.timedelta(
+                seconds = IndicatorPPADownloadStatistics.UPDATE_PERIOD * 2 ) )
+
+
 #TODO For testing:
 # {"combinePPAs": false, "filters": [["canonical-kernel-team", "ppa", "focal", "amd64", ["linux-image-oem"]], ["thebernmeister", "ppa", "jammy", "amd64", ["lunar","fortune"]], ["thebernmeister", "ppa", "focal", "amd64", ["tide","test"]] ], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "focal", "i386"],["thebernmeister", "archive", "focal", "i386"],["thebernmeister", "testing", "focal", "i386"],["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "i386"],["canonical-kernel-team", "ppa", "focal", "i386"]], "showSubmenu": true, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.81", "checklatestversion": false}
 #
@@ -929,6 +1025,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self.show_submenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, False )
         self.sort_by_download = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
         self.sort_by_download_amount = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, 5 )
+
+        self.sort_by_download = True#TODO Testing
 
         if config:
             self.ppas = [ ]
@@ -981,14 +1079,19 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                             break
 
-            self.ppas = [ PPA( "thebernmeister", "ppa" ) ]#TODO Testing
+            #TODO Testing
+            self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
             self.ppas = [
                 PPA( "thebernmeister", "testing" ), 
                 PPA( "thebernmeister", "archive" ), 
-                PPA( "thebernmeister", "ppa" ) ]#TODO Testing
+                PPA( "thebernmeister", "ppa" ) ]
 
-            self.ppas.sort(
-                key = lambda ppa: locale.strxfrm( ppa.get_descriptor() ) )
+#TODO Not sure if this is really needed here.
+# When the preferences are run, ppas are sorted by user/name
+# within the treeview.
+# Sorting by user/name is very quick, compared to say sorting the published
+# binaries which is potentially a lot more (but not terribly huge either).
+            # self.__sort_ppas_by_user_then_name()
 
         else:
             self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
