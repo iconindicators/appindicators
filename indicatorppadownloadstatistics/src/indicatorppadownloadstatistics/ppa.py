@@ -63,6 +63,7 @@ class PublishedBinary():
 
 
     def __str__( self ):
+        print( "pb str" )#TODO Test
         return (
             self.get_name() + " | " +
             self.get_version() + " | " +
@@ -244,6 +245,7 @@ class PPA():
 
 
     def __str__( self ):
+        print( "ppa str" )#TODO Test
         return (
             self.user + ' | ' +
             self.name + ' | ' +

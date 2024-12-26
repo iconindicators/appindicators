@@ -106,11 +106,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         print( ppas_sorted )
         print( "------" )
 
-        # if self.sort_by_download:
-        #     for ppa in self.ppas:
-        #         ppa.sort_published_binaries_by_download_count_and_clip(
-        #             self.sort_by_download_amount )
-
         if self.show_submenu:
             self.__build_submenu( menu, ppas_sorted )
 
@@ -1082,8 +1077,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             #TODO Testing
             self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
             self.ppas = [
-                PPA( "thebernmeister", "testing" ), 
-                PPA( "thebernmeister", "archive" ), 
+                PPA( "thebernmeister", "testing" ),
+                PPA( "thebernmeister", "archive" ),
                 PPA( "thebernmeister", "ppa" ) ]
 
 #TODO Not sure if this is really needed here.
