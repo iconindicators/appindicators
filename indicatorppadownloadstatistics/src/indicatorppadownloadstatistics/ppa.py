@@ -22,6 +22,7 @@
 import locale
 import operator
 
+from copy import deepcopy
 from enum import Enum
 from functools import cmp_to_key
 
@@ -63,7 +64,6 @@ class PublishedBinary():
 
 
     def __str__( self ):
-        print( "pb str" )#TODO Test
         return (
             self.get_name() + " | " +
             self.get_version() + " | " +
@@ -164,39 +164,54 @@ class PPA():
         return self.published_binaries
 
 
-#TODO Hopefully can delete
-    # def get_published_binaries_sorted( self ):
-    #     self.published_binaries.sort(
-    #         key = operator.methodcaller( "__str__" ) )
-    #
-    #     return self.published_binaries
-
-
     def flush_published_binaries( self ):
         self.published_binaries = [ ]
 
 
-#TODO Hopefully can delete
-    # def sort_published_binaries_by_download_count_and_clip( self, clip_amount ):
-    #     self.published_binaries.sort(
-    #         key = operator.methodcaller( "get_download_count" ),
-    #         reverse = True )
-    #
-    #     if clip_amount > 0:
-    #         del self.published_binaries[ clip_amount : ]
+    def has_status_error( self, ignore_other = False ):
+        '''
+        Returns True if the PPA has any of the error statuses.
+        If ignore_other is set to True, the status of ERROR_OTHER is ignored.
+        '''
+        has_status_error = (
+                self.get_status() == PPA.Status.ERROR_NETWORK
+                or
+                self.get_status() == PPA.Status.ERROR_TIMEOUT )
+
+        if not ignore_other:
+            has_status_error = (
+                has_status_error
+                or
+                self.get_status() == PPA.Status.ERROR_OTHER )
+
+        return has_status_error
 
 
     @staticmethod
     def sort_ppas_by_user_then_name_then_published_binaries(
             ppas, sort_by_download, clip_amount ):
+        '''
+        Sort PPAs by name then user.
 
-        ppas_sorted = sorted( ppas, key = cmp_to_key( PPA.__compare ) )
+        For each PPA's published binaries:
+            Sort by name then version (sort_by_download = False)
+        or
+            Sort by (reverse) download count then name, then version
+             (sort_by_download = True)
+
+        When sorting published binaries by download count, the published
+        binaries may be truncated to an amount defined by clip_amount.
+        When clip_amount is set to 0, no truncation occurs.
+
+        When sorting published binaries by name, clip_amount is ignored.
+        '''
+        ppas_sorted = deepcopy( ppas )
+        ppas_sorted.sort( key = cmp_to_key( PPA.__compare_ppas ) )
 
         if sort_by_download:
             for ppa in ppas_sorted:
                 ppa.get_published_binaries().sort(
-                    key = operator.methodcaller( "get_download_count" ),
-                    reverse = True )
+                    key = cmp_to_key( PPA.__compare_published_binaries ) )
 
                 if clip_amount > 0:
                     del ppa.get_published_binaries()[ clip_amount : ]
@@ -210,17 +225,49 @@ class PPA():
 
 
     @staticmethod
-    def __compare( ppa1, ppa2 ):
-        ''' Compare two PPAs, first by user, then by name. '''
+    def __compare_published_binaries( published_binary1, published_binary2 ):
+        '''
+        Compare two Published Binaries by download count.
+        If the download count is the same, sort by name then by version.
+        '''
+        if published_binary1.get_download_count() < published_binary2.get_download_count():
+            sort_value = 1
+
+        elif published_binary1.get_download_count() > published_binary2.get_download_count():
+            sort_value = -1
+
+        else:
+            if published_binary1.get_name() < published_binary2.get_name():
+                sort_value = -1
+
+            elif published_binary1.get_name() > published_binary2.get_name():
+                sort_value = 1
+
+            else:
+                if published_binary1.get_version() < published_binary2.get_version():
+                    sort_value = -1
+    
+                elif published_binary1.get_version() > published_binary2.get_version():
+                    sort_value = 1
+    
+                else:
+                    sort_value = 0
+
+        return sort_value
+
+
+    @staticmethod
+    def __compare_ppas( ppa1, ppa2 ):
+        ''' Compare two PPAs by user, then by name. '''
         return \
-            PPA.compare(
+            PPA.compare_ppas(
                 ppa1.get_user(), ppa1.get_name(),
                 ppa2.get_user(), ppa2.get_name() )
 
 
     @staticmethod
-    def compare( user1, name1, user2, name2 ):
-        ''' Compare two PPAs, first by user, then by name. '''
+    def compare_ppas( user1, name1, user2, name2 ):
+        ''' Compare two PPAs by user, then by name. '''
         user1_ = locale.strxfrm( user1 )
         user2_ = locale.strxfrm( user2 )
         if user1_ < user2_:
@@ -245,7 +292,6 @@ class PPA():
 
 
     def __str__( self ):
-        print( "ppa str" )#TODO Test
         return (
             self.user + ' | ' +
             self.name + ' | ' +
