@@ -281,9 +281,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 architecture = None
                 if entry[ "architecture_specific" ]:
                     architecture = entry[ "distro_arch_series_link" ].split( '/' )[ -1 ]
-                else:
-                    print()
 
+\
 #TODO Run over a ppa with arch specific packages and see what this section does...
 # Is this to ensure that we don't duplicate arch independent?
 # Need to ensure we're not missing counting a published binary...
@@ -299,8 +298,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         binary_package_versions,
                         architectures ) ]
 
-                x = bool( published_binary_exists )
+                print( published_binary_exists )
 
+                '''
                 if published_binary_exists:
                     print( entry[ "binary_package_name" ] )
                     print( entry[ "binary_package_version" ] )
@@ -317,12 +317,20 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     if name == entry[ "binary_package_name" ]
                     and version == entry[ "binary_package_version" ]
                     and architecture_ == architecture ] )
+                '''
 
+                '''
                 if not published_binary_exists:
                     self_links.append( entry[ "self_link" ] )
                     binary_package_names.append( entry[ "binary_package_name" ] )
                     binary_package_versions.append( entry[ "binary_package_version" ] )
                     architectures.append( architecture )
+                '''
+                self_links.append( entry[ "self_link" ] )
+                binary_package_names.append( entry[ "binary_package_name" ] )
+                binary_package_versions.append( entry[ "binary_package_version" ] )
+                architectures.append( architecture )
+
 
             if next_collection_link in json:
                 url = json[ next_collection_link ]
@@ -330,6 +338,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 continue
 
             break
+
+        '''
+        if True:
+            import sys
+            sys.exit()
+        '''
 
         return (
             self_links,
@@ -413,6 +427,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             binary_package_version,
             architecture_specific,
             download_count ):
+
+        print( f"{ binary_package_name }   { binary_package_version }    { architecture_specific }    { download_count }" )
+
 
         found = False
         for published_binary in ppa.get_published_binaries():
@@ -978,18 +995,20 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             #TODO Testing
             self.ppas = [ PPA( "canonical-kernel-team", "ppa" ) ]
+#            self.ppas = [ PPA( "mirabilos", "jdk" ) ]
+
             # self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
             # self.ppas = [
             #     PPA( "thebernmeister", "testing" ),
             #     PPA( "thebernmeister", "archive" ),
             #     PPA( "thebernmeister", "ppa" ) ]
             # self.ppas = [ PPA( "thebernmeister", "testing" ) ]
-            # self.ppas[ -1 ].set_filters( [ "banana" ] )
+            self.ppas[ -1 ].set_filters( [ "nvidia-graphics" ] )#TODO Hyphen does not seem to work!
             # self.ppas = [ PPA( "thebernmeister", "archive" ) ]
             # self.ppas = [ ]
             # self.sort_by_download = True
             # self.sort_by_download_amount = 0
-            self.show_submenu = False
+            self.show_submenu = True
 
         else:
             self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
