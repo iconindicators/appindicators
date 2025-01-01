@@ -281,6 +281,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 architecture = None
                 if entry[ "architecture_specific" ]:
                     architecture = entry[ "distro_arch_series_link" ].split( '/' )[ -1 ]
+                else:
+                    print()
 
 #TODO Run over a ppa with arch specific packages and see what this section does...
 # Is this to ensure that we don't duplicate arch independent?
@@ -297,15 +299,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         binary_package_versions,
                         architectures ) ]
 
-#TODO Eventually delete
-                # published_binary_exists = \
-                #     self.__published_binary_exists(
-                #         entry[ "binary_package_name" ],
-                #         entry[ "binary_package_version" ],
-                #         architecture,
-                #         binary_package_names,
-                #         binary_package_versions,
-                #         architectures )
+                x = bool( published_binary_exists )
+
+                if published_binary_exists:
+                    print( entry[ "binary_package_name" ] )
+                    print( entry[ "binary_package_version" ] )
+                    print( architecture )
+                    print( entry[ "self_link" ] )
+                    print( [
+                    self_link
+                    for ( name, version, architecture_, self_link ) in
+                    zip(
+                        binary_package_names,
+                        binary_package_versions,
+                        architectures,
+                        self_links )
+                    if name == entry[ "binary_package_name" ]
+                    and version == entry[ "binary_package_version" ]
+                    and architecture_ == architecture ] )
 
                 if not published_binary_exists:
                     self_links.append( entry[ "self_link" ] )
@@ -325,39 +336,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             binary_package_names,
             binary_package_versions,
             architectures )
-
-
-#TODO Eventually delete
-    # def __published_binary_exists(
-    #         self,
-    #         binary_package_name,
-    #         binary_package_version,
-    #         architecture_specific,
-    #         binary_package_names,
-    #         binary_package_versions,
-    #         architecture_specifics ):
-    #
-    #     published_binary_exists = False
-    #
-    #     z = \
-    #         zip(
-    #             binary_package_names,
-    #             binary_package_versions,
-    #             architecture_specifics )
-    #
-    #     for name, version, architecture in z:
-    #         match = (
-    #             binary_package_name == name
-    #             and
-    #             binary_package_version == version
-    #             and
-    #             architecture_specific == architecture )
-    #
-    #         if match:
-    #             published_binary_exists = True
-    #             break
-    #
-    #     return published_binary_exists
 
 
     def __get_download_counts(
