@@ -299,7 +299,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         grid.attach( scrolledwindow, 0, 0, 1, 25 )
 
-        box = \
+        box, add, remove, reset = \
             self.create_buttons_in_box(
                 (
                     _( "Add" ),

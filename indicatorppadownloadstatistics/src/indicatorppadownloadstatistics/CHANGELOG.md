@@ -2,12 +2,12 @@
 
 ## v1.0.81 (2024-09-04)
 
-- Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
-- Removed the series/architecture for a given PPA (only need specify a PPA user/name).
-- Filters now apply to a PPA user/name, irrespecitve of the series/architecture.
-- Removed the preference to combine PPAs; instead, binary packages with the same name and version are combined.
+- PPAs are now specified only by the user/name; the series/architecture is redundant.
+- Filters now apply to a PPA user/name; the series/architecture is redundant.
+- Removed the preference to combine PPAs. Instead, binary packages with the same name and version are automatically combined:
   - Where binary packages of the same name/version are architecture independant, the download count is the same across all packages.
   - Where binary packages of the same name/version are architecture dependant, the download count is summed across all packages.
+- Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhauled to adhere to the pyproject.toml standard.
 - Deployment using the .deb format is superceded; PyPI (pip) is used with operating system packages and file copy.

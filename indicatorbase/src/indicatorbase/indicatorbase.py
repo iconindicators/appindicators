@@ -1435,6 +1435,9 @@ class IndicatorBase( ABC ):
             labels,
             tooltip_texts,
             clicked_functionandarguments ):
+        '''
+        TODO Explain return values
+        '''
 
         buttons_and_expands = [ ]
         z = zip( labels, tooltip_texts, clicked_functionandarguments )
@@ -1447,11 +1450,16 @@ class IndicatorBase( ABC ):
 
             buttons_and_expands.append( [ button, True ] )
 
-        return \
+        buttons = [
+            button_and_expand[ 0 ]
+            for button_and_expand in buttons_and_expands ]
+
+        return (
             self.create_box(
                 tuple( buttons_and_expands ),
                 halign = Gtk.Align.CENTER,
-                homogeneous = True )
+                homogeneous = True ),
+            *buttons )
 
 
     def create_entry(

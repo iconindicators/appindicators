@@ -415,7 +415,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 ( ( self.create_scrolledwindow( command_text_view ), True ), ) ),
              0, 21, 1, 10 )
 
-        box = \
+        box, add, edit, copy_, remove = \
             self.create_buttons_in_box(
                 (
                     _( "Add" ),

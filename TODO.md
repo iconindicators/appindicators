@@ -1,5 +1,23 @@
 # Immediate
 
+# Installation
+Current implementation builds a self-contained wheel and deplys to PyPI.
+An end-user will install by installing OS packages (copy/paste a command) then
+creating a venv / installing wheel from PyPI / copy icons/desktop/locale
+(copy/paste command).  Some distros require setting an extension.
+
+Reading about .deb, I noticed that some .deb packagers will instead place the
+venv in /opt.  The respective icons will then go into /usr/share/icons and
+similarly for destkop/locale.  This makes the install available to all users.
+
+Should I do the same?  
+
+There is a tool
+  https://github.com/jordansissel/fpm
+to take a Python project (does not yet support pyproject.toml)
+and convert to .deb/.rpm
+
+
 # No autostart on Kubuntu and Manjaro
 Given there is no autostart on Kubuntu 24.04 and Manjaro 24.04.7,
 should the autostart checkbox and delay spinner be hidden?
