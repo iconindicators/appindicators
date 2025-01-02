@@ -201,7 +201,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         References
             https://launchpad.net/+apidoc/devel.html
-            http://help.launchpad.net/API/launchpadlib
             http://help.launchpad.net/API/Hacking
         '''
         for ppa in self.ppas:
@@ -236,17 +235,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         A filter_text of "" results to no filtering.
         '''
         print( "\t\tGetting published binaries..." )#TODO Test
-        self_links, binary_package_names, binary_package_versions, architectures = \
+        published_binaries, self_links = \
             self.__get_published_binaries( ppa, filter_text )
 
         if not ppa.has_status_error( ignore_other = True ):
-            print( f"\t\tGetting { len( self_links ) } download counts..." )#TODO Test
-            self.__get_download_counts(
-                ppa,
-                self_links,
-                binary_package_names,
-                binary_package_versions,
-                architectures )
+            print( f"\t\tGetting { len( published_binaries ) } download counts..." )#TODO Test
+            self.__get_download_counts( ppa, published_binaries, self_links )
 
 
     def __get_published_binaries( self, ppa, filter_text ):
@@ -259,15 +253,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             f"&ordered=false" +
             f"&binary_name={ filter_text }" )
 
+        published_binaries = [ ]
         self_links = [ ]
-        binary_package_names = [ ]
-        binary_package_versions = [ ]
-        architectures = [ ]
-
         page = 1#TODO Test
         next_collection_link = "next_collection_link"
         while True:
-            print( f"\t\tGetting page { page }" ) #TODO Test
+            print( f"\t\t\tGetting page { page }" ) #TODO Test
+            print( f"\t\t\t{ url }" )
             json, error_network, error_timeout = self.get_json( url )
             if error_network:
                 ppa.set_status( PPA.Status.ERROR_NETWORK )
@@ -282,55 +274,18 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if entry[ "architecture_specific" ]:
                     architecture = entry[ "distro_arch_series_link" ].split( '/' )[ -1 ]
 
-\
-#TODO Run over a ppa with arch specific packages and see what this section does...
-# Is this to ensure that we don't duplicate arch independent?
-# Need to ensure we're not missing counting a published binary...
-                published_binary_exists = [
-                    True
-                    if name == entry[ "binary_package_name" ]
-                    and version == entry[ "binary_package_version" ]
-                    and architecture_ == architecture
-                    else False
-                    for ( name, version, architecture_ ) in
-                    zip(
-                        binary_package_names,
-                        binary_package_versions,
-                        architectures ) ]
+                published_binary = \
+                    PublishedBinary(
+                        entry[ "binary_package_name" ],
+                        entry[ "binary_package_version" ],
+                        architecture )
+                    
+                print( published_binary )
 
-                print( published_binary_exists )
-
-                '''
-                if published_binary_exists:
-                    print( entry[ "binary_package_name" ] )
-                    print( entry[ "binary_package_version" ] )
-                    print( architecture )
-                    print( entry[ "self_link" ] )
-                    print( [
-                    self_link
-                    for ( name, version, architecture_, self_link ) in
-                    zip(
-                        binary_package_names,
-                        binary_package_versions,
-                        architectures,
-                        self_links )
-                    if name == entry[ "binary_package_name" ]
-                    and version == entry[ "binary_package_version" ]
-                    and architecture_ == architecture ] )
-                '''
-
-                '''
-                if not published_binary_exists:
+#TODO Check this works!
+                if published_binary not in published_binaries:
+                    published_binaries.append( published_binary )
                     self_links.append( entry[ "self_link" ] )
-                    binary_package_names.append( entry[ "binary_package_name" ] )
-                    binary_package_versions.append( entry[ "binary_package_version" ] )
-                    architectures.append( architecture )
-                '''
-                self_links.append( entry[ "self_link" ] )
-                binary_package_names.append( entry[ "binary_package_name" ] )
-                binary_package_versions.append( entry[ "binary_package_version" ] )
-                architectures.append( architecture )
-
 
             if next_collection_link in json:
                 url = json[ next_collection_link ]
@@ -339,123 +294,87 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             break
 
-        '''
-        if True:
-            import sys
-            sys.exit()
-        '''
-
-        return (
-            self_links,
-            binary_package_names,
-            binary_package_versions,
-            architectures )
+        return published_binaries, self_links
 
 
-    def __get_download_counts(
-            self,
-            ppa,
-            self_links,
-            binary_package_names,
-            binary_package_versions,
-            architectures ):
-
+    def __get_download_counts( self, ppa, published_binaries, self_links ):
         max_workers = 1 if self.low_bandwidth else 3
-        download_counts = { }
+        futures = [ ]
         lock = Lock()
         with concurrent.futures.ThreadPoolExecutor( max_workers = max_workers ) as executor:
-            for i, self_link in enumerate( self_links ):
-                download_counts[ i ] = \
+            for published_binary, self_link in zip( published_binaries, self_links ):
+                futures.append(
                     executor.submit(
                         self.__get_download_count,
                         self_link + "?ws.op=getDownloadCount",
+                        published_binary,
                         ppa,
-                        lock )
+                        lock ) )
 
         if not ppa.has_status_error( ignore_other = True ):
-            print( "PROCESSING RESULTS" )
-            for key_i, value_result in download_counts.items():
-                if value_result.exception() is None:
-                    self.__process_download_count(
-                        ppa,
-                        binary_package_names[ key_i ],
-                        binary_package_versions[ key_i ],
-                        False if architectures[ key_i ] is None else True,
-                        value_result.result() )
+            print( "\t\t\t\tPROCESSING RESULTS" )
+            for future, published_binary in zip( futures, published_binaries ):
+                if future.exception() is None:
+                    self.__add_published_binary_to_ppa( published_binary, ppa )
 
                 else:
                     ppa.set_status( PPA.Status.ERROR_OTHER )
-                    self.get_logging().exception( value_result.exception() )
+                    self.get_logging().exception( future.exception() )
                     break
 
         print( "DONE" )
 
 
-    def __get_download_count( self, url, ppa, lock ):
+    def __get_download_count( self, url, published_binary, ppa, lock ):
         id_ = url.split( '?' )[ 0 ].split( '/' )[ -1 ]
-        print( f"{ id_ }" )
+        print( f"\t\t\t\t{ id_ }" )
         with lock:
             error = ppa.has_status_error( ignore_other = True )
 
-        json_ = None
         if not error:
-            print( f"{ id_ } Getting json..." )
-            json_, error_network, error_timeout = self.get_json( url )
+            print( f"\t\t\t\t{ id_ } Getting json..." )
+            download_count, error_network, error_timeout = self.get_json( url )
             if error_network:
                 with lock:
                     ppa.set_status( PPA.Status.ERROR_NETWORK )
-                    print( f"{ id_ } ERROR NETWORK" )
+                    print( f"\t\t\t\t{ id_ } ERROR NETWORK" )
 
             elif error_timeout:
                 with lock:
                     ppa.set_status( PPA.Status.ERROR_TIMEOUT )
-                    print( f"{ id_ } ERROR TIMEOUT" )
+                    print( f"\t\t\t\t{ id_ } ERROR TIMEOUT" )
 
             else:
-                print( f"{ id_ } ...done" )
+                print( f"\t\t\t\t{ id_ } ...done" )
+                published_binary.set_download_count( download_count )
 
         else:
-            print( f"{ id_ } Aborting" )
-
-        return json_
+            print( f"\t\t\t\t{ id_ } Aborting" )
 
 
-    def __process_download_count(
-            self,
-            ppa,
-            binary_package_name,
-            binary_package_version,
-            architecture_specific,
-            download_count ):
-
-        print( f"{ binary_package_name }   { binary_package_version }    { architecture_specific }    { download_count }" )
-
-
+    def __add_published_binary_to_ppa( self, published_binary, ppa ):
+        print( f"\t\t\t\t\t{ published_binary }" )
         found = False
-        for published_binary in ppa.get_published_binaries():
+        for published_binary_ in ppa.get_published_binaries():
             match = (
-                binary_package_name == published_binary.get_name()
+                published_binary_.get_name() == published_binary.get_name()
                 and
-                binary_package_version == published_binary.get_version()
+                published_binary_.get_version() == published_binary.get_version()
                 and
-                architecture_specific == published_binary.get_architecture_specific() )
+                published_binary_.get_architecture() == published_binary.get_architecture() )
 
             if match:
+                if published_binary_.get_architecture() is not None:
+                    published_binary_.set_download_count(
+                        published_binary_.get_download_count()
+                        +
+                        published_binary.get_download_count() )
+
                 found = True
                 break
 
-        if found:
-            if architecture_specific:
-                published_binary.set_download_count(
-                    published_binary.get_download_count() + download_count )
-
-        else:
-            ppa.add_published_binary(
-                PublishedBinary(
-                    binary_package_name,
-                    binary_package_version,
-                    architecture_specific,
-                    download_count ) )
+        if not found:
+            ppa.add_published_binary( published_binary )
 
 
     def on_preferences( self, dialog ):
@@ -760,9 +679,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     if adding_ppa else
                     model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ],
                 tooltip_text = _(
-                    "Each line is a plain text filter\n" +
-                    "compared against each package name.\n\n" +
-                    "If a package name contains ANY part\n" +
+                    "Each line is plain text and compared\n" +
+                    "against the name of each built package,\n" +
+                    "NOT the package name.\n\n" +
+                    "If a built package contains ANY part\n" +
                     "of ANY filter, that package will be\n" +
                     "included in the download statistics." ) )
 
@@ -994,16 +914,16 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                             break
 
             #TODO Testing
-            self.ppas = [ PPA( "canonical-kernel-team", "ppa" ) ]
+            # self.ppas = [ PPA( "canonical-kernel-team", "ppa" ) ]
 #            self.ppas = [ PPA( "mirabilos", "jdk" ) ]
 
             # self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
-            # self.ppas = [
-            #     PPA( "thebernmeister", "testing" ),
-            #     PPA( "thebernmeister", "archive" ),
-            #     PPA( "thebernmeister", "ppa" ) ]
+            self.ppas = [
+                PPA( "thebernmeister", "testing" ),
+                PPA( "thebernmeister", "archive" ),
+                PPA( "thebernmeister", "ppa" ) ]
             # self.ppas = [ PPA( "thebernmeister", "testing" ) ]
-            self.ppas[ -1 ].set_filters( [ "nvidia-graphics" ] )#TODO Hyphen does not seem to work!
+            # self.ppas[ -1 ].set_filters( [ "linux-hwe-5.11" ] )
             # self.ppas = [ PPA( "thebernmeister", "archive" ) ]
             # self.ppas = [ ]
             # self.sort_by_download = True
@@ -1042,3 +962,458 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
 IndicatorPPADownloadStatistics().main()
+
+# libnvidia-common-565
+#
+# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
+# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
+# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
+# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
+# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
+# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
+# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
+#
+# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
+# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
+# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
+# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
+# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
+# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
+# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
+#
+# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
+#
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
+#
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
+#
+# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
+# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
+
+# linux-generate-oem
+#
+# linux-generate-oem-5.14    5.14.0-1059.67    amd64    2
+#
+# linux-generate-oem-5.17    5.17.0-1033.34    amd64    3
+#
+# linux-generate-oem-6.0    6.0.0-1018.18    amd64    2
+#
+# linux-generate-oem-6.1    6.1.0-1035.35    amd64    3
+#
+# linux-generate-oem-6.10    6.10.0-1006.6    amd64    1
+#
+# linux-generate-oem-6.11    6.11.0-1011.11    amd64    0
+#
+# linux-generate-oem-6.5    6.5.0-1027.28    amd64    3
+#
+# linux-generate-oem-6.8    6.8.0-1018.18    amd64    0
+
+
+# linux-hwe
+#
+# linux-hwe-5.11-cloud-tools-5.11.0-61    5.11.0-61.61    amd64    1
+#
+# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
+# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
+# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
+# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
+# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
+# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
+# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
+#
+# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
+# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
+# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
+# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
+# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
+# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
+# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
+#
+# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
+# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
+# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
+# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
+# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
+# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
+# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
+#
+# linux-hwe-5.11-tools-5.11.0-61    5.11.0-61.61    amd64    10
+# linux-hwe-5.11-tools-5.11.0-61    5.11.0-61.61    arm64    0
+# linux-hwe-5.11-tools-5.11.0-61    5.11.0-61.61    armhf    1
+# linux-hwe-5.11-tools-5.11.0-61    5.11.0-61.61    ppc64el    1
+# linux-hwe-5.11-tools-5.11.0-61    5.11.0-61.61    s390x    1
+#
+# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
+# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
+# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
+# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
+# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
+# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
+# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
+#
+# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
+# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
+# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
+# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
+# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
+# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
+# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
+#
+# linux-hwe-5.11-udebs-generic    5.11.0-61.61    amd64    6
+# linux-hwe-5.11-udebs-generic    5.11.0-61.61    arm64    5
+# linux-hwe-5.11-udebs-generic    5.11.0-61.61    armhf    4
+# linux-hwe-5.11-udebs-generic    5.11.0-61.61    ppc64el    6
+# linux-hwe-5.11-udebs-generic    5.11.0-61.61    s390x    6
+#
+# linux-hwe-5.11-udebs-generic-64k    5.11.0-61.61    arm64    5
+#
+# linux-hwe-5.11-udebs-generic-lpae    5.11.0-61.61    armhf    5
+#
+# linux-hwe-5.13-cloud-tools-5.13.0-52    5.13.0-52.59~20.04.1    amd64    5
+#
+# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
+# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
+# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
+# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
+# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
+# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
+# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
+#
+# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
+# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
+# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
+# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
+# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
+# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
+# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
+#
+# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
+# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
+# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
+# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
+# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
+# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
+# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
+#
+# linux-hwe-5.13-tools-5.13.0-52    5.13.0-52.59~20.04.1    amd64    12
+# linux-hwe-5.13-tools-5.13.0-52    5.13.0-52.59~20.04.1    arm64    1
+# linux-hwe-5.13-tools-5.13.0-52    5.13.0-52.59~20.04.1    armhf    1
+# linux-hwe-5.13-tools-5.13.0-52    5.13.0-52.59~20.04.1    ppc64el    1
+# linux-hwe-5.13-tools-5.13.0-52    5.13.0-52.59~20.04.1    s390x    0
+#
+# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
+# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
+# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
+# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
+# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
+# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
+# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
+#
+# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
+# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
+# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
+# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
+# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
+# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
+# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
+#
+# linux-hwe-5.13-udebs-generic    5.13.0-52.59~20.04.1    amd64    6
+# linux-hwe-5.13-udebs-generic    5.13.0-52.59~20.04.1    arm64    5
+# linux-hwe-5.13-udebs-generic    5.13.0-52.59~20.04.1    armhf    6
+# linux-hwe-5.13-udebs-generic    5.13.0-52.59~20.04.1    ppc64el    7
+# linux-hwe-5.13-udebs-generic    5.13.0-52.59~20.04.1    s390x    8
+#
+# linux-hwe-5.13-udebs-generic-64k    5.13.0-52.59~20.04.1    arm64    6
+#
+# linux-hwe-5.13-udebs-generic-lpae    5.13.0-52.59~20.04.1    armhf    4
+#
+# linux-hwe-5.15-cloud-tools-5.15.0-127    5.15.0-127.137~20.04.1    amd64    2
+#
+# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
+# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
+# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
+# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
+# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
+# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
+# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
+#
+# linux-hwe-5.15-tools-5.15.0-127    5.15.0-127.137~20.04.1    amd64    3
+# linux-hwe-5.15-tools-5.15.0-127    5.15.0-127.137~20.04.1    arm64    0
+# linux-hwe-5.15-tools-5.15.0-127    5.15.0-127.137~20.04.1    armhf    0
+# linux-hwe-5.15-tools-5.15.0-127    5.15.0-127.137~20.04.1    ppc64el    0
+# linux-hwe-5.15-tools-5.15.0-127    5.15.0-127.137~20.04.1    s390x    0
+#
+# linux-hwe-5.17-cloud-tools-5.17.0-15    5.17.0-15.16~22.04.8    amd64    4
+#
+# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
+# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
+# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
+# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
+# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
+# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
+# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
+#
+# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
+# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
+# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
+# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
+# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
+# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
+# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
+#
+# linux-hwe-5.17-tools-5.17.0-15    5.17.0-15.16~22.04.8    amd64    12
+# linux-hwe-5.17-tools-5.17.0-15    5.17.0-15.16~22.04.8    arm64    0
+# linux-hwe-5.17-tools-5.17.0-15    5.17.0-15.16~22.04.8    armhf    0
+# linux-hwe-5.17-tools-5.17.0-15    5.17.0-15.16~22.04.8    ppc64el    0
+# linux-hwe-5.17-tools-5.17.0-15    5.17.0-15.16~22.04.8    s390x    0
+#
+# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
+# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
+# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
+# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
+# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
+# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
+# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
+#
+# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
+# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
+# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
+# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
+# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
+# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
+# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
+#
+# linux-hwe-5.19-cloud-tools-5.19.0-45    5.19.0-45.46~22.04.1    amd64    1
+#
+# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
+# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
+# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
+# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
+# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
+# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
+# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
+#
+# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
+# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
+# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
+# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
+# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
+# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
+# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
+#
+# linux-hwe-5.19-tools-5.19.0-45    5.19.0-45.46~22.04.1    amd64    5
+# linux-hwe-5.19-tools-5.19.0-45    5.19.0-45.46~22.04.1    arm64    1
+# linux-hwe-5.19-tools-5.19.0-45    5.19.0-45.46~22.04.1    armhf    1
+# linux-hwe-5.19-tools-5.19.0-45    5.19.0-45.46~22.04.1    ppc64el    1
+# linux-hwe-5.19-tools-5.19.0-45    5.19.0-45.46~22.04.1    s390x    1
+#
+# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
+# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
+# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
+# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
+# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
+# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
+# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
+#
+# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
+# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
+# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
+# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
+# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
+# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
+# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
+#
+# linux-hwe-5.8-cloud-tools-5.8.0-67    5.8.0-67.75    amd64    2
+#
+# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
+# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
+# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
+# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
+# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
+# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
+# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
+#
+# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
+# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
+# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
+# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
+# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
+# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
+# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
+#
+# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
+# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
+# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
+# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
+# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
+# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
+# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
+#
+# linux-hwe-5.8-tools-5.8.0-67    5.8.0-67.75    amd64    18
+# linux-hwe-5.8-tools-5.8.0-67    5.8.0-67.75    arm64    1
+# linux-hwe-5.8-tools-5.8.0-67    5.8.0-67.75    armhf    1
+# linux-hwe-5.8-tools-5.8.0-67    5.8.0-67.75    ppc64el    1
+# linux-hwe-5.8-tools-5.8.0-67    5.8.0-67.75    s390x    1
+#
+# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
+# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
+# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
+# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
+# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
+# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
+# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
+#
+# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
+# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
+# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
+# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
+# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
+# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
+# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
+#
+# linux-hwe-5.8-udebs-generic    5.8.0-67.75    amd64    6
+# linux-hwe-5.8-udebs-generic    5.8.0-67.75    arm64    4
+# linux-hwe-5.8-udebs-generic    5.8.0-67.75    armhf    8
+# linux-hwe-5.8-udebs-generic    5.8.0-67.75    ppc64el    4
+# linux-hwe-5.8-udebs-generic    5.8.0-67.75    s390x    5
+#
+# linux-hwe-5.8-udebs-generic-64k    5.8.0-67.75    arm64    6
+#
+# linux-hwe-5.8-udebs-generic-lpae    5.8.0-67.75    armhf    4
+#
+# linux-hwe-6.11-cloud-tools-6.11.0-12    6.11.0-12.13~24.04.1    amd64    1
+#
+# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
+# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
+# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
+# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
+# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
+# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
+# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
+#
+# linux-hwe-6.11-lib-rust-6.11.0-12-generic    6.11.0-12.13~24.04.1    amd64    1
+#
+# linux-hwe-6.11-tools-6.11.0-12    6.11.0-12.13~24.04.1    amd64    17
+# linux-hwe-6.11-tools-6.11.0-12    6.11.0-12.13~24.04.1    arm64    0
+# linux-hwe-6.11-tools-6.11.0-12    6.11.0-12.13~24.04.1    armhf    0
+# linux-hwe-6.11-tools-6.11.0-12    6.11.0-12.13~24.04.1    ppc64el    0
+# linux-hwe-6.11-tools-6.11.0-12    6.11.0-12.13~24.04.1    s390x    0
+#
+# linux-hwe-6.2-cloud-tools-6.2.0-39    6.2.0-39.40~22.04.1    amd64    3
+#
+# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
+# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
+# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
+# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
+# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
+# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
+# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
+#
+# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
+# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
+# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
+# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
+# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
+# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
+# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
+#
+# linux-hwe-6.2-tools-6.2.0-39    6.2.0-39.40~22.04.1    amd64    3
+# linux-hwe-6.2-tools-6.2.0-39    6.2.0-39.40~22.04.1    arm64    0
+# linux-hwe-6.2-tools-6.2.0-39    6.2.0-39.40~22.04.1    armhf    0
+# linux-hwe-6.2-tools-6.2.0-39    6.2.0-39.40~22.04.1    ppc64el    0
+# linux-hwe-6.2-tools-6.2.0-39    6.2.0-39.40~22.04.1    s390x    0
+#
+# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
+# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
+# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
+# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
+# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
+# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
+# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
+#
+# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
+# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
+# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
+# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
+# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
+# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
+# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
+#
+# linux-hwe-6.5-cloud-tools-6.5.0-44    6.5.0-44.44~22.04.1    amd64    0
+#
+# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
+#
+# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
+# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
+# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
+# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
+# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
+# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
+# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
+#
+# linux-hwe-6.5-tools-6.5.0-44    6.5.0-44.44~22.04.1    amd64    7
+# linux-hwe-6.5-tools-6.5.0-44    6.5.0-44.44~22.04.1    arm64    0
+# linux-hwe-6.5-tools-6.5.0-44    6.5.0-44.44~22.04.1    armhf    0
+# linux-hwe-6.5-tools-6.5.0-44    6.5.0-44.44~22.04.1    ppc64el    0
+# linux-hwe-6.5-tools-6.5.0-44    6.5.0-44.44~22.04.1    s390x    0
+#
+# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
+#
+# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
+# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
+#
+# linux-hwe-6.8-cloud-tools-6.8.0-50    6.8.0-50.51~22.04.1    amd64    0
+#
+# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
+# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
+# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
+# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
+# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
+# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
+# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
+#
+# linux-hwe-6.8-tools-6.8.0-50    6.8.0-50.51~22.04.1    amd64    72
+# linux-hwe-6.8-tools-6.8.0-50    6.8.0-50.51~22.04.1    arm64    6
+# linux-hwe-6.8-tools-6.8.0-50    6.8.0-50.51~22.04.1    armhf    0
+# linux-hwe-6.8-tools-6.8.0-50    6.8.0-50.51~22.04.1    ppc64el    1
+# linux-hwe-6.8-tools-6.8.0-50    6.8.0-50.51~22.04.1    s390x    1

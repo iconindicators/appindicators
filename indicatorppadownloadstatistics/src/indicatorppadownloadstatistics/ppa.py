@@ -30,17 +30,17 @@ from functools import cmp_to_key
 class PublishedBinary():
     ''' PPA downloaded data. '''
 
-    def __init__( self, name, version, architecture_specific, download_count ):
+    def __init__( self, name, version, architecture ):
         '''
         Name (string)
         Version (string)
-        Architecture specific (boolean)
+        Architecture (None or string)
         Download count (integer)
         '''
         self.name = name
         self.version = version
-        self.architecture_specific = architecture_specific
-        self.download_count = download_count
+        self.architecture = architecture
+        self.download_count = 0
 
 
     def get_name( self ):
@@ -51,8 +51,8 @@ class PublishedBinary():
         return self.version
 
 
-    def get_architecture_specific( self ):
-        return self.architecture_specific
+    def get_architecture( self ):
+        return self.architecture
 
 
     def get_download_count( self ):
@@ -67,7 +67,7 @@ class PublishedBinary():
         return (
             self.get_name() + " | " +
             self.get_version() + " | " +
-            str( self.get_architecture_specific() ) + " | " +
+            str( self.get_architecture() ) + " | " +
             str( self.get_download_count() ) )
 
 
@@ -80,7 +80,7 @@ class PublishedBinary():
             self.__class__ == other.__class__ and \
             self.get_name() == other.get_name() and \
             self.get_version() == other.get_version() and \
-            self.get_architecture_specific() == other.get_architecture_specific() and \
+            self.get_architecture() == other.get_architecture() and \
             self.get_download_count() == other.get_download_count()
 
 
