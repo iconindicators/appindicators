@@ -28,7 +28,9 @@ from functools import cmp_to_key
 
 
 class PublishedBinary():
-    ''' PPA downloaded data. '''
+    '''
+    Holds a published binary's name, version, architecture and download count.
+    '''
 
     def __init__( self, name, version, architecture ):
         '''
@@ -64,10 +66,14 @@ class PublishedBinary():
 
 
     def __str__( self ):
+        architecture = self.get_architecture()
+        if architecture is None:
+            architecture = ""
+
         return (
             self.get_name() + " | " +
             self.get_version() + " | " +
-            str( self.get_architecture() ) + " | " +
+            architecture + " | " +
             str( self.get_download_count() ) )
 
 
@@ -76,12 +82,12 @@ class PublishedBinary():
 
 
     def __eq__( self, other ):
-        return \
-            self.__class__ == other.__class__ and \
-            self.get_name() == other.get_name() and \
-            self.get_version() == other.get_version() and \
-            self.get_architecture() == other.get_architecture() and \
-            self.get_download_count() == other.get_download_count()
+        return (
+            self.__class__ == other.__class__ and
+            self.get_name() == other.get_name() and
+            self.get_version() == other.get_version() and
+            self.get_architecture() == other.get_architecture() and
+            self.get_download_count() == other.get_download_count() )
 
 
 class PPA():
@@ -304,19 +310,27 @@ class PPA():
 
 
     def __eq__( self, other ):
-        equal = \
-            self.__class__ == other.__class__ and \
-            self.get_user() == other.get_user() and \
-            self.get_name() == other.get_name() and \
-            self.get_filters() == other.get_filters() and \
-            self.get_status() == other.get_status() and \
-            len( self.get_published_binaries() ) == len( other.get_published_binaries() )
+        equal = (
+            self.__class__ == other.__class__ and
+            self.get_user() == other.get_user() and
+            self.get_name() == other.get_name() and
+            self.get_filters() == other.get_filters() and
+            self.get_status() == other.get_status() and
+            len( self.get_published_binaries() ) == len( other.get_published_binaries() ) )
 
         if equal:
-            for \
-                published_binary_self, published_binary_other in \
-                zip( self.get_published_binaries(), other.get_published_binaries() ):
+            z = \
+                zip(
+                    sorted(
+                        self.get_published_binaries(),
+                        key = operator.methodcaller( "__str__" ) ),
+                    sorted(
+                        other.get_published_binaries(),
+                        key = operator.methodcaller( "__str__" ) ) )
 
-                equal &= published_binary_self.__eq__( published_binary_other )
+            for published_binary_self, published_binary_other in z:
+                if not published_binary_self.__eq__( published_binary_other ):
+                    equal = False
+                    break
 
         return equal

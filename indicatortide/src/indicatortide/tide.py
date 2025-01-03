@@ -81,11 +81,11 @@ class Reading():
 
 
     def __eq__( self, other ):
-        return \
-            self.__class__ == other.__class__ and \
-            self.get_date() == other.get_date() and \
-            self.get_time() == other.get_time() and \
-            self.get_location() == other.get_location() and \
-            self.is_high() == other.is_high() and \
-            self.get_level() == other.get_level() and \
-            self.get_url() == other.get_url()
+        return (
+            self.__class__ == other.__class__ and
+            self.get_date() == other.get_date() and
+            self.get_time() == other.get_time() and
+            self.get_location() == other.get_location() and
+            self.is_high() == other.is_high() and
+            self.get_level() == other.get_level() and
+            self.get_url() == other.get_url() )

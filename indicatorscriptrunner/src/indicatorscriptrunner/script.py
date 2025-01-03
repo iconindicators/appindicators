@@ -66,13 +66,13 @@ class Info( ABC ):
 
 
     def __eq__( self, other ):
-        return \
-            self.__class__ == other.__class__ and \
-            self.get_group() == other.get_group() and \
-            self.get_name() == other.get_name() and \
-            self.get_command() == other.get_command() and \
-            self.get_play_sound() == other.get_play_sound() and \
-            self.get_show_notification() == other.get_show_notification()
+        return (
+            self.__class__ == other.__class__ and
+            self.get_group() == other.get_group() and
+            self.get_name() == other.get_name() and
+            self.get_command() == other.get_command() and
+            self.get_play_sound() == other.get_play_sound() and
+            self.get_show_notification() == other.get_show_notification() )
 
 
 #TODO Check this works.
@@ -124,11 +124,11 @@ class Background( Info ):
 
 
     def __eq__( self, other ):
-        return \
-            super().__eq__( other ) and \
-            self.__class__ == other.__class__ and \
-            self.get_interval_in_minutes() == other.get_interval_in_minutes() and \
-            self.get_force_update() == other.get_force_update()
+        return (
+            super().__eq__( other ) and
+            self.__class__ == other.__class__ and
+            self.get_interval_in_minutes() == other.get_interval_in_minutes() and
+            self.get_force_update() == other.get_force_update() )
 
 
 #TODO Check this works.
@@ -178,11 +178,11 @@ class NonBackground( Info ):
 
 
     def __eq__( self, other ):
-        return \
-            super().__eq__( other ) and \
-            self.__class__ == other.__class__ and \
-            self.get_terminal_open() == other.get_terminal_open() and \
-            self.get_default() == other.get_default()
+        return (
+            super().__eq__( other ) and
+            self.__class__ == other.__class__ and
+            self.get_terminal_open() == other.get_terminal_open() and
+            self.get_default() == other.get_default() )
 
 
 #TODO Check this works.

@@ -7,6 +7,8 @@
 - Removed the preference to combine PPAs. Instead, binary packages with the same name and version are automatically combined:
   - Where binary packages of the same name/version are architecture independant, the download count is the same across all packages.
   - Where binary packages of the same name/version are architecture dependant, the download count is summed across all packages.
+- Published binaries display the name, version and if architecture specific, the architecture, otherwise blank.
+- When updating preferences, only PPAs which have been modified are updated.
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhauled to adhere to the pyproject.toml standard.

@@ -419,8 +419,8 @@ class OE():
 
 
     def __eq__( self, other ):
-        return \
-            self.__class__ == other.__class__ and \
-            self.get_name() == other.get_name() and \
-            self.get_data() == other.get_data() and \
-            self.get_data_type() == other.get_data_type()
+        return (
+            self.__class__ == other.__class__ and
+            self.get_name() == other.get_name() and
+            self.get_data() == other.get_data() and
+            self.get_data_type() == other.get_data_type() )

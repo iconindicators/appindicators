@@ -44,10 +44,10 @@ class VirtualMachine():
 
 
     def __eq__( self, other ):
-        return \
-            self.__class__ == other.__class__ and \
-            self.get_name() == other.get_name() and \
-            self.get_uuid() == other.get_uuid()
+        return (
+            self.__class__ == other.__class__ and
+            self.get_name() == other.get_name() and
+            self.get_uuid() == other.get_uuid() )
 
 
 class Group():
@@ -84,13 +84,13 @@ class Group():
 
 
     def __eq__( self, other ):
-        equal = \
-            self.__class__ == other.__class__ and \
-            self.get_name() == other.get_name() and \
-            len( self.get_items() ) == len( other.get_items( ) )
+        equal = (
+            self.__class__ == other.__class__ and
+            self.get_name() == other.get_name() and
+            len( self.get_items() ) == len( other.get_items( ) ) )
 
         if equal:
-            for item_from_self, item_from_other in zip( self.get_items(), other.get_items() ):
+            for item_from_self, item_from_other in zip( self.get_items(), other.get_items() ): #TODO Does this need to be sorted...if so, see PPA.
                 equal &= item_from_self.__eq__( item_from_other )
 
         return equal

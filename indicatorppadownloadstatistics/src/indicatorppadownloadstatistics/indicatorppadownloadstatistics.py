@@ -177,10 +177,14 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def __get_label( self, published_binary ):
-        return (
-            published_binary.get_name() + "  " +
-            published_binary.get_version() + " :  " +
-            str( published_binary.get_download_count() ) )
+        label = (
+            published_binary.get_name() + ' ' +
+            published_binary.get_version() )
+
+        if published_binary.get_architecture() is not None:
+            label += f" ({ published_binary.get_architecture() })"
+
+        return label + " :  " + str( published_binary.get_download_count() )
 
 
     def __get_url_for_ppa( self, ppa ):
@@ -280,9 +284,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         entry[ "binary_package_version" ],
                         architecture )
                     
-                print( published_binary )
-
-#TODO Check this works!
                 if published_binary not in published_binaries:
                     published_binaries.append( published_binary )
                     self_links.append( entry[ "self_link" ] )
@@ -428,7 +429,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         # Need to pass in the remove button to the add button handler.
         # However, the remove button has not been created at the point
         # the add button is created.
-        add.connect( "clicked", self.on_ppa_add, treeview, remove )
+        add.connect( "clicked", self.on_ppa_add, treeview, remove, invalid_ppas )
 
         self.__select_first_ppa_or_disable_remove(
             treeview,
@@ -555,7 +556,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def __ppas_are_identical( self, ppa1, ppa2 ):
         users_equal = ppa1.get_user() == ppa2.get_user()
         names_equal = ppa1.get_name() == ppa2.get_name()
-        filters_equal = ppa1.get_filters() == ppa2.get_filters() #TODO Test this!
+        filters_equal = ppa1.get_filters() == ppa2.get_filters()
         return users_equal and names_equal and filters_equal
 
 
@@ -602,9 +603,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.__select_first_ppa_or_disable_remove( treeview, button )
 
 
-    def on_ppa_add( self, button_add, treeview, button_remove ):
+    def on_ppa_add( self, button_add, treeview, button_remove, invalid_ppas ):
         length_before_addition = len( treeview.get_model() )
-        self.on_ppa_double_click( treeview, None, None, None )
+        self.on_ppa_double_click( treeview, None, None, invalid_ppas )
         if len( treeview.get_model() ) > length_before_addition:
             button_remove.set_sensitive( True )
 
@@ -679,12 +680,15 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     if adding_ppa else
                     model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ],
                 tooltip_text = _(
-                    "Each line is plain text and compared\n" +
+                    "Each line of plain text is compared\n" +
                     "against the name of each built package,\n" +
                     "NOT the package name.\n\n" +
                     "If a built package contains ANY part\n" +
                     "of ANY filter, that package will be\n" +
-                    "included in the download statistics." ) )
+                    "included in the download statistics.\n\n" +
+                    "If a timeout error occurs, filtering\n" +
+                    "may help by reducing the quantity of\n"
+                    "network requests." ) )
 
         grid.attach(
             self.create_box(
@@ -858,7 +862,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 # and loads up.
     def load_config( self, config ):
         self.low_bandwidth = config.get( IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH, False )
-        self.show_submenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, False )
+        self.show_submenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, True )
         self.sort_by_download = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
         self.sort_by_download_amount = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, 5 )
 
@@ -918,12 +922,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 #            self.ppas = [ PPA( "mirabilos", "jdk" ) ]
 
             # self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
-            self.ppas = [
-                PPA( "thebernmeister", "testing" ),
-                PPA( "thebernmeister", "archive" ),
-                PPA( "thebernmeister", "ppa" ) ]
+            # self.ppas = [
+            #     PPA( "thebernmeister", "testing" ),
+            #     PPA( "thebernmeister", "archive" ),
+            #     PPA( "thebernmeister", "ppa" ) ]
             # self.ppas = [ PPA( "thebernmeister", "testing" ) ]
-            # self.ppas[ -1 ].set_filters( [ "linux-hwe-5.11" ] )
+            # self.ppas[ -1 ].set_filters( [ "linux-hwe-6.8-tools" ] )
             # self.ppas = [ PPA( "thebernmeister", "archive" ) ]
             # self.ppas = [ ]
             # self.sort_by_download = True
@@ -962,458 +966,3 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
 IndicatorPPADownloadStatistics().main()
-
-# libnvidia-common-565
-#
-# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
-# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
-# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
-# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
-# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
-# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
-# libnvidia-common-565    565.77-0ubuntu0.24.10.1    None    0
-#
-# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
-# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
-# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
-# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
-# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
-# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
-# libnvidia-common-565-server    565.57.01-0ubuntu0.20.04.2    None    1
-#
-# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu0.22.04.4    None    0
-#
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.04.3    None    1
-#
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu0.24.10.3    None    0
-#
-# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
-# libnvidia-common-565-server    565.57.01-0ubuntu1    None    0
-
-# linux-generate-oem
-#
-# linux-generate-oem-5.14    5.14.0-1059.67    amd64    2
-#
-# linux-generate-oem-5.17    5.17.0-1033.34    amd64    3
-#
-# linux-generate-oem-6.0    6.0.0-1018.18    amd64    2
-#
-# linux-generate-oem-6.1    6.1.0-1035.35    amd64    3
-#
-# linux-generate-oem-6.10    6.10.0-1006.6    amd64    1
-#
-# linux-generate-oem-6.11    6.11.0-1011.11    amd64    0
-#
-# linux-generate-oem-6.5    6.5.0-1027.28    amd64    3
-#
-# linux-generate-oem-6.8    6.8.0-1018.18    amd64    0
-
-
-# linux-hwe
-#
-# linux-hwe-5.11-cloud-tools-5.11.0-61    5.11.0-61.61    amd64    1
-#
-# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
-# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
-# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
-# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
-# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
-# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
-# linux-hwe-5.11-cloud-tools-common    5.11.0-61.61    None    2
-#
-# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
-# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
-# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
-# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
-# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
-# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
-# linux-hwe-5.11-headers-5.11.0-61    5.11.0-61.61    None    76
-#
-# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
-# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
-# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
-# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
-# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
-# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
-# linux-hwe-5.11-source-5.11.0    5.11.0-61.61    None    9
-#
-# linux-hwe-5.11-tools-5.11.0-61    5.11.0-61.61    amd64    10
-# linux-hwe-5.11-tools-5.11.0-61    5.11.0-61.61    arm64    0
-# linux-hwe-5.11-tools-5.11.0-61    5.11.0-61.61    armhf    1
-# linux-hwe-5.11-tools-5.11.0-61    5.11.0-61.61    ppc64el    1
-# linux-hwe-5.11-tools-5.11.0-61    5.11.0-61.61    s390x    1
-#
-# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
-# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
-# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
-# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
-# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
-# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
-# linux-hwe-5.11-tools-common    5.11.0-61.61    None    6
-#
-# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
-# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
-# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
-# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
-# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
-# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
-# linux-hwe-5.11-tools-host    5.11.0-61.61    None    2
-#
-# linux-hwe-5.11-udebs-generic    5.11.0-61.61    amd64    6
-# linux-hwe-5.11-udebs-generic    5.11.0-61.61    arm64    5
-# linux-hwe-5.11-udebs-generic    5.11.0-61.61    armhf    4
-# linux-hwe-5.11-udebs-generic    5.11.0-61.61    ppc64el    6
-# linux-hwe-5.11-udebs-generic    5.11.0-61.61    s390x    6
-#
-# linux-hwe-5.11-udebs-generic-64k    5.11.0-61.61    arm64    5
-#
-# linux-hwe-5.11-udebs-generic-lpae    5.11.0-61.61    armhf    5
-#
-# linux-hwe-5.13-cloud-tools-5.13.0-52    5.13.0-52.59~20.04.1    amd64    5
-#
-# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
-# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
-# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
-# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
-# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
-# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
-# linux-hwe-5.13-cloud-tools-common    5.13.0-52.59~20.04.1    None    4
-#
-# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
-# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
-# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
-# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
-# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
-# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
-# linux-hwe-5.13-headers-5.13.0-52    5.13.0-52.59~20.04.1    None    178
-#
-# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
-# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
-# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
-# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
-# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
-# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
-# linux-hwe-5.13-source-5.13.0    5.13.0-52.59~20.04.1    None    8
-#
-# linux-hwe-5.13-tools-5.13.0-52    5.13.0-52.59~20.04.1    amd64    12
-# linux-hwe-5.13-tools-5.13.0-52    5.13.0-52.59~20.04.1    arm64    1
-# linux-hwe-5.13-tools-5.13.0-52    5.13.0-52.59~20.04.1    armhf    1
-# linux-hwe-5.13-tools-5.13.0-52    5.13.0-52.59~20.04.1    ppc64el    1
-# linux-hwe-5.13-tools-5.13.0-52    5.13.0-52.59~20.04.1    s390x    0
-#
-# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
-# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
-# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
-# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
-# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
-# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
-# linux-hwe-5.13-tools-common    5.13.0-52.59~20.04.1    None    5
-#
-# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
-# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
-# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
-# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
-# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
-# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
-# linux-hwe-5.13-tools-host    5.13.0-52.59~20.04.1    None    3
-#
-# linux-hwe-5.13-udebs-generic    5.13.0-52.59~20.04.1    amd64    6
-# linux-hwe-5.13-udebs-generic    5.13.0-52.59~20.04.1    arm64    5
-# linux-hwe-5.13-udebs-generic    5.13.0-52.59~20.04.1    armhf    6
-# linux-hwe-5.13-udebs-generic    5.13.0-52.59~20.04.1    ppc64el    7
-# linux-hwe-5.13-udebs-generic    5.13.0-52.59~20.04.1    s390x    8
-#
-# linux-hwe-5.13-udebs-generic-64k    5.13.0-52.59~20.04.1    arm64    6
-#
-# linux-hwe-5.13-udebs-generic-lpae    5.13.0-52.59~20.04.1    armhf    4
-#
-# linux-hwe-5.15-cloud-tools-5.15.0-127    5.15.0-127.137~20.04.1    amd64    2
-#
-# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
-# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
-# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
-# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
-# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
-# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
-# linux-hwe-5.15-headers-5.15.0-127    5.15.0-127.137~20.04.1    None    26
-#
-# linux-hwe-5.15-tools-5.15.0-127    5.15.0-127.137~20.04.1    amd64    3
-# linux-hwe-5.15-tools-5.15.0-127    5.15.0-127.137~20.04.1    arm64    0
-# linux-hwe-5.15-tools-5.15.0-127    5.15.0-127.137~20.04.1    armhf    0
-# linux-hwe-5.15-tools-5.15.0-127    5.15.0-127.137~20.04.1    ppc64el    0
-# linux-hwe-5.15-tools-5.15.0-127    5.15.0-127.137~20.04.1    s390x    0
-#
-# linux-hwe-5.17-cloud-tools-5.17.0-15    5.17.0-15.16~22.04.8    amd64    4
-#
-# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
-# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
-# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
-# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
-# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
-# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
-# linux-hwe-5.17-cloud-tools-common    5.17.0-15.16~22.04.8    None    4
-#
-# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
-# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
-# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
-# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
-# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
-# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
-# linux-hwe-5.17-headers-5.17.0-15    5.17.0-15.16~22.04.8    None    107
-#
-# linux-hwe-5.17-tools-5.17.0-15    5.17.0-15.16~22.04.8    amd64    12
-# linux-hwe-5.17-tools-5.17.0-15    5.17.0-15.16~22.04.8    arm64    0
-# linux-hwe-5.17-tools-5.17.0-15    5.17.0-15.16~22.04.8    armhf    0
-# linux-hwe-5.17-tools-5.17.0-15    5.17.0-15.16~22.04.8    ppc64el    0
-# linux-hwe-5.17-tools-5.17.0-15    5.17.0-15.16~22.04.8    s390x    0
-#
-# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
-# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
-# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
-# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
-# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
-# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
-# linux-hwe-5.17-tools-common    5.17.0-15.16~22.04.8    None    6
-#
-# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
-# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
-# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
-# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
-# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
-# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
-# linux-hwe-5.17-tools-host    5.17.0-15.16~22.04.8    None    4
-#
-# linux-hwe-5.19-cloud-tools-5.19.0-45    5.19.0-45.46~22.04.1    amd64    1
-#
-# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
-# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
-# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
-# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
-# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
-# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
-# linux-hwe-5.19-cloud-tools-common    5.19.0-45.46~22.04.1    None    1
-#
-# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
-# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
-# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
-# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
-# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
-# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
-# linux-hwe-5.19-headers-5.19.0-45    5.19.0-45.46~22.04.1    None    120
-#
-# linux-hwe-5.19-tools-5.19.0-45    5.19.0-45.46~22.04.1    amd64    5
-# linux-hwe-5.19-tools-5.19.0-45    5.19.0-45.46~22.04.1    arm64    1
-# linux-hwe-5.19-tools-5.19.0-45    5.19.0-45.46~22.04.1    armhf    1
-# linux-hwe-5.19-tools-5.19.0-45    5.19.0-45.46~22.04.1    ppc64el    1
-# linux-hwe-5.19-tools-5.19.0-45    5.19.0-45.46~22.04.1    s390x    1
-#
-# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
-# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
-# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
-# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
-# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
-# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
-# linux-hwe-5.19-tools-common    5.19.0-45.46~22.04.1    None    4
-#
-# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
-# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
-# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
-# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
-# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
-# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
-# linux-hwe-5.19-tools-host    5.19.0-45.46~22.04.1    None    2
-#
-# linux-hwe-5.8-cloud-tools-5.8.0-67    5.8.0-67.75    amd64    2
-#
-# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
-# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
-# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
-# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
-# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
-# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
-# linux-hwe-5.8-cloud-tools-common    5.8.0-67.75    None    5
-#
-# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
-# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
-# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
-# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
-# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
-# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
-# linux-hwe-5.8-headers-5.8.0-67    5.8.0-67.75    None    86
-#
-# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
-# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
-# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
-# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
-# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
-# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
-# linux-hwe-5.8-source-5.8.0    5.8.0-67.75    None    15
-#
-# linux-hwe-5.8-tools-5.8.0-67    5.8.0-67.75    amd64    18
-# linux-hwe-5.8-tools-5.8.0-67    5.8.0-67.75    arm64    1
-# linux-hwe-5.8-tools-5.8.0-67    5.8.0-67.75    armhf    1
-# linux-hwe-5.8-tools-5.8.0-67    5.8.0-67.75    ppc64el    1
-# linux-hwe-5.8-tools-5.8.0-67    5.8.0-67.75    s390x    1
-#
-# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
-# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
-# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
-# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
-# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
-# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
-# linux-hwe-5.8-tools-common    5.8.0-67.75    None    10
-#
-# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
-# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
-# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
-# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
-# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
-# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
-# linux-hwe-5.8-tools-host    5.8.0-67.75    None    6
-#
-# linux-hwe-5.8-udebs-generic    5.8.0-67.75    amd64    6
-# linux-hwe-5.8-udebs-generic    5.8.0-67.75    arm64    4
-# linux-hwe-5.8-udebs-generic    5.8.0-67.75    armhf    8
-# linux-hwe-5.8-udebs-generic    5.8.0-67.75    ppc64el    4
-# linux-hwe-5.8-udebs-generic    5.8.0-67.75    s390x    5
-#
-# linux-hwe-5.8-udebs-generic-64k    5.8.0-67.75    arm64    6
-#
-# linux-hwe-5.8-udebs-generic-lpae    5.8.0-67.75    armhf    4
-#
-# linux-hwe-6.11-cloud-tools-6.11.0-12    6.11.0-12.13~24.04.1    amd64    1
-#
-# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
-# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
-# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
-# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
-# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
-# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
-# linux-hwe-6.11-headers-6.11.0-12    6.11.0-12.13~24.04.1    None    25
-#
-# linux-hwe-6.11-lib-rust-6.11.0-12-generic    6.11.0-12.13~24.04.1    amd64    1
-#
-# linux-hwe-6.11-tools-6.11.0-12    6.11.0-12.13~24.04.1    amd64    17
-# linux-hwe-6.11-tools-6.11.0-12    6.11.0-12.13~24.04.1    arm64    0
-# linux-hwe-6.11-tools-6.11.0-12    6.11.0-12.13~24.04.1    armhf    0
-# linux-hwe-6.11-tools-6.11.0-12    6.11.0-12.13~24.04.1    ppc64el    0
-# linux-hwe-6.11-tools-6.11.0-12    6.11.0-12.13~24.04.1    s390x    0
-#
-# linux-hwe-6.2-cloud-tools-6.2.0-39    6.2.0-39.40~22.04.1    amd64    3
-#
-# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
-# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
-# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
-# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
-# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
-# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
-# linux-hwe-6.2-cloud-tools-common    6.2.0-39.40~22.04.1    None    2
-#
-# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
-# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
-# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
-# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
-# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
-# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
-# linux-hwe-6.2-headers-6.2.0-39    6.2.0-39.40~22.04.1    None    87
-#
-# linux-hwe-6.2-tools-6.2.0-39    6.2.0-39.40~22.04.1    amd64    3
-# linux-hwe-6.2-tools-6.2.0-39    6.2.0-39.40~22.04.1    arm64    0
-# linux-hwe-6.2-tools-6.2.0-39    6.2.0-39.40~22.04.1    armhf    0
-# linux-hwe-6.2-tools-6.2.0-39    6.2.0-39.40~22.04.1    ppc64el    0
-# linux-hwe-6.2-tools-6.2.0-39    6.2.0-39.40~22.04.1    s390x    0
-#
-# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
-# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
-# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
-# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
-# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
-# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
-# linux-hwe-6.2-tools-common    6.2.0-39.40~22.04.1    None    4
-#
-# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
-# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
-# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
-# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
-# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
-# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
-# linux-hwe-6.2-tools-host    6.2.0-39.40~22.04.1    None    2
-#
-# linux-hwe-6.5-cloud-tools-6.5.0-44    6.5.0-44.44~22.04.1    amd64    0
-#
-# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-cloud-tools-common    6.5.0-44.44~22.04.1    None    0
-#
-# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
-# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
-# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
-# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
-# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
-# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
-# linux-hwe-6.5-headers-6.5.0-44    6.5.0-44.44~22.04.1    None    79
-#
-# linux-hwe-6.5-tools-6.5.0-44    6.5.0-44.44~22.04.1    amd64    7
-# linux-hwe-6.5-tools-6.5.0-44    6.5.0-44.44~22.04.1    arm64    0
-# linux-hwe-6.5-tools-6.5.0-44    6.5.0-44.44~22.04.1    armhf    0
-# linux-hwe-6.5-tools-6.5.0-44    6.5.0-44.44~22.04.1    ppc64el    0
-# linux-hwe-6.5-tools-6.5.0-44    6.5.0-44.44~22.04.1    s390x    0
-#
-# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-tools-common    6.5.0-44.44~22.04.1    None    0
-#
-# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
-# linux-hwe-6.5-tools-host    6.5.0-44.44~22.04.1    None    0
-#
-# linux-hwe-6.8-cloud-tools-6.8.0-50    6.8.0-50.51~22.04.1    amd64    0
-#
-# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
-# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
-# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
-# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
-# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
-# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
-# linux-hwe-6.8-headers-6.8.0-50    6.8.0-50.51~22.04.1    None    90
-#
-# linux-hwe-6.8-tools-6.8.0-50    6.8.0-50.51~22.04.1    amd64    72
-# linux-hwe-6.8-tools-6.8.0-50    6.8.0-50.51~22.04.1    arm64    6
-# linux-hwe-6.8-tools-6.8.0-50    6.8.0-50.51~22.04.1    armhf    0
-# linux-hwe-6.8-tools-6.8.0-50    6.8.0-50.51~22.04.1    ppc64el    1
-# linux-hwe-6.8-tools-6.8.0-50    6.8.0-50.51~22.04.1    s390x    1

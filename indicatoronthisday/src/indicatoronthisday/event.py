@@ -50,7 +50,7 @@ class Event():
 
 
     def __eq__( self, other ):
-        return \
-            self.__class__ == other.__class__ and \
-            self.get_date() == other.get_date() and \
-            self.get_description() == other.get_description()
+        return (
+            self.__class__ == other.__class__ and
+            self.get_date() == other.get_date() and
+            self.get_description() == other.get_description() )
