@@ -209,10 +209,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         '''
         for ppa in self.ppas:
             if ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD:
-                print( f"{ ppa }" )#TODO Testing
                 for filter_text in ppa.get_filters():
-                    print( f"\t{ filter_text }" )#TODO Testing
-                    self.__process_ppa_with_filter( ppa, filter_text )#TODO Put back in!
+                    self.__process_ppa_with_filter( ppa, filter_text )
                     if ppa.has_status_error():
                         break
 
@@ -238,12 +236,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         A filter_text of "" results to no filtering.
         '''
-        print( "\t\tGetting published binaries..." )#TODO Test
         published_binaries, self_links = \
             self.__get_published_binaries( ppa, filter_text )
 
         if not ppa.has_status_error( ignore_other = True ):
-            print( f"\t\tGetting { len( published_binaries ) } download counts..." )#TODO Test
             self.__get_download_counts( ppa, published_binaries, self_links )
 
 
@@ -259,11 +255,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         published_binaries = [ ]
         self_links = [ ]
-        page = 1#TODO Test
         next_collection_link = "next_collection_link"
         while True:
-            print( f"\t\t\tGetting page { page }" ) #TODO Test
-            print( f"\t\t\t{ url }" )
             json, error_network, error_timeout = self.get_json( url )
             if error_network:
                 ppa.set_status( PPA.Status.ERROR_NETWORK )
@@ -290,7 +283,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             if next_collection_link in json:
                 url = json[ next_collection_link ]
-                page += 1#TODO Test
                 continue
 
             break
@@ -313,69 +305,30 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         lock ) )
 
         if not ppa.has_status_error( ignore_other = True ):
-            print( "\t\t\t\tPROCESSING RESULTS" )
             for future, published_binary in zip( futures, published_binaries ):
-                if future.exception() is None:
-                    self.__add_published_binary_to_ppa( published_binary, ppa )
-
-                else:
+                if future.exception() is not None:
                     ppa.set_status( PPA.Status.ERROR_OTHER )
                     self.get_logging().exception( future.exception() )
                     break
 
-        print( "DONE" )
-
 
     def __get_download_count( self, url, published_binary, ppa, lock ):
-        id_ = url.split( '?' )[ 0 ].split( '/' )[ -1 ]
-        print( f"\t\t\t\t{ id_ }" )
         with lock:
             error = ppa.has_status_error( ignore_other = True )
 
         if not error:
-            print( f"\t\t\t\t{ id_ } Getting json..." )
             download_count, error_network, error_timeout = self.get_json( url )
             if error_network:
                 with lock:
                     ppa.set_status( PPA.Status.ERROR_NETWORK )
-                    print( f"\t\t\t\t{ id_ } ERROR NETWORK" )
 
             elif error_timeout:
                 with lock:
                     ppa.set_status( PPA.Status.ERROR_TIMEOUT )
-                    print( f"\t\t\t\t{ id_ } ERROR TIMEOUT" )
 
             else:
-                print( f"\t\t\t\t{ id_ } ...done" )
                 published_binary.set_download_count( download_count )
-
-        else:
-            print( f"\t\t\t\t{ id_ } Aborting" )
-
-
-    def __add_published_binary_to_ppa( self, published_binary, ppa ):
-        print( f"\t\t\t\t\t{ published_binary }" )
-        found = False
-        for published_binary_ in ppa.get_published_binaries():
-            match = (
-                published_binary_.get_name() == published_binary.get_name()
-                and
-                published_binary_.get_version() == published_binary.get_version()
-                and
-                published_binary_.get_architecture() == published_binary.get_architecture() )
-
-            if match:
-                if published_binary_.get_architecture() is not None:
-                    published_binary_.set_download_count(
-                        published_binary_.get_download_count()
-                        +
-                        published_binary.get_download_count() )
-
-                found = True
-                break
-
-        if not found:
-            ppa.add_published_binary( published_binary )
+                ppa.add_published_binary( published_binary )
 
 
     def on_preferences( self, dialog ):
@@ -535,8 +488,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     for ppa_original in ppas_original:
                         if self.__ppas_are_identical( ppa, ppa_original ):
                             if not ppa_original.has_status_error():
-                                # No download required, but need to copy across the
-                                # status and published binaries.
+                                # No download required, but need to copy across
+                                # the status and published binaries.
                                 ppa.set_status( ppa_original.get_status() )
                                 for published_binary in ppa_original.get_published_binaries():
                                     ppa.add_published_binary( published_binary )
@@ -575,7 +528,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     def __select_first_ppa_or_disable_remove( self, treeview, button_remove ):
         if len( treeview.get_model() ):
-            # Select the first ppa.
+            # Select the first PPA.
             treepath_to_select_first_ppa = Gtk.TreePath.new_from_string( "0" )
             treeview.get_selection().select_path( treepath_to_select_first_ppa )
             treeview.scroll_to_cell(
@@ -627,7 +580,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             ppa_user = self.create_entry( "" )
 
         else:
-            ppa_users = list( set( [ row[ IndicatorPPADownloadStatistics.COLUMN_USER ] for row in model ] ) )
+            ppa_users = [ row[ IndicatorPPADownloadStatistics.COLUMN_USER ] for row in model ]
+            ppa_users = list( set( ppa_users ) )
             ppa_users.sort( key = locale.strxfrm )
             if adding_ppa:
                 ppa_users.insert( 0, "" )
@@ -651,11 +605,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             ppa_name = self.create_entry( "" )
 
         else:
-            ppa_names = list( set( [ row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] for row in model ] ) )
+            ppa_names = [ row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] for row in model ]
+            ppa_names = list( set( ppa_names ) )
             ppa_names.sort( key = locale.strxfrm )
             if adding_ppa:
                 ppa_names.insert( 0, "" )
-
 
             ppa_name = \
                 self.create_comboboxtext(
@@ -841,21 +795,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         dialog.destroy()
 
 
-#TODO For testing:
-# {"combinePPAs": false, "filters": [["canonical-kernel-team", "ppa", "focal", "amd64", ["linux-image-oem"]], ["thebernmeister", "ppa", "jammy", "amd64", ["lunar","fortune"]], ["thebernmeister", "ppa", "focal", "amd64", ["tide","test"]] ], "ignoreVersionArchitectureSpecific": true, "lowBandwidth": false, "ppas": [["thebernmeister", "ppa", "jammy", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "focal", "i386"],["thebernmeister", "archive", "focal", "i386"],["thebernmeister", "testing", "focal", "i386"],["thebernmeister", "ppa", "focal", "amd64"],["thebernmeister", "ppa", "jammy", "i386"],["thebernmeister", "ppa", "focal", "i386"],["canonical-kernel-team", "ppa", "focal", "i386"]], "showSubmenu": true, "sortByDownload": false, "sortByDownloadAmount": 5, "version": "1.0.81", "checklatestversion": false}
-#
-# https://launchpad.net/~mirabilos/+archive/ubuntu/jdk/+packages
-# https://launchpad.net/~t-schutter/+archive/ubuntu/ppa/+packages
-# https://launchpad.net/~skunk/+archive/ubuntu/pepper-flash/+packages
-# https://launchpad.net/~savoury1/+archive/ubuntu/scribus/+packages
-# https://launchpad.net/~cafuego/+archive/ubuntu/inkscape/+packages
-# https://launchpad.net/~cafuego/+archive/ubuntu/inkscape/+packages
-# https://launchpad.net/~csurbhi/+archive/ubuntu/ppa/+packages
-# https://launchpad.net/~guido-iodice/+archive/ubuntu/trusty-updates/+packages
-# https://launchpad.net/~unity7maintainers/+archive/ubuntu/unity7-desktop/+packages?field.name_filter=&field.status_filter=published&field.series_filter=focal
-# https://launchpad.net/~mc3man/+archive/ubuntu/focal6/+packages
-
-
 #TODO When all is sorted out with download and preferences,
 # use an old .json from old indicator name with hyphens
 # and ensure the old is copied to new location (name without hyphens)
@@ -916,23 +855,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                                     list( set( filter_text + ppa.get_filters() ) ) )
 
                             break
-
-            #TODO Testing
-            # self.ppas = [ PPA( "canonical-kernel-team", "ppa" ) ]
-#            self.ppas = [ PPA( "mirabilos", "jdk" ) ]
-
-            # self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
-            # self.ppas = [
-            #     PPA( "thebernmeister", "testing" ),
-            #     PPA( "thebernmeister", "archive" ),
-            #     PPA( "thebernmeister", "ppa" ) ]
-            # self.ppas = [ PPA( "thebernmeister", "testing" ) ]
-            # self.ppas[ -1 ].set_filters( [ "linux-hwe-6.8-tools" ] )
-            # self.ppas = [ PPA( "thebernmeister", "archive" ) ]
-            # self.ppas = [ ]
-            # self.sort_by_download = True
-            # self.sort_by_download_amount = 0
-            self.show_submenu = True
 
         else:
             self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
