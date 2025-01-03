@@ -2,12 +2,11 @@
 
 ## v1.0.81 (2024-09-04)
 
-- PPAs are now specified only by the user/name; the series/architecture is redundant.
-- Filters now apply to a PPA user/name; the series/architecture is redundant.
-- Removed the preference to combine PPAs. Instead, binary packages with the same name and version are automatically combined:
-  - Where binary packages of the same name/version are architecture independant, the download count is the same across all packages.
-  - Where binary packages of the same name/version are architecture dependant, the download count is summed across all packages.
-- Published binaries display the name, version and if architecture specific, the architecture, otherwise blank.
+- PPAs are now specified only by the user/name with an optional filter; the series/architecture is redundant.
+- Removed the preference to combine PPAs.
+  - Published binaries of the same name/version and are architecture independant are identical (the download count is the same for each published binary).  Consequently, only the first published binary is displayed.
+  - Published binaries of the same name/version and are architecture specific are unique for each architecture.
+- Each published binary displays the name, version and if architecture specific, the architecture, otherwise blank, followed by the download count.
 - When updating preferences, only PPAs which have been modified are updated.
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
