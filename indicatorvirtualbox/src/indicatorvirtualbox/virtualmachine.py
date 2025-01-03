@@ -19,6 +19,9 @@
 ''' Virtual Machine information. '''
 
 
+import operator
+
+
 class VirtualMachine():
     ''' Information about a virtual machine. '''
 
@@ -72,7 +75,6 @@ class Group():
         return self.items
 
 
-#TODO Check this works.
     def __str__( self ):
         return (
             self.get_name() + ": " +
@@ -90,7 +92,18 @@ class Group():
             len( self.get_items() ) == len( other.get_items( ) ) )
 
         if equal:
-            for item_from_self, item_from_other in zip( self.get_items(), other.get_items() ): #TODO Does this need to be sorted...if so, see PPA.
-                equal &= item_from_self.__eq__( item_from_other )
+            z = \
+                zip(
+                    sorted(
+                        self.get_items(),
+                        key = operator.methodcaller( "__str__" ) ),
+                    sorted(
+                        other.get_items(),
+                        key = operator.methodcaller( "__str__" ) ) )
+
+            for item_self, item_other in z:
+                if not item_self.__eq__( item_other ):
+                    equal = False
+                    break
 
         return equal

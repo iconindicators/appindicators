@@ -124,8 +124,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def _build_menu( self, menu, items, indent, running_uuids ):
-        if not self.sort_groups_and_virtual_machines_equally:
-            
+        if self.sort_groups_and_virtual_machines_equally:
             sorted_items = \
                 sorted(
                     items,
@@ -141,6 +140,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         for item in sorted_items:
             if isinstance( item, Group ):
+                print( item )
                 self._build_menu(
                     self._add_group_to_menu( menu, item, indent ),
                     item.get_items(),
