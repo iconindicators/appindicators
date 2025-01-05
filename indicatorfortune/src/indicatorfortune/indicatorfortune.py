@@ -51,13 +51,13 @@ class IndicatorFortune( IndicatorBase ):
     fortune_fedora = "/usr/share/games/fortune"
     fortune_manjaro_opensuse = "/usr/share/fortune"
     if Path( fortune_debian ).exists():
-        DEFAULT_FORTUNE = [ fortune_debian, Gtk.STOCK_APPLY ]
+        DEFAULT_FORTUNE = [ fortune_debian, '✔' ]
 
     elif Path( fortune_fedora ).exists():
-        DEFAULT_FORTUNE = [ fortune_fedora, Gtk.STOCK_APPLY ]
+        DEFAULT_FORTUNE = [ fortune_fedora, '✔' ]
 
     else: # Assume to be Manjaro/openSUSE.
-        DEFAULT_FORTUNE = [ fortune_manjaro_opensuse, Gtk.STOCK_APPLY ]
+        DEFAULT_FORTUNE = [ fortune_manjaro_opensuse, '✔' ]
 
     HISTORY_FILE = "fortune-history.txt"
 
@@ -67,9 +67,11 @@ class IndicatorFortune( IndicatorBase ):
     # this flag is inserted into a dummy fortune to be shown as a notification.
     NOTIFICATION_WARNING_FLAG = "%%%%%"
 
-    # Fortune treeview columns; there is a one to one mapping between model and view.
+    # Fortune treeview columns; model and view have same columns.
     COLUMN_FILE_OR_DIRECTORY = 0 # Either the fortune filename or directory.
-    COLUMN_ENABLED = 1 # Icon name for the APPLY icon when the fortune is enabled; None otherwise.
+    COLUMN_ENABLED = 1 #
+
+    Icon name for the APPLY icon when the fortune is enabled; None otherwise.
 
 
     def __init__( self ):
@@ -250,11 +252,11 @@ class IndicatorFortune( IndicatorBase ):
         # For each fortune, show the...
         #   Path to fortune
         #   Gtk.STOCK_APPLY or Gtk.STOCK_DIALOG_ERROR or None
-#TODO Change from stockapply to text (don't use pixbuf)        
+#TODO Change from stockapply to text (don't use pixbuf)
         store = Gtk.ListStore( str, str )
         for location, enabled in self.fortunes:
             if Path( location ).is_file() or Path( location ).is_dir():
-                store.append( [ location, Gtk.STOCK_APPLY if enabled else None ] )
+                store.append( [ location, '✔' if enabled else '' ] )
 
             else:
                 store.append( [ location, Gtk.STOCK_DIALOG_ERROR ] )
@@ -421,7 +423,7 @@ class IndicatorFortune( IndicatorBase ):
             self.fortunes = [ ]
             treeiter = store.get_iter_first()
             while treeiter is not None:
-                if store[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == Gtk.STOCK_APPLY:
+                if store[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == '✔':
                     self.fortunes.append( [ store[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ], True ] )
 
                 else:
@@ -451,7 +453,7 @@ class IndicatorFortune( IndicatorBase ):
 
         else:
 #TODO Check this...should it be treeiter or converted iter?
-# I suspect this should really be converted iter.            
+# I suspect this should really be converted iter.
 #...or perhaps not.  What is selected is the sorted model which is displayed...
 # which is correct.
 # But to update the underlying data, need the underlying model and then do a convert of treeiter.
@@ -563,7 +565,7 @@ class IndicatorFortune( IndicatorBase ):
                 active = \
                     True
                     if row_number is None else \
-                    model[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == Gtk.STOCK_APPLY )
+                    model[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == '✔' )
 
         grid.attach( enabled_checkbox, 0, 2, 1, 1 )
 
@@ -580,7 +582,7 @@ class IndicatorFortune( IndicatorBase ):
 
                 model.get_model().append( [
                     fortune_file_directory.get_text().strip(),
-                    Gtk.STOCK_APPLY if enabled_checkbox.get_active() else None ] )
+                    '✔' if enabled_checkbox.get_active() else '' ] )
 
             break
 
@@ -659,11 +661,19 @@ class IndicatorFortune( IndicatorBase ):
 
     def save_config( self ):
         return {
-            IndicatorFortune.CONFIG_FORTUNES : self.fortunes,
-            IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON : self.middle_mouse_click_on_icon,
-            IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY : self.notification_summary,
-            IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES : self.refresh_interval_in_minutes,
-            IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT : self.skip_fortune_character_count
+            IndicatorFortune.CONFIG_FORTUNES: self.fortunes,
+
+            IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON:
+                self.middle_mouse_click_on_icon,
+
+            IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY:
+                self.notification_summary,
+
+            IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES:
+                self.refresh_interval_in_minutes,
+
+            IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT:
+                self.skip_fortune_character_count
         }
 
 

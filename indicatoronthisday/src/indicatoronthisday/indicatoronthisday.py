@@ -76,7 +76,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     # Calendar treeview columns; one to one mapping between data model and view.
     COLUMN_CALENDAR_FILE = 0 # Path to calendar file.
-    COLUMN_CALENDAR_ENABLED = 1 # tick icon (Gtk.STOCK_APPLY) or error icon (Gtk.STOCK_DIALOG_ERROR) or None.
+    COLUMN_CALENDAR_ENABLED = 1 # Check mark, or X or empty string.
 
     CALENDARS_FILENAME = "calendars.txt"
 
@@ -112,7 +112,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def _show_notifications( self, events, today ):
-        # It is assumed/hoped the dates in the calendar result are always
+        # It is assumed (hoped) the dates in the calendar result are always in
         # short date format irrespective of locale.
         today_in_short_date_format = today.strftime( '%b %d' )
 
@@ -133,15 +133,14 @@ class IndicatorOnThisDay( IndicatorBase ):
         last_date = ""
         for event in events:
             if event.get_date() != last_date:
-                # Ensure sufficient room for the date menu item and an event
-                # menu item.
+                # Ensure space for the date menu item and an event menu item.
                 if ( menu_item_count + 2 ) > menu_item_maximum:
                     # Don't add the menu item for the new date and don't add a
                     # subsequent event.
                     break
 
                 event_date = \
-                 self.remove_leading_zero_from_date( event.get_date() )
+                    self.remove_leading_zero_from_date( event.get_date() )
 
                 self.create_and_append_menuitem( menu, event_date )
 
@@ -246,7 +245,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         # Status of calendar file
         #     'X' if missing
         #     ✔ if present and enabled
-        #     blank if present and not enabled
+        #     '' if present and not enabled
         store = Gtk.ListStore( str, str )
         for calendar in set( self.get_calendars_system() + self.calendars ):
             if Path( calendar ).is_file():
@@ -404,7 +403,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.calendars = [ ]
             treeiter = store.get_iter_first()
             while treeiter is not None:
-                if store[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ]:
+                if store[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ] == '✔':
                     self.calendars.append( store[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
 
                 treeiter = store.iter_next( treeiter )
@@ -443,6 +442,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         return calendars
 
 
+#TODO Maybe drop this.
     def on_calendar_reset( self, button, treeview ):
         if self.show_dialog_ok_cancel( treeview, _( "Reset calendars to factory default?" ) ) == Gtk.ResponseType.OK:
             liststore = treeview.get_model().get_model()
@@ -464,7 +464,6 @@ class IndicatorOnThisDay( IndicatorBase ):
             selected_calendar_path = \
                 model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
 
-#TODO Maybe allow the user to remove the default calendar...?  Can always just do a reset.
             if selected_calendar_path in self.get_calendars_system():
                 self.show_dialog_ok(
                     treeview,
