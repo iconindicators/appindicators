@@ -238,7 +238,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def start_virtual_machine( self, uuid ):
         result = self.process_get( "VBoxManage list vms | grep " + uuid )
-        if result is None or uuid not in result:
+        if uuid not in result:
             message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
             self.show_notification( _( "Error" ), message )
 
@@ -338,7 +338,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             if result:
                 window_id = result.split()[ 0 ]
 
-            if window_id is None or window_id == "":
+            if window_id is None or window_id == "":   #TODO Check if window_id can ever be None
                 start_virtualbox_manager()
 
             else:
@@ -353,20 +353,19 @@ class IndicatorVirtualBox( IndicatorBase ):
         names = [ ]
         uuids = [ ]
         result = self.process_get( "VBoxManage list runningvms" )
-        if result:
-            for line in result.splitlines():
-                if line.startswith( '\"' ) and line.endswith( '}' ):
-                    # VBoxManage may emit a warning message along with the VM
-                    # information, so check each line as best as possible.
-                    info = line[ 1 : -1 ].split( "\" {" )
-                    names.append( info[ 0 ] )
-                    uuids.append( info[ 1 ] )
+        for line in result.splitlines():
+            if line.startswith( '\"' ) and line.endswith( '}' ):
+                # VBoxManage may emit a warning message along with the VM
+                # information, so check each line as best as possible.
+                info = line[ 1 : -1 ].split( "\" {" )
+                names.append( info[ 0 ] )
+                uuids.append( info[ 1 ] )
 
         return names, uuids
 
 
     def is_virtual_machine_running( self, uuid ):
-        return self.process_get( "VBoxManage list runningvms | grep " + uuid ) is not None
+        return self.process_get( "VBoxManage list runningvms | grep " + uuid ) is not None  #TODO Check if can ever be None.
 
 
     def get_virtual_machines( self ):
@@ -404,12 +403,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def is_vbox_manage_installed( self ):
-        is_installed = False
-        result = self.process_get( "which VBoxManage" )
-        if result:
-            is_installed = result.find( "VBoxManage" ) > -1
-
-        return is_installed
+        return self.process_get( "which VBoxManage" ).find( "VBoxManage" ) > -1
 
 
     def get_start_command( self, uuid ):

@@ -75,7 +75,6 @@ class Info( ABC ):
             self.get_show_notification() == other.get_show_notification() )
 
 
-#TODO Check this works.
     def __str__( self ):
         return (
             self.group + " | " +
@@ -131,7 +130,6 @@ class Background( Info ):
             self.get_force_update() == other.get_force_update() )
 
 
-#TODO Check this works.
     def __str__( self ):
         return (
             super().__str__() + " | " +
@@ -185,7 +183,6 @@ class NonBackground( Info ):
             self.get_default() == other.get_default() )
 
 
-#TODO Check this works.
     def __str__( self ):
         return (
             super().__str__() + " | " +

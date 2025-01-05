@@ -187,7 +187,7 @@ class IndicatorFortune( IndicatorBase ):
             else:
                 while True:
                     self.fortune = self.process_get( "fortune" + locations )
-                    if self.fortune is None: # Occurs when no fortune data is found...
+                    if not self.fortune: # Occurs when no fortune data is found...     #TODO Check this happens when no fortune is found...either no fortunes, or the command is missing?
                         self.fortune = \
                             IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
                             _( "Ensure enabled fortunes contain fortune data!" )

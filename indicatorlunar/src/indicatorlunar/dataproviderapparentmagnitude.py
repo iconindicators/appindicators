@@ -170,7 +170,6 @@ class AM():
         return self.apparent_magnitude
 
 
-#TODO Check this works.
     def __str__( self ):
         return self.name + ',' + self.apparent_magnitude
 

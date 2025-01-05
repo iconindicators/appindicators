@@ -166,12 +166,12 @@ class IndicatorTest( IndicatorBase ):
 
         self.create_and_append_menuitem(
             submenu,
-            _( "Terminal: " ) + str( terminal ),
+            _( "Terminal: " ) + _( "Unknown terminal!" ) if terminal is None else str( terminal ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
             submenu,
-            _( "Execution flag: " ) + str( execution_flag ),
+            _( "Execution flag: " ) + _( "Unknown terminal!" ) if terminal is None else str( execution_flag ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(

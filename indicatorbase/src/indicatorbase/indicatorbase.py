@@ -911,9 +911,6 @@ class IndicatorBase( ABC ):
         The calendar package is unavailable on some distributions.
         '''
         etc_os_release = self.process_get( "cat /etc/os-release" )
-        if etc_os_release is None:
-            etc_os_release = ""
-
         is_manjaro = "NAME=\"Manjaro Linux\"" in etc_os_release
         is_opensuse_tumbleweed = "NAME=\"openSUSE Tumbleweed\"" in etc_os_release
 
@@ -963,11 +960,10 @@ class IndicatorBase( ABC ):
         clipboard_supported = True
         if self.is_session_type_wayland():
             etc_os_release = self.process_get( "cat /etc/os-release" )
-            if etc_os_release is None:
-                etc_os_release = ""
-
-            if "ID=ubuntu" in etc_os_release and "VERSION_ID=\"20.04\"" in etc_os_release:
-                clipboard_supported = False
+            clipboard_supported = (
+                "ID=ubuntu" in etc_os_release
+                and
+                "VERSION_ID=\"20.04\"" in etc_os_release )
 
         return clipboard_supported
 
@@ -1007,8 +1003,6 @@ class IndicatorBase( ABC ):
         if self.is_clipboard_supported():
             if self.is_session_type_wayland():
                 text_in_clipboard = self.process_get( "wl-paste" )
-                if text_in_clipboard == "":
-                    text_in_clipboard = None
 
             else:
                 text_in_clipboard = \
@@ -1041,11 +1035,8 @@ class IndicatorBase( ABC ):
                 # To shield the user from having to know whether Wayland or X11
                 # is in use, access to the primary is wrapped within a callback
                 # function.
-                text_in_primary = self.process_get( "wl-paste --primary" )
-                if text_in_primary == "":
-                    text_in_primary = None
-
-                primary_received_callback_function( text_in_primary )
+                primary_received_callback_function(
+                    self.process_get( "wl-paste --primary" ) )
 
             else:
                 Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
@@ -1969,11 +1960,12 @@ class IndicatorBase( ABC ):
         Fixed in version 1.2.0
             https://github.com/lxqt/qterminal/releases
         '''
-        qterminal_and_broken = False
-        if terminal is not None and "qterminal" in terminal:
-            qterminal_and_broken = self.process_get( "qterminal --version" ) < "1.2.0"
+        is_qterminal_and_broken_ = False
+        if "qterminal" in terminal:
+            is_qterminal_and_broken_ = \
+                self.process_get( "qterminal --version" ) < "1.2.0"
 
-        return qterminal_and_broken
+        return is_qterminal_and_broken_
 
 
     def get_terminal_and_execution_flag( self ):
@@ -1985,16 +1977,9 @@ class IndicatorBase( ABC ):
         execution_flag = None
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
             terminal = self.process_get( "which " + _terminal )
-            if terminal is not None:
+            if terminal:
                 execution_flag = _execution_flag
                 break
-
-        if terminal:
-            terminal = terminal.strip()
-
-        if terminal == "":
-            terminal = None
-            execution_flag = None
 
         return terminal, execution_flag
 
@@ -2442,17 +2427,20 @@ class IndicatorBase( ABC ):
                 logging.error( e.stderr )
 
 
+#TODO Check every function which calls this...the function no longer returns None but rather "".
+# Do we need to return the result and stderr?
     def process_get( self, command, log_non_zero_error_code = False ):
         '''
         Executes the command and returns the result.
+        The result of executing the command may indeed be "" which does not
+        necessarily indicate an error condition.
 
         logNonZeroErrorCode:
             If True, will log any exception arising from a non-zero return code;
             otherwise will ignore.
 
-        On exception, logs to file.
+        On failure/exception, logs to file and returns "".
         '''
-        result = None
         try:
             result = \
                 subprocess.run(
@@ -2460,20 +2448,22 @@ class IndicatorBase( ABC ):
                     stdout = subprocess.PIPE,
                     stderr = subprocess.PIPE,
                     shell = True,
-                    check = log_non_zero_error_code ).stdout.decode()
+                    check = log_non_zero_error_code )
 
-            if result:
-                result = result.strip()
+            stderr_ = result.stderr.decode()
+            if stderr_:
+                result = ""
+                logging.error( stderr_ )
 
             else:
-                result = None
+                result = result.stdout.decode().strip()
 
         except subprocess.CalledProcessError as e:
             logging.error( e )
             if e.stderr:
                 logging.error( e.stderr )
 
-            result = None
+            result = ""
 
         return result
 

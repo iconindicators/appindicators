@@ -409,7 +409,6 @@ class OE():
         return self.data_type
 
 
-#TODO Check this works.
     def __str__( self ):
         return self.data
 

@@ -48,6 +48,7 @@ import threading
 import time
 
 from datetime import datetime, timedelta
+from itertools import chain, groupby
 from pathlib import Path
 
 import gi
@@ -80,6 +81,7 @@ class IndicatorOnThisDay( IndicatorBase ):
     CALENDARS_FILENAME = "calendars.txt"
 
     DEFAULT_CALENDAR = "/usr/share/calendar/calendar.history"
+
     TAG_EVENT = "["+ _( "EVENT" )+ "]"
     SEARCH_URL_DEFAULT = "https://www.google.com/search?q=" + TAG_EVENT
 
@@ -120,8 +122,8 @@ class IndicatorOnThisDay( IndicatorBase ):
                     _( "On this day..." ),
                     event.get_description() )
 
-                # Without a delay some/most of the notifications disappear
-                # too quickly.
+                # Need a delay otherwise some/most of the notifications will
+                # disappear too quickly.
                 time.sleep( 3 )
 
 
@@ -198,18 +200,16 @@ class IndicatorOnThisDay( IndicatorBase ):
         self.write_cache_text_without_timestamp(
             content, IndicatorOnThisDay.CALENDARS_FILENAME )
 
-        # Run the calendar command and parse the results.
+        # Run the calendar command and parse the results into events,
+        # sorted by date then description.
+        command = (
+            "calendar -f " +
+            str( self.get_cache_directory() / IndicatorOnThisDay.CALENDARS_FILENAME ) +
+            " -A 366" )
+
         events_sorted_by_date = [ ]
-        command = \
-            "calendar -f " + \
-            str( self.get_cache_directory() / IndicatorOnThisDay.CALENDARS_FILENAME ) + \
-            " -A 366"
-
         for line in self.process_get( command ).splitlines():
-            if line is None or len( line.strip() ) == 0:
-                continue
-
-            if line.startswith( "\t" ): # Continuation of the previous event.
+            if line.startswith( '\t' ): # Continuation of the previous event.
                 date_ = events_sorted_by_date[ -1 ].get_date()
                 description = events_sorted_by_date[ -1 ].get_description() + " " + line.strip()
                 del events_sorted_by_date[ -1 ]
@@ -217,8 +217,8 @@ class IndicatorOnThisDay( IndicatorBase ):
 
             else:
                 # Start of event: month/day and event are separated by a TAB.
-                line = line.split( "\t" )
-                date_ = line[ 0 ].replace( "*", "" ).strip()
+                line = line.split( '\t' )
+                date_ = line[ 0 ].replace( '*', '' ).strip()
 
                 # Take the last element as there may be more than one TAB
                 # character throwing out the index of the event in the line.
@@ -226,38 +226,14 @@ class IndicatorOnThisDay( IndicatorBase ):
 
                 events_sorted_by_date.append( Event( date_, description ) )
 
-        # Sort events further by description.
-        i = 0
-        j = i + 1
-        events_sorted_by_date_then_description = [ ]
-        while True:
-            if j == len( events_sorted_by_date ):
-                events_sorted_by_date_then_description += \
-                    sorted(
-                        events_sorted_by_date[ i : j ],
-                        key = lambda event: event.get_description() )
+        events_grouped_by_date = [ ]
+        for date_, event in groupby( events_sorted_by_date, key = lambda event: event.get_date() ):
+            events_grouped_by_date.append(
+                sorted(
+                    list( event ),
+                    key = lambda event: event.get_description() ) )
 
-                break
-
-            if events_sorted_by_date[ j ].get_date() == events_sorted_by_date[ i ].get_date():
-                j += 1
-
-            else:
-                events_sorted_by_date_then_description += \
-                    sorted(
-                        events_sorted_by_date[ i : j ],
-                        key = lambda event: event.get_description() )
-
-                i = j
-                j = i + 1
-
-        # Remove duplicate events.
-        events_sorted_by_date_then_description_without_duplicates = [ ]
-        for event in events_sorted_by_date_then_description:
-            if event not in events_sorted_by_date_then_description_without_duplicates:
-                events_sorted_by_date_then_description_without_duplicates.append( event )
-
-        return events_sorted_by_date_then_description_without_duplicates
+        return list( chain( *events_grouped_by_date ) )
 
 
     def on_preferences( self, dialog ):
@@ -266,30 +242,30 @@ class IndicatorOnThisDay( IndicatorBase ):
         # Calendar file settings.
         grid = self.create_grid()
 
-        # For each calendar, show the...
-        #   Path to calendar file
-        #   Gtk.STOCK_APPLY or Gtk.STOCK_DIALOG_ERROR or None
-#TODO Change from stockapply to text (don't use pixbuf)        
+        # Path to calendar file
+        # Status of calendar file
+        #     'X' if missing
+        #     ✔ if present and enabled
+        #     blank if present and not enabled
         store = Gtk.ListStore( str, str )
-        for calendar in self.get_calendars():
-            if calendar not in self.calendars:
-                store.append( [ calendar, None ] )
-
-        for calendar in self.calendars:
+        for calendar in set( self.get_calendars_system() + self.calendars ):
             if Path( calendar ).is_file():
-                store.append( [ calendar, Gtk.STOCK_APPLY ] )
+                if calendar in self.calendars:
+                    store.append( [ calendar, '✔' ] )
+
+                else:
+                    store.append( [ calendar, '' ] )
 
             else:
-                store.append( [ calendar, Gtk.STOCK_DIALOG_ERROR ] )
+                store.append( [ calendar, 'X' ] )
 
-#TODO Check sorting...is user sorting really needed?
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 Gtk.TreeModelSort( model = store ),
                 ( _( "Calendar" ), _( "Enabled" ) ),
                 (
                     ( Gtk.CellRendererText(), "text", IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
-                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
+                    ( Gtk.CellRendererText(), "text", IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
                 alignments_columnviewids = ( ( 0.5, IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ), ),
                 sortcolumnviewids_columnmodelids = (
                     ( IndicatorOnThisDay.COLUMN_CALENDAR_FILE, IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
@@ -457,7 +433,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             search_engine_entry.set_text( IndicatorOnThisDay.SEARCH_URL_DEFAULT )
 
 
-    def get_calendars( self ):
+    def get_calendars_system( self ):
         calendars = [ ]
         for root, directories, filenames in os.walk( "/usr/share/calendar" ): # Path.walk() only available in Python 3.12.
             for filename in fnmatch.filter( filenames, "calendar.*" ):
@@ -471,7 +447,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         if self.show_dialog_ok_cancel( treeview, _( "Reset calendars to factory default?" ) ) == Gtk.ResponseType.OK:
             liststore = treeview.get_model().get_model()
             liststore.clear()
-            for calendar in self.get_calendars():
+            for calendar in self.get_calendars_system():
                 if calendar == IndicatorOnThisDay.DEFAULT_CALENDAR:
                     liststore.append( [ IndicatorOnThisDay.DEFAULT_CALENDAR, Gtk.STOCK_APPLY ] )
 
@@ -489,7 +465,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
 
 #TODO Maybe allow the user to remove the default calendar...?  Can always just do a reset.
-            if selected_calendar_path in self.get_calendars():
+            if selected_calendar_path in self.get_calendars_system():
                 self.show_dialog_ok(
                     treeview,
                     _( "This is a system calendar and cannot be removed." ),
@@ -517,7 +493,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         else: # This is an edit.
             is_system_calendar = \
-                model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.get_calendars()
+                model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.get_calendars_system()
 
         grid = self.create_grid()
 
@@ -592,7 +568,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def on_browse_calendar( self, button, add_edit_dialog, calendar_file ):
-        system_calendars = self.get_calendars()
+        system_calendars = self.get_calendars_system()
 
         dialog = \
             self.create_filechooser_dialog(
