@@ -2047,6 +2047,8 @@ class IndicatorLunar( IndicatorBase ):
             satellite_store_sort,
             satellite_model_column_hide_show )
 
+#TODO Can this instead use the (eventual) generic function to create
+# a treeview with multiple columns, one of which is a boolean/checkbox?
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
                 satellite_store_sort,

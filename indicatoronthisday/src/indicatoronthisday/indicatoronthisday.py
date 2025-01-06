@@ -242,7 +242,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         grid = self.create_grid()
 
         # Path to calendar file
-        # Status of calendar file
+        # Status of calendar file"
         #     'X' if missing
         #     ✔ if present and enabled
         #     '' if present and not enabled
@@ -598,7 +598,9 @@ class IndicatorOnThisDay( IndicatorBase ):
         self.calendars = \
             config.get(
                 IndicatorOnThisDay.CONFIG_CALENDARS,
-                [ IndicatorOnThisDay.DEFAULT_CALENDAR ] )
+                [ IndicatorOnThisDay.DEFAULT_CALENDAR ] )  #TODO See Fortune...need to distinguish between a system calendar and defautl calendar?
+#TODO I think there is an issue here...need to read in the calendars (and which ones are enabled).
+# Some calendars are system and some are user...but any/all can be enabled/disabled.
 
         self.copy_to_clipboard = \
             config.get(
