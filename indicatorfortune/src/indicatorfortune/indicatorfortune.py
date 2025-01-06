@@ -223,7 +223,7 @@ class IndicatorFortune( IndicatorBase ):
                         if history is None:
                             history = ""
 
-                        # Remove characters/glyphs which appear as hexadecimal. 
+                        # Remove characters/glyphs which appear as hexadecimal.
                         # Refer to:
                         #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
                         #
@@ -274,18 +274,15 @@ class IndicatorFortune( IndicatorBase ):
         # Fortune file.
         grid = self.create_grid()
 
-        # Path to fortune
-        # Status of fprtune:
-        #     'X' if missing
-        #     '✔' if present and enabled
-        #     '' if present and not enabled
-        store = Gtk.ListStore( str, str )
+        store = Gtk.ListStore( str, bool )
         for location, enabled in self.fortunes:
             if Path( location ).is_file() or Path( location ).is_dir():
-                store.append( [ location, '✔' if enabled else '' ] )
+                store.append( [ location, enabled ] )
 
             else:
-                store.append( [ location, 'X' ] )
+                store.append( [ location, False ] )
+                #TODO Need to make the row bold or something to indicate missing fortune.
+                #TODO Need to add to tooltip as to what the bold means.
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
@@ -318,6 +315,26 @@ class IndicatorFortune( IndicatorBase ):
                     "native language." ),
                 rowactivatedfunctionandarguments =
                     ( self.on_fortune_double_click, ) )
+
+        treeview, scrolledwindow = \
+            self.create_treeview_within_scrolledwindow_with_checkbox(
+                Gtk.TreeModelSort( model = store ),
+                (
+                    _( "Fortune File/Directory" ),
+                    _( "Enabled" ) ),
+                (
+                    IndicatorFortune.COLUMN_FILE_OR_DIRECTORY,
+                    IndicatorFortune.COLUMN_ENABLED ),
+                _(
+                    "Double click to edit a fortune.\n\n" +
+                    "English language fortunes are\n" +
+                    "installed by default.\n\n" +
+                    "There may be other fortune\n" +
+                    "packages available in your\n" +
+                    "native language." ),
+                IndicatorFortune.COLUMN_ENABLED,
+                IndicatorFortune.COLUMN_ENABLED,
+                self.on_checkbox )
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
@@ -489,6 +506,23 @@ class IndicatorFortune( IndicatorBase ):
                 latest_version_checkbox.get_active() )
 
         return response_type
+
+
+#TODO This will likely go into indicatorbase...
+# ...but also check that something similar has not already been done.
+    def on_checkbox(
+            self,
+            cell_renderer_toggle,
+            row,
+            liststore,
+            checkbox_column_model_id ):
+
+        store = liststore
+        if isinstance( store, Gtk.TreeModelSort ):
+            store = store.get_model()
+
+        store[ row ][ checkbox_column_model_id ] = \
+            not store[ row ][ checkbox_column_model_id ]
 
 
 #TODO Needed?
