@@ -19,12 +19,6 @@
 ''' Application indicator which displays fortunes. '''
 
 
-#TODO Need to catch when no fortunes are present.
-
-
-#TODO Need to catch when no fortunes are enabled.
-
-
 import codecs
 
 from pathlib import Path
@@ -72,8 +66,8 @@ class IndicatorFortune( IndicatorBase ):
 
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
 
-    # When no fortune is enabled or no fortunes are present in the fortune .dat,
-    # this flag is inserted into a dummy fortune to be shown as a notification.
+    # When no fortune is enabled or no fortunes are present, this flag is
+    # inserted into a dummy fortune to be shown as a notification.
     NOTIFICATION_WARNING_FLAG = "%%%%%"
 
     # Fortune treeview columns; model and view have same columns.
@@ -101,7 +95,9 @@ class IndicatorFortune( IndicatorBase ):
             activate_functionandarguments = (
                 lambda menuitem: self.refresh_and_show_fortune(), ),
             is_secondary_activate_target = (
-                self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
+                self.middle_mouse_click_on_icon
+                ==
+                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
         activate_functionandarguments = None
         if self.is_clipboard_supported():
@@ -113,7 +109,9 @@ class IndicatorFortune( IndicatorBase ):
             _( "Copy Last Fortune" ),
             activate_functionandarguments = activate_functionandarguments,
             is_secondary_activate_target = (
-                self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
+                self.middle_mouse_click_on_icon
+                ==
+                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
 
         self.create_and_append_menuitem(
             menu,
@@ -121,7 +119,9 @@ class IndicatorFortune( IndicatorBase ):
             activate_functionandarguments = (
                 lambda menuitem: self.show_fortune(), ),
             is_secondary_activate_target = (
-                self.middle_mouse_click_on_icon == IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
+                self.middle_mouse_click_on_icon
+                ==
+                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
 
         menu.append( Gtk.SeparatorMenuItem() )
 
@@ -138,7 +138,8 @@ class IndicatorFortune( IndicatorBase ):
         # https://stackoverflow.com/questions/5218948/how-to-auto-scroll-a-gtk-scrolledwindow
         def textview_changed( textview, rectangle ):
             adjustment = textview.get_parent().get_vadjustment()
-            adjustment.set_value( adjustment.get_upper() - adjustment.get_page_size() )
+            adjustment.set_value(
+                adjustment.get_upper() - adjustment.get_page_size() )
 
 
         self.set_menu_sensitivity( False )
@@ -177,76 +178,77 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def refresh_fortune( self ):
-        locations = " "
-        no_enabled_fortunes = True
+        locations = [ ]
+        at_least_one_fortune_is_enabled = False
         for location, enabled in self.fortunes:
             if enabled:
-                no_enabled_fortunes = False
+                at_least_one_fortune_is_enabled = True
                 if Path( location ).is_dir():
-                    # Remove all trailing slashes,
-                    # then add one in as 'fortune' needs it!
-                    locations += "'" + location.rstrip( "/" ) + "/" + "' "
+                    locations.append( " '" + location + "/' " )
+#
+#                     # Remove trailing slashes, then add one in as 'fortune'
+#                     # needs it.
+# #TODO I don't follow this....remove then add a slash...????
+#                     locations += "'" + location.rstrip( "/" ) + "/" + "' "
 
                 elif Path( location ).is_file():
-                    # 'fortune' doesn't want the extension.
-                    locations += "'" + location.replace( ".dat", "" ) + "' "
+                    locations.append(
+                        " '" + location.replace( ".dat", "" ) + "' " )
+                    # # Remove the extension as 'fortune' doesn't want it.
+                    # locations += "'" + location.replace( ".dat", "" ) + "' "
 
-        if no_enabled_fortunes:
+                else:
+                    self.get_logging().error(
+                        f"Unknown fortune path { location }" )
+
+        if locations:
+            while True:
+                command = "fortune" + ''.join( locations )
+                self.fortune = self.process_get( command )
+                if not self.fortune: # No fortune data found.
+                    self.fortune = \
+                        IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
+                        _( "Ensure enabled fortunes contain fortune data!" )
+
+                    break
+
+                if len( self.fortune ) <= self.skip_fortune_character_count:
+                    history = \
+                        self.read_cache_text_without_timestamp(
+                            IndicatorFortune.HISTORY_FILE )
+
+                    # Remove characters/glyphs which appear as hexadecimal.
+                    # Refer to:
+                    #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
+                    #
+                    # Examples (On Debian 12 x0007 is x0008):
+                    #     Ask not for whom the <CONTROL-G> tolls.
+                    #         *** System shutdown message from root ***
+                    #     It's a very *__UN*lucky week in which to be took dead.
+                    output = ""
+                    for c in self.fortune:
+                        char_as_hex = codecs.encode( str.encode( c ), "hex" )
+                        if char_as_hex == b'07' or char_as_hex == b'08':
+                            continue
+
+                        output += c
+
+                    self.fortune = output
+                    self.write_cache_text_without_timestamp(
+                        history + self.fortune + "\n\n",
+                        IndicatorFortune.HISTORY_FILE )
+
+                    break
+
+        elif at_least_one_fortune_is_enabled:
+            self.fortune = \
+                IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
+                _( "No enabled fortunes have a valid location!" )
+
+        else:
             self.fortune = \
                 IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
                 _( "No enabled fortunes!" )
-
-        else:
-            if locations == " ":
-                # Despite one or more fortunes enabled,
-                # none seem to be valid paths/files.
-                self.fortune = \
-                    IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
-                    _( "No enabled fortunes have a valid location!" )
-
-            else:
-                while True:
-                    self.fortune = self.process_get( "fortune" + locations )
-                    if not self.fortune: # Occurs when no fortune data is found...     #TODO Check this happens when no fortune is found...either no fortunes, or the command is missing?
-                        self.fortune = \
-                            IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
-                            _( "Ensure enabled fortunes contain fortune data!" )
-
-                        break
-
-                    if len( self.fortune ) <= self.skip_fortune_character_count:
-                        # The fortune is within the character limit, so keep it.
-                        history = \
-                            self.read_cache_text_without_timestamp(
-                                IndicatorFortune.HISTORY_FILE )
-
-                        if history is None:
-                            history = ""
-
-                        # Remove characters/glyphs which appear as hexadecimal.
-                        # Refer to:
-                        #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
-                        #
-                        # Examples:
-                        #     Ask not for whom the <CONTROL-G> tolls.
-                        #         *** System shutdown message from root ***
-                        #     It's a very *__UN*lucky week in which to be took dead.   <--- On Debian 12 this is x0008
-                        output = ""
-                        for c in self.fortune:
-                            char_as_hex = \
-                                codecs.encode( str.encode( c ), "hex" )
-
-                            if char_as_hex == b'07' or char_as_hex == b'08':
-                                continue
-
-                            output += c
-
-                        self.fortune = output
-                        self.write_cache_text_without_timestamp(
-                            history + self.fortune + "\n\n",
-                            IndicatorFortune.HISTORY_FILE )
-
-                        break
 
 
     def show_fortune( self ):
@@ -271,7 +273,7 @@ class IndicatorFortune( IndicatorBase ):
     def on_preferences( self, dialog ):
         notebook = Gtk.Notebook()
 
-        # Fortune file.
+        # Fortune(s).
         grid = self.create_grid()
 
         store = Gtk.ListStore( str, bool )
@@ -281,21 +283,33 @@ class IndicatorFortune( IndicatorBase ):
 
             else:
                 store.append( [ location, False ] )
-                #TODO Need to make the row bold or something to indicate missing fortune.
-                #TODO Need to add to tooltip as to what the bold means.
+
+        store = Gtk.TreeModelSort( model = store )
+
+#TODO Can/should this go into indicatorbase?
+# (along with the on_checkbox function below)
+# Used by onthisday, lunar.
+        renderer_toggle = Gtk.CellRendererToggle()
+        renderer_toggle.connect(
+            "toggled",
+            self.on_checkbox,
+            store,
+            IndicatorFortune.COLUMN_ENABLED )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
-                Gtk.TreeModelSort( model = store ),
-                ( _( "Fortune File/Directory" ), _( "Enabled" ) ),
+                store,
+                (
+                    _( "Fortune File/Directory" ),
+                    _( "Enabled" ) ),
                 (
                     (
                         Gtk.CellRendererText(),
                         "text",
                         IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ),
                     (
-                        Gtk.CellRendererText(),
-                        "text",
+                        renderer_toggle,
+                        "active",
                         IndicatorFortune.COLUMN_ENABLED ) ),
                 alignments_columnviewids =
                     ( ( 0.5, IndicatorFortune.COLUMN_ENABLED ), ),
@@ -314,27 +328,7 @@ class IndicatorFortune( IndicatorBase ):
                     "packages available in your\n" +
                     "native language." ),
                 rowactivatedfunctionandarguments =
-                    ( self.on_fortune_double_click, ) )
-
-        treeview, scrolledwindow = \
-            self.create_treeview_within_scrolledwindow_with_checkbox(
-                Gtk.TreeModelSort( model = store ),
-                (
-                    _( "Fortune File/Directory" ),
-                    _( "Enabled" ) ),
-                (
-                    IndicatorFortune.COLUMN_FILE_OR_DIRECTORY,
-                    IndicatorFortune.COLUMN_ENABLED ),
-                _(
-                    "Double click to edit a fortune.\n\n" +
-                    "English language fortunes are\n" +
-                    "installed by default.\n\n" +
-                    "There may be other fortune\n" +
-                    "packages available in your\n" +
-                    "native language." ),
-                IndicatorFortune.COLUMN_ENABLED,
-                IndicatorFortune.COLUMN_ENABLED,
-                self.on_checkbox )
+                    ( self.on_fortune_double_click, dialog ) )
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
@@ -488,15 +482,10 @@ class IndicatorFortune( IndicatorBase ):
             treeiter = store.get_iter_first()
             while treeiter is not None:
                 row = store[ treeiter ]
-                if row[ IndicatorFortune.COLUMN_ENABLED ] == '✔':
-                    self.fortunes.append(
-                        [
-                            row[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ],
-                            True ] )
-
-#TODO Is this needed?
-                # else:
-                #     self.fortunes.append( [ store[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ], False ] )
+                self.fortunes.append(
+                    [
+                        row[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ],
+                        row[ IndicatorFortune.COLUMN_ENABLED ] ] )
 
                 treeiter = store.iter_next( treeiter )
 
@@ -514,15 +503,15 @@ class IndicatorFortune( IndicatorBase ):
             self,
             cell_renderer_toggle,
             row,
-            liststore,
+            store,
             checkbox_column_model_id ):
 
-        store = liststore
+        store_ = store
         if isinstance( store, Gtk.TreeModelSort ):
-            store = store.get_model()
+            store_ = store.get_model()
 
-        store[ row ][ checkbox_column_model_id ] = \
-            not store[ row ][ checkbox_column_model_id ]
+        store_[ row ][ checkbox_column_model_id ] = \
+            not store_[ row ][ checkbox_column_model_id ]
 
 
 #TODO Needed?
@@ -536,7 +525,9 @@ class IndicatorFortune( IndicatorBase ):
     def on_fortune_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            self.show_dialog_ok( treeview, _( "No fortune has been selected for removal." ) )
+            self.show_dialog_ok(
+                treeview,
+                _( "No fortune has been selected for removal." ) )
 
         else:
 #TODO Check this...should it be treeiter or converted iter?
@@ -550,8 +541,7 @@ class IndicatorFortune( IndicatorBase ):
             if selected_fortune == IndicatorFortune.SYSTEM_FORTUNE:
                 self.show_dialog_ok(
                     treeview,
-                    _( "This is the system fortune and cannot be deleted." ),
-                    message_type = Gtk.MessageType.INFO )
+                    _( "This is the system fortune and cannot be deleted." ) )
 
             else:
                 response = \
@@ -565,10 +555,25 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def on_fortune_add( self, button, treeview ):
-        self.on_fortune_double_click( treeview, None, None )
+        self.__on_fortune_double_click( treeview, None, None )
 
 
-    def on_fortune_double_click( self, treeview, row_number, treeviewcolumn ):
+    def on_fortune_double_click(
+            self, treeview, row_number, treeviewcolumn, preferences_dialog ):
+
+        model, treeiter = treeview.get_selection().get_selected()
+        path = model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ]
+        if path == IndicatorFortune.SYSTEM_FORTUNE:
+            self.show_dialog_ok(
+                preferences_dialog,
+                _( "This is a system fortune and cannot be modified." ) )
+
+        else:
+            self.__on_fortune_double_click(
+                treeview, row_number, treeviewcolumn )
+
+
+    def __on_fortune_double_click( self, treeview, row_number, treeviewcolumn ):
         model, treeiter = treeview.get_selection().get_selected()
         adding_fortune = row_number is None
 
@@ -587,7 +592,7 @@ class IndicatorFortune( IndicatorBase ):
                 ''
                 if adding_fortune
                 else
-                model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ],
+                model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ],  #TODO Should model be model.get_model() or however the treeiter is supposed to be converted?
                 tooltip_text = _(
                     "The path to a fortune .dat file,\n" +
                     "or a directory containing\n" +
@@ -604,37 +609,32 @@ class IndicatorFortune( IndicatorBase ):
                     ( fortune_file_directory, True ) ) ),
             0, 0, 1, 1 )
 
-        is_system_fortune = False # This is an add.
-        if row_number: # This is an edit.
-            is_system_fortune = \
-                model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] == IndicatorFortune.DEFAULT_FORTUNE #TODO Check
-
         browse_file_button = \
             self.create_button(
                 _( "File" ),
                 tooltip_text = _(
-                    "This fortune is part of your\n" +
-                    "system and cannot be modified." )
-                    if is_system_fortune else _(
                     "Choose a fortune .dat file.\n\n" +
                     "Ensure the corresponding text\n" +
                     "file is present." ),
-                sensitive = not is_system_fortune,
-                clicked_functionandarguments = ( self.on_browse_fortune, dialog, fortune_file_directory, True ) )
+                clicked_functionandarguments = (
+                    self.on_browse_fortune,
+                    dialog,
+                    fortune_file_directory,
+                    True ) )
 
         browse_directory_button = \
             self.create_button(
                 _( "Directory" ),
                 tooltip_text = _(
-                    "This fortune is part of your\n" +
-                    "system and cannot be modified." )
-                    if is_system_fortune else _(
                     "Choose a directory containing\n" +
                     "a fortune .dat file(s).\n\n" +
                     "Ensure the corresponding text\n" +
                     "file is present." ),
-                sensitive = not is_system_fortune,
-                clicked_functionandarguments = ( self.on_browse_fortune, dialog, fortune_file_directory, False ) )
+                clicked_functionandarguments = (
+                    self.on_browse_fortune,
+                    dialog,
+                    fortune_file_directory,
+                    False ) )
 
         grid.attach(
             self.create_box(
@@ -645,35 +645,48 @@ class IndicatorFortune( IndicatorBase ):
                 homogeneous = True ),
             0, 1, 1, 1 )
 
-        enabled_checkbox = \
-            self.create_checkbutton(
-                _( "Enabled" ),
-                tooltip_text = _(
-                    "Ensure the fortune file/directory\n" +
-                    "works by running through 'fortune'\n" +
-                    "in a terminal." ),
-                active = \
-                    True
-                    if row_number is None else \
-                    model[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == '✔' )
-
-        grid.attach( enabled_checkbox, 0, 2, 1, 1 )
+#TODO This goes I think.
+        # enabled_checkbox = \
+        #     self.create_checkbutton(
+        #         _( "Enabled" ),
+        #         tooltip_text = _(
+        #             "Ensure the fortune file/directory\n" +
+        #             "works by running through 'fortune'\n" +
+        #             "in a terminal." ),
+        #         active = \
+        #             True
+        #             if row_number is None else \
+        #             model[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == '✔' )
+        #
+        # grid.attach( enabled_checkbox, 0, 2, 1, 1 )
 
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
-#TODO What if I try to add the system fortune?
-                if fortune_file_directory.get_text().strip() == "": # Will occur if the user does a browse: cancels the browse and hits okay.
-                    self.show_dialog_ok( dialog, _( "The fortune path cannot be empty." ) )
+                path = fortune_file_directory.get_text().strip()
+                if path == "":
+                    self.show_dialog_ok(
+                        dialog, _( "The fortune path cannot be empty." ),
+                        message_type = Gtk.MessageType.INFO )
+
                     fortune_file_directory.grab_focus()
                     continue
 
-                if row_number: # This is an edit; remove the old value.
-                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
+                if IndicatorFortune.SYSTEM_FORTUNE in path:
+                    self.show_dialog_ok(
+                        dialog,
+                        _( "The fortune is part of your system and is already included." ),
+                        message_type = Gtk.MessageType.INFO )
 
-                model.get_model().append( [
-                    fortune_file_directory.get_text().strip(),
-                    '✔' if enabled_checkbox.get_active() else '' ] )
+                    continue
+
+#TODO Disallow duplicates?
+
+                if not adding_fortune: # This is an edit; remove the old path.
+                    model.get_model().remove(
+                        model.convert_iter_to_child_iter( treeiter ) ) #TODO Check if correct - also see top of function and also remove.
+
+                model.get_model().append( [ path, True ] )
 
             break
 
@@ -702,21 +715,19 @@ class IndicatorFortune( IndicatorBase ):
                 fortune_file_directory.get_text(),
                 action = action )
 
-        while True:
-            response = dialog.run()
-            if response == Gtk.ResponseType.OK:
-                if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] ):  #TODO Check
-                    self.show_dialog_ok(
-                        dialog,
-                        _( "The fortune is part of your system and is already included." ),
-                        message_type = Gtk.MessageType.INFO )
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            # if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] ):  #TODO Check
+            #     self.show_dialog_ok(
+            #         dialog,
+            #         _( "The fortune is part of your system and is already included." ),
+            #         message_type = Gtk.MessageType.INFO )
+            #
+            # else:
+            #     fortune_file_directory.set_text( dialog.get_filename() )
+            #     break
 
-                else:
-                    fortune_file_directory.set_text( dialog.get_filename() )
-                    break
-
-            else:
-                break
+            fortune_file_directory.set_text( dialog.get_filename() )
 
         dialog.destroy()
 
@@ -729,6 +740,11 @@ class IndicatorFortune( IndicatorBase ):
                 if IndicatorFortune.SYSTEM_FORTUNE is None
                 else
                 [ IndicatorFortune.SYSTEM_FORTUNE, True ] )
+
+        # self.fortunes.append( [ "/home/bernard/Downloads", True ] ) #TODO Testing
+        # self.fortunes.append( [ "/home/bernard/Programming", False ] ) #TODO Testing
+        # self.fortunes.append( [ "/home/bernard/UnknownDirectory", True ] ) #TODO Testing
+        # self.fortunes.append( [ "/home/bernard/AnotherUnknownDirectory", False ] ) #TODO Testing
 
         self.middle_mouse_click_on_icon = \
             config.get(

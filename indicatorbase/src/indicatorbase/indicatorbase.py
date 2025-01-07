@@ -1808,52 +1808,6 @@ class IndicatorBase( ABC ):
         return treeview, scrolledwindow
 
 
-#TODO...
-    def create_treeview_within_scrolledwindow_with_checkbox(
-            self,
-            treemodel,
-            titles,
-            column_model_ids,
-            tooltip_text,
-            checkbox_column_model_id,
-            checkbox_column_view_id,
-            checkbox_toggle_function ):
-
-        renderer_toggle = Gtk.CellRendererToggle()
-
-        renderer_toggle.connect(
-            "toggled",
-            checkbox_toggle_function,
-            treemodel,
-            checkbox_column_model_id )
-
-        renderers_attributes_columnmodelids = [ ]
-        for column_model_id in column_model_ids:
-            if column_model_id == checkbox_column_model_id:
-                renderers_attributes_columnmodelids.append( ( renderer_toggle, "active", column_model_id ) )
-
-            else:
-                renderers_attributes_columnmodelids.append( ( Gtk.CellRendererText(), "text", column_model_id ) )
-
-        treeview, scrolledwindow = \
-            self.create_treeview_within_scrolledwindow(
-                treemodel,
-                titles,
-                tuple( renderers_attributes_columnmodelids ),
-                alignments_columnviewids = ( ( 0.5, checkbox_column_view_id ), ),
-                tooltip_text = tooltip_text )
-        '''
-                ,
-                clickablecolumnviewids_functionsandarguments = (
-                (
-                    natural_body_view_column_hide_show,
-                    ( self.on_columnheader, treemodel, natural_body_model_column_hide_show ), ), )
-                )
-        '''
-
-        return treeview, scrolledwindow
-
-
     def create_filechooser_dialog(
         self,
         title,

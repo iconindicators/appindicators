@@ -238,7 +238,7 @@ class IndicatorOnThisDay( IndicatorBase ):
     def on_preferences( self, dialog ):
         notebook = Gtk.Notebook()
 
-        # Calendar file settings.
+        # Calendars.
         grid = self.create_grid()
 
         # Path to calendar file
@@ -293,7 +293,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         notebook.append_page( grid, Gtk.Label.new( _( "Calendars" ) ) )
 
-        # General settings.
+        # General.
         grid = self.create_grid()
 
         spinner = \
