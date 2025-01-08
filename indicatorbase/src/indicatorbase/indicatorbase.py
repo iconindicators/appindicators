@@ -238,7 +238,7 @@ class IndicatorBase( ABC ):
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
 
-#TODO Make shorter        
+#TODO Make shorter
         self.website = \
             project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
 
@@ -374,7 +374,7 @@ class IndicatorBase( ABC ):
 
                 if first_metadata is None:
                     project_metadata = None
-#TODO Make shorter        
+#TODO Make shorter
                     error_message = f"No metadata was found in { wheel_in_release.absolute() }!"
 
                 else:
@@ -418,12 +418,12 @@ class IndicatorBase( ABC ):
         made_a_change = False
         with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
             for line in f:
-#TODO Make shorter        
+#TODO Make shorter
                 if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ):
                     output += line
                     autostart_enabled_present = True
 
-#TODO Make shorter        
+#TODO Make shorter
                 elif line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_DELAY + '=' ):
                     # Does not work in Debian et al; capture delay and comment line.
                     delay = line.split( '=' )[ 1 ].strip()
@@ -441,7 +441,7 @@ class IndicatorBase( ABC ):
                         output += '#' + line
                         made_a_change = True
 
-#TODO Make shorter        
+#TODO Make shorter
                 elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL + '=' ):
                     output += line
                     terminal_present = True
@@ -449,7 +449,7 @@ class IndicatorBase( ABC ):
                 else:
                     output += line
 
-#TODO Make shorter        
+#TODO Make shorter
         if not autostart_enabled_present or not exec_with_sleep_present or not terminal_present:
             # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled
             # line from the original .desktop file (production or development).
@@ -457,36 +457,36 @@ class IndicatorBase( ABC ):
                 desktop_file_original = desktop_file_virtual_environment
 
             else:
-#TODO Make shorter        
+#TODO Make shorter
                 desktop_file_original = \
                     Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop"
 
             with open( desktop_file_original, 'r', encoding = "utf-8" ) as f:
                 for line in f:
-#TODO Make shorter        
+#TODO Make shorter
                     if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ) and not autostart_enabled_present:
                         output += line
                         made_a_change = True
 
-#TODO Make shorter        
+#TODO Make shorter
                     elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) and not exec_with_sleep_present:
                         if delay:
-#TODO Make shorter        
+#TODO Make shorter
                             output += line.replace( "{indicator_name}", self.indicator_name ).replace( '0', delay )
 
                         else:
-#TODO Make shorter        
+#TODO Make shorter
                             output += line.replace( "{indicator_name}", self.indicator_name )
 
                         made_a_change = True
 
-#TODO Make shorter        
+#TODO Make shorter
                     elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL ) and not terminal_present:
                         output += line
                         made_a_change = True
 
         if made_a_change:
-#TODO Make shorter        
+#TODO Make shorter
             with open( self.desktop_file_user_home, 'w', encoding = "utf-8" ) as f:
                 f.write( output )
 
@@ -654,7 +654,7 @@ class IndicatorBase( ABC ):
             menu.prepend( Gtk.SeparatorMenuItem() )
 
             if next_update_in_seconds:
-#TODO Make shorter        
+#TODO Make shorter
                 next_update_date_time = \
                     datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds )
 
@@ -798,11 +798,11 @@ class IndicatorBase( ABC ):
 
 
     def _on_mouse_wheel_scroll(
-            self,
-            indicator,
-            delta,
-            scroll_direction,
-            functionandarguments ):
+        self,
+        indicator,
+        delta,
+        scroll_direction,
+        functionandarguments ):
 
         if self.indicator.get_menu().get_children()[ 0 ].get_sensitive():
 #TODO Check this comment...correct working and placement?
@@ -850,11 +850,11 @@ class IndicatorBase( ABC ):
 
         changelog_markdown_path = IndicatorBase.get_changelog_markdown_path()
 
-#TODO Make shorter        
+#TODO Make shorter
         authors = [ author_and_email[ 0 ] for author_and_email in self.authors_and_emails ]
         about_dialog.set_copyright(
             "Copyright \xa9 " +
-#TODO Make shorter        
+#TODO Make shorter
             IndicatorBase.get_year_in_changelog_markdown( changelog_markdown_path ) +
             '-' + str( datetime.datetime.now().year ) + " " +
             ' '.join( authors ) )
@@ -894,15 +894,15 @@ class IndicatorBase( ABC ):
 
 
     def _add_hyperlink_label(
-            self,
-            about_dialog,
-            file_path,
-            left_text,
-            anchor_text,
-            right_text ):
+        self,
+        about_dialog,
+        file_path,
+        left_text,
+        anchor_text,
+        right_text ):
 
         tooltip = "file://" + str( file_path )
-#TODO Make shorter        
+#TODO Make shorter
         markup = \
             left_text + \
             " <a href=\'" + "file://" + str( file_path ) + "\' title=\'" + tooltip + "\'>" + \
@@ -912,7 +912,7 @@ class IndicatorBase( ABC ):
         label = Gtk.Label()
         label.set_markup( markup )
         label.show()
-#TODO Make shorter        
+#TODO Make shorter
         about_dialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
 
 
@@ -1023,7 +1023,7 @@ class IndicatorBase( ABC ):
         '''
         if self.is_clipboard_supported():
             if self.is_session_type_wayland():
-#TODO Make shorter        
+#TODO Make shorter
                 with tempfile.NamedTemporaryFile( mode = 'w', delete = False ) as temporary_named_file:
                     temporary_named_file.write( text )
 
@@ -1095,10 +1095,10 @@ class IndicatorBase( ABC ):
 
 
     def _clipboard_text_received_function(
-            self,
-            clipboard,
-            text,
-            primary_received_callback_function ):
+        self,
+        clipboard,
+        text,
+        primary_received_callback_function ):
         '''
         A callback function is required by GTK to obtain text from the primary
         when running under X11:
@@ -1117,14 +1117,14 @@ class IndicatorBase( ABC ):
 
 
     def create_dialog(
-            self,
-            parent_widget,
-            title,
-            content_widget = None,
-            buttons_responsetypes = (
-                Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                Gtk.STOCK_OK, Gtk.ResponseType.OK ),
-            default_size = None ):
+        self,
+        parent_widget,
+        title,
+        content_widget = None,
+        buttons_responsetypes = (
+            Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+            Gtk.STOCK_OK, Gtk.ResponseType.OK ),
+        default_size = None ):
 
         dialog = \
             Gtk.Dialog(
@@ -1147,10 +1147,10 @@ class IndicatorBase( ABC ):
 
 
     def show_dialog_ok_cancel(
-            self,
-            parent_widget,
-            message,
-            title = None ):
+        self,
+        parent_widget,
+        message,
+        title = None ):
 
         return \
             self._show_dialog(
@@ -1162,11 +1162,11 @@ class IndicatorBase( ABC ):
 
 
     def show_dialog_ok(
-            self,
-            parent_widget,
-            message,
-            title = None,
-            message_type = Gtk.MessageType.ERROR ):
+        self,
+        parent_widget,
+        message,
+        title = None,
+        message_type = Gtk.MessageType.ERROR ):
 
         return \
             self._show_dialog(
@@ -1178,12 +1178,12 @@ class IndicatorBase( ABC ):
 
 
     def _show_dialog(
-            self,
-            parent_widget,
-            message,
-            message_type,
-            buttons_type,
-            title = None ):
+        self,
+        parent_widget,
+        message,
+        message_type,
+        buttons_type,
+        title = None ):
 
         dialog = \
             Gtk.MessageDialog(
@@ -1206,7 +1206,7 @@ class IndicatorBase( ABC ):
 
 
     def _get_parent( self, widget ):
-#TODO Make shorter        
+#TODO Make shorter
         parent = widget # Sometimes the widget is a Dialog/Window so don't get the parent.
         while parent is not None:
             if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
@@ -1222,11 +1222,11 @@ class IndicatorBase( ABC ):
         delay = 0
         with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
             for line in f:
-#TODO Make shorter        
+#TODO Make shorter
                 if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" ):
                     autostart = True
 
-#TODO Make shorter        
+#TODO Make shorter
                 if line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) and "sleep" in line:
                     delay = int( line.split( "sleep" )[ 1 ].split( "&&" )[ 0 ].strip() )
 
@@ -1272,7 +1272,7 @@ class IndicatorBase( ABC ):
         if self.new_version_available and self.check_latest_version:
             url = f"https://pypi.org/project/{ self.indicator_name }"
             label = Gtk.Label.new()
-#TODO Make shorter        
+#TODO Make shorter
             label.set_markup( _(
                 "An update is available at <a href=\"{0}\">{1}</a>." ).format( url, url ) )
 
@@ -1463,15 +1463,15 @@ class IndicatorBase( ABC ):
 
 
     def create_box(
-            self,
-            widgets_and_expands,
-            sensitive = True,
-            margin_top = 0,
-            margin_left = 0,
-            spacing = 6,
-            orientation = Gtk.Orientation.HORIZONTAL,
-            halign = Gtk.Align.FILL,
-            homogeneous = False ):
+        self,
+        widgets_and_expands,
+        sensitive = True,
+        margin_top = 0,
+        margin_left = 0,
+        spacing = 6,
+        orientation = Gtk.Orientation.HORIZONTAL,
+        halign = Gtk.Align.FILL,
+        homogeneous = False ):
 
         box = Gtk.Box( spacing = spacing, orientation = orientation )
         box.set_sensitive( sensitive )
@@ -1489,10 +1489,10 @@ class IndicatorBase( ABC ):
 
 
     def create_buttons_in_box(
-            self,
-            labels,
-            tooltip_texts,
-            clicked_functionandarguments ):
+        self,
+        labels,
+        tooltip_texts,
+        clicked_functionandarguments ):
         '''
         TODO Explain return values
         '''
@@ -1549,11 +1549,11 @@ class IndicatorBase( ABC ):
 
 
     def create_comboboxtext(
-            self,
-            data,
-            tooltip_text = "",
-            active = -1,
-            editable = False ):
+        self,
+        data,
+        tooltip_text = "",
+        active = -1,
+        editable = False ):
 
         if editable:
             comboboxtext = Gtk.ComboBoxText.new_with_entry()
@@ -1570,11 +1570,11 @@ class IndicatorBase( ABC ):
 
 
     def create_textview(
-            self,
-            text = "",
-            tooltip_text = "",
-            editable = True,
-            wrap_mode = Gtk.WrapMode.WORD ):
+        self,
+        text = "",
+        tooltip_text = "",
+        editable = True,
+        wrap_mode = Gtk.WrapMode.WORD ):
 
         textview = Gtk.TextView()
         textview.get_buffer().set_text( text )
@@ -1735,8 +1735,8 @@ class IndicatorBase( ABC ):
 
         sortcolumnviewids_columnmodelids:
             Tuple of tuples, each of which contains the view column id and
-            corresponding model column id.  The first column will be set as
-            default sorted ascendingly.
+            corresponding model column id.
+            The first column will be set as default sorted ascendingly.
 
         celldatafunctionandarguments_renderers_columnviewids:
             Tuple of tuples, each contains a cell data renderer function,
@@ -1760,16 +1760,17 @@ class IndicatorBase( ABC ):
         treeview = Gtk.TreeView.new_with_model( treemodel )
 
         z = zip( titles, renderers_attributes_columnmodelids )
-#TODO Make shorter        
         for index, ( title, renderer_attribute_columnmodelid ) in enumerate( z ):
             treeviewcolumn = Gtk.TreeViewColumn( title )
 
             # Expand the column unless the column contains a single checkbox
             # and no column header title.
-#TODO Make shorter        
             is_checkbox_column = (
                 isinstance(
-                    renderer_attribute_columnmodelid[ 0 ], Gtk.CellRendererToggle ) and not title )
+                    renderer_attribute_columnmodelid[ 0 ],
+                    Gtk.CellRendererToggle )
+                and
+                not title )
 
             treeviewcolumn.set_expand( not is_checkbox_column )
 
@@ -1787,7 +1788,7 @@ class IndicatorBase( ABC ):
             else:
                 # Assume a tuple of tuples of
                 #   renderer, attribute, column model id.
-#TODO Make shorter        
+#TODO Make shorter
                 for renderer, attribute, columnmodelid in renderer_attribute_columnmodelid:
                     treeviewcolumn.pack_start( renderer, False )
                     treeviewcolumn.add_attribute(
@@ -1833,31 +1834,21 @@ class IndicatorBase( ABC ):
 # https://stackoverflow.com/questions/12368059/a-sorted-and-filtered-treemodel-in-python-gtk3
 # https://stackoverflow.com/questions/9194588/how-to-programmatically-sort-treeview
 # https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html
-        
-        # if sortcolumnviewids_columnmodelids:
-        #     for columnviewid, columnmodelid in sortcolumnviewids_columnmodelids:
-        #         for indexcolumn, treeviewcolumn in enumerate( treeview.get_columns() ):
-        #             if columnviewid == indexcolumn:
-        #                 treeviewcolumn.set_sort_column_id( columnmodelid )
-        #                 if sortcolumnviewids_columnmodelids.index( ( columnviewid, columnmodelid ) ) == 0:
-        #                     # Set first sorted column as default ascending.
-        #                     treemodel.set_sort_column_id(
-        #                         columnmodelid,
-        #                         Gtk.SortType.ASCENDING )
+#
+# I think this is now okay...better check with ALL tables in all indicators.
         if sortcolumnviewids_columnmodelids:
             for columnviewid, columnmodelid in sortcolumnviewids_columnmodelids:
                 for indexcolumn, treeviewcolumn in enumerate( treeview.get_columns() ):
                     if columnviewid == indexcolumn:
-                        pass
-                        # treeviewcolumn.set_sort_column_id( columnmodelid )
-                        # if sortcolumnviewids_columnmodelids.index( ( columnviewid, columnmodelid ) ) == 0:
-                        #     # Set first sorted column as default ascending.
-                        #     treemodel.set_sort_column_id(
-                        #         columnmodelid,
-                        #         Gtk.SortType.ASCENDING )
+                        treeviewcolumn.set_sort_column_id( columnmodelid )
+                        if sortcolumnviewids_columnmodelids.index( ( columnviewid, columnmodelid ) ) == 0:
+                            # Set first sorted column as default ascending.
+                            treemodel.set_sort_column_id(
+                                columnmodelid,
+                                Gtk.SortType.ASCENDING )
 
         if celldatafunctionandarguments_renderers_columnviewids:
-#TODO Make shorter        
+#TODO Make shorter
             for data_function_and_arguments, renderer, columnviewid in celldatafunctionandarguments_renderers_columnviewids:
                 for index, treeviewcolumn in enumerate( treeview.get_columns() ):
                     if columnviewid == index:
@@ -1866,7 +1857,7 @@ class IndicatorBase( ABC ):
                             *data_function_and_arguments )
 
         if clickablecolumnviewids_functionsandarguments:
-#TODO Make shorter        
+#TODO Make shorter
             for columnviewid_functionandarguments in clickablecolumnviewids_functionsandarguments:
                 for index, treeviewcolumn in enumerate( treeview.get_columns() ):
                     if columnviewid_functionandarguments[ 0 ] == index:
@@ -1923,24 +1914,24 @@ class IndicatorBase( ABC ):
 
 
     def set_preferences_common_attributes(
-            self,
-            is_set,
-            delay,
-            check_latest_version ):
+        self,
+        is_set,
+        delay,
+        check_latest_version ):
 
         self.check_latest_version = check_latest_version
 
         output = ""
         with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
             for line in f:
-#TODO Make shorter        
+#TODO Make shorter
                 if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
                     output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
 
                 elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
                     parts = line.split( "sleep" )
                     right = parts[ 1 ].split( "&&" )[ 1 ]
-#TODO Make shorter        
+#TODO Make shorter
                     output += parts[ 0 ] + "sleep " + str( delay ) + " &&" + right + '\n'
 
                 else:
@@ -2075,7 +2066,7 @@ class IndicatorBase( ABC ):
         '''
         terminal = None
         execution_flag = None
-#TODO Make shorter        
+#TODO Make shorter
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
             terminal = self.process_get( "which " + _terminal )
             if terminal:
@@ -2090,7 +2081,7 @@ class IndicatorBase( ABC ):
         ''' Download the contents of the given URL and save to file. '''
         downloaded = False
         try:
-#TODO Make shorter        
+#TODO Make shorter
             with urlopen( url, timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) as f_in:
                 with open( filename, 'w', encoding = "utf-8" ) as f_out:
                     f_out.write( f_in.read().decode() )
@@ -2111,7 +2102,7 @@ class IndicatorBase( ABC ):
 
     def _load_config( self ):
         ''' Read a dictionary of configuration from a JSON text file. '''
-#TODO Make shorter        
+#TODO Make shorter
         config_file = \
             self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
 
@@ -2185,7 +2176,7 @@ class IndicatorBase( ABC ):
         config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] = \
             self.check_latest_version
 
-#TODO Make shorter        
+#TODO Make shorter
         config_file = \
             self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
 
@@ -2216,7 +2207,7 @@ class IndicatorBase( ABC ):
 
         else:
             utc_now = datetime.datetime.now( datetime.timezone.utc )
-#TODO Make shorter        
+#TODO Make shorter
             stale = ( cache_date_time + datetime.timedelta( hours = maximum_age_in_hours ) ) < utc_now
 
         return stale
@@ -2238,7 +2229,7 @@ class IndicatorBase( ABC ):
 
         if the_file: # A value of "" evaluates to False.
             # YYYYMMDDHHMMSS is 14 characters.
-#TODO Make shorter        
+#TODO Make shorter
             date_time_component = the_file[ len( basename ) : len( basename ) + 14 ]
 
             expiry = \
@@ -2252,12 +2243,12 @@ class IndicatorBase( ABC ):
 
 
     def get_cache_filename_with_timestamp(
-            self, basename, extension = EXTENSION_TEXT ):
+        self, basename, extension = EXTENSION_TEXT ):
         '''
         Create a filename with timestamp and extension to be used to save data
         to the cache.
         '''
-#TODO Make shorter        
+#TODO Make shorter
         filename = \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
@@ -2316,7 +2307,7 @@ class IndicatorBase( ABC ):
         Any file extension is ignored in determining if the file should be
         deleted or not.
         '''
-#TODO Make shorter        
+#TODO Make shorter
         cache_maximum_age_date_time = \
             datetime.datetime.now() - datetime.timedelta( hours = maximum_age_in_hours )
 
@@ -2325,7 +2316,7 @@ class IndicatorBase( ABC ):
             # ("icon-" versus "icon-fullmoon-")
             # so use the date/time to ensure the correct group of files.
             if file.name.startswith( basename ):
-#TODO Make shorter        
+#TODO Make shorter
                 date_time = file.name[ len( basename ) : len( basename ) + 14 ] # len( YYYYMMDDHHMMSS ) = 14.
                 if date_time.isdigit():
                     file_date_time = \
@@ -2391,7 +2382,7 @@ class IndicatorBase( ABC ):
 
         Returns filename written on success; None otherwise.
         '''
-#TODO Make shorter        
+#TODO Make shorter
         filename = \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
@@ -2467,7 +2458,7 @@ class IndicatorBase( ABC ):
 
         Returns filename written on success; None otherwise.
         '''
-#TODO Make shorter        
+#TODO Make shorter
         return self._write_cache_text( text, self.get_cache_directory() / filename )
 
 
@@ -2488,13 +2479,13 @@ class IndicatorBase( ABC ):
 
         Returns filename written on success; None otherwise.
         '''
-#TODO Make shorter        
+#TODO Make shorter
         filename = \
             basename + \
             datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
             extension
 
-#TODO Make shorter        
+#TODO Make shorter
         return self._write_cache_text( text, self.get_cache_directory() / filename )
 
 

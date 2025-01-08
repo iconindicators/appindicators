@@ -22,6 +22,7 @@
 import datetime
 import os
 import platform
+import random
 
 from threading import Thread
 
@@ -118,7 +119,11 @@ class IndicatorTest( IndicatorBase ):
         label = "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_current_desktop()
         self.create_and_append_menuitem( submenu, label, indent = ( 2, 0 ) )
 
-        label = "os.environ.get( 'DESKTOP_SESSION' ): " + os.environ.get( "DESKTOP_SESSION" )
+        label = (
+            "os.environ.get( 'DESKTOP_SESSION' ): "
+            +
+            os.environ.get( "DESKTOP_SESSION" ) )
+
         self.create_and_append_menuitem( submenu, label, indent = ( 2, 0 ) )
 
         label = "echo $XDG_SESSION_TYPE" + ": " + self.get_session_type()
@@ -133,21 +138,25 @@ class IndicatorTest( IndicatorBase ):
     def _build_menu_icon_theme( self, menu ):
         submenu = Gtk.Menu()
 
-        label = \
-            "Gtk.Settings().get_default().get_property( \"gtk-icon-theme-name\" ): " + \
-            Gtk.Settings().get_default().get_property( "gtk-icon-theme-name" )
+        property_ = "gtk-icon-theme-name"
+        label = (
+            f"Gtk.Settings().get_default().get_property( \"{ property_ }\" ): "
+            +
+            Gtk.Settings().get_default().get_property( f"{ property_ }" ) )
 
         self.create_and_append_menuitem( submenu, label, indent = ( 2, 0 ) )
 
         command = "gsettings get org.gnome.desktop.interface "
 
-        result = self.process_get( command + "icon-theme" ).replace( '"', '' ).replace( '\'', '' )
+        result = self.process_get( command + "icon-theme" )
+        result = result.replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
             command + "icon-theme: " + result,
             indent = ( 2, 0 ) )
 
-        result = self.process_get( command + "gtk-theme" ).replace( '"', '' ).replace( '\'', '' )
+        result = self.process_get( command + "gtk-theme" )
+        result = result.replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
             command + "gtk-theme: " + result,
@@ -166,12 +175,18 @@ class IndicatorTest( IndicatorBase ):
 
         self.create_and_append_menuitem(
             submenu,
-            _( "Terminal: " ) + _( "Unknown terminal!" ) if terminal is None else str( terminal ),
+            _( "Terminal: " ) + _( "Unknown terminal!" )
+            if terminal is None
+            else
+            str( terminal ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
             submenu,
-            _( "Execution flag: " ) + _( "Unknown terminal!" ) if terminal is None else str( execution_flag ),
+            _( "Execution flag: " ) + _( "Unknown terminal!" )
+            if terminal is None
+            else
+            str( execution_flag ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -191,25 +206,18 @@ class IndicatorTest( IndicatorBase ):
                     self.set_icon( self.get_icon_name() ), ),
             indent = ( 2, 0 ) )
 
-        icons = (
-            "FULL_MOON",
-            "WANING_GIBBOUS",
-            "THIRD_QUARTER",
-            "NEW_MOON",
-            "WAXING_CRESCENT" )
-
-        for icon in icons:
-            label = \
-                _( "Show '{0}' rendered to {1}" ).format(
-                    icon.replace( '_', ' ' ).title(),
-                    self.get_cache_directory() )
-
-            self.create_and_append_menuitem(
-                submenu,
-                label,
-                name = icon,
-                activate_functionandarguments = ( self._use_icon_dynamically_created, ),
-                indent = ( 2, 0 ) )
+        self.create_and_append_menuitem(
+            submenu,
+            "Dynamically created third quarter icon",
+            activate_functionandarguments = (
+                lambda menuitem:
+                    self.set_icon(
+                        str(
+                            self.write_cache_text(
+                                self.__get_third_quarter_svg_icon_text(),
+                                IndicatorTest.CACHE_ICON_BASENAME,
+                                IndicatorBase.EXTENSION_SVG_SYMBOLIC ) ) ), ),
+            indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
             menu,
@@ -243,7 +251,8 @@ class IndicatorTest( IndicatorBase ):
             _( "Show current time in OSD" ),
             activate_functionandarguments = (
                 lambda menuitem:
-                    self.show_notification( _( "Current time..." ), self._get_current_time() ), ),
+                    self.show_notification(
+                        _( "Current time..." ), self._get_current_time() ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -255,16 +264,22 @@ class IndicatorTest( IndicatorBase ):
     def _build_menu_clipboard( self, menu ):
         submenu = Gtk.Menu()
 
-        message_clipboard_unsupported = \
-            f"notify-send -i { self.get_icon_name() } \"Unsupported\" \"Clipboard unsupported.\""
+        message_clipboard_unsupported = (
+            f"notify-send -i { self.get_icon_name() } "
+            +
+            "\"Unsupported\" "
+            +
+            "\"Clipboard unsupported.\"" )
 
         self.create_and_append_menuitem(
             submenu,
             _( "Copy current time to clipboard" ),
             activate_functionandarguments = (
                 lambda menuitem: (
-                    self.copy_to_selection( self._get_current_time() ) \
-                    if self.is_clipboard_supported() else \
+                    self.copy_to_selection(
+                        self._get_current_time() )
+                    if self.is_clipboard_supported()
+                    else
                     self._execute_command( message_clipboard_unsupported ) ), ),
             indent = ( 2, 0 ) )
 
@@ -273,8 +288,10 @@ class IndicatorTest( IndicatorBase ):
             _( "Copy current time to primary" ),
             activate_functionandarguments = (
                 lambda menuitem: (
-                    self.copy_to_selection( self._get_current_time(), is_primary = True ) \
-                    if self.is_clipboard_supported() else \
+                    self.copy_to_selection(
+                        self._get_current_time(), is_primary = True )
+                    if self.is_clipboard_supported()
+                    else
                     self._execute_command( message_clipboard_unsupported ) ), ),
             indent = ( 2, 0 ) )
 
@@ -312,7 +329,8 @@ class IndicatorTest( IndicatorBase ):
                 submenu,
                 label,
                 activate_functionandarguments = (
-                    lambda menuitem, command = command:  # Need command = command to handle lambda late binding.
+                    # Need command = command to handle lambda late binding.
+                    lambda menuitem, command = command:
                         self._execute_command( command ), ),
                 indent = ( 2, 0 ) )
 
@@ -326,17 +344,19 @@ class IndicatorTest( IndicatorBase ):
         return datetime.datetime.now().strftime( "%H:%M:%S" )
 
 
+#TODO Delete
     def _use_icon_dynamically_created( self, menuitem ):
         icon_path = \
             self.write_cache_text(
-                self._get_svg_icon_text( menuitem.get_name(), 35, 65 ),
+                self.__get_third_quarter_svg_icon_text(),
                 IndicatorTest.CACHE_ICON_BASENAME,
                 IndicatorBase.EXTENSION_SVG_SYMBOLIC )
 
         self.set_icon( str( icon_path ) )
 
 
-    def _get_svg_icon_text(
+#TODO Really need this...?  Just need to make one dynamic icon.
+    def _get_svg_icon_textOLF(
             self,
             phase,
             illumination_percentage,
@@ -359,6 +379,7 @@ class IndicatorTest( IndicatorBase ):
         radius = float( width / 2 )
         colour = "777777"
         if phase in { "FULL_MOON", "NEW_MOON" }:
+            print( "Full new" )
             body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
             if phase == "NEW_MOON":
                 body += '" fill="#' + colour + '" fill-opacity="0.0" />'
@@ -367,6 +388,7 @@ class IndicatorTest( IndicatorBase ):
                 body += '" fill="#' + colour + '" />'
 
         else: # First/Third Quarter or Waning/Waxing Crescent or Waning/Waxing Gibbous
+            print( "first third  crescent gibbous" )
             body = \
                 '<path d="M ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + ' ' + \
                 'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + \
@@ -374,13 +396,16 @@ class IndicatorTest( IndicatorBase ):
 
             if phase in { "FIRST_QUARTER", "THIRD_QUARTER" }:
                 body += ' Z"'
+                print( "first third" )
 
             elif phase in { "WANING_CRESCENT", "WAXING_CRESCENT" }:
+                print( "crescent" )
                 body += \
                     ' A ' + str( radius ) + ' ' + str( radius * ( 50 - illumination_percentage ) / 50 ) + ' 0 0 0 ' + \
                     str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
 
             else: # Waning/Waxing Gibbous
+                print( "gibbous" )
                 body += \
                     ' A ' + str( radius ) + ' ' + str( radius * ( illumination_percentage - 50 ) / 50 ) + ' 0 0 1 ' + \
                     str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
@@ -395,6 +420,35 @@ class IndicatorTest( IndicatorBase ):
             '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>'
 
 
+    def __get_third_quarter_svg_icon_text( self ):
+        ''' Inspired from indicatorlunar to create third quarter. '''
+        width = 100
+        height = width
+        radius = float( width / 2 )
+        colour = "777777"
+        bright_limb_angle_in_degrees = random.randint( 0, 359 )
+
+        body = (
+            '<path d="M ' +
+            str( width / 2 - radius ) + ' ' +
+            str( height / 2 ) + ' ' +
+            'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' +
+            str( width / 2 + radius ) + ' ' + str( height / 2 ) +
+            ' Z" ' +
+            'transform="rotate(' + str( -bright_limb_angle_in_degrees ) + ' ' +
+            str( width / 2 ) + ' ' +
+            str( height / 2 ) + ')" fill="#' + colour + '" />' )
+
+        svg = (
+            '<?xml version="1.0" standalone="no"?>'
+            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ' +
+            '"https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' +
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" ' +
+            'viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>' )
+
+        return svg
+
+
     def _execute_command( self, command ):
         terminal, terminal_execution_flag = \
             self.get_terminal_and_execution_flag()
@@ -407,9 +461,10 @@ class IndicatorTest( IndicatorBase ):
         elif self.is_qterminal_and_broken( terminal ):
             # As a result of
             #    https://github.com/lxqt/qterminal/issues/335
-            # the default terminal in Lubuntu (qterminal) fails to parse argument.
-            # Although a fix has been made, it is unlikely the repository will be updated any time soon.
-            # So the quickest/easiest workaround is to install gnome-terminal.
+            # the default terminal in Lubuntu (qterminal) fails to parse the
+            # arguments.  Although a fix has been made, it is unlikely the
+            # repository will be updated any time soon.  The quickest/easiest
+            # workaround is to install gnome-terminal.
             message = _( "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead." )
             self.get_logging().error( message )
             self.show_notification( "Cannot run script", message )
@@ -450,7 +505,9 @@ class IndicatorTest( IndicatorBase ):
                 ( _( "Day of Week" ), ),
                 ( ( renderer_text_for_column_dayofweek, "text", 0 ), ),
                 celldatafunctionandarguments_renderers_columnviewids = (
-                    ( ( self.data_function, "" ), renderer_text_for_column_dayofweek, 0 ), ),
+                    (
+                        ( self.data_function, "" ),
+                        renderer_text_for_column_dayofweek, 0 ), ),
                 tooltip_text = _( "Days of week containing an 'n' are bold." ) )
 
         grid.attach( scrolledwindow, 0, 1, 1, 10 )
@@ -476,12 +533,12 @@ class IndicatorTest( IndicatorBase ):
 
 
     def data_function(
-            self,
-            treeviewcolumn,
-            cell_renderer,
-            tree_model,
-            tree_iter,
-            data ):
+        self,
+        treeviewcolumn,
+        cell_renderer,
+        tree_model,
+        tree_iter,
+        data ):
         '''
         References
             https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display

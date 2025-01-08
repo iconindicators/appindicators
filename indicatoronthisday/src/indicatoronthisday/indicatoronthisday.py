@@ -16,6 +16,12 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+
+#TODO Got this on Debian 12 running in terminal:
+#
+#Jan 11*    National Children's Day (วันเด็กแห่งชาติ) in Thailand
+
+
 '''
 Application indicator which displays calendar events.
 
@@ -693,7 +699,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             config.get(
                 IndicatorOnThisDay.CONFIG_CALENDARS,
                 [ system_calendar_default, True ]
-                if system_calendar_default 
+                if system_calendar_default
                 else
                 [ ] )
 
