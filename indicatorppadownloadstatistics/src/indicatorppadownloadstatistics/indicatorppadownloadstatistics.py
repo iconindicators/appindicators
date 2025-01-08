@@ -800,10 +800,21 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 # and ensure the old is copied to new location (name without hyphens)
 # and loads up.
     def load_config( self, config ):
-        self.low_bandwidth = config.get( IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH, False )
-        self.show_submenu = config.get( IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, True )
-        self.sort_by_download = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
-        self.sort_by_download_amount = config.get( IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, 5 )
+        self.low_bandwidth = \
+            config.get(
+                IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH, False )
+
+        self.show_submenu = \
+            config.get(
+                IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU, True )
+
+        self.sort_by_download = \
+            config.get(
+                IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD, False )
+
+        self.sort_by_download_amount = \
+            config.get(
+                IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT, 5 )
 
         if config:
             self.ppas = [ ]
@@ -852,7 +863,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                             else:
                                 ppa.set_filters(
-                                    list( set( filter_text + ppa.get_filters() ) ) )
+                                    list(
+                                        set(
+                                            filter_text + ppa.get_filters() ) ) )
 
                             break
 
@@ -879,11 +892,20 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa.get_filters() ] )
 
         return {
-            IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH: self.low_bandwidth,
-            IndicatorPPADownloadStatistics.CONFIG_PPAS: ppas,
-            IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU: self.show_submenu,
-            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD: self.sort_by_download,
-            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT: self.sort_by_download_amount
+            IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH:
+                self.low_bandwidth,
+
+            IndicatorPPADownloadStatistics.CONFIG_PPAS:
+                ppas,
+
+            IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU:
+                self.show_submenu,
+
+            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD:
+                self.sort_by_download,
+
+            IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT:
+                self.sort_by_download_amount
         }
 
 

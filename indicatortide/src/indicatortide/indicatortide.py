@@ -368,10 +368,17 @@ class IndicatorTide( IndicatorBase ):
 
     def save_config( self ):
         return {
-            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS : self.show_as_submenus,
-            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY : self.show_as_submenus_except_first_day,
-            IndicatorTide.CONFIG_USER_SCRIPT_CLASS_NAME : self.user_script_class_name,
-            IndicatorTide.CONFIG_USER_SCRIPT_PATH_AND_FILENAME : self.user_script_path_and_filename
+            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS:
+                self.show_as_submenus,
+
+            IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY:
+                self.show_as_submenus_except_first_day,
+
+            IndicatorTide.CONFIG_USER_SCRIPT_CLASS_NAME:
+                self.user_script_class_name,
+
+            IndicatorTide.CONFIG_USER_SCRIPT_PATH_AND_FILENAME:
+                self.user_script_path_and_filename
         }
 
 

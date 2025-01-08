@@ -2793,7 +2793,7 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME ) # Returns None if the key is not found.
+        self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME )
         if self.city is None:
             self.city = self.get_default_city()
             self.latitude, self.longitude, self.elevation = \
@@ -2805,9 +2805,11 @@ class IndicatorLunar( IndicatorBase ):
             self.longitude = config.get( IndicatorLunar.CONFIG_CITY_LONGITUDE )
 
         self.comets = config.get( IndicatorLunar.CONFIG_COMETS, [ ] )
-        self.comets_add_new = config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, False )
+        self.comets_add_new = \
+            config.get( IndicatorLunar.CONFIG_COMETS_ADD_NEW, False )
 
-        self.hide_bodies_below_horizon = config.get( IndicatorLunar.CONFIG_HIDE_BODIES_BELOW_HORIZON, False )
+        self.hide_bodies_below_horizon = \
+            config.get( IndicatorLunar.CONFIG_HIDE_BODIES_BELOW_HORIZON, False )
 
         self.indicator_text = \
             config.get(
@@ -2819,15 +2821,27 @@ class IndicatorLunar( IndicatorBase ):
                 IndicatorLunar.CONFIG_INDICATOR_TEXT_SEPARATOR,
                 IndicatorLunar.INDICATOR_TEXT_SEPARATOR_DEFAULT )
 
-        self.minor_planets = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS, [ ] )
-        self.minor_planets_add_new = config.get( IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW, False )
+        self.minor_planets = \
+            config.get( IndicatorLunar.CONFIG_MINOR_PLANETS, [ ] )
 
-        self.magnitude = config.get( IndicatorLunar.CONFIG_MAGNITUDE, 3 ) # Although a value of 6 is visible with the naked eye, that gives too many minor planets initially.
+        self.minor_planets_add_new = \
+            config.get( IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW, False )
 
-        self.planets = config.get( IndicatorLunar.CONFIG_PLANETS, IndicatorLunar.astro_backend.PLANETS )
+        # Although a value of 6 is visible with the naked eye,
+        # that gives too many minor planets initially.
+        self.magnitude = \
+            config.get( IndicatorLunar.CONFIG_MAGNITUDE, 3 )
 
-        self.satellite_limit_start = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_START, 16 ) # 4pm
-        self.satellite_limit_end = config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_END, 22 ) # 10pm
+        self.planets = \
+            config.get(
+                IndicatorLunar.CONFIG_PLANETS,
+                IndicatorLunar.astro_backend.PLANETS )
+
+        self.satellite_limit_start = \
+            config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_START, 16 ) # 4pm
+
+        self.satellite_limit_end = \
+            config.get( IndicatorLunar.CONFIG_SATELLITE_LIMIT_END, 22 ) # 10pm
 
         self.satellite_notification_message = \
             config.get(
@@ -2840,14 +2854,23 @@ class IndicatorLunar( IndicatorBase ):
                 IndicatorLunar.SATELLITE_NOTIFICATION_SUMMARY_DEFAULT )
 
         self.satellites = config.get( IndicatorLunar.CONFIG_SATELLITES, [ ] )
-        self.satellites_add_new = config.get( IndicatorLunar.CONFIG_SATELLITES_ADD_NEW, False )
-        self.satellites_sort_by_date_time = config.get( IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME, True )
+        self.satellites_add_new = \
+            config.get( IndicatorLunar.CONFIG_SATELLITES_ADD_NEW, False )
+
+        self.satellites_sort_by_date_time = \
+            config.get(
+                IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME, True )
 
         self.show_rise_when_set_before_sunset = \
-            config.get( IndicatorLunar.CONFIG_SHOW_RISE_WHEN_SET_BEFORE_SUNSET, False )
+            config.get(
+                IndicatorLunar.CONFIG_SHOW_RISE_WHEN_SET_BEFORE_SUNSET, False )
 
-        self.show_satellite_notification = config.get( IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION, False )
-        self.show_werewolf_warning = config.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, True )
+        self.show_satellite_notification = \
+            config.get(
+                IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION, False )
+
+        self.show_werewolf_warning = \
+            config.get( IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING, True )
 
         self.stars = config.get( IndicatorLunar.CONFIG_STARS, [ ] )
 
@@ -2867,47 +2890,101 @@ class IndicatorLunar( IndicatorBase ):
             comets = [ ]
 
         else:
-            comets = self.comets # Only write out the list of comets if the user elects to not add new.
+            # Only write out comets if the user elects to not add new.
+            comets = self.comets
 
         if self.minor_planets_add_new:
             minor_planets = [ ]
 
         else:
-            minor_planets = self.minor_planets # Only write out the list of minor planets if the user elects to not add new.
+            # Only write out minor planets if the user elects to not add new.
+            minor_planets = self.minor_planets
 
         if self.satellites_add_new:
             satellites = [ ]
 
         else:
-            satellites = self.satellites # Only write out the list of satellites if the user elects to not add new.
+            # Only write out satellites if the user elects to not add new.
+            satellites = self.satellites
 
         return {
-            IndicatorLunar.CONFIG_CITY_ELEVATION : self.elevation,
-            IndicatorLunar.CONFIG_CITY_LATITUDE : self.latitude,
-            IndicatorLunar.CONFIG_CITY_LONGITUDE : self.longitude,
-            IndicatorLunar.CONFIG_CITY_NAME : self.city,
-            IndicatorLunar.CONFIG_COMETS : comets,
-            IndicatorLunar.CONFIG_COMETS_ADD_NEW : self.comets_add_new,
-            IndicatorLunar.CONFIG_HIDE_BODIES_BELOW_HORIZON : self.hide_bodies_below_horizon,
-            IndicatorLunar.CONFIG_INDICATOR_TEXT : self.indicator_text,
-            IndicatorLunar.CONFIG_INDICATOR_TEXT_SEPARATOR : self.indicator_text_separator,
-            IndicatorLunar.CONFIG_MINOR_PLANETS : minor_planets,
-            IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW : self.minor_planets_add_new,
-            IndicatorLunar.CONFIG_MAGNITUDE : self.magnitude,
-            IndicatorLunar.CONFIG_PLANETS : self.planets,
-            IndicatorLunar.CONFIG_SATELLITE_LIMIT_START : self.satellite_limit_start,
-            IndicatorLunar.CONFIG_SATELLITE_LIMIT_END : self.satellite_limit_end,
-            IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE : self.satellite_notification_message,
-            IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY : self.satellite_notification_summary,
-            IndicatorLunar.CONFIG_SATELLITES : satellites,
-            IndicatorLunar.CONFIG_SATELLITES_ADD_NEW : self.satellites_add_new,
-            IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME : self.satellites_sort_by_date_time,
-            IndicatorLunar.CONFIG_SHOW_RISE_WHEN_SET_BEFORE_SUNSET : self.show_rise_when_set_before_sunset,
-            IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION : self.show_satellite_notification,
-            IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING : self.show_werewolf_warning,
-            IndicatorLunar.CONFIG_STARS : self.stars,
-            IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE : self.werewolf_warning_message,
-            IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY : self.werewolf_warning_summary
+            IndicatorLunar.CONFIG_CITY_ELEVATION:
+                self.elevation,
+
+            IndicatorLunar.CONFIG_CITY_LATITUDE:
+                self.latitude,
+
+            IndicatorLunar.CONFIG_CITY_LONGITUDE:
+                self.longitude,
+
+            IndicatorLunar.CONFIG_CITY_NAME:
+                self.city,
+
+            IndicatorLunar.CONFIG_COMETS:
+                comets,
+
+            IndicatorLunar.CONFIG_COMETS_ADD_NEW:
+                self.comets_add_new,
+
+            IndicatorLunar.CONFIG_HIDE_BODIES_BELOW_HORIZON:
+                self.hide_bodies_below_horizon,
+
+            IndicatorLunar.CONFIG_INDICATOR_TEXT:
+                self.indicator_text,
+
+            IndicatorLunar.CONFIG_INDICATOR_TEXT_SEPARATOR:
+                self.indicator_text_separator,
+
+            IndicatorLunar.CONFIG_MINOR_PLANETS:
+                minor_planets,
+
+            IndicatorLunar.CONFIG_MINOR_PLANETS_ADD_NEW:
+                self.minor_planets_add_new,
+
+            IndicatorLunar.CONFIG_MAGNITUDE:
+                self.magnitude,
+
+            IndicatorLunar.CONFIG_PLANETS:
+                self.planets,
+
+            IndicatorLunar.CONFIG_SATELLITE_LIMIT_START:
+                self.satellite_limit_start,
+
+            IndicatorLunar.CONFIG_SATELLITE_LIMIT_END:
+                self.satellite_limit_end,
+
+            IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_MESSAGE:
+                self.satellite_notification_message,
+
+            IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY:
+                self.satellite_notification_summary,
+
+            IndicatorLunar.CONFIG_SATELLITE:
+                satellites,
+
+            IndicatorLunar.CONFIG_SATELLITES_ADD_NEW:
+                self.satellites_add_new,
+
+            IndicatorLunar.CONFIG_SATELLITES_SORT_BY_DATE_TIME:
+                self.satellites_sort_by_date_time,
+
+            IndicatorLunar.CONFIG_SHOW_RISE_WHEN_SET_BEFORE_SUNSET:
+                self.show_rise_when_set_before_sunset,
+
+            IndicatorLunar.CONFIG_SHOW_SATELLITE_NOTIFICATION:
+                self.show_satellite_notification,
+
+            IndicatorLunar.CONFIG_SHOW_WEREWOLF_WARNING:
+                self.show_werewolf_warning,
+
+            IndicatorLunar.CONFIG_STARS:
+                self.stars,
+
+            IndicatorLunar.CONFIG_WEREWOLF_WARNING_MESSAGE:
+                self.werewolf_warning_message,
+
+            IndicatorLunar.CONFIG_WEREWOLF_WARNING_SUMMARY:
+                self.werewolf_warning_summary
         }
 
 

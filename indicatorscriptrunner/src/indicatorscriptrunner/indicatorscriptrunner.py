@@ -1474,13 +1474,26 @@ class IndicatorScriptRunner( IndicatorBase ):
                     script.get_default() ] )
 
         return {
-            IndicatorScriptRunner.CONFIG_HIDE_GROUPS : self.hide_groups,
-            IndicatorScriptRunner.CONFIG_INDICATOR_TEXT : self.indicator_text,
-            IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR : self.indicator_text_separator,
-            IndicatorScriptRunner.CONFIG_SCRIPTS_BACKGROUND : scripts_background,
-            IndicatorScriptRunner.CONFIG_SCRIPTS_NON_BACKGROUND : scripts_non_background,
-            IndicatorScriptRunner.CONFIG_SEND_COMMAND_TO_LOG : self.send_command_to_log,
-            IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS : self.show_scripts_in_submenus
+            IndicatorScriptRunner.CONFIG_HIDE_GROUPS:
+                self.hide_groups,
+
+            IndicatorScriptRunner.CONFIG_INDICATOR_TEXT:
+                self.indicator_text,
+
+            IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR:
+                self.indicator_text_separator,
+
+            IndicatorScriptRunner.CONFIG_SCRIPTS_BACKGROUND:
+                scripts_background,
+
+            IndicatorScriptRunner.CONFIG_SCRIPTS_NON_BACKGROUND:
+                scripts_non_background,
+
+            IndicatorScriptRunner.CONFIG_SEND_COMMAND_TO_LOG:
+                self.send_command_to_log,
+
+            IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS:
+                self.show_scripts_in_submenus
         }
 
 

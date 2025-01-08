@@ -197,9 +197,14 @@ class IndicatorStardate( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.pad_integer = config.get( IndicatorStardate.CONFIG_PAD_INTEGER, True )
-        self.show_classic = config.get( IndicatorStardate.CONFIG_SHOW_CLASSIC, True )
-        self.show_issue = config.get( IndicatorStardate.CONFIG_SHOW_ISSUE, True )
+        self.pad_integer = \
+            config.get( IndicatorStardate.CONFIG_PAD_INTEGER, True )
+
+        self.show_classic = \
+            config.get( IndicatorStardate.CONFIG_SHOW_CLASSIC, True )
+
+        self.show_issue = \
+            config.get( IndicatorStardate.CONFIG_SHOW_ISSUE, True )
 
 
     def save_config( self ):

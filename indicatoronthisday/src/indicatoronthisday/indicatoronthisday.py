@@ -68,22 +68,22 @@ class IndicatorOnThisDay( IndicatorBase ):
     indicator_name_for_desktop_file = _( "Indicator On This Day" )
     indicator_categories = "Categories=Utility;Amusement"
 
+    CALENDARS_FILENAME = "calendars.txt"
+
+    # Calendar treeview columns; model and view have same columns.
+    COLUMN_CALENDAR_FILE = 0 # Path to calendar file.
+    COLUMN_CALENDAR_ENABLED = 1  # Boolean.
+
     CONFIG_CALENDARS = "calendars"
     CONFIG_COPY_TO_CLIPBOARD = "copyToClipboard"
     CONFIG_LINES = "lines"
     CONFIG_NOTIFY = "notify"
     CONFIG_SEARCH_URL = "searchURL"
 
-    # Calendar treeview columns; one to one mapping between data model and view.
-    COLUMN_CALENDAR_FILE = 0 # Path to calendar file.
-    COLUMN_CALENDAR_ENABLED = 1 # Check mark, or X or empty string.
-
-    CALENDARS_FILENAME = "calendars.txt"
-
-    DEFAULT_CALENDAR = "/usr/share/calendar/calendar.history"
-
     TAG_EVENT = "["+ _( "EVENT" )+ "]"
     SEARCH_URL_DEFAULT = "https://www.google.com/search?q=" + TAG_EVENT
+
+    SYSTEM_CALENDAR = "/usr/share/calendar"
 
 
     def __init__( self ):
@@ -101,19 +101,21 @@ class IndicatorOnThisDay( IndicatorBase ):
             today + timedelta( days = 1 ) ).replace(
                 hour = 0, minute = 0, second = 5 )
 
-        five_seconds_after_midnight = int( ( just_after_midnight - today ).total_seconds() )
+        five_seconds_after_midnight = \
+            int( ( just_after_midnight - today ).total_seconds() )
+
         self.request_update( delay = five_seconds_after_midnight )
 
         if self.notify:
-            # Show notifications in a thread to avoid blocking update.
+            # Show notifications in a thread to avoid blocking the update.
             threading.Thread(
                 target = self._show_notifications,
                 args = ( events, today ) ).start()
 
 
     def _show_notifications( self, events, today ):
-        # It is assumed (hoped) the dates in the calendar result are always in
-        # short date format irrespective of locale.
+        # Assume the dates in the calendar result are always in short date
+        # format irrespective of locale.
         today_in_short_date_format = today.strftime( '%b %d' )
 
         for event in events:
@@ -128,7 +130,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def build_menu( self, menu, events ):
-        menu_item_maximum = self.lines - 3 # Account for About, Preferences and Quit.
+        menu_item_maximum = self.lines - 3 # Account for About/Preferences/Quit.
         menu_item_count = 0
         last_date = ""
         for event in events:
@@ -153,14 +155,23 @@ class IndicatorOnThisDay( IndicatorBase ):
                 if self.is_clipboard_supported():
                     activate_functionandarguments = (
                         lambda menuitem:
-                            self.copy_to_selection( menuitem.get_name() + ' ' + menuitem.get_label().strip() ), )
+                            self.copy_to_selection(
+                                menuitem.get_name() +
+                                ' ' +
+                                menuitem.get_label().strip() ), )
 
             else:
                 if len( self.search_url ) > 0:
-                    date_and_description = event_date + ' ' + event.get_description()
-                    name = self.search_url.replace( IndicatorOnThisDay.TAG_EVENT, date_and_description )
+                    date_and_description = \
+                        event_date + ' ' + event.get_description()
+
+                    name = \
+                        self.search_url.replace(
+                            IndicatorOnThisDay.TAG_EVENT, date_and_description )
+
                     name = name.replace( ' ', '+' )
-                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), )
+                    activate_functionandarguments = (
+                        self.get_on_click_menuitem_open_browser_function(), )
 
                 else: # The user has entered an empty URL (no internet search).
                     name = ""
@@ -190,27 +201,55 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     def get_events( self ):
         # Write the path of each calendar file to a temporary file;
-        # allows for one call to calendar.
+        # only need to call calendar once.
         content = ""
-        for calendar in self.calendars:
-            if Path( calendar ).is_file():
-                content += "#include <" + calendar + ">\n"
+        at_least_one_calendar_is_enabled = False
+        for calendar, enabled in self.calendars:
+            if enabled:
+                at_least_one_calendar_is_enabled = True
+                if Path( calendar ).is_file():
+                    content += "#include <" + calendar + ">\n"
 
+        events_grouped_by_date = [ ]
+        if content:
+            events_grouped_by_date = self.__get_events( content )
+
+        elif at_least_one_calendar_is_enabled:
+            self.show_notification(
+                _( "Warning" ), #TODO A better summary???
+                _( "No enabled calendars have a valid location!" ) )
+
+        else:
+            self.show_notification(
+                _( "Warning" ), #TODO A better summary???
+                _( "No enabled calendars!" ) )
+
+        return events_grouped_by_date
+
+
+    def __get_events( self, content ):
         self.write_cache_text_without_timestamp(
             content, IndicatorOnThisDay.CALENDARS_FILENAME )
 
-        # Run the calendar command and parse the results into events,
-        # sorted by date then description.
+        # Parse the results from the calendar command into events sorted by
+        # date then description.
         command = (
             "calendar -f " +
-            str( self.get_cache_directory() / IndicatorOnThisDay.CALENDARS_FILENAME ) +
+            str(
+                self.get_cache_directory()
+                /
+                IndicatorOnThisDay.CALENDARS_FILENAME ) +
             " -A 366" )
 
         events_sorted_by_date = [ ]
         for line in self.process_get( command ).splitlines():
             if line.startswith( '\t' ): # Continuation of the previous event.
                 date_ = events_sorted_by_date[ -1 ].get_date()
-                description = events_sorted_by_date[ -1 ].get_description() + " " + line.strip()
+
+#TODO Make shorter
+                description = \
+                    events_sorted_by_date[ -1 ].get_description() + " " + line.strip()
+
                 del events_sorted_by_date[ -1 ]
                 events_sorted_by_date.append( Event( date_, description ) )
 
@@ -226,6 +265,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 events_sorted_by_date.append( Event( date_, description ) )
 
         events_grouped_by_date = [ ]
+#TODO Make this into a couple of lines if possible.
         for date_, event in groupby( events_sorted_by_date, key = lambda event: event.get_date() ):
             events_grouped_by_date.append(
                 sorted(
@@ -241,55 +281,79 @@ class IndicatorOnThisDay( IndicatorBase ):
         # Calendars.
         grid = self.create_grid()
 
-        # Path to calendar file
-        # Status of calendar file"
-        #     'X' if missing
-        #     ✔ if present and enabled
-        #     '' if present and not enabled
-        store = Gtk.ListStore( str, str )
-        for calendar in set( self.get_calendars_system() + self.calendars ):
-            if Path( calendar ).is_file():
-                if calendar in self.calendars:
-                    store.append( [ calendar, '✔' ] )
+        store = Gtk.ListStore( str, bool )
 
-                else:
-                    store.append( [ calendar, '' ] )
+        for location, enabled in self.calendars:
+            if Path( location ).is_file():
+                store.append( [ location, enabled ] )
 
             else:
-                store.append( [ calendar, 'X' ] )
+                store.append( [ location, False ] )
+
+        system_calendars_minus_user_calendars = \
+            [
+                x
+                for x in self.get_system_calendars()
+                if x not in [ x[ 0 ] for x in self.calendars ] ]
+
+        for calendar in system_calendars_minus_user_calendars:
+            store.append( [ calendar, False ] )
+
+        store = Gtk.TreeModelSort( model = store )
+
+#TODO Can/should this go into indicatorbase?
+# (along with the on_checkbox function below)
+# Used by fortune, onthisday, lunar.
+        renderer_toggle = Gtk.CellRendererToggle()
+        renderer_toggle.connect(
+            "toggled",
+            self.on_checkbox,
+            store,
+            IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED )
 
         treeview, scrolledwindow = \
             self.create_treeview_within_scrolledwindow(
-                Gtk.TreeModelSort( model = store ),
-                ( _( "Calendar" ), _( "Enabled" ) ),
+                store,
                 (
-                    ( Gtk.CellRendererText(), "text", IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
-                    ( Gtk.CellRendererText(), "text", IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
-                alignments_columnviewids = ( ( 0.5, IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ), ),
+                    _( "Calendar" ),
+                    _( "Enabled" ) ),
+                (
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
+                    (
+                        renderer_toggle,
+                        "active",
+                        IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
+                alignments_columnviewids = (
+                    ( 0.5, IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ), ),
                 sortcolumnviewids_columnmodelids = (
-                    ( IndicatorOnThisDay.COLUMN_CALENDAR_FILE, IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
-                    ( IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED, IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
+                    (
+                        IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
+                        IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
+                    (
+                        IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED,
+                        IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
                 tooltip_text = _( "Double click to edit a calendar." ),
-                rowactivatedfunctionandarguments= ( self.on_calendar_double_click, ) )
+                rowactivatedfunctionandarguments =
+                    ( self.on_calendar_double_click, dialog ) )
 
-        grid.attach( scrolledwindow, 0, 0, 1, 25 )
+        grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
-        box, add, remove, reset = \
+        box, add, remove = \
             self.create_buttons_in_box(
                 (
                     _( "Add" ),
-                    _( "Remove" ),
-                    _( "Reset" ) ),
+                    _( "Remove" ) ),
                 (
                     _( "Add a new calendar." ),
-                    _( "Remove the selected calendar." ),
-                    _( "Reset to factory default." ) ),
+                    _( "Remove the selected calendar." ) ),
                 (
                     ( self.on_calendar_add, treeview ),
-                    ( self.on_calendar_remove, treeview ),
-                    ( self.on_calendar_reset, treeview ) ) )
+                    ( self.on_calendar_remove, treeview ) ) )
 
-        grid.attach( box, 0, 26, 1, 1 )
+        grid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Calendars" ) ) )
 
@@ -301,7 +365,8 @@ class IndicatorOnThisDay( IndicatorBase ):
                 self.lines,
                 1,
                 1000,
-                tooltip_text = _( "The number of menu items available for display." ) )
+                tooltip_text =
+                    _( "The number of menu items available for display." ) )
 
         grid.attach(
             self.create_box(
@@ -334,7 +399,8 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_radiobutton(
                 radio_copy_to_clipboard,
                 _( "Search event on the internet" ),
-                tooltip_text = _( "Open the default web browser and search for the event." ),
+                tooltip_text =
+                    _( "Search for the event in the default web browser." ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = not self.copy_to_clipboard )
 
@@ -398,13 +464,17 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
+#TODO Check below
             self.lines = spinner.get_value_as_int()
 
             self.calendars = [ ]
             treeiter = store.get_iter_first()
             while treeiter is not None:
-                if store[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ] == '✔':
-                    self.calendars.append( store[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
+                row = store[ treeiter ]
+                self.fortunes.append(
+                    [
+                        row[ IndicatorOnThisDay.COLUMN_FILE_OR_DIRECTORY ],
+                        row[ IndicatorOnThisDay.COLUMN_ENABLED ] ] )
 
                 treeiter = store.iter_next( treeiter )
 
@@ -420,6 +490,23 @@ class IndicatorOnThisDay( IndicatorBase ):
         return response_type
 
 
+#TODO This will likely go into indicatorbase...
+# ...but also check that something similar has not already been done.
+    def on_checkbox(
+            self,
+            cell_renderer_toggle,
+            row,
+            store,
+            checkbox_column_model_id ):
+
+        store_ = store
+        if isinstance( store, Gtk.TreeModelSort ):
+            store_ = store.get_model()
+
+        store_[ row ][ checkbox_column_model_id ] = \
+            not store_[ row ][ checkbox_column_model_id ]
+
+
     def on_event_click_radio(
             self,
             source,
@@ -428,47 +515,35 @@ class IndicatorOnThisDay( IndicatorBase ):
             search_engine_entry ):
 
         search_engine_entry.set_sensitive( source == radio_internet_search )
-        if source == radio_copy_to_clipboard and len( search_engine_entry.get_text() ) == 0:
-            search_engine_entry.set_text( IndicatorOnThisDay.SEARCH_URL_DEFAULT )
+        copy_to_clipboard_and_empty_search = (
+            source == radio_copy_to_clipboard
+            and
+            len( search_engine_entry.get_text() ) == 0 )
 
-
-    def get_calendars_system( self ):
-        calendars = [ ]
-        for root, directories, filenames in os.walk( "/usr/share/calendar" ): # Path.walk() only available in Python 3.12.
-            for filename in fnmatch.filter( filenames, "calendar.*" ):
-                calendars.append( str( Path( root ).joinpath( filename ) ) )
-
-        calendars.sort()
-        return calendars
-
-
-#TODO Maybe drop this.
-    def on_calendar_reset( self, button, treeview ):
-        if self.show_dialog_ok_cancel( treeview, _( "Reset calendars to factory default?" ) ) == Gtk.ResponseType.OK:
-            liststore = treeview.get_model().get_model()
-            liststore.clear()
-            for calendar in self.get_calendars_system():
-                if calendar == IndicatorOnThisDay.DEFAULT_CALENDAR:
-                    liststore.append( [ IndicatorOnThisDay.DEFAULT_CALENDAR, Gtk.STOCK_APPLY ] )
-
-                else:
-                    liststore.append( [ calendar, None ] )
+        if copy_to_clipboard_and_empty_search:
+            search_engine_entry.set_text(
+                IndicatorOnThisDay.SEARCH_URL_DEFAULT )
 
 
     def on_calendar_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
-            self.show_dialog_ok( treeview, _( "No calendar has been selected." ) )
+            self.show_dialog_ok(
+                treeview, _( "No calendar has been selected for removal." ) )
 
         else:
-            selected_calendar_path = \
+#TODO Check this...should it be treeiter or converted iter?
+# I suspect this should really be converted iter.
+#...or perhaps not.  What is selected is the sorted model which is displayed...
+# which is correct.
+# But to update the underlying data, need the underlying model and then do a convert of treeiter.
+            selected_calendar = \
                 model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
 
-            if selected_calendar_path in self.get_calendars_system():
+            if selected_calendar in self.get_system_calendars():
                 self.show_dialog_ok(
                     treeview,
-                    _( "This is a system calendar and cannot be removed." ),
-                    message_type = Gtk.MessageType.INFO )
+                    _( "This is a system calendar and cannot be removed." ) )
 
             else:
                 response = \
@@ -477,34 +552,51 @@ class IndicatorOnThisDay( IndicatorBase ):
                         _( "Remove the selected calendar?" ) )
 
                 if response == Gtk.ResponseType.OK:
-                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
+                    model.get_model().remove(
+                        model.convert_iter_to_child_iter( treeiter ) )
 
 
     def on_calendar_add( self, button, treeview ):
-        self.on_calendar_double_click( treeview, None, None )
+        self.__on_calendar_double_click( treeview, None, None )
 
 
-    def on_calendar_double_click( self, treeview, row_number, treeviewcolumn ):
+    def on_calendar_double_click(
+            self, treeview, row_number, treeviewcolumn, preferences_dialog ):
+
         model, treeiter = treeview.get_selection().get_selected()
+        path = model[ treeiter ][ IndicatorOnThisDay.COLUMN_FILE_OR_DIRECTORY ]
+        if path == self.get_system_fortune():
+            self.show_dialog_ok(
+                preferences_dialog,
+                _( "This is a system calendar and cannot be modified." ) )
 
-        if row_number is None: # This is an add.
-            is_system_calendar = False
+        else:
+            self.__on_calendar_double_click(
+                treeview, row_number, treeviewcolumn )
 
-        else: # This is an edit.
-            is_system_calendar = \
-                model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] in self.get_calendars_system()
+
+    def __on_calendar_double_click(
+            self, treeview, row_number, treeviewcolumn ):
+
+        model, treeiter = treeview.get_selection().get_selected()
+        adding_calendar = row_number is None
 
         grid = self.create_grid()
 
-        title = _( "Add Calendar" )
-        if row_number:
+        if adding_calendar:
+            title = _( "Add Calendar" )
+
+        else:
             title = _( "Edit Calendar" )
 
         dialog = self.create_dialog( treeview, title, content_widget = grid )
 
         file_entry = \
             self.create_entry(
-                model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] if row_number else "",
+                ''
+                if adding_calendar
+                else
+                model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ],  #TODO Should model be model.get_model() or however the treeiter is supposed to be converted?
                 tooltip_text = _( "The path to a calendar file." ),
                 editable = False,
                 make_longer = True )
@@ -513,15 +605,12 @@ class IndicatorOnThisDay( IndicatorBase ):
             self.create_button(
                 _( "Browse" ),
                 tooltip_text = _(
-                    "This calendar is part of your\n" +
-                    "system and cannot be modified." )
-                    if is_system_calendar else _(
                     "Choose a calendar file.\n\n" +
                     "Ensure the calendar file is\n" +
                     "valid by running through\n" +
                     "'calendar' in a terminal." ),
-                    sensitive = not is_system_calendar,
-                    clicked_functionandarguments = ( self.on_browse_calendar, dialog, file_entry ) )
+                    clicked_functionandarguments = (
+                        self.on_browse_calendar, dialog, file_entry ) )
 
         grid.attach(
             self.create_box(
@@ -531,35 +620,29 @@ class IndicatorOnThisDay( IndicatorBase ):
                     ( browse_button, False ) ) ),
             0, 0, 1, 1 )
 
-        enabled_checkbutton = \
-            self.create_checkbutton(
-                _( "Enabled" ),
-                active = \
-                    True
-                    if row_number is None else \
-                    model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ] == Gtk.STOCK_APPLY )
-
-        grid.attach( enabled_checkbutton, 0, 1, 1, 1 )
-
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
-                if not is_system_calendar and file_entry.get_text().strip() == "":
-                    self.show_dialog_ok( dialog, _( "The calendar path cannot be empty." ) )
+                path = file_entry.get_text().strip()
+                if path == "":
+                    self.show_dialog_ok(
+                        dialog, _( "The calendar path cannot be empty." ) )
+
                     file_entry.grab_focus()
                     continue
 
-                if not is_system_calendar and not Path( file_entry.get_text().strip() ).is_file():
-                    self.show_dialog_ok( dialog, _( "The calendar path does not exist." ) )
-                    file_entry.grab_focus()
+                if IndicatorOnThisDay.SYSTEM_CALENDAR in path:
+                    self.show_dialog_ok(
+                        dialog,
+                        _( "This calendar is part of your system and is already included." ) )
+
                     continue
 
-                if row_number: # This is an edit...remove the old value and append new value.
-                    model.get_model().remove( model.convert_iter_to_child_iter( treeiter ) )
+                if not adding_calendar: # This is an edit; remove the old path.
+                    model.get_model().remove(
+                        model.convert_iter_to_child_iter( treeiter ) ) #TODO Check if correct - also see top of function and also remove.
 
-                model.get_model().append( [
-                    file_entry.get_text().strip(),
-                    Gtk.STOCK_APPLY if enabled_checkbutton.get_active() else None ] )
+                model.get_model().append( [ path, True ] )
 
             break
 
@@ -567,40 +650,62 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def on_browse_calendar( self, button, add_edit_dialog, calendar_file ):
-        system_calendars = self.get_calendars_system()
-
         dialog = \
             self.create_filechooser_dialog(
                 _( "Choose a calendar file" ),
                 add_edit_dialog,
                 calendar_file.get_text() )
 
-        while True:
-            response = dialog.run()
-            if response == Gtk.ResponseType.OK:
-                if dialog.get_filename() in system_calendars:
-                    self.show_dialog_ok(
-                        dialog,
-                        _( "The calendar is part of your system\nand is already included." ),
-                        nessage_type = Gtk.MessageType.INFO )
-
-                else:
-                    calendar_file.set_text( dialog.get_filename() )
-                    break
-
-            else:
-                break
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+            calendar_file.set_text( dialog.get_filename() )
 
         dialog.destroy()
 
 
+    def get_system_calendars( self ):
+        calendars = [ ]
+        if Path( IndicatorOnThisDay.SYSTEM_CALENDAR ).exists():
+            # Ideally use Path.walk() but only available in Python 3.12.
+            walk_generator = os.walk( IndicatorOnThisDay.SYSTEM_CALENDAR )
+            for root, directories, filenames in walk_generator:
+                for filename in fnmatch.filter( filenames, "calendar.*" ):
+                    calendars.append( str( Path( root ).joinpath( filename ) ) )
+
+            calendars.sort()
+
+        return calendars
+
+
+    def get_system_calendar_default( self ):
+        system_calendar_default = \
+            Path( IndicatorOnThisDay.SYSTEM_CALENDAR ) / "calendar.history"
+
+        if not system_calendar_default.exists():
+            system_calendar_default = None
+
+        return system_calendar_default
+
+
     def load_config( self, config ):
+        system_calendar_default = self.get_system_calendar_default()
         self.calendars = \
             config.get(
                 IndicatorOnThisDay.CONFIG_CALENDARS,
-                [ IndicatorOnThisDay.DEFAULT_CALENDAR ] )  #TODO See Fortune...need to distinguish between a system calendar and defautl calendar?
-#TODO I think there is an issue here...need to read in the calendars (and which ones are enabled).
-# Some calendars are system and some are user...but any/all can be enabled/disabled.
+                [ system_calendar_default, True ]
+                if system_calendar_default 
+                else
+                [ ] )
+
+        if self.calendars and isinstance( self.calendars[ 0 ], str ):
+            # Prior to 1.0.17, calendars were saved as a list of paths.
+            # Convert to new format where each calendar path is save with a
+            # corresponding boolean (whether the calendar is enabled or not).
+            calendars = [ ]
+            for calendar in self.calendars:
+                calendars.append( [ calendar, True ] )
+
+            self.calendars = calendars
 
         self.copy_to_clipboard = \
             config.get(
@@ -622,11 +727,20 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     def save_config( self ):
         return {
-            IndicatorOnThisDay.CONFIG_CALENDARS : self.calendars,
-            IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD : self.copy_to_clipboard,
-            IndicatorOnThisDay.CONFIG_LINES : self.lines,
-            IndicatorOnThisDay.CONFIG_NOTIFY : self.notify,
-            IndicatorOnThisDay.CONFIG_SEARCH_URL : self.search_url,
+            IndicatorOnThisDay.CONFIG_CALENDARS:
+                self.calendars,
+
+            IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD:
+                self.copy_to_clipboard,
+
+            IndicatorOnThisDay.CONFIG_LINES:
+                self.lines,
+
+            IndicatorOnThisDay.CONFIG_NOTIFY:
+                self.notify,
+
+            IndicatorOnThisDay.CONFIG_SEARCH_URL:
+                self.search_url,
         }
 
 

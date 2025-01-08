@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*-
 
 
+#TODO In onthisday, I had a set of user calendars and system calendars...
+# but not so in fortune.
+# How to ensure the system fortune is always present in the preferences?
+
+
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -38,6 +43,10 @@ class IndicatorFortune( IndicatorBase ):
     indicator_name_for_desktop_file = _( "Indicator Fortune" )
     indicator_categories = "Categories=Utility;Amusement"
 
+    # Fortune treeview columns; model and view have same columns.
+    COLUMN_FILE_OR_DIRECTORY = 0 # Either the fortune filename or directory.
+    COLUMN_ENABLED = 1 # Boolean.
+
     CONFIG_FORTUNES = "fortunes"
     CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON = "middleMouseClickOnIcon"
     CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW = 1
@@ -47,21 +56,6 @@ class IndicatorFortune( IndicatorBase ):
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     CONFIG_SKIP_FORTUNE_CHARACTER_COUNT = "skipFortuneCharacterCount"
 
-    SYSTEM_FORTUNE_DEBIAN = "/usr/share/games/fortunes"
-    SYSTEM_FORTUNE_FEDORA = "/usr/share/games/fortune"
-    SYSTEM_FORTUNE_OPENSUSE_MANJARO = "/usr/share/fortune"
-    if Path( SYSTEM_FORTUNE_DEBIAN ).exists():
-        SYSTEM_FORTUNE = SYSTEM_FORTUNE_DEBIAN
-
-    elif Path( SYSTEM_FORTUNE_FEDORA ).exists():
-        SYSTEM_FORTUNE = SYSTEM_FORTUNE_FEDORA
-
-    elif Path( SYSTEM_FORTUNE_OPENSUSE_MANJARO ).exists():
-        SYSTEM_FORTUNE = SYSTEM_FORTUNE_OPENSUSE_MANJARO
-
-    else:
-        SYSTEM_FORTUNE = None
-
     HISTORY_FILE = "fortune-history.txt"
 
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
@@ -69,10 +63,6 @@ class IndicatorFortune( IndicatorBase ):
     # When no fortune is enabled or no fortunes are present, this flag is
     # inserted into a dummy fortune to be shown as a notification.
     NOTIFICATION_WARNING_FLAG = "%%%%%"
-
-    # Fortune treeview columns; model and view have same columns.
-    COLUMN_FILE_OR_DIRECTORY = 0 # Either the fortune filename or directory.
-    COLUMN_ENABLED = 1 #
 
 
     def __init__( self ):
@@ -132,6 +122,11 @@ class IndicatorFortune( IndicatorBase ):
                 lambda menuitem: self.show_history(), ) )
 
 
+    def refresh_and_show_fortune( self ):
+        self.refresh_fortune()
+        self.show_fortune()
+
+
     def show_history( self ):
 
         # Scroll to the end...strange way of doing so!
@@ -185,17 +180,10 @@ class IndicatorFortune( IndicatorBase ):
                 at_least_one_fortune_is_enabled = True
                 if Path( location ).is_dir():
                     locations.append( " '" + location + "/' " )
-#
-#                     # Remove trailing slashes, then add one in as 'fortune'
-#                     # needs it.
-# #TODO I don't follow this....remove then add a slash...????
-#                     locations += "'" + location.rstrip( "/" ) + "/" + "' "
 
                 elif Path( location ).is_file():
                     locations.append(
                         " '" + location.replace( ".dat", "" ) + "' " )
-                    # # Remove the extension as 'fortune' doesn't want it.
-                    # locations += "'" + location.replace( ".dat", "" ) + "' "
 
                 else:
                     self.get_logging().error(
@@ -265,15 +253,10 @@ class IndicatorFortune( IndicatorBase ):
             self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ) )
 
 
-    def refresh_and_show_fortune( self ):
-        self.refresh_fortune()
-        self.show_fortune()
-
-
     def on_preferences( self, dialog ):
         notebook = Gtk.Notebook()
 
-        # Fortune(s).
+        # Fortunes.
         grid = self.create_grid()
 
         store = Gtk.ListStore( str, bool )
@@ -288,7 +271,7 @@ class IndicatorFortune( IndicatorBase ):
 
 #TODO Can/should this go into indicatorbase?
 # (along with the on_checkbox function below)
-# Used by onthisday, lunar.
+# Used by fortune, onthisday, lunar.
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect(
             "toggled",
@@ -311,8 +294,8 @@ class IndicatorFortune( IndicatorBase ):
                         renderer_toggle,
                         "active",
                         IndicatorFortune.COLUMN_ENABLED ) ),
-                alignments_columnviewids =
-                    ( ( 0.5, IndicatorFortune.COLUMN_ENABLED ), ),
+                alignments_columnviewids = (
+                    ( 0.5, IndicatorFortune.COLUMN_ENABLED ), ),
                 sortcolumnviewids_columnmodelids = (
                     (
                         IndicatorFortune.COLUMN_FILE_OR_DIRECTORY,
@@ -514,20 +497,11 @@ class IndicatorFortune( IndicatorBase ):
             not store_[ row ][ checkbox_column_model_id ]
 
 
-#TODO Needed?
-    # def on_fortune_reset( self, button, treeview ):
-    #     if self.show_dialog_ok_cancel( treeview, _( "Reset fortunes to factory default?" ) ) == Gtk.ResponseType.OK:
-    #         liststore = treeview.get_model().get_model()
-    #         liststore.clear()
-    #         liststore.append( IndicatorFortune.DEFAULT_FORTUNE ) # Cannot set True into the model, so need to do this silly thing to get "True" into the model!
-
-
     def on_fortune_remove( self, button, treeview ):
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
             self.show_dialog_ok(
-                treeview,
-                _( "No fortune has been selected for removal." ) )
+                treeview, _( "No fortune has been selected for removal." ) )
 
         else:
 #TODO Check this...should it be treeiter or converted iter?
@@ -538,10 +512,10 @@ class IndicatorFortune( IndicatorBase ):
             selected_fortune = \
                 model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ]
 
-            if selected_fortune == IndicatorFortune.SYSTEM_FORTUNE:
+            if selected_fortune == self.get_system_fortune():
                 self.show_dialog_ok(
                     treeview,
-                    _( "This is the system fortune and cannot be deleted." ) )
+                    _( "This is the system fortune and cannot be removed." ) )
 
             else:
                 response = \
@@ -563,10 +537,10 @@ class IndicatorFortune( IndicatorBase ):
 
         model, treeiter = treeview.get_selection().get_selected()
         path = model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ]
-        if path == IndicatorFortune.SYSTEM_FORTUNE:
+        if path == self.get_system_fortune():
             self.show_dialog_ok(
                 preferences_dialog,
-                _( "This is a system fortune and cannot be modified." ) )
+                _( "This is the system fortune and cannot be modified." ) )
 
         else:
             self.__on_fortune_double_click(
@@ -645,42 +619,23 @@ class IndicatorFortune( IndicatorBase ):
                 homogeneous = True ),
             0, 1, 1, 1 )
 
-#TODO This goes I think.
-        # enabled_checkbox = \
-        #     self.create_checkbutton(
-        #         _( "Enabled" ),
-        #         tooltip_text = _(
-        #             "Ensure the fortune file/directory\n" +
-        #             "works by running through 'fortune'\n" +
-        #             "in a terminal." ),
-        #         active = \
-        #             True
-        #             if row_number is None else \
-        #             model[ treeiter ][ IndicatorFortune.COLUMN_ENABLED ] == '✔' )
-        #
-        # grid.attach( enabled_checkbox, 0, 2, 1, 1 )
-
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
                 path = fortune_file_directory.get_text().strip()
                 if path == "":
                     self.show_dialog_ok(
-                        dialog, _( "The fortune path cannot be empty." ),
-                        message_type = Gtk.MessageType.INFO )
+                        dialog, _( "The fortune path cannot be empty." ) )
 
                     fortune_file_directory.grab_focus()
                     continue
 
-                if IndicatorFortune.SYSTEM_FORTUNE in path:
+                if self.get_system_fortune() in path:
                     self.show_dialog_ok(
                         dialog,
-                        _( "The fortune is part of your system and is already included." ),
-                        message_type = Gtk.MessageType.INFO )
+                        _( "This fortune is part of your system and is already included." ) )
 
                     continue
-
-#TODO Disallow duplicates?
 
                 if not adding_fortune: # This is an edit; remove the old path.
                     model.get_model().remove(
@@ -717,29 +672,41 @@ class IndicatorFortune( IndicatorBase ):
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
-            # if dialog.get_filename().startswith( IndicatorFortune.DEFAULT_FORTUNE[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] ):  #TODO Check
-            #     self.show_dialog_ok(
-            #         dialog,
-            #         _( "The fortune is part of your system and is already included." ),
-            #         message_type = Gtk.MessageType.INFO )
-            #
-            # else:
-            #     fortune_file_directory.set_text( dialog.get_filename() )
-            #     break
-
             fortune_file_directory.set_text( dialog.get_filename() )
 
         dialog.destroy()
+
+
+    def get_system_fortune( self ):
+        SYSTEM_FORTUNE_DEBIAN = "/usr/share/games/fortunes"
+        SYSTEM_FORTUNE_FEDORA = "/usr/share/games/fortune"
+        SYSTEM_FORTUNE_MANJARO = "/usr/share/fortune"
+        SYSTEM_FORTUNE_OPENSUSE = "/usr/share/fortune"
+
+        system_fortune = None
+        if Path( SYSTEM_FORTUNE_DEBIAN ).exists():
+            system_fortune = SYSTEM_FORTUNE_DEBIAN
+
+        elif Path( SYSTEM_FORTUNE_FEDORA ).exists():
+            system_fortune = SYSTEM_FORTUNE_FEDORA
+
+        elif Path( SYSTEM_FORTUNE_MANJARO ).exists():
+            system_fortune = SYSTEM_FORTUNE_MANJARO
+
+        elif Path( SYSTEM_FORTUNE_OPENSUSE ).exists():
+            system_fortune = SYSTEM_FORTUNE_OPENSUSE
+
+        return system_fortune
 
 
     def load_config( self, config ):
         self.fortunes = \
             config.get(
                 IndicatorFortune.CONFIG_FORTUNES,
-                [ ]
-                if IndicatorFortune.SYSTEM_FORTUNE is None
+                [ self.get_system_fortune(), True ]
+                if self.get_system_fortune()
                 else
-                [ IndicatorFortune.SYSTEM_FORTUNE, True ] )
+                [ ] )
 
         # self.fortunes.append( [ "/home/bernard/Downloads", True ] ) #TODO Testing
         # self.fortunes.append( [ "/home/bernard/Programming", False ] ) #TODO Testing

@@ -279,18 +279,32 @@ class IndicatorPunycode( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.drop_path_query = config.get( IndicatorPunycode.CONFIG_DROP_PATH_QUERY, False )
-        self.input_clipboard = config.get( IndicatorPunycode.CONFIG_INPUT_CLIPBOARD, False )
-        self.output_both = config.get( IndicatorPunycode.CONFIG_OUTPUT_BOTH, False )
-        self.result_history_length = config.get( IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH, 3 )
+        self.drop_path_query = \
+            config.get( IndicatorPunycode.CONFIG_DROP_PATH_QUERY, False )
+
+        self.input_clipboard = \
+            config.get( IndicatorPunycode.CONFIG_INPUT_CLIPBOARD, False )
+
+        self.output_both = \
+            config.get( IndicatorPunycode.CONFIG_OUTPUT_BOTH, False )
+
+        self.result_history_length = \
+            config.get( IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH, 3 )
 
 
     def save_config( self ):
         return {
-            IndicatorPunycode.CONFIG_DROP_PATH_QUERY : self.drop_path_query,
-            IndicatorPunycode.CONFIG_INPUT_CLIPBOARD : self.input_clipboard,
-            IndicatorPunycode.CONFIG_OUTPUT_BOTH : self.output_both,
-            IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH : self.result_history_length
+            IndicatorPunycode.CONFIG_DROP_PATH_QUERY:
+                self.drop_path_query,
+
+            IndicatorPunycode.CONFIG_INPUT_CLIPBOARD:
+                self.input_clipboard,
+
+            IndicatorPunycode.CONFIG_OUTPUT_BOTH:
+                self.output_both,
+
+            IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH:
+                self.result_history_length
         }
 
 
