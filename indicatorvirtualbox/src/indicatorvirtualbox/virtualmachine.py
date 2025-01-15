@@ -92,15 +92,14 @@ class Group():
             len( self.get_items() ) == len( other.get_items( ) ) )
 
         if equal:
-#TODO Remove \
-            z = \
+            z = (
                 zip(
                     sorted(
                         self.get_items(),
                         key = operator.methodcaller( "__str__" ) ),
                     sorted(
                         other.get_items(),
-                        key = operator.methodcaller( "__str__" ) ) )
+                        key = operator.methodcaller( "__str__" ) ) ) )
 
             for item_self, item_other in z:
                 if not item_self.__eq__( item_other ):

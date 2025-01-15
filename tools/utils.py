@@ -27,9 +27,8 @@ from pathlib import Path
 
 
 def is_correct_directory( example_arguments = None ):
-#TODO Remove \
-    correct_directory = \
-        Path.cwd() == Path( inspect.stack()[ 1 ].filename ).parent.parent.absolute()
+    correct_directory = (
+        Path.cwd() == Path( inspect.stack()[ 1 ].filename ).parent.parent.absolute() )
 
     message = ""
     if not correct_directory:
@@ -70,8 +69,8 @@ def initialise_virtual_environment( venv_directory, *modules_to_install ):
         command = f"python3 -m venv { venv_directory }"
         subprocess.call( command, shell = True )
 
-    command = \
+    command = (
         f". { venv_directory.absolute() / 'bin' / 'activate' } && " + \
-        f"python3 -m pip install --upgrade --force-reinstall { ' '.join( modules_to_install ) }"
+        f"python3 -m pip install --upgrade --force-reinstall { ' '.join( modules_to_install ) }" )
 
     subprocess.call( command, shell = True )

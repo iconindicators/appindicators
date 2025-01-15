@@ -122,44 +122,43 @@ def get_stardate_classic( gregorian_date_time ):
     if ( year < 2162 ) or ( year == 2162 and month == 1 and day < 4 ):
         # Pre-stardate era; convert here otherwise a negative time is generated.
         index = 0
-#TODO Remove \
-        number_of_seconds = \
-            ( _gregorian_dates[ index ] - gregorian_date_time ).total_seconds()
+        number_of_seconds = (
+            ( _gregorian_dates[ index ] - gregorian_date_time ).total_seconds() )
 
         number_of_days = number_of_seconds / 60.0 / 60.0 / 24.0
         rate = _stardate_rates[ index ]
         units = number_of_days * rate
 
-        stardate_issue = \
-            stardate_issues[ index ] - int( units / stardate_ranges[ index ] )
+        stardate_issue = (
+            stardate_issues[ index ] - int( units / stardate_ranges[ index ] ) )
 
-        remainder = \
-            stardate_ranges[ index ] - ( units % stardate_ranges[ index ] )
+        remainder = (
+            stardate_ranges[ index ] - ( units % stardate_ranges[ index ] ) )
 
         stardate_integer = int( remainder )
         stardate_fraction = int( remainder * 10.0 ) - ( int( remainder ) * 10 )
 
     else:
         # First period of stardates (2162/1/4 - 2270/1/26).
-        first_period = \
+        first_period = (
             ( year == 2162 and month == 1 and day >= 4 ) or \
             ( year == 2162 and month > 1 ) or \
             ( 2162 < year < 2270 ) or \
-            ( year == 2270 and month == 1 and day < 26 )
+            ( year == 2270 and month == 1 and day < 26 ) )
 
         # Second period of stardates (2270/1/26 - 2283/10/5).
-        second_period = \
+        second_period = (
             ( year == 2270 and month == 1 and day >= 26 ) or \
             ( year == 2270 & month > 1 ) or \
             ( 2270 < year < 2283 ) or \
             ( year == 2283 and month < 10 ) or \
-            ( year == 2283 and month == 10 and day < 5 )
+            ( year == 2283 and month == 10 and day < 5 ) )
 
         # Third period of stardates (2283/10/5 - 2323/1/1).
-        third_period = \
+        third_period = (
             ( year == 2283 and month == 10 and day >= 5 ) or \
             ( year == 2283 and month > 10 ) or \
-            ( 2283 < year < 2323 )
+            ( 2283 < year < 2323 ) )
 
         # Fourth period of stardates (2323/1/1 - ).
         fourth_period = year >= 2323
@@ -178,7 +177,7 @@ def get_stardate_classic( gregorian_date_time ):
 
         else:
             raise ValueError(
-                "Invalid year/month/day: " + 
+                "Invalid year/month/day: " +
                 str( year ) + "/" + str( month ) + "/" + str( day ) )
 
         # Now convert...
@@ -187,8 +186,8 @@ def get_stardate_classic( gregorian_date_time ):
 
         number_of_days = number_of_seconds / 60.0 / 60.0 / 24.0
         units = number_of_days * _stardate_rates[ index ]
-        stardate_issue = \
-            int( units / stardate_ranges[ index ] ) + stardate_issues[ index ]
+        stardate_issue = (
+            int( units / stardate_ranges[ index ] ) + stardate_issues[ index ] )
 
         remainder = units % stardate_ranges[ index ]
         stardate_integer = int( remainder ) + stardate_integers[ index ]
@@ -240,8 +239,8 @@ def get_next_update_in_seconds( gregorian_date_time, is_classic ):
         raise ValueError( "Gregorian year out of range: 1900 <= year <= 9500." )
 
     if is_classic:
-        stardate_issue, stardate_integer, stardate_fraction = \
-            get_stardate_classic( gregorian_date_time )
+        stardate_issue, stardate_integer, stardate_fraction = (
+            get_stardate_classic( gregorian_date_time ) )
 
         stardate_issue_next = stardate_issue
         stardate_integer_next = stardate_integer
@@ -253,11 +252,11 @@ def get_next_update_in_seconds( gregorian_date_time, is_classic ):
                 stardate_integer_next = 0
                 stardate_issue_next += 1
 
-        date_time_of_next_stardate = \
+        date_time_of_next_stardate = (
             get_gregorian_from_stardate_classic(
                 stardate_issue_next,
                 stardate_integer_next,
-                stardate_fraction_next )
+                stardate_fraction_next ) )
 
         number_of_seconds_to_next_update = (
             date_time_of_next_stardate - gregorian_date_time ).total_seconds()
@@ -357,21 +356,21 @@ def get_gregorian_from_stardate_classic(
     minutes = ( hours - int( hours ) ) * 60.0
     seconds = ( minutes - int( minutes ) ) * 60.0
 
-    gregorian_date_time = \
+    gregorian_date_time = (
         datetime.datetime(
             _gregorian_dates[ index ].year,
             _gregorian_dates[ index ].month,
             _gregorian_dates[ index ].day,
-            tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) )
+            tzinfo = datetime.timezone( datetime.timedelta( hours = 0 ) ) ) )
 
-    gregorian_date_time += \
+    gregorian_date_time += (
         datetime.timedelta(
             int( days ),
             int( seconds ),
             0,
             0,
             int( minutes ),
-            int( hours ) )
+            int( hours ) ) )
 
     return gregorian_date_time
 

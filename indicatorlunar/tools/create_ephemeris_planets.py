@@ -60,19 +60,18 @@ def create_ephemeris_planets( in_bsp, out_bsp, years ):
     end_date = today.replace( year = today.year + years )
     date_format = "%Y/%m/%d"
 
-#TODO Remove \
-    command = \
+    command = (
         "python3 -m jplephem excerpt " + \
         start_date.strftime( date_format ) + " " + \
         end_date.strftime( date_format ) + " " + \
-        in_bsp + " " + out_bsp
+        in_bsp + " " + out_bsp )
 
     print( "Processing...\n\t", command )
     subprocess.call( command, shell = True )
 
 
 if __name__ == "__main__":
-    description = \
+    description = (
         textwrap.dedent(
             r'''
             From an existing .bsp, create a new .bsp with a date range
@@ -86,12 +85,12 @@ if __name__ == "__main__":
             ---     * BE DOUBLE QUOTED                          ---
             ---     * HAVE SPACES ESCAPED WITH A \              ---
             -------------------------------------------------------
-            ''' )
+            ''' ) )
 
-    parser = \
+    parser = (
         argparse.ArgumentParser(
             formatter_class = argparse.RawDescriptionHelpFormatter,
-            description = description )
+            description = description ) )
 
     parser.add_argument(
         "in_bsp",

@@ -384,9 +384,8 @@ class IndicatorTest( IndicatorBase ):
 
 
     def _execute_command( self, command ):
-#TODO Remove \
-        terminal, terminal_execution_flag = \
-            self.get_terminal_and_execution_flag()
+        terminal, terminal_execution_flag = (
+            self.get_terminal_and_execution_flag() )
 
         if terminal is None:
             message = _(
@@ -426,11 +425,11 @@ class IndicatorTest( IndicatorBase ):
     def on_preferences( self, dialog ):
         grid = self.create_grid()
 
-        x_checkbutton = \
+        x_checkbutton = (
             self.create_checkbutton(
                 _( "Enable/disable X" ),
                 tooltip_text = _( "Enable/disable X" ),
-                active = self.x )
+                active = self.x ) )
 
         grid.attach( x_checkbutton, 0, 0, 1, 1 )
 
@@ -444,7 +443,7 @@ class IndicatorTest( IndicatorBase ):
         store.append( [ "Sunday" ] )
 
         renderer_text_for_column_dayofweek = Gtk.CellRendererText()
-        treeview, scrolledwindow = \
+        treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 store,
                 ( _( "Day of Week" ), ),
@@ -453,12 +452,12 @@ class IndicatorTest( IndicatorBase ):
                     (
                         ( self.data_function, "" ),
                         renderer_text_for_column_dayofweek, 0 ), ),
-                tooltip_text = _( "Days of week containing an 'n' are bold." ) )
+                tooltip_text = _( "Days of week containing an 'n' are bold." ) ) )
 
         grid.attach( scrolledwindow, 0, 1, 1, 10 )
 
-        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
-            self.create_preferences_common_widgets()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = (
+            self.create_preferences_common_widgets() )
 
         grid.attach( box, 0, 11, 1, 1 )
 

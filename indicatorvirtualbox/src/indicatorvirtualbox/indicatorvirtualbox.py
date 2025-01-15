@@ -100,9 +100,8 @@ class IndicatorVirtualBox( IndicatorBase ):
     def build_menu( self, menu, vbox_manage_installed, virtual_machines ):
         if vbox_manage_installed:
             if virtual_machines:
-#TODO Remove \
-                running_names, running_uuids = \
-                    self.get_running_virtual_machines()
+                running_names, running_uuids = (
+                    self.get_running_virtual_machines() )
 
                 self._build_menu(
                     menu, virtual_machines,
@@ -126,18 +125,18 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def _build_menu( self, menu, items, indent, running_uuids ):
         if self.sort_groups_and_virtual_machines_equally:
-            sorted_items = \
+            sorted_items = (
                 sorted(
                     items,
-                    key = lambda x: locale.strxfrm( x.get_name() ) )
+                    key = lambda x: locale.strxfrm( x.get_name() ) ) )
 
         else:
-            sorted_items = \
+            sorted_items = (
                 sorted(
                     items,
                     key = lambda x: (
                         not isinstance( x, Group ),
-                        locale.strxfrm( x.get_name() ) ) )
+                        locale.strxfrm( x.get_name() ) ) ) )
 
         for item in sorted_items:
             if isinstance( item, Group ):
@@ -157,11 +156,11 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def _add_group_to_menu( self, menu, group, indent ):
-        menuitem = \
+        menuitem = (
             self.create_and_append_menuitem(
                 menu,
                 group.get_name(),
-                indent = indent )
+                indent = indent ) )
 
         if self.show_submenu:
             menu = Gtk.Menu()
@@ -202,8 +201,8 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def auto_start_virtual_machines( self, virtual_machines ):
-        virtual_machines_for_autostart = \
-            self._get_virtual_machines_for_autostart( virtual_machines )
+        virtual_machines_for_autostart = (
+            self._get_virtual_machines_for_autostart( virtual_machines ) )
 
         # Start up each virtual machine and only insert the time delay if the
         # machine was not already running.
@@ -256,9 +255,9 @@ class IndicatorVirtualBox( IndicatorBase ):
             self, virtual_machine_name, delay_in_seconds = 0 ):
 
         if not self.is_session_type_wayland():
-            number_of_windows_with_the_same_name = \
+            number_of_windows_with_the_same_name = (
                 self.process_get(
-                    'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' )
+                    'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' ) )
 
             if number_of_windows_with_the_same_name == "0":
                 message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtual_machine_name )
@@ -390,10 +389,10 @@ class IndicatorVirtualBox( IndicatorBase ):
     def get_virtual_machines( self ):
         def add_virtual_machine( group, name, uuid, groups ):
             for group_name in groups:
-                the_group = \
+                the_group = (
                     next(
                         ( x for x in group.get_items()
-                          if isinstance( x, Group ) and x.get_name() == group_name ), None )
+                          if isinstance( x, Group ) and x.get_name() == group_name ), None ) )
 
                 if the_group is None:
                     the_group = Group( group_name )
@@ -458,7 +457,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         groups_exist = self._add_items_to_store( treestore, None, items )
 
-        treeview, scrolledwindow = \
+        treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 treestore,
                 ( _( "Virtual Machine" ), _( "Autostart" ), _( "Start Command" ) ),
@@ -480,7 +479,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 tooltip_text = _(
                     "Double click to edit a virtual machine's properties." ),
                 rowactivatedfunctionandarguments = (
-                    self.on_virtual_machine_double_click, ) )
+                    self.on_virtual_machine_double_click, ) ) )
 
         notebook.append_page(
             scrolledwindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
@@ -488,7 +487,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         # General settings.
         grid = self.create_grid()
 
-        window_name = \
+        window_name = (
             self.create_entry(
                 self.virtualbox_manager_window_name,
                 tooltip_text = _(
@@ -496,7 +495,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "You may have to adjust for your local language.\n\n" +
                     "This is used to bring the VirtualBox™ Manager\n" +
                     "window to the front if already running.\n\n" +
-                    "This is unsupported under Wayland." ) )
+                    "This is unsupported under Wayland." ) ) )
 
         grid.attach(
             self.create_box(
@@ -505,7 +504,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     ( window_name, True ) ) ),
             0, 0, 1, 1 )
 
-        sort_groups_and_virtual_machines_equally_checkbox = \
+        sort_groups_and_virtual_machines_equally_checkbox = (
             self.create_checkbutton(
                 _( "Sort groups and virtual machines equally" ),
                 tooltip_text = _(
@@ -513,25 +512,25 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "are sorted without distinction.\n\n" +
                     "Otherwise, groups are sorted first,\n" +
                     "followed by virtual machines." ),
-                active = self.sort_groups_and_virtual_machines_equally )
+                active = self.sort_groups_and_virtual_machines_equally ) )
 
         grid.attach(
             sort_groups_and_virtual_machines_equally_checkbox, 0, 1, 1, 1 )
 
-        show_as_submenus_checkbox = \
+        show_as_submenus_checkbox = (
             self.create_checkbutton(
                 _( "Show groups as submenus" ),
                 tooltip_text = _(
                     "If checked, groups are shown using submenus.\n\n" +
                     "Otherwise, groups are shown as an indented list." ),
-                active = self.show_submenu )
+                active = self.show_submenu ) )
 
         row = 2
         if groups_exist:
             grid.attach( show_as_submenus_checkbox, 0, row, 1, 1 )
             row += 1
 
-        spinner_refresh_interval = \
+        spinner_refresh_interval = (
             self.create_spinbutton(
                 self.refresh_interval_in_minutes,
                 1,
@@ -539,7 +538,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 page_increment = 5,
                 tooltip_text = _(
                     "How often the list of virtual machines\n" +
-                    "and their running status are updated." ) )
+                    "and their running status are updated." ) ) )
 
         grid.attach(
             self.create_box(
@@ -550,7 +549,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             0, row, 1, 1 )
         row += 1
 
-        spinner_delay = \
+        spinner_delay = (
             self.create_spinbutton(
                 self.delay_between_autostart_in_seconds,
                 1,
@@ -558,7 +557,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 page_increment = 30,
                 tooltip_text = _(
                     "Amount of time to wait from automatically\n" +
-                    "starting one virtual machine to the next." ) )
+                    "starting one virtual machine to the next." ) ) )
 
         grid.attach(
             self.create_box(
@@ -601,18 +600,18 @@ class IndicatorVirtualBox( IndicatorBase ):
     def _add_items_to_store( self, treestore, parent, items ):
         groups_exist = False
         if self.sort_groups_and_virtual_machines_equally:
-            sorted_items = \
+            sorted_items = (
                 sorted(
                     items,
-                    key = lambda x: locale.strxfrm( x.get_name() ) )
+                    key = lambda x: locale.strxfrm( x.get_name() ) ) )
 
         else:
-            sorted_items = \
+            sorted_items = (
                 sorted(
                     items,
                     key = lambda x: (
                         not isinstance( x, Group ),
-                        locale.strxfrm( x.get_name() ) ) )
+                        locale.strxfrm( x.get_name() ) ) ) )
 
         for item in sorted_items:
             if isinstance( item, Group ):
@@ -682,7 +681,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     ( start_command, True ) ) ),
             0, 0, 2, 1 )
 
-        autostart_checkbutton = \
+        autostart_checkbutton = (
             self.create_checkbutton(
                 _( "Autostart" ),
                 tooltip_text = _(
@@ -690,7 +689,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 active = (
                     model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None
                     and
-                    model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY ) )
+                    model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY ) ) )
 
         grid.attach( autostart_checkbutton, 0, 1, 2, 1 )
 

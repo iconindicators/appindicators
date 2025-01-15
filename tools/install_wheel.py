@@ -31,12 +31,12 @@ import utils
 
 
 if __name__ == "__main__":
-#TODO Remove \
-    correct_directory, message = \
-        utils.is_correct_directory( example_arguments = "release indicatorfortune" )
+    correct_directory, message = (
+        utils.is_correct_directory(
+            example_arguments = "release indicatorfortune" ) )
 
     if correct_directory:
-        args = \
+        args = (
             utils.initialiase_parser_and_get_arguments(
                 f"Install a Python wheel package for one or more indicators to "
                 f"a virtual environment within $HOME/.local/venv_indicators "
@@ -51,7 +51,7 @@ if __name__ == "__main__":
                         f"The list of indicators separated by spaces to install." },
                 {
                     "indicators" :
-                        "+" } )
+                        "+" } ) )
 
         for indicator_name in args.indicators:
             utils.initialise_virtual_environment(

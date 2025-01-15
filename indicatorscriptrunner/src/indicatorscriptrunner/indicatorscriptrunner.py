@@ -21,7 +21,7 @@ Application indicator to run a terminal command/script from the indicator menu.
 '''
 
 
-#TODO When deleting a script, 
+#TODO When deleting a script,
 # if the script's group still exists, maybe
 # select the first script of that group.
 # Otherwise, select first script.
@@ -110,16 +110,15 @@ class IndicatorScriptRunner( IndicatorBase ):
         super().__init__(
             comments = _( "Runs a terminal command or script;\noptionally display results in the icon label." ) )
 
-#TODO Remove \
-        self.command_notify_background = \
-            "notify-send -i " + self.get_icon_name() + \
-            " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " + \
-            "\"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT + "\""
+        self.command_notify_background = (
+            "notify-send -i " + self.get_icon_name() +
+            " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " +
+            "\"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT + "\"" )
 
-        self.command_notify_nonbackground = \
-            "notify-send -i " + self.get_icon_name() + \
-            " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " + \
-            "\"" + _( "...has completed." ) + "\""
+        self.command_notify_nonbackground = (
+            "notify-send -i " + self.get_icon_name() +
+            " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " +
+            "\"" + _( "...has completed." ) + "\"" )
 
 
     def update( self, menu ):
@@ -133,6 +132,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         for script in self.scripts:
             key = self._create_key( script.get_group(), script.get_name() )
 
+#TODO Tidy up
             if isinstance( script, Background ) and \
                self.background_script_next_update_time[ key ] < next_update and \
                self.is_background_script_in_indicator_text( script ):
@@ -168,14 +168,14 @@ class IndicatorScriptRunner( IndicatorBase ):
     def add_scripts_to_menu( self, scripts, menu, indent ):
         scripts.sort( key = lambda script: script.get_name().lower() )
         for script in scripts:
-            menuitem = \
+            menuitem = (
                 self.create_and_append_menuitem(
                     menu,
                     script.get_name(),
                     activate_functionandarguments = (
                         lambda menuitem, script = script:
                             self.on_script_menuitem( script ), ), # Note script = script to handle lambda late binding.
-                    indent = indent )
+                    indent = indent ) )
 
             if script.get_default():
                 self.set_secondary_activate_target( menuitem )
@@ -203,10 +203,10 @@ class IndicatorScriptRunner( IndicatorBase ):
             command += script.get_command()
 
             if script.get_show_notification():
-                notification = \
+                notification = (
                     self.command_notify_nonbackground.replace(
                         IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME,
-                        script.get_name() )
+                        script.get_name() ) )
 
                 command += "; " + notification
 
@@ -231,6 +231,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             if isinstance( script, Background ) and self.is_background_script_in_indicator_text( script ):
                 # Script is background AND present in the indicator text, so is a potential candidate to be updated...
                 key = self._create_key( script.get_group(), script.get_name() )
+#TODO Tidy up
                 if ( self.background_script_next_update_time[ key ] < now ) or \
                    ( script.get_force_update() and self.background_script_results[ key ] ):
                     background_scripts_to_execute.append( script )
@@ -255,15 +256,15 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 if script.get_show_notification() and command_result:
                     notification_command = self.command_notify_background
-                    notification_command = \
+                    notification_command = (
                         notification_command.replace(
                             IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME,
-                            script.get_name().replace( '-', '\\-' ) )
+                            script.get_name().replace( '-', '\\-' ) ) )
 
-                    notification_command = \
+                    notification_command = (
                         notification_command.replace(
                             IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT,
-                            command_result.replace( '-', '\\-' ) )
+                            command_result.replace( '-', '\\-' ) ) )
 
                     self.process_call( notification_command )
 
@@ -273,15 +274,15 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.get_logging().debug(
                 script.get_group() + " | " + script.get_name() + ": " + script.get_command() )
 
-        command_result = \
+        command_result = (
             self.process_get(
                 script.get_command(),
-                log_non_zero_error_code = True ) # When calling a user script, always want to log out any errors (from non-zero return codes).
+                log_non_zero_error_code = True ) ) # When calling a user script, always want to log out any errors (from non-zero return codes).
 
         key = self._create_key( script.get_group(), script.get_name() )
         self.background_script_results[ key ] = command_result
-        self.background_script_next_update_time[ key ] = \
-            now + datetime.timedelta( minutes = script.get_interval_in_minutes() )
+        self.background_script_next_update_time[ key ] = (
+            now + datetime.timedelta( minutes = script.get_interval_in_minutes() ) )
 
         return key
 
@@ -293,22 +294,22 @@ class IndicatorScriptRunner( IndicatorBase ):
             if isinstance( script, Background ) and "[" + key + "]" in indicator_text_processed:
                 command_result = self.background_script_results[ key ]
                 if command_result is None: # Background script failed so leave the tag in place for the user to see.
-                    indicator_text_processed = \
+                    indicator_text_processed = (
                         indicator_text_processed.replace(
                             "[" + key + "]",
-                            "[" + key + "]" + self.indicator_text_separator )
+                            "[" + key + "]" + self.indicator_text_separator ) )
 
                 elif command_result: # Non-empty result so replace tag and tack on a separator.
-                    indicator_text_processed = \
+                    indicator_text_processed = (
                         indicator_text_processed.replace(
                             "[" + key + "]",
-                            command_result + self.indicator_text_separator )
+                            command_result + self.indicator_text_separator ) )
 
                 else: # No result, so remove tag but no need for separator.
-                    indicator_text_processed = \
+                    indicator_text_processed = (
                         indicator_text_processed.replace(
                             "[" + key + "]",
-                            command_result )
+                            command_result ) )
 
         return indicator_text_processed[ 0 : - len( self.indicator_text_separator ) ] # Trim last separator.
 
@@ -322,7 +323,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         grid = self.create_grid()
 
         # Define these here so that widgets can connect to handle events.
-        indicator_text_entry = \
+        indicator_text_entry = (
             self.create_entry(
                 self.indicator_text,
                 tooltip_text = _(
@@ -334,12 +335,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "\tand empty text otherwise.\n\n" +
                     "Only background scripts added to the\n" +
                     "icon text will be run.\n\n" +
-                    "Not supported on all desktops." ) )
+                    "Not supported on all desktops." ) ) )
 
-        command_text_view = \
+        command_text_view = (
             self.create_textview(
                 tooltip_text = _( "The terminal script/command, along with any arguments." ),
-                editable = False )
+                editable = False ) )
 
         treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str )
 
@@ -347,7 +348,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         treestore_background_scripts_filter.set_visible_func(
             self.background_scripts_filter_func, copy_of_scripts )
 
-        background_scripts_treeview, background_scripts_scrolledwindow = \
+        background_scripts_treeview, background_scripts_scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 treestore_background_scripts_filter,
                 (
@@ -372,11 +373,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                 tooltip_text = _( "Double click on a script to add to the icon text." ),
                 rowactivatedfunctionandarguments = (
                     self.on_background_script_double_click,
-                    indicator_text_entry ), )
+                    indicator_text_entry ), ) )
 
         renderer_column_name_text = Gtk.CellRendererText()
 
-        scripts_treeview, scripts_scrolledwindow = \
+        scripts_treeview, scripts_scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 treestore,
                 (
@@ -404,7 +405,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_TERMINAL ),
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_INTERVAL ),
                     ( 0.5, IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_FORCE_UPDATE ) ),
-                celldatafunctionandarguments_renderers_columnviewids = ( ( 
+                celldatafunctionandarguments_renderers_columnviewids = ( (
                     ( self.data_function_column_name_renderer, copy_of_scripts ),
                     renderer_column_name_text,
                     IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_NAME ), ),
@@ -419,7 +420,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 rowactivatedfunctionandarguments = (
                     self.on_script_double_click,
                     background_scripts_treeview,
-                    indicator_text_entry, copy_of_scripts ), )
+                    indicator_text_entry, copy_of_scripts ), ) )
 
         grid.attach( scripts_scrolledwindow, 0, 0, 1, 20 )
 
@@ -434,7 +435,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 ( ( self.create_scrolledwindow( command_text_view ), True ), ) ),
              0, 21, 1, 10 )
 
-        box, add, edit, copy_, remove = \
+        box, add, edit, copy_, remove = (
             self.create_buttons_in_box(
                 (
                     _( "Add" ),
@@ -468,19 +469,19 @@ class IndicatorScriptRunner( IndicatorBase ):
                         copy_of_scripts,
                         scripts_treeview,
                         background_scripts_treeview,
-                        indicator_text_entry ) ) )
+                        indicator_text_entry ) ) ) )
 
         box.set_margin_top( IndicatorBase.INDENT_WIDGET_TOP )
         grid.attach( box, 0, 31, 1, 1 )
 
-        send_command_to_log_checkbutton = \
+        send_command_to_log_checkbutton = (
             self.create_checkbutton(
                 _( "Send command to log" ),
                 tooltip_text = _(
                     "When a script is run,\n" +
                     "send the command to the log\n" +
                     "(located in your home directory)." ),
-                active = self.send_command_to_log )
+                active = self.send_command_to_log ) )
 
         grid.attach( send_command_to_log_checkbutton, 0, 32, 1, 1 )
 
@@ -494,25 +495,25 @@ class IndicatorScriptRunner( IndicatorBase ):
                 ( ( Gtk.Label.new( _( "Show non-background scripts" ) ), False ), ) ),
             0, 0, 1, 1 )
 
-        radio_show_scripts_submenu = \
+        radio_show_scripts_submenu = (
             self.create_radiobutton(
                 None,
                 _( "In sub-menus" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = self.show_scripts_in_submenus )
+                active = self.show_scripts_in_submenus ) )
 
         grid.attach( radio_show_scripts_submenu, 0, 1, 1, 1 )
 
-        radio_show_scripts_indented = \
+        radio_show_scripts_indented = (
             self.create_radiobutton(
                 radio_show_scripts_submenu,
                 _( "Indented by group" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = not self.show_scripts_in_submenus )
+                active = not self.show_scripts_in_submenus ) )
 
         grid.attach( radio_show_scripts_indented, 0, 2, 1, 1 )
 
-        hide_groups_checkbutton = \
+        hide_groups_checkbutton = (
             self.create_checkbutton(
                 _( "Hide groups" ),
                 tooltip_text = _(
@@ -521,7 +522,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "within their respective group." ),
                 sensitive = not self.show_scripts_in_submenus,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 2,
-                active = self.hide_groups )
+                active = self.hide_groups ) )
 
         radio_show_scripts_indented.connect(
             "toggled", self.on_radio_or_checkbox, True, hide_groups_checkbutton )
@@ -540,10 +541,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( indicator_text_entry, True ) ) ),
             0, 0, 1, 1 )
 
-        indicator_text_separator_entry = \
+        indicator_text_separator_entry = (
             self.create_entry(
                 self.indicator_text_separator,
-                tooltip_text = _( "The separator will be added between script tags." ) )
+                tooltip_text = _( "The separator will be added between script tags." ) ) )
 
         grid.attach(
             self.create_box(
@@ -562,8 +563,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         # General settings.
         grid = self.create_grid()
 
-        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
-            self.create_preferences_common_widgets()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = (
+            self.create_preferences_common_widgets() )
 
         grid.attach( box, 0, 0, 1, 1 )
 
@@ -571,7 +572,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         # Workaround for odd focus behaviour; in the Preferences dialog,
         # when switching tabs, the TextEntry on the third tab would have
-        # the focus and highlight the text. 
+        # the focus and highlight the text.
         # If the user hits the space bar (or any regular key), the text would
         # be overwritten.  Refer to:
         #    https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
@@ -607,11 +608,11 @@ class IndicatorScriptRunner( IndicatorBase ):
             show = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ] == '✔'
 
         else:
-            background_scripts_by_group = \
+            background_scripts_by_group = (
                 self.get_scripts_by_group(
                     scripts,
                     non_background = False,
-                    background = True )
+                    background = True ) )
 
             if group in background_scripts_by_group:
                 show = len( background_scripts_by_group[ group ] ) > 0
@@ -636,10 +637,10 @@ class IndicatorScriptRunner( IndicatorBase ):
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
         name = treemodel.get_value( treeiter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
         if name:
-            group = \
+            group = (
                 treemodel.get_value(
                     treemodel.iter_parent( treeiter ),
-                    IndicatorScriptRunner.COLUMN_MODEL_GROUP )
+                    IndicatorScriptRunner.COLUMN_MODEL_GROUP ) )
 
             script = self.get_script( scripts, group, name )
             if isinstance( script, NonBackground ) and script.get_default():
@@ -791,14 +792,14 @@ class IndicatorScriptRunner( IndicatorBase ):
             grid = self.create_grid()
 
             groups = sorted( self.get_scripts_by_group( scripts ).keys(), key = str.lower )
-            script_group_combo = \
+            script_group_combo = (
                 self.create_comboboxtext(
                       groups,
                       tooltip_text = _(
                           "The group to which the script belongs.\n\n" +
                           "Choose an existing group or enter a new one." ),
                       active = groups.index( script.get_group() ),
-                      editable = True )
+                      editable = True ) )
 
             grid.attach(
                 self.create_box(
@@ -807,10 +808,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                         ( script_group_combo, True ) ) ),
                 0, 0, 1, 1 )
 
-            script_name_entry = \
+            script_name_entry = (
                 self.create_entry(
                     script.get_name(),
-                    tooltip_text = _( "The name of the script." ) )
+                    tooltip_text = _( "The name of the script." ) ) )
 
             grid.attach(
                 self.create_box(
@@ -820,11 +821,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                     margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
                 0, 1, 1, 1 )
 
-            dialog = \
+            dialog = (
                 self.create_dialog(
                     scripts_treeview,
                     _( "Copy Script" ),
-                    content_widget = grid )
+                    content_widget = grid ) )
 
             while True:
                 dialog.show_all()
@@ -940,11 +941,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         group, name = self._get_group_name_from_treeview( scripts_treeview )
         if group and name:
             the_script = self.get_script( scripts, group, name )
-            edited_script = \
+            edited_script = (
                 self._add_edit_script(
                     the_script,
                     scripts, scripts_treeview,
-                    background_scripts_treeview )
+                    background_scripts_treeview ) )
 
             if edited_script:
                 if isinstance( the_script, Background ) and isinstance( edited_script, NonBackground ):
@@ -982,14 +983,14 @@ class IndicatorScriptRunner( IndicatorBase ):
         else:
             index = groups.index( script.get_group() )
 
-        group_combo = \
+        group_combo = (
             self.create_comboboxtext(
                 groups,
                 tooltip_text = _(
                     "The group to which the script belongs.\n\n" +
                     "Choose an existing group or enter a new one." ),
                 active = index,
-                editable = True )
+                editable = True ) )
 
         grid = self.create_grid()
 
@@ -1000,10 +1001,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( group_combo, True ) ) ),
             0, 0, 1, 1 )
 
-        name_entry = \
+        name_entry = (
             self.create_entry(
                 "" if add else script.get_name(),
-                tooltip_text = _( "The name of the script." ) )
+                tooltip_text = _( "The name of the script." ) ) )
 
         grid.attach(
             self.create_box(
@@ -1019,17 +1020,17 @@ class IndicatorScriptRunner( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 2, 1, 1 )
 
-        command_text_view = \
+        command_text_view = (
             self.create_textview(
                 text = "" if add else script.get_command(),
-                tooltip_text = _( "The terminal script/command, along with any arguments." ) )
+                tooltip_text = _( "The terminal script/command, along with any arguments." ) ) )
 
         grid.attach(
             self.create_box(
                 ( ( self.create_scrolledwindow( command_text_view ), True ), ) ),
             0, 3, 1, 10 )
 
-        sound_checkbutton = \
+        sound_checkbutton = (
             self.create_checkbutton(
                 _( "Play sound" ),
                 tooltip_text = _(
@@ -1037,11 +1038,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "on script completion.\n\n" +
                     "For background scripts, play a sound\n" +
                     "only if the script returns non-empty text." ),
-                active = False if add else script.get_play_sound() )
+                active = False if add else script.get_play_sound() ) )
 
         grid.attach( sound_checkbutton, 0, 13, 1, 1 )
 
-        notification_checkbutton = \
+        notification_checkbutton = (
             self.create_checkbutton(
                 _( "Show notification" ),
                 tooltip_text = _(
@@ -1049,11 +1050,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "notification on script completion.\n\n" +
                     "For background scripts, show a notification\n" +
                     "only if the script returns non-empty text." ),
-                active = False if add else script.get_show_notification() )
+                active = False if add else script.get_show_notification() ) )
 
         grid.attach( notification_checkbutton, 0, 14, 1, 1 )
 
-        script_non_background_radio = \
+        script_non_background_radio = (
             self.create_radiobutton(
                 None,
                 _( "Non-background" ),
@@ -1061,21 +1062,21 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "Non-background scripts are displayed\n" +
                     "in the menu and run when the user\n" +
                     "clicks on the corresponding menu item." ),
-                active = True if add else isinstance( script, NonBackground ) )
+                active = True if add else isinstance( script, NonBackground ) ) )
 
         grid.attach( script_non_background_radio, 0, 15, 1, 1 )
 
-        terminal_checkbutton = \
+        terminal_checkbutton = (
             self.create_checkbutton(
                 _( "Leave terminal open" ),
                 tooltip_text = _( "Leave the terminal open on script completion." ),
                 sensitive = True if add else isinstance( script, NonBackground ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = False if add else isinstance( script, NonBackground ) and script.get_terminal_open() )
+                active = False if add else isinstance( script, NonBackground ) and script.get_terminal_open() ) )
 
         grid.attach( terminal_checkbutton, 0, 16, 1, 1 )
 
-        default_script_checkbutton = \
+        default_script_checkbutton = (
             self.create_checkbutton(
                 _( "Default script" ),
                 tooltip_text = _(
@@ -1085,11 +1086,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "Not supported on all desktops." ),
                 sensitive = True if add else isinstance( script, NonBackground ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = False if add else isinstance( script, NonBackground ) and script.get_default() )
+                active = False if add else isinstance( script, NonBackground ) and script.get_default() ) )
 
         grid.attach( default_script_checkbutton, 0, 17, 1, 1 )
 
-        script_background_radio = \
+        script_background_radio = (
             self.create_radiobutton(
                 script_non_background_radio,
                 _( "Background" ),
@@ -1101,11 +1102,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "execution will be logged to a file in the\n" +
                     "user's home directory and the script tag\n" +
                     "will remain in the icon text." ),
-                active = False if add else isinstance( script, Background ) )
+                active = False if add else isinstance( script, Background ) ) )
 
         grid.attach( script_background_radio, 0, 18, 1, 1 )
 
-        interval_spinner = \
+        interval_spinner = (
             self.create_spinbutton(
                 script.get_interval_in_minutes()
                 if isinstance( script, Background )
@@ -1114,19 +1115,19 @@ class IndicatorScriptRunner( IndicatorBase ):
                 1,
                 10000,
                 page_increment = 100,
-                tooltip_text = _( "Interval, in minutes, between runs." ) )
+                tooltip_text = _( "Interval, in minutes, between runs." ) ) )
 
-        label_and_interval_spinner_box = \
+        label_and_interval_spinner_box = (
             self.create_box(
                 (
                     ( Gtk.Label.new( _( "Interval" ) ), False ),
                     ( interval_spinner, False ) ),
                 sensitive = False if add else isinstance( script, Background ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ) # Approximate alignment with the checkboxes above.
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ) ) # Approximate alignment with the checkboxes above.
 
         grid.attach( label_and_interval_spinner_box, 0, 19, 1, 1 )
 
-        force_update_checkbutton = \
+        force_update_checkbutton = (
             self.create_checkbutton(
                 _( "Force update" ),
                 tooltip_text = _(
@@ -1135,7 +1136,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "on the next update of ANY script." ),
                 sensitive = True if add else isinstance( script, Background ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = False if add else isinstance( script, Background ) and script.get_force_update() )
+                active = False if add else isinstance( script, Background ) and script.get_force_update() ) )
 
         grid.attach( force_update_checkbutton, 0, 20, 1, 1 )
 
@@ -1167,11 +1168,11 @@ class IndicatorScriptRunner( IndicatorBase ):
             terminal_checkbutton,
             default_script_checkbutton )
 
-        dialog = \
+        dialog = (
             self.create_dialog(
                 scripts_treeview,
                 _( "Add Script" ) if add else _( "Edit Script" ),
-                content_widget = grid )
+                content_widget = grid ) )
 
         new_script = None
         while True:
@@ -1201,17 +1202,17 @@ class IndicatorScriptRunner( IndicatorBase ):
                 # Check for duplicates...
                 #    For an add, find an existing script with the same group/name.
                 #    For an edit, the group and/or name must change (and then match with an existing script other than the original).
-                script_of_same_name_and_group_exists = \
+                script_of_same_name_and_group_exists = (
                     self.get_script(
                         scripts,
                         group_combo.get_active_text().strip(),
-                        name_entry.get_text().strip() ) is not None
+                        name_entry.get_text().strip() ) is not None )
 
-                edited_script_group_or_name_different = \
-                    not add and \
+                edited_script_group_or_name_different = (
+                    not add and
                     (
-                        group_combo.get_active_text().strip() != script.get_group() or \
-                        name_entry.get_text().strip() != script.get_name() )
+                        group_combo.get_active_text().strip() != script.get_group() or
+                        name_entry.get_text().strip() != script.get_name() ) )
 
                 if ( add or edited_script_group_or_name_different ) and script_of_same_name_and_group_exists:
                     self.show_dialog_ok( dialog, _( "A script of the same group and name already exists." ) )
@@ -1301,12 +1302,13 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         scripts_by_group = { }
         for script in scripts:
-            script_is_non_background_and_want_non_background = \
-                non_background and isinstance( script, NonBackground )
+            script_is_non_background_and_want_non_background = (
+                non_background and isinstance( script, NonBackground ) )
 
-            script_is_background_and_want_background = \
-                background and isinstance( script, Background )
+            script_is_background_and_want_background = (
+                background and isinstance( script, Background ) )
 
+#TODO Tidy up
             if script_is_non_background_and_want_non_background or \
                script_is_background_and_want_background:
 
@@ -1341,7 +1343,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         cached result when the quicker script is run.
 
         Initialise the cache results and set a next update time in the past to
-        force all (background) scripts to update first time.        
+        force all (background) scripts to update first time.
         '''
         self.background_script_results = { }
         self.background_script_next_update_time = { }
@@ -1365,15 +1367,30 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.hide_groups = config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False )
-        self.indicator_text = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT, "" )
-        self.indicator_text_separator = config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR, " | " )
-        self.send_command_to_log = config.get( IndicatorScriptRunner.CONFIG_SEND_COMMAND_TO_LOG, False )
-        self.show_scripts_in_submenus = config.get( IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS, False )
+        self.hide_groups = (
+            config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False ) )
+
+        self.indicator_text = (
+            config.get( IndicatorScriptRunner.CONFIG_INDICATOR_TEXT, "" ) )
+
+        self.indicator_text_separator = (
+            config.get(
+                IndicatorScriptRunner.CONFIG_INDICATOR_TEXT_SEPARATOR,
+                " | " ) )
+
+        self.send_command_to_log = (
+            config.get(
+                IndicatorScriptRunner.CONFIG_SEND_COMMAND_TO_LOG, False ) )
+
+        self.show_scripts_in_submenus = (
+            config.get(
+                IndicatorScriptRunner.CONFIG_SHOW_SCRIPTS_IN_SUBMENUS, False ) )
 
         self.scripts = [ ]
         if config:
-            scripts_non_background = config.get( self.CONFIG_SCRIPTS_NON_BACKGROUND, [ ] )
+            scripts_non_background = (
+                config.get( self.CONFIG_SCRIPTS_NON_BACKGROUND, [ ] ) )
+
             for script in scripts_non_background:
                 skript = NonBackground(
                     script[ IndicatorScriptRunner.JSON_GROUP ],
@@ -1385,6 +1402,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     bool( script[ IndicatorScriptRunner.JSON_DEFAULT ] ) )
 
                 self.scripts.append( skript )
+
 
             scripts_background = config.get( self.CONFIG_SCRIPTS_BACKGROUND, [ ] )
             for script in scripts_background:
@@ -1412,14 +1430,18 @@ class IndicatorScriptRunner( IndicatorBase ):
                 NonBackground(
                     "Network",
                     "Public IP address",
-                    "notify-send -i " + self.get_icon_name() + " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"",
+                    "notify-send -i " +
+                    self.get_icon_name() +
+                    " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"",
                     False, False, False, False ) )
 
             self.scripts.append(
                 NonBackground(
                     "Network",
                     "Up or down",
-                    "if wget -qO /dev/null google.com > /dev/null; then notify-send -i " + self.get_icon_name() + " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi",
+                    "if wget -qO /dev/null google.com > /dev/null; " +
+                    "then notify-send -i " + self.get_icon_name() +
+                    " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi",
                     False, False, False, True ) )
 
             self.scripts.append(
@@ -1433,7 +1455,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                 NonBackground(
                     "Update",
                     "autoclean | autoremove | update | dist-upgrade",
-                    "sudo apt-get autoclean && sudo apt-get -y autoremove && sudo apt-get update && sudo apt-get -y dist-upgrade",
+                    "sudo apt-get autoclean && " +
+                    "sudo apt-get -y autoremove && " +
+                    "sudo apt-get update && " +
+                    "sudo apt-get -y dist-upgrade",
                     True, True, True, False ) )
 
             # Example background scripts.
@@ -1441,17 +1466,20 @@ class IndicatorScriptRunner( IndicatorBase ):
                 Background(
                     "Network",
                     "Internet Down",
-                    "if wget -qO /dev/null google.com > /dev/null; then echo \"\"; else echo \"Internet is DOWN\"; fi",
+                    "if wget -qO /dev/null google.com > /dev/null; " +
+                    "then echo \"\"; else echo \"Internet is DOWN\"; fi",
                     False, True, 60, True ) )
 
             self.scripts.append(
                 Background(
                     "System",
                     "Available Memory",
-                    "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"",
+                    "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | " +
+                    "grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"",
                     False, False, 5, False ) )
 
-            self.indicator_text = " [Network::Internet Down][System::Available Memory]"
+            self.indicator_text = (
+                " [Network::Internet Down][System::Available Memory]" )
 
         self.initialise_background_scripts()
 

@@ -252,10 +252,10 @@ class PPA():
             else:
                 if published_binary1.get_version() < published_binary2.get_version():
                     sort_value = -1
-    
+
                 elif published_binary1.get_version() > published_binary2.get_version():
                     sort_value = 1
-    
+
                 else:
                     sort_value = 0
 
@@ -265,11 +265,10 @@ class PPA():
     @staticmethod
     def _compare_ppas( ppa1, ppa2 ):
         ''' Compare two PPAs by user, then by name. '''
-#TODO Remove \
-        return \
+        return (
             PPA.compare_ppas(
                 ppa1.get_user(), ppa1.get_name(),
-                ppa2.get_user(), ppa2.get_name() )
+                ppa2.get_user(), ppa2.get_name() ) )
 
 
     @staticmethod
@@ -320,14 +319,14 @@ class PPA():
             len( self.get_published_binaries() ) == len( other.get_published_binaries() ) )
 
         if equal:
-            z = \
+            z = (
                 zip(
                     sorted(
                         self.get_published_binaries(),
                         key = operator.methodcaller( "__str__" ) ),
                     sorted(
                         other.get_published_binaries(),
-                        key = operator.methodcaller( "__str__" ) ) )
+                        key = operator.methodcaller( "__str__" ) ) ) )
 
             for published_binary_self, published_binary_other in z:
                 if not published_binary_self.__eq__( published_binary_other ):

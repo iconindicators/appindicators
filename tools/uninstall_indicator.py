@@ -29,12 +29,11 @@ import utils
 
 
 if __name__ == "__main__":
-#TODO Remove \
-    correct_directory, message = \
-        utils.is_correct_directory( example_arguments = "indicatorfortune" )
+    correct_directory, message = (
+        utils.is_correct_directory( example_arguments = "indicatorfortune" ) )
 
     if correct_directory:
-        args = \
+        args = (
             utils.initialiase_parser_and_get_arguments(
                 f"Uninstall one or more indicators, including the run script, "
                 f"icons, .desktop and .config/.cache. and additionally removing "
@@ -46,18 +45,18 @@ if __name__ == "__main__":
                         "The list of indicators separated by spaces to uninstall." },
                 {
                     "indicators" :
-                        "+" } )
+                        "+" } ) )
 
         for indicator_name in args.indicators:
-            command = \
-                f"indicator={indicator_name} && " + \
-                f"venv=$HOME/.local/venv_indicators && " + \
-                f"$(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/{indicator_name}/platform/linux/uninstall.sh && " + \
-                f". ${{venv}}/bin/activate && " + \
-                f"python3 -m pip uninstall --yes {indicator_name} && " + \
-                f"count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && " + \
-                f"deactivate && " + \
-                f"if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi"
+            command = (
+                f"indicator={indicator_name} && " +
+                f"venv=$HOME/.local/venv_indicators && " +
+                f"$(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/{indicator_name}/platform/linux/uninstall.sh && " +
+                f". ${{venv}}/bin/activate && " +
+                f"python3 -m pip uninstall --yes {indicator_name} && " +
+                f"count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && " +
+                f"deactivate && " +
+                f"if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi" )
 
             subprocess.call( command, shell = True )
 

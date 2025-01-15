@@ -60,28 +60,27 @@ class IndicatorStardate( IndicatorBase ):
     def update( self, menu ):
         utc_now = datetime.datetime.now( datetime.timezone.utc )
         if self.show_classic:
-#TODO Remove \
-            stardate_issue, stardate_integer, stardate_fraction = \
-                stardate.get_stardate_classic( utc_now )
+            stardate_issue, stardate_integer, stardate_fraction = (
+                stardate.get_stardate_classic( utc_now ) )
 
-            number_of_seconds_to_next_update = \
-                stardate.get_next_update_in_seconds( utc_now, True )
+            number_of_seconds_to_next_update = (
+                stardate.get_next_update_in_seconds( utc_now, True ) )
 
         else:
             stardate_issue = None
-            stardate_integer, stardate_fraction = \
-                stardate.get_stardate_2009_revised( utc_now )
+            stardate_integer, stardate_fraction = (
+                stardate.get_stardate_2009_revised( utc_now ) )
 
-            number_of_seconds_to_next_update = \
-                stardate.get_next_update_in_seconds( utc_now, False )
+            number_of_seconds_to_next_update = (
+                stardate.get_next_update_in_seconds( utc_now, False ) )
 
-        stardate_string = \
+        stardate_string = (
             stardate.to_stardate_string(
                 stardate_issue,
                 stardate_integer,
                 stardate_fraction,
                 self.show_issue,
-                self.pad_integer )
+                self.pad_integer ) )
 
         if not self.set_label_or_tooltip( stardate_string ):
             menu.append( Gtk.MenuItem.new_with_label( stardate_string ) )
@@ -99,8 +98,8 @@ class IndicatorStardate( IndicatorBase ):
                 stardate.get_stardate_classic(
                     datetime.datetime.now( datetime.timezone.utc ) ) )
 
-            padding_required = \
-                stardate.requires_padding( stardate_issue, stardate_integer )
+            padding_required = (
+                stardate.requires_padding( stardate_issue, stardate_integer ) )
 
             if padding_required:
                 if self.show_issue and self.pad_integer:
@@ -148,7 +147,7 @@ class IndicatorStardate( IndicatorBase ):
     def on_preferences( self, dialog ):
         grid = self.create_grid()
 
-        show_classic_checkbutton = \
+        show_classic_checkbutton = (
             self.create_checkbutton(
                 _( "Show stardate 'classic'" ),
                 tooltip_text = _(
@@ -156,21 +155,21 @@ class IndicatorStardate( IndicatorBase ):
                     "\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n\n" +
                     "Otherwise, show stardate '2009 revised' based on\n\n" +
                     "\thttps://en.wikipedia.org/wiki/Stardate" ),
-                active = self.show_classic )
+                active = self.show_classic ) )
 
         grid.attach( show_classic_checkbutton, 0, 0, 1, 1 )
 
-        show_issue_checkbutton = \
+        show_issue_checkbutton = (
             self.create_checkbutton(
                 _( "Show ISSUE" ),
                 tooltip_text = _( "Show the ISSUE of the stardate 'classic'." ),
                 sensitive = show_classic_checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = self.show_issue )
+                active = self.show_issue ) )
 
         grid.attach( show_issue_checkbutton, 0, 1, 1, 1 )
 
-        pad_integer_checkbutton = \
+        pad_integer_checkbutton = (
             self.create_checkbutton(
                 _( "Pad INTEGER" ),
                 tooltip_text = _(
@@ -179,7 +178,7 @@ class IndicatorStardate( IndicatorBase ):
                     "with leading zeros." ),
                 sensitive = show_classic_checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = self.pad_integer )
+                active = self.pad_integer ) )
 
         grid.attach( pad_integer_checkbutton, 0, 2, 1, 1 )
 
@@ -190,8 +189,8 @@ class IndicatorStardate( IndicatorBase ):
             show_issue_checkbutton,
             pad_integer_checkbutton )
 
-        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
-            self.create_preferences_common_widgets()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = (
+            self.create_preferences_common_widgets() )
 
         grid.attach( box, 0, 3, 1, 1 )
 
@@ -213,14 +212,14 @@ class IndicatorStardate( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.pad_integer = \
-            config.get( IndicatorStardate.CONFIG_PAD_INTEGER, True )
+        self.pad_integer = (
+            config.get( IndicatorStardate.CONFIG_PAD_INTEGER, True ) )
 
-        self.show_classic = \
-            config.get( IndicatorStardate.CONFIG_SHOW_CLASSIC, True )
+        self.show_classic = (
+            config.get( IndicatorStardate.CONFIG_SHOW_CLASSIC, True ) )
 
-        self.show_issue = \
-            config.get( IndicatorStardate.CONFIG_SHOW_ISSUE, True )
+        self.show_issue = (
+            config.get( IndicatorStardate.CONFIG_SHOW_ISSUE, True ) )
 
 
     def save_config( self ):

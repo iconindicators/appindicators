@@ -16,13 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-
-#TODO Got this on Debian 12 running in terminal:
-#
-#Jan 11*    National Children's Day (วันเด็กแห่งชาติ) in Thailand
-#
-# Need to view on Debian 12 to show bad chars as under Ubuntu 20.04 all looks well!
-
 '''
 Application indicator which displays calendar events.
 
@@ -111,9 +104,8 @@ class IndicatorOnThisDay( IndicatorBase ):
             today + timedelta( days = 1 ) ).replace(
                 hour = 0, minute = 0, second = 5 )
 
-#TODO Remove \
-        five_seconds_after_midnight = \
-            int( ( just_after_midnight - today ).total_seconds() )
+        five_seconds_after_midnight = (
+            int( ( just_after_midnight - today ).total_seconds() ) )
 
         self.request_update( delay = five_seconds_after_midnight )
 
@@ -152,8 +144,8 @@ class IndicatorOnThisDay( IndicatorBase ):
                     # subsequent event.
                     break
 
-                event_date = \
-                    self.remove_leading_zero_from_date( event.get_date() )
+                event_date = (
+                    self.remove_leading_zero_from_date( event.get_date() ) )
 
                 self.create_and_append_menuitem( menu, event_date )
 
@@ -173,12 +165,13 @@ class IndicatorOnThisDay( IndicatorBase ):
 
             else:
                 if len( self.search_url ) > 0:
-                    date_and_description = \
-                        event_date + ' ' + event.get_description()
+                    date_and_description = (
+                        event_date + ' ' + event.get_description() )
 
-                    name = \
+                    name = (
                         self.search_url.replace(
-                            IndicatorOnThisDay.TAG_EVENT, date_and_description )
+                            IndicatorOnThisDay.TAG_EVENT,
+                            date_and_description ) )
 
                     name = name.replace( ' ', '+' )
                     activate_functionandarguments = (
@@ -304,11 +297,9 @@ class IndicatorOnThisDay( IndicatorBase ):
             else:
                 store.append( [ location, False ] )
 
-        system_calendars_minus_user_calendars = \
-            [
-                x
-                for x in self.get_system_calendars()
-                if x not in [ x[ 0 ] for x in self.calendars ] ]
+        system_calendars_minus_user_calendars = ( [
+            x for x in self.get_system_calendars()
+            if x not in [ x[ 0 ] for x in self.calendars ] ] )
 
         for calendar in system_calendars_minus_user_calendars:
             store.append( [ calendar, False ] )
@@ -325,7 +316,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             store,
             IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED )
 
-        treeview, scrolledwindow = \
+        treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 store,
                 (
@@ -351,11 +342,11 @@ class IndicatorOnThisDay( IndicatorBase ):
                         IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
                 tooltip_text = _( "Double click to edit a calendar." ),
                 rowactivatedfunctionandarguments =
-                    ( self.on_calendar_double_click, dialog ) )
+                    ( self.on_calendar_double_click, dialog ) ) )
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
-        box, add, remove = \
+        box, add, remove = (
             self.create_buttons_in_box(
                 (
                     _( "Add" ),
@@ -365,7 +356,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     _( "Remove the selected calendar." ) ),
                 (
                     ( self.on_calendar_add, treeview ),
-                    ( self.on_calendar_remove, treeview ) ) )
+                    ( self.on_calendar_remove, treeview ) ) ) )
 
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -374,13 +365,13 @@ class IndicatorOnThisDay( IndicatorBase ):
         # General.
         grid = self.create_grid()
 
-        spinner = \
+        spinner = (
             self.create_spinbutton(
                 self.lines,
                 1,
                 1000,
                 tooltip_text =
-                    _( "The number of menu items available for display." ) )
+                    _( "The number of menu items available for display." ) ) )
 
         grid.attach(
             self.create_box(
@@ -399,28 +390,28 @@ class IndicatorOnThisDay( IndicatorBase ):
         if self.is_clipboard_supported():
             tooltip_text += _( "\n\nUnsupported on Ubuntun 20.04 on Wayland." )
 
-        radio_copy_to_clipboard = \
+        radio_copy_to_clipboard = (
             self.create_radiobutton(
                 None,
                 _( "Copy event to clipboard" ),
                 tooltip_text = tooltip_text,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = self.copy_to_clipboard )
+                active = self.copy_to_clipboard ) )
 
         grid.attach( radio_copy_to_clipboard, 0, 2, 1, 1 )
 
-        radio_internet_search = \
+        radio_internet_search = (
             self.create_radiobutton(
                 radio_copy_to_clipboard,
                 _( "Search event on the internet" ),
                 tooltip_text =
                     _( "Search for the event in the default web browser." ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = not self.copy_to_clipboard )
+                active = not self.copy_to_clipboard ) )
 
         grid.attach( radio_internet_search, 0, 3, 1, 1 )
 
-        search_engine_entry = \
+        search_engine_entry = (
             self.create_entry(
                 self.search_url,
                 tooltip_text = _(
@@ -431,7 +422,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     "the search will effectively be ignored.\n\n" +
                     "If the URL is empty and 'copy' is selected,\n" +
                     "the URL is reset back to factory default." ).format( IndicatorOnThisDay.TAG_EVENT ),
-                sensitive = not self.copy_to_clipboard )
+                sensitive = not self.copy_to_clipboard ) )
 
         grid.attach(
             self.create_box(
@@ -455,14 +446,14 @@ class IndicatorOnThisDay( IndicatorBase ):
             radio_internet_search,
             search_engine_entry )
 
-        notify_checkbutton = \
+        notify_checkbutton = (
             self.create_checkbutton(
                 _( "Notify" ),
                 tooltip_text = _(
                     "On startup or when saving preferences,\n" +
                     "show a notification for each of today's events." ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
-                active = self.notify )
+                active = self.notify ) )
 
         grid.attach( notify_checkbutton, 0, 5, 1, 1 )
 
@@ -517,8 +508,8 @@ class IndicatorOnThisDay( IndicatorBase ):
         if isinstance( store, Gtk.TreeModelSort ):
             store_ = store.get_model()
 
-        store_[ row ][ checkbox_column_model_id ] = \
-            not store_[ row ][ checkbox_column_model_id ]
+        store_[ row ][ checkbox_column_model_id ] = (
+            not store_[ row ][ checkbox_column_model_id ] )
 
 
     def on_event_click_radio(
@@ -551,8 +542,8 @@ class IndicatorOnThisDay( IndicatorBase ):
 #...or perhaps not.  What is selected is the sorted model which is displayed...
 # which is correct.
 # But to update the underlying data, need the underlying model and then do a convert of treeiter.
-            selected_calendar = \
-                model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
+            selected_calendar = (
+                model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
 
             if selected_calendar in self.get_system_calendars():
                 self.show_dialog_ok(
@@ -560,10 +551,10 @@ class IndicatorOnThisDay( IndicatorBase ):
                     _( "This is a system calendar and cannot be removed." ) )
 
             else:
-                response = \
+                response = (
                     self.show_dialog_ok_cancel(
                         treeview,
-                        _( "Remove the selected calendar?" ) )
+                        _( "Remove the selected calendar?" ) ) )
 
                 if response == Gtk.ResponseType.OK:
                     model.get_model().remove(
@@ -575,7 +566,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def on_calendar_double_click(
-            self, treeview, row_number, treeviewcolumn, preferences_dialog ):
+        self, treeview, row_number, treeviewcolumn, preferences_dialog ):
 
         model, treeiter = treeview.get_selection().get_selected()
         path = model[ treeiter ][ IndicatorOnThisDay.COLUMN_FILE_OR_DIRECTORY ]
@@ -605,7 +596,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         dialog = self.create_dialog( treeview, title, content_widget = grid )
 
-        file_entry = \
+        file_entry = (
             self.create_entry(
                 ''
                 if adding_calendar
@@ -613,9 +604,9 @@ class IndicatorOnThisDay( IndicatorBase ):
                 model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ],  #TODO Should model be model.get_model() or however the treeiter is supposed to be converted?
                 tooltip_text = _( "The path to a calendar file." ),
                 editable = False,
-                make_longer = True )
+                make_longer = True ) )
 
-        browse_button = \
+        browse_button = (
             self.create_button(
                 _( "Browse" ),
                 tooltip_text = _(
@@ -624,7 +615,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     "valid by running through\n" +
                     "'calendar' in a terminal." ),
                     clicked_functionandarguments = (
-                        self.on_browse_calendar, dialog, file_entry ) )
+                        self.on_browse_calendar, dialog, file_entry ) ) )
 
         grid.attach(
             self.create_box(
@@ -666,11 +657,11 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def on_browse_calendar( self, button, add_edit_dialog, calendar_file ):
-        dialog = \
+        dialog = (
             self.create_filechooser_dialog(
                 _( "Choose a calendar file" ),
                 add_edit_dialog,
-                calendar_file.get_text() )
+                calendar_file.get_text() ) )
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
@@ -694,8 +685,8 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def get_system_calendar_default( self ):
-        system_calendar_default = \
-            Path( IndicatorOnThisDay.SYSTEM_CALENDAR ) / "calendar.history"
+        system_calendar_default = (
+            Path( IndicatorOnThisDay.SYSTEM_CALENDAR ) / "calendar.history" )
 
         if not system_calendar_default.exists():
             system_calendar_default = None
@@ -705,13 +696,13 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     def load_config( self, config ):
         system_calendar_default = self.get_system_calendar_default()
-        self.calendars = \
+        self.calendars = (
             config.get(
                 IndicatorOnThisDay.CONFIG_CALENDARS,
                 [ system_calendar_default, True ]
                 if system_calendar_default
                 else
-                [ ] )
+                [ ] ) )
 
         if self.calendars and isinstance( self.calendars[ 0 ], str ):
             # Prior to 1.0.17, calendars were saved as a list of paths.
@@ -723,22 +714,22 @@ class IndicatorOnThisDay( IndicatorBase ):
 
             self.calendars = calendars
 
-        self.copy_to_clipboard = \
+        self.copy_to_clipboard = (
             config.get(
                 IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD,
                 True )
 
-        self.lines = \
+        self.lines = (
             config.get(
                 IndicatorOnThisDay.CONFIG_LINES,
-                IndicatorBase.get_menuitems_guess() )
+                IndicatorBase.get_menuitems_guess() ) ) )
 
         self.notify = config.get( IndicatorOnThisDay.CONFIG_NOTIFY, True )
 
-        self.search_url = \
+        self.search_url = (
             config.get(
                 IndicatorOnThisDay.CONFIG_SEARCH_URL,
-                IndicatorOnThisDay.SEARCH_URL_DEFAULT )
+                IndicatorOnThisDay.SEARCH_URL_DEFAULT ) )
 
 
     def save_config( self ):

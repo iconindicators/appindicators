@@ -81,10 +81,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         self.download_ppa_statistics()
 
-#TODO Remove \
-        ppas_sorted = \
+        ppas_sorted = (
             PPA.sort_ppas_by_user_then_name_then_published_binaries(
-                self.ppas, self.sort_by_download, self.sort_by_download_amount )
+                self.ppas,
+                self.sort_by_download,
+                self.sort_by_download_amount ) )
 
         if self.show_submenu:
             self._build_submenu( menu, ppas_sorted )
@@ -241,8 +242,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         A filter_text of "" results to no filtering.
         '''
-        published_binaries, self_links = \
-            self._get_published_binaries( ppa, filter_text )
+        published_binaries, self_links = (
+            self._get_published_binaries( ppa, filter_text ) )
 
         if not ppa.has_status_error( ignore_other = True ):
             self._get_download_counts( ppa, published_binaries, self_links )
@@ -276,12 +277,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 if entry[ "architecture_specific" ]:
                     architecture = entry[ "distro_arch_series_link" ].split( '/' )[ -1 ]
 
-                published_binary = \
+                published_binary = (
                     PublishedBinary(
                         entry[ "binary_package_name" ],
                         entry[ "binary_package_version" ],
-                        architecture )
-                    
+                        architecture ) )
+
                 if published_binary not in published_binaries:
                     published_binaries.append( published_binary )
                     self_links.append( entry[ "self_link" ] )
@@ -352,7 +353,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa.get_name(),
                 '\n'.join( ppa.get_filters() ) ] )
 
-        treeview, scrolledwindow = \
+        treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 ppa_store,
                 (
@@ -375,11 +376,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 default_sort_func = self._ppa_sort,
                 tooltip_text = _( "Double click to edit a PPA." ),
                 rowactivatedfunctionandarguments = (
-                    self.on_ppa_double_click, invalid_ppas ) )
+                    self.on_ppa_double_click, invalid_ppas ) ) )
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
-        box, add, remove = \
+        box, add, remove = (
             self.create_buttons_in_box(
                 (
                     _( "Add" ),
@@ -389,7 +390,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     _( "Remove the selected PPA." ) ),
                 (
                     None,
-                    ( self.on_ppa_remove, treeview, invalid_ppas ) ) )
+                    ( self.on_ppa_remove, treeview, invalid_ppas ) ) ) )
 
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -408,29 +409,29 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         # General settings.
         grid = self.create_grid()
 
-        show_as_submenus_checkbutton = \
+        show_as_submenus_checkbutton = (
             self.create_checkbutton(
                 _( "Show PPAs as submenus" ),
                 tooltip_text = _(
                     "The download statistics for each PPA\n" +
                     "are shown in a separate submenu." ),
-                active = self.show_submenu )
+                active = self.show_submenu ) )
 
         grid.attach( show_as_submenus_checkbutton, 0, 0, 1, 1 )
 
-        sort_by_download_checkbutton = \
+        sort_by_download_checkbutton = (
             self.create_checkbutton(
                 _( "Sort by download" ),
                 tooltip_text = _( "Sort by download count within each PPA." ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
-                active = self.sort_by_download )
+                active = self.sort_by_download ) )
 
         grid.attach( sort_by_download_checkbutton, 0, 1, 1, 1 )
 
         label = Gtk.Label.new( _( "Clip amount" ) )
         label.set_sensitive( sort_by_download_checkbutton.get_active() )
 
-        spinner = \
+        spinner = (
             self.create_spinbutton(
                 self.sort_by_download_amount,
                 0,
@@ -440,7 +441,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     "Limit the number of entries\n" +
                     "when sorting by download.\n\n" +
                     "A value of zero will not clip." ),
-                sensitive = sort_by_download_checkbutton.get_active() )
+                sensitive = sort_by_download_checkbutton.get_active() ) )
 
         grid.attach(
             self.create_box(
@@ -457,18 +458,18 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             label,
             spinner )
 
-        low_bandwidth_checkbutton = \
+        low_bandwidth_checkbutton = (
             self.create_checkbutton(
                 _( "Low bandwidth" ),
                 tooltip_text = _(
                     "Enable if your internet connection is slow." ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
-                active = self.low_bandwidth )
+                active = self.low_bandwidth ) )
 
         grid.attach( low_bandwidth_checkbutton, 0, 3, 1, 1 )
 
-        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
-            self.create_preferences_common_widgets()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = (
+            self.create_preferences_common_widgets() )
 
         grid.attach( box, 0, 4, 1, 1 )
 
@@ -530,7 +531,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def _ppa_sort( self, model, row1, row2, user_data ):
-        return \
+        return (
             PPA.compare_ppas(
                 model.get_value(
                     row1, IndicatorPPADownloadStatistics.COLUMN_USER ),
@@ -539,7 +540,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 model.get_value(
                     row2, IndicatorPPADownloadStatistics.COLUMN_USER ),
                 model.get_value(
-                    row2, IndicatorPPADownloadStatistics.COLUMN_NAME ) )
+                    row2, IndicatorPPADownloadStatistics.COLUMN_NAME ) ) )
 
 
     def _select_first_ppa_or_disable_remove( self, treeview, button_remove ):
@@ -558,10 +559,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     def on_ppa_remove( self, button, treeview, invalid_ppas ):
         model, treeiter = treeview.get_selection().get_selected()
-        response = \
+        response = (
             self.show_dialog_ok_cancel(
                 treeview,
-                _( "Remove the selected PPA?" ) )
+                _( "Remove the selected PPA?" ) ) )
 
         if response == Gtk.ResponseType.OK:
             row = model[ treeiter ]
@@ -603,7 +604,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             if adding_ppa:
                 ppa_users.insert( 0, "" )
 
-            ppa_user = \
+            ppa_user = (
                 self.create_comboboxtext(
                     ppa_users,
                     active =
@@ -611,7 +612,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         if adding_ppa else
                         ppa_users.index(
                             model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] ),
-                        editable = True )
+                        editable = True ) )
 
         grid.attach( ppa_user, 1, 0, 1, 1 )
 
@@ -629,7 +630,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             if adding_ppa:
                 ppa_names.insert( 0, "" )
 
-            ppa_name = \
+            ppa_name = (
                 self.create_comboboxtext(
                     ppa_names,
                     active =
@@ -637,7 +638,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         if adding_ppa else
                         ppa_names.index(
                             model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ),
-                        editable = True )
+                        editable = True ) )
 
         grid.attach( ppa_name, 1, 1, 1, 1 )
 
@@ -646,7 +647,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         label.set_valign( Gtk.Align.START )
         grid.attach( label, 0, 2, 1, 1 )
 
-        textview = \
+        textview = (
             self.create_textview(
                 text =
                     ""
@@ -661,7 +662,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     "included in the download statistics.\n\n" +
                     "If a timeout error occurs, filtering\n" +
                     "may help by reducing the quantity of\n"
-                    "network requests." ) )
+                    "network requests." ) ) )
 
         grid.attach(
             self.create_box(
@@ -674,11 +675,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if adding_ppa:
             title = _( "Add PPA" )
 
-        dialog = \
+        dialog = (
             self.create_dialog(
              treeview,
              title,
-             content_widget = grid )
+             content_widget = grid ) )
 
         while True:
             dialog.show_all()
@@ -723,21 +724,21 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         continue
 
                 else:
-                    user_is_unchanged = \
-                        model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
+                    user_is_unchanged = (
+                        model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] == user )
 
-                    name_is_unchanged = \
-                        model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
+                    name_is_unchanged = (
+                        model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name )
 
                     if not( user_is_unchanged and name_is_unchanged ):
                         user_exists = False
                         name_exists = False
                         for row in model:
-                            user_exists = \
-                                row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
+                            user_exists = (
+                                row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user )
 
-                            name_exists = \
-                                row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
+                            name_exists = (
+                                row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name )
 
                             if user_exists and name_exists:
                                 break
@@ -790,13 +791,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 # Select the added/edited PPA.
                 row_iter = treeview.get_model().get_iter_first()
                 while iter:
-                    user_ = \
+                    user_ = (
                         treeview.get_model().get_value(
-                            row_iter, IndicatorPPADownloadStatistics.COLUMN_USER )
+                            row_iter, IndicatorPPADownloadStatistics.COLUMN_USER ) )
 
-                    name_ = \
+                    name_ = (
                         treeview.get_model().get_value(
-                            row_iter, IndicatorPPADownloadStatistics.COLUMN_NAME )
+                            row_iter, IndicatorPPADownloadStatistics.COLUMN_NAME ) )
 
                     if user == user_ and name == name_:
                         treepath_for_row = treeview.get_model().get_path( row_iter )
@@ -819,25 +820,25 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 # and ensure the old is copied to new location (name without hyphens)
 # and loads up.
     def load_config( self, config ):
-        self.low_bandwidth = \
+        self.low_bandwidth = (
             config.get(
                 IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH,
-                False )
+                False ) )
 
-        self.show_submenu = \
+        self.show_submenu = (
             config.get(
                 IndicatorPPADownloadStatistics.CONFIG_SHOW_SUBMENU,
-                True )
+                True ) )
 
-        self.sort_by_download = \
+        self.sort_by_download = (
             config.get(
                 IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD,
-                False )
+                False ) )
 
-        self.sort_by_download_amount = \
+        self.sort_by_download_amount = (
             config.get(
                 IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT,
-                5 )
+                5 ) )
 
         if config:
             self.ppas = [ ]

@@ -49,8 +49,7 @@ except ModuleNotFoundError:
     # resulting in a "ModuleNotFoundError: No module named 'indicatorbase'"
     # which is a red herring...
     print(
-#TODO Remove \
-        "indicatorbase could not be found;" + \
+        "indicatorbase could not be found;" +
         "ensure you are running this script from the correct directory!" )
 
 
@@ -126,13 +125,13 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
     text = text.replace( "{dependencies}", dependencies )
     text = text.replace( "{indicator_name}", indicator_name )
 
-    text = \
+    text = (
         text.replace(
         "[project]",
         "[project]\n" + \
         "name = \'" + indicator_name + '\'\n' + \
         "version = \'" + version + '\'\n' + \
-        "description = \'" + description + '\'' )
+        "description = \'" + description + '\'' ) )
 
     out_pyproject_toml = directory_out / indicator_name / "pyproject.toml"
     with open( out_pyproject_toml, 'w', encoding = "utf-8" ) as f:
@@ -208,8 +207,8 @@ def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
             stat.S_IROTH | stat.S_IXOTH )
 
 
-    indicatorbase_platform_linux_path = \
-        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux"
+    indicatorbase_platform_linux_path = (
+        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" )
 
     read_format_write(
         indicatorbase_platform_linux_path,
@@ -255,8 +254,8 @@ def _create_dot_desktop(
         comments_from_mo_files,
         categories ):
 
-    indicatorbase_dot_desktop_path = \
-        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" / "indicatorbase.py.desktop"
+    indicatorbase_dot_desktop_path = (
+        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" / "indicatorbase.py.desktop" )
 
     dot_desktop_text = ""
     with open( indicatorbase_dot_desktop_path, 'r', encoding = "utf-8" ) as f:
@@ -276,12 +275,12 @@ def _create_dot_desktop(
     for language, _comment in comments_from_mo_files.items():
         comment += f"\nComment[{ language }]={ _comment.replace( newline, ' ' ) }"
 
-    dot_desktop_text = \
+    dot_desktop_text = (
         dot_desktop_text.format(
             indicator_name = indicator_name,
             names = "Name=" + names,
             comment = "Comment=" + comment,
-            categories = categories )
+            categories = categories ) )
 
     indicator_dot_desktop_path = directory_platform_linux / ( indicator_name + ".py.desktop" )
 
@@ -358,38 +357,38 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "indicatorbase.py",
         Path( '.' ) / directory_indicator / "src" / indicator_name )
 
-    pyproject_toml, version_indicator_base = \
-        _create_pyproject_dot_toml( indicator_name, directory_dist )
+    pyproject_toml, version_indicator_base = (
+        _create_pyproject_dot_toml( indicator_name, directory_dist ) )
 
     authors = get_pyproject_toml_authors( pyproject_toml )
     version = get_pyproject_toml_version( pyproject_toml )
 
-    version_from_changelog_markdown = \
+    version_from_changelog_markdown = (
         _get_version_in_changelog_markdown(
-            Path( '.' ) / indicator_name / "src" / indicator_name / "CHANGELOG.md" )
+            Path( '.' ) / indicator_name / "src" / indicator_name / "CHANGELOG.md" ) )
 
     if version != version_from_changelog_markdown:
         message = f"{ indicator_name }: The (most recent) version in CHANGELOG.md does not match that in pyproject.toml\n"
 
     else:
-        start_year = \
+        start_year = (
             indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
-                Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
+                Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" ) )
 
-        message = \
+        message = (
             utils_locale.update_locale_source(
                 indicator_name,
                 authors,
                 start_year,
                 version,
-                version_indicator_base )
+                version_indicator_base ) )
 
         if not message:
             utils_locale.build_locale_release( directory_dist, indicator_name )
 
-            name, categories, comments, message = \
+            name, categories, comments, message = (
                 _get_name_categories_comments_from_indicator(
-                    indicator_name, directory_indicator )
+                    indicator_name, directory_indicator ) )
 
             if not message:
                 utils_readme.create_readme(
@@ -410,12 +409,12 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
 
                 directory_indicator_locale = Path( '.' ) / directory_indicator / "src" / indicator_name / "locale"
 
-                names_from_mo_files, comments_from_mo_files = \
+                names_from_mo_files, comments_from_mo_files = (
                     utils_locale.get_names_and_comments_from_mo_files(
                         indicator_name,
                         directory_indicator_locale,
                         name,
-                        comments )
+                        comments ) )
 
                 directory_platform_linux = directory_dist / indicator_name / "src" / indicator_name / "platform" / "linux"
                 directory_platform_linux.mkdir( parents = True )
@@ -459,11 +458,12 @@ def _build_wheel_for_indicator( directory_release, indicator_name ):
 
 
 if __name__ == "__main__":
-    correct_directory, error_message = \
-        utils.is_correct_directory( example_arguments = "release indicatorfortune" )
+    correct_directory, error_message = (
+        utils.is_correct_directory(
+            example_arguments = "release indicatorfortune" ) )
 
     if correct_directory:
-        args = \
+        args = (
             utils.initialiase_parser_and_get_arguments(
                 "Create a Python wheel for one or more indicators.",
                 ( "directory_release", "indicators" ),
@@ -476,7 +476,7 @@ if __name__ == "__main__":
                         "The list of indicators separated by spaces to build." },
                 {
                     "indicators" :
-                        "+" } )
+                        "+" } ) )
 
         utils.initialise_virtual_environment(
             VENV,

@@ -158,10 +158,9 @@ class IndicatorPunycode( IndicatorBase ):
 
             else:
                 for label in text.split( "." ):
-#TODO Remove \
-                    converted_text += \
+                    converted_text += (
                         encodings.idna.ToUnicode(
-                            encodings.idna.nameprep( label ) ) + "."
+                            encodings.idna.nameprep( label ) ) + "." )
 
                 converted_text = converted_text[ : -1 ]
                 result = [
@@ -216,29 +215,29 @@ class IndicatorPunycode( IndicatorBase ):
                 ( ( Gtk.Label.new( _( "Input source" ) ), False ), ) ),
             0, 0, 1, 1 )
 
-        input_clipboard_radio = \
+        input_clipboard_radio = (
             self.create_radiobutton(
                 None,
                 _( "Clipboard" ),
                 tooltip_text = _(
                     "Input is taken from the clipboard." ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = self.input_clipboard )
+                active = self.input_clipboard ) )
 
         grid.attach( input_clipboard_radio, 0, 1, 1, 1 )
 
-        input_primary_radio = \
+        input_primary_radio = (
             self.create_radiobutton(
                 input_clipboard_radio,
                 _( "Primary" ),
                 tooltip_text = _(
                     "Input is taken from the currently selected text." ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = not self.input_clipboard )
+                active = not self.input_clipboard ) )
 
         grid.attach( input_primary_radio, 0, 2, 1, 1 )
 
-        output_both_checkbutton = \
+        output_both_checkbutton = (
             self.create_checkbutton(
                 _( "Output to clipboard and primary" ),
                 tooltip_text = _(
@@ -247,22 +246,22 @@ class IndicatorPunycode( IndicatorBase ):
                     "Otherwise the converted text is sent\n"
                     "only to the input source." ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
-                active = self.output_both )
+                active = self.output_both ) )
 
         grid.attach( output_both_checkbutton, 0, 3, 1, 1 )
 
-        drop_path_query_checkbutton = \
+        drop_path_query_checkbutton = (
             self.create_checkbutton(
                 _( "Drop path/query in output" ),
                 tooltip_text = _(
                     "If checked, the output text will not\n"
                     "contain any path/query (if present)." ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
-                active = self.drop_path_query )
+                active = self.drop_path_query ) )
 
         grid.attach( drop_path_query_checkbutton, 0, 4, 1, 1 )
 
-        results_amount_spinner = \
+        results_amount_spinner = (
             self.create_spinbutton(
                 self.result_history_length,
                 0,
@@ -272,7 +271,7 @@ class IndicatorPunycode( IndicatorBase ):
                     "results to show in the menu.\n\n"
                     "Selecting a menu item which\n"
                     "contains a result will copy\n"
-                    "the result to the output." ) )
+                    "the result to the output." ) ) )
 
         grid.attach(
             self.create_box(
@@ -282,8 +281,8 @@ class IndicatorPunycode( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 5, 1, 1 )
 
-        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
-            self.create_preferences_common_widgets()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = (
+            self.create_preferences_common_widgets() )
 
         grid.attach( box, 0, 6, 1, 1 )
 
@@ -295,8 +294,8 @@ class IndicatorPunycode( IndicatorBase ):
             self.input_clipboard = input_clipboard_radio.get_active()
             self.output_both = output_both_checkbutton.get_active()
             self.drop_path_query = drop_path_query_checkbutton.get_active()
-            self.result_history_length = \
-                results_amount_spinner.get_value_as_int()
+            self.result_history_length = (
+                results_amount_spinner.get_value_as_int() )
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),
@@ -309,17 +308,17 @@ class IndicatorPunycode( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.drop_path_query = \
-            config.get( IndicatorPunycode.CONFIG_DROP_PATH_QUERY, False )
+        self.drop_path_query = (
+            config.get( IndicatorPunycode.CONFIG_DROP_PATH_QUERY, False ) )
 
-        self.input_clipboard = \
-            config.get( IndicatorPunycode.CONFIG_INPUT_CLIPBOARD, False )
+        self.input_clipboard = (
+            config.get( IndicatorPunycode.CONFIG_INPUT_CLIPBOARD, False ) )
 
-        self.output_both = \
-            config.get( IndicatorPunycode.CONFIG_OUTPUT_BOTH, False )
+        self.output_both = (
+            config.get( IndicatorPunycode.CONFIG_OUTPUT_BOTH, False ) )
 
-        self.result_history_length = \
-            config.get( IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH, 3 )
+        self.result_history_length = (
+            config.get( IndicatorPunycode.CONFIG_RESULT_HISTORY_LENGTH, 3 ) )
 
 
     def save_config( self ):

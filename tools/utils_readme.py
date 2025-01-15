@@ -125,9 +125,8 @@ def _get_indicator_names_sans_current( indicator_name ):
 def _get_introduction( indicator_name ):
     pattern_tag = re.compile( r".*comments = _\(.*" )
 
-#TODO Remove \
-    filename = \
-        indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py"
+    filename = (
+        indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py" )
 
     with open( filename, encoding = "utf-8" ) as f_in:
         for line in f_in:
@@ -246,24 +245,24 @@ def _get_installation_for_operating_system(
 
     # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
-    os_has_no_calendar = \
+    os_has_no_calendar = (
         operating_system.issubset( {
             OperatingSystem.MANJARO_240X,
-            OperatingSystem.OPENSUSE_TUMBLEWEED } )
+            OperatingSystem.OPENSUSE_TUMBLEWEED } ) )
 
-    indicator_uses_calendar = \
+    indicator_uses_calendar = (
         _is_indicator(
             indicator_name,
-            IndicatorName.INDICATORONTHISDAY )
+            IndicatorName.INDICATORONTHISDAY ) )
 
     if indicator_uses_calendar and os_has_no_calendar:
         installation = ''
 
     else:
-        operating_system_packages = \
+        operating_system_packages = (
             _get_operating_system_dependencies_function_name(
                 operating_system,
-                IndicatorName[ indicator_name.upper() ] )
+                IndicatorName[ indicator_name.upper() ] ) )
 
         # Reference on installing some of the operating system packages:
         #   https://stackoverflow.com/a/61164149/2156453
@@ -297,15 +296,15 @@ def _get_uninstall_for_operating_system(
 
     # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
-    os_has_no_calendar = \
+    os_has_no_calendar = (
         operating_system.issubset( {
             OperatingSystem.MANJARO_240X,
-            OperatingSystem.OPENSUSE_TUMBLEWEED } )
+            OperatingSystem.OPENSUSE_TUMBLEWEED } ) )
 
-    indicator_uses_calendar = \
+    indicator_uses_calendar = (
         _is_indicator(
             indicator_name,
-            IndicatorName.INDICATORONTHISDAY )
+            IndicatorName.INDICATORONTHISDAY ) )
 
     if indicator_uses_calendar and os_has_no_calendar:
         uninstall = ''
@@ -540,9 +539,9 @@ def _get_install_uninstall( indicator_name, install = True ):
         function = _get_uninstall_for_operating_system
         command_debian = "sudo apt-get -y remove"
         command_fedora = "sudo dnf -y remove"
-        title = \
+        title = (
             "Uninstall\n" + \
-            "---------\n\n"
+            "---------\n\n" )
 
     return (
         title +

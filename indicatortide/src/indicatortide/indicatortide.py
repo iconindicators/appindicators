@@ -70,18 +70,17 @@ class IndicatorTide( IndicatorBase ):
         else:
             tidal_readings = [ ]
             try:
-#TODO Remove \
-                spec = \
+                spec = (
                     importlib.util.spec_from_file_location(
                         self.user_script_class_name,
-                        self.user_script_path_and_filename )
+                        self.user_script_path_and_filename ) )
 
                 module = importlib.util.module_from_spec( spec )
                 sys.modules[ self.user_script_class_name ] = module
                 spec.loader.exec_module( module )
                 klazz = getattr( module, self.user_script_class_name )
-                tidal_readings = \
-                    klazz.get_tide_data( logging = self.get_logging() )
+                tidal_readings = (
+                    klazz.get_tide_data( logging = self.get_logging() ) )
 
                 self.build_menu( menu, tidal_readings )
 
@@ -264,11 +263,11 @@ class IndicatorTide( IndicatorBase ):
                 ( ( Gtk.Label.new( _( "User Script" ) ), False ), ), ),
             0, 0, 1, 1 )
 
-        user_script_path_and_filename = \
+        user_script_path_and_filename = (
             self.create_entry(
                 self.user_script_path_and_filename,
                 tooltip_text = _(
-                    "Full path and filename\nof user's Python3 script." ) )
+                    "Full path and filename\nof user's Python3 script." ) ) )
 
         grid.attach(
             self.create_box(
@@ -278,7 +277,7 @@ class IndicatorTide( IndicatorBase ):
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT ),
             0, 1, 1, 1 )
 
-        user_script_class_name = \
+        user_script_class_name = (
             self.create_entry(
                 self.user_script_class_name,
                 tooltip_text = _(
@@ -286,7 +285,7 @@ class IndicatorTide( IndicatorBase ):
                     "which must contain the function\n\n" +
                     "    get_tide_data()\n\n" +
                     "implemented by the user to obtain\n" +
-                    "the tidal data." ) )
+                    "the tidal data." ) ) )
 
         grid.attach(
             self.create_box(
@@ -296,22 +295,22 @@ class IndicatorTide( IndicatorBase ):
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT ),
                 0, 2, 1, 1 )
 
-        show_as_submenus_checkbutton = \
+        show_as_submenus_checkbutton = (
             self.create_checkbutton(
                 _( "Show as submenus" ),
                 tooltip_text = _( "Show each day's tides in a submenu." ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
-                active = self.show_as_submenus )
+                active = self.show_as_submenus ) )
 
         grid.attach( show_as_submenus_checkbutton, 0, 3, 1, 1 )
 
-        show_as_submenus_except_first_day_checkbutton = \
+        show_as_submenus_except_first_day_checkbutton = (
             self.create_checkbutton(
                 _( "Except first day" ),
                 tooltip_text = _( "Show the first day's tide in full." ),
                 sensitive = show_as_submenus_checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = self.show_as_submenus_except_first_day )
+                active = self.show_as_submenus_except_first_day ) )
 
         grid.attach( show_as_submenus_except_first_day_checkbutton, 0, 4, 1, 1 )
 
@@ -321,8 +320,8 @@ class IndicatorTide( IndicatorBase ):
             True,
             show_as_submenus_except_first_day_checkbutton )
 
-        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
-            self.create_preferences_common_widgets()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = (
+            self.create_preferences_common_widgets() )
 
         grid.attach( box, 0, 5, 1, 1 )
 
@@ -332,11 +331,11 @@ class IndicatorTide( IndicatorBase ):
         while True:
             response_type = dialog.run()
             if response_type == Gtk.ResponseType.OK:
-                self.show_as_submenus = \
-                    show_as_submenus_checkbutton.get_active()
+                self.show_as_submenus = (
+                    show_as_submenus_checkbutton.get_active() )
 
-                self.show_as_submenus_except_first_day = \
-                    show_as_submenus_except_first_day_checkbutton.get_active()
+                self.show_as_submenus_except_first_day = (
+                    show_as_submenus_except_first_day_checkbutton.get_active() )
 
                 if user_script_path_and_filename.get_text() and user_script_class_name.get_text():
                     if not Path( user_script_path_and_filename.get_text().strip() ).is_file():
@@ -363,11 +362,11 @@ class IndicatorTide( IndicatorBase ):
                     user_script_class_name.grab_focus()
                     continue
 
-                self.user_script_path_and_filename = \
-                    user_script_path_and_filename.get_text().strip()
+                self.user_script_path_and_filename = (
+                    user_script_path_and_filename.get_text().strip() )
 
-                self.user_script_class_name = \
-                    user_script_class_name.get_text().strip()
+                self.user_script_class_name = (
+                    user_script_class_name.get_text().strip() )
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),
@@ -380,25 +379,25 @@ class IndicatorTide( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.show_as_submenus = \
+        self.show_as_submenus = (
             config.get(
                 IndicatorTide.CONFIG_SHOW_AS_SUBMENUS,
-                True )
+                True ) )
 
-        self.show_as_submenus_except_first_day = \
+        self.show_as_submenus_except_first_day = (
             config.get(
                 IndicatorTide.CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY,
-                True )
+                True ) )
 
-        self.user_script_path_and_filename = \
+        self.user_script_path_and_filename = (
             config.get(
                 IndicatorTide.CONFIG_USER_SCRIPT_PATH_AND_FILENAME,
-                "" )
+                "" ) )
 
-        self.user_script_class_name = \
+        self.user_script_class_name = (
             config.get(
                 IndicatorTide.CONFIG_USER_SCRIPT_CLASS_NAME,
-                "" )
+                "" ) )
 
 
     def save_config( self ):

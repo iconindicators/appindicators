@@ -29,35 +29,37 @@ print( f"Stardate API version: {stardate.get_version() }\n" )
 utc_now = datetime.datetime.now( datetime.timezone.utc )
 print( f"UTC now: { utc_now }\n" )
 
-#TODO Remove \
-stardate_issue, stardate_integer, stardate_fraction = \
-    stardate.get_stardate_classic( utc_now )
+stardate_issue, stardate_integer, stardate_fraction = (
+    stardate.get_stardate_classic( utc_now ) )
 
 print(
-    f"'classic' Stardate components (issue, integer, fraction): " + \
+    f"'classic' Stardate components (issue, integer, fraction): "
+    +
     f"{ stardate_issue } { stardate_integer } { stardate_fraction }" )
 
-stardate_as_string = \
+stardate_as_string = (
     stardate.to_stardate_string(
         stardate_issue,
         stardate_integer,
         stardate_fraction,
         True,
-        False )
+        False ) )
 
 print( f"'classic' Stardate string: { stardate_as_string }" )
 
 # Use the calculated 'classic' Stardate to get the date/time;
 # should be the same but rounding plays a part.
-utc_now_from_stardate_classic = \
+utc_now_from_stardate_classic = (
     stardate.get_gregorian_from_stardate_classic(
         stardate_issue,
         stardate_integer,
-        stardate_fraction )
+        stardate_fraction ) )
+
 print( f"UTC now from 'classic' Stardate: { utc_now_from_stardate_classic }\n" )
 
-stardate_integer, stardate_fraction = \
-    stardate.get_stardate_2009_revised( utc_now )
+stardate_integer, stardate_fraction = (
+    stardate.get_stardate_2009_revised( utc_now ) )
+
 print(
     f"'2009 Revised' Stardate components (integer, fraction): "
     f"{ stardate_integer }, { stardate_fraction }" )
@@ -68,8 +70,9 @@ print(
 
 # Use the calculated '2009 Revised' Stardate to get the date/time;
 # should be the same but rounding plays a part.
-utc_now_from_stardate_2009 = \
+utc_now_from_stardate_2009 = (
     stardate.get_gregorian_from_stardate_2009_revised(
         stardate_integer,
-        stardate_fraction )
+        stardate_fraction ) )
+
 print( f"UTC now from '2009 Revised' Stardate: { utc_now_from_stardate_2009 } " )

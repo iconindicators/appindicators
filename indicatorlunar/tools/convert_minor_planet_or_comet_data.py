@@ -117,10 +117,9 @@ def process_and_write_one_line_lowell_minorplanet(
     start_indices = [ x - 1 for x in start_indices ] # Offset back to zero to match each line read into a string.
 
     # Inspired by https://stackoverflow.com/a/10851479/2156453
-#TODO Remove \
-    fields = \
-        [ "OFFSET TO ALIGN WITH FIELD NUMBERING" ] + \
-        [ line[ i : j ] for i, j in zip( start_indices, start_indices[ 1 : ] + [ None ] ) ]
+    fields = (
+        [ "OFFSET TO ALIGN WITH FIELD NUMBERING" ] +
+        [ line[ i : j ] for i, j in zip( start_indices, start_indices[ 1 : ] + [ None ] ) ] )
 
     number = fields[ 1 ].strip()
     name = fields[ 2 ].strip()
@@ -407,7 +406,7 @@ def convert( option, in_file, out_file ):
 
 
 if __name__ == "__main__":
-    description = \
+    description = (
         textwrap.dedent( '''\
             Convert an ephemeris file for minor planets or comets...
 
@@ -430,12 +429,12 @@ if __name__ == "__main__":
 
             ------------------------------------------------------------------------
             --- INPUT & OUTPUT PATHNAMES CONTAINING SPACES MUST BE DOUBLE QUOTED ---
-            ------------------------------------------------------------------------''' )
+            ------------------------------------------------------------------------''' ) )
 
-    parser = \
+    parser = (
         argparse.ArgumentParser(
             formatter_class = argparse.RawDescriptionHelpFormatter,
-            description = description )
+            description = description ) )
 
     parser.add_argument( "option", type = int, choices = [ 1, 2, 3, 4 ] )
 
