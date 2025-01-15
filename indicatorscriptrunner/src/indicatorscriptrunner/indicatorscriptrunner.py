@@ -21,6 +21,12 @@ Application indicator to run a terminal command/script from the indicator menu.
 '''
 
 
+#TODO When deleting a script, 
+# if the script's group still exists, maybe
+# select the first script of that group.
+# Otherwise, select first script.
+
+
 import concurrent.futures
 import copy
 import datetime
@@ -104,6 +110,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         super().__init__(
             comments = _( "Runs a terminal command or script;\noptionally display results in the icon label." ) )
 
+#TODO Remove \
         self.command_notify_background = \
             "notify-send -i " + self.get_icon_name() + \
             " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " + \

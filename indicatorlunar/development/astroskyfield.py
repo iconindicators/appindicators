@@ -288,21 +288,22 @@ class AstroSkyfield( AstroBase ):
         data = { }
 
         timescale = load.timescale( builtin = True ) #TODO Was "timeScale =" so hopefully the rename to timescale does not clash with load.timescale.
-        now = \
+        now = (
             timescale.utc(
                 utc_now.year,
                 utc_now.month,
                 utc_now.day,
                 utc_now.hour,
                 utc_now.minute,
-                utc_now.second )
+                utc_now.second ) )
 
         now_plus_twenty_five_hours = now + datetime.timedelta( hours = 25 ) # Rise/set window for most bodies.
 
         latitude_longitude_elevation = wgs84.latlon( latitude, longitude, elevation )
-        location = \
-            AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._PLANET_EARTH ] + \
-            wgs84.latlon( latitude, longitude, elevation )
+        location = (
+            AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._PLANET_EARTH ]
+            +
+            wgs84.latlon( latitude, longitude, elevation ) )
 
         location_at_now = location.at( now )
 
@@ -392,16 +393,16 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def get_credit():
-        return _( "Calculations courtesy of Skyfield. https://rhodesmill.org/skyfield" )
+        return "Skyfield https://github.com/skyfielders/python-skyfield"
 
 
     @staticmethod
     def get_latitude_longitude_elevation( city ):
         # Latitude = 0, Longitude = 1, Elevation = 2
-        return \
-            AstroSkyfield._city_data.get( city )[ 0 ], \
-            AstroSkyfield._city_data.get( city )[ 1 ], \
-            AstroSkyfield._city_data.get( city )[ 2 ]
+        return (
+            AstroSkyfield._city_data.get( city )[ 0 ],
+            AstroSkyfield._city_data.get( city )[ 1 ],
+            AstroSkyfield._city_data.get( city )[ 2 ] )
 
 
     @staticmethod
@@ -413,48 +414,48 @@ class AstroSkyfield( AstroBase ):
     def _calculate_moon( now, location, location_at_now, data ):
         key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
 
-        moon_at_now = \
+        moon_at_now = (
             location_at_now.observe(
-                AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._MOON ] )
+                AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._MOON ] ) )
 
         moon_at_now_apparent = moon_at_now.apparent()
 
-        illumination = \
+        illumination = (
             moon_at_now_apparent.fraction_illuminated(
-                AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._SUN ] ) * 100
+                AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._SUN ] ) * 100 )
 
         data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( illumination ) # Needed for icon.
 
         now_plus_thirty_one_days = now + datetime.timedelta( days = 31 ) # Moon phases search window.
-        date_times, events = \
+        date_times, events = (
             almanac.find_discrete(
                 now,
                 now_plus_thirty_one_days,
-                almanac.moon_phases( AstroSkyfield._EPHEMERIS_PLANETS ) )
+                almanac.moon_phases( AstroSkyfield._EPHEMERIS_PLANETS ) ) )
 
         events_to_date_times = dict( zip( events[ : 4 ], date_times[ : 4 ].utc_datetime() ) ) # Take first four events to avoid an unforeseen edge case!
 
-        lunar_phase = \
+        lunar_phase = (
             AstroBase.get_lunar_phase(
                 illumination,
                 events_to_date_times[ almanac.MOON_PHASES.index( "Full Moon" ) ],
-                events_to_date_times[ almanac.MOON_PHASES.index( "New Moon" ) ] )
+                events_to_date_times[ almanac.MOON_PHASES.index( "New Moon" ) ] ) )
 
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = lunar_phase # Needed for notification.
 
-        sun_alt_az = \
+        sun_alt_az = (
             location_at_now.observe(
-                AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._SUN ] ).apparent().altaz()
+                AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._SUN ] ).apparent().altaz() )
 
-        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = \
-            str( position_angle_of( moon_at_now_apparent.altaz(), sun_alt_az ).radians ) # Needed for icon.
+        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = (
+            str( position_angle_of( moon_at_now_apparent.altaz(), sun_alt_az ).radians ) ) # Needed for icon.
 
-        never_up = \
+        never_up = (
             AstroSkyfield._calculate_common(
                 now,
                 now + datetime.timedelta( hours = 36 ), # Rise/set window for the moon.
                 location, location_at_now,
-                data, key, AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._MOON ] )
+                data, key, AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._MOON ] ) )
 
         if not never_up:
             data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = events_to_date_times[ almanac.MOON_PHASES.index( "First Quarter" ) ]
@@ -474,18 +475,18 @@ class AstroSkyfield( AstroBase ):
 
         key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
 
-        never_up = \
+        never_up = (
             AstroSkyfield._calculate_common(
                 now, now_plus_twenty_five_hours,
                 location, location_at_now,
-                data, key, AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._SUN ] )
+                data, key, AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._SUN ] ) )
 
         if not never_up:
-            date_times, events = \
+            date_times, events = (
                 almanac.find_discrete(
                     now,
                     now + datetime.timedelta( days = 366 / 12 * 7 ), # Solstice/equinox search window.
-                    almanac.seasons( AstroSkyfield._EPHEMERIS_PLANETS ) )
+                    almanac.seasons( AstroSkyfield._EPHEMERIS_PLANETS ) ) )
 
             events_to_date_times = dict( zip( events[ : 2 ], date_times[ : 2 ].utc_datetime() ) ) # Take first two events to avoid an unforeseen edge case!
 
@@ -531,8 +532,8 @@ class AstroSkyfield( AstroBase ):
 
 
         if is_solar:
-            date_time, eclipse_type, latitude, longitude = \
-                eclipse.get_eclipse_solar( now.utc_datetime() )
+            date_time, eclipse_type, latitude, longitude = (
+                eclipse.get_eclipse_solar( now.utc_datetime() ) )
 
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = date_time
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipse_type
@@ -552,11 +553,11 @@ class AstroSkyfield( AstroBase ):
 # If feasible, add here and remove check in indicator front-end.
 # https://github.com/skyfielders/python-skyfield/discussions/801
             now_plus_one_year = now + datetime.timedelta( days = 366 ) # Eclipse search window.
-            date_times, events, details = \
+            date_times, events, details = (
                 eclipselib.lunar_eclipses(
                     now,
                     now_plus_one_year,
-                    AstroSkyfield._EPHEMERIS_PLANETS )
+                    AstroSkyfield._EPHEMERIS_PLANETS ) )
 
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = date_times[ 0 ].utc_datetime()
             data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = _get_native_eclipse_type( events[ 0 ], True )
@@ -645,10 +646,10 @@ class AstroSkyfield( AstroBase ):
 
             # According to MPC, always use the gk model.
             #   https://github.com/skyfielders/python-skyfield/issues/416
-            apparent_magnitude = \
+            apparent_magnitude = (
                 AstroBase.get_apparent_magnitude_gk(
                     row[ "magnitude_g" ], row[ "magnitude_k" ],
-                    earth_body_distance.au, sun_body_distance.au )
+                    earth_body_distance.au, sun_body_distance.au ) )
 
             if apparent_magnitude < apparent_magnitude:
                 AstroSkyfield._calculate_common(
@@ -669,6 +670,7 @@ class AstroSkyfield( AstroBase ):
             minor_planets, orbital_element_data,
             apparent_magnitude_maximum, apparent_magnitude_data ):
 
+#TODO Remove \
         with io.BytesIO() as f:
             for key in minor_planets:
                 if key in orbital_element_data and \
@@ -737,28 +739,28 @@ class AstroSkyfield( AstroBase ):
 
         end = now + datetime.timedelta( hours = AstroBase.SATELLITE_SEARCH_DURATION_HOURS )
 
-        windows = \
+        windows = (
             AstroBase.get_start_end_windows(
                 now.utc_datetime(),
                 end.utc_datetime(),
                 start_hour_as_date_time_in_utc,
-                end_hour_as_date_time_in_utc )
+                end_hour_as_date_time_in_utc ) )
 
-        is_twilight_function = \
+        is_twilight_function = (
             almanac.dark_twilight_day(
                 AstroSkyfield._EPHEMERIS_PLANETS,
-                latitude_longitude_elevation )
+                latitude_longitude_elevation ) )
 
         for satellite in satellites:
             if satellite in satellite_data:
                 key = ( AstroBase.BodyType.SATELLITE, satellite )
-                earth_satellite = \
+                earth_satellite = (
                     EarthSatellite.from_satrec(
                         satellite_data[ satellite ].get_satellite_record(),
-                        timescale )
+                        timescale ) )
 
                 for start_date_time, end_date_time in windows:
-                    found_pass = \
+                    found_pass = (
                         AstroSkyfield._calculate_satellite(
                             timescale.from_datetime( start_date_time ),
                             timescale.from_datetime( end_date_time ),
@@ -767,7 +769,7 @@ class AstroSkyfield( AstroBase ):
                             data,
                             key,
                             earth_satellite,
-                            is_twilight_function )
+                            is_twilight_function ) )
 
                     if found_pass:
                         break
@@ -785,12 +787,12 @@ class AstroSkyfield( AstroBase ):
         rise_date_time = None
         culmination_date_times = [ ] # Culminate may occur more than once, so collect them all.
 
-        date_times, events = \
+        date_times, events = (
             earth_satellite.find_events(
                 latitude_longitude_elevation,
                 start_date_time,
                 end_date_time,
-                altitude_degrees = 20.0 )
+                altitude_degrees = 20.0 ) )
 
         for date_time, event in zip( date_times, events ):
             if event == 0: # Satellite rose above altitude_degrees.
@@ -800,7 +802,7 @@ class AstroSkyfield( AstroBase ):
                 culmination_date_times.append( date_time )
 
             else: # Satellite fell below altitude_degrees.
-#TODO Tidy up
+#TODO Remove \
                 if rise_date_time is not None and \
                    culmination_date_times and \
                    AstroSkyfield._is_satellite_pass_visible(
@@ -836,14 +838,14 @@ class AstroSkyfield( AstroBase ):
         if range_step < 1.0:
             range_step = 1.0
 
-        transit_range = \
+        transit_range = (
             timescale.utc(
                 start_date_time.utc.year,
                 start_date_time.utc.month,
                 start_date_time.utc.day,
                 start_date_time.utc.hour,
                 start_date_time.utc.minute,
-                range( range_start, range_end, range_step ) )
+                range( range_start, range_end, range_step ) ) )
 
         is_twilight_astronomical = is_twilight_function( transit_range ) == 1 # almanac.TWILIGHTS[ 1 ], Astronomical twilight
         is_twilight_nautical = is_twilight_function( transit_range ) == 2 # almanac.TWILIGHTS[ 2 ], Nautical twilight

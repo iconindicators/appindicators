@@ -43,34 +43,36 @@ class DataProviderOrbitalElement( DataProvider ):
             apparent_magnitude_maximum ):
         ''' Download orbital element data and save to the given filename. '''
 
-        is_comet = \
+        is_comet = (
             orbital_element_data_type in {
                 OE.DataType.SKYFIELD_COMET,
-                OE.DataType.XEPHEM_COMET }
+                OE.DataType.XEPHEM_COMET } )
 
-        is_minor_planet = \
+        is_minor_planet = (
             orbital_element_data_type in {
                 OE.DataType.SKYFIELD_MINOR_PLANET,
-                OE.DataType.XEPHEM_MINOR_PLANET }
+                OE.DataType.XEPHEM_MINOR_PLANET } )
 
         if is_comet:
-            downloaded = \
+            downloaded = (
                 DataProviderOrbitalElement._download_from_comet_observation_database(
                     filename,
                     logging,
                     orbital_element_data_type,
-                    apparent_magnitude_maximum )
+                    apparent_magnitude_maximum ) )
 
         elif is_minor_planet:
-            downloaded = \
+            downloaded = (
                 DataProviderOrbitalElement._download_from_lowell_minor_planet_services(
                     filename,
                     logging,
                     orbital_element_data_type,
-                    apparent_magnitude_maximum )
+                    apparent_magnitude_maximum ) )
 
         else:
-            logging.error( "Unknown data type: " + str( orbital_element_data_type ) )
+            logging.error(
+                "Unknown data type: " + str( orbital_element_data_type ) )
+
             downloaded = False
 
         return downloaded
@@ -141,19 +143,30 @@ class DataProviderOrbitalElement( DataProvider ):
 
             with open( filename, 'w', encoding = "utf-8" ) as f:
                 for minor_planet in minor_planets:
-                    asteroid_number = minor_planet[ "minorplanet" ][ "ast_number" ]
+                    asteroid_number = (
+                        minor_planet[ "minorplanet" ][ "ast_number" ] )
+
                     if asteroid_number is None:
-                        continue # Not all asteroids / minor planets have a number.
+                        # Not all asteroids / minor planets have a number.
+                        continue
 
                     if minor_planet[ "minorplanet" ][ "designameByIdDesignationName" ] is None:
-                        continue # Not all asteroids / minor planets have names.
+                        # Not all asteroids / minor planets have a number.
+                        continue
 
-                    designation_name = minor_planet[ "minorplanet" ][ "designameByIdDesignationName" ][ "str_designame" ]
+                    designation_name = (
+                        minor_planet[ "minorplanet" ][ "designameByIdDesignationName" ][ "str_designame" ] )
 
-                    designation = str( asteroid_number ) + ' ' + designation_name
+                    designation = (
+                        str( asteroid_number ) + ' ' + designation_name )
 
-                    absolute_magnitude = str( minor_planet[ "minorplanet" ][ 'h' ] )
-                    slope_parameter = "0.15" # Slope parameter (hard coded as typically does not vary that much and will not be used to calculate apparent magnitude)
+                    absolute_magnitude = (
+                        str( minor_planet[ "minorplanet" ][ 'h' ] ) )
+
+                    # The slope parameter is hard coded; typically does not vary
+                    # that much and is not used to calculate apparent magnitude.
+                    slope_parameter = "0.15"
+
                     mean_anomaly_epoch = str( minor_planet[ 'm' ] )
                     argument_perihelion = str( minor_planet[ "peri" ] )
                     longitude_ascending_node = str( minor_planet[ "node" ] )
@@ -164,14 +177,18 @@ class DataProviderOrbitalElement( DataProvider ):
                     # XEphem has three formats for minor planets
                     # based on the value of the eccentricity ( < 1, == 1, > 1 ):
                     #   https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
-                    # When the eccentricity is >= 1, the format is the same and requires date of epoch of perihelion,
-                    # which does not appear to be present in the Lowell data.
-                    # After checking both the Minor Planet Center's MPCORB.DAT and Lowell's astorb.dat,
-                    # there are no bodies for which the eccentricity is >= 1.0
-                    # Therefore this should not be a problem of concern...
-                    # ...however, screen out a body with such an eccentricity just to be safe!
+                    # When the eccentricity is >= 1, the format is the same and
+                    # requires date of epoch of perihelion, which does not
+                    # appear to be present in the Lowell data.
+                    # After checking both the Minor Planet Center's MPCORB.DAT
+                    # and Lowell's astorb.dat, there are no bodies for which the
+                    # eccentricity is >= 1.0
+                    # Therefore this should not be a problem of concern;
+                    # however, filter out such bodies just to be safe!
                     if float( orbital_eccentricity ) >= 1.0:
-                        logging.error( "Found a body with eccentricity >= 1.0:" )
+                        logging.error(
+                            "Found a body with eccentricity >= 1.0:" )
+
                         logging.error( "\t" + str( minor_planet ) )
                         continue
 
@@ -320,15 +337,15 @@ class DataProviderOrbitalElement( DataProvider ):
         '''
         oe_data = { }
 
-        is_skyfield_data = \
+        is_skyfield_data = (
             orbital_element_data_type in {
                 OE.DataType.SKYFIELD_COMET,
-                OE.DataType.SKYFIELD_MINOR_PLANET }
+                OE.DataType.SKYFIELD_MINOR_PLANET } )
 
-        is_xephem_data = \
+        is_xephem_data = (
             orbital_element_data_type in {
                 OE.DataType.XEPHEM_COMET,
-                OE.DataType.XEPHEM_MINOR_PLANET }
+                OE.DataType.XEPHEM_MINOR_PLANET } )
 
         if is_skyfield_data:
             if orbital_element_data_type == OE.DataType.SKYFIELD_COMET:
@@ -360,22 +377,26 @@ class DataProviderOrbitalElement( DataProvider ):
             with open( filename, 'r', encoding = "utf-8" ) as f:
                 for line in f.read().splitlines():
                     if not line.startswith( '{' ):
-                        # Sometimes the COBS download emits an error message of the form:
+                        # Sometimes the COBS download emits an error message
+                        # of the form:
                         #   {"code": "400",
                         #    "message": "Invalid integer value provided in the parameter.",
                         #    "moreInfo": "invalid literal for int() with base 10: 'false'",
                         #    "signature": {"source": "COBS Query API", "version": "1.3", "date": "2024 May"}}
-                        # In this event, keep the download file as is for bug tracking if needed,
-                        # but skip loading the data (there is no data to load).
-                        # When the cache becomes stale,
-                        # a fresh (and hopefully successful) download will occur.
+                        # In this event, keep the download file as is for bug
+                        # tracking if needed, but skip loading the data as there
+                        # is no data to load.  When the cache becomes stale,
+                        # a fresh and hopefully successful download will occur.
                         name = line[ : line.find( ',' ) ].strip()
                         oe = OE( name, line, orbital_element_data_type )
                         oe_data[ oe.get_name().upper() ] = oe
 
         else:
             oe_data = { }
-            logging.error( "Unknown data type encountered when loading orbital elements from file: '" + str( orbital_element_data_type ) + "', '" + filename + "'" )
+            logging.error(
+                "Unknown data type encountered when loading orbital elements from file: '"
+                +
+                str( orbital_element_data_type ) + "', '" + filename + "'" )
 
         return oe_data
 

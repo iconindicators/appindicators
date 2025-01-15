@@ -29,7 +29,9 @@ from dataprovider import DataProvider
 
 
 class DataProviderApparentMagnitude( DataProvider ):
-    ''' Download and persist apparent magnitude for comets and minor planets. '''
+    '''
+    Download and persist apparent magnitude for comets and minor planets.
+    '''
 
     @staticmethod
     def download(
@@ -43,20 +45,21 @@ class DataProviderApparentMagnitude( DataProvider ):
         '''
 
         if is_comet:
-            downloaded = False # COBS does not directly provide apparent magnitude data.
+            downloaded = False # COBS apparent magnitude data is separate.
 
         else:
-            downloaded = DataProviderApparentMagnitude._download_from_lowell_minor_planet_services(
-                filename, logging, apparent_magnitude_maximum )
+            downloaded = (
+                DataProviderApparentMagnitude._download_from_lowell_minor_planet_services(
+                    filename, logging, apparent_magnitude_maximum ) )
 
         return downloaded
 
 
     @staticmethod
     def _download_from_lowell_minor_planet_services(
-            filename,
-            logging,
-            apparent_magnitude_maximum ):
+        filename,
+        logging,
+        apparent_magnitude_maximum ):
         '''
         Download apparent magnitude data for minor planets from Lowell Minor
         Planet Services and saves to the given filename.
@@ -111,21 +114,37 @@ class DataProviderApparentMagnitude( DataProvider ):
                 for minor_planet in minor_planets:
                     asteroid_number = minor_planet[ "ast_number" ]
                     if asteroid_number is None:
-                        continue # Not all asteroids / minor planets have a number.
+                        continue # Not all minor planets have a number.
 
                     if minor_planet[ "designameByIdDesignationName" ] is None:
-                        continue # Not all asteroids / minor planets have names.
+                        continue # Not all minor planets have names.
 
-                    designation_name = minor_planet[ "designameByIdDesignationName" ][ "str_designame" ]
+                    designation_name = (
+                        minor_planet[ "designameByIdDesignationName" ][ "str_designame" ] )
 
-                    apparent_magnitude = str( minor_planet[ "ephemeris" ][ 0 ][ "v_mag" ] )
-                    f.write( str( asteroid_number ) + ' ' + designation_name + ',' + apparent_magnitude + '\n' )
+                    apparent_magnitude = (
+                        str( minor_planet[ "ephemeris" ][ 0 ][ "v_mag" ] ) )
+
+                    f.write(
+                        str( asteroid_number )
+                        +
+                        ' '
+                        +
+                        designation_name
+                        +
+                        ','
+                        +
+                        apparent_magnitude
+                        +
+                        '\n' )
 
             downloaded = True
 
         except Exception as e:
             downloaded = False
-            logging.error( "Error retrieving apparent magnitude data from " + str( url ) )
+            logging.error(
+                "Error retrieving apparent magnitude data from " + str( url ) )
+
             logging.exception( e )
 
         return downloaded

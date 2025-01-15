@@ -69,6 +69,7 @@ def get_stars_and_hips( iau_catalog_file ):
 def print_formatted_stars( stars_and_hips_, star_information_url ):
     print( "Printing formatted stars from", star_information_url )
     for name, hip in stars_and_hips_:
+#TODO Remove \
         print(
             "        [ " + \
             "\"" + name.upper() + "\"," + \

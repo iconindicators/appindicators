@@ -214,7 +214,7 @@ class IndicatorTest( IndicatorBase ):
                     self.set_icon(
                         str(
                             self.write_cache_text(
-                                self.__get_third_quarter_svg_icon_text(),
+                                self._get_third_quarter_svg_icon_text(),
                                 IndicatorTest.CACHE_ICON_BASENAME,
                                 IndicatorBase.EXTENSION_SVG_SYMBOLIC ) ) ), ),
             indent = ( 2, 0 ) )
@@ -312,16 +312,26 @@ class IndicatorTest( IndicatorBase ):
             "paplay",
             "wmctrl" )
 
+        notify_send = f"notify-send -i { self.get_icon_name() }"
+        notify_send_unsupported = f"{ notify_send } \"Unsupported\" "
+
         commands = (
-            "calendar -f /usr/share/calendar/calendar.all -A 3" \
-            if self.is_calendar_supported() else \
-            f"notify-send -i { self.get_icon_name() } \"Unsupported\" \"The calendar package is unavailable.\"",
+            "calendar -f /usr/share/calendar/calendar.all -A 3"
+            if self.is_calendar_supported()
+            else
+            f"{ notify_send_unsupported } \"Calendar package is unavailable.\"",
+
             "fortune",
+
             "ls -la",
-            f"notify-send -i { self.get_icon_name() } \"summary 1 2 3\" \"body 4 5 6\"",
+
+            f"{ notify_send } \"summary 1 2 3\" \"body 4 5 6\"",
+
             self.get_play_sound_complete_command(),
-            f"notify-send -i { self.get_icon_name() } \"Unsupported\" \"Wayland does not support wmctrl.\"" \
-            if self.is_session_type_wayland() else \
+
+            f"{ notify_send_unsupported } \"Wayland does not support wmctrl.\""
+            if self.is_session_type_wayland()
+            else
             "wmctrl -l" )
 
         for label, command in zip( labels, commands ):
@@ -344,83 +354,7 @@ class IndicatorTest( IndicatorBase ):
         return datetime.datetime.now().strftime( "%H:%M:%S" )
 
 
-#TODO Delete
-    def _use_icon_dynamically_created( self, menuitem ):
-        icon_path = \
-            self.write_cache_text(
-                self.__get_third_quarter_svg_icon_text(),
-                IndicatorTest.CACHE_ICON_BASENAME,
-                IndicatorBase.EXTENSION_SVG_SYMBOLIC )
-
-        self.set_icon( str( icon_path ) )
-
-
-#TODO Really need this...?  Just need to make one dynamic icon.
-    def _get_svg_icon_textOLF(
-            self,
-            phase,
-            illumination_percentage,
-            bright_limb_angle_in_degrees ):
-        '''
-        More or less a direct copy from indicatorlunar to test dynamically
-        created SVG icons in the user cache.
-
-        phase
-            The current phase of the moon.
-        illumination percentage
-            The brightness ranging from 0 to 100 inclusive.
-            Ignored when phase is full/new or first/third quarter.
-        bright limb angle in degrees
-            Bright limb angle, relative to zenith, from 0 to 360 inclusive.
-            Ignored when phase is full/new.
-        '''
-        width = 100
-        height = width
-        radius = float( width / 2 )
-        colour = "777777"
-        if phase in { "FULL_MOON", "NEW_MOON" }:
-            print( "Full new" )
-            body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
-            if phase == "NEW_MOON":
-                body += '" fill="#' + colour + '" fill-opacity="0.0" />'
-
-            else: # Full
-                body += '" fill="#' + colour + '" />'
-
-        else: # First/Third Quarter or Waning/Waxing Crescent or Waning/Waxing Gibbous
-            print( "first third  crescent gibbous" )
-            body = \
-                '<path d="M ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + ' ' + \
-                'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + \
-                str( width / 2 + radius ) + ' ' + str( height / 2 )
-
-            if phase in { "FIRST_QUARTER", "THIRD_QUARTER" }:
-                body += ' Z"'
-                print( "first third" )
-
-            elif phase in { "WANING_CRESCENT", "WAXING_CRESCENT" }:
-                print( "crescent" )
-                body += \
-                    ' A ' + str( radius ) + ' ' + str( radius * ( 50 - illumination_percentage ) / 50 ) + ' 0 0 0 ' + \
-                    str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
-
-            else: # Waning/Waxing Gibbous
-                print( "gibbous" )
-                body += \
-                    ' A ' + str( radius ) + ' ' + str( radius * ( illumination_percentage - 50 ) / 50 ) + ' 0 0 1 ' + \
-                    str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"'
-
-            body += \
-                ' transform="rotate(' + str( -bright_limb_angle_in_degrees ) + ' ' + \
-                str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />'
-
-        return \
-            '<?xml version="1.0" standalone="no"?>' \
-            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">' \
-            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>'
-
-
-    def __get_third_quarter_svg_icon_text( self ):
+    def _get_third_quarter_svg_icon_text( self ):
         ''' Inspired from indicatorlunar to create third quarter. '''
         width = 100
         height = width
@@ -450,11 +384,16 @@ class IndicatorTest( IndicatorBase ):
 
 
     def _execute_command( self, command ):
+#TODO Remove \
         terminal, terminal_execution_flag = \
             self.get_terminal_and_execution_flag()
 
         if terminal is None:
-            message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )
+            message = _(
+                "Cannot run script as no terminal and/or terminal execution "
+                +
+                "flag found; please install gnome-terminal." )
+
             self.get_logging().error( message )
             self.show_notification( "Cannot run script", message )
 
@@ -465,15 +404,21 @@ class IndicatorTest( IndicatorBase ):
             # arguments.  Although a fix has been made, it is unlikely the
             # repository will be updated any time soon.  The quickest/easiest
             # workaround is to install gnome-terminal.
-            message = _( "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead." )
+            message = _(
+                "Cannot run script as qterminal incorrectly parses arguments; "
+                +
+                "please install gnome-terminal instead." )
+
             self.get_logging().error( message )
             self.show_notification( "Cannot run script", message )
 
         else:
-            command_ = terminal + " " + terminal_execution_flag + " ${SHELL} -c '"
-            command_ += command
-            command_ += "; ${SHELL}"
-            command_ += "'"
+            command_ = (
+                terminal + " " + terminal_execution_flag + " ${SHELL} -c '"
+                +
+                command
+                + "; ${SHELL}" + "'" )
+
             Thread( target = self.process_call, args = ( command_, ) ).start()
             print( "Executing command: " + command_ )
 
@@ -541,9 +486,9 @@ class IndicatorTest( IndicatorBase ):
         data ):
         '''
         References
-            https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
-            https://stackoverflow.com/questions/27745585/show-icon-or-color-in-gtk-treeview-tree
-            https://stackoverflow.com/questions/49836499/make-only-some-rows-bold-in-a-gtk-treeview
+            https://stackoverflow.com/q/52798356/2156453
+            https://stackoverflow.com/q/27745585/2156453
+            https://stackoverflow.com/q/49836499/2156453
         '''
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
         day_of_week = tree_model.get_value( tree_iter, 0 )

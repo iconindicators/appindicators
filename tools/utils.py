@@ -27,6 +27,7 @@ from pathlib import Path
 
 
 def is_correct_directory( example_arguments = None ):
+#TODO Remove \
     correct_directory = \
         Path.cwd() == Path( inspect.stack()[ 1 ].filename ).parent.parent.absolute()
 

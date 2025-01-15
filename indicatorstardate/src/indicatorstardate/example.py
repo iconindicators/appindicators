@@ -29,6 +29,7 @@ print( f"Stardate API version: {stardate.get_version() }\n" )
 utc_now = datetime.datetime.now( datetime.timezone.utc )
 print( f"UTC now: { utc_now }\n" )
 
+#TODO Remove \
 stardate_issue, stardate_integer, stardate_fraction = \
     stardate.get_stardate_classic( utc_now )
 

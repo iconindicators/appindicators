@@ -60,13 +60,17 @@ class IndicatorTide( IndicatorBase ):
             # so do not treat this an exception.
             label = _( "No user script specified!" )
             summary = _( "No user script specified!" )
-            message = _( "Please specify a user script and class name in the preferences." )
+            message = _(
+                "Please specify a user script and class name in "
+                +
+                "the preferences." )
             menu.append( Gtk.MenuItem.new_with_label( label ) )
             self.show_notification( summary, message )
 
         else:
             tidal_readings = [ ]
             try:
+#TODO Remove \
                 spec = \
                     importlib.util.spec_from_file_location(
                         self.user_script_class_name,
@@ -84,17 +88,22 @@ class IndicatorTide( IndicatorBase ):
             except FileNotFoundError:
                 label = _( "User script could not be found!" )
                 summary = _( "User script could not be found!" )
-                message = _( "Please check the user script in the preferences." )
+                message = _(
+                    "Please check the user script in the preferences." )
 
             except AttributeError:
                 label = _( "User script class name could not be found!" )
                 summary = _( "User script class name could not be found!" )
-                message = _( "Please check the user script class name in the preferences." )
+                message = _(
+                    "Please check the user script class name in "
+                    +
+                    "the preferences." )
 
             except NotImplementedError:
                 label = _( "User function could not be found!" )
                 summary = _( "User function could not be found!" )
-                message = _( "You must implement the function 'get_tide_data()'." )
+                message = _(
+                    "You must implement the function 'get_tide_data()'." )
 
             except Exception as e:
                 self.get_logging().exception( e )
@@ -131,11 +140,15 @@ class IndicatorTide( IndicatorBase ):
 
         if self.show_as_submenus:
             if self.show_as_submenus_except_first_day:
-                first_date_tidal_readings, after_first_date_tidal_readings = \
-                    self._split_tidal_readings_after_first_date( tidal_readings )
+                first_date_tidal_readings, after_first_date_tidal_readings = (
+                    self._split_tidal_readings_after_first_date(
+                        tidal_readings ) )
 
-                self._create_menu_flat( first_date_tidal_readings, menu, indent )
-                self._create_menu_sub( after_first_date_tidal_readings, menu, indent )
+                self._create_menu_flat(
+                    first_date_tidal_readings, menu, indent )
+
+                self._create_menu_sub(
+                    after_first_date_tidal_readings, menu, indent )
 
             else:
                 self._create_menu_sub( tidal_readings, menu, indent )
@@ -150,9 +163,12 @@ class IndicatorTide( IndicatorBase ):
             if today_date != tidal_reading.get_date():
                 shown_today = False
 
-            menu_text = \
-                ( _( "HIGH" ) if tidal_reading.is_high() else _( "LOW" ) ) + "  " + \
-                tidal_reading.get_time() + "  " + tidal_reading.get_level()
+            menu_text = (
+                ( _( "HIGH" ) if tidal_reading.is_high() else _( "LOW" ) )
+                +
+                "  "
+                +
+                tidal_reading.get_time() + "  " + tidal_reading.get_level() )
 
             if shown_today:
                 self.create_and_append_menuitem(
@@ -192,9 +208,12 @@ class IndicatorTide( IndicatorBase ):
             if today_date != tidal_reading.get_date():
                 shown_today = False
 
-            menu_text = \
-                ( _( "HIGH" ) if tidal_reading.is_high() else _( "LOW" ) ) + "  " + \
-                tidal_reading.get_time() + "  " + tidal_reading.get_level()
+            menu_text = (
+                ( _( "HIGH" ) if tidal_reading.is_high() else _( "LOW" ) )
+                +
+                "  "
+                +
+                tidal_reading.get_time() + "  " + tidal_reading.get_level() )
 
             if shown_today:
                 self.create_and_append_menuitem(
@@ -241,13 +260,15 @@ class IndicatorTide( IndicatorBase ):
         grid = self.create_grid()
 
         grid.attach(
-            self.create_box( ( ( Gtk.Label.new( _( "User Script" ) ), False ), ), ),
+            self.create_box(
+                ( ( Gtk.Label.new( _( "User Script" ) ), False ), ), ),
             0, 0, 1, 1 )
 
         user_script_path_and_filename = \
             self.create_entry(
                 self.user_script_path_and_filename,
-                tooltip_text = _( "Full path and filename\nof user's Python3 script." ) )
+                tooltip_text = _(
+                    "Full path and filename\nof user's Python3 script." ) )
 
         grid.attach(
             self.create_box(
@@ -311,28 +332,42 @@ class IndicatorTide( IndicatorBase ):
         while True:
             response_type = dialog.run()
             if response_type == Gtk.ResponseType.OK:
-                self.show_as_submenus = show_as_submenus_checkbutton.get_active()
-                self.show_as_submenus_except_first_day = show_as_submenus_except_first_day_checkbutton.get_active()
+                self.show_as_submenus = \
+                    show_as_submenus_checkbutton.get_active()
+
+                self.show_as_submenus_except_first_day = \
+                    show_as_submenus_except_first_day_checkbutton.get_active()
 
                 if user_script_path_and_filename.get_text() and user_script_class_name.get_text():
                     if not Path( user_script_path_and_filename.get_text().strip() ).is_file():
-                        self.show_dialog_ok( dialog, _( "The user script path/filename cannot be found." ) )
+                        message = _(
+                            "The user script path/filename cannot be found." )
+
+                        self.show_dialog_ok( dialog, message )
                         user_script_path_and_filename.grab_focus()
                         continue
 
                 elif user_script_path_and_filename.get_text() or user_script_class_name.get_text(): # Cannot have one empty and the other not.
                     if not user_script_path_and_filename.get_text():
-                        self.show_dialog_ok( dialog, _( "The user script path/filename cannot be empty." ) )
+                        message = _(
+                            "The user script path/filename cannot be empty." )
+
+                        self.show_dialog_ok( dialog, message )
                         user_script_path_and_filename.grab_focus()
                         continue
 
-                    self.show_dialog_ok( dialog, _( "The user script class name cannot be empty." ) )
+                    self.show_dialog_ok(
+                        dialog,
+                        _( "The user script class name cannot be empty." ) )
+
                     user_script_class_name.grab_focus()
                     continue
 
-                self.user_script_path_and_filename = user_script_path_and_filename.get_text().strip()
-                self.user_script_class_name = user_script_class_name.get_text().strip()
+                self.user_script_path_and_filename = \
+                    user_script_path_and_filename.get_text().strip()
 
+                self.user_script_class_name = \
+                    user_script_class_name.get_text().strip()
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),

@@ -61,7 +61,7 @@ class AstroBase( ABC ):
         SUN = 6
 
 
-    # Data tags representing each of the pieces of calculated astronomical information.
+    # Data tags representing calculated astronomical information.
     DATA_TAG_ALTITUDE = "ALTITUDE"
     DATA_TAG_AZIMUTH = "AZIMUTH"
     DATA_TAG_BRIGHT_LIMB = "BRIGHT LIMB" # Used for creating an icon.
@@ -83,7 +83,8 @@ class AstroBase( ABC ):
     DATA_TAG_THIRD_QUARTER = "THIRD QUARTER"
 
 
-    # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
+    # Corresponding tags reflecting each data tag made visible to the user
+    # in the Preferences.
     DATA_TAGS_TRANSLATIONS = {
         DATA_TAG_ALTITUDE           : _( "ALTITUDE" ),
         DATA_TAG_AZIMUTH            : _( "AZIMUTH" ),
@@ -170,7 +171,8 @@ class AstroBase( ABC ):
     NAME_TAG_MOON = "MOON"
     NAME_TAG_SUN = "SUN"
 
-    # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
+    # Corresponding tags reflecting each data tag made visible to the user
+    # in the Preferences.
     NAME_TAG_MOON_TRANSLATION = { NAME_TAG_MOON : _( "MOON" ) }
     NAME_TAG_SUN_TRANSLATION = { NAME_TAG_SUN : _( "SUN" ) }
 
@@ -183,7 +185,14 @@ class AstroBase( ABC ):
     PLANET_URANUS = "URANUS"
     PLANET_NEPTUNE = "NEPTUNE"
 
-    PLANETS = [ PLANET_MERCURY, PLANET_VENUS, PLANET_MARS, PLANET_JUPITER, PLANET_SATURN, PLANET_URANUS, PLANET_NEPTUNE ]
+    PLANETS = [
+        PLANET_MERCURY,
+        PLANET_VENUS,
+        PLANET_MARS,
+        PLANET_JUPITER,
+        PLANET_SATURN,
+        PLANET_URANUS,
+        PLANET_NEPTUNE ]
 
     PLANET_NAMES_TRANSLATIONS = {
         PLANET_MERCURY  : _( "Mercury" ),
@@ -194,7 +203,8 @@ class AstroBase( ABC ):
         PLANET_URANUS   : _( "Uranus" ),
         PLANET_NEPTUNE  : _( "Neptune" ) }
 
-    # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
+    # Corresponding tags reflecting each data tag made visible to the user
+    # in the Preferences.
     PLANET_TAGS_TRANSLATIONS = {
         PLANET_MERCURY  : _( "MERCURY" ),
         PLANET_VENUS    : _( "VENUS" ),
@@ -215,7 +225,8 @@ class AstroBase( ABC ):
     LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
     LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
-    # Corresponding tags which reflect each data tag made visible to the user in the Preferences.
+    # Corresponding tags reflecting each data tag made visible to the user
+    # in the Preferences.
     LUNAR_PHASE_NAMES_TRANSLATIONS = {
         LUNAR_PHASE_FULL_MOON       : _( "Full Moon" ),
         LUNAR_PHASE_WANING_GIBBOUS  : _( "Waning Gibbous" ),
@@ -234,7 +245,7 @@ class AstroBase( ABC ):
 
 
     # PyEphem provides a list of stars and data, whereas Skyfield does not.
-    # Over the years, the PyEphem stars has accumulated duplicates and misspellings,
+    # Over time, that list has accumulated duplicates and misspellings,
     # which must be kept for backward compatibility.
     #
     # Several possibilities are available for creating a new list of stars...
@@ -242,7 +253,7 @@ class AstroBase( ABC ):
     #    http://fer3.com/arc/imgx/Bowditch-American-Practical-Navigator-2002-(2004).pdf
     #    https://en.wikipedia.org/wiki/List_of_stars_for_navigation
     #        Contains a list of around 58 navigational stars.
-    #        Unknown if this is northern hemisphere centric as the source is American.
+    #        Unsure if northern hemisphere centric as the source is American.
     #        PyEphem contains all these stars.
     #
     #    http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt
@@ -378,23 +389,45 @@ class AstroBase( ABC ):
 
     SATELLITE_TAG_NAME_TRANSLATION = "[" + _( "NAME" ) + "]"
     SATELLITE_TAG_NUMBER_TRANSLATION = "[" + _( "NUMBER" ) + "]"
-    SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION = "[" + _( "INTERNATIONAL DESIGNATOR" ) + "]"
+    SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION = (
+        "[" + _( "INTERNATIONAL DESIGNATOR" ) + "]" )
     SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION = "[" + _( "RISE AZIMUTH" ) + "]"
     SATELLITE_TAG_RISE_TIME_TRANSLATION = "[" + _( "RISE TIME" ) + "]"
     SATELLITE_TAG_SET_AZIMUTH_TRANSLATION = "[" + _( "SET AZIMUTH" ) + "]"
     SATELLITE_TAG_SET_TIME_TRANSLATION = "[" + _( "SET TIME" ) + "]"
 
     SATELLITE_TAG_TRANSLATIONS = [ ] # List of [ tag, translated tag ] pairs.
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_NAME.strip( "[]" ), SATELLITE_TAG_NAME_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_NUMBER.strip( "[]" ), SATELLITE_TAG_NUMBER_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_INTERNATIONAL_DESIGNATOR.strip( "[]" ), SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_AZIMUTH.strip( "[]" ), SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_RISE_TIME.strip( "[]" ), SATELLITE_TAG_RISE_TIME_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_AZIMUTH.strip( "[]" ), SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append( [ SATELLITE_TAG_SET_TIME.strip( "[]" ), SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append(
+        [
+            SATELLITE_TAG_NAME.strip( "[]" ),
+            SATELLITE_TAG_NAME_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append(
+        [
+            SATELLITE_TAG_NUMBER.strip( "[]" ),
+            SATELLITE_TAG_NUMBER_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append(
+        [
+            SATELLITE_TAG_INTERNATIONAL_DESIGNATOR.strip( "[]" ),
+            SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append(
+        [
+            SATELLITE_TAG_RISE_AZIMUTH.strip( "[]" ),
+            SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append(
+        [
+            SATELLITE_TAG_RISE_TIME.strip( "[]" ),
+            SATELLITE_TAG_RISE_TIME_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append(
+        [
+            SATELLITE_TAG_SET_AZIMUTH.strip( "[]" ),
+            SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
+    SATELLITE_TAG_TRANSLATIONS.append(
+        [
+            SATELLITE_TAG_SET_TIME.strip( "[]" ),
+            SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
 
     # Miscellaneous.
-    MAGNITUDE_MAXIMUM = 15.0 # No point going any higher for the typical home astronomer.
+    MAGNITUDE_MAXIMUM = 15.0 # More than adequate for the home astronomer.
     MAGNITUDE_MINIMUM = -10.0 # Have found (erroneous) magnitudes in comet OE data which are brighter than the sun, so set a lower limit.
 
 
@@ -405,9 +438,15 @@ class AstroBase( ABC ):
             latitude, longitude, elevation,
             planets,
             stars,
-            satellites, satellite_data, start_hour_as_date_time_in_utc, end_hour_as_date_time_in_utc,
-            comets, comet_data, comet_apparent_magnitude_data,
-            minor_planets, minor_planet_data, minor_planet_apparent_magnitude_data,
+            satellites,
+            satellite_data,
+            start_hour_as_date_time_in_utc, end_hour_as_date_time_in_utc,
+            comets,
+            comet_data,
+            comet_apparent_magnitude_data,
+            minor_planets,
+            minor_planet_data,
+            minor_planet_apparent_magnitude_data,
             apparent_magnitude_maximum,
             logging = None ):
         '''
@@ -520,10 +559,12 @@ class AstroBase( ABC ):
         https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId564354
         '''
 
-        return \
-            g_absolute_magnitude + \
-            5 * math.log10( body_earth_distance_au ) + \
-            2.5 * k_luminosity_index * math.log10( body_sun_distance_au )
+        return (
+            g_absolute_magnitude
+            +
+            5 * math.log10( body_earth_distance_au )
+            +
+            2.5 * k_luminosity_index * math.log10( body_sun_distance_au ) )
 
 
     @staticmethod
@@ -548,17 +589,17 @@ class AstroBase( ABC ):
         #
         # A solution posted in
         #
-        #    https://math.stackexchange.com/questions/4060964/floating-point-division-resulting-in-a-value-exceeding-1-but-should-be-equal-to
+        #    https://math.stackexchange.com/q/4060964/301146
         #
         # suggests setting an upper bound to the division with a value +/- 1.0.
         # However, the subsequent value for beta is zero and feeding into
         # tan( 0 ) yields zero and the immediate logarithm is undefined!
         # Not really sure what can be done, or should be done;
         # leave things as they are and the caller can catch the error/exception.
-        numerator = \
-            body_sun_distance_au * body_sun_distance_au + \
-            body_earth_distance_au * body_earth_distance_au - \
-            earth_sun_distance_au * earth_sun_distance_au
+        numerator = (
+            body_sun_distance_au * body_sun_distance_au +
+            body_earth_distance_au * body_earth_distance_au -
+            earth_sun_distance_au * earth_sun_distance_au )
 
         denominator = 2 * body_sun_distance_au * body_earth_distance_au
         beta = math.acos( numerator / denominator )
@@ -568,10 +609,10 @@ class AstroBase( ABC ):
         psi_t = math.exp( math.log( math.tan( beta / 2.0 ) ) * 1.22 )
         psi_2 = math.exp( -1.87 * psi_t )
 
-        apparent_magnitude = \
-            h_absolute_magnitude + \
-            5.0 * math.log10( body_sun_distance_au * body_earth_distance_au ) - \
-            2.5 * math.log10( ( 1 - g_slope ) * psi_1 + g_slope * psi_2 )
+        apparent_magnitude = (
+            h_absolute_magnitude +
+            5.0 * math.log10( body_sun_distance_au * body_earth_distance_au ) -
+            2.5 * math.log10( ( 1 - g_slope ) * psi_1 + g_slope * psi_2 ) )
 
         return apparent_magnitude
 
@@ -630,12 +671,12 @@ class AstroBase( ABC ):
         # Assume the date is always later than 15th October, 1582.
         y = utc_now.year
         m = utc_now.month
-        d = \
-            utc_now.day + \
-            ( utc_now.hour / 24 ) + \
-            ( utc_now.minute / ( 60 * 24 ) ) + \
-            ( utc_now.second / ( 60 * 60 * 24 ) ) + \
-            ( utc_now.microsecond / ( 60 * 60 * 24 * 1000 ) )
+        d = (
+            utc_now.day +
+            ( utc_now.hour / 24 ) +
+            ( utc_now.minute / ( 60 * 24 ) ) +
+            ( utc_now.second / ( 60 * 60 * 24 ) ) +
+            ( utc_now.microsecond / ( 60 * 60 * 24 * 1000 ) ) )
 
         if m in { 1, 2 }:
             y_prime = y - 1
@@ -662,7 +703,8 @@ class AstroBase( ABC ):
         # Find local sidereal time.  Section 14 of the reference.
         longitude_in_hours = math.degrees( longitude ) / 15
 
-        return ( greenwich_sidereal_time_decimal + longitude_in_hours ) % 24 # Local sidereal time as a decimal time.
+        # Local sidereal time as a decimal time.
+        return ( greenwich_sidereal_time_decimal + longitude_in_hours ) % 24
 
 
     @staticmethod
@@ -701,21 +743,32 @@ class AstroBase( ABC ):
         '''
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
         y = math.cos( sun_dec ) * math.sin( sun_ra - body_ra )
-        x = math.sin( sun_dec ) * math.cos( body_dec ) - math.cos( sun_dec ) * math.sin( body_dec ) * math.cos( sun_ra - body_ra )
+        x = (
+            math.sin( sun_dec ) * math.cos( body_dec )
+            -
+            math.cos( sun_dec ) * math.sin( body_dec ) * math.cos( sun_ra - body_ra ) )
+
         position_angle_of_bright_limb = math.atan2( y, x )
 
-        # Multiply by 15 to convert from decimal time to decimal degrees; section 22 of Practical Astronomy with Your Calculator.
-        local_sidereal_time = math.radians( AstroBase.get_sidereal_time( utc_now, observer_lon ) * 15 )
+        # Multiply by 15 to convert from decimal time to decimal degrees;
+        # section 22 of Practical Astronomy with Your Calculator.
+        local_sidereal_time = (
+            math.radians(
+                AstroBase.get_sidereal_time( utc_now, observer_lon ) * 15 ) )
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, page 92.
         # https://tycho.usno.navy.mil/sidereal.html
         # http://www.wwu.edu/skywise/skymobile/skywatch.html
-        # https://www.heavens-above.com/whattime.aspx?lat=-33.8675&lng=151.207&loc=Sydney&alt=19&tz=AEST&cul=en
+        # https://www.heavens-above.com/whattime.aspx
         hour_angle = local_sidereal_time - body_ra
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
         y = math.sin( hour_angle )
-        x = math.tan( observer_lat ) * math.cos( body_dec ) - math.sin( body_dec ) * math.cos( hour_angle )
+        x = (
+            math.tan( observer_lat ) * math.cos( body_dec ) 
+            -
+            math.sin( body_dec ) * math.cos( hour_angle ) )
+
         parallactic_angle = math.atan2( y, x )
 
         return ( position_angle_of_bright_limb - parallactic_angle ) % ( 2.0 * math.pi )
@@ -737,13 +790,13 @@ class AstroBase( ABC ):
         The start hour (as date/time in UTC) < end hour (as date/time UTC).
         '''
 
-        #   SH            EH
-        #                 SH            EH
-        #                               SH            EH
-        #                                             SH            EH
-        #                                                           SH            EH
-        #                        X------------------------X
-        #                 start_date_time                   end_date_time
+        #  SH           EH
+        #               SH           EH
+        #                            SH           EH
+        #                                         SH            EH
+        #                                                       SH            EH
+        #                     X------------------------X
+        #              start_date_time            end_date_time
         windows = [ ]
 
         current = start_date_time - datetime.timedelta( days = 1 )
@@ -760,13 +813,18 @@ class AstroBase( ABC ):
             else:
                 if start_hour_as_date_time < end_date_time:
                     if end_hour_as_date_time < end_date_time:
-                        windows.append( [ start_hour_as_date_time, end_hour_as_date_time ] )
+                        windows.append(
+                            [ start_hour_as_date_time, end_hour_as_date_time ] )
 
                     else:
-                        windows.append( [ start_hour_as_date_time, end_date_time ] )
+                        windows.append(
+                            [ start_hour_as_date_time, end_date_time ] )
 
             current = current + datetime.timedelta( days = 1 )
-            start_hour_as_date_time = start_hour_as_date_time + datetime.timedelta( days = 1 )
-            end_hour_as_date_time = end_hour_as_date_time + datetime.timedelta( days = 1 )
+            start_hour_as_date_time = (
+                start_hour_as_date_time + datetime.timedelta( days = 1 ) )
+
+            end_hour_as_date_time = (
+                end_hour_as_date_time + datetime.timedelta( days = 1 ) )
 
         return windows

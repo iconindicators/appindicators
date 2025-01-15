@@ -82,24 +82,12 @@ class IndicatorLunar( IndicatorBase ):
     CONFIG_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
-    CREDIT_COMETS = _( "Comet data by Comet Observation Database. https://cobs.si" )
-    CREDIT_ECLIPSES = _( "Eclipse predictions by Fred Espenak, NASA/GSFC Emeritus. https://eclipse.gsfc.nasa.gov" )
-    CREDIT_ECLIPSE_SOLAR_ONLY = _( "Solar eclipse predictions by Fred Espenak, NASA/GSFC Emeritus. https://eclipse.gsfc.nasa.gov" )
-    CREDIT_MINOR_PLANETS = _( "Minor Planet data by Lowell Minor Planet Services. https://asteroid.lowell.edu" )
-    CREDIT_SATELLITES = _( "Satellite data by Celestrak. https://celestrak.org" )
-    if astro_backend_name == astro_backend_pyephem:
-        CREDIT = [ astro_backend.get_credit(),
-                  CREDIT_COMETS,
-                  CREDIT_ECLIPSES,
-                  CREDIT_MINOR_PLANETS,
-                  CREDIT_SATELLITES ]
-
-    else:
-        CREDIT = [ astro_backend.get_credit(),
-                  CREDIT_COMETS,
-                  CREDIT_ECLIPSE_SOLAR_ONLY,
-                  CREDIT_MINOR_PLANETS,
-                  CREDIT_SATELLITES ]
+    CREDIT = [
+        astro_backend.get_credit(),
+        "Comet Observation Database https://cobs.si",
+        "Fred Espenak NASA/GSFC Emeritus https://eclipse.gsfc.nasa.gov",
+        "Lowell Minor Planet Services https://asteroid.lowell.edu",
+        "Celestrak https://celestrak.org" ]
 
     DATA_INDEX_BODY_TYPE = 0
     DATA_INDEX_BODY_NAME = 1
@@ -114,6 +102,7 @@ class IndicatorLunar( IndicatorBase ):
     INDICATOR_TEXT_DEFAULT = " [" + astro_backend.NAME_TAG_MOON + " " + astro_backend.DATA_TAG_PHASE + "]"
     INDICATOR_TEXT_SEPARATOR_DEFAULT = ", "
 
+#TODO Remove \
     BODY_TAGS_TRANSLATIONS = \
         dict(
             list( astro_backend.NAME_TAG_MOON_TRANSLATION.items() ) +

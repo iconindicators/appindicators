@@ -125,6 +125,7 @@ def _get_indicator_names_sans_current( indicator_name ):
 def _get_introduction( indicator_name ):
     pattern_tag = re.compile( r".*comments = _\(.*" )
 
+#TODO Remove \
     filename = \
         indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py"
 

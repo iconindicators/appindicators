@@ -49,6 +49,7 @@ except ModuleNotFoundError:
     # resulting in a "ModuleNotFoundError: No module named 'indicatorbase'"
     # which is a red herring...
     print(
+#TODO Remove \
         "indicatorbase could not be found;" + \
         "ensure you are running this script from the correct directory!" )
 

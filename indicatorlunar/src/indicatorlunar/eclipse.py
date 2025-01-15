@@ -55,6 +55,7 @@ _months = {
 
 # https://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
 # https://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
+#TODO Remove \   But be careful, seems just wrapping in ( ) is not good!
 _ECLIPSES_LUNAR = \
 ''' 09706   2025 Mar 14  06:59:56     75    311  123   T   -p   0.3484  2.2595  1.1784  362.6  218.3   65.4    3N  102W
     09707   2025 Sep 07  18:12:58     75    317  128   T   -p  -0.2752  2.3440  1.3619  326.7  209.4   82.1    6S   87E
@@ -97,6 +98,7 @@ _ECLIPSES_LUNAR = \
 
 # https://eclipse.gsfc.nasa.gov/5MCSE/5MKSEcatalog.txt
 # https://eclipse.gsfc.nasa.gov/SEcat5/catkey.html
+#TODO Remove \   But be careful, seems just wrapping in ( ) is not good!
 _ECLIPSES_SOLAR = \
 '''  9563  479   2025 Mar 29  10:48:36     75    312  149   P   t-   1.0405  0.9376  61.1N  77.1W   0   83
      9564  479   2025 Sep 21  19:43:04     75    318  154   P   t-  -1.0651  0.8550  60.9S 153.5E   0   89
@@ -185,10 +187,12 @@ def _get_eclipse(
         delta_t = fields[ field_delta_t ]
 
         # https://eclipse.gsfc.nasa.gov/LEcat5/deltat.html
-        date_string = year + ", " + _months[ month ] + ", " + day + ", " + time_utc
-        date_time = \
-            datetime.datetime.strptime( date_string, "%Y, %m, %d, %H:%M:%S" ).replace( tzinfo = datetime.timezone.utc ) - \
-            datetime.timedelta( seconds = int( delta_t ) )
+        date_string = (
+            year + ", " + _months[ month ] + ", " + day + ", " + time_utc )
+
+        date_time = (
+            datetime.datetime.strptime( date_string, "%Y, %m, %d, %H:%M:%S" ).replace( tzinfo = datetime.timezone.utc ) -
+            datetime.timedelta( seconds = int( delta_t ) ) )
 
         if utc_now <= date_time:
             eclipse_type = fields[ field_type ][ 0 ]

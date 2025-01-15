@@ -171,17 +171,25 @@ class AstroPyEphem( AstroBase ):
             latitude, longitude, elevation,
             planets,
             stars,
-            satellites, satellite_data, start_hour_as_date_time_in_utc, end_hour_as_date_time_in_utc,
-            comets, comet_data, comet_apparent_magnitude_data,
-            minor_planets, minor_planet_data, minor_planet_apparent_magnitude_data,
+            satellites,
+            satellite_data,
+            start_hour_as_date_time_in_utc,
+            end_hour_as_date_time_in_utc,
+            comets,
+            comet_data,
+            comet_apparent_magnitude_data,
+            minor_planets,
+            minor_planet_data,
+            minor_planet_apparent_magnitude_data,
             apparent_magnitude_maximum,
             logging ):
 
         data = { }
 
-        ephem_now = ephem.Date( utc_now ) # PyEphem date/time is NOT timezone aware.
+        # PyEphem date/time is NOT timezone aware.
+        ephem_now = ephem.Date( utc_now )
 
-        observer = ephem.city( "London" ) # Any name will do; add in the correct latitude/longitude/elevation.
+        observer = ephem.city( "London" ) # Any name will do for now.
         observer.lat = str( latitude )
         observer.lon = str( longitude )
         observer.elev = elevation
@@ -189,8 +197,11 @@ class AstroPyEphem( AstroBase ):
 
         AstroPyEphem._calculate_moon( ephem_now, observer, data )
         AstroPyEphem._calculate_sun( ephem_now, observer, data )
-        AstroPyEphem._calculate_planets( observer, data, planets, apparent_magnitude_maximum )
-        AstroPyEphem._calculate_stars( observer, data, stars, apparent_magnitude_maximum )
+        AstroPyEphem._calculate_planets(
+            observer, data, planets, apparent_magnitude_maximum )
+
+        AstroPyEphem._calculate_stars(
+            observer, data, stars, apparent_magnitude_maximum )
 
         AstroPyEphem._calculate_comets(
             observer,
@@ -202,8 +213,10 @@ class AstroPyEphem( AstroBase ):
         AstroPyEphem._calculate_minor_planets(
             observer,
             data,
-            minor_planets, minor_planet_data,
-            apparent_magnitude_maximum, minor_planet_apparent_magnitude_data )
+            minor_planets,
+            minor_planet_data,
+            apparent_magnitude_maximum,
+            minor_planet_apparent_magnitude_data )
 
         AstroPyEphem._calculate_satellites(
             ephem_now,
@@ -224,15 +237,16 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def get_credit():
-        return _( "Calculations courtesy of PyEphem/XEphem. https://rhodesmill.org/pyephem" )
+        return "PyEphem https://github.com/brandon-rhodes/pyephem"
 
 
     @staticmethod
     def get_latitude_longitude_elevation( city ):
-        return \
-            float( _city_data.get( city )[ AstroPyEphem._PYEPHEM_CITY_LATITUDE ] ), \
-            float( _city_data.get( city )[ AstroPyEphem._PYEPHEM_CITY_LONGITUDE ] ), \
-            _city_data.get( city )[ AstroPyEphem._PYEPHEM_CITY_ELEVATION ]
+        city_ = _city_data.get( city )
+        return (
+            float( city_[ AstroPyEphem._PYEPHEM_CITY_LATITUDE ] ),
+            float( city_[ AstroPyEphem._PYEPHEM_CITY_LONGITUDE ] ),
+            city_[ AstroPyEphem._PYEPHEM_CITY_ELEVATION ] )
 
 
     @staticmethod
@@ -246,37 +260,41 @@ class AstroPyEphem( AstroBase ):
         moon = ephem.Moon( observer )
         sun = ephem.Sun( observer )
 
-        data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( moon.phase ) # Needed for icon.
+        # Needed for icon.
+        data[ key + ( AstroBase.DATA_TAG_ILLUMINATION, ) ] = str( moon.phase )
 
-        phase = \
+        # Need for notification.
+        phase = (
             AstroBase.get_lunar_phase(
                 moon.phase,
                 ephem.next_full_moon( ephem_now ),
-                ephem.next_new_moon( ephem_now ) ) # Need for notification.
+                ephem.next_new_moon( ephem_now ) ) )
 
         data[ key + ( AstroBase.DATA_TAG_PHASE, ) ] = phase
 
-        bright_limb = \
+        bright_limb = (
             AstroBase.get_zenith_angle_of_bright_limb(
                 ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ),
                 sun.ra, sun.dec,
                 moon.ra, moon.dec,
-                float( observer.lat ), float( observer.lon ) )
+                float( observer.lat ), float( observer.lon ) ) )
 
-        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( bright_limb ) # Needed for icon.
+        # Needed for icon.
+        data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( bright_limb )
 
         if not AstroPyEphem._calculate_common( data, ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ), observer, moon ):
-            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = \
-                ephem.next_first_quarter_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc )
+            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = (
+                ephem.next_first_quarter_moon(
+                    ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc ) )
 
-            data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = \
-                ephem.next_full_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc )
+            data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = (
+                ephem.next_full_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc ) )
 
-            data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = \
-                ephem.next_last_quarter_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc )
+            data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = (
+                ephem.next_last_quarter_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc ) )
 
-            data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = \
-                ephem.next_new_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc )
+            data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = (
+                ephem.next_new_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc ))
 
             AstroPyEphem._calculate_eclipse( ephem_now, data, key, False )
 
@@ -288,11 +306,11 @@ class AstroPyEphem( AstroBase ):
         if not AstroPyEphem._calculate_common( data, ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ), observer, sun ):
             key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
 
-            data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = \
-                ephem.next_equinox( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc )
+            data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = (
+                ephem.next_equinox( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc ) )
 
-            data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = \
-                ephem.next_solstice( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc )
+            data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = (
+                ephem.next_solstice( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc ) )
 
             AstroPyEphem._calculate_eclipse( ephem_now, data, key, True )
 
@@ -300,39 +318,51 @@ class AstroPyEphem( AstroBase ):
     @staticmethod
     def _calculate_eclipse( ephem_now, data, key, is_solar ):
         if is_solar:
-            date_time, eclipse_type, latitude, longitude = \
-                eclipse.get_eclipse_solar( ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ) )
+            date_time, eclipse_type, latitude, longitude = (
+                eclipse.get_eclipse_solar( ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ) ) )
 
         else:
-            date_time, eclipse_type, latitude, longitude = \
-                eclipse.get_eclipse_lunar( ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ) )
+            date_time, eclipse_type, latitude, longitude = (
+                eclipse.get_eclipse_lunar( ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ) ) )
 
-        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = date_time.replace( tzinfo = datetime.timezone.utc )
+        data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = (
+            date_time.replace( tzinfo = datetime.timezone.utc ) )
+
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_TYPE, ) ] = eclipse_type
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LATITUDE, ) ] = latitude
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_LONGITUDE, ) ] = longitude
 
 
     @staticmethod
-    def _calculate_planets( observer, data, planets, apparent_magnitude_maximum ):
+    def _calculate_planets(
+            observer, data, planets, apparent_magnitude_maximum ):
+
         for planet in planets:
             body = getattr( ephem, planet.title() )()
             body.compute( observer )
             if body.mag <= apparent_magnitude_maximum:
-                AstroPyEphem._calculate_common( data, ( AstroBase.BodyType.PLANET, planet ), observer, body )
+                AstroPyEphem._calculate_common(
+                    data,
+                    ( AstroBase.BodyType.PLANET, planet ),
+                    observer, body )
 
 
     @staticmethod
     def _calculate_stars( observer, data, stars, apparent_magnitude_maximum ):
         for star in stars:
-            # Did test obtaining the absolute magnitude directly from the ephemeris
-            # before reading in and computing the body.
-            # After timing tests, this makes no difference, so follow "traditional" route of
-            # read, compute and obtain the absolute magnitude.
+            # Did test obtaining the absolute magnitude directly
+            # from the ephemeris before reading in and computing the body.
+            # After timing tests, this makes no difference,
+            # so follow "traditional" route of read, compute and obtain
+            # the absolute magnitude.
             body = ephem.readdb( AstroPyEphem._EPHEMERIS_STARS[ star.upper() ] )
             body.compute( observer )
             if body.mag <= apparent_magnitude_maximum:
-                AstroPyEphem._calculate_common( data, ( AstroBase.BodyType.STAR, star ), observer, body )
+                AstroPyEphem._calculate_common(
+                    data,
+                    ( AstroBase.BodyType.STAR, star ),
+                    observer,
+                    body )
 
 
     @staticmethod
@@ -369,31 +399,39 @@ class AstroPyEphem( AstroBase ):
                     slope_parameter = fields[ 10 - 1 ]
 
                 else:
-                    logging.warning( "Found unknown object type " + object_type + " for comet " + key )
+                    logging.warning(
+                        "Found unknown object type "
+                        +
+                        object_type
+                        +
+                        " for comet "
+                        +
+                        key )
+
                     continue
 
-                body = \
+                body = (
                     AstroPyEphem._compute_minor_planet_or_comet_for_observer(
                         observer,
-                        orbital_element_data[ key ].get_data() )
+                        orbital_element_data[ key ].get_data() ) )
 
                 if not AstroPyEphem._is_body_bad( body ):
                     if is_gk:
-                        apparent_magnitude = \
+                        apparent_magnitude = (
                             AstroBase.get_apparent_magnitude_gk(
                                 float( absolute_magnitude ),
                                 float( slope_parameter ),
                                 body.earth_distance,
-                                body.sun_distance )
+                                body.sun_distance ) )
 
                     else:
-                        apparent_magnitude = \
+                        apparent_magnitude = (
                             AstroBase.get_apparent_magnitude_hg(
                                 float( absolute_magnitude ),
                                 float( slope_parameter ),
                                 body.earth_distance,
                                 body.sun_distance,
-                                sun.earth_distance )
+                                sun.earth_distance ) )
 
                     if apparent_magnitude <= apparent_magnitude_maximum:
                         AstroPyEphem._calculate_common(
@@ -411,13 +449,14 @@ class AstroPyEphem( AstroBase ):
             apparent_magnitude_maximum, apparent_magnitude_data ):
 
         for key in minor_planets:
+#TODO Remove \
             if key in orbital_element_data and \
                key in apparent_magnitude_data and \
                float( apparent_magnitude_data[ key ].get_apparent_magnitude() ) < apparent_magnitude_maximum:
-                body = \
+                body = (
                     AstroPyEphem._compute_minor_planet_or_comet_for_observer(
                         observer,
-                        orbital_element_data[ key ].get_data() )
+                        orbital_element_data[ key ].get_data() ) )
 
                 if not AstroPyEphem._is_body_bad( body ):
                     AstroPyEphem._calculate_common(
@@ -428,7 +467,9 @@ class AstroPyEphem( AstroBase ):
 
 
     @staticmethod
-    def _compute_minor_planet_or_comet_for_observer( observer, orbital_element_data ):
+    def _compute_minor_planet_or_comet_for_observer(
+            observer, orbital_element_data ):
+
         body = ephem.readdb( orbital_element_data )
         body.compute( observer )
         return body
@@ -438,13 +479,17 @@ class AstroPyEphem( AstroBase ):
     @staticmethod
     def _is_body_bad( body ):
         try:
-            bad = \
-                math.isnan( body.earth_distance ) or \
-                math.isnan( body.phase ) or \
-                math.isnan( body.size ) or \
-                math.isnan( body.sun_distance ) # Have found MPC data may contain ***** in lieu of actual data!
+            # Have found MPC data may contain ***** in lieu of actual data!
+            bad = (
+                math.isnan( body.earth_distance )
+                or
+                math.isnan( body.phase )
+                or
+                math.isnan( body.size )
+                or
+                math.isnan( body.sun_distance ) )
 
-        except RunTimeError:
+        except RunTimeError:  #TODO Need to import???  Check when/where this was added via repository history.
             # Some comets with a near-parabolic orbit will trigger an error:
             #   https://github.com/brandon-rhodes/pyephem/issues/239
             bad = True
@@ -462,15 +507,16 @@ class AstroPyEphem( AstroBase ):
         '''
         never_up = False
         try:
-            # Must compute az/alt BEFORE rise/set otherwise results will be incorrect.
+            # Must compute az/alt BEFORE rise/set otherwise results
+            # will be incorrect.
             data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
             data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
 
-            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
-                observer.next_rising( body ).datetime().replace( tzinfo = datetime.timezone.utc )
+            data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = (
+                observer.next_rising( body ).datetime().replace( tzinfo = datetime.timezone.utc ) )
 
-            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = \
-                observer.next_setting( body ).datetime().replace( tzinfo = datetime.timezone.utc )
+            data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = (
+                observer.next_setting( body ).datetime().replace( tzinfo = datetime.timezone.utc ) )
 
         except ephem.AlwaysUpError:
             pass
@@ -494,12 +540,12 @@ class AstroPyEphem( AstroBase ):
             end_hour_as_date_time_in_utc ):
 
         utc_now = ephem_now.datetime().replace( tzinfo = datetime.timezone.utc )
-        windows = \
+        windows = (
             AstroBase.get_start_end_windows(
                 utc_now,
                 utc_now + datetime.timedelta( hours = AstroBase.SATELLITE_SEARCH_DURATION_HOURS ),
                 start_hour_as_date_time_in_utc,
-                end_hour_as_date_time_in_utc )
+                end_hour_as_date_time_in_utc ) )
 
         observer_visible_passes = observer.copy()
         observer_visible_passes.pressure = 0
@@ -508,12 +554,13 @@ class AstroPyEphem( AstroBase ):
         for satellite in satellites:
             if satellite in satellite_data:
                 key = ( AstroBase.BodyType.SATELLITE, satellite )
-                earth_satellite = \
+                earth_satellite = (
                     ephem.readtle(
                         satellite_data[ satellite ].get_name(),
-                        *satellite_data[ satellite ].get_tle_line_one_line_two() )
+                        *satellite_data[ satellite ].get_tle_line_one_line_two() ) )
 
                 for start_date_time, end_date_time in windows:
+#TODO Remove \
                     if \
                         AstroPyEphem._calculate_satellite(
                             ephem.Date( start_date_time ),
@@ -526,7 +573,7 @@ class AstroPyEphem( AstroBase ):
 
                         break
 
-        # The observer's date was constantly changed in the calculate satellite method,
+        # Observer's date was changed in the calculate satellite method,
         # so clean up before returning in case the observer is used later.
         observer.date = ephem_now
 
@@ -547,48 +594,59 @@ class AstroPyEphem( AstroBase ):
             observer.date = current_date_time
             earth_satellite.compute( observer )
             try:
-                # Must set 'singlepass = False' as it is possible a pass is too quick/low and an exception is thrown.
+                # Must set 'singlepass = False' as it is possible a pass is too
+                # quick/low and an exception is thrown.
                 # https://github.com/brandon-rhodes/pyephem/issues/164
                 # https://github.com/brandon-rhodes/pyephem/pull/85/files
-                next_pass = observer.next_pass( earth_satellite, singlepass = False )
-                if AstroPyEphem._is_satellite_pass_valid( next_pass ):
-                    pass_before_end_date_time = \
-                        next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ] < end_date_time
+                next_pass = (
+                    observer.next_pass( earth_satellite, singlepass = False ) )
 
-                    pass_is_visible = \
+                if AstroPyEphem._is_satellite_pass_valid( next_pass ):
+                    pass_before_end_date_time = (
+                        next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ] < end_date_time )
+
+                    pass_is_visible = (
                         AstroPyEphem._is_satellite_pass_visible(
                             observer_visible_passes,
                             earth_satellite,
-                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_CULMINATION_DATE ] )
+                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_CULMINATION_DATE ] ) )
 
                     if pass_before_end_date_time and pass_is_visible:
-                        data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = \
-                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc )
+                        data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = (
+                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc ) )
 
-                        data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = \
-                            repr( next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_ANGLE ] )
+                        data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = (
+                            repr( next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_ANGLE ] ) )
 
-                        data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = \
-                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc )
+                        data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = (
+                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc ) )
 
-                        data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = \
-                            repr( next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_ANGLE ] )
+                        data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = (
+                            repr( next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_ANGLE ] ))
 
                         found_pass = True
                         break
 
                     # Look for the next pass starting shortly after current set.
-                    current_date_time = \
+                    current_date_time = (
                         ephem.Date(
-                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ] + ephem.minute * 15 ) # Bad pass data, so look shortly after the current time.
+                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ] + ephem.minute * 15 ) )
 
                 else:
-                    current_date_time = ephem.Date( current_date_time + ephem.minute * 15 ) # Bad pass data, so look shortly after the current time.
+                    # Bad pass data, so look shortly after the current time.
+                    current_date_time = (
+                        ephem.Date( current_date_time + ephem.minute * 15 ) )
 
             except ValueError:
-                if earth_satellite.circumpolar: # Satellite never rises/sets, so can only show current position.
-                    data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( earth_satellite.az )
-                    data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( earth_satellite.alt )
+                if earth_satellite.circumpolar:
+                    # Satellite never rises/sets,
+                    # so can only show current position.
+                    data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = (
+                        repr( earth_satellite.az ) )
+
+                    data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = (
+                        repr( earth_satellite.alt ) )
+
                     found_pass = True
 
                 break
@@ -604,17 +662,30 @@ class AstroPyEphem( AstroBase ):
             Rise time exceeds transit time.
             Transit time exceeds set time.
         '''
-        return \
-            satellite_pass and \
-            len( satellite_pass ) == 6 and \
-            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_DATE ] and \
-            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_ANGLE ] and \
-            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_CULMINATION_DATE ] and \
-            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_CULMINATION_ANGLE ] and \
-            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ] and \
-            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_ANGLE ] and \
-            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_CULMINATION_DATE ] > satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_DATE ] and \
-            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ] > satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_CULMINATION_DATE ]
+        return (
+            satellite_pass
+            and
+            len( satellite_pass ) == 6
+            and
+            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_DATE ]
+            and
+            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_ANGLE ]
+            and
+            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_CULMINATION_DATE ]
+            and
+            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_CULMINATION_ANGLE ]
+            and
+            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ]
+            and
+            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_ANGLE ]
+            and
+            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_CULMINATION_DATE ]
+            >
+            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_DATE ]
+            and
+            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ]
+            >
+            satellite_pass[ AstroPyEphem._PYEPHEM_SATELLITE_CULMINATION_DATE ] )
 
 
     @staticmethod
@@ -625,8 +696,8 @@ class AstroPyEphem( AstroBase ):
         '''
         Determine if a satellite pass is visible.
 
-            https://space.stackexchange.com/questions/4339/calculating-which-satellite-passes-are-visible
-            https://stackoverflow.com/questions/19739831/is-there-any-way-to-calculate-the-visual-magnitude-of-a-satellite-iss
+            https://space.stackexchange.com/q/4339/3442
+            https://stackoverflow.com/q/19739831/2156453
             https://celestrak.org/columns/v03n01
         '''
         observer_visible_passes.date = pass_date_time
@@ -634,7 +705,9 @@ class AstroPyEphem( AstroBase ):
         sun = ephem.Sun()
         sun.compute( observer_visible_passes )
 
-        return \
-            not satellite.eclipsed and \
-            sun.alt > ephem.degrees( "-18" ) and \
-            sun.alt < ephem.degrees( "-6" )
+        return (
+            not satellite.eclipsed
+            and
+            sun.alt > ephem.degrees( "-18" )
+            and
+            sun.alt < ephem.degrees( "-6" ) )

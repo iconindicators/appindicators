@@ -120,8 +120,9 @@ def get_stardate_classic( gregorian_date_time ):
     month = gregorian_date_time.month # Month is one-based.
     day = gregorian_date_time.day
     if ( year < 2162 ) or ( year == 2162 and month == 1 and day < 4 ):
-        # Pre-stardate era; do the conversion here as a negative time is generated.
+        # Pre-stardate era; convert here otherwise a negative time is generated.
         index = 0
+#TODO Remove \
         number_of_seconds = \
             ( _gregorian_dates[ index ] - gregorian_date_time ).total_seconds()
 
@@ -258,15 +259,22 @@ def get_next_update_in_seconds( gregorian_date_time, is_classic ):
                 stardate_integer_next,
                 stardate_fraction_next )
 
-        number_of_seconds_to_next_update = \
-            int( math.ceil( ( date_time_of_next_stardate - gregorian_date_time ).total_seconds() ) )
+        number_of_seconds_to_next_update = (
+            date_time_of_next_stardate - gregorian_date_time ).total_seconds()
 
     else:
-        one_second_after_midnight = \
-            ( gregorian_date_time + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 0, second = 1 )
+        one_second_after_midnight = (
+            (
+                gregorian_date_time
+                +
+                datetime.timedelta( days = 1 ) ).replace(
+                    hour = 0, minute = 0, second = 1 ) )
 
-        number_of_seconds_to_next_update = \
-            int( math.ceil( ( one_second_after_midnight - gregorian_date_time ).total_seconds() ) )
+        number_of_seconds_to_next_update = (
+            one_second_after_midnight - gregorian_date_time ).total_seconds()
+
+    number_of_seconds_to_next_update = (
+        int( math.ceil( number_of_seconds_to_next_update ) ) )
 
     return number_of_seconds_to_next_update
 
@@ -309,32 +317,40 @@ def get_gregorian_from_stardate_classic(
         index = 0
         units = stardate_issue * 10000.0 + stardate_integer + stardate_fraction / fraction_divisor
 
-    elif 0 <= stardate_issue < 19: # First period of stardates (2162/1/4 - 2270/1/26).
+    elif 0 <= stardate_issue < 19:
+        # First period of stardates (2162/1/4 - 2270/1/26).
         index = 1
         units = stardate_issue * 1000.0 + stardate_integer + stardate_fraction / fraction_divisor
 
-    elif stardate_issue == 19 and stardate_integer < 7340: # First period of stardates (2162/1/4 - 2270/1/26).
+    elif stardate_issue == 19 and stardate_integer < 7340:
+        # First period of stardates (2162/1/4 - 2270/1/26).
         index = 1
         units = stardate_issue * 19.0 * 1000.0 + stardate_integer + stardate_fraction / fraction_divisor
 
-    elif stardate_issue == 19 and 7340 <= stardate_integer < 7840: # Second period of stardates (2270/1/26 - 2283/10/5).
+    elif stardate_issue == 19 and 7340 <= stardate_integer < 7840:
+        # Second period of stardates (2270/1/26 - 2283/10/5).
         index = 2
         units = stardate_integer + stardate_fraction / fraction_divisor - 7340
 
-    elif stardate_issue == 19 and stardate_integer >= 7840: # Third period of stardates (2283/10/5 - 2323/1/1).
+    elif stardate_issue == 19 and stardate_integer >= 7840:
+        # Third period of stardates (2283/10/5 - 2323/1/1).
         index = 3
         units = stardate_integer + stardate_fraction / fraction_divisor - 7840
 
-    elif stardate_issue == 20 and stardate_integer < 5006: # Third period of stardates (2283/10/5 - 2323/1/1).
+    elif stardate_issue == 20 and stardate_integer < 5006:
+        # Third period of stardates (2283/10/5 - 2323/1/1).
         index = 3
         units = 1000.0 + stardate_integer + stardate_fraction / fraction_divisor
 
-    elif stardate_issue >= 21: # Fourth period of stardates (2323/1/1 - ).
+    elif stardate_issue >= 21:
+        # Fourth period of stardates (2323/1/1 - ).
         index = 4
         units = ( stardate_issue - 21 ) * 10000.0 + stardate_integer + stardate_fraction / fraction_divisor
 
     else:
-        raise ValueError( "Illegal issue/integer: " + str( stardate_issue ) + "/" + str( stardate_integer ) )
+        raise ValueError(
+            "Illegal issue/integer: "
+            + str( stardate_issue ) + "/" + str( stardate_integer ) )
 
     days = units / _stardate_rates[ index ]
     hours = ( days - int( days ) ) * 24.0
@@ -377,7 +393,11 @@ def get_gregorian_from_stardate_2009_revised(
     if stardate_fraction < 0:
         raise ValueError( "Fraction cannot be negative." )
 
-    is_leap_year = ( stardate_integer % 4 == 0 and stardate_integer % 100 != 0 ) or stardate_integer % 400 == 0
+    is_leap_year = (
+        ( stardate_integer % 4 == 0 and stardate_integer % 100 != 0 )
+        or
+        stardate_integer % 400 == 0 )
+
     if is_leap_year:
         if stardate_fraction > 366:
             raise ValueError( "Integer cannot exceed 366." )
@@ -410,7 +430,8 @@ def to_stardate_string(
     '''
     string_builder = ""
     if stardate_issue is None:
-        string_builder = str( stardate_integer ) + "." + str( stardate_fraction )
+        string_builder = (
+            str( stardate_integer ) + "." + str( stardate_fraction ) )
 
     else:
         if show_issue:

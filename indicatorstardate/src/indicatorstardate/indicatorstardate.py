@@ -46,16 +46,21 @@ class IndicatorStardate( IndicatorBase ):
         super().__init__(
             comments = _( "Shows the current Star Trek™ stardate." ),
             creditz = [
-                _( "STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-trek/stardates" ),
-                _( "Wikipedia::Stardate" "https://en.wikipedia.org/wiki/Stardate" ) ] )
+                "STARDATES IN STAR TREK FAQ by Andrew Main. "
+                +
+                "http://www.faqs.org/faqs/star-trek/stardates",
+                "Wikipedia::Stardate https://en.wikipedia.org/wiki/Stardate" ] )
 
-        self.request_mouse_wheel_scroll_events( ( self.on_mouse_wheel_scroll, ) )
+        self.request_mouse_wheel_scroll_events(
+            ( self.on_mouse_wheel_scroll, ) )
+
         self.save_config_timer_id = None
 
 
     def update( self, menu ):
         utc_now = datetime.datetime.now( datetime.timezone.utc )
         if self.show_classic:
+#TODO Remove \
             stardate_issue, stardate_integer, stardate_fraction = \
                 stardate.get_stardate_classic( utc_now )
 
@@ -87,10 +92,12 @@ class IndicatorStardate( IndicatorBase ):
 
     def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction ):
         # Cycle through all combinations of options for display of the stardate.
-        # If showing a 'classic' stardate and padding is not required, ignore the padding option.
+        # If showing a 'classic' stardate and padding is not required,
+        # ignore the padding option.
         if self.show_classic:
-            stardate_issue, stardate_integer, stardate_fraction = \
-                stardate.get_stardate_classic( datetime.datetime.now( datetime.timezone.utc ) )
+            stardate_issue, stardate_integer, stardate_fraction = (
+                stardate.get_stardate_classic(
+                    datetime.datetime.now( datetime.timezone.utc ) ) )
 
             padding_required = \
                 stardate.requires_padding( stardate_issue, stardate_integer )
@@ -109,26 +116,32 @@ class IndicatorStardate( IndicatorBase ):
                     self.pad_integer = False
 
                 else:
+                    # Shown all possible 'classic' options, when padding is
+                    # required; now move on to '2009 revised'.
                     self.show_issue = True
                     self.pad_integer = True
-                    self.show_classic = False # Shown all possible 'classic' options (when padding is required)...now move on to '2009 revised'.
+                    self.show_classic = False
 
             else:
                 if self.show_issue:
                     self.show_issue = False
 
                 else:
+                    # Shown all possible 'classic' options, when padding is not
+                    # required; now move on to '2009 revised'.
                     self.show_issue = True
-                    self.show_classic = False # Shown all possible 'classic' options (when padding is not required)...now move on to '2009 revised'.
+                    self.show_classic = False
 
         else:
+            # Have shown the '2009 revised' version, now move on to 'classic'.
             self.show_issue = True
             self.pad_integer = True
-            self.show_classic = True # Have shown the '2009 revised' version, now move on to 'classic'.
+            self.show_classic = True
 
         self.request_update( delay = 0 )
 
-        # Defer the save; avoids multiple saves when scrolling the mouse wheel like crazy!
+        # Defer the save; avoids multiple saves when scrolling the mouse wheel
+        # like crazy!
         self.request_save_config( delay = 10 )
 
 
@@ -160,7 +173,10 @@ class IndicatorStardate( IndicatorBase ):
         pad_integer_checkbutton = \
             self.create_checkbutton(
                 _( "Pad INTEGER" ),
-                tooltip_text = _( "Pad the INTEGER part of the stardate 'classic' with leading zeros." ),
+                tooltip_text = _(
+                    "Pad the INTEGER part of the stardate 'classic' "
+                    +
+                    "with leading zeros." ),
                 sensitive = show_classic_checkbutton.get_active(),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.pad_integer )

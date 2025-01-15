@@ -173,9 +173,8 @@ class IndicatorBase( ABC ):
 
             else:
                 # Running in development.
-#TODO Make shorter
-                locale_directory = \
-                    Path( __file__ ).parent.parent.parent.parent / INDICATOR_NAME / "src" / INDICATOR_NAME / "locale"
+                locale_directory = (
+                    Path( __file__ ).parent.parent.parent.parent / INDICATOR_NAME / "src" / INDICATOR_NAME / "locale" )
 
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
@@ -206,8 +205,8 @@ class IndicatorBase( ABC ):
 
         self.indicator_name = IndicatorBase.INDICATOR_NAME
 
-        project_metadata, error_message = \
-            IndicatorBase.get_project_metadata( self.indicator_name )
+        project_metadata, error_message = (
+            IndicatorBase.get_project_metadata( self.indicator_name ) )
 
         if error_message:
             self.show_dialog_ok(
@@ -238,9 +237,8 @@ class IndicatorBase( ABC ):
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
 
-#TODO Make shorter
-        self.website = \
-            project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
+        self.website = (
+            project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip() )
 
         self.log = Path.home() / ( self.indicator_name + ".log" )
         logging.basicConfig(
@@ -259,11 +257,11 @@ class IndicatorBase( ABC ):
 
         Notify.init( self.indicator_name )
 
-        self.indicator = \
+        self.indicator = (
             AppIndicator.Indicator.new(
                 self.indicator_name, # ID
                 self.get_icon_name(), # Icon name
-                AppIndicator.IndicatorCategory.APPLICATION_STATUS )
+                AppIndicator.IndicatorCategory.APPLICATION_STATUS ) )
 
         self.indicator.set_status( AppIndicator.IndicatorStatus.ACTIVE )
 
@@ -360,22 +358,22 @@ class IndicatorBase( ABC ):
         except metadata.PackageNotFoundError:
             # No pip information found; assume running in development;
             # look for a .whl file in the release folder.
-            wheel_in_release, error_message = \
-                IndicatorBase._get_wheel_in_release( indicator_name )
+            wheel_in_release, error_message = (
+                IndicatorBase._get_wheel_in_release( indicator_name ) )
 
             if wheel_in_release is None:
                 project_metadata = None
 
             else:
-                first_metadata = \
+                first_metadata = (
                     next(
                         metadata.distributions(
-                            path = [ wheel_in_release ] ), None )
+                            path = [ wheel_in_release ] ), None ) )
 
                 if first_metadata is None:
                     project_metadata = None
-#TODO Make shorter
-                    error_message = f"No metadata was found in { wheel_in_release.absolute() }!"
+                    error_message = (
+                        f"No metadata was found in { wheel_in_release.absolute() }!" )
 
                 else:
                     project_metadata = first_metadata.metadata
@@ -389,8 +387,8 @@ class IndicatorBase( ABC ):
 
         desktop_file = self.indicator_name + ".py.desktop"
         self.desktop_file_user_home = autostart_path / desktop_file
-        desktop_file_virtual_environment = \
-            Path( __file__ ).parent / "platform" / "linux" / desktop_file
+        desktop_file_virtual_environment = (
+            Path( __file__ ).parent / "platform" / "linux" / desktop_file )
 
         error_message = None
         if self.desktop_file_user_home.is_file():
@@ -398,9 +396,9 @@ class IndicatorBase( ABC ):
                 desktop_file_virtual_environment )
 
         else:
-            error_message = \
+            error_message = (
                 self._copy_dot_desktop_file_to_home_config_autostart(
-                    desktop_file_virtual_environment, desktop_file )
+                    desktop_file_virtual_environment, desktop_file ) )
 
         return error_message
 
@@ -457,30 +455,24 @@ class IndicatorBase( ABC ):
                 desktop_file_original = desktop_file_virtual_environment
 
             else:
-#TODO Make shorter
-                desktop_file_original = \
-                    Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop"
+                desktop_file_original = (
+                    Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop" )
 
             with open( desktop_file_original, 'r', encoding = "utf-8" ) as f:
                 for line in f:
-#TODO Make shorter
                     if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ) and not autostart_enabled_present:
                         output += line
                         made_a_change = True
 
-#TODO Make shorter
                     elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) and not exec_with_sleep_present:
                         if delay:
-#TODO Make shorter
                             output += line.replace( "{indicator_name}", self.indicator_name ).replace( '0', delay )
 
                         else:
-#TODO Make shorter
                             output += line.replace( "{indicator_name}", self.indicator_name )
 
                         made_a_change = True
 
-#TODO Make shorter
                     elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL ) and not terminal_present:
                         output += line
                         made_a_change = True
@@ -508,27 +500,27 @@ class IndicatorBase( ABC ):
             error_message = None
 
         else:
-            wheel_in_release, error_message = \
-                IndicatorBase._get_wheel_in_release( self.indicator_name )
+            wheel_in_release, error_message = (
+                IndicatorBase._get_wheel_in_release( self.indicator_name ) )
 
             if wheel_in_release:
                 with ZipFile( wheel_in_release, 'r' ) as z:
-                    desktop_file_in_wheel = \
-                        self.indicator_name + \
-                        "/platform/linux/" + \
-                        desktop_file
+                    desktop_file_in_wheel = (
+                        self.indicator_name +
+                        "/platform/linux/" +
+                        desktop_file )
 
                     if desktop_file_in_wheel in z.namelist():
-                        desktop_file_in_tmp = \
-                            z.extract( desktop_file_in_wheel, path = "/tmp" )
+                        desktop_file_in_tmp = (
+                            z.extract( desktop_file_in_wheel, path = "/tmp" ) )
 
                         shutil.copy(
                             desktop_file_in_tmp,
                             self.desktop_file_user_home )
 
                     else:
-                        error_message = \
-                            f"Unable to locate { desktop_file_in_wheel } in { wheel_in_release.absolute() }."
+                        error_message = (
+                            f"Unable to locate { desktop_file_in_wheel } in { wheel_in_release.absolute() }." )
 
                 z.close()
 
@@ -541,10 +533,10 @@ class IndicatorBase( ABC ):
         Extract the authors (and emails) from the project metadata.
         https://stackoverflow.com/a/75803208/2156453
         '''
-        email_message_object = \
+        email_message_object = (
             email.message_from_string(
                 f'To: { project_metadata[ "Author-email" ] }',
-                policy = email.policy.default, )
+                policy = email.policy.default, ) )
 
         authors_emails = [ ]
         for address in email_message_object[ "to" ].addresses:
@@ -568,8 +560,8 @@ class IndicatorBase( ABC ):
             for line in lines:
                 if line.startswith( "## v" ):
                     left_parenthesis = line.find( '(' )
-                    year = \
-                        line[ left_parenthesis + 1 : left_parenthesis + 1 + 4 ]
+                    year = (
+                        line[ left_parenthesis + 1 : left_parenthesis + 1 + 4 ] )
 
                     break
 
@@ -654,19 +646,18 @@ class IndicatorBase( ABC ):
             menu.prepend( Gtk.SeparatorMenuItem() )
 
             if next_update_in_seconds:
-#TODO Make shorter
-                next_update_date_time = \
-                    datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds )
+                next_update_date_time = (
+                    datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds ) )
 
-                label = \
-                    "Next update: " + \
-                    str( next_update_date_time ).split( '.', maxsplit = 1 )[ 0 ]
+                label = (
+                    "Next update: " +
+                    str( next_update_date_time ).split( '.', maxsplit = 1 )[ 0 ] )
 
                 menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
-            label = \
-                "Time to update: " + \
-                str( datetime.datetime.now() - update_start )
+            label = (
+                "Time to update: " +
+                str( datetime.datetime.now() - update_start ) )
 
             menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
@@ -707,8 +698,8 @@ class IndicatorBase( ABC ):
         tooltip contains the indicator source filename and so would return a
         False value.
         '''
-        label_or_tooltip_update_supported = \
-            self._is_label_or_tooltip_update_supported()
+        label_or_tooltip_update_supported = (
+            self._is_label_or_tooltip_update_supported() )
 
         if label_or_tooltip_update_supported:
             self.indicator.set_label( text, text )
@@ -853,10 +844,17 @@ class IndicatorBase( ABC ):
 #TODO Make shorter
         authors = [ author_and_email[ 0 ] for author_and_email in self.authors_and_emails ]
         about_dialog.set_copyright(
-            "Copyright \xa9 " +
-#TODO Make shorter
-            IndicatorBase.get_year_in_changelog_markdown( changelog_markdown_path ) +
-            '-' + str( datetime.datetime.now().year ) + " " +
+            "Copyright \xa9 "
+            +
+            IndicatorBase.get_year_in_changelog_markdown(
+                changelog_markdown_path )
+            +
+            '-'
+            +
+            str( datetime.datetime.now().year )
+            +
+            " "
+            +
             ' '.join( authors ) )
 
         about_dialog.set_license_type( Gtk.License.GPL_3_0 )
@@ -902,17 +900,16 @@ class IndicatorBase( ABC ):
         right_text ):
 
         tooltip = "file://" + str( file_path )
-#TODO Make shorter
-        markup = \
-            left_text + \
-            " <a href=\'" + "file://" + str( file_path ) + "\' title=\'" + tooltip + "\'>" + \
-            anchor_text + "</a> " + \
-            right_text
+        markup = (
+            left_text
+            +
+            " <a href=\'" + "file://" + str( file_path ) + "\' title=\'" + tooltip + "\'>" +
+            anchor_text + "</a> " +
+            right_text )
 
         label = Gtk.Label()
         label.set_markup( markup )
         label.show()
-#TODO Make shorter
         about_dialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
 
 
@@ -1055,8 +1052,8 @@ class IndicatorBase( ABC ):
                 text_in_clipboard = self.process_get( "wl-paste" )
 
             else:
-                text_in_clipboard = \
-                    Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text()
+                text_in_clipboard = (
+                    Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text() )
 
         return text_in_clipboard
 
@@ -1126,11 +1123,11 @@ class IndicatorBase( ABC ):
             Gtk.STOCK_OK, Gtk.ResponseType.OK ),
         default_size = None ):
 
-        dialog = \
+        dialog = (
             Gtk.Dialog(
                 title,
                 self._get_parent( parent_widget ),
-                Gtk.DialogFlags.MODAL )
+                Gtk.DialogFlags.MODAL ) )
 
         dialog.add_buttons( *buttons_responsetypes )
 
@@ -1152,13 +1149,13 @@ class IndicatorBase( ABC ):
         message,
         title = None ):
 
-        return \
+        return (
             self._show_dialog(
                 parent_widget,
                 message,
                 Gtk.MessageType.QUESTION,
                 Gtk.ButtonsType.OK_CANCEL,
-                title = title )
+                title = title ) )
 
 
     def show_dialog_ok(
@@ -1168,13 +1165,13 @@ class IndicatorBase( ABC ):
         title = None,
         message_type = Gtk.MessageType.ERROR ):
 
-        return \
+        return (
             self._show_dialog(
                 parent_widget,
                 message,
                 message_type,
                 Gtk.ButtonsType.OK,
-                title = title )
+                title = title ) )
 
 
     def _show_dialog(
@@ -1185,13 +1182,13 @@ class IndicatorBase( ABC ):
         buttons_type,
         title = None ):
 
-        dialog = \
+        dialog = (
             Gtk.MessageDialog(
                 self._get_parent( parent_widget ),
                 Gtk.DialogFlags.MODAL,
                 message_type,
                 buttons_type,
-                message )
+                message ) )
 
         dialog.set_title( self.indicator_name if title is None else title )
 
@@ -1206,10 +1203,10 @@ class IndicatorBase( ABC ):
 
 
     def _get_parent( self, widget ):
-#TODO Make shorter
-        parent = widget # Sometimes the widget is a Dialog/Window so don't get the parent.
+        parent = widget
         while parent is not None:
             if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
+                # Stop when the widget is a Dialog/Window.
                 break
 
             parent = parent.get_parent()
@@ -1230,19 +1227,19 @@ class IndicatorBase( ABC ):
                 if line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) and "sleep" in line:
                     delay = int( line.split( "sleep" )[ 1 ].split( "&&" )[ 0 ].strip() )
 
-        autostart_checkbox = \
+        autostart_checkbox = (
             self.create_checkbutton(
                 _( "Autostart" ),
                 tooltip_text = _( "Run the indicator automatically." ),
-                active = autostart )
+                active = autostart ) )
 
-        autostart_spinner = \
+        autostart_spinner = (
             self.create_spinbutton(
                 delay,
                 0,
                 1000,
                 tooltip_text = _( "Start up delay (seconds)." ),
-                sensitive = autostart_checkbox.get_active() )
+                sensitive = autostart_checkbox.get_active() ) )
 
         autostart_checkbox.connect(
             "toggled",
@@ -1250,46 +1247,45 @@ class IndicatorBase( ABC ):
             True,
             autostart_spinner )
 
-        box_autostart = \
+        box_autostart = (
             self.create_box(
                 (
                     ( autostart_checkbox, False ),
                     ( autostart_spinner, False ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP )
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP ) )
 
-        latest_version_checkbox = \
+        latest_version_checkbox = (
             self.create_checkbutton(
                 _( "Check Latest Version" ),
                 tooltip_text =
                     _( "Check for the latest version of the indicator on start up." ),
-                active = self.check_latest_version )
+                active = self.check_latest_version ) )
 
-        box_latest_version = \
+        box_latest_version = (
             self.create_box(
                 ( ( latest_version_checkbox, False ), ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP )
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP ) )
 
         if self.new_version_available and self.check_latest_version:
             url = f"https://pypi.org/project/{ self.indicator_name }"
             label = Gtk.Label.new()
-#TODO Make shorter
             label.set_markup( _(
                 "An update is available at <a href=\"{0}\">{1}</a>." ).format( url, url ) )
 
-            box_new_version = \
+            box_new_version = (
                 self.create_box(
                     ( ( label, False ), ),
-                    orientation = Gtk.Orientation.VERTICAL )
+                    orientation = Gtk.Orientation.VERTICAL ) )
 
-            boxes = \
+            boxes = (
                 ( ( box_autostart, False ),
                   ( box_latest_version, False ),
-                  ( box_new_version, False ) )
+                  ( box_new_version, False ) ) )
 
         else:
-            boxes = \
+            boxes = (
                 ( ( box_autostart, False ),
-                  ( box_latest_version, False ) )
+                  ( box_latest_version, False ) ) )
 
         box = self.create_box( boxes, orientation = Gtk.Orientation.VERTICAL )
 
@@ -1337,14 +1333,14 @@ class IndicatorBase( ABC ):
         indent = ( 0, 0 ), # First element: indent level when adding to a non-detachable menu; Second element: equivalent for a detachable menu.
         is_secondary_activate_target = False ):
 
-        menuitem = \
+        menuitem = (
             self.create_and_append_menuitem(
                 menu,
                 label,
                 name = name,
                 activate_functionandarguments = activate_functionandarguments,
                 indent = indent,
-                is_secondary_activate_target = is_secondary_activate_target )
+                is_secondary_activate_target = is_secondary_activate_target ) )
 
         menu.reorder_child( menuitem, index )
         return menuitem
@@ -1363,8 +1359,8 @@ class IndicatorBase( ABC ):
         '''
 
         indent_amount = self._get_menu_indent_amount( indent )
-        menuitem = \
-            Gtk.RadioMenuItem.new_with_label( [ ], indent_amount + label )
+        menuitem = (
+            Gtk.RadioMenuItem.new_with_label( [ ], indent_amount + label ) )
 
         menuitem.set_active( True )
 
@@ -1391,8 +1387,8 @@ class IndicatorBase( ABC ):
         '''
 
         indent_amount = "      "
-        indent_small = \
-            self.get_current_desktop() == IndicatorBase._DESKTOP_KDE
+        indent_small = (
+            self.get_current_desktop() == IndicatorBase._DESKTOP_KDE )
 
         if indent_small:
             indent_amount = "   "
@@ -1426,11 +1422,11 @@ class IndicatorBase( ABC ):
         additional calls to get the start/end positions.
         '''
         textview_buffer = textview.get_buffer()
-        return \
+        return (
             textview_buffer.get_text(
                 textview_buffer.get_start_iter(),
                 textview_buffer.get_end_iter(),
-                True )
+                True ) )
 
 
     def on_radio_or_checkbox( self, radio_or_checkbox, sense, *widgets ):
@@ -1500,11 +1496,11 @@ class IndicatorBase( ABC ):
         buttons_and_expands = [ ]
         z = zip( labels, tooltip_texts, clicked_functionandarguments )
         for label, tooltip_text, clicked_functionandargument in z:
-            button = \
+            button = (
                 self.create_button(
                     label,
                     tooltip_text = tooltip_text,
-                    clicked_functionandarguments = clicked_functionandargument )
+                    clicked_functionandarguments = clicked_functionandargument ) )
 
             buttons_and_expands.append( [ button, True ] )
 
@@ -1668,9 +1664,9 @@ class IndicatorBase( ABC ):
         margin_left = 0,
         active = True ):
 
-        radiobutton = \
+        radiobutton = (
             Gtk.RadioButton.new_with_label_from_widget(
-                radio_group_member, label )
+                radio_group_member, label ) )
 
         self._set_widget_common_attributes(
             radiobutton,
@@ -1802,8 +1798,8 @@ class IndicatorBase( ABC ):
 
                 if alignment:
                     treeviewcolumn.set_alignment( alignment[ 0 ] )
-                    current_alignment = \
-                        renderer_attribute_columnmodelid[ 0 ].get_alignment()
+                    current_alignment = (
+                        renderer_attribute_columnmodelid[ 0 ].get_alignment() )
 
                     renderer_attribute_columnmodelid[ 0 ].set_alignment(
                         alignment[ 0 ],
@@ -1896,11 +1892,11 @@ class IndicatorBase( ABC ):
         filename,
         action = Gtk.FileChooserAction.OPEN ):
 
-        dialog = \
+        dialog = (
             Gtk.FileChooserDialog(
                 title = title,
                 parent = parent,
-                action = action )
+                action = action ) )
 
         dialog.add_buttons(
             Gtk.STOCK_CANCEL,
@@ -1969,11 +1965,11 @@ class IndicatorBase( ABC ):
                 screen_heights_in_pixels[ -1 ] ) # Best guess.
 
         else:
-            number_of_menuitems = \
+            number_of_menuitems = (
                 IndicatorBase.interpolate(
                     screen_heights_in_pixels,
                     numbers_of_menuitems,
-                    screen_height_in_pixels )
+                    screen_height_in_pixels ) )
 
         return number_of_menuitems
 
@@ -2025,10 +2021,12 @@ class IndicatorBase( ABC ):
         label/tooltip.
         '''
         desktop_environment = self.get_current_desktop()
-        label_or_tooltip_update_unsupported = \
-            desktop_environment is None or \
-            desktop_environment == IndicatorBase._DESKTOP_ICEWM or \
-            desktop_environment == IndicatorBase._DESKTOP_LXQT
+        label_or_tooltip_update_unsupported = (
+            desktop_environment is None
+            or
+            desktop_environment == IndicatorBase._DESKTOP_ICEWM
+            or
+            desktop_environment == IndicatorBase._DESKTOP_LXQT )
 
         return not label_or_tooltip_update_unsupported
 
@@ -2036,9 +2034,10 @@ class IndicatorBase( ABC ):
     def _is_icon_update_supported( self ):
         ''' Lubuntu 20.04/22.04 does not support updating of icon once set. '''
         desktop_environment = self.get_current_desktop()
-        icon_update_unsupported = \
-            desktop_environment is None or \
-            desktop_environment == IndicatorBase._DESKTOP_LXQT
+        icon_update_unsupported = (
+            desktop_environment is None
+            or
+            desktop_environment == IndicatorBase._DESKTOP_LXQT )
 
         return not icon_update_unsupported
 
@@ -2053,8 +2052,8 @@ class IndicatorBase( ABC ):
         '''
         is_qterminal_and_broken_ = False
         if "qterminal" in terminal:
-            is_qterminal_and_broken_ = \
-                self.process_get( "qterminal --version" ) < "1.2.0"
+            is_qterminal_and_broken_ = (
+                self.process_get( "qterminal --version" ) < "1.2.0" )
 
         return is_qterminal_and_broken_
 
@@ -2102,9 +2101,8 @@ class IndicatorBase( ABC ):
 
     def _load_config( self ):
         ''' Read a dictionary of configuration from a JSON text file. '''
-#TODO Make shorter
-        config_file = \
-            self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
+        config_file = (
+            self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON ) )
 
         self._copy_config_to_new_directory( config_file )
 
@@ -2118,8 +2116,8 @@ class IndicatorBase( ABC ):
         if IndicatorBase._CONFIG_CHECK_LATEST_VERSION not in config:
             config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] = False
 
-        self.check_latest_version = \
-            config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ]
+        self.check_latest_version = (
+            config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] )
 
 
     def _copy_config_to_new_directory( self, config_file ):
@@ -2154,8 +2152,8 @@ class IndicatorBase( ABC ):
             if self.id_save_config > 0:
                 GLib.source_remove( self.id_save_config )
 
-            self.id_save_config = \
-                GLib.timeout_add_seconds( delay, self._save_config )
+            self.id_save_config = (
+                GLib.timeout_add_seconds( delay, self._save_config ) )
 
             self.lock_save_config.release()
 
@@ -2173,12 +2171,11 @@ class IndicatorBase( ABC ):
         ''' Write a dictionary of user configuration to a JSON text file. '''
         config = self.save_config() # Call to implementation in indicator.
         config[ IndicatorBase._CONFIG_VERSION ] = self.version
-        config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] = \
-            self.check_latest_version
+        config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] = (
+            self.check_latest_version )
 
-#TODO Make shorter
-        config_file = \
-            self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON )
+        config_file = (
+            self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON ) )
 
         with open( config_file, 'w', encoding = "utf-8" ) as f_out:
             f_out.write( json.dumps( config ) )
@@ -2232,10 +2229,10 @@ class IndicatorBase( ABC ):
 #TODO Make shorter
             date_time_component = the_file[ len( basename ) : len( basename ) + 14 ]
 
-            expiry = \
+            expiry = (
                 datetime.datetime.strptime(
                     date_time_component,
-                    IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+                    IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) )
 
             expiry = expiry.replace( tzinfo = datetime.timezone.utc )
 
@@ -2248,11 +2245,12 @@ class IndicatorBase( ABC ):
         Create a filename with timestamp and extension to be used to save data
         to the cache.
         '''
-#TODO Make shorter
-        filename = \
-            basename + \
-            datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
-            extension
+        filename = (
+            basename
+            +
+            datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            +
+            extension )
 
         return self.get_cache_directory() / filename
 
@@ -2307,22 +2305,25 @@ class IndicatorBase( ABC ):
         Any file extension is ignored in determining if the file should be
         deleted or not.
         '''
-#TODO Make shorter
-        cache_maximum_age_date_time = \
-            datetime.datetime.now() - datetime.timedelta( hours = maximum_age_in_hours )
+        cache_maximum_age_date_time = (
+            datetime.datetime.now()
+            -
+            datetime.timedelta( hours = maximum_age_in_hours ) )
 
         for file in self.get_cache_directory().iterdir():
             # Sometimes the base name is shared
             # ("icon-" versus "icon-fullmoon-")
             # so use the date/time to ensure the correct group of files.
             if file.name.startswith( basename ):
-#TODO Make shorter
-                date_time = file.name[ len( basename ) : len( basename ) + 14 ] # len( YYYYMMDDHHMMSS ) = 14.
+                # len( YYYYMMDDHHMMSS ) = 14.
+                date_time = (
+                    file.name[ len( basename ) : len( basename ) + 14 ] )
+
                 if date_time.isdigit():
-                    file_date_time = \
+                    file_date_time = (
                         datetime.datetime.strptime(
                             date_time,
-                            IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+                            IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) )
 
                     if file_date_time < cache_maximum_age_date_time:
                         file.unlink()
@@ -2382,11 +2383,12 @@ class IndicatorBase( ABC ):
 
         Returns filename written on success; None otherwise.
         '''
-#TODO Make shorter
-        filename = \
-            basename + \
-            datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
-            extension
+        filename = (
+            basename
+            +
+            datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            +
+            extension )
 
         cache_file = self.get_cache_directory() / filename
         with open( cache_file, 'wb' ) as f_out:
@@ -2479,13 +2481,13 @@ class IndicatorBase( ABC ):
 
         Returns filename written on success; None otherwise.
         '''
-#TODO Make shorter
-        filename = \
-            basename + \
-            datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) + \
-            extension
+        filename = (
+            basename
+            +
+            datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            +
+            extension )
 
-#TODO Make shorter
         return self._write_cache_text( text, self.get_cache_directory() / filename )
 
 
@@ -2553,13 +2555,13 @@ class IndicatorBase( ABC ):
         On failure/exception, logs to file and returns "".
         '''
         try:
-            result = \
+            result = (
                 subprocess.run(
                     command,
                     stdout = subprocess.PIPE,
                     stderr = subprocess.PIPE,
                     shell = True,
-                    check = log_non_zero_error_code )
+                    check = log_non_zero_error_code ) )
 
             stderr_ = result.stderr.decode()
             if stderr_:

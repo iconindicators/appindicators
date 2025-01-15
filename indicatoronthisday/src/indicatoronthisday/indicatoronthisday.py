@@ -20,7 +20,8 @@
 #TODO Got this on Debian 12 running in terminal:
 #
 #Jan 11*    National Children's Day (วันเด็กแห่งชาติ) in Thailand
-
+#
+# Need to view on Debian 12 to show bad chars as under Ubuntu 20.04 all looks well!
 
 '''
 Application indicator which displays calendar events.
@@ -31,18 +32,18 @@ Neither openSUSE nor Manjaro have the 'calendar' package.  Possible options...
    this indicator is unsupported.
 
 2. From the post
-      https://forums.opensuse.org/t/debian-calendar-equivalent-in-opensuse/171251
+     https://forums.opensuse.org/t/debian-calendar-equivalent-in-opensuse/171251
    the recommendation is obtain the source code
-      https://github.com/openbsd/src/tree/master/usr.bin/calendar
-      https://salsa.debian.org/meskes/bsdmainutils/-/tree/master/usr.bin/calendar
+     https://github.com/openbsd/src/tree/master/usr.bin/calendar
+     https://salsa.debian.org/meskes/bsdmainutils/-/tree/master/usr.bin/calendar
    and include the source code/calendars as part of the pip installation,
    then run make as part of the copy files set of instructions.
 
 3. Have found
-      https://pypi.org/project/bsd-calendar/
+     https://pypi.org/project/bsd-calendar/
    based on the original calendar program, but modifies date formats.
-   This code could be used to create a standalone Python calendar module, say
-   ultimately releasing to PyPI.
+   This code could be used to create a standalone Python calendar module,
+   say ultimately releasing to PyPI.
    Alternatively, incorporate some version of this implementation into the
    indicator, along with calendar files.
 '''
@@ -94,7 +95,10 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
+            comments = _(
+                "Calls the 'calendar' program and displays events "
+                +
+                "in the menu." ) )
 
 
     def update( self, menu ):
@@ -107,6 +111,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             today + timedelta( days = 1 ) ).replace(
                 hour = 0, minute = 0, second = 5 )
 
+#TODO Remove \
         five_seconds_after_midnight = \
             int( ( just_after_midnight - today ).total_seconds() )
 
@@ -218,7 +223,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         events_grouped_by_date = [ ]
         if content:
-            events_grouped_by_date = self.__get_events( content )
+            events_grouped_by_date = self._get_events( content )
 
         elif at_least_one_calendar_is_enabled:
             self.show_notification(
@@ -233,7 +238,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         return events_grouped_by_date
 
 
-    def __get_events( self, content ):
+    def _get_events( self, content ):
         self.write_cache_text_without_timestamp(
             content, IndicatorOnThisDay.CALENDARS_FILENAME )
 
@@ -252,9 +257,12 @@ class IndicatorOnThisDay( IndicatorBase ):
             if line.startswith( '\t' ): # Continuation of the previous event.
                 date_ = events_sorted_by_date[ -1 ].get_date()
 
-#TODO Make shorter
-                description = \
-                    events_sorted_by_date[ -1 ].get_description() + " " + line.strip()
+                description = (
+                    events_sorted_by_date[ -1 ].get_description()
+                    +
+                    " "
+                    +
+                    line.strip() )
 
                 del events_sorted_by_date[ -1 ]
                 events_sorted_by_date.append( Event( date_, description ) )
@@ -458,8 +466,8 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         grid.attach( notify_checkbutton, 0, 5, 1, 1 )
 
-        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
-            self.create_preferences_common_widgets()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = (
+            self.create_preferences_common_widgets() )
 
         grid.attach( box, 0, 6, 1, 1 )
 
@@ -563,7 +571,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def on_calendar_add( self, button, treeview ):
-        self.__on_calendar_double_click( treeview, None, None )
+        self._on_calendar_double_click( treeview, None, None )
 
 
     def on_calendar_double_click(
@@ -577,11 +585,11 @@ class IndicatorOnThisDay( IndicatorBase ):
                 _( "This is a system calendar and cannot be modified." ) )
 
         else:
-            self.__on_calendar_double_click(
+            self._on_calendar_double_click(
                 treeview, row_number, treeviewcolumn )
 
 
-    def __on_calendar_double_click(
+    def _on_calendar_double_click(
             self, treeview, row_number, treeviewcolumn ):
 
         model, treeiter = treeview.get_selection().get_selected()
@@ -640,7 +648,9 @@ class IndicatorOnThisDay( IndicatorBase ):
                 if IndicatorOnThisDay.SYSTEM_CALENDAR in path:
                     self.show_dialog_ok(
                         dialog,
-                        _( "This calendar is part of your system and is already included." ) )
+                        _( "This calendar is part of your system and is "
+                           +
+                           "already included." ) )
 
                     continue
 

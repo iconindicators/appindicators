@@ -60,6 +60,7 @@ def create_ephemeris_planets( in_bsp, out_bsp, years ):
     end_date = today.replace( year = today.year + years )
     date_format = "%Y/%m/%d"
 
+#TODO Remove \
     command = \
         "python3 -m jplephem excerpt " + \
         start_date.strftime( date_format ) + " " + \

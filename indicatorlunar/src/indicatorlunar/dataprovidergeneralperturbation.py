@@ -91,7 +91,10 @@ class GP():
         self.number = xml_fields_from_omm[ "NORAD_CAT_ID" ]
         if float( xml_fields_from_omm[ "NORAD_CAT_ID" ] ) > float( "339999" ):
             xml_fields_from_omm[ "NORAD_CAT_ID" ] = '0'
-            omm.initialize( self.satellite_record, xml_fields_from_omm ) # The satellite record now has a satnum = 0.
+
+            # The satellite record now has a satnum = 0.
+            omm.initialize( self.satellite_record, xml_fields_from_omm )
+
             xml_fields_from_omm[ "NORAD_CAT_ID" ] = self.number
 
         else:
@@ -132,16 +135,20 @@ class GP():
         if self.tle_line_one is None:
             if float( self.get_number() ) > float( "339999" ):
                 # The satnum was set to '0' in the init, so safe to do an export.
-                self.tle_line_one, self.tle_line_two = exporter.export_tle( self.satellite_record )
+                self.tle_line_one, self.tle_line_two = (
+                    exporter.export_tle( self.satellite_record ) )
 
             elif len( self.get_number() ) > 5:
                 # https://github.com/brandon-rhodes/python-sgp4/issues/97#issuecomment-1525482029
                 self.satellite_record.satnum_str = "00000"
-                self.tle_line_one, self.tle_line_two = exporter.export_tle( self.satellite_record )
-                self.satellite_record.satnum_str = alpha5.to_alpha5( int( self.get_number() ) )
+                self.tle_line_one, self.tle_line_two = (
+                    exporter.export_tle( self.satellite_record ) )
+                self.satellite_record.satnum_str = (
+                    alpha5.to_alpha5( int( self.get_number() ) ) )
 
             else:
-                self.tle_line_one, self.tle_line_two = exporter.export_tle( self.satellite_record )
+                self.tle_line_one, self.tle_line_two = (
+                    exporter.export_tle( self.satellite_record ) )
 
         return self.tle_line_one, self.tle_line_two
 

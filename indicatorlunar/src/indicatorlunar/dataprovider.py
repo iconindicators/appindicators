@@ -26,7 +26,9 @@ from abc import ABC, abstractmethod
 
 
 class DataProvider( ABC ):
-    ''' Base class for downloading and persisting data for astronomical objects. '''
+    '''
+    Base class for downloading and persisting data for astronomical objects.
+    '''
 
     @staticmethod
     @abstractmethod

@@ -139,21 +139,21 @@ class IndicatorFortune( IndicatorBase ):
 
         self.set_menu_sensitivity( False )
 
-        textview = \
+        textview = (
             self.create_textview(
                 text =
                     self.read_cache_text_without_timestamp(
                         IndicatorFortune.HISTORY_FILE ),
-                editable = False )
+                editable = False ) )
 
         textview.connect( "size-allocate", textview_changed )
 
-        box = \
+        box = (
             self.create_box(
                 ( ( self.create_scrolledwindow( textview ), True ), ),
-                spacing = 0 )
+                spacing = 0 ) )
 
-        dialog = \
+        dialog = (
             self.create_dialog(
                 None,
                 _( "Fortune History for Session" ),
@@ -163,7 +163,7 @@ class IndicatorFortune( IndicatorBase ):
                 default_size =
                     (
                         IndicatorBase.DIALOG_DEFAULT_WIDTH,
-                        IndicatorBase.DIALOG_DEFAULT_HEIGHT ) )
+                        IndicatorBase.DIALOG_DEFAULT_HEIGHT ) ) )
 
         dialog.show_all()
         dialog.run()
@@ -194,16 +194,17 @@ class IndicatorFortune( IndicatorBase ):
                 command = "fortune" + ''.join( locations )
                 self.fortune = self.process_get( command )
                 if not self.fortune: # No fortune data found.
-                    self.fortune = \
-                        IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
-                        _( "Ensure enabled fortunes contain fortune data!" )
+                    self.fortune = (
+                        IndicatorFortune.NOTIFICATION_WARNING_FLAG
+                        +
+                        _( "Ensure enabled fortunes contain fortune data!" ) )
 
                     break
 
                 if len( self.fortune ) <= self.skip_fortune_character_count:
-                    history = \
+                    history = (
                         self.read_cache_text_without_timestamp(
-                            IndicatorFortune.HISTORY_FILE )
+                            IndicatorFortune.HISTORY_FILE ) )
 
                     # Remove characters/glyphs which appear as hexadecimal.
                     # Refer to:
@@ -229,14 +230,16 @@ class IndicatorFortune( IndicatorBase ):
                     break
 
         elif at_least_one_fortune_is_enabled:
-            self.fortune = \
-                IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
-                _( "No enabled fortunes have a valid location!" )
+            self.fortune = (
+                IndicatorFortune.NOTIFICATION_WARNING_FLAG
+                +
+                _( "No enabled fortunes have a valid location!" ) )
 
         else:
-            self.fortune = \
-                IndicatorFortune.NOTIFICATION_WARNING_FLAG + \
-                _( "No enabled fortunes!" )
+            self.fortune = (
+                IndicatorFortune.NOTIFICATION_WARNING_FLAG
+                +
+                _( "No enabled fortunes!" ) )
 
 
     def show_fortune( self ):
@@ -279,7 +282,7 @@ class IndicatorFortune( IndicatorBase ):
             store,
             IndicatorFortune.COLUMN_ENABLED )
 
-        treeview, scrolledwindow = \
+        treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 store,
                 (
@@ -311,11 +314,11 @@ class IndicatorFortune( IndicatorBase ):
                     "packages available in your\n" +
                     "native language." ),
                 rowactivatedfunctionandarguments =
-                    ( self.on_fortune_double_click, dialog ) )
+                    ( self.on_fortune_double_click, dialog ) ) )
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
-        box, add, remove = \
+        box, add, remove = (
             self.create_buttons_in_box(
                 (
                     _( "Add" ),
@@ -325,7 +328,7 @@ class IndicatorFortune( IndicatorBase ):
                     _( "Remove the selected fortune location." ) ),
                 (
                     ( self.on_fortune_add, treeview ),
-                    ( self.on_fortune_remove, treeview ) ) )
+                    ( self.on_fortune_remove, treeview ) ) ) )
 
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -334,12 +337,12 @@ class IndicatorFortune( IndicatorBase ):
         # General.
         grid = self.create_grid()
 
-        spinner_refresh_interval = \
+        spinner_refresh_interval = (
             self.create_spinbutton(
                 self.refresh_interval_in_minutes,
                 1,
                 60 * 24,
-                tooltip_text = _( "How often a fortune is displayed." ) )
+                tooltip_text = _( "How often a fortune is displayed." ) ) )
 
         grid.attach(
             self.create_box(
@@ -348,10 +351,10 @@ class IndicatorFortune( IndicatorBase ):
                     ( spinner_refresh_interval, False ) ) ),
             0, 0, 1, 1 )
 
-        notification_summary = \
+        notification_summary = (
             self.create_entry(
                 self.notification_summary,
-                tooltip_text = _( "The summary text for the notification." ) )
+                tooltip_text = _( "The summary text for the notification." ) ) )
 
         grid.attach(
             self.create_box(
@@ -361,7 +364,7 @@ class IndicatorFortune( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 1, 1, 1 )
 
-        spinner_character_count = \
+        spinner_character_count = (
             self.create_spinbutton(
                 self.skip_fortune_character_count,
                 1,
@@ -372,7 +375,7 @@ class IndicatorFortune( IndicatorBase ):
                     "Do not set too low (below 50) as\n" +
                     "many fortunes may be dropped,\n" +
                     "resulting in excessive calls to the\n" +
-                    "'fortune' program." ) )
+                    "'fortune' program." ) ) )
 
         grid.attach(
             self.create_box(
@@ -388,15 +391,15 @@ class IndicatorFortune( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 3, 1, 1 )
 
-        radio_middle_mouse_click_new_fortune = \
+        radio_middle_mouse_click_new_fortune = (
             self.create_radiobutton(
                 None,
                 _( "Show a new fortune" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = \
+                active = (
                     self.middle_mouse_click_on_icon
                     ==
-                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
+                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) ) )
 
         grid.attach( radio_middle_mouse_click_new_fortune, 0, 4, 1, 1 )
 
@@ -404,33 +407,33 @@ class IndicatorFortune( IndicatorBase ):
         if not self.is_clipboard_supported():
             tooltip_text += _( "Unsupported on Ubuntun 20.04 on Wayland." )
 
-        radio_middle_mouse_click_copy_last_fortune = \
+        radio_middle_mouse_click_copy_last_fortune = (
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,
                 _( "Copy current fortune to clipboard" ),
                 tooltip_text = tooltip_text,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = \
+                active =
                     self.middle_mouse_click_on_icon
                     ==
-                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
+                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
 
         grid.attach( radio_middle_mouse_click_copy_last_fortune, 0, 5, 1, 1 )
 
-        radio_middle_mouse_click_show_last_fortune = \
+        radio_middle_mouse_click_show_last_fortune = (
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,
                 _( "Show current fortune" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = \
+                active =
                     self.middle_mouse_click_on_icon
                     ==
-                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
+                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
 
         grid.attach( radio_middle_mouse_click_show_last_fortune, 0, 6, 1, 1 )
 
-        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
-            self.create_preferences_common_widgets()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = (
+            self.create_preferences_common_widgets() )
 
         grid.attach( box, 0, 7, 1, 1 )
 
@@ -442,22 +445,22 @@ class IndicatorFortune( IndicatorBase ):
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
             if radio_middle_mouse_click_new_fortune.get_active():
-                self.middle_mouse_click_on_icon = \
-                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW
+                self.middle_mouse_click_on_icon = (
+                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
 
             elif radio_middle_mouse_click_copy_last_fortune.get_active():
-                self.middle_mouse_click_on_icon = \
-                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST
+                self.middle_mouse_click_on_icon = (
+                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
 
             else:
-                self.middle_mouse_click_on_icon = \
-                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST
+                self.middle_mouse_click_on_icon = (
+                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
 
-            self.refresh_interval_in_minutes = \
-                spinner_refresh_interval.get_value_as_int()
+            self.refresh_interval_in_minutes = (
+                spinner_refresh_interval.get_value_as_int() )
 
-            self.skip_fortune_character_count = \
-                spinner_character_count.get_value_as_int()
+            self.skip_fortune_character_count = (
+                spinner_character_count.get_value_as_int() )
 
             self.notification_summary = notification_summary.get_text()
 
@@ -493,8 +496,8 @@ class IndicatorFortune( IndicatorBase ):
         if isinstance( store, Gtk.TreeModelSort ):
             store_ = store.get_model()
 
-        store_[ row ][ checkbox_column_model_id ] = \
-            not store_[ row ][ checkbox_column_model_id ]
+        store_[ row ][ checkbox_column_model_id ] = (
+            not store_[ row ][ checkbox_column_model_id ] )
 
 
     def on_fortune_remove( self, button, treeview ):
@@ -509,8 +512,8 @@ class IndicatorFortune( IndicatorBase ):
 #...or perhaps not.  What is selected is the sorted model which is displayed...
 # which is correct.
 # But to update the underlying data, need the underlying model and then do a convert of treeiter.
-            selected_fortune = \
-                model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ]
+            selected_fortune = (
+                model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] )
 
             if selected_fortune == self.get_system_fortune():
                 self.show_dialog_ok(
@@ -518,10 +521,10 @@ class IndicatorFortune( IndicatorBase ):
                     _( "This is the system fortune and cannot be removed." ) )
 
             else:
-                response = \
+                response = (
                     self.show_dialog_ok_cancel(
                         treeview,
-                        _( "Remove the selected fortune?" ) )
+                        _( "Remove the selected fortune?" ) ) )
 
                 if response == Gtk.ResponseType.OK:
                     model.get_model().remove(
@@ -529,7 +532,7 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def on_fortune_add( self, button, treeview ):
-        self.__on_fortune_double_click( treeview, None, None )
+        self._on_fortune_double_click( treeview, None, None )
 
 
     def on_fortune_double_click(
@@ -543,11 +546,11 @@ class IndicatorFortune( IndicatorBase ):
                 _( "This is the system fortune and cannot be modified." ) )
 
         else:
-            self.__on_fortune_double_click(
+            self._on_fortune_double_click(
                 treeview, row_number, treeviewcolumn )
 
 
-    def __on_fortune_double_click( self, treeview, row_number, treeviewcolumn ):
+    def _on_fortune_double_click( self, treeview, row_number, treeviewcolumn ):
         model, treeiter = treeview.get_selection().get_selected()
         adding_fortune = row_number is None
 
@@ -561,7 +564,7 @@ class IndicatorFortune( IndicatorBase ):
 
         dialog = self.create_dialog( treeview, title, content_widget = grid )
 
-        fortune_file_directory = \
+        fortune_file_directory = (
             self.create_entry(
                 ''
                 if adding_fortune
@@ -574,7 +577,7 @@ class IndicatorFortune( IndicatorBase ):
                     "Ensure the corresponding\n" +
                     "fortune text file(s) is present." ),
                 editable = False,
-                make_longer = True )
+                make_longer = True ) )
 
         grid.attach(
             self.create_box(
@@ -583,7 +586,7 @@ class IndicatorFortune( IndicatorBase ):
                     ( fortune_file_directory, True ) ) ),
             0, 0, 1, 1 )
 
-        browse_file_button = \
+        browse_file_button = (
             self.create_button(
                 _( "File" ),
                 tooltip_text = _(
@@ -594,9 +597,9 @@ class IndicatorFortune( IndicatorBase ):
                     self.on_browse_fortune,
                     dialog,
                     fortune_file_directory,
-                    True ) )
+                    True ) ) )
 
-        browse_directory_button = \
+        browse_directory_button = (
             self.create_button(
                 _( "Directory" ),
                 tooltip_text = _(
@@ -608,7 +611,7 @@ class IndicatorFortune( IndicatorBase ):
                     self.on_browse_fortune,
                     dialog,
                     fortune_file_directory,
-                    False ) )
+                    False ) ) )
 
         grid.attach(
             self.create_box(
@@ -663,12 +666,12 @@ class IndicatorFortune( IndicatorBase ):
             title = _( "Choose a directory containing a fortune .dat file(s)" )
             action = Gtk.FileChooserAction.SELECT_FOLDER
 
-        dialog = \
+        dialog = (
             self.create_filechooser_dialog(
                 title,
                 add_edit_dialog,
                 fortune_file_directory.get_text(),
-                action = action )
+                action = action ) )
 
         response = dialog.run()
         if response == Gtk.ResponseType.OK:
@@ -700,41 +703,41 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.fortunes = \
+        self.fortunes = (
             config.get(
                 IndicatorFortune.CONFIG_FORTUNES,
                 [ self.get_system_fortune(), True ]
                 if self.get_system_fortune()
                 else
-                [ ] )
+                [ ] ) )
 
         # self.fortunes.append( [ "/home/bernard/Downloads", True ] ) #TODO Testing
         # self.fortunes.append( [ "/home/bernard/Programming", False ] ) #TODO Testing
         # self.fortunes.append( [ "/home/bernard/UnknownDirectory", True ] ) #TODO Testing
         # self.fortunes.append( [ "/home/bernard/AnotherUnknownDirectory", False ] ) #TODO Testing
 
-        self.middle_mouse_click_on_icon = \
+        self.middle_mouse_click_on_icon = (
             config.get(
                 IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON,
-                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
+                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
 
-        self.notification_summary = \
+        self.notification_summary = (
             config.get(
                 IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY,
-                IndicatorFortune.NOTIFICATION_SUMMARY )
+                IndicatorFortune.NOTIFICATION_SUMMARY ) )
 
-        self.refresh_interval_in_minutes = \
+        self.refresh_interval_in_minutes = (
             config.get(
                 IndicatorFortune.CONFIG_REFRESH_INTERVAL_IN_MINUTES,
-                15 )
+                15 ) )
 
         # From experimentation, estimate around 45 characters per line.
         # However, to ensure word boundaries are maintained,
         # reduce to 40 characters per line (with at most 9 lines).
-        self.skip_fortune_character_count = \
+        self.skip_fortune_character_count = (
             config.get(
                 IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT,
-                360 )
+                360 ) )
 
 
     def save_config( self ):

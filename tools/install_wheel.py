@@ -31,6 +31,7 @@ import utils
 
 
 if __name__ == "__main__":
+#TODO Remove \
     correct_directory, message = \
         utils.is_correct_directory( example_arguments = "release indicatorfortune" )
 

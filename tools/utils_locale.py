@@ -363,6 +363,7 @@ def get_names_and_comments_from_mo_files(
         # https://stackoverflow.com/questions/54638570/extract-single-translation-from-gettext-po-file-from-shell
         # https://www.reddit.com/r/learnpython/comments/jkun99/how_do_i_load_a_specific_mo_file_by_giving_its
         # https://stackoverflow.com/questions/53316631/unable-to-use-gettext-to-retrieve-the-translated-string-in-mo-files
+#TODO Remove \
         translation = \
             gettext.translation(
                 indicator_name,

@@ -16,7 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-''' Application indicator which converts domain names between Unicode and ASCII. '''
+'''
+Application indicator which converts domain names between Unicode and ASCII.
+'''
 
 
 import encodings.idna
@@ -52,17 +54,19 @@ class IndicatorPunycode( IndicatorBase ):
             comments = _( "Converts domain names between Unicode and ASCII." ),
             artwork = [ "Oleg Moiseichuk" ] )
 
-        self.results =  [ ] # List of lists, each sublist contains [ unicode, ascii ].
+        # List of lists, each sublist contains [ unicode, ascii ].
+        self.results =  [ ]
 
 
     def update( self, menu ):
         # The mouse middle button click kicks off a convert, but to do so must
         # be bound to a menu item (which in reality kicks off the convert).
-        # Therefore this menu item, although seemingly redundant, must be present.
+        # Therefore this menu item, seemingly redundant, must be present.
         self.create_and_append_menuitem(
             menu,
             _( "Convert" ),
-            activate_functionandarguments = ( lambda menuitem: self.on_convert(), ),
+            activate_functionandarguments = (
+                lambda menuitem: self.on_convert(), ),
             is_secondary_activate_target = True )
 
         for result in self.results:
@@ -72,8 +76,9 @@ class IndicatorPunycode( IndicatorBase ):
                 menu,
                 _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
                 activate_functionandarguments = (
-                    lambda menuitem, result = result: # Need result = result to handle lambda late binding.
-                        self.send_results_to_output( result[ IndicatorPunycode.RESULTS_UNICODE ] ), ),
+                    lambda menuitem, result = result: # Lambda late binding.
+                        self.send_results_to_output(
+                            result[ IndicatorPunycode.RESULTS_UNICODE ] ), ),
                 indent = ( 1, 1 ) )
 
             self.create_and_append_menuitem(
@@ -81,7 +86,8 @@ class IndicatorPunycode( IndicatorBase ):
                 _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
                 activate_functionandarguments = (
                     lambda menuitem, result = result:
-                        self.send_results_to_output( result[ IndicatorPunycode.RESULTS_ASCII ] ), ),
+                        self.send_results_to_output(
+                            result[ IndicatorPunycode.RESULTS_ASCII ] ), ),
                 indent = ( 1, 1 ) )
 
 
@@ -91,7 +97,8 @@ class IndicatorPunycode( IndicatorBase ):
             if self.input_clipboard:
                 text = self.copy_from_selection_clipboard()
                 if text is None:
-                    self.show_notification( summary, _( "No text is in the clipboard." ) )
+                    self.show_notification(
+                        summary, _( "No text is in the clipboard." ) )
 
                 else:
                     self._do_conversion( text )
@@ -101,18 +108,23 @@ class IndicatorPunycode( IndicatorBase ):
                     print( "2" )
                     print( text )
                     if text is None:
-                        self.show_notification( summary, _( "No text is highlighted/selected." ) )
+                        self.show_notification(
+                            summary, _( "No text is highlighted/selected." ) )
 
                     else:
                         self._do_conversion( text )
 
                 print( "1" )
-                self. copy_from_selection_primary( primary_received_callback_function )
+                self. copy_from_selection_primary(
+                    primary_received_callback_function )
 
         else:
             self.show_notification(
                 _( "Unsupported" ),
-                _( "On Ubuntu 20.04 running Wayland, the clipboard is unsupported." ) )
+                _(
+                    "On Ubuntu 20.04 running Wayland, "
+                    +
+                    "the clipboard is unsupported." ) )
 
 
     def _do_conversion( self, text ):
@@ -134,17 +146,27 @@ class IndicatorPunycode( IndicatorBase ):
             if text.find( "xn--" ) == -1:
                 labels = [ ]
                 for label in text.split( "." ):
-                    labels.append( ( encodings.idna.ToASCII( encodings.idna.nameprep( label ) ) ) )
+                    labels.append(
+                        (
+                            encodings.idna.ToASCII(
+                                encodings.idna.nameprep( label ) ) ) )
 
                 converted_text = str( b'.'.join( labels ), "utf-8" )
-                result = [ protocol + text + path_query, protocol + converted_text + path_query ]
+                result = [
+                    protocol + text + path_query,
+                    protocol + converted_text + path_query ]
 
             else:
                 for label in text.split( "." ):
-                    converted_text += encodings.idna.ToUnicode( encodings.idna.nameprep( label ) ) + "."
+#TODO Remove \
+                    converted_text += \
+                        encodings.idna.ToUnicode(
+                            encodings.idna.nameprep( label ) ) + "."
 
                 converted_text = converted_text[ : -1 ]
-                result = [ protocol + converted_text + path_query, protocol + text + path_query ]
+                result = [
+                    protocol + converted_text + path_query,
+                    protocol + text + path_query ]
 
             if result in self.results:
                 self.results.remove( result )
@@ -153,14 +175,19 @@ class IndicatorPunycode( IndicatorBase ):
 
             self.cull_results()
 
-            self.send_results_to_output( protocol + converted_text + path_query )
+            self.send_results_to_output(
+                protocol + converted_text + path_query )
+
             self.request_update()
 
 #TODO Can the exception be more specific?
         except Exception as e:
             self.get_logging().exception( e )
-            self.get_logging().error( "Error converting '" + protocol + text + path_query + "'." )
-            self.show_notification( _( "Error converting..." ), _( "See log for more details." ) )
+            self.get_logging().error(
+                "Error converting '" + protocol + text + path_query + "'." )
+
+            self.show_notification(
+                _( "Error converting..." ), _( "See log for more details." ) )
 
 
     def cull_results( self ):
@@ -185,7 +212,8 @@ class IndicatorPunycode( IndicatorBase ):
         grid = self.create_grid()
 
         grid.attach(
-            self.create_box( ( ( Gtk.Label.new( _( "Input source" ) ), False ), ) ),
+            self.create_box(
+                ( ( Gtk.Label.new( _( "Input source" ) ), False ), ) ),
             0, 0, 1, 1 )
 
         input_clipboard_radio = \
@@ -203,7 +231,8 @@ class IndicatorPunycode( IndicatorBase ):
             self.create_radiobutton(
                 input_clipboard_radio,
                 _( "Primary" ),
-                tooltip_text = _( "Input is taken from the currently selected text." ),
+                tooltip_text = _(
+                    "Input is taken from the currently selected text." ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = not self.input_clipboard )
 
@@ -213,9 +242,9 @@ class IndicatorPunycode( IndicatorBase ):
             self.create_checkbutton(
                 _( "Output to clipboard and primary" ),
                 tooltip_text = _(
-                    "If checked, the converted text is sent\n" +
-                    "to both the clipboard and primary.\n\n" +
-                    "Otherwise the converted text is sent\n" +
+                    "If checked, the converted text is sent\n"
+                    "to both the clipboard and primary.\n\n"
+                    "Otherwise the converted text is sent\n"
                     "only to the input source." ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.output_both )
@@ -226,7 +255,7 @@ class IndicatorPunycode( IndicatorBase ):
             self.create_checkbutton(
                 _( "Drop path/query in output" ),
                 tooltip_text = _(
-                    "If checked, the output text will not\n" +
+                    "If checked, the output text will not\n"
                     "contain any path/query (if present)." ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.drop_path_query )
@@ -239,10 +268,10 @@ class IndicatorPunycode( IndicatorBase ):
                 0,
                 1000,
                 tooltip_text = _(
-                    "The number of most recent\n" +
-                    "results to show in the menu.\n\n" +
-                    "Selecting a menu item which\n" +
-                    "contains a result will copy\n" +
+                    "The number of most recent\n"
+                    "results to show in the menu.\n\n"
+                    "Selecting a menu item which\n"
+                    "contains a result will copy\n"
                     "the result to the output." ) )
 
         grid.attach(
@@ -266,7 +295,8 @@ class IndicatorPunycode( IndicatorBase ):
             self.input_clipboard = input_clipboard_radio.get_active()
             self.output_both = output_both_checkbutton.get_active()
             self.drop_path_query = drop_path_query_checkbutton.get_active()
-            self.result_history_length = results_amount_spinner.get_value_as_int()
+            self.result_history_length = \
+                results_amount_spinner.get_value_as_int()
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),

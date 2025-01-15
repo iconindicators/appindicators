@@ -52,8 +52,8 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT = "VBoxManage startvm %VM%"
 
-    # Virtual Machine treeview columns; one to one mapping between data model and view.
-    COLUMN_GROUP_OR_VIRTUAL_MACHINE_NAME = 0 # Either the group or name of the virtual machine.
+    # Virtual Machine model/view columns.
+    COLUMN_GROUP_OR_VIRTUAL_MACHINE_NAME = 0 # Name of group or virtual machine.
     COLUMN_AUTOSTART = 1 # Icon name for the APPLY icon when the virtual machine is to autostart; None otherwise.
     COLUMN_START_COMMAND = 2 # Start command for the virtual machine.
     COLUMN_UUID = 3 # The UUID for the virtual machine (used to identify; not displayed).
@@ -100,6 +100,7 @@ class IndicatorVirtualBox( IndicatorBase ):
     def build_menu( self, menu, vbox_manage_installed, virtual_machines ):
         if vbox_manage_installed:
             if virtual_machines:
+#TODO Remove \
                 running_names, running_uuids = \
                     self.get_running_virtual_machines()
 
@@ -169,19 +170,23 @@ class IndicatorVirtualBox( IndicatorBase ):
         return menu
 
 
-    def _add_virtual_machine_to_menu( self, menu, virtual_machine, indent, is_running ):
+    def _add_virtual_machine_to_menu(
+            self, menu, virtual_machine, indent, is_running ):
+
         if is_running:
             self.create_and_append_radiomenuitem(
                 menu,
                 virtual_machine.get_name(),
-                activate_functionandarguments = ( self._on_virtual_machine, virtual_machine ),
+                activate_functionandarguments = (
+                    self._on_virtual_machine, virtual_machine ),
                 indent = indent )
 
         else:
             self.create_and_append_menuitem(
                 menu,
                 virtual_machine.get_name(),
-                activate_functionandarguments = ( self._on_virtual_machine, virtual_machine ),
+                activate_functionandarguments = (
+                    self._on_virtual_machine, virtual_machine ),
                 indent = indent )
 
 
@@ -243,18 +248,25 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.show_notification( _( "Error" ), message )
 
         else:
-            self.process_call( self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &" )
+            self.process_call(
+                self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &" )
 
 
-    def bring_window_to_front( self, virtual_machine_name, delay_in_seconds = 0 ):
+    def bring_window_to_front(
+            self, virtual_machine_name, delay_in_seconds = 0 ):
+
         if not self.is_session_type_wayland():
             number_of_windows_with_the_same_name = \
-                self.process_get( 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' )
+                self.process_get(
+                    'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' )
 
             if number_of_windows_with_the_same_name == "0":
                 message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtual_machine_name )
                 summary = _( "Warning" )
-                self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
+                self.show_notification_with_delay(
+                    summary,
+                    message,
+                    delay_in_seconds = delay_in_seconds )
 
             elif number_of_windows_with_the_same_name == "1":
                 for line in self.process_get( "wmctrl -l" ).splitlines():
@@ -266,22 +278,27 @@ class IndicatorVirtualBox( IndicatorBase ):
             else:
                 message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window with overlapping names." ).format( virtual_machine_name )
                 summary = _( "Warning" )
-                self.show_notification_with_delay( summary, message, delay_in_seconds = delay_in_seconds )
+                self.show_notification_with_delay(
+                    summary,
+                    message,
+                    delay_in_seconds = delay_in_seconds )
 
 
     def show_notification_with_delay(
-            self,
-            summary,
-            message,
-            delay_in_seconds = 0 ):
+        self,
+        summary,
+        message,
+        delay_in_seconds = 0 ):
         '''
         Zealous mouse wheel scrolling can cause too many notifications,
         subsequently popping the graphics stack!
         Prevent notifications from appearing until a set time has elapsed since
         the previous notification.
         '''
-        date_time_of_last_notification_plus_delay = \
-            self.date_time_of_last_notification + datetime.timedelta( seconds = delay_in_seconds )
+        date_time_of_last_notification_plus_delay = (
+            self.date_time_of_last_notification
+            +
+            datetime.timedelta( seconds = delay_in_seconds ) )
 
         if date_time_of_last_notification_plus_delay < datetime.datetime.now():
             self.show_notification( summary, message )
@@ -305,7 +322,9 @@ class IndicatorVirtualBox( IndicatorBase ):
                     self.scroll_uuid = running_uuids[ index ]
                     self.scroll_direction_is_up = False
 
-                self.bring_window_to_front( running_names[ running_uuids.index( self.scroll_uuid ) ], 10 )
+                self.bring_window_to_front(
+                    running_names[ running_uuids.index( self.scroll_uuid ) ],
+                    10 )
 
 
     def on_launch_virtual_box_manager( self ):
@@ -415,9 +434,10 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def is_autostart( self, uuid ):
-        return \
-            uuid in self.virtual_machine_preferences and \
-            self.virtual_machine_preferences[ uuid ][ IndicatorVirtualBox.PREFERENCES_AUTOSTART ]
+        return (
+            uuid in self.virtual_machine_preferences
+            and
+            self.virtual_machine_preferences[ uuid ][ IndicatorVirtualBox.PREFERENCES_AUTOSTART ] )
 
 
     def on_preferences( self, dialog ):
@@ -443,14 +463,27 @@ class IndicatorVirtualBox( IndicatorBase ):
                 treestore,
                 ( _( "Virtual Machine" ), _( "Autostart" ), _( "Start Command" ) ),
                 (
-                    ( Gtk.CellRendererText(), "text", IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHINE_NAME ),
-                    ( Gtk.CellRendererPixbuf(), "stock_id", IndicatorVirtualBox.COLUMN_AUTOSTART ),
-                    ( Gtk.CellRendererText(), "text", IndicatorVirtualBox.COLUMN_START_COMMAND ) ),
-                alignments_columnviewids = ( ( 0.5, IndicatorVirtualBox.COLUMN_AUTOSTART ), ),
-                tooltip_text = _( "Double click to edit a virtual machine's properties." ),
-                rowactivatedfunctionandarguments = ( self.on_virtual_machine_double_click, ) )
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHINE_NAME ),
+                    (
+                        Gtk.CellRendererPixbuf(),
+                        "stock_id",
+                        IndicatorVirtualBox.COLUMN_AUTOSTART ),
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        IndicatorVirtualBox.COLUMN_START_COMMAND ) ),
+                alignments_columnviewids = (
+                    ( 0.5, IndicatorVirtualBox.COLUMN_AUTOSTART ), ),
+                tooltip_text = _(
+                    "Double click to edit a virtual machine's properties." ),
+                rowactivatedfunctionandarguments = (
+                    self.on_virtual_machine_double_click, ) )
 
-        notebook.append_page( scrolledwindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
+        notebook.append_page(
+            scrolledwindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
 
         # General settings.
         grid = self.create_grid()
@@ -482,7 +515,8 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "followed by virtual machines." ),
                 active = self.sort_groups_and_virtual_machines_equally )
 
-        grid.attach( sort_groups_and_virtual_machines_equally_checkbox, 0, 1, 1, 1 )
+        grid.attach(
+            sort_groups_and_virtual_machines_equally_checkbox, 0, 1, 1, 1 )
 
         show_as_submenus_checkbox = \
             self.create_checkbutton(
@@ -535,8 +569,8 @@ class IndicatorVirtualBox( IndicatorBase ):
             0, row, 1, 1 )
         row += 1
 
-        autostart_checkbox, delay_spinner, latest_version_checkbox, box = \
-            self.create_preferences_common_widgets()
+        autostart_checkbox, delay_spinner, latest_version_checkbox, box = (
+            self.create_preferences_common_widgets() )
 
         grid.attach( box, 0, row, 1, 1 )
         row += 1
@@ -585,13 +619,17 @@ class IndicatorVirtualBox( IndicatorBase ):
                 groups_exist = True
                 self._add_items_to_store(
                     treestore,
-                    treestore.append( parent, [ item.get_name(), None, None, None ] ),
+                    treestore.append(
+                        parent, [ item.get_name(), None, None, None ] ),
                     item.get_items() )
 
             else:
                 row = [
                     item.get_name(),
-                    Gtk.STOCK_APPLY if self.is_autostart( item.get_uuid() ) else None,
+                    Gtk.STOCK_APPLY
+                    if self.is_autostart( item.get_uuid() )
+                    else
+                    None,
                     self.get_start_command( item.get_uuid() ),
                     item.get_uuid() ]
                 treestore.append( parent, row )
@@ -616,7 +654,9 @@ class IndicatorVirtualBox( IndicatorBase ):
             treeiter = treestore.iter_next( treeiter )
 
 
-    def on_virtual_machine_double_click( self, tree, row_number, treeviewcolumn ):
+    def on_virtual_machine_double_click(
+            self, tree, row_number, treeviewcolumn ):
+
         model, treeiter = tree.get_selection().get_selected()
         if treeiter and model[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]:
             self.edit_virtual_machine( tree, model, treeiter )
@@ -625,7 +665,7 @@ class IndicatorVirtualBox( IndicatorBase ):
     def edit_virtual_machine( self, tree, model, treeiter ):
         grid = self.create_grid()
 
-        start_command = \
+        start_command = (
             self.create_entry(
                 model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] if model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] else "",
                 tooltip_text = _(
@@ -633,7 +673,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "\tVBoxManage startvm %VM%\n" +
                     "or\n" +
                     "\tVBoxHeadless --startvm %VM% --vrde off" ),
-                make_longer = True )
+                make_longer = True ) )
 
         grid.attach(
             self.create_box(
@@ -645,10 +685,12 @@ class IndicatorVirtualBox( IndicatorBase ):
         autostart_checkbutton = \
             self.create_checkbutton(
                 _( "Autostart" ),
-                tooltip_text = _( "Run the virtual machine when the indicator starts." ),
-                active = \
-                    model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None and
-                    model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY )
+                tooltip_text = _(
+                    "Run the virtual machine when the indicator starts." ),
+                active = (
+                    model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None
+                    and
+                    model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY ) )
 
         grid.attach( autostart_checkbutton, 0, 1, 2, 1 )
 
@@ -660,12 +702,16 @@ class IndicatorVirtualBox( IndicatorBase ):
                 break
 
             if start_command.get_text().strip() == "":
-                self.show_dialog_ok( dialog, _( "The start command cannot be empty." ) )
+                self.show_dialog_ok(
+                    dialog, _( "The start command cannot be empty." ) )
+
                 start_command.grab_focus()
                 continue
 
             if not "%VM%" in start_command.get_text().strip():
-                message = _( "The start command must contain %VM% which is substituted for the virtual machine name/id." )
+                message = _(
+                    "The start command must contain %VM% which is substituted for the virtual machine name/id." )
+
                 self.show_dialog_ok( dialog, message )
                 start_command.grab_focus()
                 continue
@@ -679,45 +725,56 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def load_config( self, config ):
-        self.delay_between_autostart_in_seconds = \
+        self.delay_between_autostart_in_seconds = (
             config.get(
                 IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS,
-                10 )
+                10 ) )
 
-        self.refresh_interval_in_minutes = \
+        self.refresh_interval_in_minutes = (
             config.get(
                 IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES,
-                15 )
+                15 ) )
 
-        self.show_submenu = \
+        self.show_submenu = (
             config.get(
                 IndicatorVirtualBox.CONFIG_SHOW_SUBMENU,
-                False )
+                False ) )
 
-        self.sort_groups_and_virtual_machines_equally = \
+        self.sort_groups_and_virtual_machines_equally = (
             config.get(
                 IndicatorVirtualBox.CONFIG_SORT_GROUPS_AND_VIRTUAL_MACHINES_EQUALLY,
-                True )
+                True ) )
 
-        self.virtual_machine_preferences = \
+        self.virtual_machine_preferences = (
             config.get(
                 IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES,
-                { } ) # Store information about VMs.  Key is VM UUID; value is [ autostart (bool), start command (str) ]
+                { } ) ) # Store information about VMs.  Key is VM UUID; value is [ autostart (bool), start command (str) ]
 
-        self.virtualbox_manager_window_name = \
+        self.virtualbox_manager_window_name = (
             config.get(
                 IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME,
-                "Oracle VM VirtualBox Manager" )
+                "Oracle VM VirtualBox Manager" ) )
 
 
     def save_config( self ):
         return {
-            IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS : self.delay_between_autostart_in_seconds,
-            IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES : self.refresh_interval_in_minutes,
-            IndicatorVirtualBox.CONFIG_SHOW_SUBMENU : self.show_submenu,
-            IndicatorVirtualBox.CONFIG_SORT_GROUPS_AND_VIRTUAL_MACHINES_EQUALLY : self.sort_groups_and_virtual_machines_equally,
-            IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES : self.virtual_machine_preferences,
-            IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME : self.virtualbox_manager_window_name
+            IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS:
+                self.delay_between_autostart_in_seconds,
+
+            IndicatorVirtualBox.CONFIG_REFRESH_INTERVAL_IN_MINUTES:
+                self.refresh_interval_in_minutes,
+
+            IndicatorVirtualBox.CONFIG_SHOW_SUBMENU:
+                self.show_submenu,
+
+            IndicatorVirtualBox.CONFIG_SORT_GROUPS_AND_VIRTUAL_MACHINES_EQUALLY:
+                self.sort_groups_and_virtual_machines_equally,
+
+            IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES:
+                self.virtual_machine_preferences,
+
+            IndicatorVirtualBox.CONFIG_VIRTUALBOX_MANAGER_WINDOW_NAME:
+                self.virtualbox_manager_window_name
         }
 
 

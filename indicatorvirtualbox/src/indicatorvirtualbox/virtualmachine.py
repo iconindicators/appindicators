@@ -60,7 +60,7 @@ class Group():
 
     def __init__( self, name ):
         self.name = name
-        self.items = [ ] # List of virtual machines and/or groups pertaining to this group.
+        self.items = [ ] # Virtual machines and/or groups within this group.
 
 
     def get_name( self ):
@@ -92,6 +92,7 @@ class Group():
             len( self.get_items() ) == len( other.get_items( ) ) )
 
         if equal:
+#TODO Remove \
             z = \
                 zip(
                     sorted(

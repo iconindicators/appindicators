@@ -212,12 +212,12 @@ class PPA():
         When sorting published binaries by name, clip_amount is ignored.
         '''
         ppas_sorted = deepcopy( ppas )
-        ppas_sorted.sort( key = cmp_to_key( PPA.__compare_ppas ) )
+        ppas_sorted.sort( key = cmp_to_key( PPA._compare_ppas ) )
 
         if sort_by_download:
             for ppa in ppas_sorted:
                 ppa.get_published_binaries().sort(
-                    key = cmp_to_key( PPA.__compare_published_binaries ) )
+                    key = cmp_to_key( PPA._compare_published_binaries ) )
 
                 if clip_amount > 0:
                     del ppa.get_published_binaries()[ clip_amount : ]
@@ -231,7 +231,7 @@ class PPA():
 
 
     @staticmethod
-    def __compare_published_binaries( published_binary1, published_binary2 ):
+    def _compare_published_binaries( published_binary1, published_binary2 ):
         '''
         Compare two Published Binaries by download count.
         If the download count is the same, sort by name then by version.
@@ -263,8 +263,9 @@ class PPA():
 
 
     @staticmethod
-    def __compare_ppas( ppa1, ppa2 ):
+    def _compare_ppas( ppa1, ppa2 ):
         ''' Compare two PPAs by user, then by name. '''
+#TODO Remove \
         return \
             PPA.compare_ppas(
                 ppa1.get_user(), ppa1.get_name(),

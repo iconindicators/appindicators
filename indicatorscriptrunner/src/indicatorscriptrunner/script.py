@@ -67,20 +67,29 @@ class Info( ABC ):
 
     def __eq__( self, other ):
         return (
-            self.__class__ == other.__class__ and
-            self.get_group() == other.get_group() and
-            self.get_name() == other.get_name() and
-            self.get_command() == other.get_command() and
-            self.get_play_sound() == other.get_play_sound() and
+            self.__class__ == other.__class__
+            and
+            self.get_group() == other.get_group()
+            and
+            self.get_name() == other.get_name()
+            and
+            self.get_command() == other.get_command()
+            and
+            self.get_play_sound() == other.get_play_sound()
+            and
             self.get_show_notification() == other.get_show_notification() )
 
 
     def __str__( self ):
         return (
-            self.group + " | " +
-            self.name + " | " +
-            self.command + " | " +
-            str( self.play_sound ) + " | " +
+            self.group + " | "
+            +
+            self.name + " | "
+            +
+            self.command + " | "
+            +
+            str( self.play_sound ) + " | "
+            +
             str( self.show_notification ) )
 
 
@@ -107,7 +116,8 @@ class Background( Info ):
         True to play a sound on completion of script/command execution.
         True to show a notification on completion of script/command execution.
         Update interval (in minutes).
-        Force update; script will update on the next update for ANY background script.        
+        Force update; script will update on the next update for ANY
+        background script.        
         '''
         super().__init__( group, name, command, play_sound, show_notification )
         self.interval_in_minutes = interval_in_minutes
@@ -124,16 +134,21 @@ class Background( Info ):
 
     def __eq__( self, other ):
         return (
-            super().__eq__( other ) and
-            self.__class__ == other.__class__ and
-            self.get_interval_in_minutes() == other.get_interval_in_minutes() and
+            super().__eq__( other )
+            and
+            self.__class__ == other.__class__
+            and
+            self.get_interval_in_minutes() == other.get_interval_in_minutes()
+            and
             self.get_force_update() == other.get_force_update() )
 
 
     def __str__( self ):
         return (
-            super().__str__() + " | " +
-            str( self.interval_in_minutes ) + " | " +
+            super().__str__() + " | "
+            +
+            str( self.interval_in_minutes ) + " | "
+            +
             str( self.force_update ) )
 
 
@@ -162,7 +177,9 @@ class NonBackground( Info ):
         True to leave the terminal open on completion of script/command execution.
         True if the script is default (only one non-background script can be default).
         '''
-        super().__init__( group, name, command, play_sound, show_notification )
+        super().__init__(
+            group, name, command, play_sound, show_notification )
+
         self.terminal_open = terminal_open
         self.default = default
 
@@ -177,16 +194,21 @@ class NonBackground( Info ):
 
     def __eq__( self, other ):
         return (
-            super().__eq__( other ) and
-            self.__class__ == other.__class__ and
-            self.get_terminal_open() == other.get_terminal_open() and
+            super().__eq__( other )
+            and
+            self.__class__ == other.__class__
+            and
+            self.get_terminal_open() == other.get_terminal_open()
+            and
             self.get_default() == other.get_default() )
 
 
     def __str__( self ):
         return (
-            super().__str__() + " | " +
-            str( self.terminal_open ) + " | " +
+            super().__str__() + " | "
+            +
+            str( self.terminal_open ) + " | "
+            +
             str( self.default ) )
 
 

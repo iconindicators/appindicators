@@ -117,6 +117,7 @@ def process_and_write_one_line_lowell_minorplanet(
     start_indices = [ x - 1 for x in start_indices ] # Offset back to zero to match each line read into a string.
 
     # Inspired by https://stackoverflow.com/a/10851479/2156453
+#TODO Remove \
     fields = \
         [ "OFFSET TO ALIGN WITH FIELD NUMBERING" ] + \
         [ line[ i : j ] for i, j in zip( start_indices, start_indices[ 1 : ] + [ None ] ) ]

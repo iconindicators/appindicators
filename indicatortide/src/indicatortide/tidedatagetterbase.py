@@ -45,9 +45,14 @@ class TideDataGetterBase( ABC ):
         # Convert tidal data from your URL to tide.Reading().
 
         return [
-            tide.Reading( "Tuesday August 3rd", "4:07 AM", "The port", True, 1.6, url ),
-            tide.Reading( "Tuesday August 3rd", "10:31 AM", "The port", False, 0.3, url ),
-            tide.Reading( "Wednesday August 4th", "5:26 AM", "The port", True, 1.5, url ) ]
+            tide.Reading(
+                "Tuesday May 3rd", "4:07 AM", "The port", True, 1.6, url ),
+
+            tide.Reading(
+                "Tuesday May 3rd", "10:31 AM", "The port", False, 0.3, url ),
+
+            tide.Reading(
+                "Wednesday May 4th", "5:26 AM", "The port", True, 1.5, url ) ]
 
         Do not include @abstractmethod at the top of your own function.
         '''
