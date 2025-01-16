@@ -24,7 +24,7 @@ References
     https://github.com/AyatanaIndicators/libayatana-appindicator
     https://wiki.ayatana-indicators.org/AyatanaIndicatorApplication
     https://wiki.ubuntu.com/DesktopExperienceTeam/ApplicationIndicators
-    https://askubuntu.com/questions/108035/writing-indicators-with-python-gir-and-gtk3
+    https://askubuntu.com/q/108035/67335
     https://python-gtk-3-tutorial.readthedocs.org
     https://pygobject.gnome.org/guide/threading.html
     https://stackoverflow.com/q/73665239/2156453
@@ -33,7 +33,7 @@ References
     https://pygobject.readthedocs.io/en/latest/getting_started.html
     https://twine.readthedocs.io/en/latest/
     https://packaging.python.org/en/latest/tutorials/packaging-projects/
-    https://specifications.freedesktop.org/icon-theme-spec/icon-theme-spec-latest.html
+    https://specifications.freedesktop.org/icon-theme-spec/latest/
     https://pypi.org/project/pystray/
     https://peps.python.org/pep-0008/
     https://docs.python-guide.org/writing/style/
@@ -172,6 +172,8 @@ class IndicatorBase( ABC ):
                 locale_directory = Path( __file__ ).parent / "locale"
 
             else:
+#TODO When running under development, 
+# check this works under Eclipse, Visual Studio Code and via a terminal.
                 # Running in development.
                 locale_directory = (
                     Path( __file__ ).parent.parent.parent.parent / INDICATOR_NAME / "src" / INDICATOR_NAME / "locale" )
@@ -334,10 +336,13 @@ class IndicatorBase( ABC ):
     def _get_wheel_in_release( indicator_name ):
         error_message = None
         path_release = Path( __file__ ).parent.parent.parent.parent
-        path_wheel = path_release / "release" / "wheel" / f"dist_{ indicator_name }"
+        path_wheel = (
+            path_release / "release" / "wheel" / f"dist_{ indicator_name }" )
+
         first_wheel = next( path_wheel.glob( "*.whl" ), None )
         if first_wheel is None:
-            error_message = f"Unable to locate a .whl in { path_wheel.absolute() }"
+            error_message = (
+                f"Unable to locate a .whl in { path_wheel.absolute() }" )
 
         return first_wheel, error_message
 
@@ -420,19 +425,33 @@ class IndicatorBase( ABC ):
         made_a_change = False
         with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
             for line in f:
-#TODO Make shorter
-                if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ):
+                starts_with_autostart_enabled = (
+                    line.startswith(
+                        IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ) )
+
+                starts_with_autostart_delay = (
+                    line.startswith(
+                        IndicatorBase._DOT_DESKTOP_AUTOSTART_DELAY + '=' ) )
+
+                starts_with_desktop_exec = (
+                    line.startswith(
+                        IndicatorBase._DOT_DESKTOP_EXEC + '=' ) )
+
+                starts_with_desktop_terminal = (
+                    line.startswith(
+                        IndicatorBase._DOT_DESKTOP_TERMINAL + '=' ) )
+
+                if starts_with_autostart_enabled:
                     output += line
                     autostart_enabled_present = True
 
-#TODO Make shorter
-                elif line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_DELAY + '=' ):
+                elif starts_with_autostart_delay:
                     # Does not work in Debian et al; capture delay and comment line.
                     delay = line.split( '=' )[ 1 ].strip()
                     output += '#' + line
                     made_a_change = True
 
-                elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC + '=' ):
+                elif starts_with_desktop_exec:
                     if "sleep" in line:
                         # Assume to be part of the install and not user created.
                         output += line
@@ -443,8 +462,7 @@ class IndicatorBase( ABC ):
                         output += '#' + line
                         made_a_change = True
 
-#TODO Make shorter
-                elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL + '=' ):
+                elif starts_with_desktop_terminal:
                     output += line
                     terminal_present = True
 
