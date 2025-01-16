@@ -1,23 +1,5 @@
 # Immediate
 
-# Installation
-Current implementation builds a self-contained wheel and deplys to PyPI.
-An end-user will install by installing OS packages (copy/paste a command) then
-creating a venv / installing wheel from PyPI / copy icons/desktop/locale
-(copy/paste command).  Some distros require setting an extension.
-
-Reading about .deb, I noticed that some .deb packagers will instead place the
-venv in /opt.  The respective icons will then go into /usr/share/icons and
-similarly for destkop/locale.  This makes the install available to all users.
-
-Should I do the same?  
-
-There is a tool
-  https://github.com/jordansissel/fpm
-to take a Python project (does not yet support pyproject.toml)
-and convert to .deb/.rpm
-
-
 # No autostart on Kubuntu and Manjaro
 Given there is no autostart on Kubuntu 24.04 and Manjaro 24.04.7,
 should the autostart checkbox and delay spinner be hidden?
@@ -122,3 +104,23 @@ Determine which distros/desktops these are and if anything can be done.
 May need to continue to run as GTK3 simulataneously.
 - https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159
 - https://stackoverflow.com/questions/73006299/unable-to-get-application-icons-to-display-with-gtk4-under-ubuntu
+
+
+# Installation other than via PyPI
+Current implementation builds a self-contained wheel uploaded to PyPI.
+An end-user installs an indicator by:
+- installing OS packages (copy/paste a command)
+- creating a venv
+- installing wheel from PyPI
+- copy icons/desktop/locale (copy/paste command)
+- some distros require setting an extension
+
+Whilst creating a .deb/.rpm would make an install easier, consider submitting
+to each distro's package repository (Debian, Fedora, openSUSE).
+Need to consider in this case perhaps changing the venv location to /opt
+rather than the user $HOME, particulary given icons/locale/.desktop will then
+be installed under /usr/share or similar.
+
+The tool https://github.com/jordansissel/fpm takes a Python project 
+and convert to .deb/.rpm which may be a helpful first step.
+Does not yet support pyproject.toml
