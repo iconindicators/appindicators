@@ -138,7 +138,8 @@ _ECLIPSES_SOLAR = \
      9598  480   2040 Nov 04  19:09:02     85    505  124   P   -t   1.0993  0.8074  62.2N  53.4W   0  234'''
 
 
-def get_eclipse_lunar( utc_now ):
+def get_eclipse_lunar(
+    utc_now ):
     '''
     Gets the upcoming lunar eclipse.
 
@@ -151,7 +152,8 @@ def get_eclipse_lunar( utc_now ):
     return _get_eclipse( utc_now, _ECLIPSES_LUNAR, 1, 2, 3, 4, 5, 8, 16, 17 )
 
 
-def get_eclipse_solar( utc_now ):
+def get_eclipse_solar(
+    utc_now ):
     '''
     Gets the upcoming solar eclipse.
 
@@ -165,16 +167,16 @@ def get_eclipse_solar( utc_now ):
 
 
 def _get_eclipse(
-        utc_now,
-        eclipses,
-        field_year,
-        field_month,
-        field_day,
-        field_time_utc,
-        field_delta_t,
-        field_type,
-        field_latitude,
-        field_longitude ):
+    utc_now,
+    eclipses,
+    field_year,
+    field_month,
+    field_day,
+    field_time_utc,
+    field_delta_t,
+    field_type,
+    field_latitude,
+    field_longitude ):
 
     eclipse_information = None
     for line in eclipses.splitlines():
@@ -218,7 +220,8 @@ def _get_eclipse(
     return eclipse_information
 
 
-def get_eclipse_type_as_text( eclipse_type ):
+def get_eclipse_type_as_text(
+    eclipse_type ):
     ''' Returns the translated descriptive text for a given eclipse type. '''
     if eclipse_type == EclipseType.ANNULAR:
         eclipse_type_text = _( "Annular" )
@@ -238,7 +241,8 @@ def get_eclipse_type_as_text( eclipse_type ):
     return eclipse_type_text
 
 
-def _get_eclipse_type_from_table_value( eclipse_type_from_table_value ):
+def _get_eclipse_type_from_table_value(
+    eclipse_type_from_table_value ):
     '''
     https://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
     https://eclipse.gsfc.nasa.gov/SEcat5/catkey.html

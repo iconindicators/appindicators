@@ -33,7 +33,9 @@ class DataProviderGeneralPerturbation( DataProvider ):
     ''' Download and persist general pertubation for satellites. '''
 
     @staticmethod
-    def download( filename, logging ):
+    def download(
+        filename,
+        logging ):
         '''
         Download general perturbation data from Celestrak and save to the
         given filename.
@@ -43,7 +45,9 @@ class DataProviderGeneralPerturbation( DataProvider ):
 
 
     @staticmethod
-    def load( filename, logging ):
+    def load(
+        filename,
+        logging ):
         '''
         Load general perturbation data from the given filename.
 
@@ -64,7 +68,9 @@ class DataProviderGeneralPerturbation( DataProvider ):
 class GP():
     '''Hold general perturbation for a satellite.'''
 
-    def __init__( self, xml_fields_from_omm ):
+    def __init__(
+        self,
+        xml_fields_from_omm ):
         '''
         Take the XML fields from the OMM data and propagate.
 

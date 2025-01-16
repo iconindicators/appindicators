@@ -25,7 +25,11 @@ import operator
 class VirtualMachine():
     ''' Information about a virtual machine. '''
 
-    def __init__( self, name, uuid ):
+    def __init__(
+        self,
+        name,
+        uuid ):
+
         self.name = name
         self.uuid = uuid
 
@@ -58,7 +62,10 @@ class Group():
     A group contains one or more groups and/or one or more virtual machines.
     '''
 
-    def __init__( self, name ):
+    def __init__(
+        self,
+        name ):
+
         self.name = name
         self.items = [ ] # Virtual machines and/or groups within this group.
 
@@ -67,7 +74,10 @@ class Group():
         return self.name
 
 
-    def add_item( self, virtual_machine_or_group ):
+    def add_item(
+        self,
+        virtual_machine_or_group ):
+
         self.items.append( virtual_machine_or_group )
 
 

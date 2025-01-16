@@ -121,7 +121,10 @@ class IndicatorScriptRunner( IndicatorBase ):
             "\"" + _( "...has completed." ) + "\"" )
 
 
-    def update( self, menu ):
+    def update(
+        self,
+        menu ):
+
         today = datetime.datetime.now()
         self.update_menu( menu )
         self.update_background_scripts( today )
@@ -142,7 +145,10 @@ class IndicatorScriptRunner( IndicatorBase ):
         return 60 if next_update_in_seconds < 60 else next_update_in_seconds
 
 
-    def update_menu( self, menu ):
+    def update_menu(
+        self,
+        menu ):
+
         if self.show_scripts_in_submenus:
             scripts_by_group = self.get_scripts_by_group( self.scripts, True, False )
             for group in sorted( scripts_by_group.keys(), key = str.lower ):
@@ -165,7 +171,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                         scripts_by_group[ group ], menu, indent = ( 1, 1 ) )
 
 
-    def add_scripts_to_menu( self, scripts, menu, indent ):
+    def add_scripts_to_menu(
+        self,
+        scripts,
+        menu,
+        indent ):
+
         scripts.sort( key = lambda script: script.get_name().lower() )
         for script in scripts:
             menuitem = (
@@ -181,7 +192,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                 self.set_secondary_activate_target( menuitem )
 
 
-    def on_script_menuitem( self, script ):
+    def on_script_menuitem(
+        self,
+        script ):
+
         terminal, terminal_execution_flag = self.get_terminal_and_execution_flag()
         if terminal is None:
             message = _( "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal." )
@@ -225,7 +239,10 @@ class IndicatorScriptRunner( IndicatorBase ):
             Thread( target = self.process_call, args = ( command, ) ).start()
 
 
-    def update_background_scripts( self, now ):
+    def update_background_scripts(
+        self,
+        now ):
+
         background_scripts_to_execute = [ ]
         for script in self.scripts:
             if isinstance( script, Background ) and self.is_background_script_in_indicator_text( script ):
@@ -269,7 +286,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                     self.process_call( notification_command )
 
 
-    def _update_background_script( self, script, now ):
+    def _update_background_script(
+        self,
+        script,
+        now ):
+
         if self.send_command_to_log:
             self.get_logging().debug(
                 script.get_group() + " | " + script.get_name() + ": " + script.get_command() )
@@ -314,7 +335,10 @@ class IndicatorScriptRunner( IndicatorBase ):
         return indicator_text_processed[ 0 : - len( self.indicator_text_separator ) ] # Trim last separator.
 
 
-    def on_preferences( self, dialog ):
+    def on_preferences(
+        self,
+        dialog ):
+
         copy_of_scripts = copy.deepcopy( self.scripts )
 
         notebook = Gtk.Notebook()
@@ -698,14 +722,14 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def _expand_trees_and_select(
-            self,
-            treeview_all_scripts,
-            treeview_background_scripts,
-            select_group,
-            select_script,
-            scripts_by_group,
-            groups,
-            background_groups ):
+        self,
+        treeview_all_scripts,
+        treeview_background_scripts,
+        select_group,
+        select_script,
+        scripts_by_group,
+        groups,
+        background_groups ):
 
         def build_path_and_select_group_and_script( treeview, groups ):
             path_as_string = "0:0"
@@ -739,7 +763,12 @@ class IndicatorScriptRunner( IndicatorBase ):
             treeview_background_scripts, background_groups )
 
 
-    def on_script_selection( self, treeview, textview, scripts ):
+    def on_script_selection(
+        self,
+        treeview,
+        textview,
+        scripts ):
+
         group, name = self._get_group_name_from_treeview( treeview )
         command_text = ""
         if group and name:
@@ -749,13 +778,13 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def on_script_double_click(
-            self,
-            scripts_treeview,
-            treepath,
-            treeviewcolumn,
-            background_scripts_treeview,
-            textentry,
-            scripts ):
+        self,
+        scripts_treeview,
+        treepath,
+        treeviewcolumn,
+        background_scripts_treeview,
+        textentry,
+        scripts ):
 
         self.on_script_edit(
             None,
@@ -766,11 +795,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def on_background_script_double_click(
-            self,
-            treeview,
-            treepath,
-            treeviewcolumn,
-            textentry ):
+        self,
+        treeview,
+        treepath,
+        treeviewcolumn,
+        textentry ):
 
         group, name = self._get_group_name_from_treeview( treeview )
         if group and name:
@@ -779,11 +808,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def on_script_copy(
-            self,
-            button,
-            scripts,
-            scripts_treeview,
-            background_scripts_treeview ):
+        self,
+        button,
+        scripts,
+        scripts_treeview,
+        background_scripts_treeview ):
 
         group, name = self._get_group_name_from_treeview( scripts_treeview )
         if group and name:
@@ -879,7 +908,12 @@ class IndicatorScriptRunner( IndicatorBase ):
             dialog.destroy()
 
 
-    def update_indicator_textentry( self, textentry, old_tag, new_tag ):
+    def update_indicator_textentry(
+        self,
+        textentry,
+        old_tag,
+        new_tag ):
+
         if new_tag:
             textentry.set_text(
                 textentry.get_text().replace( "[" + old_tag + "]", "[" + new_tag + "]" ) )
@@ -890,12 +924,12 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def on_script_remove(
-            self,
-            button,
-            scripts,
-            scripts_treeview,
-            background_scripts_treeview,
-            textentry ):
+        self,
+        button,
+        scripts,
+        scripts_treeview,
+        background_scripts_treeview,
+        textentry ):
 
         group, name = self._get_group_name_from_treeview( scripts_treeview )
         if group and name:
@@ -920,23 +954,23 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def on_script_add(
-            self,
-            button,
-            scripts,
-            scripts_treeview,
-            background_scripts_treeview ):
+        self,
+        button,
+        scripts,
+        scripts_treeview,
+        background_scripts_treeview ):
 
         self._add_edit_script(
             None, scripts, scripts_treeview, background_scripts_treeview )
 
 
     def on_script_edit(
-            self,
-            button,
-            scripts,
-            scripts_treeview,
-            background_scripts_treeview,
-            textentry ):
+        self,
+        button,
+        scripts,
+        scripts_treeview,
+        background_scripts_treeview,
+        textentry ):
 
         group, name = self._get_group_name_from_treeview( scripts_treeview )
         if group and name:
@@ -960,11 +994,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def _add_edit_script(
-            self,
-            script,
-            scripts,
-            scripts_treeview,
-            background_scripts_treeview ):
+        self,
+        script,
+        scripts,
+        scripts_treeview,
+        background_scripts_treeview ):
 
         groups = sorted( self.get_scripts_by_group( scripts ).keys(), key = str.lower )
 
@@ -1287,7 +1321,12 @@ class IndicatorScriptRunner( IndicatorBase ):
         return new_script
 
 
-    def get_script( self, scripts, group, name ):
+    def get_script(
+        self,
+        scripts,
+        group,
+        name ):
+
         the_script = None
         for script in scripts:
             if script.get_group() == group and script.get_name() == name:
@@ -1298,7 +1337,10 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def get_scripts_by_group(
-            self, scripts, non_background = True, background = True ):
+        self,
+        scripts,
+        non_background = True,
+        background = True ):
 
         scripts_by_group = { }
         for script in scripts:
@@ -1320,7 +1362,10 @@ class IndicatorScriptRunner( IndicatorBase ):
         return scripts_by_group
 
 
-    def _get_group_name_from_treeview( self, treeview ):
+    def _get_group_name_from_treeview(
+        self,
+        treeview ):
+
         group = None
         name = None
         model, treeiter = treeview.get_selection().get_selected()
@@ -1360,13 +1405,19 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
 #TODO Test to see if this returns a boolean...used to not have ( ).
-    def is_background_script_in_indicator_text( self, script ):
+    def is_background_script_in_indicator_text(
+        self,
+        script ):
+
         return (
             '[' + self._create_key( script.get_group(), script.get_name() ) + ']'
             in self.indicator_text )
 
 
-    def load_config( self, config ):
+    def load_config(
+        self,
+        config ):
+
         self.hide_groups = (
             config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False ) )
 

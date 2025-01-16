@@ -65,17 +65,28 @@ class IndicatorTest( IndicatorBase ):
             IndicatorTest.CACHE_ICON_MAXIMUM_AGE_HOURS )
 
 
-    def update( self, menu ):
+    def update(
+        self,
+        menu ):
+
         self._build_menu( menu )
         self.set_label_or_tooltip( IndicatorTest.LABEL )
 
 
-    def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction ):
+    def on_mouse_wheel_scroll(
+        self,
+        indicator,
+        delta,
+        scroll_direction ):
+
         self.set_label_or_tooltip( self._get_current_time() )
         print( "Mouse wheel is scrolling..." )
 
 
-    def _build_menu( self, menu ):
+    def _build_menu(
+        self,
+        menu ):
+
         self.create_and_append_menuitem( menu, _( "Information" ) )
         self._build_menu_platform_uname( menu )
         self._build_menu_desktop( menu )
@@ -91,7 +102,10 @@ class IndicatorTest( IndicatorBase ):
         self._build_menu_execute_command( menu )
 
 
-    def _build_menu_platform_uname( self, menu ):
+    def _build_menu_platform_uname(
+        self,
+        menu ):
+
         submenu = Gtk.Menu()
 
         uname = platform.uname()
@@ -113,7 +127,10 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def _build_menu_desktop( self, menu ):
+    def _build_menu_desktop(
+        self,
+        menu ):
+
         submenu = Gtk.Menu()
 
         label = "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_current_desktop()
@@ -135,7 +152,10 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def _build_menu_icon_theme( self, menu ):
+    def _build_menu_icon_theme(
+        self,
+        menu ):
+
         submenu = Gtk.Menu()
 
         property_ = "gtk-icon-theme-name"
@@ -168,7 +188,10 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def _build_menu_terminal( self, menu ):
+    def _build_menu_terminal(
+        self,
+        menu ):
+
         submenu = Gtk.Menu()
 
         terminal, execution_flag = self.get_terminal_and_execution_flag()
@@ -195,7 +218,10 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def _build_menu_icon( self, menu ):
+    def _build_menu_icon(
+        self,
+        menu ):
+
         submenu = Gtk.Menu()
 
         self.create_and_append_menuitem(
@@ -225,7 +251,10 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def _build_menu_label_tooltip_osd( self, menu ):
+    def _build_menu_label_tooltip_osd(
+        self,
+        menu ):
+
         submenu = Gtk.Menu()
 
         self.create_and_append_menuitem(
@@ -261,7 +290,10 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def _build_menu_clipboard( self, menu ):
+    def _build_menu_clipboard(
+        self,
+        menu ):
+
         submenu = Gtk.Menu()
 
         message_clipboard_unsupported = (
@@ -301,7 +333,10 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-    def _build_menu_execute_command( self, menu ):
+    def _build_menu_execute_command(
+        self,
+        menu ):
+
         submenu = Gtk.Menu()
 
         labels = (
@@ -383,7 +418,10 @@ class IndicatorTest( IndicatorBase ):
         return svg
 
 
-    def _execute_command( self, command ):
+    def _execute_command(
+        self,
+        command ):
+
         terminal, terminal_execution_flag = (
             self.get_terminal_and_execution_flag() )
 
@@ -422,7 +460,10 @@ class IndicatorTest( IndicatorBase ):
             print( "Executing command: " + command_ )
 
 
-    def on_preferences( self, dialog ):
+    def on_preferences(
+        self,
+        dialog ):
+
         grid = self.create_grid()
 
         x_checkbutton = (
@@ -495,7 +536,10 @@ class IndicatorTest( IndicatorBase ):
             cell_renderer.set_property( "weight", Pango.Weight.BOLD )
 
 
-    def load_config( self, config ):
+    def load_config(
+        self,
+        config ):
+
         self.x = config.get( IndicatorTest.CONFIG_X, True )
 
 

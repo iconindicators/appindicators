@@ -37,10 +37,10 @@ class DataProviderOrbitalElement( DataProvider ):
 
     @staticmethod
     def download(
-            filename,
-            logging,
-            orbital_element_data_type,
-            apparent_magnitude_maximum ):
+        filename,
+        logging,
+        orbital_element_data_type,
+        apparent_magnitude_maximum ):
         ''' Download orbital element data and save to the given filename. '''
 
         is_comet = (
@@ -80,10 +80,10 @@ class DataProviderOrbitalElement( DataProvider ):
 
     @staticmethod
     def _download_from_lowell_minor_planet_services(
-            filename,
-            logging,
-            orbital_element_data_type,
-            apparent_magnitude_maximum ):
+        filename,
+        logging,
+        orbital_element_data_type,
+        apparent_magnitude_maximum ):
         '''
         Download orbital element data for minor planets from Lowell Minor
         Planet Services and save to the given filename.
@@ -270,7 +270,10 @@ class DataProviderOrbitalElement( DataProvider ):
 
 
     @staticmethod
-    def get_packed_date( year, month, day ):
+    def get_packed_date(
+        year,
+        month,
+        day ):
         '''
         https://www.minorplanetcenter.net/iau/info/PackedDates.html
         '''
@@ -303,10 +306,10 @@ class DataProviderOrbitalElement( DataProvider ):
 
     @staticmethod
     def _download_from_comet_observation_database(
-            filename,
-            logging,
-            orbital_element_data_type,
-            apparent_magnitude_maximum ):
+        filename,
+        logging,
+        orbital_element_data_type,
+        apparent_magnitude_maximum ):
         '''
         Download orbital element data for comets from Comet Observation
         Database and save to the given filename.
@@ -325,7 +328,10 @@ class DataProviderOrbitalElement( DataProvider ):
 
 
     @staticmethod
-    def load( filename, logging, orbital_element_data_type ):
+    def load(
+        filename,
+        logging,
+        orbital_element_data_type ):
         '''
         Load orbital element data from the given filename.
 
@@ -412,7 +418,12 @@ class OE():
         XEPHEM_MINOR_PLANET = 3
 
 
-    def __init__( self, name, data, data_type ):
+    def __init__(
+        self,
+        name,
+        data,
+        data_type ):
+
         self.name = name
         self.data = data
         self.data_type = data_type

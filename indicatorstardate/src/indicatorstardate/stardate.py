@@ -94,7 +94,8 @@ def get_version():
     return "Version 6.0 (2024-06-11)"
 
 
-def get_stardate_classic( gregorian_date_time ):
+def get_stardate_classic(
+    gregorian_date_time ):
     '''
     Convert a Gregorian datetime.datetime in UTC to a 'classic' stardate.
 
@@ -196,7 +197,8 @@ def get_stardate_classic( gregorian_date_time ):
     return stardate_issue, stardate_integer, stardate_fraction
 
 
-def get_stardate_2009_revised( gregorian_date_time ):
+def get_stardate_2009_revised(
+    gregorian_date_time ):
     '''
     Convert a Gregorian datetime.datetime in UTC to a '2009 revised' stardate.
 
@@ -222,7 +224,9 @@ def get_stardate_2009_revised( gregorian_date_time ):
     return stardate_integer, stardate_fraction
 
 
-def get_next_update_in_seconds( gregorian_date_time, is_classic ):
+def get_next_update_in_seconds(
+    gregorian_date_time,
+    is_classic ):
     '''
     Converts the date/time to the corresponding stardate and determines how
     many seconds will elapse until that stardate will change.
@@ -279,9 +283,9 @@ def get_next_update_in_seconds( gregorian_date_time, is_classic ):
 
 
 def get_gregorian_from_stardate_classic(
-        stardate_issue,
-        stardate_integer,
-        stardate_fraction ):
+    stardate_issue,
+    stardate_integer,
+    stardate_fraction ):
     '''
     Convert a 'classic' stardate to a Gregorian datetime.datetime.
 
@@ -376,8 +380,8 @@ def get_gregorian_from_stardate_classic(
 
 
 def get_gregorian_from_stardate_2009_revised(
-        stardate_integer,
-        stardate_fraction ):
+    stardate_integer,
+    stardate_fraction ):
     '''
     Convert a '2009 revised' stardate to a Gregorian datetime.datetime.
 
@@ -411,11 +415,11 @@ def get_gregorian_from_stardate_2009_revised(
 
 
 def to_stardate_string(
-        stardate_issue,
-        stardate_integer,
-        stardate_fraction,
-        show_issue,
-        pad_integer ):
+    stardate_issue,
+    stardate_integer,
+    stardate_fraction,
+    show_issue,
+    pad_integer ):
     '''
     Returns a stardate in string format.
 
@@ -457,7 +461,9 @@ def to_stardate_string(
     return string_builder
 
 
-def requires_padding( stardate_issue, stardate_integer ):
+def requires_padding(
+    stardate_issue,
+    stardate_integer ):
     '''
     Determines if a 'classic' stardate requires zero padding.
 

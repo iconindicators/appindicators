@@ -30,7 +30,13 @@ from abc import ABC
 class Info( ABC ):
     ''' Base class for script information. '''
 
-    def __init__( self, group, name, command, play_sound, show_notification ):
+    def __init__(
+        self,
+        group,
+        name,
+        command,
+        play_sound,
+        show_notification ):
         '''
         Group to which a script belongs.
         Name of script.
@@ -101,14 +107,14 @@ class Background( Info ):
     ''' Background script information. '''
 
     def __init__(
-            self,
-            group,
-            name,
-            command,
-            play_sound,
-            show_notification,
-            interval_in_minutes,
-            force_update ):
+        self,
+        group,
+        name,
+        command,
+        play_sound,
+        show_notification,
+        interval_in_minutes,
+        force_update ):
         '''
         Group to which a script belongs.
         Name of script.
@@ -117,7 +123,7 @@ class Background( Info ):
         True to show a notification on completion of script/command execution.
         Update interval (in minutes).
         Force update; script will update on the next update for ANY
-        background script.        
+        background script.
         '''
         super().__init__( group, name, command, play_sound, show_notification )
         self.interval_in_minutes = interval_in_minutes
@@ -160,14 +166,14 @@ class NonBackground( Info ):
     ''' Non-background (foreground) script information. '''
 
     def __init__(
-            self,
-            group,
-            name,
-            command,
-            play_sound,
-            show_notification,
-            terminal_open,
-            default ):
+        self,
+        group,
+        name,
+        command,
+        play_sound,
+        show_notification,
+        terminal_open,
+        default ):
         '''
         Group to which a script belongs.
         Name of script.

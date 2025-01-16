@@ -59,26 +59,31 @@ class IndicatorFortune( IndicatorBase ):
     HISTORY_FILE = "fortune-history.txt"
 
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
-
-    # When no fortune is enabled or no fortunes are present, this flag is
-    # inserted into a dummy fortune to be shown as a notification.
-    NOTIFICATION_WARNING_FLAG = "%%%%%"
+    NOTIFICATION_SUMMARY_WARNING = _( "WARNING. . ." )
 
 
     def __init__( self ):
         super().__init__(
-            comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
+            comments = _(
+                "Calls the 'fortune' program displaying the result in the " +
+                "on-screen notification." ) )
 
         self.remove_file_from_cache( IndicatorFortune.HISTORY_FILE )
 
 
-    def update( self, menu ):
-        self.build_menu( menu )
-        self.refresh_and_show_fortune()
+    def update(
+        self,
+        menu ):
+
+        self.build_menu( menu, self.refresh_and_show_fortune() )
         return int( self.refresh_interval_in_minutes ) * 60
 
 
-    def build_menu( self, menu ):
+    def build_menu(
+        self,
+        menu,
+        fortune ):
+
         self.create_and_append_menuitem(
             menu,
             _( "New Fortune" ),
@@ -92,7 +97,7 @@ class IndicatorFortune( IndicatorBase ):
         activate_functionandarguments = None
         if self.is_clipboard_supported():
             activate_functionandarguments = (
-                lambda menuitem: self.copy_to_selection( self.fortune ), )
+                lambda menuitem: self.copy_to_selection( fortune ), )
 
         self.create_and_append_menuitem(
             menu,
@@ -122,16 +127,14 @@ class IndicatorFortune( IndicatorBase ):
                 lambda menuitem: self.show_history(), ) )
 
 
-    def refresh_and_show_fortune( self ):
-        self.refresh_fortune()
-        self.show_fortune()
-
-
     def show_history( self ):
 
-        # Scroll to the end...strange way of doing so!
-        # https://stackoverflow.com/questions/5218948/how-to-auto-scroll-a-gtk-scrolledwindow
-        def textview_changed( textview, rectangle ):
+        # Scroll to the end:
+        #   https://stackoverflow.com/q/5218948/2156453
+        def textview_changed(
+            textview,
+            rectangle ):
+
             adjustment = textview.get_parent().get_vadjustment()
             adjustment.set_value(
                 adjustment.get_upper() - adjustment.get_page_size() )
@@ -172,7 +175,7 @@ class IndicatorFortune( IndicatorBase ):
         self.set_menu_sensitivity( True )
 
 
-    def refresh_fortune( self ):
+    def refresh_and_show_fortune( self ):
         locations = [ ]
         at_least_one_fortune_is_enabled = False
         for location, enabled in self.fortunes:
@@ -189,74 +192,61 @@ class IndicatorFortune( IndicatorBase ):
                     self.get_logging().error(
                         f"Unknown fortune path { location }" )
 
+        notification_summary = ( IndicatorFortune.NOTIFICATION_SUMMARY_WARNING )
         if locations:
             while True:
                 command = "fortune" + ''.join( locations )
-                self.fortune = self.process_get( command )
-                if not self.fortune: # No fortune data found.
-                    self.fortune = (
-                        IndicatorFortune.NOTIFICATION_WARNING_FLAG
-                        +
-                        _( "Ensure enabled fortunes contain fortune data!" ) )
-
+                fortune = self.process_get( command )
+                if not fortune: # No fortune data found.
+                    fortune = _( "Ensure enabled fortunes contain data!" )
                     break
 
-                if len( self.fortune ) <= self.skip_fortune_character_count:
+                if len( fortune ) <= self.skip_fortune_character_count:
                     history = (
                         self.read_cache_text_without_timestamp(
                             IndicatorFortune.HISTORY_FILE ) )
 
                     # Remove characters/glyphs which appear as hexadecimal.
-                    # Refer to:
-                    #     https://askubuntu.com/questions/827193/detect-missing-glyphs-in-text
+                    #    https://askubuntu.com/q/827193
                     #
                     # Examples (On Debian 12 x0007 is x0008):
-                    #     Ask not for whom the <CONTROL-G> tolls.
-                    #         *** System shutdown message from root ***
-                    #     It's a very *__UN*lucky week in which to be took dead.
+                    #    Ask not for whom the <CONTROL-G> tolls.
+                    #        *** System shutdown message from root
+                    #    It's a very *__UN*lucky week in which to be took
                     output = ""
-                    for c in self.fortune:
+                    for c in fortune:
                         char_as_hex = codecs.encode( str.encode( c ), "hex" )
                         if char_as_hex == b'07' or char_as_hex == b'08':
                             continue
 
                         output += c
 
-                    self.fortune = output
+                    fortune = output
+                    notification_summary = self.notification_summary
+                    if notification_summary == "":
+                        notification_summary = " "
+
                     self.write_cache_text_without_timestamp(
-                        history + self.fortune + "\n\n",
+                        history + fortune + "\n\n",
                         IndicatorFortune.HISTORY_FILE )
 
                     break
 
         elif at_least_one_fortune_is_enabled:
-            self.fortune = (
-                IndicatorFortune.NOTIFICATION_WARNING_FLAG
-                +
-                _( "No enabled fortunes have a valid location!" ) )
+            fortune = _( "No enabled fortunes have a valid location!" )
 
         else:
-            self.fortune = (
-                IndicatorFortune.NOTIFICATION_WARNING_FLAG
-                +
-                _( "No enabled fortunes!" ) )
+            fortune = _( "No enabled fortunes!" )
+
+        self.show_notification( notification_summary, fortune )
+
+        return fortune
 
 
-    def show_fortune( self ):
-        if self.fortune.startswith( IndicatorFortune.NOTIFICATION_WARNING_FLAG ):
-            notification_summary = _( "WARNING. . ." )
+    def on_preferences(
+        self,
+        dialog ):
 
-        else:
-            notification_summary = self.notification_summary
-            if notification_summary == "":
-                notification_summary = " "
-
-        self.show_notification(
-            notification_summary,
-            self.fortune.strip( IndicatorFortune.NOTIFICATION_WARNING_FLAG ) )
-
-
-    def on_preferences( self, dialog ):
         notebook = Gtk.Notebook()
 
         # Fortunes.
@@ -344,10 +334,11 @@ class IndicatorFortune( IndicatorBase ):
                 60 * 24,
                 tooltip_text = _( "How often a fortune is displayed." ) ) )
 
+        label = Gtk.Label.new( _( "Refresh interval (minutes)" ) )
         grid.attach(
             self.create_box(
                 (
-                    ( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False ),
+                    ( label, False ),
                     ( spinner_refresh_interval, False ) ) ),
             0, 0, 1, 1 )
 
@@ -385,21 +376,26 @@ class IndicatorFortune( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 2, 1, 1 )
 
+
+        label = Gtk.Label.new( _( "Middle mouse click of the icon" ) )
+
         grid.attach(
             self.create_box(
-                ( ( Gtk.Label.new( _( "Middle mouse click of the icon" ) ), False ), ),
+                ( ( label, False ), ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 3, 1, 1 )
+
+        active_ = (
+            self.middle_mouse_click_on_icon
+            ==
+            IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
 
         radio_middle_mouse_click_new_fortune = (
             self.create_radiobutton(
                 None,
                 _( "Show a new fortune" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = (
-                    self.middle_mouse_click_on_icon
-                    ==
-                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) ) )
+                active = active_ ) )
 
         grid.attach( radio_middle_mouse_click_new_fortune, 0, 4, 1, 1 )
 
@@ -407,28 +403,32 @@ class IndicatorFortune( IndicatorBase ):
         if not self.is_clipboard_supported():
             tooltip_text += _( "Unsupported on Ubuntun 20.04 on Wayland." )
 
+        active_ = (
+            self.middle_mouse_click_on_icon
+            ==
+            IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
+
         radio_middle_mouse_click_copy_last_fortune = (
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,
                 _( "Copy current fortune to clipboard" ),
                 tooltip_text = tooltip_text,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active =
-                    self.middle_mouse_click_on_icon
-                    ==
-                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
+                active = active_ ) )
 
         grid.attach( radio_middle_mouse_click_copy_last_fortune, 0, 5, 1, 1 )
+
+        active_ = (
+            self.middle_mouse_click_on_icon
+            ==
+            IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST )
 
         radio_middle_mouse_click_show_last_fortune = (
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,
                 _( "Show current fortune" ),
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active =
-                    self.middle_mouse_click_on_icon
-                    ==
-                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
+                active = active_ ) )
 
         grid.attach( radio_middle_mouse_click_show_last_fortune, 0, 6, 1, 1 )
 
@@ -486,11 +486,11 @@ class IndicatorFortune( IndicatorBase ):
 #TODO This will likely go into indicatorbase...
 # ...but also check that something similar has not already been done.
     def on_checkbox(
-            self,
-            cell_renderer_toggle,
-            row,
-            store,
-            checkbox_column_model_id ):
+        self,
+        cell_renderer_toggle,
+        row,
+        store,
+        checkbox_column_model_id ):
 
         store_ = store
         if isinstance( store, Gtk.TreeModelSort ):
@@ -500,7 +500,11 @@ class IndicatorFortune( IndicatorBase ):
             not store_[ row ][ checkbox_column_model_id ] )
 
 
-    def on_fortune_remove( self, button, treeview ):
+    def on_fortune_remove(
+        self,
+        button,
+        treeview ):
+
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
             self.show_dialog_ok(
@@ -531,12 +535,20 @@ class IndicatorFortune( IndicatorBase ):
                         model.convert_iter_to_child_iter( treeiter ) )
 
 
-    def on_fortune_add( self, button, treeview ):
+    def on_fortune_add(
+        self,
+        button,
+        treeview ):
+
         self._on_fortune_double_click( treeview, None, None )
 
 
     def on_fortune_double_click(
-            self, treeview, row_number, treeviewcolumn, preferences_dialog ):
+        self,
+        treeview,
+        row_number,
+        treeviewcolumn,
+        preferences_dialog ):
 
         model, treeiter = treeview.get_selection().get_selected()
         path = model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ]
@@ -550,7 +562,12 @@ class IndicatorFortune( IndicatorBase ):
                 treeview, row_number, treeviewcolumn )
 
 
-    def _on_fortune_double_click( self, treeview, row_number, treeviewcolumn ):
+    def _on_fortune_double_click(
+        self,
+        treeview,
+        row_number,
+        treeviewcolumn ):
+
         model, treeiter = treeview.get_selection().get_selected()
         adding_fortune = row_number is None
 
@@ -636,7 +653,9 @@ class IndicatorFortune( IndicatorBase ):
                 if self.get_system_fortune() in path:
                     self.show_dialog_ok(
                         dialog,
-                        _( "This fortune is part of your system and is already included." ) )
+                        _(
+                            "This fortune is part of your system and is " +
+                            "already included." ) )
 
                     continue
 
@@ -652,11 +671,11 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def on_browse_fortune(
-            self,
-            file_or_directory_button,
-            add_edit_dialog,
-            fortune_file_directory,
-            is_file ):
+        self,
+        file_or_directory_button,
+        add_edit_dialog,
+        fortune_file_directory,
+        is_file ):
 
         if is_file:
             title = _( "Choose a fortune .dat file" )
@@ -702,7 +721,10 @@ class IndicatorFortune( IndicatorBase ):
         return system_fortune
 
 
-    def load_config( self, config ):
+    def load_config(
+        self,
+        config ):
+
         self.fortunes = (
             config.get(
                 IndicatorFortune.CONFIG_FORTUNES,

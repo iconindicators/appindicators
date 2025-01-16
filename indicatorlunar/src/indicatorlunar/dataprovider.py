@@ -32,7 +32,10 @@ class DataProvider( ABC ):
 
     @staticmethod
     @abstractmethod
-    def download( filename, logging, *args ):
+    def download(
+        filename,
+        logging,
+        *args ):
         '''
         Download data and save to file.
 
@@ -43,7 +46,10 @@ class DataProvider( ABC ):
 
     @staticmethod
     @abstractmethod
-    def load( filename, logging, *args ):
+    def load(
+        filename,
+        logging,
+        *args ):
         '''
         Load data from file and return in a dictionary.
 

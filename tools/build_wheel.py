@@ -56,7 +56,9 @@ except ModuleNotFoundError:
 VENV = Path.home() / ".local" / "venv_indicators"
 
 
-def _run_checks_on_indicator( indicator_name ):
+def _run_checks_on_indicator(
+    indicator_name ):
+
     paths = [
         Path( '.' ) / "indicatorbase",
         Path( '.' ) / indicator_name,
@@ -85,11 +87,19 @@ def _run_checks_on_indicator( indicator_name ):
     # return message #TODO Uncomment in final release.
 
 
-def _chmod( file, user_permission, group_permission, other_permission ):
-    Path( file ).chmod( user_permission | group_permission | other_permission )
+def _chmod(
+    file_,
+    user_permission,
+    group_permission,
+    other_permission ):
+
+    Path( file_ ).chmod( user_permission | group_permission | other_permission )
 
 
-def _create_pyproject_dot_toml( indicator_name, directory_out ):
+def _create_pyproject_dot_toml(
+    indicator_name,
+    directory_out ):
+
     indicator_pyproject_toml = Path( '.' ) / indicator_name / "pyproject.toml"
 
     config = configparser.ConfigParser()
@@ -146,7 +156,10 @@ def _create_pyproject_dot_toml( indicator_name, directory_out ):
     return out_pyproject_toml, version_indicator_base
 
 
-def _get_name_categories_comments_from_indicator( indicator_name, directory_indicator ):
+def _get_name_categories_comments_from_indicator(
+    indicator_name,
+    directory_indicator ):
+
     indicator_source = Path( '.' ) / directory_indicator / "src" / indicator_name / ( indicator_name + ".py" )
 
     name = ""
@@ -173,7 +186,9 @@ def _get_name_categories_comments_from_indicator( indicator_name, directory_indi
     return name, categories, comments, message
 
 
-def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
+def _create_scripts_for_linux(
+    directory_platform_linux,
+    indicator_name ):
 
     class SafeDict( dict ):
         '''
@@ -183,14 +198,17 @@ def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
         https://stackoverflow.com/a/17215533/2156453
         '''
 
-        def __missing__( self, key ):
+        def __missing__(
+            self,
+            key ):
+
             return '{' + key + '}'
 
 
     def read_format_write(
-            indicatorbase_platform_linux_path,
-            source_script_name,
-            destination_script_name ):
+        indicatorbase_platform_linux_path,
+        source_script_name,
+        destination_script_name ):
 
         with open( indicatorbase_platform_linux_path / source_script_name, 'r', encoding = "utf-8" ) as f:
             script_text = f.read()
@@ -228,7 +246,10 @@ def _create_scripts_for_linux( directory_platform_linux, indicator_name ):
         uninstall_script )
 
 
-def _create_symbolic_icons( directory_wheel, indicator_name ):
+def _create_symbolic_icons(
+    directory_wheel,
+    indicator_name ):
+
     directory_icons = directory_wheel / indicator_name / "src" / indicator_name / "icons"
     for hicolor_icon in list( ( Path( '.' ) / directory_icons ).glob( "*.svg" ) ):
         symbolic_icon = directory_icons / ( str( hicolor_icon.name )[ 0 : -4 ] + "-symbolic.svg" )
@@ -246,13 +267,13 @@ def _create_symbolic_icons( directory_wheel, indicator_name ):
 
 
 def _create_dot_desktop(
-        directory_platform_linux,
-        indicator_name,
-        name,
-        names_from_mo_files,
-        comments,
-        comments_from_mo_files,
-        categories ):
+    directory_platform_linux,
+    indicator_name,
+    name,
+    names_from_mo_files,
+    comments,
+    comments_from_mo_files,
+    categories ):
 
     indicatorbase_dot_desktop_path = (
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" / "indicatorbase.py.desktop" )
@@ -294,13 +315,18 @@ def _create_dot_desktop(
         stat.S_IROTH )
 
 
-def _get_value_from_pyproject_toml( pyproject_toml, key ):
+def _get_value_from_pyproject_toml(
+    pyproject_toml,
+    key ):
+
     config = configparser.ConfigParser()
     config.read( pyproject_toml )
     return config[ key[ 0 ] ][ key[ 1 ] ]
 
 
-def get_pyproject_toml_authors( pyproject_toml ):
+def get_pyproject_toml_authors(
+    pyproject_toml ):
+
     authors = _get_value_from_pyproject_toml( pyproject_toml, ( "project", "authors" ) )
     authors = authors.replace( '[', '' ).replace( ']', '' )
     authors = authors.replace( '{', '' ).replace( '},', '' ).replace( '}', '' ).strip()
@@ -324,12 +350,16 @@ def get_pyproject_toml_authors( pyproject_toml ):
     return tuple( names_emails )
 
 
-def get_pyproject_toml_version( pyproject_toml ):
+def get_pyproject_toml_version(
+    pyproject_toml ):
+
     version = _get_value_from_pyproject_toml( pyproject_toml, ( "project", "version" ) )
     return version.replace( '\'', '' ).strip()
 
 
-def _get_version_in_changelog_markdown( changelog_markdown ):
+def _get_version_in_changelog_markdown(
+    changelog_markdown ):
+
     version = ""
     with open( changelog_markdown, 'r', encoding = "utf-8" ) as f:
         for line in f.readlines():
@@ -340,7 +370,10 @@ def _get_version_in_changelog_markdown( changelog_markdown ):
     return version
 
 
-def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
+def _package_source_for_build_wheel_process(
+    directory_dist,
+    indicator_name ):
+
     message = ""
 
     # Using copytree, the ENTIRE project is copied across.
@@ -435,7 +468,10 @@ def _package_source_for_build_wheel_process( directory_dist, indicator_name ):
     return message
 
 
-def _build_wheel_for_indicator( directory_release, indicator_name ):
+def _build_wheel_for_indicator(
+    directory_release,
+    indicator_name ):
+
     message = _run_checks_on_indicator( indicator_name )
     if not message:
         directory_dist = Path( '.' ) / directory_release / "wheel" / ( "dist_" + indicator_name )

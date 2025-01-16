@@ -57,7 +57,10 @@ class IndicatorStardate( IndicatorBase ):
         self.save_config_timer_id = None
 
 
-    def update( self, menu ):
+    def update(
+        self,
+        menu ):
+
         utc_now = datetime.datetime.now( datetime.timezone.utc )
         if self.show_classic:
             stardate_issue, stardate_integer, stardate_fraction = (
@@ -89,7 +92,12 @@ class IndicatorStardate( IndicatorBase ):
         return number_of_seconds_to_next_update
 
 
-    def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction ):
+    def on_mouse_wheel_scroll(
+        self,
+        indicator,
+        delta,
+        scroll_direction ):
+
         # Cycle through all combinations of options for display of the stardate.
         # If showing a 'classic' stardate and padding is not required,
         # ignore the padding option.
@@ -144,7 +152,10 @@ class IndicatorStardate( IndicatorBase ):
         self.request_save_config( delay = 10 )
 
 
-    def on_preferences( self, dialog ):
+    def on_preferences(
+        self,
+        dialog ):
+
         grid = self.create_grid()
 
         show_classic_checkbutton = (
@@ -211,7 +222,10 @@ class IndicatorStardate( IndicatorBase ):
         return response_type
 
 
-    def load_config( self, config ):
+    def load_config(
+        self,
+        config ):
+
         self.pad_integer = (
             config.get( IndicatorStardate.CONFIG_PAD_INTEGER, True ) )
 

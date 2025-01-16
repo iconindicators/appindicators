@@ -66,7 +66,10 @@ def get_stars_and_hips( iau_catalog_file ):
     return stars_and_hips_from_iau
 
 
-def print_formatted_stars( stars_and_hips_, star_information_url ):
+def print_formatted_stars(
+    stars_and_hips_,
+    star_information_url ):
+
     print( "Printing formatted stars from", star_information_url )
     for name, hip in stars_and_hips_:
         print(
@@ -82,7 +85,11 @@ def print_formatted_stars( stars_and_hips_, star_information_url ):
     print( "Done" )
 
 
-def create_ephemeris_skyfield( out_file, star_ephemeris, stars_and_hips_ ):
+def create_ephemeris_skyfield(
+    out_file,
+    star_ephemeris,
+    stars_and_hips_ ):
+
     print( "Creating", out_file, "for Skyfield..." )
     hipparcos_identifiers = (
         [ star_and_hip[ 1 ] for star_and_hip in stars_and_hips_ ] )
@@ -98,7 +105,10 @@ def create_ephemeris_skyfield( out_file, star_ephemeris, stars_and_hips_ ):
     print( "Done" )
 
 
-def print_ephemeris_pyephem( bsp_file , star_ephemeris, stars_and_hips_ ):
+def print_ephemeris_pyephem(
+    bsp_file,
+    star_ephemeris,
+    stars_and_hips_ ):
     '''
     Mostly taken from
         https://github.com/brandon-rhodes/pyephem/blob/master/bin/rebuild-star-data

@@ -54,7 +54,11 @@ import textwrap
 from dateutil.relativedelta import relativedelta
 
 
-def create_ephemeris_planets( in_bsp, out_bsp, years ):
+def create_ephemeris_planets(
+    in_bsp,
+    out_bsp,
+    years ):
+
     today = datetime.date.today()
     start_date = today - relativedelta( months = 1 )
     end_date = today.replace( year = today.year + years )

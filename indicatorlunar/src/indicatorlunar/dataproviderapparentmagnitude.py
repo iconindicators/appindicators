@@ -35,10 +35,10 @@ class DataProviderApparentMagnitude( DataProvider ):
 
     @staticmethod
     def download(
-            filename,
-            logging,
-            is_comet,
-            apparent_magnitude_maximum ):
+        filename,
+        logging,
+        is_comet,
+        apparent_magnitude_maximum ):
         '''
         Download apparent magnitude data for comets and minor planets and save
         to the given filename.
@@ -151,7 +151,9 @@ class DataProviderApparentMagnitude( DataProvider ):
 
 
     @staticmethod
-    def load( filename, logging ):
+    def load(
+        filename,
+        logging ):
         '''
         Load apparent magnitude data from the given filename.
 
@@ -176,7 +178,11 @@ class DataProviderApparentMagnitude( DataProvider ):
 class AM():
     ''' Apparent magnitude for a comet or minor planet. '''
 
-    def __init__( self, name, apparent_magnitude ):
+    def __init__(
+        self,
+        name,
+        apparent_magnitude ):
+
         self.name = name
         self.apparent_magnitude = apparent_magnitude
 

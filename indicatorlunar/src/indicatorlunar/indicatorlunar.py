@@ -270,7 +270,10 @@ class IndicatorLunar( IndicatorBase ):
         self.next_download_time_satellite = utc_now
 
 
-    def update( self, menu ):
+    def update(
+        self,
+        menu ):
+
         utc_now = datetime.datetime.now( datetime.timezone.utc )
 
         # Update comet minor planet and satellite cached data.
@@ -323,7 +326,10 @@ class IndicatorLunar( IndicatorBase ):
         return self.get_next_update_time_in_seconds()
 
 
-    def update_data( self, utc_now ):
+    def update_data(
+        self,
+        utc_now ):
+
         # Update comet data.
         self.comet_orbital_element_data, self.download_count_comet, self.next_download_time_comet = (
             self._update_data(
@@ -400,11 +406,18 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def _update_data(
-            self, utc_now, current_data,
-            cache_basename, cache_extension, cache_maximum_age,
-            download_count, next_download_time,
-            download_data_function, download_data_additional_arguments,
-            load_data_function, load_data_additional_arguments ):
+        self,
+        utc_now,
+        current_data,
+        cache_basename,
+        cache_extension,
+        cache_maximum_age,
+        download_count,
+        next_download_time,
+        download_data_function,
+        download_data_additional_arguments,
+        load_data_function,
+        load_data_additional_arguments ):
         '''
         Get the data from the cache, or if stale, download from the source.
         '''
@@ -458,7 +471,11 @@ class IndicatorLunar( IndicatorBase ):
         return fresh_data, download_count, next_download_time
 
 
-    def _get_next_download_time( self, utc_now, download_count ):
+    def _get_next_download_time(
+        self,
+        utc_now,
+        download_count ):
+
         # Worst case scenario for retrying downloads: every 24 hours.
         next_download_time = utc_now + datetime.timedelta( minutes = 60 * 24 )
         time_interval_in_minutes = {
@@ -475,7 +492,11 @@ class IndicatorLunar( IndicatorBase ):
         return next_download_time
 
 
-    def add_new_bodies( self, data, bodies ):
+    def add_new_bodies(
+        self,
+        data,
+        bodies ):
+
         for body in data:
             if body not in bodies:
                 bodies.append( body )
@@ -626,7 +647,11 @@ class IndicatorLunar( IndicatorBase ):
         return next_update_in_seconds
 
 
-    def update_menu( self, menu, utc_now ):
+    def update_menu(
+        self,
+        menu,
+        utc_now ):
+
         self.update_menu_moon( menu )
         self.update_menu_sun( menu )
         self.update_menu_planets_minor_planets_comets_stars(
@@ -775,7 +800,10 @@ class IndicatorLunar( IndicatorBase ):
             self._notification_satellite( number )
 
 
-    def _notification_satellite( self, number ):
+    def _notification_satellite(
+        self,
+        number ):
+
         key = ( IndicatorLunar.astro_backend.BodyType.SATELLITE, number )
 
         rise_time = (
@@ -858,7 +886,10 @@ class IndicatorLunar( IndicatorBase ):
         self.show_notification( summary, message, icon = self.icon_satellite )
 
 
-    def update_menu_moon( self, menu ):
+    def update_menu_moon(
+        self,
+        menu ):
+
         submenu = Gtk.Menu()
         updated = (
             self._update_menu_common(
@@ -940,7 +971,10 @@ class IndicatorLunar( IndicatorBase ):
                 IndicatorLunar.SEARCH_URL_MOON )
 
 
-    def update_menu_sun( self, menu ):
+    def update_menu_sun(
+        self,
+        menu ):
+
         submenu = Gtk.Menu()
         updated = (
             self._update_menu_common(
@@ -1018,7 +1052,13 @@ class IndicatorLunar( IndicatorBase ):
                 IndicatorLunar.SEARCH_URL_SUN )
 
 
-    def _update_menu_eclipse( self, menu, body_type, name_tag, url ):
+    def _update_menu_eclipse(
+        self,
+        menu,
+        body_type,
+        name_tag,
+        url ):
+
         menu.append( Gtk.SeparatorMenuItem() )
         key = ( body_type, name_tag )
 
@@ -1084,7 +1124,12 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def update_menu_planets_minor_planets_comets_stars(
-            self, menu, menu_label, bodies, bodies_data, body_type ):
+        self,
+        menu,
+        menu_label,
+        bodies,
+        bodies_data,
+        body_type ):
 
         def get_menuitem_name_function():
             if body_type == IndicatorLunar.astro_backend.BodyType.PLANET:
@@ -1121,7 +1166,9 @@ class IndicatorLunar( IndicatorBase ):
             return menuitem_name_function
 
 
-        def comet_on_click_function( menuitem ):
+        def comet_on_click_function(
+            menuitem ):
+
             try:
                 response = (
                     requests.get(
@@ -1227,7 +1274,9 @@ class IndicatorLunar( IndicatorBase ):
 
 
     @staticmethod
-    def _get_comet_designation_for_cobs_lookup( name, logging ):
+    def _get_comet_designation_for_cobs_lookup(
+        name,
+        logging ):
         '''
         Retrieve a comet's designation for lookup at the Comet
         Observation Database.
@@ -1275,7 +1324,8 @@ class IndicatorLunar( IndicatorBase ):
 
 
     @staticmethod
-    def _get_minor_planet_designation_for_lowell_lookup( name ):
+    def _get_minor_planet_designation_for_lowell_lookup(
+        name ):
         '''
         Retrieve a minor planet's designation for lookup at the Lowell Minor
         Planet Services.
@@ -1292,12 +1342,12 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def _update_menu_common(
-            self,
-            menu,
-            body_type,
-            name_tag,
-            menuitem_name,
-            on_click_function_and_arguments ):
+        self,
+        menu,
+        body_type,
+        name_tag,
+        menuitem_name,
+        on_click_function_and_arguments ):
         '''
         For the given body, creates the menu items relating to
         rise/set/azimuth/altitude.
@@ -1394,13 +1444,13 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def _update_menuitems_rise_azimuth_altitude_set(
-            self,
-            menu,
-            key,
-            menuitem_name,
-            on_click_function_and_arguments,
-            is_rise,
-            is_set ):
+        self,
+        menu,
+        key,
+        menuitem_name,
+        on_click_function_and_arguments,
+        is_rise,
+        is_set ):
 
         is_moon_or_sun = (
             key[ 0 ] == IndicatorLunar.astro_backend.BodyType.MOON or
@@ -1456,7 +1506,10 @@ class IndicatorLunar( IndicatorBase ):
                 indent = indent )
 
 
-    def update_menu_satellites( self, menu, utc_now ):
+    def update_menu_satellites(
+        self,
+        menu,
+        utc_now ):
         '''
         Display the rise/set information for each satellite.
 
@@ -1569,7 +1622,12 @@ class IndicatorLunar( IndicatorBase ):
                 menu, _( "Satellites (Polar)" ), satellites_polar )
 
 
-    def _update_menu_satellites( self, menu, label, satellites ):
+    def _update_menu_satellites(
+        self,
+        menu,
+        label,
+        satellites ):
+
         submenu = Gtk.Menu()
         self.create_and_append_menuitem( menu, label ).set_submenu( submenu )
         for info in satellites:
@@ -1710,7 +1768,12 @@ class IndicatorLunar( IndicatorBase ):
         submenu.remove( separator )
 
 
-    def format_data( self, data_tag, data, date_time_format = None ):
+    def format_data(
+        self,
+        data_tag,
+        data,
+        date_time_format = None ):
+
         display_data = ""
 
         is_altitude_or_azimuth = (
@@ -1781,7 +1844,10 @@ class IndicatorLunar( IndicatorBase ):
         return display_data
 
 
-    def to_local_date_time_string( self, utc_date_time, output_format ):
+    def to_local_date_time_string(
+        self,
+        utc_date_time,
+        output_format ):
         '''
         Converts a UTC date/time to a local date/time string in the given format.
         '''
@@ -1789,9 +1855,9 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def convert_start_hour_and_end_hour_to_date_time_in_utc(
-            self,
-            start_hour,
-            end_hour ):
+        self,
+        start_hour,
+        end_hour ):
         '''
         https://stackoverflow.com/a/64097432/2156453
         https://medium.com/@eleroy/10-things-you-need-to-know-about-date-and-time-in-python-with-datetime-pytz-dateutil-timedelta-309bfbafb3f7
@@ -1880,7 +1946,10 @@ class IndicatorLunar( IndicatorBase ):
             '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>' )
 
 
-    def on_preferences( self, dialog ):
+    def on_preferences(
+        self,
+        dialog ):
+
         notebook = Gtk.Notebook()
 
         page_icon = 0
@@ -2068,7 +2137,7 @@ class IndicatorLunar( IndicatorBase ):
                 0,
                 23,
                 page_increment = 4,
-                tooltip_text = _( 
+                tooltip_text = _(
                     "Show satellite passes before this hour (inclusive)" ) ) )
 
         grid.attach(
@@ -2547,7 +2616,7 @@ class IndicatorLunar( IndicatorBase ):
                 if row[ natural_body_model_column_hide_show ]:
                     self.stars.append( row[ natural_body_model_column_name ] )
 
-            # If the option to add new comets is checked, 
+            # If the option to add new comets is checked,
             # this will be handled out in the main update loop.
             # Otherwise, update the list of checked comets;
             # similarly for minor planets and satellites.
@@ -2615,7 +2684,10 @@ class IndicatorLunar( IndicatorBase ):
         return response_type
 
 
-    def initialise_display_tags_store( self, display_tags_store ):
+    def initialise_display_tags_store(
+        self,
+        display_tags_store ):
+
         items = [
             [
                 IndicatorLunar.astro_backend.BodyType.MOON,
@@ -2739,7 +2811,9 @@ class IndicatorLunar( IndicatorBase ):
                             body_tag + " " + data_tag, translated_tag, value ] )
 
 
-    def list_of_lists_to_liststore( self, list_of_lists ):
+    def list_of_lists_to_liststore(
+        self,
+        list_of_lists ):
         '''
         Converts a list of lists to a GTK ListStore.
         Each row of the returned ListStore contains one inner list.
@@ -2757,7 +2831,10 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def translate_text_using_tags(
-            self, tags_list_store, original_to_local, text ):
+        self,
+        tags_list_store,
+        original_to_local,
+        text ):
 
         # The tags list store contains at three columns.
         #   First column contains the original/untranslated tags.
@@ -2794,12 +2871,12 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def on_tags_values_double_click(
-            self,
-            tree,
-            row_number,
-            treeviewcolumn,
-            translated_tag_column_index,
-            indicator_textentry ):
+        self,
+        tree,
+        row_number,
+        treeviewcolumn,
+        translated_tag_column_index,
+        indicator_textentry ):
 
         model_sort, treeiter_sort = tree.get_selection().get_selected()
         value = model_sort[ treeiter_sort ][ translated_tag_column_index ]
@@ -2809,13 +2886,13 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def create_natural_body_treeview_within_scrolledwindow(
-            self,
-            treemodel,
-            title,
-            tooltip_text,
-            natural_body_model_column_hide_show,
-            natural_body_model_column_translated_name,
-            natural_body_view_column_hide_show ):
+        self,
+        treemodel,
+        title,
+        tooltip_text,
+        natural_body_model_column_hide_show,
+        natural_body_model_column_translated_name,
+        natural_body_view_column_hide_show ):
 
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect(
@@ -2852,23 +2929,23 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def on_natural_body_checkbox(
-            self,
-            cell_renderer_toggle,
-            row,
-            liststore,
-            natural_body_model_column_hide_show ):
+        self,
+        cell_renderer_toggle,
+        row,
+        liststore,
+        natural_body_model_column_hide_show ):
 
         liststore[ row ][ natural_body_model_column_hide_show ] = (
             not liststore[ row ][ natural_body_model_column_hide_show ] )
 
 
     def on_satellite_checkbox(
-            self,
-            cell_renderer_toggle,
-            row,
-            liststore,
-            sortstore,
-            satellite_model_column_hide_show ):
+        self,
+        cell_renderer_toggle,
+        row,
+        liststore,
+        sortstore,
+        satellite_model_column_hide_show ):
 
         actual_row = (
             sortstore.convert_path_to_child_path(
@@ -2879,7 +2956,10 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def on_columnheader(
-        self, treeviewcolumn, datastore, datastore_column_hide_show ):
+        self,
+        treeviewcolumn,
+        datastore,
+        datastore_column_hide_show ):
 
         all_items_checked = True
         for i, row in enumerate( datastore ):
@@ -2899,11 +2979,19 @@ class IndicatorLunar( IndicatorBase ):
 
     def create_notification_panel(
         self,
-        grid, grid_start_index,
-        checkbox_label, checkbox_tooltip, checkbox_is_active,
-        summary_label, summary_text, summary_tooltip,
-        message_label, message_text, message_tooltip,
-        test_button_text, test_button_tooltip,
+        grid,
+        grid_start_index,
+        checkbox_label,
+        checkbox_tooltip,
+        checkbox_is_active,
+        summary_label,
+        summary_text,
+        summary_tooltip,
+        message_label,
+        message_text,
+        message_tooltip,
+        test_button_text,
+        test_button_tooltip,
         is_moon_notification ):
 
         checkbutton = (
@@ -2983,7 +3071,11 @@ class IndicatorLunar( IndicatorBase ):
 
         else:
 
-            def replace_tags( text, rise_time, set_time ):
+            def replace_tags(
+                text,
+                rise_time,
+                set_time ):
+
                 return (
                     text.
                     replace(
@@ -3027,7 +3119,13 @@ class IndicatorLunar( IndicatorBase ):
         self.show_notification( summary, message, icon = icon )
 
 
-    def on_city_changed( self, combobox, latitude, longitude, elevation ):
+    def on_city_changed(
+        self,
+        combobox,
+        latitude,
+        longitude,
+        elevation ):
+
         city = combobox.get_active_text()
         if city in IndicatorLunar.astro_backend.get_cities():
             the_latitude, the_longitude, the_elevation = (
@@ -3056,7 +3154,10 @@ class IndicatorLunar( IndicatorBase ):
         return the_city
 
 
-    def load_config( self, config ):
+    def load_config(
+        self,
+        config ):
+
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME )
         if self.city is None:
             self.city = self.get_default_city()

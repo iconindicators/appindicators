@@ -26,7 +26,8 @@ import subprocess
 from pathlib import Path
 
 
-def is_correct_directory( example_arguments = None ):
+def is_correct_directory(
+    example_arguments = None ):
     correct_directory = (
         Path.cwd() == Path( inspect.stack()[ 1 ].filename ).parent.parent.absolute() )
 
@@ -43,10 +44,10 @@ def is_correct_directory( example_arguments = None ):
 
 
 def initialiase_parser_and_get_arguments(
-        description,
-        argument_names,
-        argument_helps = None,
-        argument_nargs = None ):
+    description,
+    argument_names,
+    argument_helps = None,
+    argument_nargs = None ):
 
     if argument_helps is None:
         argument_helps = { }
@@ -64,7 +65,10 @@ def initialiase_parser_and_get_arguments(
     return parser.parse_args()
 
 
-def initialise_virtual_environment( venv_directory, *modules_to_install ):
+def initialise_virtual_environment(
+    venv_directory,
+    *modules_to_install ):
+
     if not venv_directory.is_dir():
         command = f"python3 -m venv { venv_directory }"
         subprocess.call( command, shell = True )

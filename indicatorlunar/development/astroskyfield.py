@@ -34,7 +34,7 @@
 #       # planets_bsp = data_directory / "planets.bsp"
 #       # if not planets_bsp.is_file():
 #       #   message += f"{ indicator_name }: Unable to locate { planets_bsp } - may need to be created - aborting.\n"
-#     
+#
 #       # stars_dat = Path( str( data_directory ) + "/stars.dat" )
 #       # if not stars_dat.is_file():
 #       #   message += f"{ indicator_name }: Unable to locate { stars_dat } - may need to be created - aborting.\n"
@@ -275,15 +275,24 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def calculate(
-            utc_now,
-            latitude, longitude, elevation,
-            planets,
-            stars,
-            satellites, satellite_data, start_hour_as_date_time_in_utc, end_hour_as_date_time_in_utc,
-            comets, comet_data, comet_apparent_magnitude_data,
-            minor_planets, minor_planet_data, minor_planet_apparent_magnitude_data,
-            apparent_magnitude_maximum,
-            logging ):
+        utc_now,
+        latitude,
+        longitude,
+        elevation,
+        planets,
+        stars,
+        satellites,
+        satellite_data,
+        start_hour_as_date_time_in_utc,
+        end_hour_as_date_time_in_utc,
+        comets,
+        comet_data,
+        comet_apparent_magnitude_data,
+        minor_planets,
+        minor_planet_data,
+        minor_planet_apparent_magnitude_data,
+        apparent_magnitude_maximum,
+        logging ):
 
         data = { }
 
@@ -311,19 +320,19 @@ class AstroSkyfield( AstroBase ):
             now,
             location, location_at_now,
             data )
-        
+
         AstroSkyfield._calculate_sun(
             now, now_plus_twenty_five_hours,
             location, location_at_now,
             data )
-        
+
         AstroSkyfield._calculate_planets(
             now, now_plus_twenty_five_hours,
             location, location_at_now,
             data,
             planets,
             apparent_magnitude_maximum )
-        
+
         AstroSkyfield._calculate_stars(
             now, now_plus_twenty_five_hours,
             location, location_at_now,
@@ -397,12 +406,13 @@ class AstroSkyfield( AstroBase ):
 
 
     @staticmethod
-    def get_latitude_longitude_elevation( city ):
-        # Latitude = 0, Longitude = 1, Elevation = 2
+    def get_latitude_longitude_elevation(
+        city ):
+
         return (
-            AstroSkyfield._city_data.get( city )[ 0 ],
-            AstroSkyfield._city_data.get( city )[ 1 ],
-            AstroSkyfield._city_data.get( city )[ 2 ] )
+            AstroSkyfield._city_data.get( city )[ 0 ], # Latitude
+            AstroSkyfield._city_data.get( city )[ 1 ], # Longitude
+            AstroSkyfield._city_data.get( city )[ 2 ] ) # Elevation
 
 
     @staticmethod
@@ -411,7 +421,12 @@ class AstroSkyfield( AstroBase ):
 
 
     @staticmethod
-    def _calculate_moon( now, location, location_at_now, data ):
+    def _calculate_moon(
+        now,
+        location,
+        location_at_now,
+        data ):
+
         key = ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON )
 
         moon_at_now = (
@@ -468,10 +483,10 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def _calculate_sun(
-            now,
-            now_plus_twenty_five_hours,
-            location,
-            location_at_now, data ):
+        now,
+        now_plus_twenty_five_hours,
+        location,
+        location_at_now, data ):
 
         key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
 
@@ -510,10 +525,17 @@ class AstroSkyfield( AstroBase ):
 
 
     @staticmethod
-    def _calculate_eclipse( now, data, key, is_solar ):
+    def _calculate_eclipse(
+        now,
+        data,
+        key,
+        is_solar ):
 
         # https://rhodesmill.org/skyfield/almanac.html
-        def _get_native_eclipse_type( skyfield_eclipse_type, is_lunar ):
+        def _get_native_eclipse_type(
+            skyfield_eclipse_type,
+            is_lunar ):
+
             native_eclipse_type = None
             if is_lunar:
                 if skyfield_eclipse_type == eclipselib.LUNAR_ECLIPSES.index( "Partial" ):
@@ -565,13 +587,13 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def _calculate_planets(
-            now,
-            now_plus_twenty_five_hours,
-            location,
-            location_at_now,
-            data,
-            planets,
-            apparent_magnitude_maximum ):
+        now,
+        now_plus_twenty_five_hours,
+        location,
+        location_at_now,
+        data,
+        planets,
+        apparent_magnitude_maximum ):
 
         earth_at_now = AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._PLANET_EARTH ].at( now )
         for planet_name in planets:
@@ -589,13 +611,13 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def _calculate_stars(
-            now,
-            now_plus_twenty_five_hours,
-            location,
-            location_at_now,
-            data,
-            stars,
-            apparent_magnitude_maximum ):
+        now,
+        now_plus_twenty_five_hours,
+        location,
+        location_at_now,
+        data,
+        stars,
+        apparent_magnitude_maximum ):
 
         for star in stars:
             the_star = AstroSkyfield._EPHEMERIS_STARS.loc[ AstroBase.get_star_hip( star ) ]
@@ -613,11 +635,11 @@ class AstroSkyfield( AstroBase ):
 # https://github.com/skyfielders/python-skyfield/pull/526
     @staticmethod
     def _calculate_comets(
-            now, timescale,
-            location, location_at_now,
-            data,
-            comets, orbital_element_data,
-            apparent_magnitude_maximum ):
+        now, timescale,
+        location, location_at_now,
+        data,
+        comets, orbital_element_data,
+        apparent_magnitude_maximum ):
 
         with io.BytesIO() as f:
             for key in comets:
@@ -664,11 +686,11 @@ class AstroSkyfield( AstroBase ):
 # https://github.com/skyfielders/python-skyfield/pull/526
     @staticmethod
     def _calculate_minor_planets(
-            now, timescale,
-            location, location_at_now,
-            data,
-            minor_planets, orbital_element_data,
-            apparent_magnitude_maximum, apparent_magnitude_data ):
+        now, timescale,
+        location, location_at_now,
+        data,
+        minor_planets, orbital_element_data,
+        apparent_magnitude_maximum, apparent_magnitude_data ):
 
 #TODO Remove \
         with io.BytesIO() as f:
@@ -697,7 +719,15 @@ class AstroSkyfield( AstroBase ):
 
 
     @staticmethod
-    def _calculate_common( now, now_plus_whatever, location, location_at_now, data, key, body ):
+    def _calculate_common(
+        now,
+        now_plus_whatever,
+        location,
+        location_at_now,
+        data,
+        key,
+        body ):
+
         never_up = False
 
         # https://rhodesmill.org/skyfield/almanac.html#risings-and-settings
@@ -731,11 +761,14 @@ class AstroSkyfield( AstroBase ):
     #    https://github.com/skyfielders/python-skyfield/issues/558
     @staticmethod
     def _calculate_satellites(
-            now, timescale,
-            latitude_longitude_elevation,
-            data,
-            satellites, satellite_data,
-            start_hour_as_date_time_in_utc, end_hour_as_date_time_in_utc ):
+        now,
+        timescale,
+        latitude_longitude_elevation,
+        data,
+        satellites,
+        satellite_data,
+        start_hour_as_date_time_in_utc,
+        end_hour_as_date_time_in_utc ):
 
         end = now + datetime.timedelta( hours = AstroBase.SATELLITE_SEARCH_DURATION_HOURS )
 
@@ -777,11 +810,11 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def _calculate_satellite(
-            start_date_time, end_date_time, timescale,
-            latitude_longitude_elevation,
-            data, key,
-            earth_satellite,
-            is_twilight_function ):
+        start_date_time, end_date_time, timescale,
+        latitude_longitude_elevation,
+        data, key,
+        earth_satellite,
+        is_twilight_function ):
 
         found_pass = False
         rise_date_time = None
@@ -827,9 +860,9 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def _is_satellite_pass_visible(
-            timescale, start_date_time, end_date_time,
-            is_twilight_function,
-            earth_satellite ):
+        timescale, start_date_time, end_date_time,
+        is_twilight_function,
+        earth_satellite ):
 
         seconds_from_rise_to_set = ( end_date_time.utc_datetime() - start_date_time.utc_datetime() ).total_seconds()
         range_start = math.ceil( start_date_time.utc.second )

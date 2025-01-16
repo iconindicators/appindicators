@@ -181,11 +181,11 @@ class IndicatorBase( ABC ):
 
 
     def __init__(
-            self,
-            comments,
-            artwork = None,
-            creditz = None,
-            debug = False ):
+        self,
+        comments,
+        artwork = None,
+        creditz = None,
+        debug = False ):
         '''
         The comments argument is used in two places:
             1) The comments are passed directly to the About dialog.
@@ -289,7 +289,9 @@ class IndicatorBase( ABC ):
                     _( "Refer to the Preferences for details." ) )
 
 
-    def get_json( self, url ):
+    def get_json(
+        self,
+        url ):
         '''
         Retrieves the JSON content from a URL.
 
@@ -404,7 +406,9 @@ class IndicatorBase( ABC ):
 
 
     def _process_existing_dot_desktop_file_to_home_config_autostart(
-            self, desktop_file_virtual_environment ):
+        self,
+        desktop_file_virtual_environment ):
+
         # The .desktop may be an older version with an Exec without a sleep,
         # or tags no longer used such as X-GNOME-Autostart-Delay.
         # Comment out unused tags and get the delay if present.
@@ -484,9 +488,9 @@ class IndicatorBase( ABC ):
 
 
     def _copy_dot_desktop_file_to_home_config_autostart(
-            self,
-            desktop_file_virtual_environment,
-            desktop_file ):
+        self,
+        desktop_file_virtual_environment,
+        desktop_file ):
         '''
         The .desktop file is not present in $HOME/.config/autostart
         so copy from the virtual environment (when running in production)
@@ -546,7 +550,9 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def get_year_in_changelog_markdown( changelog_markdown, first_year = True ):
+    def get_year_in_changelog_markdown(
+        changelog_markdown,
+        first_year = True ):
         '''
         If first_year = True, retrieves the first/earliest year from
         CHANGELOG.md otherwise retrieves the most recent year.
@@ -585,7 +591,9 @@ class IndicatorBase( ABC ):
         Gtk.main()
 
 
-    def request_update( self, delay = 1 ):
+    def request_update(
+        self,
+        delay = 1 ):
         '''
         The typical flow of events is:
             Indicator starts up and kicks off an initial update.
@@ -616,7 +624,9 @@ class IndicatorBase( ABC ):
 
 
     @abstractmethod
-    def update( self, menu ):
+    def update(
+        self,
+        menu ):
         raise NotImplementedError()
 
 
@@ -690,7 +700,9 @@ class IndicatorBase( ABC ):
         return False
 
 
-    def set_label_or_tooltip( self, text ):
+    def set_label_or_tooltip(
+        self,
+        text ):
         '''
         Sets the label and tooltip assuming this is supported.
         Returns True if the operation is supported; False otherwise.
@@ -708,7 +720,9 @@ class IndicatorBase( ABC ):
         return label_or_tooltip_update_supported
 
 
-    def set_icon( self, icon ):
+    def set_icon(
+        self,
+        icon ):
         '''
         Sets the icon assuming this is supported.
         Returns True if the operation is supported; False otherwise.
@@ -755,7 +769,12 @@ class IndicatorBase( ABC ):
         return self.debug
 
 
-    def show_notification( self, summary, message, icon = None ):
+    def show_notification(
+        self,
+        summary,
+        message,
+        icon = None ):
+
         _icon = icon
         if icon is None:
             _icon = self.get_icon_name()
@@ -766,11 +785,16 @@ class IndicatorBase( ABC ):
         Notify.Notification.new( summary, message, _icon ).show()
 
 
-    def set_secondary_activate_target( self, menuitem ):
+    def set_secondary_activate_target(
+        self,
+        menuitem ):
+
         self.secondary_activate_target = menuitem
 
 
-    def request_mouse_wheel_scroll_events( self, functionandarguments ):
+    def request_mouse_wheel_scroll_events(
+        self,
+        functionandarguments ):
         '''
         Registers a function (and arguments) to be called on mouse wheel scroll.
 
@@ -821,7 +845,10 @@ class IndicatorBase( ABC ):
         return self.get_session_type() == IndicatorBase.SESSION_TYPE_X11
 
 
-    def _on_about( self, menuitem ):
+    def _on_about(
+        self,
+        menuitem ):
+
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
 
@@ -914,11 +941,17 @@ class IndicatorBase( ABC ):
 
 
     @abstractmethod
-    def on_preferences( self, dialog ):
+    def on_preferences(
+        self,
+        dialog ):
+
         raise NotImplementedError()
 
 
-    def _on_preferences( self, menuitem ):
+    def _on_preferences(
+        self,
+        menuitem ):
+
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
 
@@ -940,7 +973,10 @@ class IndicatorBase( ABC ):
                 self.secondary_activate_target )
 
 
-    def set_menu_sensitivity( self, toggle ):
+    def set_menu_sensitivity(
+        self,
+        toggle ):
+
         menuitems = self.indicator.get_menu().get_children()
         # On the first update, the menu only contains the "initialising"
         # menu item, so ignore.
@@ -1014,7 +1050,10 @@ class IndicatorBase( ABC ):
         return clipboard_supported
 
 
-    def copy_to_selection( self, text, is_primary = False ):
+    def copy_to_selection(
+        self,
+        text,
+        is_primary = False ):
         '''
         Send text to the clipboard or primary.
         '''
@@ -1058,7 +1097,9 @@ class IndicatorBase( ABC ):
         return text_in_clipboard
 
 
-    def copy_from_selection_primary( self, primary_received_callback_function ):
+    def copy_from_selection_primary(
+        self,
+        primary_received_callback_function ):
         '''
         To receive the text from the primary input, a callback function
         is required, the simplest of which for example is:
@@ -1202,7 +1243,10 @@ class IndicatorBase( ABC ):
         return response
 
 
-    def _get_parent( self, widget ):
+    def _get_parent(
+        self,
+        widget ):
+
         parent = widget
         while parent is not None:
             if isinstance( parent, ( Gtk.Dialog, Gtk.Window ) ):
@@ -1302,9 +1346,13 @@ class IndicatorBase( ABC ):
         label,
         name = None,
         activate_functionandarguments = None,
-#TODO Make shorter        Maybe docstring???
-        indent = ( 0, 0 ), # First element: indent level when adding to a non-detachable menu; Second element: equivalent for a detachable menu.
+        indent = ( 0, 0 ),
         is_secondary_activate_target = False ):
+        '''
+        indent:
+            First element: indent level when adding to a non-detachable menu.
+            Second element: equivalent for a detachable menu.
+        '''
 
         indent_amount = self._get_menu_indent_amount( indent )
         menuitem = Gtk.MenuItem.new_with_label( indent_amount + label )
@@ -1329,9 +1377,13 @@ class IndicatorBase( ABC ):
         index,
         name = None,
         activate_functionandarguments = None,
-#TODO Make shorter        Docstring?
-        indent = ( 0, 0 ), # First element: indent level when adding to a non-detachable menu; Second element: equivalent for a detachable menu.
+        indent = ( 0, 0 ),
         is_secondary_activate_target = False ):
+        '''
+        indent:
+            First element: indent level when adding to a non-detachable menu.
+            Second element: equivalent for a detachable menu.
+        '''
 
         menuitem = (
             self.create_and_append_menuitem(
@@ -1351,11 +1403,14 @@ class IndicatorBase( ABC ):
         menu,
         label,
         activate_functionandarguments = None,
-#TODO Make shorter        Docstring??
-        indent = ( 0, 0 ) ): # First element: indent level when adding to a non-detachable menu; Second element: equivalent for a detachable menu.
+        indent = ( 0, 0 ) ):
         '''
-        Creates a single (isolated, not part of a group)
-        RadioMenuItem that is enabled/active.
+        Creates a single (isolated, not part of a group) RadioMenuItem that is
+        enabled/active.
+
+        indent:
+            First element: indent level when adding to a non-detachable menu.
+            Second element: equivalent for a detachable menu.
         '''
 
         indent_amount = self._get_menu_indent_amount( indent )
@@ -1371,7 +1426,9 @@ class IndicatorBase( ABC ):
         return menuitem
 
 
-    def _get_menu_indent_amount( self, indent = ( 0, 0 ) ):
+    def _get_menu_indent_amount(
+        self,
+        indent = ( 0, 0 ) ):
         '''
         When adding a menuitem to a submenu,
         under GNOME the menuitem appears in the same menu as the submenu
@@ -1416,7 +1473,9 @@ class IndicatorBase( ABC ):
         return lambda menuitem: webbrowser.open( menuitem.get_name() )
 
 
-    def get_textview_text( self, textview ):
+    def get_textview_text(
+        self,
+        textview ):
         '''
         Takes a Gtk.TextView and returns the containing text, avoiding the
         additional calls to get the start/end positions.
@@ -1429,7 +1488,11 @@ class IndicatorBase( ABC ):
                 True ) )
 
 
-    def on_radio_or_checkbox( self, radio_or_checkbox, sense, *widgets ):
+    def on_radio_or_checkbox(
+        self,
+        radio_or_checkbox,
+        sense,
+        *widgets ):
         '''
         Listens to radio/checkbox "toggled" events and toggles the visibility
         of the widgets according to the boolean value of 'sense'.
@@ -1450,7 +1513,10 @@ class IndicatorBase( ABC ):
         return grid
 
 
-    def create_scrolledwindow( self, widget ):
+    def create_scrolledwindow(
+        self,
+        widget ):
+
         scrolledwindow = Gtk.ScrolledWindow()
         scrolledwindow.set_hexpand( True )
         scrolledwindow.set_vexpand( True )
@@ -1587,8 +1653,12 @@ class IndicatorBase( ABC ):
         sensitive = True,
         margin_top = 0,
         margin_left = 0,
-#TODO Make shorter        Docstring?
-        clicked_functionandarguments = None ): # Must be passed as a tuple https://stackoverflow.com/a/6289656/2156453
+        clicked_functionandarguments = None ):
+        '''
+        clicked_functionandarguments:
+            Must be passed as a tuple.
+            https://stackoverflow.com/a/6289656/2156453
+       '''
 
         button = Gtk.Button.new_with_label( label )
         self._set_widget_common_attributes(
@@ -1975,7 +2045,10 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def interpolate( x_values, y_values, x ):
+    def interpolate(
+        x_values,
+        y_values,
+        x ):
         '''
         Reference: https://stackoverflow.com/a/56233642/2156453
         '''
@@ -2002,7 +2075,10 @@ class IndicatorBase( ABC ):
         return logging
 
 
-    def is_number( self, number_as_string ):
+    def is_number(
+        self,
+        number_as_string ):
+
         try:
             float( number_as_string )
             return True
@@ -2042,7 +2118,9 @@ class IndicatorBase( ABC ):
         return not icon_update_unsupported
 
 
-    def is_qterminal_and_broken( self, terminal ):
+    def is_qterminal_and_broken(
+        self,
+        terminal ):
         '''
         As a result of
             https://github.com/lxqt/qterminal/issues/335
@@ -2076,7 +2154,10 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def download( url, filename, logging_ ):
+    def download(
+        url,
+        filename,
+        logging_ ):
         ''' Download the contents of the given URL and save to file. '''
         downloaded = False
         try:
@@ -2095,7 +2176,10 @@ class IndicatorBase( ABC ):
 
 
     @abstractmethod
-    def load_config( self, config ):
+    def load_config(
+        self,
+        config ):
+
         raise NotImplementedError()
 
 
@@ -2120,7 +2204,9 @@ class IndicatorBase( ABC ):
             config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] )
 
 
-    def _copy_config_to_new_directory( self, config_file ):
+    def _copy_config_to_new_directory(
+        self,
+        config_file ):
         '''
         Copies .config using the old indicator name format (using hyphens)
         to the new format, sans hyphens.
@@ -2147,7 +2233,10 @@ class IndicatorBase( ABC ):
             shutil.copyfile( config_file_old, config_file )
 
 
-    def request_save_config( self, delay = 0 ):
+    def request_save_config(
+        self,
+        delay = 0 ):
+
         if self.lock_save_config.acquire( blocking = False ):
             if self.id_save_config > 0:
                 GLib.source_remove( self.id_save_config )
@@ -2192,7 +2281,10 @@ class IndicatorBase( ABC ):
         return self._get_user_directory( ".config", self.indicator_name )
 
 
-    def is_cache_stale( self, basename, maximum_age_in_hours ):
+    def is_cache_stale(
+        self,
+        basename,
+        maximum_age_in_hours ):
         '''
         Finds the most recent file in the cache with the given basename and if
         the timestamp is older than the current date/time plus the maximum age,
@@ -2210,7 +2302,9 @@ class IndicatorBase( ABC ):
         return stale
 
 
-    def get_cache_date_time( self, basename ):
+    def get_cache_date_time(
+        self,
+        basename ):
         '''
         Find the date/time of the newest file in the cache matching the
         basename, where the basename is the text used to form the file name,
@@ -2240,7 +2334,9 @@ class IndicatorBase( ABC ):
 
 
     def get_cache_filename_with_timestamp(
-        self, basename, extension = EXTENSION_TEXT ):
+        self,
+        basename,
+        extension = EXTENSION_TEXT ):
         '''
         Create a filename with timestamp and extension to be used to save data
         to the cache.
@@ -2255,7 +2351,9 @@ class IndicatorBase( ABC ):
         return self.get_cache_directory() / filename
 
 
-    def get_cache_newest_filename( self, basename ):
+    def get_cache_newest_filename(
+        self,
+        basename ):
         '''
         Search through the cache for all files matching the basename.
         Returns the newest filename matching the basename on success;
@@ -2276,7 +2374,9 @@ class IndicatorBase( ABC ):
         return cache_file
 
 
-    def remove_file_from_cache( self, filename ):
+    def remove_file_from_cache(
+        self,
+        filename ):
         '''
         The file removed will be
             ~/.cache/application_base_directory/filename
@@ -2287,7 +2387,10 @@ class IndicatorBase( ABC ):
                 break
 
 
-    def flush_cache( self, basename, maximum_age_in_hours ):
+    def flush_cache(
+        self,
+        basename,
+        maximum_age_in_hours ):
         '''
         Removes out of date cache files for a given basename.
 
@@ -2329,7 +2432,9 @@ class IndicatorBase( ABC ):
                         file.unlink()
 
 
-    def read_cache_binary( self, basename ):
+    def read_cache_binary(
+        self,
+        basename ):
         '''
         Read the most recent binary file from the cache.
 
@@ -2366,7 +2471,11 @@ class IndicatorBase( ABC ):
         return data
 
 
-    def write_cache_binary( self, binary_data, basename, extension = "" ):
+    def write_cache_binary(
+        self,
+        binary_data,
+        basename,
+        extension = "" ):
         '''
         Writes an object as a binary file to the cache.
 
@@ -2397,7 +2506,9 @@ class IndicatorBase( ABC ):
         return cache_file
 
 
-    def read_cache_text_without_timestamp( self, filename ):
+    def read_cache_text_without_timestamp(
+        self,
+        filename ):
         '''
         Read the named text file from the cache.
 
@@ -2408,7 +2519,9 @@ class IndicatorBase( ABC ):
         return self._read_cache_text( self.get_cache_directory() / filename )
 
 
-    def read_cache_text( self, basename ):
+    def read_cache_text(
+        self,
+        basename ):
         '''
         Read the most recent text file from the cache.
 
@@ -2442,7 +2555,9 @@ class IndicatorBase( ABC ):
         return self._read_cache_text( cache_file )
 
 
-    def _read_cache_text( self, cache_file ):
+    def _read_cache_text(
+        self,
+        cache_file ):
         text = ""
         if cache_file.is_file():
             with open( cache_file, 'r', encoding = "utf-8" ) as f_in:
@@ -2451,7 +2566,10 @@ class IndicatorBase( ABC ):
         return text
 
 
-    def write_cache_text_without_timestamp( self, text, filename ):
+    def write_cache_text_without_timestamp(
+        self,
+        text,
+        filename ):
         '''
         Writes text to a file in the cache.
 
@@ -2464,7 +2582,11 @@ class IndicatorBase( ABC ):
         return self._write_cache_text( text, self.get_cache_directory() / filename )
 
 
-    def write_cache_text( self, text, basename, extension = EXTENSION_TEXT ):
+    def write_cache_text(
+        self,
+        text,
+        basename,
+        extension = EXTENSION_TEXT ):
         '''
         Writes text to a file in the cache.
 
@@ -2491,7 +2613,11 @@ class IndicatorBase( ABC ):
         return self._write_cache_text( text, self.get_cache_directory() / filename )
 
 
-    def _write_cache_text( self, text, cache_file ):
+    def _write_cache_text(
+        self,
+        text,
+        cache_file ):
+
         with open( cache_file, 'w', encoding = "utf-8" ) as f_out:
             f_out.write( text )
 
@@ -2507,7 +2633,9 @@ class IndicatorBase( ABC ):
 
 
     def _get_user_directory(
-            self, user_base_directory, application_base_directory ):
+        self,
+        user_base_directory,
+        application_base_directory ):
         '''
         Obtain (and create if not present) the directory for configuration,
         cache or similar.
@@ -2526,7 +2654,9 @@ class IndicatorBase( ABC ):
         return directory
 
 
-    def process_call( self, command ):
+    def process_call(
+        self,
+        command ):
         '''
         Executes the command in a new process.
         On exception, logs to file.
@@ -2542,7 +2672,10 @@ class IndicatorBase( ABC ):
 
 #TODO Check every function which calls this...the function no longer returns None but rather "".
 # Do we need to return the result and stderr?
-    def process_get( self, command, log_non_zero_error_code = False ):
+    def process_get(
+        self,
+        command,
+        log_non_zero_error_code = False ):
         '''
         Executes the command and returns the result.
         The result of executing the command may indeed be "" which does not
@@ -2583,8 +2716,8 @@ class IndicatorBase( ABC ):
 
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
     '''
-    Log file handler which truncates the file when the file size limit has been
-    reached.
+    Log file handler which truncates the file when the file size limit
+    (in bytes) has been reached.
 
     References:
         https://docs.python.org/3/library/logging.handlers.html
@@ -2592,7 +2725,11 @@ class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
         https://github.com/python/cpython/blob/main/Lib/logging/handlers.py
     '''
 
-    def __init__( self, filename, maxBytes = 10000 ):
+    def __init__(
+        self,
+        filename,
+        maxBytes = 10000 ):
+
         super().__init__(
             filename,
             maxBytes = maxBytes,
@@ -2603,7 +2740,7 @@ class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
         if self.stream:
             self.stream.close()
 
-        # self.baseFilename is defined in parent class.
+        # self.baseFilename is defined in the parent class.
         Path( self.baseFilename ).unlink( missing_ok = True )
         self.mode = 'a'
         self.stream = self._open()

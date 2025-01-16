@@ -19,10 +19,10 @@
 '''
 Application indicator which displays calendar events.
 
-Neither openSUSE nor Manjaro have the 'calendar' package.  Possible options...
+Neither openSUSE nor Manjaro have the 'calendar' package.
+Possible options...
 
-1. For openSUSE/Manjaro (and any others yet to be found),
-   this indicator is unsupported.
+1. For openSUSE/Manjaro, this indicator is unsupported.
 
 2. From the post
      https://forums.opensuse.org/t/debian-calendar-equivalent-in-opensuse/171251
@@ -32,11 +32,11 @@ Neither openSUSE nor Manjaro have the 'calendar' package.  Possible options...
    and include the source code/calendars as part of the pip installation,
    then run make as part of the copy files set of instructions.
 
-3. Have found
+3. The project
      https://pypi.org/project/bsd-calendar/
-   based on the original calendar program, but modifies date formats.
+   is based on the original calendar program, but modifies date formats.
    This code could be used to create a standalone Python calendar module,
-   say ultimately releasing to PyPI.
+   ultimately released to PyPI.
    Alternatively, incorporate some version of this implementation into the
    indicator, along with calendar files.
 '''
@@ -89,12 +89,14 @@ class IndicatorOnThisDay( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             comments = _(
-                "Calls the 'calendar' program and displays events "
-                +
+                "Calls the 'calendar' program and displays events " +
                 "in the menu." ) )
 
 
-    def update( self, menu ):
+    def update(
+        self,
+        menu ):
+
         events = self.get_events()
         self.build_menu( menu, events )
 
@@ -116,7 +118,11 @@ class IndicatorOnThisDay( IndicatorBase ):
                 args = ( events, today ) ).start()
 
 
-    def _show_notifications( self, events, today ):
+    def _show_notifications(
+        self,
+        events,
+        today ):
+
         # Assume the dates in the calendar result are always in short date
         # format irrespective of locale.
         today_in_short_date_format = today.strftime( '%b %d' )
@@ -124,15 +130,18 @@ class IndicatorOnThisDay( IndicatorBase ):
         for event in events:
             if today_in_short_date_format == event.get_date():
                 self.show_notification(
-                    _( "On this day..." ),
-                    event.get_description() )
+                    _( "On this day..." ), event.get_description() )
 
                 # Need a delay otherwise some/most of the notifications will
                 # disappear too quickly.
                 time.sleep( 3 )
 
 
-    def build_menu( self, menu, events ):
+    def build_menu(
+        self,
+        menu,
+        events ):
+
         menu_item_maximum = self.lines - 3 # Account for About/Preferences/Quit.
         menu_item_count = 0
         last_date = ""
@@ -193,12 +202,16 @@ class IndicatorOnThisDay( IndicatorBase ):
                 break
 
 
-    def remove_leading_zero_from_date( self, date_ ):
+    def remove_leading_zero_from_date(
+        self,
+        date_ ):
+
+        _date = date_[ 0 : -3 ] + ' '
         if date_[ -2 ] == '0':
-            _date = date_[ 0 : -3 ] + ' ' + date_[ -1 ]
+            _date += date_[ -1 ]
 
         else:
-            _date = date_[ 0 : -3 ] + ' ' + date_[ -2 : ]
+            _date += date_[ -2 : ]
 
         return _date
 
@@ -231,7 +244,10 @@ class IndicatorOnThisDay( IndicatorBase ):
         return events_grouped_by_date
 
 
-    def _get_events( self, content ):
+    def _get_events(
+        self,
+        content ):
+
         self.write_cache_text_without_timestamp(
             content, IndicatorOnThisDay.CALENDARS_FILENAME )
 
@@ -282,7 +298,10 @@ class IndicatorOnThisDay( IndicatorBase ):
         return list( chain( *events_grouped_by_date ) )
 
 
-    def on_preferences( self, dialog ):
+    def on_preferences(
+        self,
+        dialog ):
+
         notebook = Gtk.Notebook()
 
         # Calendars.
@@ -498,11 +517,11 @@ class IndicatorOnThisDay( IndicatorBase ):
 #TODO This will likely go into indicatorbase...
 # ...but also check that something similar has not already been done.
     def on_checkbox(
-            self,
-            cell_renderer_toggle,
-            row,
-            store,
-            checkbox_column_model_id ):
+        self,
+        cell_renderer_toggle,
+        row,
+        store,
+        checkbox_column_model_id ):
 
         store_ = store
         if isinstance( store, Gtk.TreeModelSort ):
@@ -513,11 +532,11 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def on_event_click_radio(
-            self,
-            source,
-            radio_copy_to_clipboard,
-            radio_internet_search,
-            search_engine_entry ):
+        self,
+        source,
+        radio_copy_to_clipboard,
+        radio_internet_search,
+        search_engine_entry ):
 
         search_engine_entry.set_sensitive( source == radio_internet_search )
         copy_to_clipboard_and_empty_search = (
@@ -530,7 +549,11 @@ class IndicatorOnThisDay( IndicatorBase ):
                 IndicatorOnThisDay.SEARCH_URL_DEFAULT )
 
 
-    def on_calendar_remove( self, button, treeview ):
+    def on_calendar_remove(
+        self,
+        button,
+        treeview ):
+
         model, treeiter = treeview.get_selection().get_selected()
         if treeiter is None:
             self.show_dialog_ok(
@@ -561,12 +584,20 @@ class IndicatorOnThisDay( IndicatorBase ):
                         model.convert_iter_to_child_iter( treeiter ) )
 
 
-    def on_calendar_add( self, button, treeview ):
+    def on_calendar_add(
+        self,
+        button,
+        treeview ):
+
         self._on_calendar_double_click( treeview, None, None )
 
 
     def on_calendar_double_click(
-        self, treeview, row_number, treeviewcolumn, preferences_dialog ):
+        self,
+        treeview,
+        row_number,
+        treeviewcolumn,
+        preferences_dialog ):
 
         model, treeiter = treeview.get_selection().get_selected()
         path = model[ treeiter ][ IndicatorOnThisDay.COLUMN_FILE_OR_DIRECTORY ]
@@ -581,7 +612,10 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def _on_calendar_double_click(
-            self, treeview, row_number, treeviewcolumn ):
+        self,
+        treeview,
+        row_number,
+        treeviewcolumn ):
 
         model, treeiter = treeview.get_selection().get_selected()
         adding_calendar = row_number is None
@@ -656,7 +690,12 @@ class IndicatorOnThisDay( IndicatorBase ):
         dialog.destroy()
 
 
-    def on_browse_calendar( self, button, add_edit_dialog, calendar_file ):
+    def on_browse_calendar(
+        self,
+        button,
+        add_edit_dialog,
+        calendar_file ):
+
         dialog = (
             self.create_filechooser_dialog(
                 _( "Choose a calendar file" ),
@@ -694,7 +733,10 @@ class IndicatorOnThisDay( IndicatorBase ):
         return system_calendar_default
 
 
-    def load_config( self, config ):
+    def load_config(
+        self,
+        config ):
+
         system_calendar_default = self.get_system_calendar_default()
         self.calendars = (
             config.get(

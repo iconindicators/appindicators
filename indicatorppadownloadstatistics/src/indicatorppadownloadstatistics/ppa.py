@@ -32,7 +32,12 @@ class PublishedBinary():
     Holds a published binary's name, version, architecture and download count.
     '''
 
-    def __init__( self, name, version, architecture ):
+    def __init__(
+        self,
+        name,
+        version,
+        architecture ):
+
         '''
         Name (string)
         Version (string)
@@ -61,7 +66,10 @@ class PublishedBinary():
         return self.download_count
 
 
-    def set_download_count( self, count ):
+    def set_download_count(
+        self,
+        count ):
+
         self.download_count = count
 
 
@@ -104,7 +112,11 @@ class PPA():
         ERROR_TIMEOUT = 6
 
 
-    def __init__( self, user, name ):
+    def __init__(
+        self,
+        user,
+        name ):
+
         '''
         Creates a PPA with a default single filter [ "" ].
 
@@ -122,7 +134,10 @@ class PPA():
         return self.status
 
 
-    def set_status( self, status ):
+    def set_status(
+        self,
+        status ):
+
         self.status = status
         if not status == PPA.Status.OK:
             self.published_binaries = [ ]
@@ -141,7 +156,10 @@ class PPA():
         return self.filters
 
 
-    def set_filters( self, filters ):
+    def set_filters(
+        self,
+        filters ):
+
         '''
         Set a list of one or more filter strings.
         Each filter string must be plain text without whitespace.
@@ -158,7 +176,10 @@ class PPA():
         return self.user + ' | ' + self.name
 
 
-    def add_published_binary( self, published_binary ):
+    def add_published_binary(
+        self,
+        published_binary ):
+
         self.published_binaries.append( published_binary )
 
 
@@ -174,7 +195,10 @@ class PPA():
         self.published_binaries = [ ]
 
 
-    def has_status_error( self, ignore_other = False ):
+    def has_status_error(
+        self,
+        ignore_other = False ):
+
         '''
         Returns True if the PPA has any of the error statuses.
         If ignore_other is set to True, the status of ERROR_OTHER is ignored.
@@ -195,7 +219,10 @@ class PPA():
 
     @staticmethod
     def sort_ppas_by_user_then_name_then_published_binaries(
-            ppas, sort_by_download, clip_amount ):
+        ppas,
+        sort_by_download,
+        clip_amount ):
+
         '''
         Sort PPAs by name then user.
 
@@ -231,7 +258,9 @@ class PPA():
 
 
     @staticmethod
-    def _compare_published_binaries( published_binary1, published_binary2 ):
+    def _compare_published_binaries(
+        published_binary1,
+        published_binary2 ):
         '''
         Compare two Published Binaries by download count.
         If the download count is the same, sort by name then by version.
@@ -263,7 +292,10 @@ class PPA():
 
 
     @staticmethod
-    def _compare_ppas( ppa1, ppa2 ):
+    def _compare_ppas(
+        ppa1,
+        ppa2 ):
+
         ''' Compare two PPAs by user, then by name. '''
         return (
             PPA.compare_ppas(
@@ -272,7 +304,11 @@ class PPA():
 
 
     @staticmethod
-    def compare_ppas( user1, name1, user2, name2 ):
+    def compare_ppas(
+        user1,
+        name1,
+        user2,
+        name2 ):
         ''' Compare two PPAs by user, then by name. '''
         user1_ = locale.strxfrm( user1 )
         user2_ = locale.strxfrm( user2 )

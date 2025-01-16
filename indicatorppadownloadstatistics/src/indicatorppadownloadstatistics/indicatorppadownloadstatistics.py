@@ -68,7 +68,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self.preferences_changed = False
 
 
-    def update( self, menu ):
+    def update(
+        self,
+        menu ):
+
         if self.preferences_changed:
             # One or more PPAs were modified in the Preferences;
             # download only those PPAs.
@@ -96,7 +99,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return IndicatorPPADownloadStatistics.UPDATE_PERIOD
 
 
-    def _build_submenu( self, menu, ppas_sorted ):
+    def _build_submenu(
+        self,
+        menu,
+        ppas_sorted ):
+
         for ppa in ppas_sorted:
             submenu = Gtk.Menu()
             self.create_and_append_menuitem(
@@ -126,7 +133,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     indent = ( 1, 1 ) )
 
 
-    def _build_menu( self, menu, ppas_sorted ):
+    def _build_menu(
+        self,
+        menu,
+        ppas_sorted ):
+
         for ppa in ppas_sorted:
             self.create_and_append_menuitem(
                 menu,
@@ -163,7 +174,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.set_secondary_activate_target( menu.get_children()[ 0 ] )
 
 
-    def _get_status_message( self, ppa ):
+    def _get_status_message(
+        self,
+        ppa ):
+
         if ppa.get_status() == PPA.Status.ERROR_NETWORK:
             message = IndicatorPPADownloadStatistics.MESSAGE_ERROR_NETWORK
 
@@ -182,7 +196,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return message
 
 
-    def _get_label( self, published_binary ):
+    def _get_label(
+        self,
+        published_binary ):
+
         label = (
             published_binary.get_name() + ' ' +
             published_binary.get_version() )
@@ -193,12 +210,19 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return label + " :  " + str( published_binary.get_download_count() )
 
 
-    def _get_url_for_ppa( self, ppa ):
+    def _get_url_for_ppa(
+        self,
+        ppa ):
+
         user, name = ppa.get_descriptor().split( " | " )
         return f"https://launchpad.net/~{ user }/+archive/ubuntu/{ name }"
 
 
-    def _get_url_for_published_binary( self, ppa, published_binary ):
+    def _get_url_for_published_binary(
+        self,
+        ppa,
+        published_binary ):
+
         return (
             f"{ self._get_url_for_ppa( ppa ) }/+packages?" +
             f"field.name_filter={ published_binary.get_name() }&"
@@ -235,7 +259,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa.set_status( PPA.Status.FILTERED )
 
 
-    def _process_ppa_with_filter( self, ppa, filter_text ):
+    def _process_ppa_with_filter(
+        self,
+        ppa,
+        filter_text ):
+
         '''
         Get the published binaries for the PPA, then for each published binary,
         get the download count.
@@ -249,7 +277,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self._get_download_counts( ppa, published_binaries, self_links )
 
 
-    def _get_published_binaries( self, ppa, filter_text ):
+    def _get_published_binaries(
+        self,
+        ppa,
+        filter_text ):
+
         url = (
             f"https://api.launchpad.net/1.0/~{ ppa.get_user() }" +
             f"/+archive/ubuntu/{ ppa.get_name() }" +
@@ -296,7 +328,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return published_binaries, self_links
 
 
-    def _get_download_counts( self, ppa, published_binaries, self_links ):
+    def _get_download_counts(
+        self,
+        ppa,
+        published_binaries,
+        self_links ):
+
         max_workers = 1 if self.low_bandwidth else 3
         futures = [ ]
         lock = Lock()
@@ -318,7 +355,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     break
 
 
-    def _get_download_count( self, url, published_binary, ppa, lock ):
+    def _get_download_count(
+        self,
+        url,
+        published_binary,
+        ppa,
+        lock ):
+
         with lock:
             error = ppa.has_status_error( ignore_other = True )
 
@@ -337,7 +380,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa.add_published_binary( published_binary )
 
 
-    def on_preferences( self, dialog ):
+    def on_preferences(
+        self,
+        dialog ):
+
         notebook = Gtk.Notebook()
         invalid_ppas = [ ]
 
@@ -523,14 +569,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return response_type
 
 
-    def _ppas_are_identical( self, ppa1, ppa2 ):
+    def _ppas_are_identical(
+        self,
+        ppa1,
+        ppa2 ):
+
         users_equal = ppa1.get_user() == ppa2.get_user()
         names_equal = ppa1.get_name() == ppa2.get_name()
         filters_equal = ppa1.get_filters() == ppa2.get_filters()
         return users_equal and names_equal and filters_equal
 
 
-    def _ppa_sort( self, model, row1, row2, user_data ):
+    def _ppa_sort(
+        self,
+        model,
+        row1,
+        row2,
+        user_data ):
+
         return (
             PPA.compare_ppas(
                 model.get_value(
@@ -543,7 +599,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     row2, IndicatorPPADownloadStatistics.COLUMN_NAME ) ) )
 
 
-    def _select_first_ppa_or_disable_remove( self, treeview, button_remove ):
+    def _select_first_ppa_or_disable_remove(
+        self,
+        treeview,
+        button_remove ):
+
         if len( treeview.get_model() ):
             # Select the first PPA.
             treepath_to_select_first_ppa = Gtk.TreePath.new_from_string( "0" )
@@ -557,7 +617,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             button_remove.set_sensitive( False )
 
 
-    def on_ppa_remove( self, button, treeview, invalid_ppas ):
+    def on_ppa_remove(
+        self,
+        button,
+        treeview,
+        invalid_ppas ):
+
         model, treeiter = treeview.get_selection().get_selected()
         response = (
             self.show_dialog_ok_cancel(
@@ -574,7 +639,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self._select_first_ppa_or_disable_remove( treeview, button )
 
 
-    def on_ppa_add( self, button_add, treeview, button_remove, invalid_ppas ):
+    def on_ppa_add(
+        self,
+        button_add,
+        treeview,
+        button_remove,
+        invalid_ppas ):
+
         length_before_addition = len( treeview.get_model() )
         self.on_ppa_double_click( treeview, None, None, invalid_ppas )
         if len( treeview.get_model() ) > length_before_addition:
@@ -582,7 +653,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def on_ppa_double_click(
-            self, treeview, row_number, treeviewcolumn, invalid_ppas ):
+        self,
+        treeview,
+        row_number,
+        treeviewcolumn,
+        invalid_ppas ):
 
         model, treeiter = treeview.get_selection().get_selected()
         first_ppa = len( model ) == 0
@@ -819,7 +894,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 # use an old .json from old indicator name with hyphens
 # and ensure the old is copied to new location (name without hyphens)
 # and loads up.
-    def load_config( self, config ):
+    def load_config(
+        self,
+        config ):
+
         self.low_bandwidth = (
             config.get(
                 IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH,

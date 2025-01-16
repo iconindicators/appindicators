@@ -80,7 +80,10 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.request_mouse_wheel_scroll_events( ( self.on_mouse_wheel_scroll, ) )
 
 
-    def update( self, menu ):
+    def update(
+        self,
+        menu ):
+
         virtual_machines = [ ]
         vbox_manage_installed = self.is_vbox_manage_installed()
         if vbox_manage_installed:
@@ -97,7 +100,12 @@ class IndicatorVirtualBox( IndicatorBase ):
         return int( 60 * self.refresh_interval_in_minutes )
 
 
-    def build_menu( self, menu, vbox_manage_installed, virtual_machines ):
+    def build_menu(
+        self,
+        menu,
+        vbox_manage_installed,
+        virtual_machines ):
+
         if vbox_manage_installed:
             if virtual_machines:
                 running_names, running_uuids = (
@@ -123,7 +131,13 @@ class IndicatorVirtualBox( IndicatorBase ):
                 _( "(VirtualBox™ is not installed)" ) )
 
 
-    def _build_menu( self, menu, items, indent, running_uuids ):
+    def _build_menu(
+        self,
+        menu,
+        items,
+        indent,
+        running_uuids ):
+
         if self.sort_groups_and_virtual_machines_equally:
             sorted_items = (
                 sorted(
@@ -155,7 +169,12 @@ class IndicatorVirtualBox( IndicatorBase ):
                     item.get_uuid() in running_uuids )
 
 
-    def _add_group_to_menu( self, menu, group, indent ):
+    def _add_group_to_menu(
+        self,
+        menu,
+        group,
+        indent ):
+
         menuitem = (
             self.create_and_append_menuitem(
                 menu,
@@ -170,7 +189,11 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def _add_virtual_machine_to_menu(
-            self, menu, virtual_machine, indent, is_running ):
+        self,
+        menu,
+        virtual_machine,
+        indent,
+        is_running ):
 
         if is_running:
             self.create_and_append_radiomenuitem(
@@ -189,7 +212,11 @@ class IndicatorVirtualBox( IndicatorBase ):
                 indent = indent )
 
 
-    def _on_virtual_machine( self, menuitem, virtual_machine ):
+    def _on_virtual_machine(
+        self,
+        menuitem,
+        virtual_machine ):
+
         if self.is_virtual_machine_running( virtual_machine.get_uuid() ):
             self.bring_window_to_front( virtual_machine.get_name() )
 
@@ -200,7 +227,10 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.request_update( delay = 10 )
 
 
-    def auto_start_virtual_machines( self, virtual_machines ):
+    def auto_start_virtual_machines(
+        self,
+        virtual_machines ):
+
         virtual_machines_for_autostart = (
             self._get_virtual_machines_for_autostart( virtual_machines ) )
 
@@ -227,7 +257,10 @@ class IndicatorVirtualBox( IndicatorBase ):
             time.sleep( 10 )
 
 
-    def _get_virtual_machines_for_autostart( self, virtual_machines ):
+    def _get_virtual_machines_for_autostart(
+        self,
+        virtual_machines ):
+
         virtual_machines_for_autostart = [ ]
         for item in virtual_machines:
             if isinstance( item, Group ):
@@ -240,7 +273,10 @@ class IndicatorVirtualBox( IndicatorBase ):
         return virtual_machines_for_autostart
 
 
-    def start_virtual_machine( self, uuid ):
+    def start_virtual_machine(
+        self,
+        uuid ):
+
         result = self.process_get( "VBoxManage list vms | grep " + uuid )
         if uuid not in result:
             message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
@@ -252,7 +288,9 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def bring_window_to_front(
-            self, virtual_machine_name, delay_in_seconds = 0 ):
+        self,
+        virtual_machine_name,
+        delay_in_seconds = 0 ):
 
         if not self.is_session_type_wayland():
             number_of_windows_with_the_same_name = (
@@ -304,7 +342,12 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.date_time_of_last_notification = datetime.datetime.now()
 
 
-    def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction ):
+    def on_mouse_wheel_scroll(
+        self,
+        indicator,
+        delta,
+        scroll_direction ):
+
         if self.is_vbox_manage_installed():
             running_names, running_uuids = self.get_running_virtual_machines()
             if running_uuids:
@@ -382,7 +425,10 @@ class IndicatorVirtualBox( IndicatorBase ):
         return names, uuids
 
 
-    def is_virtual_machine_running( self, uuid ):
+    def is_virtual_machine_running(
+        self,
+        uuid ):
+
         return self.process_get( "VBoxManage list runningvms | grep " + uuid ) is not None  #TODO Check if can ever be None.
 
 
@@ -424,7 +470,10 @@ class IndicatorVirtualBox( IndicatorBase ):
         return self.process_get( "which VBoxManage" ).find( "VBoxManage" ) > -1
 
 
-    def get_start_command( self, uuid ):
+    def get_start_command(
+        self,
+        uuid ):
+
         start_command = IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
         if uuid in self.virtual_machine_preferences:
             start_command = self.virtual_machine_preferences[ uuid ][ IndicatorVirtualBox.PREFERENCES_START_COMMAND ]
@@ -432,14 +481,20 @@ class IndicatorVirtualBox( IndicatorBase ):
         return start_command
 
 
-    def is_autostart( self, uuid ):
+    def is_autostart(
+        self,
+        uuid ):
+
         return (
             uuid in self.virtual_machine_preferences
             and
             self.virtual_machine_preferences[ uuid ][ IndicatorVirtualBox.PREFERENCES_AUTOSTART ] )
 
 
-    def on_preferences( self, dialog ):
+    def on_preferences(
+        self,
+        dialog ):
+
         notebook = Gtk.Notebook()
 
 #TODO Rewrite comment as per what is in fortune/onthisday/ppa
@@ -597,7 +652,12 @@ class IndicatorVirtualBox( IndicatorBase ):
         return response_type
 
 
-    def _add_items_to_store( self, treestore, parent, items ):
+    def _add_items_to_store(
+        self,
+        treestore,
+        parent,
+        items ):
+
         groups_exist = False
         if self.sort_groups_and_virtual_machines_equally:
             sorted_items = (
@@ -636,7 +696,11 @@ class IndicatorVirtualBox( IndicatorBase ):
         return groups_exist
 
 
-    def _update_virtual_machine_preferences( self, treestore, treeiter ):
+    def _update_virtual_machine_preferences(
+        self,
+        treestore,
+        treeiter ):
+
         while treeiter:
             is_virtual_machine = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
             is_autostart = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY
@@ -654,14 +718,22 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def on_virtual_machine_double_click(
-            self, tree, row_number, treeviewcolumn ):
+        self,
+        tree,
+        row_number,
+        treeviewcolumn ):
 
         model, treeiter = tree.get_selection().get_selected()
         if treeiter and model[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]:
             self.edit_virtual_machine( tree, model, treeiter )
 
 
-    def edit_virtual_machine( self, tree, model, treeiter ):
+    def edit_virtual_machine(
+        self,
+        tree,
+        model,
+        treeiter ):
+
         grid = self.create_grid()
 
         start_command = (
@@ -723,7 +795,10 @@ class IndicatorVirtualBox( IndicatorBase ):
         dialog.destroy()
 
 
-    def load_config( self, config ):
+    def load_config(
+        self,
+        config ):
+
         self.delay_between_autostart_in_seconds = (
             config.get(
                 IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS,

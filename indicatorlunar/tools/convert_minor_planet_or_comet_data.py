@@ -72,7 +72,10 @@ def get_unpacked_date( packed_date ):
 
 
 
-def get_packed_date( year, month, day ):
+def get_packed_date(
+    year,
+    month,
+    day ):
     '''
     https://www.minorplanetcenter.net/iau/info/PackedDates.html
     '''
@@ -103,9 +106,9 @@ def get_packed_date( year, month, day ):
 
 
 def process_and_write_one_line_lowell_minorplanet(
-        line,
-        output_file,
-        to_skyfield ):
+    line,
+    output_file,
+    to_skyfield ):
     '''
     https://asteroid.lowell.edu/astorb/
     https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
@@ -221,8 +224,8 @@ def process_and_write_one_line_lowell_minorplanet(
 
 
 def process_and_write_one_line_minorplanetcenter_minorplanet_to_xephem(
-        line,
-        output_file ):
+    line,
+    output_file ):
     '''
     https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
     https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
@@ -280,8 +283,8 @@ def process_and_write_one_line_minorplanetcenter_minorplanet_to_xephem(
 
 
 def process_and_write_one_line_minorplanetcenter_comet_to_xephem(
-        line,
-        output_file ):
+    line,
+    output_file ):
     '''
     https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
     https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
@@ -372,7 +375,11 @@ def process_and_write_one_line_minorplanetcenter_comet_to_xephem(
         output_file.write( ','.join( components ) + '\n' )
 
 
-def convert( option, in_file, out_file ):
+def convert(
+    option,
+    in_file,
+    out_file ):
+
     if in_file.endswith( ".gz" ):
         f_in = gzip.open( in_file, 'rt' )
 

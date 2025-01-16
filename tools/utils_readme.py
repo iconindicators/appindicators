@@ -71,7 +71,9 @@ class IndicatorName( Enum ):
     INDICATORVIRTUALBOX = auto()
 
 
-def _get_summary( operating_system ):
+def _get_summary(
+    operating_system ):
+
     summary = [ ]
     for operating_system_ in operating_system:
         human_readable_operating_system = ""
@@ -104,7 +106,10 @@ def _get_summary( operating_system ):
     return " | ".join( sorted( summary ) )
 
 
-def _is_indicator( indicator_name, *indicator_names ):
+def _is_indicator(
+    indicator_name,
+    *indicator_names ):
+
     is_indicator = False
     for indicator_name_ in indicator_names:
         if indicator_name.upper() == indicator_name_.name:
@@ -114,7 +119,9 @@ def _is_indicator( indicator_name, *indicator_names ):
     return is_indicator
 
 
-def _get_indicator_names_sans_current( indicator_name ):
+def _get_indicator_names_sans_current(
+    indicator_name ):
+
     indicators = [ str( x ) for x in Path( '.' ).iterdir() if x.is_dir() and str( x ).startswith( "indicator" ) ]
     indicators.remove( indicator_name )
     indicators.remove( "indicatorbase" )
@@ -122,7 +129,9 @@ def _get_indicator_names_sans_current( indicator_name ):
     return indicators
 
 
-def _get_introduction( indicator_name ):
+def _get_introduction(
+    indicator_name ):
+
     pattern_tag = re.compile( r".*comments = _\(.*" )
 
     filename = (
@@ -166,7 +175,9 @@ def _get_introduction( indicator_name ):
     return introduction
 
 
-def _get_installation_additional_python_modules( indicator_name ):
+def _get_installation_additional_python_modules(
+    indicator_name ):
+
     message = ''
 
     common = (
@@ -191,7 +202,9 @@ def _get_installation_additional_python_modules( indicator_name ):
     return message
 
 
-def _get_installation_python_virtual_environment( indicator_name ):
+def _get_installation_python_virtual_environment(
+    indicator_name ):
+
     message = (
         f"Install the indicator to a `Python` virtual environment:\n"
         f"    ```\n"
@@ -207,7 +220,9 @@ def _get_installation_python_virtual_environment( indicator_name ):
     return message
 
 
-def _get_extension( operating_system ):
+def _get_extension(
+    operating_system ):
+
     extension = ''
 
     applicable_operating_systems = {
@@ -238,10 +253,10 @@ def _get_extension( operating_system ):
 
 
 def _get_installation_for_operating_system(
-        operating_system,
-        indicator_name,
-        install_command,
-        _get_operating_system_dependencies_function_name ):
+    operating_system,
+    indicator_name,
+    install_command,
+    _get_operating_system_dependencies_function_name ):
 
     # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
@@ -289,10 +304,10 @@ def _get_installation_for_operating_system(
 
 
 def _get_uninstall_for_operating_system(
-        operating_system,
-        indicator_name,
-        uninstall_command,
-        _get_operating_system_dependencies_function_name ):
+    operating_system,
+    indicator_name,
+    uninstall_command,
+    _get_operating_system_dependencies_function_name ):
 
     # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
@@ -338,7 +353,10 @@ def _get_uninstall_for_operating_system(
     return uninstall
 
 
-def _get_operating_system_dependencies_debian( operating_system, indicator_name ):
+def _get_operating_system_dependencies_debian(
+    operating_system,
+    indicator_name ):
+
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
         "libcairo2-dev",
@@ -420,7 +438,10 @@ def _get_operating_system_dependencies_debian( operating_system, indicator_name 
     return ' '.join( sorted( dependencies ) )
 
 
-def _get_operating_system_dependencies_fedora( operating_system, indicator_name ):
+def _get_operating_system_dependencies_fedora(
+    operating_system,
+    indicator_name ):
+
     dependencies = [
         "cairo-gobject-devel",
         "gcc",
@@ -467,7 +488,10 @@ def _get_operating_system_dependencies_fedora( operating_system, indicator_name 
     return ' '.join( sorted( dependencies ) )
 
 
-def _get_operating_system_dependencies_manjaro( operating_system, indicator_name ):
+def _get_operating_system_dependencies_manjaro(
+    operating_system,
+    indicator_name ):
+
     dependencies = [
         "cairo",
         "gcc",
@@ -495,7 +519,10 @@ def _get_operating_system_dependencies_manjaro( operating_system, indicator_name
     return ' '.join( sorted( dependencies ) )
 
 
-def _get_operating_system_dependencies_opensuse( operating_system, indicator_name ):
+def _get_operating_system_dependencies_opensuse(
+    operating_system,
+    indicator_name ):
+
     dependencies = [
         "cairo-devel",
         "gcc",
@@ -512,7 +539,10 @@ def _get_operating_system_dependencies_opensuse( operating_system, indicator_nam
     return ' '.join( sorted( dependencies ) )
 
 
-def _get_install_uninstall( indicator_name, install = True ):
+def _get_install_uninstall(
+    indicator_name,
+    install = True ):
+
     if install:
         function = _get_installation_for_operating_system
         command_debian = "sudo apt-get -y install"
@@ -605,7 +635,10 @@ def _get_install_uninstall( indicator_name, install = True ):
             _get_operating_system_dependencies_debian ) )
 
 
-def _get_usage( indicator_name, indicator_name_human_readable ):
+def _get_usage(
+    indicator_name,
+    indicator_name_human_readable ):
+
     return (
         f"Usage\n"
         f"-----\n\n"
@@ -624,7 +657,9 @@ def _get_usage( indicator_name, indicator_name_human_readable ):
         f"```\n\n" )
 
 
-def _get_limitations( indicator_name ):
+def _get_limitations(
+    indicator_name ):
+
     messages = [ ]
 
     if _is_indicator(
@@ -761,7 +796,10 @@ def _get_limitations( indicator_name ):
     return message
 
 
-def _get_license( authors_emails, start_year ):
+def _get_license(
+    authors_emails,
+    start_year ):
+
     end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
 
     authors = [ author_email[ 0 ] for author_email in authors_emails ]

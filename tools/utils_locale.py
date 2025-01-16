@@ -29,7 +29,9 @@ import subprocess
 from pathlib import Path
 
 
-def _get_linguas_codes( indicator_name ):
+def _get_linguas_codes(
+    indicator_name ):
+
     lingua_codes = [ ]
     with open( _get_linguas( indicator_name ), 'r', encoding = "utf-8" ) as f:
         for line in f:
@@ -39,17 +41,23 @@ def _get_linguas_codes( indicator_name ):
     return lingua_codes
 
 
-def _get_locale_directory( indicator_name ):
+def _get_locale_directory(
+    indicator_name ):
+
     return Path( '.' ) / indicator_name / "src" / indicator_name / "locale"
 
 
-def _get_linguas( indicator_name ):
+def _get_linguas(
+    indicator_name ):
+
     # The LINGUAS file lists each supported language/locale:
     #   http://www.gnu.org/software/gettext/manual/gettext.html#po_002fLINGUAS
     return _get_locale_directory( indicator_name ) / "LINGUAS"
 
 
-def _get_potfiles_dot_in( indicator_name ):
+def _get_potfiles_dot_in(
+    indicator_name ):
+
     return _get_locale_directory( indicator_name ) / "POTFILES.in"
 
 
@@ -58,11 +66,11 @@ def _get_current_year():
 
 
 def _create_update_pot(
-        indicator_name,
-        locale_directory,
-        authors_emails,
-        version,
-        copyright_ ):
+    indicator_name,
+    locale_directory,
+    authors_emails,
+    version,
+    copyright_ ):
 
     pot_file = f"{ locale_directory / indicator_name }.pot"
 
@@ -175,11 +183,11 @@ def _create_update_pot(
 
 
 def _create_update_po(
-        indicator_name,
-        linguas_codes,
-        version,
-        copyright_,
-        start_year ):
+    indicator_name,
+    linguas_codes,
+    version,
+    copyright_,
+    start_year ):
 
     pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
     for lingua_code in linguas_codes:
@@ -280,7 +288,9 @@ def _create_update_po(
             print( message )
 
 
-def _validate_locale_source( indicator_name ):
+def _validate_locale_source(
+    indicator_name ):
+
     message = ""
 
     potfiles_dot_in = _get_potfiles_dot_in( "indicatorbase" )
@@ -350,10 +360,10 @@ def update_locale_source(
 
 
 def get_names_and_comments_from_mo_files(
-        indicator_name,
-        directory_indicator_locale,
-        name,
-        comments ):
+    indicator_name,
+    directory_indicator_locale,
+    name,
+    comments ):
 
     names_from_mo_files = { }
     comments_from_mo_files = { }
@@ -383,7 +393,10 @@ def get_names_and_comments_from_mo_files(
     return names_from_mo_files, comments_from_mo_files
 
 
-def build_locale_release( directory_release, indicator_name ):
+def build_locale_release(
+    directory_release,
+    indicator_name ):
+
     directory_indicator = Path( '.' ) / directory_release / indicator_name
     directory_indicator_locale = Path( '.' ) / directory_indicator / "src" / indicator_name / "locale"
     directory_indicator_base_locale = Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale"

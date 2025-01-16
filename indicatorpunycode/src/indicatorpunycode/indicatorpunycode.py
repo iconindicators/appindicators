@@ -58,7 +58,10 @@ class IndicatorPunycode( IndicatorBase ):
         self.results =  [ ]
 
 
-    def update( self, menu ):
+    def update(
+        self,
+        menu ):
+
         # The mouse middle button click kicks off a convert, but to do so must
         # be bound to a menu item (which in reality kicks off the convert).
         # Therefore this menu item, seemingly redundant, must be present.
@@ -127,7 +130,10 @@ class IndicatorPunycode( IndicatorBase ):
                     "the clipboard is unsupported." ) )
 
 
-    def _do_conversion( self, text ):
+    def _do_conversion(
+        self,
+        text ):
+
         protocol = ""
         result = re.split( r"(^.*//)", text )
         if len( result ) == 3:
@@ -194,7 +200,10 @@ class IndicatorPunycode( IndicatorBase ):
             self.results = self.results[ : self.result_history_length ]
 
 
-    def send_results_to_output( self, text ):
+    def send_results_to_output(
+        self,
+        text ):
+
         if self.output_both:
             self.copy_to_selection( text )
             self.copy_to_selection( text, is_primary = True )
@@ -207,7 +216,10 @@ class IndicatorPunycode( IndicatorBase ):
                 self.copy_to_selection( text, is_primary = True )
 
 
-    def on_preferences( self, dialog ):
+    def on_preferences(
+        self,
+        dialog ):
+
         grid = self.create_grid()
 
         grid.attach(
@@ -307,7 +319,10 @@ class IndicatorPunycode( IndicatorBase ):
         return response_type
 
 
-    def load_config( self, config ):
+    def load_config(
+        self,
+        config ):
+
         self.drop_path_query = (
             config.get( IndicatorPunycode.CONFIG_DROP_PATH_QUERY, False ) )
 

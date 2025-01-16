@@ -20,23 +20,23 @@
 Base class for calculating astronomical information.
 
 References:
-	https://ssd.jpl.nasa.gov/horizons.cgi
-	https://stellarium-web.org/
-	https://theskylive.com/
-	https://www.wolframalpha.com
-	https://www.ga.gov.au/scientific-topics/astronomical
-	https://futureboy.us/fsp/moon.fsp
-	https://futureboy.us/fsp/sun.fsp
-	https://www.satellite-calculations.com/
-	https://aa.usno.navy.mil/data/docs/mrst.php
-	https://celestrak.org/columns/v03n01
-	https://celestrak.org/NORAD/elements
-	https://www.n2yo.com
-	https://www.heavens-above.com
-	https://in-the-sky.org
-	https://uphere.space
-	https://www.amsat.org/track
-	https://tracksat.space
+    https://ssd.jpl.nasa.gov/horizons.cgi
+    https://stellarium-web.org/
+    https://theskylive.com/
+    https://www.wolframalpha.com
+    https://www.ga.gov.au/scientific-topics/astronomical
+    https://futureboy.us/fsp/moon.fsp
+    https://futureboy.us/fsp/sun.fsp
+    https://www.satellite-calculations.com/
+    https://aa.usno.navy.mil/data/docs/mrst.php
+    https://celestrak.org/columns/v03n01
+    https://celestrak.org/NORAD/elements
+    https://www.n2yo.com
+    https://www.heavens-above.com
+    https://in-the-sky.org
+    https://uphere.space
+    https://www.amsat.org/track
+    https://tracksat.space
 '''
 
 
@@ -434,21 +434,24 @@ class AstroBase( ABC ):
     @staticmethod
     @abstractmethod
     def calculate(
-            utc_now,
-            latitude, longitude, elevation,
-            planets,
-            stars,
-            satellites,
-            satellite_data,
-            start_hour_as_date_time_in_utc, end_hour_as_date_time_in_utc,
-            comets,
-            comet_data,
-            comet_apparent_magnitude_data,
-            minor_planets,
-            minor_planet_data,
-            minor_planet_apparent_magnitude_data,
-            apparent_magnitude_maximum,
-            logging = None ):
+        utc_now,
+        latitude,
+        longitude,
+        elevation,
+        planets,
+        stars,
+        satellites,
+        satellite_data,
+        start_hour_as_date_time_in_utc,
+        end_hour_as_date_time_in_utc,
+        comets,
+        comet_data,
+        comet_apparent_magnitude_data,
+        minor_planets,
+        minor_planet_data,
+        minor_planet_apparent_magnitude_data,
+        apparent_magnitude_maximum,
+        logging = None ):
         '''
         Returns a dictionary with astronomical information:
             Key is a tuple of a BodyType, a name tag and a data tag.
@@ -457,7 +460,7 @@ class AstroBase( ABC ):
         Latitude, longitude are floating point numbers in decimal degrees.
         Elevation is a floating point number for metres above sea level.
         Maximum magnitude applies to planets, stars, comets and minor planets.
-        
+
         If a body is never up, no data is added.
         If a body is always up, the current azimuth/altitude are added.
         If the body will rise/set, the next rise date/time, next set date/time
@@ -494,7 +497,8 @@ class AstroBase( ABC ):
 
     @staticmethod
     @abstractmethod
-    def get_latitude_longitude_elevation( city ):
+    def get_latitude_longitude_elevation(
+        city ):
         '''
         Returns a tuple of floats of the latitude, longitude and elevation for
         the city.
@@ -512,22 +516,26 @@ class AstroBase( ABC ):
 
 
     @staticmethod
-    def _get_star_row( star ):
+    def _get_star_row(
+        star ):
         return next( i for i in AstroBase.STARS if i[ AstroBase._STARS_INDEX_NAME ] == star )
 
 
     @staticmethod
-    def get_star_hip( star ):
+    def get_star_hip(
+        star ):
         return AstroBase._get_star_row( star )[ AstroBase._STARS_INDEX_HIP ]
 
 
     @staticmethod
-    def get_star_name_translation( star ):
+    def get_star_name_translation(
+        star ):
         return AstroBase._get_star_row( star )[ AstroBase._STARS_INDEX_NAME_TRANSLATION ]
 
 
     @staticmethod
-    def get_star_tag_translation( star ):
+    def get_star_tag_translation(
+        star ):
         return AstroBase._get_star_row( star )[ AstroBase._STARS_INDEX_TAG_TRANSLATION ]
 
 
@@ -548,10 +556,10 @@ class AstroBase( ABC ):
 
     @staticmethod
     def get_apparent_magnitude_gk(
-            g_absolute_magnitude,
-            k_luminosity_index,
-            body_earth_distance_au,
-            body_sun_distance_au ):
+        g_absolute_magnitude,
+        k_luminosity_index,
+        body_earth_distance_au,
+        body_sun_distance_au ):
         '''
         Calculate apparent magnitude.
         May throw a value error or similar if bad numbers/calculations occur.
@@ -569,17 +577,17 @@ class AstroBase( ABC ):
 
     @staticmethod
     def get_apparent_magnitude_hg(
-            h_absolute_magnitude,
-            g_slope,
-            body_earth_distance_au,
-            body_sun_distance_au,
-            earth_sun_distance_au ):
+        h_absolute_magnitude,
+        g_slope,
+        body_earth_distance_au,
+        body_sun_distance_au,
+        earth_sun_distance_au ):
         '''
         Calculate apparent magnitude.
         May throw a value error or similar if bad numbers/calculations occur.
 
         https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId564354
-        https://www.britastro.org/asteroids/dymock4.pdf        
+        https://www.britastro.org/asteroids/dymock4.pdf
         '''
 
         # The division below may result in a number greater than 1 in the fifth
@@ -619,9 +627,9 @@ class AstroBase( ABC ):
 
     @staticmethod
     def get_lunar_phase(
-            illumination_percentage,
-            next_full_moon_date,
-            next_new_moon_date ):
+        illumination_percentage,
+        next_full_moon_date,
+        next_new_moon_date ):
         '''
         Get the lunar phase.
 
@@ -659,7 +667,9 @@ class AstroBase( ABC ):
 
 
     @staticmethod
-    def get_sidereal_time( utc_now, longitude ):
+    def get_sidereal_time(
+        utc_now,
+        longitude ):
         '''
         Compute the sidereal decimal time for the given longitude (in
         floating point radians).
@@ -709,13 +719,13 @@ class AstroBase( ABC ):
 
     @staticmethod
     def get_zenith_angle_of_bright_limb(
-            utc_now,
-            sun_ra,
-            sun_dec,
-            body_ra,
-            body_dec,
-            observer_lat,
-            observer_lon ):
+        utc_now,
+        sun_ra,
+        sun_dec,
+        body_ra,
+        body_dec,
+        observer_lat,
+        observer_lon ):
         '''
         Compute the bright limb angle (relative to zenith) between the sun and
         a planetary body (typically the moon), measured in radians, counter
@@ -765,7 +775,7 @@ class AstroBase( ABC ):
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
         y = math.sin( hour_angle )
         x = (
-            math.tan( observer_lat ) * math.cos( body_dec ) 
+            math.tan( observer_lat ) * math.cos( body_dec )
             -
             math.sin( body_dec ) * math.cos( hour_angle ) )
 
@@ -776,10 +786,10 @@ class AstroBase( ABC ):
 
     @staticmethod
     def get_start_end_windows(
-            start_date_time,
-            end_date_time,
-            start_hour_as_date_time,
-            end_hour_as_date_time ):
+        start_date_time,
+        end_date_time,
+        start_hour_as_date_time,
+        end_hour_as_date_time ):
         '''
         Take a start/end date/time in UTC to define a search window for a
         satellite transit and determine where a given start/end hour will
