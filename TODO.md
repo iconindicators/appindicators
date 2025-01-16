@@ -10,7 +10,9 @@ Otherwise just leave as is...and keep the entry in the changelog.
 What to do?
 
 
-# Change the date in the latest entry in each CHANGELOG.md to date of release.
+# Update date CHANGELOG.md
+For each indicator's CHANGELOG.md, at release time, update the release date in
+the latest entry to the date of release.
 
 
 ## When finally released, or at least indicatortest is released, post a note to
