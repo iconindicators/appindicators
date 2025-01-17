@@ -493,7 +493,8 @@ class IndicatorTest( IndicatorBase ):
                     (
                         ( self.data_function, "" ),
                         renderer_text_for_column_dayofweek, 0 ), ),
-                tooltip_text = _( "Days of week containing an 'n' are bold." ) ) )
+                tooltip_text = _(
+                    "Days of week containing an 'n' are bold." ) ) )
 
         grid.attach( scrolledwindow, 0, 1, 1, 10 )
 

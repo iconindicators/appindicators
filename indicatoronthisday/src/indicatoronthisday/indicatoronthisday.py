@@ -440,7 +440,8 @@ class IndicatorOnThisDay( IndicatorBase ):
                     "If the URL is empty and 'search' is selected,\n" +
                     "the search will effectively be ignored.\n\n" +
                     "If the URL is empty and 'copy' is selected,\n" +
-                    "the URL is reset back to factory default." ).format( IndicatorOnThisDay.TAG_EVENT ),
+                    "the URL is reset back to factory default." ).format(
+                        IndicatorOnThisDay.TAG_EVENT ),
                 sensitive = not self.copy_to_clipboard ) )
 
         grid.attach(

@@ -45,7 +45,7 @@ try:
     import indicatorbase
 except ModuleNotFoundError:
     # If the script is called from a directory other than the correct directory,
-    # this import will fail before the check for the correct directory can be done,
+    # this import will fail before the check for the correct directory is done,
     # resulting in a "ModuleNotFoundError: No module named 'indicatorbase'"
     # which is a red herring...
     print(
@@ -75,7 +75,7 @@ def _run_checks_on_indicator(
     message = ""
     for path in paths:
         for path_ in ( path_.resolve() for path_ in path.glob( '**/*' ) if path_.is_file() and not any( exclusion in str( path_ ) for exclusion in exclusions ) ):
-            print( path_ )
+            print( path_ )  #TODO Why is this print here?
             with open( path_, 'r', encoding = "utf-8" ) as f:
                 if t_o_d_o in f.read().lower():
                     message += f"\t{ path_ }\n"
@@ -120,7 +120,9 @@ def _create_pyproject_dot_toml(
         dependencies = config[ "top" ][ "dependencies" ].replace( '[', '' ).replace( ']', '' ).strip()
         dependencies = ',\n' + re.sub( "^", "  ", dependencies, flags = re.M )
 
-    indicatorbase_pyproject_toml = Path( '.' ) / "indicatorbase" / "pyprojectbase.toml"
+    indicatorbase_pyproject_toml = (
+        Path( '.' ) / "indicatorbase" / "pyprojectbase.toml" )
+
     text = ""
     with open( indicatorbase_pyproject_toml, encoding = "utf-8" ) as f:
         for line in f:

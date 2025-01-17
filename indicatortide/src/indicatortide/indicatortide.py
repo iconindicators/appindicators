@@ -52,7 +52,9 @@ class IndicatorTide( IndicatorBase ):
 
 
     def update( self, menu ):
-        if self.user_script_path_and_filename == "" and self.user_script_class_name == "":
+        no_user_script_path = self.user_script_path_and_filename == ""
+        no_user_script_name = self.user_script_class_name == ""
+        if no_user_script_path and no_user_script_name:
             # First time the indicator is run, or really,
             # when there is no preference/json file,
             # there will be no user script specified,
@@ -118,9 +120,14 @@ class IndicatorTide( IndicatorBase ):
                 menu.append( Gtk.MenuItem.new_with_label( label ) )
                 self.show_notification( summary, message )
 
-        # Update a little after midnight...best guess as to when the user's data source will update.
+        # Update a little after midnight;
+        # guess as to when the user's data source will update.
         today = datetime.datetime.now()
-        five_minutes_after_midnight = ( today + datetime.timedelta( days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
+        five_minutes_after_midnight = (
+            today +
+            datetime.timedelta(
+                days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
+
         return ( five_minutes_after_midnight - today ).total_seconds()
 
 

@@ -281,14 +281,16 @@ class IndicatorBase( ABC ):
 
     def _check_for_newer_version( self ):
         url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
+        message = _( "Refer to the Preferences for details." )
+        summary = _(
+            "New version of {0} available..." ).format( self.indicator_name )
+
         data_json, error_network, error_timeout = self.get_json( url )
         if data_json:
             version_latest = data_json[ "info" ][ "version" ]
             if version_latest != str( self.version ):
                 self.new_version_available = True
-                self.show_notification(
-                    _( "New version of {0} available..." ).format( self.indicator_name ),
-                    _( "Refer to the Preferences for details." ) )
+                self.show_notification( summary, message )
 
 
     def get_json(
@@ -304,8 +306,8 @@ class IndicatorBase( ABC ):
         The first boolean indicates a network error and the second boolean
         indicates a timeout.
 
-        https://stackoverflow.com/questions/72388829/request-urlopenurl-not-return-website-response-or-timeout
-        https://stackoverflow.com/questions/8763451/how-to-handle-urllibs-timeout-in-python-3
+        https://stackoverflow.com/q/72388829/2156453
+        https://stackoverflow.com/q/8763451/2156453
         '''
         error_network = False
         error_timeout = False
@@ -354,8 +356,8 @@ class IndicatorBase( ABC ):
             either via pip if the indicator is installed,
             or parsing a .whl in the release folder running under development.
 
-        https://stackoverflow.com/questions/75801738/importlib-metadata-doesnt-appear-to-handle-the-authors-field-from-a-pyproject-t
-        https://stackoverflow.com/questions/76143042/is-there-an-interface-to-access-pyproject-toml-from-python
+        https://stackoverflow.com/q/75801738/2156453
+        https://stackoverflow.com/q/76143042/2156453
         '''
         try:
             # Obtain pyproject.toml information from pip.
@@ -380,7 +382,8 @@ class IndicatorBase( ABC ):
                 if first_metadata is None:
                     project_metadata = None
                     error_message = (
-                        f"No metadata was found in { wheel_in_release.absolute() }!" )
+                        f"No metadata was found in " +
+                        "{ wheel_in_release.absolute() }!" )
 
                 else:
                     project_metadata = first_metadata.metadata
@@ -446,7 +449,8 @@ class IndicatorBase( ABC ):
                     autostart_enabled_present = True
 
                 elif starts_with_autostart_delay:
-                    # Does not work in Debian et al; capture delay and comment line.
+                    # Does not work in Debian et al.
+                    # Capture the delay and comment out the line.
                     delay = line.split( '=' )[ 1 ].strip()
                     output += '#' + line
                     made_a_change = True
@@ -542,7 +546,8 @@ class IndicatorBase( ABC ):
 
                     else:
                         error_message = (
-                            f"Unable to locate { desktop_file_in_wheel } in { wheel_in_release.absolute() }." )
+                            f"Unable to locate { desktop_file_in_wheel } in " +
+                            "{ wheel_in_release.absolute() }." )
 
                 z.close()
 
@@ -777,7 +782,9 @@ class IndicatorBase( ABC ):
 
         When updating/replacing an icon, the desktop environment appears to
         cache.  So perhaps first try:
+
             sudo touch $HOME/.local/share/icons/hicolor && sudo gtk-update-icon-cache
+
         and if that fails, either log out/in or restart.
         '''
         return self.indicator_name + "-symbolic"
@@ -818,7 +825,8 @@ class IndicatorBase( ABC ):
 
         The function must have the form:
 
-            def on_mouse_wheel_scroll( self, indicator, delta, scroll_direction )
+            def on_mouse_wheel_scroll(
+                self, indicator, delta, scroll_direction )
 
         The name of the function may be any name.
         The arguments must be present as specified.
@@ -886,8 +894,10 @@ class IndicatorBase( ABC ):
 
         changelog_markdown_path = IndicatorBase.get_changelog_markdown_path()
 
-#TODO Make shorter
-        authors = [ author_and_email[ 0 ] for author_and_email in self.authors_and_emails ]
+        authors = [
+                author_and_email[ 0 ]
+                for author_and_email in self.authors_and_emails ]
+
         about_dialog.set_copyright(
             "Copyright \xa9 "
             +
@@ -944,18 +954,21 @@ class IndicatorBase( ABC ):
         anchor_text,
         right_text ):
 
-        tooltip = "file://" + str( file_path )
+        file_ = f"\'file://{ str( file_path ) }\'"
+        title = f"title=\'file://{ str( file_path ) }\'>"
+
         markup = (
-            left_text
-            +
-            " <a href=\'" + "file://" + str( file_path ) + "\' title=\'" + tooltip + "\'>" +
-            anchor_text + "</a> " +
-            right_text )
+            f"{ left_text }" +
+            f" <a href={ file_ } { title }{ anchor_text }</a> " +
+            f"{ right_text }" )
 
         label = Gtk.Label()
         label.set_markup( markup )
         label.show()
-        about_dialog.get_content_area().get_children()[ 0 ].get_children()[ 2 ].get_children()[ 0 ].pack_start( label, False, False, 0 )
+        about_dialog.get_content_area().get_children()[
+            0 ].get_children()[
+                2 ].get_children()[
+                    0 ].pack_start( label, False, False, 0 )
 
 
     @abstractmethod
@@ -1110,7 +1123,8 @@ class IndicatorBase( ABC ):
 
             else:
                 text_in_clipboard = (
-                    Gtk.Clipboard.get( Gdk.SELECTION_CLIPBOARD ).wait_for_text() )
+                    Gtk.Clipboard.get(
+                        Gdk.SELECTION_CLIPBOARD ).wait_for_text() )
 
         return text_in_clipboard
 
@@ -1158,9 +1172,12 @@ class IndicatorBase( ABC ):
         '''
         A callback function is required by GTK to obtain text from the primary
         when running under X11:
+
             https://lazka.github.io/pgi-docs/#Gtk-3.0/classes/Clipboard.html#Gtk.Clipboard.request_text
+
         When running under Wayland, the package wl-paste is called directly
         and no callback is required.
+
         However, so that a user can retrieve the text from the primary without
         having to know whether running under X11 or Wayland, the Wayland method
         also uses the same callback mechanism.
@@ -1280,14 +1297,19 @@ class IndicatorBase( ABC ):
         autostart = False
         delay = 0
         with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
+            autostart_enable_equals_true = (
+                IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" )
+
             for line in f:
-#TODO Make shorter
-                if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" ):
+                if line.startswith( autostart_enable_equals_true ):
                     autostart = True
 
-#TODO Make shorter
-                if line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) and "sleep" in line:
-                    delay = int( line.split( "sleep" )[ 1 ].split( "&&" )[ 0 ].strip() )
+                starts_with_dot_desktop_exec = (
+                    line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) )
+
+                if starts_with_dot_desktop_exec and "sleep" in line:
+                    delay = int(
+                        line.split( "sleep" )[ 1 ].split( "&&" )[ 0 ].strip() )
 
         autostart_checkbox = (
             self.create_checkbutton(
@@ -1319,8 +1341,9 @@ class IndicatorBase( ABC ):
         latest_version_checkbox = (
             self.create_checkbutton(
                 _( "Check Latest Version" ),
-                tooltip_text =
-                    _( "Check for the latest version of the indicator on start up." ),
+                tooltip_text = _(
+                    "Check for the latest version " +
+                    "of the indicator on start up." ),
                 active = self.check_latest_version ) )
 
         box_latest_version = (
@@ -1332,7 +1355,8 @@ class IndicatorBase( ABC ):
             url = f"https://pypi.org/project/{ self.indicator_name }"
             label = Gtk.Label.new()
             label.set_markup( _(
-                "An update is available at <a href=\"{0}\">{1}</a>." ).format( url, url ) )
+                "An update is available at " +
+                "<a href=\"{0}\">{1}</a>." ).format( url, url ) )
 
             box_new_version = (
                 self.create_box(
@@ -1584,7 +1608,8 @@ class IndicatorBase( ABC ):
                 self.create_button(
                     label,
                     tooltip_text = tooltip_text,
-                    clicked_functionandarguments = clicked_functionandargument ) )
+                    clicked_functionandarguments =
+                        clicked_functionandargument ) )
 
             buttons_and_expands.append( [ button, True ] )
 
@@ -2008,15 +2033,26 @@ class IndicatorBase( ABC ):
         output = ""
         with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
             for line in f:
-#TODO Make shorter
-                if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
-                    output += IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' + str( is_set ).lower() + '\n'
+                line_starts_with_dot_desktop_autostart_enabled = (
+                    line.startswith(
+                        IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ) )
+
+                if line_starts_with_dot_desktop_autostart_enabled:
+                    output += (
+                        IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED +
+                        '=' +
+                        str( is_set ).lower() +
+                        '\n' )
 
                 elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
                     parts = line.split( "sleep" )
                     right = parts[ 1 ].split( "&&" )[ 1 ]
-#TODO Make shorter
-                    output += parts[ 0 ] + "sleep " + str( delay ) + " &&" + right + '\n'
+                    output += (
+                        parts[ 0 ] +
+                        "sleep " + str( delay ) +
+                        " &&" +
+                        right +
+                        '\n' )
 
                 else:
                     output += line
@@ -2230,16 +2266,16 @@ class IndicatorBase( ABC ):
         to the new format, sans hyphens.
         '''
         mapping = {
-            "indicatorfortune":                 "indicator-fortune",
-            "indicatorlunar":                   "indicator-lunar",
-            "indicatoronthisday":               "indicator-on-this-day",
-            "indicatorppadownloadstatistics":   "indicator-ppa-download-statistics",
-            "indicatorpunycode":                "indicator-punycode",
-            "indicatorscriptrunner":            "indicator-script-runner",
-            "indicatorstardate":                "indicator-stardate",
-            "indicatortide":                    "indicator-tide",
-            "indicatortest":                    "indicator-test",
-            "indicatorvirtualbox":              "indicator-virtual-box" }
+            "indicatorfortune":               "indicator-fortune",
+            "indicatorlunar":                 "indicator-lunar",
+            "indicatoronthisday":             "indicator-on-this-day",
+            "indicatorppadownloadstatistics": "indicator-ppa-download-statistics",
+            "indicatorpunycode":              "indicator-punycode",
+            "indicatorscriptrunner":          "indicator-script-runner",
+            "indicatorstardate":              "indicator-stardate",
+            "indicatortide":                  "indicator-tide",
+            "indicatortest":                  "indicator-test",
+            "indicatorvirtualbox":            "indicator-virtual-box" }
 
         config_file_old = (
             str( config_file ).replace(
@@ -2313,9 +2349,13 @@ class IndicatorBase( ABC ):
             stale = True
 
         else:
+            cache_date_time_plus_maximum_age = (
+                cache_date_time +
+                datetime.timedelta( hours = maximum_age_in_hours ) )
+
             utc_now = datetime.datetime.now( datetime.timezone.utc )
-#TODO Make shorter
-            stale = ( cache_date_time + datetime.timedelta( hours = maximum_age_in_hours ) ) < utc_now
+
+            stale = cache_date_time_plus_maximum_age < utc_now
 
         return stale
 
@@ -2338,8 +2378,8 @@ class IndicatorBase( ABC ):
 
         if the_file: # A value of "" evaluates to False.
             # YYYYMMDDHHMMSS is 14 characters.
-#TODO Make shorter
-            date_time_component = the_file[ len( basename ) : len( basename ) + 14 ]
+            date_time_component = (
+                    the_file[ len( basename ) : len( basename ) + 14 ] )
 
             expiry = (
                 datetime.datetime.strptime(
@@ -2362,7 +2402,8 @@ class IndicatorBase( ABC ):
         filename = (
             basename
             +
-            datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            datetime.datetime.now().strftime(
+                IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
             +
             extension )
 
@@ -2513,7 +2554,8 @@ class IndicatorBase( ABC ):
         filename = (
             basename
             +
-            datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            datetime.datetime.now().strftime(
+                IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )  #TODO Look to see where this is used...seems to be used to create the same filename over and over...or am I dreaming?
             +
             extension )
 
@@ -2596,8 +2638,9 @@ class IndicatorBase( ABC ):
 
         Returns filename written on success; None otherwise.
         '''
-#TODO Make shorter
-        return self._write_cache_text( text, self.get_cache_directory() / filename )
+        return (
+            self._write_cache_text(
+                text, self.get_cache_directory() / filename ) )
 
 
     def write_cache_text(
@@ -2624,11 +2667,14 @@ class IndicatorBase( ABC ):
         filename = (
             basename
             +
-            datetime.datetime.now().strftime( IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
+            datetime.datetime.now().strftime(
+                IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
             +
             extension )
 
-        return self._write_cache_text( text, self.get_cache_directory() / filename )
+        return (
+            self._write_cache_text(
+                text, self.get_cache_directory() / filename ) )
 
 
     def _write_cache_text(

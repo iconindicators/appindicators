@@ -65,7 +65,9 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
+            comments = _(
+                "Shows VirtualBox™ virtual machines and allows them " +
+                "to be started." ) )
 
         self.auto_start_required = True
         self.date_time_of_last_notification = datetime.datetime.now()
@@ -77,7 +79,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         # Under Wayland, wmctrl is not implemented and so it is pointless
         # listening for events which will result in nothing.
         if not self.is_session_type_wayland():
-            self.request_mouse_wheel_scroll_events( ( self.on_mouse_wheel_scroll, ) )
+            self.request_mouse_wheel_scroll_events(
+                ( self.on_mouse_wheel_scroll, ) )
 
 
     def update(
@@ -279,7 +282,12 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         result = self.process_get( "VBoxManage list vms | grep " + uuid )
         if uuid not in result:
-            message = _( "The virtual machine could not be found - perhaps it has been renamed or deleted.  The list of virtual machines has been refreshed - please try again." )
+            message = _(
+                "The virtual machine could not be found - " +
+                "perhaps it has been renamed or deleted.  " +
+                "The list of virtual machines has been refreshed - " +
+                "please try again." )
+
             self.show_notification( _( "Error" ), message )
 
         else:
@@ -295,10 +303,15 @@ class IndicatorVirtualBox( IndicatorBase ):
         if not self.is_session_type_wayland():
             number_of_windows_with_the_same_name = (
                 self.process_get(
-                    'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l' ) )
+                    'wmctrl -l | grep "' +
+                    virtual_machine_name + '" | wc -l' ) )
 
             if number_of_windows_with_the_same_name == "0":
-                message = _( "Unable to find the window for the virtual machine '{0}' - perhaps it is running as headless." ).format( virtual_machine_name )
+                message = _(
+                    "Unable to find the window for the virtual machine '{0}' " +
+                    "- perhaps it is running as headless." ).format(
+                        virtual_machine_name )
+
                 summary = _( "Warning" )
                 self.show_notification_with_delay(
                     summary,
@@ -313,7 +326,11 @@ class IndicatorVirtualBox( IndicatorBase ):
                         break
 
             else:
-                message = _( "Unable to bring the virtual machine '{0}' to front as there is more than one window with overlapping names." ).format( virtual_machine_name )
+                message = _(
+                    "Unable to bring the virtual machine '{0}' to front " +
+                    "as there is more than one window " +
+                    "with overlapping names." ).format( virtual_machine_name )
+
                 summary = _( "Warning" )
                 self.show_notification_with_delay(
                     summary,
@@ -355,12 +372,20 @@ class IndicatorVirtualBox( IndicatorBase ):
                     self.scroll_uuid = running_uuids[ 0 ]
 
                 if scroll_direction == Gdk.ScrollDirection.UP:
-                    index = ( running_uuids.index( self.scroll_uuid ) + 1 ) % len( running_uuids )
+                    index = (
+                        ( running_uuids.index( self.scroll_uuid ) + 1 )
+                        %
+                        len( running_uuids ) )
+
                     self.scroll_uuid = running_uuids[ index ]
                     self.scroll_direction_is_up = True
 
                 else:
-                    index = ( running_uuids.index( self.scroll_uuid ) - 1 ) % len( running_uuids )
+                    index = (
+                        ( running_uuids.index( self.scroll_uuid ) - 1 )
+                        %
+                        len( running_uuids ) )
+
                     self.scroll_uuid = running_uuids[ index ]
                     self.scroll_direction_is_up = False
 
@@ -394,7 +419,10 @@ class IndicatorVirtualBox( IndicatorBase ):
             # window in the preferences and using that, find the window by the
             # window title.
             window_id = None
-            command = "wmctrl -l | grep \"" + self.virtualbox_manager_window_name + "\""
+            command = (
+                "wmctrl -l | grep \"" +
+                self.virtualbox_manager_window_name + "\"" )
+
             result = self.process_get( command )
             if result:
                 window_id = result.split()[ 0 ]
@@ -515,7 +543,10 @@ class IndicatorVirtualBox( IndicatorBase ):
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 treestore,
-                ( _( "Virtual Machine" ), _( "Autostart" ), _( "Start Command" ) ),
+                (
+                    _( "Virtual Machine" ),
+                    _( "Autostart" ),
+                    _( "Start Command" ) ),
                 (
                     (
                         Gtk.CellRendererText(),
@@ -819,10 +850,13 @@ class IndicatorVirtualBox( IndicatorBase ):
                 IndicatorVirtualBox.CONFIG_SORT_GROUPS_AND_VIRTUAL_MACHINES_EQUALLY,
                 True ) )
 
+        # Store information about VMs. 
+        #   Key is VM UUID
+        #   Value is [ autostart (bool), start command (str) ]
         self.virtual_machine_preferences = (
             config.get(
                 IndicatorVirtualBox.CONFIG_VIRTUAL_MACHINE_PREFERENCES,
-                { } ) ) # Store information about VMs.  Key is VM UUID; value is [ autostart (bool), start command (str) ]
+                { } ) )
 
         self.virtualbox_manager_window_name = (
             config.get(
