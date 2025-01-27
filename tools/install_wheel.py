@@ -48,7 +48,7 @@ if __name__ == "__main__":
                         f"If the directory specified is 'release', "
                         "the Python wheel must be located at 'release/wheel'.",
                     "indicators" :
-                        f"The list of indicators separated by spaces to install." },
+                        f"List of indicators, space separated, to install." },
                 {
                     "indicators" :
                         "+" } ) )
@@ -59,7 +59,10 @@ if __name__ == "__main__":
                 f"pip",
                 f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)" )
 
-            command = f"$(ls -d $HOME/.local/venv_indicators/lib/python3.* | head -1)/site-packages/{indicator_name}/platform/linux/install.sh"
+            command = (
+                f"$(ls -d $HOME/.local/venv_indicators/lib/python3.* | " +
+                f" head -1)/site-packages/{indicator_name}/platform/" +
+                f"linux/install.sh" )
 
             subprocess.call( command, shell = True )
 

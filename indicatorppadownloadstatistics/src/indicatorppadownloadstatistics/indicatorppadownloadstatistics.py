@@ -307,6 +307,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             for entry in json[ "entries" ]:
                 architecture = None
                 if entry[ "architecture_specific" ]:
+#TODO Shorten
                     architecture = entry[ "distro_arch_series_link" ].split( '/' )[ -1 ]
 
                 published_binary = (
@@ -542,6 +543,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
 
                 self.ppas[ -1 ].set_filters(
+#TODO Shorten
                     ppa[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ].split( '\n' ) )
 
                 treeiter = ppa_store.iter_next( treeiter )
@@ -673,6 +675,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             ppa_user = self.create_entry( "" )
 
         else:
+#TODO Shorten
             ppa_users = [ row[ IndicatorPPADownloadStatistics.COLUMN_USER ] for row in model ]
             ppa_users = list( set( ppa_users ) )
             ppa_users.sort( key = locale.strxfrm )
@@ -742,6 +745,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         grid.attach(
             self.create_box(
                 (
+#TODO Shorten
                     ( Gtk.Label.new( "\n\n\n\n\n" ), False ), # Ensure the textview for the filter text is not too short.
                     ( self.create_scrolledwindow( textview ), True ) ) ),
                      1, 2, 1, 1 )
@@ -799,6 +803,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         continue
 
                 else:
+#TODO Shorten
                     user_is_unchanged = (
                         model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] == user )
 

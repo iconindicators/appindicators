@@ -178,10 +178,11 @@ class NonBackground( Info ):
         Group to which a script belongs.
         Name of script.
         The command or script with any arguments as needed.
-        True to play a sound on completion of script/command execution.
-        True to show a notification on completion of script/command execution.
-        True to leave the terminal open on completion of script/command execution.
-        True if the script is default (only one non-background script can be default).
+        True plays a sound on completion of script/command execution.
+        True shows a notification on completion of script/command execution.
+        True leaves the terminal open on completion of script/command execution.
+        True if the script is the default; only one non-background script can
+        be default.
         '''
         super().__init__(
             group, name, command, play_sound, show_notification )

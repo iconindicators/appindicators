@@ -36,13 +36,13 @@ if __name__ == "__main__":
         args = (
             utils.initialiase_parser_and_get_arguments(
                 f"Uninstall one or more indicators, including the run script, "
-                f"icons, .desktop and .config/.cache. and additionally removing "
-                f"the shared virtual environment $HOME/.local/venv_indicators "
+                f"icons, .desktop and .config/.cache. and additionally removing"
+                f" the shared virtual environment $HOME/.local/venv_indicators "
                 f"if no indicators are installed.",
                 ( "indicators", ),
                 {
                     "indicators" :
-                        "The list of indicators separated by spaces to uninstall." },
+                        "List of indicators, space separated, to uninstall." },
                 {
                     "indicators" :
                         "+" } ) )
@@ -51,10 +51,12 @@ if __name__ == "__main__":
             command = (
                 f"indicator={indicator_name} && " +
                 f"venv=$HOME/.local/venv_indicators && " +
-                f"$(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/{indicator_name}/platform/linux/uninstall.sh && " +
+                f"$(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/" +
+                f"{indicator_name}/platform/linux/uninstall.sh && " +
                 f". ${{venv}}/bin/activate && " +
                 f"python3 -m pip uninstall --yes {indicator_name} && " +
-                f"count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && " +
+                f"count=$(python3 -m pip --disable-pip-version-check list | " +
+                f"grep -o \"indicator\" | wc -l) && " +
                 f"deactivate && " +
                 f"if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi" )
 

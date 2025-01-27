@@ -35,6 +35,8 @@ from gi.repository import Gtk
 
 from indicatorbase import IndicatorBase
 
+from fortune import Fortune
+
 
 class IndicatorFortune( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
@@ -59,7 +61,6 @@ class IndicatorFortune( IndicatorBase ):
     HISTORY_FILE = "fortune-history.txt"
 
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
-    NOTIFICATION_SUMMARY_WARNING = _( "WARNING. . ." )
 
 
     def __init__( self ):
@@ -75,14 +76,15 @@ class IndicatorFortune( IndicatorBase ):
         self,
         menu ):
 
-        self.build_menu( menu, self.refresh_and_show_fortune() )
+        self.refresh_fortune()
+        self.show_fortune()
+        self.build_menu( menu )
         return int( self.refresh_interval_in_minutes ) * 60
 
 
     def build_menu(
         self,
-        menu,
-        fortune ):
+        menu ):
 
         self.create_and_append_menuitem(
             menu,
@@ -94,15 +96,12 @@ class IndicatorFortune( IndicatorBase ):
                 ==
                 IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
-        activate_functionandarguments = None
-        if self.is_clipboard_supported():
-            activate_functionandarguments = (
-                lambda menuitem: self.copy_to_selection( fortune ), )
-
         self.create_and_append_menuitem(
             menu,
             _( "Copy Last Fortune" ),
-            activate_functionandarguments = activate_functionandarguments,
+            activate_functionandarguments = (
+                lambda menuitem:
+                    self.copy_to_selection( self.fortune.get_message() ), ),
             is_secondary_activate_target = (
                 self.middle_mouse_click_on_icon
                 ==
@@ -125,6 +124,80 @@ class IndicatorFortune( IndicatorBase ):
             _( "History" ),
             activate_functionandarguments = (
                 lambda menuitem: self.show_history(), ) )
+
+
+    def refresh_fortune( self ):
+        locations = [ ]
+        at_least_one_fortune_is_enabled = False
+        for location, enabled in self.fortunes:
+            if enabled:
+                at_least_one_fortune_is_enabled = True
+                if Path( location ).is_dir():
+                    locations.append( " '" + location + "/' " )
+
+                elif Path( location ).is_file():
+                    locations.append(
+                        " '" + location.replace( ".dat", "" ) + "' " )
+
+                else:
+                    self.get_logging().error(
+                        f"Unknown fortune path { location }" )
+
+        summary = _( "WARNING. . ." )
+        if locations:
+            while True:
+                command = "fortune" + ''.join( locations )
+                fortune = self.process_get( command )
+                if not fortune: # No fortune data found.
+                    message = _( "Ensure enabled fortunes contain data!" )
+                    break
+
+                if len( fortune ) <= self.skip_fortune_character_count:
+                    history = (
+                        self.read_cache_text_without_timestamp(
+                            IndicatorFortune.HISTORY_FILE ) )
+
+                    # Remove characters/glyphs which appear as hexadecimal.
+                    #    https://askubuntu.com/q/827193
+                    #
+                    # Examples (On Debian 12 x0007 is x0008):
+                    #    Ask not for whom the <CONTROL-G> tolls.
+                    #        *** System shutdown message from root
+                    #    It's a very *__UN*lucky week in which to be took
+                    output = ""
+                    for c in fortune:
+                        char_as_hex = codecs.encode( str.encode( c ), "hex" )
+                        if char_as_hex == b'07' or char_as_hex == b'08':
+                            continue
+
+                        output += c
+
+                    message = output
+                    summary = self.notification_summary
+
+                    self.write_cache_text_without_timestamp(
+                        history + message + "\n\n",
+                        IndicatorFortune.HISTORY_FILE )
+
+                    break
+
+        elif at_least_one_fortune_is_enabled:
+            message = _( "No enabled fortunes have a valid location!" )
+
+        else:
+            message = _( "No enabled fortunes!" )
+
+        self.fortune = Fortune( message, summary )
+
+
+    def show_fortune( self ):
+        self.show_notification(
+            self.fortune.get_summary(), self.fortune.get_message() )
+
+
+    def refresh_and_show_fortune( self ):
+        self.refresh_fortune()
+        self.show_fortune()
 
 
     def show_history( self ):
@@ -173,74 +246,6 @@ class IndicatorFortune( IndicatorBase ):
         dialog.destroy()
 
         self.set_menu_sensitivity( True )
-
-
-    def refresh_and_show_fortune( self ):
-        locations = [ ]
-        at_least_one_fortune_is_enabled = False
-        for location, enabled in self.fortunes:
-            if enabled:
-                at_least_one_fortune_is_enabled = True
-                if Path( location ).is_dir():
-                    locations.append( " '" + location + "/' " )
-
-                elif Path( location ).is_file():
-                    locations.append(
-                        " '" + location.replace( ".dat", "" ) + "' " )
-
-                else:
-                    self.get_logging().error(
-                        f"Unknown fortune path { location }" )
-
-        notification_summary = ( IndicatorFortune.NOTIFICATION_SUMMARY_WARNING )
-        if locations:
-            while True:
-                command = "fortune" + ''.join( locations )
-                fortune = self.process_get( command )
-                if not fortune: # No fortune data found.
-                    fortune = _( "Ensure enabled fortunes contain data!" )
-                    break
-
-                if len( fortune ) <= self.skip_fortune_character_count:
-                    history = (
-                        self.read_cache_text_without_timestamp(
-                            IndicatorFortune.HISTORY_FILE ) )
-
-                    # Remove characters/glyphs which appear as hexadecimal.
-                    #    https://askubuntu.com/q/827193
-                    #
-                    # Examples (On Debian 12 x0007 is x0008):
-                    #    Ask not for whom the <CONTROL-G> tolls.
-                    #        *** System shutdown message from root
-                    #    It's a very *__UN*lucky week in which to be took
-                    output = ""
-                    for c in fortune:
-                        char_as_hex = codecs.encode( str.encode( c ), "hex" )
-                        if char_as_hex == b'07' or char_as_hex == b'08':
-                            continue
-
-                        output += c
-
-                    fortune = output
-                    notification_summary = self.notification_summary
-                    if notification_summary == "":
-                        notification_summary = " "
-
-                    self.write_cache_text_without_timestamp(
-                        history + fortune + "\n\n",
-                        IndicatorFortune.HISTORY_FILE )
-
-                    break
-
-        elif at_least_one_fortune_is_enabled:
-            fortune = _( "No enabled fortunes have a valid location!" )
-
-        else:
-            fortune = _( "No enabled fortunes!" )
-
-        self.show_notification( notification_summary, fortune )
-
-        return fortune
 
 
     def on_preferences(
@@ -463,6 +468,8 @@ class IndicatorFortune( IndicatorBase ):
                 spinner_character_count.get_value_as_int() )
 
             self.notification_summary = notification_summary.get_text()
+            if self.notification_summary == "":
+                self.notification_summary = " "
 
             self.fortunes = [ ]
             treeiter = store.get_iter_first()
@@ -747,6 +754,17 @@ class IndicatorFortune( IndicatorBase ):
             config.get(
                 IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY,
                 IndicatorFortune.NOTIFICATION_SUMMARY ) )
+
+        # Prior to 1.0.44 it was possible for the user to set an empty
+        # notification summary which was amended from "" to " " prior to the
+        # notification being displayed.
+        #
+        # Now the preferences checks for "" and sets to " " on a save.
+        #
+        # However it is possible a user has "" still saved in their properties
+        # file, so need this check here.
+        if self.notification_summary == "":
+            self.notification_summary = " "
 
         self.refresh_interval_in_minutes = (
             config.get(

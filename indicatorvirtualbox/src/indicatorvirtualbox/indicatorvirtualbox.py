@@ -43,6 +43,7 @@ class IndicatorVirtualBox( IndicatorBase ):
     indicator_name_for_desktop_file = _( "Indicator VirtualBox™" )
     indicator_categories = "Categories=Utility"
 
+#TODO Shorten
     CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS = "delayBetweenAutoStartInSeconds"
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     CONFIG_SHOW_SUBMENU = "showSubmenu"
@@ -368,6 +369,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         if self.is_vbox_manage_installed():
             running_names, running_uuids = self.get_running_virtual_machines()
             if running_uuids:
+#TODO Shorten
                 if self.scroll_uuid is None or self.scroll_uuid not in running_uuids:
                     self.scroll_uuid = running_uuids[ 0 ]
 
@@ -457,6 +459,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         self,
         uuid ):
 
+#TODO Shorten
         return self.process_get( "VBoxManage list runningvms | grep " + uuid ) is not None  #TODO Check if can ever be None.
 
 
@@ -467,6 +470,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     next(
                         ( x for x in group.get_items()
                           if isinstance( x, Group ) and x.get_name() == group_name ), None ) )
+#TODO Shorten
 
                 if the_group is None:
                     the_group = Group( group_name )
@@ -478,6 +482,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
         top_group = Group( "" )
+#TODO Shorten
         for line in self.process_get( "VBoxManage list vms --long" ).splitlines():
             if line.startswith( "Name:" ):
                 name = line.split( "Name:" )[ 1 ].strip()
@@ -503,6 +508,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         uuid ):
 
         start_command = IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
+#TODO Shorten
         if uuid in self.virtual_machine_preferences:
             start_command = self.virtual_machine_preferences[ uuid ][ IndicatorVirtualBox.PREFERENCES_START_COMMAND ]
 
@@ -513,6 +519,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         self,
         uuid ):
 
+#TODO Shorten
         return (
             uuid in self.virtual_machine_preferences
             and
@@ -674,6 +681,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.refresh_interval_in_minutes = spinner_refresh_interval.get_value_as_int()
             self.virtual_machine_preferences.clear()
             self._update_virtual_machine_preferences( treestore, treeview.get_model().get_iter_first() )
+#TODO Shorten
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),
@@ -732,6 +740,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         treestore,
         treeiter ):
 
+#TODO Shorten
         while treeiter:
             is_virtual_machine = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
             is_autostart = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY
@@ -768,6 +777,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         grid = self.create_grid()
 
         start_command = (
+#TODO Shorten
             self.create_entry(
                 model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] if model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] else "",
                 tooltip_text = _(
@@ -850,7 +860,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 IndicatorVirtualBox.CONFIG_SORT_GROUPS_AND_VIRTUAL_MACHINES_EQUALLY,
                 True ) )
 
-        # Store information about VMs. 
+        # Store information about VMs.
         #   Key is VM UUID
         #   Value is [ autostart (bool), start command (str) ]
         self.virtual_machine_preferences = (

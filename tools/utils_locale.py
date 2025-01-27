@@ -81,10 +81,11 @@ def _create_update_pot(
         new_pot_file = pot_file
 
     potfiles_in = locale_directory / "POTFILES.in"
-    input_files_search_directory = Path( '.' ) / indicator_name / "src" / indicator_name
+    input_files_search_directory = (
+        Path( '.' ) / indicator_name / "src" / indicator_name )
 
     # Use xgettext to create a new POT file and sed to insert some other text:
-    #   http://www.gnu.org/software/gettext/manual/gettext.html#po_002fPOTFILES_002ein
+    #   http://www.gnu.org/software/gettext/manual/gettext.html
     command = [
         f"xgettext",
         f"--files-from={ potfiles_in }",
@@ -125,7 +126,8 @@ def _create_update_pot(
 
     subprocess.run( command )
 
-    # Create the POT if none exists; otherwise, compare the new POT with the original POT...
+    # Create the POT if none exists;
+    # otherwise, compare the new POT with the original POT...
     if new_pot_file.endswith( ".new.pot" ):
         command = [
             f"sed",
@@ -189,7 +191,10 @@ def _create_update_po(
     copyright_,
     start_year ):
 
-    pot_file = _get_locale_directory( indicator_name ) / ( indicator_name + ".pot" )
+    pot_file = (
+            _get_locale_directory(
+                indicator_name ) / ( indicator_name + ".pot" ) )
+
     for lingua_code in linguas_codes:
         po_file = (
             _get_locale_directory( indicator_name ) /
@@ -217,7 +222,8 @@ def _create_update_po(
             subprocess.run( command )
 
             # Ensure the Project-Id-Version is latest.
-            project_id_version = f"\"Project-Id-Version: { indicator_name } { version }\\\\n\""
+            project_id_version = (
+                f"\"Project-Id-Version: { indicator_name } { version }\\\\n\"" )
 
             command = [
                 f"sed",
@@ -232,7 +238,9 @@ def _create_update_po(
                 f"{ po_file }",
                 f"{ po_file }.new.po" ]
 
-            result = subprocess.run( command, capture_output = True, text = True )
+            result = (
+                subprocess.run( command, capture_output = True, text = True ) )
+
             if result.stdout:
                 command = [
                     f"rm",
@@ -268,22 +276,24 @@ def _create_update_po(
 
             subprocess.run( command )
 
-            message = ""
+            message = (
+                f"Update line 1, replacing\n" +
+                f"\t# Portable Object Template for { indicator_name }.\n" +
+                f"with\n" +
+                f"\t# <name of the language in English for " +
+                f"{ lingua_code }> translation for { indicator_name }.\n\n" +
 
-            message += f"Update line 1, replacing\n"
-            message += f"\t# Portable Object Template for { indicator_name }.\n"
-            message += f"with\n"
-            message += f"\t# <name of the language in English for { lingua_code }> translation for { indicator_name }.\n\n"
+                f"Update line 4, replacing\n" +
+                f"\t# Automatically generated, { _get_current_year() }.\n" +
+                f"with\n" +
+                f"\t# <author name> <<author email>>, " +
+                f"{ start_year }-{ _get_current_year() }.\n\n" +
 
-            message += f"Update line 4, replacing\n"
-            message += f"\t# Automatically generated, { _get_current_year() }.\n"
-            message += f"with\n"
-            message += f"\t# <author name> <<author email>>, { start_year }-{ _get_current_year() }.\n\n"
-
-            message += f"Update line 12, replacing\n"
-            message += f"\t\"Last-Translator: Automatically generated\\n\"\n"
-            message += f"with\n"
-            message += f"\t\"Last-Translator: <author name> <<author email>>\\n\"\n\n"
+                f"Update line 12, replacing\n" +
+                f"\t\"Last-Translator: Automatically generated\\n\"\n" +
+                f"with\n" +
+                f"\t\"Last-Translator: <author name> <<author email>>\\n\"" +
+                f"\n\n" )
 
             print( message )
 
@@ -323,8 +333,11 @@ def update_locale_source(
     if not message:
         message = ""
 
-        current_year_author = f"{ _get_current_year() } { authors_emails[ 0 ][ 0 ] }"
-        copyright_ = f"2017-{ current_year_author }"  # Start year for indicatorbase translations is 2017.
+        current_year_author = (
+            f"{ _get_current_year() } { authors_emails[ 0 ][ 0 ] }" )
+
+        # Start year for indicatorbase translations is 2017.
+        copyright_ = f"2017-{ current_year_author }"
 
         _create_update_pot(
             "indicatorbase",
@@ -370,15 +383,14 @@ def get_names_and_comments_from_mo_files(
     for mo in list( Path( directory_indicator_locale ).rglob( "*.mo" ) ):
         locale = mo.parent.parent.stem
 
-        # https://stackoverflow.com/questions/54638570/extract-single-translation-from-gettext-po-file-from-shell
+        # https://stackoverflow.com/q/54638570/2156453
+        # https://stackoverflow.com/q/53316631/2156453
         # https://www.reddit.com/r/learnpython/comments/jkun99/how_do_i_load_a_specific_mo_file_by_giving_its
-        # https://stackoverflow.com/questions/53316631/unable-to-use-gettext-to-retrieve-the-translated-string-in-mo-files
-#TODO Remove \
-        translation = \
+        translation = (
             gettext.translation(
                 indicator_name,
                 localedir = directory_indicator_locale,
-                languages = [ locale ] )
+                languages = [ locale ] ) )
 
         translated_string = translation.gettext( name )
 
@@ -397,16 +409,22 @@ def build_locale_release(
     directory_release,
     indicator_name ):
 
-    directory_indicator = Path( '.' ) / directory_release / indicator_name
-    directory_indicator_locale = Path( '.' ) / directory_indicator / "src" / indicator_name / "locale"
-    directory_indicator_base_locale = Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale"
+    directory_indicator = (
+        Path( '.' ) / directory_release / indicator_name )
+
+    directory_indicator_locale = (
+        Path( '.' ) / directory_indicator / "src" / indicator_name / "locale" )
+
+    directory_indicator_base_locale = (
+        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" )
 
     # Append translations from indicatorbase to POT.
-    command = \
-        "msgcat --use-first " + \
-        str( directory_indicator_locale / ( indicator_name + ".pot" ) ) + " " + \
-        str( directory_indicator_base_locale / "indicatorbase.pot" ) + \
-        " --output-file=" + str( directory_indicator_locale / ( indicator_name + ".pot" ) )
+    command = (
+        "msgcat --use-first " +
+        str( directory_indicator_locale / ( indicator_name + ".pot" ) ) + " " +
+        str( directory_indicator_base_locale / "indicatorbase.pot" ) +
+        " --output-file=" + 
+        str( directory_indicator_locale / ( indicator_name + ".pot" ) ) )
 
     subprocess.call( command, shell = True )
 

@@ -65,6 +65,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
     COMMAND_NOTIFY_TAG_SCRIPT_RESULT = "[SCRIPT_RESULT]"
 
+#TODO Shorten
     COLUMN_MODEL_GROUP = 0 # Group name when displaying a group; empty when displaying a script.
     COLUMN_MODEL_NAME = 1 # Script name.
     COLUMN_MODEL_SOUND = 2 # Icon name for the APPLY icon; None otherwise.
@@ -107,6 +108,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def __init__( self ):
+#TODO Shorten
         super().__init__(
             comments = _( "Runs a terminal command or script;\noptionally display results in the icon label." ) )
 

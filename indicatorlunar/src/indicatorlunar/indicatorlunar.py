@@ -454,7 +454,7 @@ class IndicatorLunar( IndicatorBase ):
 
                     # Download failed for some reason; retry at a later time.
                     next_download_time = (
-                        self._get_next_download_time(utc_now, download_count )
+                        self._get_next_download_time(utc_now, download_count ) )
 
         else:
             # Cache is not stale; only load off disk as necessary.
@@ -1390,7 +1390,7 @@ class IndicatorLunar( IndicatorBase ):
                     sun_set = (
                         self.data[
                             key_sun +
-                            ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ]
+                            ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] )
 
                     if \
                         target_body_type and \
@@ -2359,6 +2359,7 @@ class IndicatorLunar( IndicatorBase ):
             IndicatorLunar.astro_backend.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" +
             _( notify_osd_information ) )
 
+#TODO Something broken here...
         summary_tooltip = _(
             "The summary for the satellite rise notification.\n\n" +  "Available tags:\n\t" ) +
             tooltip_common

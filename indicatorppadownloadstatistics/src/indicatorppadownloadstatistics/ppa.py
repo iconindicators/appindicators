@@ -265,6 +265,7 @@ class PPA():
         Compare two Published Binaries by download count.
         If the download count is the same, sort by name then by version.
         '''
+#TODO Shorten
         if published_binary1.get_download_count() < published_binary2.get_download_count():
             sort_value = 1
 

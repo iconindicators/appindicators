@@ -172,7 +172,7 @@ class IndicatorBase( ABC ):
                 locale_directory = Path( __file__ ).parent / "locale"
 
             else:
-#TODO When running under development, 
+#TODO When running under development,
 # check this works under Eclipse, Visual Studio Code and via a terminal.
                 # Running in development.
                 locale_directory = (

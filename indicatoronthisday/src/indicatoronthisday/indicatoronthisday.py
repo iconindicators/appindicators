@@ -233,12 +233,12 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         elif at_least_one_calendar_is_enabled:
             self.show_notification(
-                _( "Warning" ), #TODO A better summary???
+                _( "Warning" ),
                 _( "No enabled calendars have a valid location!" ) )
 
         else:
             self.show_notification(
-                _( "Warning" ), #TODO A better summary???
+                _( "Warning" ),
                 _( "No enabled calendars!" ) )
 
         return events_grouped_by_date
@@ -288,8 +288,11 @@ class IndicatorOnThisDay( IndicatorBase ):
                 events_sorted_by_date.append( Event( date_, description ) )
 
         events_grouped_by_date = [ ]
-#TODO Make this into a couple of lines if possible.
-        for date_, event in groupby( events_sorted_by_date, key = lambda event: event.get_date() ):
+        grouped_events_sorted_by_date = (
+            groupby(
+                events_sorted_by_date, key = lambda event: event.get_date() ) )
+
+        for date_, event in grouped_events_sorted_by_date:
             events_grouped_by_date.append(
                 sorted(
                     list( event ),
@@ -308,7 +311,6 @@ class IndicatorOnThisDay( IndicatorBase ):
         grid = self.create_grid()
 
         store = Gtk.ListStore( str, bool )
-
         for location, enabled in self.calendars:
             if Path( location ).is_file():
                 store.append( [ location, enabled ] )
@@ -316,6 +318,8 @@ class IndicatorOnThisDay( IndicatorBase ):
             else:
                 store.append( [ location, False ] )
 
+# TODO Need a comment about this...is this for including system calendars?
+# Does the same need to be done for fortune?
         system_calendars_minus_user_calendars = ( [
             x for x in self.get_system_calendars()
             if x not in [ x[ 0 ] for x in self.calendars ] ] )
@@ -490,8 +494,6 @@ class IndicatorOnThisDay( IndicatorBase ):
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
 #TODO Check below
-            self.lines = spinner.get_value_as_int()
-
             self.calendars = [ ]
             treeiter = store.get_iter_first()
             while treeiter is not None:
@@ -503,6 +505,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
                 treeiter = store.iter_next( treeiter )
 
+            self.lines = spinner.get_value_as_int()
             self.copy_to_clipboard = radio_copy_to_clipboard.get_active()
             self.search_url = search_engine_entry.get_text().strip()
             self.notify = notify_checkbutton.get_active()
@@ -760,12 +763,12 @@ class IndicatorOnThisDay( IndicatorBase ):
         self.copy_to_clipboard = (
             config.get(
                 IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD,
-                True )
+                True ) )
 
         self.lines = (
             config.get(
                 IndicatorOnThisDay.CONFIG_LINES,
-                IndicatorBase.get_menuitems_guess() ) ) )
+                IndicatorBase.get_menuitems_guess() ) )
 
         self.notify = config.get( IndicatorOnThisDay.CONFIG_NOTIFY, True )
 
