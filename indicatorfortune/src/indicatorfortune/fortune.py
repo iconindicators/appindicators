@@ -17,8 +17,7 @@
 
 
 '''
-A fortune comprises a summary and a message, used to be shown in the on-screen
-notification.
+A fortune comprises a summary and a message, used for display notification.
 '''
 
 

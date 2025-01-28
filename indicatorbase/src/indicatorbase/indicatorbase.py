@@ -1058,7 +1058,9 @@ class IndicatorBase( ABC ):
 #   Ubuntu 24.04
 #
 #   Ubuntu 20.04  Works on X11 but logs out on Wayland.
-
+#
+#
+# Seems to also be an issue on Debian 12 32 bit wayland.
 
     def is_clipboard_supported( self ):
         '''

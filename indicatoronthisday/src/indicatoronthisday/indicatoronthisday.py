@@ -72,7 +72,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     # Calendar treeview columns; model and view have same columns.
     COLUMN_CALENDAR_FILE = 0 # Path to calendar file.
-    COLUMN_CALENDAR_ENABLED = 1  # Boolean.
+    COLUMN_ENABLED = 1  # Boolean.
 
     CONFIG_CALENDARS = "calendars"
     CONFIG_COPY_TO_CLIPBOARD = "copyToClipboard"
@@ -83,7 +83,7 @@ class IndicatorOnThisDay( IndicatorBase ):
     TAG_EVENT = "["+ _( "EVENT" )+ "]"
     SEARCH_URL_DEFAULT = "https://www.google.com/search?q=" + TAG_EVENT
 
-    SYSTEM_CALENDAR = "/usr/share/calendar"
+    SYSTEM_CALENDARS = "/usr/share/calendar"
 
 
     def __init__( self ):
@@ -318,14 +318,16 @@ class IndicatorOnThisDay( IndicatorBase ):
             else:
                 store.append( [ location, False ] )
 
-# TODO Need a comment about this...is this for including system calendars?
-# Does the same need to be done for fortune?
-        system_calendars_minus_user_calendars = ( [
-            x for x in self.get_system_calendars()
-            if x not in [ x[ 0 ] for x in self.calendars ] ] )
+        # Ensure all system calendars are present in the list of calendars,
+        # not just those selected/defined by the user.
+        for system_calendar in self.get_system_calendars():
+            system_calendar_in_user_calendars = (
+                [ system_calendar, True ] in self.calendars
+                or
+                [ system_calendar, False ] in self.calendars )
 
-        for calendar in system_calendars_minus_user_calendars:
-            store.append( [ calendar, False ] )
+            if not system_calendar_in_user_calendars:
+                store.append( [ system_calendar, False ] )
 
         store = Gtk.TreeModelSort( model = store )
 
@@ -337,7 +339,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             "toggled",
             self.on_checkbox,
             store,
-            IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED )
+            IndicatorOnThisDay.COLUMN_ENABLED )
 
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
@@ -353,16 +355,16 @@ class IndicatorOnThisDay( IndicatorBase ):
                     (
                         renderer_toggle,
                         "active",
-                        IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
+                        IndicatorOnThisDay.COLUMN_ENABLED ) ),
                 alignments_columnviewids = (
-                    ( 0.5, IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ), ),
+                    ( 0.5, IndicatorOnThisDay.COLUMN_ENABLED ), ),
                 sortcolumnviewids_columnmodelids = (
                     (
                         IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
                         IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
                     (
-                        IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED,
-                        IndicatorOnThisDay.COLUMN_CALENDAR_ENABLED ) ),
+                        IndicatorOnThisDay.COLUMN_ENABLED,
+                        IndicatorOnThisDay.COLUMN_ENABLED ) ),
                 tooltip_text = _( "Double click to edit a calendar." ),
                 rowactivatedfunctionandarguments =
                     ( self.on_calendar_double_click, dialog ) ) )
@@ -500,7 +502,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 row = store[ treeiter ]
                 self.fortunes.append(
                     [
-                        row[ IndicatorOnThisDay.COLUMN_FILE_OR_DIRECTORY ],
+                        row[ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ],
                         row[ IndicatorOnThisDay.COLUMN_ENABLED ] ] )
 
                 treeiter = store.iter_next( treeiter )
@@ -604,7 +606,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         preferences_dialog ):
 
         model, treeiter = treeview.get_selection().get_selected()
-        path = model[ treeiter ][ IndicatorOnThisDay.COLUMN_FILE_OR_DIRECTORY ]
+        path = model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
         if path == self.get_system_fortune():
             self.show_dialog_ok(
                 preferences_dialog,
@@ -674,7 +676,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     file_entry.grab_focus()
                     continue
 
-                if IndicatorOnThisDay.SYSTEM_CALENDAR in path:
+                if IndicatorOnThisDay.SYSTEM_CALENDARS in path:
                     self.show_dialog_ok(
                         dialog,
                         _( "This calendar is part of your system and is "
@@ -714,10 +716,13 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def get_system_calendars( self ):
+        '''
+        Returns a list of the system calendars; may be empty.
+        '''
         calendars = [ ]
-        if Path( IndicatorOnThisDay.SYSTEM_CALENDAR ).exists():
+        if Path( IndicatorOnThisDay.SYSTEM_CALENDARS ).exists():
             # Ideally use Path.walk() but only available in Python 3.12.
-            walk_generator = os.walk( IndicatorOnThisDay.SYSTEM_CALENDAR )
+            walk_generator = os.walk( IndicatorOnThisDay.SYSTEM_CALENDARS )
             for root, directories, filenames in walk_generator:
                 for filename in fnmatch.filter( filenames, "calendar.*" ):
                     calendars.append( str( Path( root ).joinpath( filename ) ) )
@@ -728,8 +733,14 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def get_system_calendar_default( self ):
+        '''
+        Get the default system calendar.
+
+        On success returns the history calendar.
+        Otherwise, returns None.
+        '''
         system_calendar_default = (
-            Path( IndicatorOnThisDay.SYSTEM_CALENDAR ) / "calendar.history" )
+            Path( IndicatorOnThisDay.SYSTEM_CALENDARS ) / "calendar.history" )
 
         if not system_calendar_default.exists():
             system_calendar_default = None

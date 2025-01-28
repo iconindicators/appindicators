@@ -94,10 +94,15 @@ class IndicatorPunycode( IndicatorBase ):
                 indent = ( 1, 1 ) )
 
 
+#TODO On Debian 12 laptop under wayland,
+# cannot do a conversion...why?
+# Seems to not work on Ubuntu 20.04 on wayland either.
+# So how to capture this?
     def on_convert( self ):
         if self.is_clipboard_supported():
             summary =_( "Nothing to convert..." )
             if self.input_clipboard:
+                print( "clipboard input" ) #TODO Remove
                 text = self.copy_from_selection_clipboard()
                 if text is None:
                     self.show_notification(
@@ -105,29 +110,27 @@ class IndicatorPunycode( IndicatorBase ):
 
                 else:
                     self._do_conversion( text )
+                    print( text ) #TODO Remove
 
             else:
+                print( "primary input" ) #TODO Remove
                 def primary_received_callback_function( text ):
-                    print( "2" )
-                    print( text )
+                    print( text )#TODO Test
                     if text is None:
                         self.show_notification(
                             summary, _( "No text is highlighted/selected." ) )
 
                     else:
                         self._do_conversion( text )
+                        print( text ) #TODO Remove
 
-                print( "1" )
                 self. copy_from_selection_primary(
                     primary_received_callback_function )
 
         else:
             self.show_notification(
                 _( "Unsupported" ),
-                _(
-                    "On Ubuntu 20.04 running Wayland, "
-                    +
-                    "the clipboard is unsupported." ) )
+                _( "Under Wayland, the clipboard is unsupported." ) )
 
 
     def _do_conversion(
@@ -187,6 +190,9 @@ class IndicatorPunycode( IndicatorBase ):
 
 #TODO Can the exception be more specific?
         except Exception as e:
+            print( "EXCEPTION" )
+            print( e )
+            print()
             self.get_logging().exception( e )
             self.get_logging().error(
                 "Error converting '" + protocol + text + path_query + "'." )
