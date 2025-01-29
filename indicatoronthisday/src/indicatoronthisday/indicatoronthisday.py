@@ -149,8 +149,8 @@ class IndicatorOnThisDay( IndicatorBase ):
             if event.get_date() != last_date:
                 # Ensure space for the date menu item and an event menu item.
                 if ( menu_item_count + 2 ) > menu_item_maximum:
-                    # Don't add the menu item for the new date and don't add a
-                    # subsequent event.
+                    # Don't add the menu item for the new date and
+                    # don't add a subsequent event.
                     break
 
                 event_date = (
@@ -239,7 +239,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         else:
             self.show_notification(
                 _( "Warning" ),
-                _( "No enabled calendars!" ) )
+                _( "No calendars are enabled!" ) )
 
         return events_grouped_by_date
 
@@ -306,19 +306,16 @@ class IndicatorOnThisDay( IndicatorBase ):
         dialog ):
 
         notebook = Gtk.Notebook()
+        notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
         # Calendars.
         grid = self.create_grid()
 
         store = Gtk.ListStore( str, bool )
         for location, enabled in self.calendars:
-            if Path( location ).is_file():
-                store.append( [ location, enabled ] )
+            store.append( [ location, enabled ] )
 
-            else:
-                store.append( [ location, False ] )
-
-        # Ensure all system calendars are present in the list of calendars,
+        # Ensure the system calendars are present in the list of calendars,
         # not just those selected/defined by the user.
         for system_calendar in self.get_system_calendars():
             system_calendar_in_user_calendars = (
@@ -500,7 +497,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             treeiter = store.get_iter_first()
             while treeiter is not None:
                 row = store[ treeiter ]
-                self.fortunes.append(
+                self.calendars.append(
                     [
                         row[ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ],
                         row[ IndicatorOnThisDay.COLUMN_ENABLED ] ] )
@@ -560,8 +557,8 @@ class IndicatorOnThisDay( IndicatorBase ):
         button,
         treeview ):
 
-        model, treeiter = treeview.get_selection().get_selected()
-        if treeiter is None:
+        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        if treeiter_sort is None:
             self.show_dialog_ok(
                 treeview, _( "No calendar has been selected for removal." ) )
 
@@ -571,8 +568,29 @@ class IndicatorOnThisDay( IndicatorBase ):
 #...or perhaps not.  What is selected is the sorted model which is displayed...
 # which is correct.
 # But to update the underlying data, need the underlying model and then do a convert of treeiter.
+# YES...I think this needs another look as I added a user calendar (bogus file)
+# and the entry was not selected and when I checked the box, a different
+# entry was checked!
+            # selected_calendar = (
+            #     model_sort[
+            #         treeiter_sort ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
+            #
+            # #TODO Test
+            # print( selected_calendar )#TODO Test
+
+            # treeiter = model_sort.convert_iter_to_child_iter( treeiter_sort )
+            # model = model_sort.get_model()
+            # model, treeiter = (
+            #     self.get_model_and_treeiter_from_sort(
+            #         model_sort, treeiter_sort ) )
+
             selected_calendar = (
-                model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
+                model_sort[
+                    treeiter_sort ][
+                        IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
+
+            print( selected_calendar )#TODO Test
+            return
 
             if selected_calendar in self.get_system_calendars():
                 self.show_dialog_ok(
@@ -586,8 +604,22 @@ class IndicatorOnThisDay( IndicatorBase ):
                         _( "Remove the selected calendar?" ) ) )
 
                 if response == Gtk.ResponseType.OK:
-                    model.get_model().remove(
-                        model.convert_iter_to_child_iter( treeiter ) )
+                    model_sort.get_model().remove(
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
+
+
+
+    #TODO This could go into indicatorbase...see where else this could be used.
+    #TODO What about the same for filtering?
+    #TODO Keep this function?
+    # def get_model_and_treeiter_from_sort(
+    #     self,
+    #     model_sort,
+    #     iter_sort ):
+    #
+    #     return (
+    #         model_sort.get_model(),
+    #         model_sort.convert_iter_to_child_iter( iter_sort ) )
 
 
     def on_calendar_add(
@@ -607,7 +639,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         model, treeiter = treeview.get_selection().get_selected()
         path = model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
-        if path == self.get_system_fortune():
+        if path in self.get_system_calendars():
             self.show_dialog_ok(
                 preferences_dialog,
                 _( "This is a system calendar and cannot be modified." ) )
