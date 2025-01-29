@@ -344,6 +344,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         copy_of_scripts = copy.deepcopy( self.scripts )
 
         notebook = Gtk.Notebook()
+        notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
         # Scripts.
         grid = self.create_grid()

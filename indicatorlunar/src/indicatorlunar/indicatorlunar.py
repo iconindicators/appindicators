@@ -1951,6 +1951,7 @@ class IndicatorLunar( IndicatorBase ):
         dialog ):
 
         notebook = Gtk.Notebook()
+        notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
         page_icon = 0
         page_menu = 1

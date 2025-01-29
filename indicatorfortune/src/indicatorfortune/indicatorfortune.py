@@ -141,7 +141,7 @@ class IndicatorFortune( IndicatorBase ):
 
                 else:
                     self.get_logging().error(
-                        f"Unknown fortune path { location }" )
+                        f"Cannot locate fortune path { location }" )
 
         summary = _( "WARNING. . ." )
         if locations:
@@ -185,7 +185,7 @@ class IndicatorFortune( IndicatorBase ):
             message = _( "No enabled fortunes have a valid location!" )
 
         else:
-            message = _( "No enabled fortunes!" )
+            message = _( "No fortunes are enabled!" )
 
         self.fortune = Fortune( message, summary )
 
@@ -253,17 +253,25 @@ class IndicatorFortune( IndicatorBase ):
         dialog ):
 
         notebook = Gtk.Notebook()
+        notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
         # Fortunes.
         grid = self.create_grid()
 
         store = Gtk.ListStore( str, bool )
         for location, enabled in self.fortunes:
-            if Path( location ).is_file() or Path( location ).is_dir():
-                store.append( [ location, enabled ] )
+            store.append( [ location, enabled ] )
 
-            else:
-                store.append( [ location, False ] )
+        # Ensure the system fortune is present in the list of fortunes,
+        # not just those selected/defined by the user.
+        system_fortune = self.get_system_fortune()
+        system_fortune_in_user_fortunes = (
+            [ system_fortune, True ] in self.fortunes
+            or
+            [ system_fortune, False ] in self.fortunes )
+
+        if not system_fortune_in_user_fortunes:
+            store.append( [ system_fortune, False ] )
 
         store = Gtk.TreeModelSort( model = store )
 

@@ -386,6 +386,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         dialog ):
 
         notebook = Gtk.Notebook()
+        notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
+
         invalid_ppas = [ ]
 
         # PPAs.

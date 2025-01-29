@@ -531,6 +531,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         dialog ):
 
         notebook = Gtk.Notebook()
+        notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
 #TODO Rewrite comment as per what is in fortune/onthisday/ppa
 #TODO Change stock_apply to text (pixbuf to text).  Can the tick be made bold?
