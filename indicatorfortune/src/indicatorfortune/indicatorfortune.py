@@ -275,11 +275,8 @@ class IndicatorFortune( IndicatorBase ):
             store.append( [ system_fortune, False ] )
 
         store = Gtk.TreeModelSort( model = store )
-#TODO Need an option to pass in perhaps to the treeview create function for this?
-#TODO Maybe rename the parameters in the treeview create function such that
-# the stuff for letting a user sort columns is named to be clear
-# and the stuff for letting the user click on a column header is also clear.
-        store.set_sort_column_id( IndicatorFortune.COLUMN_FILE_OR_DIRECTORY, Gtk.SortType.ASCENDING )
+        store.set_sort_column_id(
+            IndicatorFortune.COLUMN_FILE_OR_DIRECTORY, Gtk.SortType.ASCENDING )
 
 #TODO Can/should this go into indicatorbase?
 # (along with the on_checkbox function below)
@@ -308,13 +305,6 @@ class IndicatorFortune( IndicatorBase ):
                         IndicatorFortune.COLUMN_ENABLED ) ),
                 alignments_columnviewids = (
                     ( 0.5, IndicatorFortune.COLUMN_ENABLED ), ),
-                # sortcolumnviewids_columnmodelids = (
-                #     (
-                #         IndicatorFortune.COLUMN_FILE_OR_DIRECTORY,
-                #         IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ),
-                #     (
-                #         IndicatorFortune.COLUMN_ENABLED,
-                #         IndicatorFortune.COLUMN_ENABLED ) ),
                 tooltip_text = _(
                     "Double click to edit a fortune.\n\n" +
                     "English language fortunes are\n" +
@@ -515,8 +505,11 @@ class IndicatorFortune( IndicatorBase ):
 
         path_ = path
         store_ = store
-        if isinstance( store, Gtk.TreeModelSort ):  #TODO Need to handle filter?
-            path_ = store_.convert_path_to_child_path( Gtk.TreePath.new_from_string( path_ ) )
+        if isinstance( store, Gtk.TreeModelSort ):  #TODO Need/how to handle filter?
+            path_ = (
+                store_.convert_path_to_child_path(
+                    Gtk.TreePath.new_from_string( path_ ) ) )
+
             store_ = store_.get_model()
 
         store_[ path_ ][ checkbox_model_column_id ] = (
@@ -528,8 +521,8 @@ class IndicatorFortune( IndicatorBase ):
         button,
         treeview ):
 
-        model, treeiter = treeview.get_selection().get_selected()
-        if treeiter is None:
+        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        if treeiter_sort is None:
             self.show_dialog_ok(
                 treeview, _( "No fortune has been selected for removal." ) )
 
@@ -540,7 +533,7 @@ class IndicatorFortune( IndicatorBase ):
 # which is correct.
 # But to update the underlying data, need the underlying model and then do a convert of treeiter.
             selected_fortune = (
-                model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] )
+                model_sort[ treeiter_sort ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] )
 
             if selected_fortune == self.get_system_fortune():
                 self.show_dialog_ok(
@@ -554,8 +547,8 @@ class IndicatorFortune( IndicatorBase ):
                         _( "Remove the selected fortune?" ) ) )
 
                 if response == Gtk.ResponseType.OK:
-                    model.get_model().remove(
-                        model.convert_iter_to_child_iter( treeiter ) )
+                    model_sort.get_model().remove(
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
 
 
     def on_fortune_add(
@@ -573,8 +566,8 @@ class IndicatorFortune( IndicatorBase ):
         treeviewcolumn,
         preferences_dialog ):
 
-        model, treeiter = treeview.get_selection().get_selected()
-        path = model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ]
+        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        path = model_sort[ treeiter_sort ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ]
         if path == self.get_system_fortune():
             self.show_dialog_ok(
                 preferences_dialog,
@@ -591,7 +584,7 @@ class IndicatorFortune( IndicatorBase ):
         row_number,
         treeviewcolumn ):
 
-        model, treeiter = treeview.get_selection().get_selected()
+        model_sort, treeiter_sort = treeview.get_selection().get_selected()
         adding_fortune = row_number is None
 
         grid = self.create_grid()
@@ -609,7 +602,7 @@ class IndicatorFortune( IndicatorBase ):
                 ''
                 if adding_fortune
                 else
-                model[ treeiter ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ],  #TODO Should model be model.get_model() or however the treeiter is supposed to be converted?
+                model_sort[ treeiter_sort ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ],  #TODO Should model be model.get_model() or however the treeiter is supposed to be converted?
                 tooltip_text = _(
                     "The path to a fortune .dat file,\n" +
                     "or a directory containing\n" +
@@ -683,10 +676,25 @@ class IndicatorFortune( IndicatorBase ):
                     continue
 
                 if not adding_fortune: # This is an edit; remove the old path.
-                    model.get_model().remove(
-                        model.convert_iter_to_child_iter( treeiter ) ) #TODO Check if correct - also see top of function and also remove.
+                    model_sort.get_model().remove(
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) ) #TODO Check if correct - also see top of function and also remove.
 
-                model.get_model().append( [ path, True ] )
+                model_sort.get_model().append( [ path, True ] )
+
+#TODO Check this is okay
+                treepath = 0
+                for row in model.get_model():
+                    if row[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] == path:
+                        break
+
+                    treepath += 1
+
+                treepath = (
+                    model_sort.convert_child_path_to_path(
+                        Gtk.TreePath.new_from_string( str( treepath ) ) ) )
+
+                treeview.get_selection().select_path( treepath )
+                treeview.set_cursor( treepath, None, False )
 
             break
 

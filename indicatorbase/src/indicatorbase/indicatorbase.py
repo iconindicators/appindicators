@@ -1814,9 +1814,12 @@ class IndicatorBase( ABC ):
         titles,
         renderers_attributes_columnmodelids,
         alignments_columnviewids = None,
-        default_sort_func = None,
-        sortcolumnviewids_columnmodelids = None,
         celldatafunctionandarguments_renderers_columnviewids = None,
+        default_sort_func = None,
+#TODO Maybe rename the sort parameters...
+# sortcolumnviewids_columnmodelids => usersort_columnviewids_columnmodelids
+# clickablecolumnviewids_functionsandarguments => userclickable_columnviewids_functionsandarguments
+        sortcolumnviewids_columnmodelids = None,
         clickablecolumnviewids_functionsandarguments = None,
         tooltip_text = "",
         cursorchangedfunctionandarguments = None,
@@ -1841,6 +1844,12 @@ class IndicatorBase( ABC ):
         alignments_columnviewids:
             Tuple of tuples, each contains the xalign and view column id.
 
+        celldatafunctionandarguments_renderers_columnviewids:
+            Tuple of tuples, each contains a cell data renderer function,
+            parameters to the function, a cell data renderer (the SAME renderer
+            passed in to the renderers_attributes_columnmodelids) and the view
+            column id.
+
         default_sort_func:
             Name of a comparison function to sort rows.
 
@@ -1848,12 +1857,6 @@ class IndicatorBase( ABC ):
             Tuple of tuples, each of which contains the view column id and
             corresponding model column id.
             The first column will be set as default sorted ascending.
-
-        celldatafunctionandarguments_renderers_columnviewids:
-            Tuple of tuples, each contains a cell data renderer function,
-            parameters to the function, a cell data renderer (the SAME renderer
-            passed in to the renderers_attributes_columnmodelids) and the view
-            column id.
 
         clickablecolumnviewids_functionsandarguments:
             Tuple of tuples, each contains the view column id and a
@@ -1922,6 +1925,15 @@ class IndicatorBase( ABC ):
 
             treeview.append_column( treeviewcolumn )
 
+        if celldatafunctionandarguments_renderers_columnviewids:
+#TODO Make shorter
+            for data_function_and_arguments, renderer, columnviewid in celldatafunctionandarguments_renderers_columnviewids:
+                for index, treeviewcolumn in enumerate( treeview.get_columns() ):
+                    if columnviewid == index:
+                        treeviewcolumn.set_cell_data_func(
+                            renderer,
+                            *data_function_and_arguments )
+
         if default_sort_func:
             treemodel.set_default_sort_func( default_sort_func, None )
             treemodel.set_sort_column_id(
@@ -1959,15 +1971,6 @@ class IndicatorBase( ABC ):
                             treemodel.set_sort_column_id(
                                 columnmodelid,
                                 Gtk.SortType.ASCENDING )
-
-        if celldatafunctionandarguments_renderers_columnviewids:
-#TODO Make shorter
-            for data_function_and_arguments, renderer, columnviewid in celldatafunctionandarguments_renderers_columnviewids:
-                for index, treeviewcolumn in enumerate( treeview.get_columns() ):
-                    if columnviewid == index:
-                        treeviewcolumn.set_cell_data_func(
-                            renderer,
-                            *data_function_and_arguments )
 
         if clickablecolumnviewids_functionsandarguments:
 #TODO Make shorter

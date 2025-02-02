@@ -26,19 +26,19 @@ Possible options...
 
 2. From the post
      https://forums.opensuse.org/t/debian-calendar-equivalent-in-opensuse/171251
-   the recommendation is obtain the source code
+the recommendation is obtain the source code
      https://github.com/openbsd/src/tree/master/usr.bin/calendar
      https://salsa.debian.org/meskes/bsdmainutils/-/tree/master/usr.bin/calendar
-   and include the source code/calendars as part of the pip installation,
-   then run make as part of the copy files set of instructions.
+and include the source code/calendars as part of the pip installation,
+then run make as part of the copy files set of instructions.
 
 3. The project
      https://pypi.org/project/bsd-calendar/
-   is based on the original calendar program, but modifies date formats.
-   This code could be used to create a standalone Python calendar module,
-   ultimately released to PyPI.
-   Alternatively, incorporate some version of this implementation into the
-   indicator, along with calendar files.
+is based on the original calendar program, but modifies date formats.
+This code could be used to create a standalone Python calendar module,
+ultimately released to PyPI.
+Alternatively, incorporate some version of this implementation into the
+indicator, along with calendar files.
 '''
 
 
@@ -326,13 +326,9 @@ class IndicatorOnThisDay( IndicatorBase ):
             if not system_calendar_in_user_calendars:
                 store.append( [ system_calendar, False ] )
 
-#TODO This seems to NOT influence whether or not the columns are sortable...
-# So what is its point?
-# Not sure if this is needed or not...
-# I think this is only useful to sort model data and keep that data sorted
-# if/when the data changes.
         store = Gtk.TreeModelSort( model = store )
-        store.set_sort_column_id( IndicatorOnThisDay.COLUMN_CALENDAR_FILE, Gtk.SortType.ASCENDING )
+        store.set_sort_column_id(
+            IndicatorOnThisDay.COLUMN_CALENDAR_FILE, Gtk.SortType.ASCENDING )
 
 #TODO Can/should this go into indicatorbase?
 # (along with the on_checkbox function below)
@@ -361,13 +357,6 @@ class IndicatorOnThisDay( IndicatorBase ):
                         IndicatorOnThisDay.COLUMN_ENABLED ) ),
                 alignments_columnviewids = (
                     ( 0.5, IndicatorOnThisDay.COLUMN_ENABLED ), ),
-                # sortcolumnviewids_columnmodelids = (
-                #     (
-                #         IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
-                #         IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
-                #     (
-                #         IndicatorOnThisDay.COLUMN_ENABLED,
-                #         IndicatorOnThisDay.COLUMN_ENABLED ) ),
                 tooltip_text = _( "Double click to edit a calendar." ),
                 rowactivatedfunctionandarguments =
                     ( self.on_calendar_double_click, dialog ) ) )
@@ -523,14 +512,6 @@ class IndicatorOnThisDay( IndicatorBase ):
         return response_type
 
 
-#TODO This will likely go into indicatorbase...
-# ...but also check that something similar has not already been done.
-#TODO Ensure this works for a sorted/filtered model.
-# I added a user calendar (bogus file) and the entry was not selected and
-# when I checked the box, a different entry was checked!
-#
-# For lunar we have planets which is not sorted and stars which are sorted.
-# Do satellites work?
     def on_checkbox(
         self,
         cell_renderer_toggle,
@@ -541,7 +522,10 @@ class IndicatorOnThisDay( IndicatorBase ):
         path_ = path
         store_ = store
         if isinstance( store, Gtk.TreeModelSort ):  #TODO Need to handle filter?
-            path_ = store_.convert_path_to_child_path( Gtk.TreePath.new_from_string( path_ ) )
+            path_ = (
+                store_.convert_path_to_child_path(
+                    Gtk.TreePath.new_from_string( path_ ) ) )
+
             store_ = store_.get_model()
 
         store_[ path_ ][ checkbox_model_column_id ] = (
@@ -614,8 +598,12 @@ class IndicatorOnThisDay( IndicatorBase ):
         treeviewcolumn,
         preferences_dialog ):
 
-        model, treeiter = treeview.get_selection().get_selected()
-        path = model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
+        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        path = (
+            model_sort[
+                treeiter_sort ][
+                IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
+
         if path in self.get_system_calendars():
             self.show_dialog_ok(
                 preferences_dialog,
@@ -632,7 +620,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         row_number,
         treeviewcolumn ):
 
-        model, treeiter = treeview.get_selection().get_selected()
+        model_sort, treeiter_sort = treeview.get_selection().get_selected()
         adding_calendar = row_number is None
 
         grid = self.create_grid()
@@ -650,7 +638,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 ''
                 if adding_calendar
                 else
-                model[ treeiter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ],  #TODO Should model be model.get_model() or however the treeiter is supposed to be converted?
+                model_sort[ treeiter_sort ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ],  #TODO Should model be model.get_model() or however the treeiter is supposed to be converted?
                 tooltip_text = _( "The path to a calendar file." ),
                 editable = False,
                 make_longer = True ) )
@@ -695,10 +683,29 @@ class IndicatorOnThisDay( IndicatorBase ):
                     continue
 
                 if not adding_calendar: # This is an edit; remove the old path.
-                    model.get_model().remove(
-                        model.convert_iter_to_child_iter( treeiter ) ) #TODO Check if correct - also see top of function and also remove.
+                    model_sort.get_model().remove(
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) ) #TODO Check if correct - also see top of function and also remove.
 
-                model.get_model().append( [ path, True ] )
+                model_sort.get_model().append( [ path, True ] )
+
+#TODO This might also happen in fortune and ppa.
+# Can the code below be used in script runner at all?
+                treepath = 0
+                for row in model_sort.get_model():
+                    if row[ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] == path:
+                        break
+
+                    treepath += 1
+
+#TODO Is all the code below needed?
+#                treeview.expand_all()
+                treepath = (
+                    model_sort.convert_child_path_to_path(
+                        Gtk.TreePath.new_from_string( str( treepath ) ) ) )
+
+                treeview.get_selection().select_path( treepath )
+                treeview.set_cursor( treepath, None, False )
+#                treeview.scroll_to_cell( treepath )
 
             break
 

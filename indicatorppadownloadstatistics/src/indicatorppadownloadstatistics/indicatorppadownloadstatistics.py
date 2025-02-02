@@ -449,9 +449,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         add.connect(
             "clicked", self.on_ppa_add, treeview, remove, invalid_ppas )
 
-        self._select_first_ppa_or_disable_remove(
-            treeview,
-            remove )
+        self._select_first_ppa_or_disable_remove( treeview, remove )
 
         notebook.append_page( grid, Gtk.Label.new( _( "PPAs" ) ) )
 
@@ -870,6 +868,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 model.append( [ user, name, '\n'.join( filter_text ) ] )
                 invalid_ppas.append( ( user, name ) )
 
+#TODO See if the fortune/onthisday way is better.
                 # Select the added/edited PPA.
                 row_iter = treeview.get_model().get_iter_first()
                 while iter:
