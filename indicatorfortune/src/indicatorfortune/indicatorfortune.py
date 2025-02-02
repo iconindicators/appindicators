@@ -76,8 +76,9 @@ class IndicatorFortune( IndicatorBase ):
         self,
         menu ):
 
-        self.refresh_fortune()
-        self.show_fortune()
+#TODO Testing...uncomment the next two lines
+        # self.refresh_fortune()
+        # self.show_fortune()
         self.build_menu( menu )
         return int( self.refresh_interval_in_minutes ) * 60
 
@@ -274,6 +275,11 @@ class IndicatorFortune( IndicatorBase ):
             store.append( [ system_fortune, False ] )
 
         store = Gtk.TreeModelSort( model = store )
+#TODO Need an option to pass in perhaps to the treeview create function for this?
+#TODO Maybe rename the parameters in the treeview create function such that
+# the stuff for letting a user sort columns is named to be clear
+# and the stuff for letting the user click on a column header is also clear.
+        store.set_sort_column_id( IndicatorFortune.COLUMN_FILE_OR_DIRECTORY, Gtk.SortType.ASCENDING )
 
 #TODO Can/should this go into indicatorbase?
 # (along with the on_checkbox function below)
@@ -302,13 +308,13 @@ class IndicatorFortune( IndicatorBase ):
                         IndicatorFortune.COLUMN_ENABLED ) ),
                 alignments_columnviewids = (
                     ( 0.5, IndicatorFortune.COLUMN_ENABLED ), ),
-                sortcolumnviewids_columnmodelids = (
-                    (
-                        IndicatorFortune.COLUMN_FILE_OR_DIRECTORY,
-                        IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ),
-                    (
-                        IndicatorFortune.COLUMN_ENABLED,
-                        IndicatorFortune.COLUMN_ENABLED ) ),
+                # sortcolumnviewids_columnmodelids = (
+                #     (
+                #         IndicatorFortune.COLUMN_FILE_OR_DIRECTORY,
+                #         IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ),
+                #     (
+                #         IndicatorFortune.COLUMN_ENABLED,
+                #         IndicatorFortune.COLUMN_ENABLED ) ),
                 tooltip_text = _(
                     "Double click to edit a fortune.\n\n" +
                     "English language fortunes are\n" +
@@ -503,16 +509,18 @@ class IndicatorFortune( IndicatorBase ):
     def on_checkbox(
         self,
         cell_renderer_toggle,
-        row,
+        path,
         store,
-        checkbox_column_model_id ):
+        checkbox_model_column_id ):
 
+        path_ = path
         store_ = store
-        if isinstance( store, Gtk.TreeModelSort ):
-            store_ = store.get_model()
+        if isinstance( store, Gtk.TreeModelSort ):  #TODO Need to handle filter?
+            path_ = store_.convert_path_to_child_path( Gtk.TreePath.new_from_string( path_ ) )
+            store_ = store_.get_model()
 
-        store_[ row ][ checkbox_column_model_id ] = (
-            not store_[ row ][ checkbox_column_model_id ] )
+        store_[ path_ ][ checkbox_model_column_id ] = (
+            not store_[ path_ ][ checkbox_model_column_id ] )
 
 
     def on_fortune_remove(

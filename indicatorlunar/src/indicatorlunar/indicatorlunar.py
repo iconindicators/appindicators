@@ -2362,12 +2362,14 @@ class IndicatorLunar( IndicatorBase ):
 
 #TODO Something broken here...
         summary_tooltip = _(
-            "The summary for the satellite rise notification.\n\n" +  "Available tags:\n\t" ) +
-            tooltip_common
+            "The summary for the satellite rise notification.\n\n" +
+            "Available tags:\n\t" +
+            tooltip_common )
 
         message_tooltip = _(
-            "The message for the satellite rise notification.\n\n" + "Available tags:\n\t" ) +
-            tooltip_common
+            "The message for the satellite rise notification.\n\n" +
+            "Available tags:\n\t" +
+            tooltip_common )
 
         # Additional lines are added to the message to ensure the textview for the message text is not too small.
         show_satellite_notification_checkbox, satellite_notification_summary_text, satellite_notification_messaget_ext = (

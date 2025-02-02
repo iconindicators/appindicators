@@ -1847,7 +1847,7 @@ class IndicatorBase( ABC ):
         sortcolumnviewids_columnmodelids:
             Tuple of tuples, each of which contains the view column id and
             corresponding model column id.
-            The first column will be set as default sorted ascendingly.
+            The first column will be set as default sorted ascending.
 
         celldatafunctionandarguments_renderers_columnviewids:
             Tuple of tuples, each contains a cell data renderer function,
@@ -1947,6 +1947,8 @@ class IndicatorBase( ABC ):
 # https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html
 #
 # I think this is now okay...better check with ALL tables in all indicators.
+#
+# TODO I think this is only used in lunar for the icon text values and satellites.
         if sortcolumnviewids_columnmodelids:
             for columnviewid, columnmodelid in sortcolumnviewids_columnmodelids:
                 for indexcolumn, treeviewcolumn in enumerate( treeview.get_columns() ):

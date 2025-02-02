@@ -326,7 +326,13 @@ class IndicatorOnThisDay( IndicatorBase ):
             if not system_calendar_in_user_calendars:
                 store.append( [ system_calendar, False ] )
 
+#TODO This seems to NOT influence whether or not the columns are sortable...
+# So what is its point?
+# Not sure if this is needed or not...
+# I think this is only useful to sort model data and keep that data sorted
+# if/when the data changes.
         store = Gtk.TreeModelSort( model = store )
+        store.set_sort_column_id( IndicatorOnThisDay.COLUMN_CALENDAR_FILE, Gtk.SortType.ASCENDING )
 
 #TODO Can/should this go into indicatorbase?
 # (along with the on_checkbox function below)
@@ -355,13 +361,13 @@ class IndicatorOnThisDay( IndicatorBase ):
                         IndicatorOnThisDay.COLUMN_ENABLED ) ),
                 alignments_columnviewids = (
                     ( 0.5, IndicatorOnThisDay.COLUMN_ENABLED ), ),
-                sortcolumnviewids_columnmodelids = (
-                    (
-                        IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
-                        IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
-                    (
-                        IndicatorOnThisDay.COLUMN_ENABLED,
-                        IndicatorOnThisDay.COLUMN_ENABLED ) ),
+                # sortcolumnviewids_columnmodelids = (
+                #     (
+                #         IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
+                #         IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
+                #     (
+                #         IndicatorOnThisDay.COLUMN_ENABLED,
+                #         IndicatorOnThisDay.COLUMN_ENABLED ) ),
                 tooltip_text = _( "Double click to edit a calendar." ),
                 rowactivatedfunctionandarguments =
                     ( self.on_calendar_double_click, dialog ) ) )
@@ -519,19 +525,27 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 #TODO This will likely go into indicatorbase...
 # ...but also check that something similar has not already been done.
+#TODO Ensure this works for a sorted/filtered model.
+# I added a user calendar (bogus file) and the entry was not selected and
+# when I checked the box, a different entry was checked!
+#
+# For lunar we have planets which is not sorted and stars which are sorted.
+# Do satellites work?
     def on_checkbox(
         self,
         cell_renderer_toggle,
-        row,
+        path,
         store,
-        checkbox_column_model_id ):
+        checkbox_model_column_id ):
 
+        path_ = path
         store_ = store
-        if isinstance( store, Gtk.TreeModelSort ):
-            store_ = store.get_model()
+        if isinstance( store, Gtk.TreeModelSort ):  #TODO Need to handle filter?
+            path_ = store_.convert_path_to_child_path( Gtk.TreePath.new_from_string( path_ ) )
+            store_ = store_.get_model()
 
-        store_[ row ][ checkbox_column_model_id ] = (
-            not store_[ row ][ checkbox_column_model_id ] )
+        store_[ path_ ][ checkbox_model_column_id ] = (
+            not store_[ path_ ][ checkbox_model_column_id ] )
 
 
     def on_event_click_radio(
@@ -563,34 +577,10 @@ class IndicatorOnThisDay( IndicatorBase ):
                 treeview, _( "No calendar has been selected for removal." ) )
 
         else:
-#TODO Check this...should it be treeiter or converted iter?
-# I suspect this should really be converted iter.
-#...or perhaps not.  What is selected is the sorted model which is displayed...
-# which is correct.
-# But to update the underlying data, need the underlying model and then do a convert of treeiter.
-# YES...I think this needs another look as I added a user calendar (bogus file)
-# and the entry was not selected and when I checked the box, a different
-# entry was checked!
-            # selected_calendar = (
-            #     model_sort[
-            #         treeiter_sort ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
-            #
-            # #TODO Test
-            # print( selected_calendar )#TODO Test
-
-            # treeiter = model_sort.convert_iter_to_child_iter( treeiter_sort )
-            # model = model_sort.get_model()
-            # model, treeiter = (
-            #     self.get_model_and_treeiter_from_sort(
-            #         model_sort, treeiter_sort ) )
-
             selected_calendar = (
                 model_sort[
                     treeiter_sort ][
                         IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
-
-            print( selected_calendar )#TODO Test
-            return
 
             if selected_calendar in self.get_system_calendars():
                 self.show_dialog_ok(
@@ -604,22 +594,9 @@ class IndicatorOnThisDay( IndicatorBase ):
                         _( "Remove the selected calendar?" ) ) )
 
                 if response == Gtk.ResponseType.OK:
+#TODO For all treeview/liststore/treestore with sorting/filtering, check!
                     model_sort.get_model().remove(
                         model_sort.convert_iter_to_child_iter( treeiter_sort ) )
-
-
-
-    #TODO This could go into indicatorbase...see where else this could be used.
-    #TODO What about the same for filtering?
-    #TODO Keep this function?
-    # def get_model_and_treeiter_from_sort(
-    #     self,
-    #     model_sort,
-    #     iter_sort ):
-    #
-    #     return (
-    #         model_sort.get_model(),
-    #         model_sort.convert_iter_to_child_iter( iter_sort ) )
 
 
     def on_calendar_add(
