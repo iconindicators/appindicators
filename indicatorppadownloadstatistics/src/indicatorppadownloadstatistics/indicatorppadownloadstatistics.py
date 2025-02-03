@@ -394,17 +394,17 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         grid = self.create_grid()
 
         # PPA user, name, filter.
-        ppa_store = Gtk.ListStore( str, str, str )
+        store = Gtk.ListStore( str, str, str )
 
         for ppa in self.ppas:
-            ppa_store.append( [
+            store.append( [
                 ppa.get_user(),
                 ppa.get_name(),
                 '\n'.join( ppa.get_filters() ) ] )
 
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
-                ppa_store,
+                store,
                 (
                     _( "User" ),
                     _( "Name" ),
@@ -443,9 +443,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         grid.attach( box, 0, 1, 1, 1 )
 
-        # Need to pass in the remove button to the add button handler.
-        # However, the remove button has not been created at the point
-        # the add button is created.
         add.connect(
             "clicked", self.on_ppa_add, treeview, remove, invalid_ppas )
 
@@ -534,19 +531,20 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             ppas_original = self.ppas
             self.ppas = [ ]
-            treeiter = ppa_store.get_iter_first()
+            treeiter = store.get_iter_first()
             while treeiter is not None:
-                ppa = ppa_store[ treeiter ]
+                ppa = store[ treeiter ]
                 self.ppas.append(
                     PPA(
                         ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ],
                         ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
 
-                self.ppas[ -1 ].set_filters(
-#TODO Shorten
-                    ppa[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ].split( '\n' ) )
+                filter_text = (
+                    ppa[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] )
+                
+                self.ppas[ -1 ].set_filters( filter_text.split( '\n' ) )
 
-                treeiter = ppa_store.iter_next( treeiter )
+                treeiter = store.iter_next( treeiter )
 
             for ppa in self.ppas:
                 if ( ppa.get_user(), ppa.get_name() ) not in invalid_ppas:
@@ -601,6 +599,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     row2, IndicatorPPADownloadStatistics.COLUMN_NAME ) ) )
 
 
+#TODO Maybe drop this...select first PPA and adjust remove button during init.
+# On add/edit/remove, select apppropriate PPA and adjust remove as needed...see fortune/onthisday.
     def _select_first_ppa_or_disable_remove(
         self,
         treeview,
@@ -610,7 +610,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             # Select the first PPA.
             treepath_to_select_first_ppa = Gtk.TreePath.new_from_string( "0" )
             treeview.get_selection().select_path( treepath_to_select_first_ppa )
-            treeview.scroll_to_cell(
+            treeview.scroll_to_cell( #TODO Check if this is needed.
                 path = treepath_to_select_first_ppa,
                 use_align = False )
 
@@ -638,7 +638,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
 
             model.remove( treeiter )
-            self._select_first_ppa_or_disable_remove( treeview, button )
+            self._select_first_ppa_or_disable_remove( treeview, button )   #TODO Maybe also see fortune/onthisday on how to do this.
 
 
     def on_ppa_add(
@@ -805,10 +805,16 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 else:
 #TODO Shorten
                     user_is_unchanged = (
-                        model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] == user )
+                        model[
+                            treeiter ][
+                                IndicatorPPADownloadStatistics.COLUMN_USER ]
+                        == user )
 
                     name_is_unchanged = (
-                        model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name )
+                        model[
+                            treeiter ][
+                                IndicatorPPADownloadStatistics.COLUMN_NAME ]
+                        == name )
 
                     if not( user_is_unchanged and name_is_unchanged ):
                         user_exists = False
@@ -830,15 +836,16 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                             continue
 
+                # Remove blank lines.
                 filter_text = self.get_textview_text( textview ).split( '\n' )
-                filter_text = [ f for f in filter_text if f ] # Remove blank lines.
+                filter_text = [ f for f in filter_text if f ]
 
                 duplicates_in_filter_text = (
                     len( filter_text ) > len( set( filter_text ) ) )
 
                 if duplicates_in_filter_text:
                     # Could have removed the duplicates using a set().
-                    # Assume the user made a mistake...
+                    # However, assume the user made a mistake...
                     self.show_dialog_ok(
                         dialog,
                         _( "Filter text may not contain duplicates." ) )

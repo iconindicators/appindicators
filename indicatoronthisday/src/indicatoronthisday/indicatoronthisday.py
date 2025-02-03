@@ -578,9 +578,18 @@ class IndicatorOnThisDay( IndicatorBase ):
                         _( "Remove the selected calendar?" ) ) )
 
                 if response == Gtk.ResponseType.OK:
-#TODO For all treeview/liststore/treestore with sorting/filtering, check!
+                    treepath = (
+                        Gtk.TreePath.new_from_string(
+                            model_sort.get_string_from_iter( treeiter_sort ) ) )
+
+                    has_previous = treepath.prev()
+
                     model_sort.get_model().remove(
                         model_sort.convert_iter_to_child_iter( treeiter_sort ) )
+
+                    if has_previous:
+                        treeview.get_selection().select_path( treepath )
+                        treeview.set_cursor( treepath, None, False )
 
 
     def on_calendar_add(
@@ -688,8 +697,6 @@ class IndicatorOnThisDay( IndicatorBase ):
 
                 model_sort.get_model().append( [ path, True ] )
 
-#TODO This might also happen in fortune and ppa.
-# Can the code below be used in script runner at all?
                 treepath = 0
                 for row in model_sort.get_model():
                     if row[ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] == path:

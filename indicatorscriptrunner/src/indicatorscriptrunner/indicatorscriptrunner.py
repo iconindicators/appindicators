@@ -27,6 +27,9 @@ Application indicator to run a terminal command/script from the indicator menu.
 # Otherwise, select first script.
 
 
+#TODO When add/edit a script, see fortune/onthisday...maybe there is a simpler
+# way to select the script (similarly for remove).
+
 import concurrent.futures
 import copy
 import datetime

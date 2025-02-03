@@ -527,13 +527,10 @@ class IndicatorFortune( IndicatorBase ):
                 treeview, _( "No fortune has been selected for removal." ) )
 
         else:
-#TODO Check this...should it be treeiter or converted iter?
-# I suspect this should really be converted iter.
-#...or perhaps not.  What is selected is the sorted model which is displayed...
-# which is correct.
-# But to update the underlying data, need the underlying model and then do a convert of treeiter.
             selected_fortune = (
-                model_sort[ treeiter_sort ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] )
+                model_sort[
+                    treeiter_sort ][
+                        IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] )
 
             if selected_fortune == self.get_system_fortune():
                 self.show_dialog_ok(
@@ -547,8 +544,18 @@ class IndicatorFortune( IndicatorBase ):
                         _( "Remove the selected fortune?" ) ) )
 
                 if response == Gtk.ResponseType.OK:
+                    treepath = (
+                        Gtk.TreePath.new_from_string(
+                            model_sort.get_string_from_iter( treeiter_sort ) ) )
+
+                    has_previous = treepath.prev()
+
                     model_sort.get_model().remove(
                         model_sort.convert_iter_to_child_iter( treeiter_sort ) )
+
+                    if has_previous:
+                        treeview.get_selection().select_path( treepath )
+                        treeview.set_cursor( treepath, None, False )
 
 
     def on_fortune_add(
@@ -567,7 +574,10 @@ class IndicatorFortune( IndicatorBase ):
         preferences_dialog ):
 
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        path = model_sort[ treeiter_sort ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ]
+        path = (
+            model_sort[
+                treeiter_sort ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] )
+
         if path == self.get_system_fortune():
             self.show_dialog_ok(
                 preferences_dialog,
@@ -681,20 +691,22 @@ class IndicatorFortune( IndicatorBase ):
 
                 model_sort.get_model().append( [ path, True ] )
 
-#TODO Check this is okay
                 treepath = 0
-                for row in model.get_model():
+                for row in model_sort.get_model():
                     if row[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] == path:
                         break
 
                     treepath += 1
 
+#TODO Is all the code below needed?
+#                treeview.expand_all()
                 treepath = (
                     model_sort.convert_child_path_to_path(
                         Gtk.TreePath.new_from_string( str( treepath ) ) ) )
 
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
+#                treeview.scroll_to_cell( treepath )
 
             break
 
