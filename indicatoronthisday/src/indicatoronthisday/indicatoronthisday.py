@@ -311,7 +311,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         # Calendars.
         grid = self.create_grid()
 
-        store = Gtk.ListStore( str, bool )
+        store = Gtk.ListStore( str, bool ) # Path to calendar; enabled or not.
         for location, enabled in self.calendars:
             store.append( [ location, enabled ] )
 

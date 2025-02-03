@@ -393,8 +393,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         # PPAs.
         grid = self.create_grid()
 
-        # PPA user, name, filter.
-        store = Gtk.ListStore( str, str, str )
+        store = Gtk.ListStore( str, str, str ) # PPA user, name, filter.
 
         for ppa in self.ppas:
             store.append( [

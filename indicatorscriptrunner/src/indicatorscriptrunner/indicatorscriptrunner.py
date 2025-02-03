@@ -372,6 +372,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 tooltip_text = _( "The terminal script/command, along with any arguments." ),
                 editable = False ) )
 
+#TODO List the items
         treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str )
 
         treestore_background_scripts_filter = treestore.filter_new()

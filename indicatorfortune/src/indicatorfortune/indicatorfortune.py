@@ -259,7 +259,7 @@ class IndicatorFortune( IndicatorBase ):
         # Fortunes.
         grid = self.create_grid()
 
-        store = Gtk.ListStore( str, bool )
+        store = Gtk.ListStore( str, bool ) # Path to fortune; enabled or not.
         for location, enabled in self.fortunes:
             store.append( [ location, enabled ] )
 

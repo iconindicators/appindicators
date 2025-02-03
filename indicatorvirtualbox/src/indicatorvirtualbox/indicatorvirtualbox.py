@@ -533,13 +533,11 @@ class IndicatorVirtualBox( IndicatorBase ):
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
-#TODO Rewrite comment as per what is in fortune/onthisday/ppa
 #TODO Change stock_apply to text (pixbuf to text).  Can the tick be made bold?
-        # List of groups and virtual machines...
-        #   Group name or virtual machine name
-        #   Autostart
-        #   Start command
-        #   UUID
+
+        # Group name (remaining data is empty).
+        #   or
+        # Virtual machine name, autostart, start command, UUID.
         treestore = Gtk.TreeStore( str, str, str, str )
 
         items = [ ]
