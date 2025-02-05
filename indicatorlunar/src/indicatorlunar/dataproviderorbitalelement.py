@@ -45,13 +45,13 @@ class DataProviderOrbitalElement( DataProvider ):
 
         is_comet = (
             orbital_element_data_type in {
-                OE.DataType.SKYFIELD_COMET,
-                OE.DataType.XEPHEM_COMET } )
+                OrbitalElement.DataType.SKYFIELD_COMET,
+                OrbitalElement.DataType.XEPHEM_COMET } )
 
         is_minor_planet = (
             orbital_element_data_type in {
-                OE.DataType.SKYFIELD_MINOR_PLANET,
-                OE.DataType.XEPHEM_MINOR_PLANET } )
+                OrbitalElement.DataType.SKYFIELD_MINOR_PLANET,
+                OrbitalElement.DataType.XEPHEM_MINOR_PLANET } )
 
         if is_comet:
             downloaded = (
@@ -192,7 +192,7 @@ class DataProviderOrbitalElement( DataProvider ):
                         logging.error( "\t" + str( minor_planet ) )
                         continue
 
-                    if orbital_element_data_type == OE.DataType.XEPHEM_MINOR_PLANET:
+                    if orbital_element_data_type == OrbitalElement.DataType.XEPHEM_MINOR_PLANET:
                         components = [
                             designation,
                             'e',
@@ -210,7 +210,7 @@ class DataProviderOrbitalElement( DataProvider ):
 
                         f.write( ','.join( components )  + '\n' )
 
-                    else: # OE.DataType.SKYFIELD_MINOR_PLANET
+                    else: # OrbitalElement.DataType.SKYFIELD_MINOR_PLANET
                         components = [
                             ' ' * 7, # number or designation packed
                             ' ', # 8
@@ -318,10 +318,10 @@ class DataProviderOrbitalElement( DataProvider ):
         url = "https://cobs.si/api/elements.api?mag=obs&is-active=true&is-observed=true&cur-mag="
         url += str( int( apparent_magnitude_maximum ) )
 
-        if orbital_element_data_type == OE.DataType.SKYFIELD_COMET:
+        if orbital_element_data_type == OrbitalElement.DataType.SKYFIELD_COMET:
             url += "&format=mpc"
 
-        else: # Assume to be OE.DataType.PYEPHEM_COMET
+        else: # Assume to be OrbitalElement.DataType.PYEPHEM_COMET
             url += "&format=ephem"
 
         return IndicatorBase.download( url, filename, logging )
@@ -337,7 +337,7 @@ class DataProviderOrbitalElement( DataProvider ):
 
         Returns a dictionary:
             Key: Object/body name
-            Value: OE object
+            Value: OrbitalElement object
 
         Otherwise, returns an empty dictionary and may write to the log.
         '''
@@ -345,16 +345,16 @@ class DataProviderOrbitalElement( DataProvider ):
 
         is_skyfield_data = (
             orbital_element_data_type in {
-                OE.DataType.SKYFIELD_COMET,
-                OE.DataType.SKYFIELD_MINOR_PLANET } )
+                OrbitalElement.DataType.SKYFIELD_COMET,
+                OrbitalElement.DataType.SKYFIELD_MINOR_PLANET } )
 
         is_xephem_data = (
             orbital_element_data_type in {
-                OE.DataType.XEPHEM_COMET,
-                OE.DataType.XEPHEM_MINOR_PLANET } )
+                OrbitalElement.DataType.XEPHEM_COMET,
+                OrbitalElement.DataType.XEPHEM_MINOR_PLANET } )
 
         if is_skyfield_data:
-            if orbital_element_data_type == OE.DataType.SKYFIELD_COMET:
+            if orbital_element_data_type == OrbitalElement.DataType.SKYFIELD_COMET:
                 # https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
                 name_start = 103
                 name_end = 158
@@ -376,7 +376,7 @@ class DataProviderOrbitalElement( DataProvider ):
 
                     if keep:
                         name = line[ name_start - 1 : name_end - 1 + 1 ].strip()
-                        oe = OE( name, line, orbital_element_data_type )
+                        oe = OrbitalElement( name, line, orbital_element_data_type )
                         oe_data[ oe.get_name().upper() ] = oe
 
         elif is_xephem_data:
@@ -394,7 +394,7 @@ class DataProviderOrbitalElement( DataProvider ):
                         # is no data to load.  When the cache becomes stale,
                         # a fresh and hopefully successful download will occur.
                         name = line[ : line.find( ',' ) ].strip()
-                        oe = OE( name, line, orbital_element_data_type )
+                        oe = OrbitalElement( name, line, orbital_element_data_type )
                         oe_data[ oe.get_name().upper() ] = oe
 
         else:
@@ -407,7 +407,7 @@ class DataProviderOrbitalElement( DataProvider ):
         return oe_data
 
 
-class OE():
+class OrbitalElement():
     ''' Orbital element for a comet or minor planet. '''
 
     class DataType( Enum ):

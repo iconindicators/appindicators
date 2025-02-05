@@ -53,19 +53,19 @@ class DataProviderGeneralPerturbation( DataProvider ):
 
         Returns a dictionary:
             Key: Satellite catalog number (NORAD number)
-            Value: GP object
+            Value: GeneralPerturbation object
 
         Otherwise, returns an empty dictionary and may write to the log.
         '''
         data = { }
         for fields in omm.parse_xml( filename ):
-            gp = GP( fields )
+            gp = GeneralPerturbation( fields )
             data[ gp.get_number() ] = gp
 
         return data
 
 
-class GP():
+class GeneralPerturbation():
     '''Hold general perturbation for a satellite.'''
 
     def __init__(

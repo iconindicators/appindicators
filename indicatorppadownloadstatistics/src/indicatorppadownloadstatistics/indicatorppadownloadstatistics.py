@@ -168,8 +168,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         self.get_on_click_menuitem_open_browser_function(), ),
                     indent = ( 1, 1 ) )
 
-        # When only one PPA is present, enable a middle mouse click on the
-        # icon to open the PPA in the browser.
+        # When only one PPA is present, enable a middle mouse click on the icon
+        # to open the PPA in the browser.
         if len( self.ppas ) == 1:
             self.set_secondary_activate_target( menu.get_children()[ 0 ] )
 
@@ -201,7 +201,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         published_binary ):
 
         label = (
-            published_binary.get_name() + ' ' +
+            published_binary.get_name() +
+            ' ' +
             published_binary.get_version() )
 
         if published_binary.get_architecture() is not None:
@@ -307,8 +308,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             for entry in json[ "entries" ]:
                 architecture = None
                 if entry[ "architecture_specific" ]:
-#TODO Shorten
-                    architecture = entry[ "distro_arch_series_link" ].split( '/' )[ -1 ]
+                    architecture = entry[ "distro_arch_series_link" ]
+                    architecture = architecture.split( '/' )[ -1 ]
 
                 published_binary = (
                     PublishedBinary(
@@ -393,8 +394,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         # PPAs.
         grid = self.create_grid()
 
-        store = Gtk.ListStore( str, str, str ) # PPA user, name, filter.
-
+        store = Gtk.ListStore( str, str, str ) # User, name, filter.
         for ppa in self.ppas:
             store.append( [
                 ppa.get_user(),
@@ -445,7 +445,13 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         add.connect(
             "clicked", self.on_ppa_add, treeview, remove, invalid_ppas )
 
-        self._select_first_ppa_or_disable_remove( treeview, remove )
+        if len( store ):
+            treepath = Gtk.TreePath.new_from_string( '0' )
+            treeview.get_selection().select_path( treepath )
+            treeview.set_cursor( treepath, None, False )
+
+        else:
+            remove.set_sensitive( False )
 
         notebook.append_page( grid, Gtk.Label.new( _( "PPAs" ) ) )
 
@@ -598,26 +604,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     row2, IndicatorPPADownloadStatistics.COLUMN_NAME ) ) )
 
 
-#TODO Maybe drop this...select first PPA and adjust remove button during init.
-# On add/edit/remove, select apppropriate PPA and adjust remove as needed...see fortune/onthisday.
-    def _select_first_ppa_or_disable_remove(
-        self,
-        treeview,
-        button_remove ):
-
-        if len( treeview.get_model() ):
-            # Select the first PPA.
-            treepath_to_select_first_ppa = Gtk.TreePath.new_from_string( "0" )
-            treeview.get_selection().select_path( treepath_to_select_first_ppa )
-            treeview.scroll_to_cell( #TODO Check if this is needed.
-                path = treepath_to_select_first_ppa,
-                use_align = False )
-
-        else:
-            # No ppas; disable the Remove button.
-            button_remove.set_sensitive( False )
-
-
     def on_ppa_remove(
         self,
         button,
@@ -636,8 +622,18 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 row[ IndicatorPPADownloadStatistics.COLUMN_USER ],
                 row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
 
+            treepath = (
+                Gtk.TreePath.new_from_string(
+                    model.get_string_from_iter( treeiter ) ) )
+
+            has_previous = treepath.prev()
             model.remove( treeiter )
-            self._select_first_ppa_or_disable_remove( treeview, button )   #TODO Maybe also see fortune/onthisday on how to do this.
+            if has_previous:
+                treeview.get_selection().select_path( treepath )
+                treeview.set_cursor( treepath, None, False )
+
+            else:
+                button.set_sensitive( False )
 
 
     def on_ppa_add(
@@ -647,9 +643,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         button_remove,
         invalid_ppas ):
 
-        length_before_addition = len( treeview.get_model() )
         self.on_ppa_double_click( treeview, None, None, invalid_ppas )
-        if len( treeview.get_model() ) > length_before_addition:
+        if len( treeview.get_model() ) > 0:
             button_remove.set_sensitive( True )
 
 
@@ -674,8 +669,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             ppa_user = self.create_entry( "" )
 
         else:
-#TODO Shorten
-            ppa_users = [ row[ IndicatorPPADownloadStatistics.COLUMN_USER ] for row in model ]
+            ppa_users = [
+                row[ IndicatorPPADownloadStatistics.COLUMN_USER ]
+                for row in model ]
+
             ppa_users = list( set( ppa_users ) )
             ppa_users.sort( key = locale.strxfrm )
             if adding_ppa:
@@ -729,7 +726,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 text =
                     ""
                     if adding_ppa else
-                    model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ],
+                    model[
+                        treeiter ][
+                            IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ],
                 tooltip_text = _(
                     "Each line of plain text is compared\n" +
                     "against the name of each built package,\n" +
@@ -744,8 +743,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         grid.attach(
             self.create_box(
                 (
-#TODO Shorten
-                    ( Gtk.Label.new( "\n\n\n\n\n" ), False ), # Ensure the textview for the filter text is not too short.
+                    ( Gtk.Label.new( "\n\n\n\n\n" ), False ),
                     ( self.create_scrolledwindow( textview ), True ) ) ),
                      1, 2, 1, 1 )
 
@@ -874,28 +872,18 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 model.append( [ user, name, '\n'.join( filter_text ) ] )
                 invalid_ppas.append( ( user, name ) )
 
-#TODO See if the fortune/onthisday way is better.
-                # Select the added/edited PPA.
-                row_iter = treeview.get_model().get_iter_first()
-                while iter:
-                    user_ = (
-                        treeview.get_model().get_value(
-                            row_iter, IndicatorPPADownloadStatistics.COLUMN_USER ) )
-
-                    name_ = (
-                        treeview.get_model().get_value(
-                            row_iter, IndicatorPPADownloadStatistics.COLUMN_NAME ) )
-
+                treepath = 0
+                for row in model:
+                    user_ = row[ IndicatorPPADownloadStatistics.COLUMN_USER ]
+                    name_ = row[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
                     if user == user_ and name == name_:
-                        treepath_for_row = treeview.get_model().get_path( row_iter )
-                        treeview.get_selection().select_path( treepath_for_row )
-                        treeview.scroll_to_cell(
-                            path = treepath_for_row,
-                            use_align = False )
-
                         break
-
-                    row_iter = treeview.get_model().iter_next( row_iter )
+                
+                    treepath += 1
+                
+                treepath = Gtk.TreePath.new_from_string( str( treepath ) )
+                treeview.get_selection().select_path( treepath )
+                treeview.set_cursor( treepath, None, False )
 
             break
 

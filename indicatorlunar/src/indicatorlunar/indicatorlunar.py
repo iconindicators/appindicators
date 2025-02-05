@@ -39,7 +39,7 @@ import eclipse
 
 from dataproviderapparentmagnitude import DataProviderApparentMagnitude
 from dataprovidergeneralperturbation import DataProviderGeneralPerturbation
-from dataproviderorbitalelement import DataProviderOrbitalElement, OE
+from dataproviderorbitalelement import DataProviderOrbitalElement, OrbitalElement
 
 
 class IndicatorLunar( IndicatorBase ):
@@ -93,13 +93,24 @@ class IndicatorLunar( IndicatorBase ):
     DATA_INDEX_BODY_NAME = 1
     DATA_INDEX_DATA_NAME = 2
 
-    DATE_TIME_FORMAT_HHcolonMM = "%H:%M" # Used in the display of the satellite rise notification.
-    DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M" # Used to display any body's rise/set in the menu.
+    # Used in the display of the satellite rise notification.
+    DATE_TIME_FORMAT_HHcolonMM = "%H:%M"
+
+    # Used to display any body's rise/set in the menu.
+    DATE_TIME_FORMAT_YYYYdashMMdashDDspacespaceHHcolonMM = "%Y-%m-%d  %H:%M"
 
     ICON_CACHE_BASENAME = "icon-"
-    ICON_CACHE_MAXIMUM_AGE_HOURS = 1 # Keep icons around for an hour to allow multiple instances to run (when testing for example).
 
-    INDICATOR_TEXT_DEFAULT = " [" + astro_backend.NAME_TAG_MOON + " " + astro_backend.DATA_TAG_PHASE + "]"
+    # Keep icons around for an hour to allow multiple instances to run.
+    ICON_CACHE_MAXIMUM_AGE_HOURS = 1
+
+    INDICATOR_TEXT_DEFAULT = (
+        " [" +
+        astro_backend.NAME_TAG_MOON +
+        " " +
+        astro_backend.DATA_TAG_PHASE +
+        "]" )
+
     INDICATOR_TEXT_SEPARATOR_DEFAULT = ", "
 
     BODY_TAGS_TRANSLATIONS = (
@@ -118,15 +129,14 @@ class IndicatorLunar( IndicatorBase ):
 
     COMET_CACHE_ORBITAL_ELEMENT_BASENAME = (
         "comet-orbitalelement" +
-        '-'
-        +
+        '-' +
         astro_backend_name.lower() + CACHE_VERSION )
 
     COMET_CACHE_MAXIMUM_AGE_HOURS = 96
     COMET_DATA_TYPE = (
-        OE.DataType.XEPHEM_COMET
+        OrbitalElement.DataType.XEPHEM_COMET
         if astro_backend_name == astro_backend_pyephem else
-        OE.DataType.SKYFIELD_COMET )
+        OrbitalElement.DataType.SKYFIELD_COMET )
 
     MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME = (
         "minorplanet-apparentmagnitude" + CACHE_VERSION )
@@ -139,9 +149,9 @@ class IndicatorLunar( IndicatorBase ):
 
     MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS = 96
     MINOR_PLANET_DATA_TYPE = (
-        OE.DataType.XEPHEM_MINOR_PLANET
+        OrbitalElement.DataType.XEPHEM_MINOR_PLANET
         if astro_backend_name == astro_backend_pyephem else
-        OE.DataType.SKYFIELD_MINOR_PLANET )
+        OrbitalElement.DataType.SKYFIELD_MINOR_PLANET )
 
     SATELLITE_CACHE_BASENAME = "satellite-generalperturbation" + CACHE_VERSION
     SATELLITE_CACHE_EXTENSION = ".xml"
@@ -289,7 +299,8 @@ class IndicatorLunar( IndicatorBase ):
                 self.stars,
                 self.satellites, self.satellite_general_perturbation_data,
                 *self.convert_start_hour_and_end_hour_to_date_time_in_utc(
-                    self.satellite_limit_start, self.satellite_limit_end ),
+                    self.satellite_limit_start,
+                    self.satellite_limit_end ),
                 self.comets, self.comet_orbital_element_data, None,
                 self.minor_planets,
                 self.minor_planet_orbital_element_data,
@@ -298,8 +309,7 @@ class IndicatorLunar( IndicatorBase ):
                 self.get_logging() ) )
 
         if self.data_previous is None:
-            # Happens only on first run or when the user alters the satellite
-            # visibility window.
+            # Occurs on first run or when the user alters the satellite window.
             self.data_previous = self.data
 
         # Update frontend.
@@ -464,7 +474,7 @@ class IndicatorLunar( IndicatorBase ):
             else:
                 fresh_data = (
                     load_data_function(
-                        self.get_cache_newest_filename( cache_basename ), # Should NOT return None as the cache was checked for staleness above.
+                        self.get_cache_newest_filename( cache_basename ),
                         self.get_logging(),
                         *load_data_additional_arguments ) )
 
@@ -1143,7 +1153,7 @@ class IndicatorLunar( IndicatorBase ):
                 def get_menuitem_name_for_minor_planet( name ):
                     return (
                         IndicatorLunar.SEARCH_URL_MINOR_PLANET +
-                        IndicatorLunar._get_minor_planet_designation_for_lowell_lookup( name ) )
+                        IndicatorLunar._get_minor_planet_designation_from_lowell( name ) )
 
                 menuitem_name_function = get_menuitem_name_for_minor_planet
 
@@ -1151,7 +1161,8 @@ class IndicatorLunar( IndicatorBase ):
                 def get_menuitem_name_for_comet( name ):
                     return (
                         IndicatorLunar.SEARCH_URL_COMET_DATABASE +
-                        IndicatorLunar._get_comet_designation_for_cobs_lookup( name, self.get_logging() ) )
+                        IndicatorLunar._get_comet_designation_from_cobs(
+                            name, self.get_logging() ) )
 
                 menuitem_name_function = get_menuitem_name_for_comet
 
@@ -1274,12 +1285,11 @@ class IndicatorLunar( IndicatorBase ):
 
 
     @staticmethod
-    def _get_comet_designation_for_cobs_lookup(
+    def _get_comet_designation_from_cobs(
         name,
         logging ):
         '''
-        Retrieve a comet's designation for lookup at the Comet
-        Observation Database.
+        Retrieve a comet's designation from Comet Observation Database.
 
         https://minorplanetcenter.net//iau/lists/CometResolution.html
         https://minorplanetcenter.net/iau/info/CometNamingGuidelines.html
@@ -1324,11 +1334,10 @@ class IndicatorLunar( IndicatorBase ):
 
 
     @staticmethod
-    def _get_minor_planet_designation_for_lowell_lookup(
+    def _get_minor_planet_designation_from_lowell(
         name ):
         '''
-        Retrieve a minor planet's designation for lookup at the Lowell Minor
-        Planet Services.
+        Retrieve a minor planet's designation from Lowell Minor Planet Services.
 
         https://www.iau.org/public/themes/naming/
         https://minorplanetcenter.net/iau/info/DesDoc.html
@@ -1953,11 +1962,9 @@ class IndicatorLunar( IndicatorBase ):
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
-        page_icon = 0
+        # Pages in the notebooks are numbered leftwise from zero,
+        # with only some pages needing to be referenced.
         page_menu = 1
-        page_natural_bodies = 2
-        page_satellites = 3
-        page_notifications = 4
         page_location = 5
 
         # Icon text.
@@ -1991,7 +1998,8 @@ class IndicatorLunar( IndicatorBase ):
         indicator_text_separator = (
             self.create_entry(
                 self.indicator_text_separator,
-                tooltip_text = _( "The separator will be added between pairs of { }." ) ) )
+                tooltip_text = _(
+                    "The separator will be added between pairs of { }." ) ) )
 
         grid.attach(
             self.create_box(
@@ -2011,7 +2019,8 @@ class IndicatorLunar( IndicatorBase ):
         column_view_tag = 0
         column_view_value = 1
 
-        display_tags_store = Gtk.ListStore( str, str, str ) # Tag, translated tag, value.
+        # Tag, translated tag, value.
+        display_tags_store = Gtk.ListStore( str, str, str )
         self.initialise_display_tags_store( display_tags_store )
 
         indicator_text.set_text(
@@ -2021,17 +2030,25 @@ class IndicatorLunar( IndicatorBase ):
                 self.indicator_text ) ) # Translate tags into local language.
 
 #TODO Check sorting...is user sorting really needed?
+#Allow for user sorting...but is the treemodelsort needed for this to work?
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 Gtk.TreeModelSort( model = display_tags_store ),
                 ( _( "Tag" ), _( "Value" ) ),
                 (
-                    ( Gtk.CellRendererText(), "text", column_model_translated_tag ),
-                    ( Gtk.CellRendererText(), "text", column_model_value ) ),
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        column_model_translated_tag ),
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        column_model_value ) ),
                 sortcolumnviewids_columnmodelids = (
                     ( column_view_tag, column_model_translated_tag ),
                     ( column_view_value, column_model_value ) ),
-                tooltip_text = _( "Double click to add a tag to the icon text." ),
+                tooltip_text = _(
+                    "Double click to add a tag to the icon text." ),
                 rowactivatedfunctionandarguments = (
                     self.on_tags_values_double_click,
                     column_model_translated_tag, indicator_text ) ) )
@@ -2162,7 +2179,8 @@ class IndicatorLunar( IndicatorBase ):
         natural_body_view_column_hide_show = 0
         natural_body_view_column_translated_name = 1
 
-        planet_store = Gtk.ListStore( bool, str, str ) # Show/hide, planet name (not displayed), translated planet name.
+        # Show/hide, planet name, translated planet name.
+        planet_store = Gtk.ListStore( bool, str, str )
         for planet_name in IndicatorLunar.astro_backend.PLANETS:
             planet_store.append( [
                 planet_name in self.planets,
@@ -2181,8 +2199,8 @@ class IndicatorLunar( IndicatorBase ):
                 natural_body_model_column_translated_name,
                 natural_body_view_column_hide_show ) )
 
-        minor_planet_store = Gtk.ListStore( bool, str, str ) # Show/hide, minor planet name, human readable name.
-
+        # Show/hide, minor planet designation, human readable name.
+        minor_planet_store = Gtk.ListStore( bool, str, str )
         for minor_planet in sorted( self.minor_planet_orbital_element_data.keys() ):
             minor_planet_store.append( [
                 minor_planet in self.minor_planets,
@@ -2206,8 +2224,8 @@ class IndicatorLunar( IndicatorBase ):
                 natural_body_model_column_translated_name,
                 natural_body_view_column_hide_show ) )
 
-        comet_store = Gtk.ListStore( bool, str, str ) # Show/hide, comet name, human readable name.
-
+        # Show/hide, comet designation, human readable name.
+        comet_store = Gtk.ListStore( bool, str, str )
         for comet in sorted( self.comet_orbital_element_data.keys() ):
             comet_store.append( [
                 comet in self.comets,
@@ -2238,8 +2256,9 @@ class IndicatorLunar( IndicatorBase ):
                 star_name,
                 IndicatorLunar.astro_backend.get_star_name_translation( star_name ) ] )
 
-        star_store = Gtk.ListStore( bool, str, str ) # Show/hide, star name, star translated name.
-        for star in sorted( stars, key = lambda x: ( x[ 2 ] ) ): # Sort by translated star name.
+        # Show/hide, star name, star translated name.
+        star_store = Gtk.ListStore( bool, str, str )
+        for star in sorted( stars, key = lambda x: ( x[ 2 ] ) ):
             star_store.append( star )
 
         scrolledwindow_stars = (
@@ -2275,7 +2294,8 @@ class IndicatorLunar( IndicatorBase ):
         satellite_view_column_number = 2
         satellite_view_column_international_designator = 3
 
-        satellite_store = Gtk.ListStore( bool, str, str, str ) # Show/hide, name, number, international designator.
+        # Show/hide, name, number, international designator.
+        satellite_store = Gtk.ListStore( bool, str, str, str )
         for satellite in self.satellite_general_perturbation_data:
             satellite_store.append( [
                 satellite in self.satellites,
@@ -2295,6 +2315,10 @@ class IndicatorLunar( IndicatorBase ):
 
 #TODO Can this instead use the (eventual) generic function to create
 # a treeview with multiple columns, one of which is a boolean/checkbox?
+#
+# NOT SURE WHAT THE ABOVE TODO IS SAYING...!
+#
+#TODO Allow the user to sort by column header, but need a treesortmodel to do this?
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 satellite_store_sort,
@@ -2932,6 +2956,8 @@ class IndicatorLunar( IndicatorBase ):
         return scrolledwindow
 
 
+#TODO Can this function and the one below be made generic and put into indicatorbase?
+# See also fortune/onthisday.
     def on_natural_body_checkbox(
         self,
         cell_renderer_toggle,

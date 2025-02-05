@@ -159,7 +159,7 @@ class DataProviderApparentMagnitude( DataProvider ):
 
         Returns a dictionary
             Key: Object/body name
-            Value: AM object
+            Value: ApparentMagnitude object
 
         Otherwise, returns an empty dictionary and may write to the log.
         '''
@@ -169,13 +169,13 @@ class DataProviderApparentMagnitude( DataProvider ):
                 last_comma = line.rfind( ',' )
                 name = line[ 0 : last_comma ]
                 apparent_magnitude = line[ last_comma + 1 : ]
-                am = AM( name, apparent_magnitude )
+                am = ApparentMagnitude( name, apparent_magnitude )
                 am_data[ am.get_name().upper() ] = am
 
         return am_data
 
 
-class AM():
+class ApparentMagnitude():
     ''' Apparent magnitude for a comet or minor planet. '''
 
     def __init__(
