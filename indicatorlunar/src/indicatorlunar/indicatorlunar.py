@@ -2029,11 +2029,12 @@ class IndicatorLunar( IndicatorBase ):
                 True,
                 self.indicator_text ) ) # Translate tags into local language.
 
-#TODO Check sorting...is user sorting really needed?
-#Allow for user sorting...but is the treemodelsort needed for this to work?
+#TODO Allow user sorting...but is the treemodelsort needed for this to work?
+# Seems not...
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
-                Gtk.TreeModelSort( model = display_tags_store ),
+#                Gtk.TreeModelSort( model = display_tags_store ),
+                display_tags_store,
                 ( _( "Tag" ), _( "Value" ) ),
                 (
                     (
@@ -2303,6 +2304,7 @@ class IndicatorLunar( IndicatorBase ):
                 satellite,
                 self.satellite_general_perturbation_data[ satellite ].get_international_designator() ] )
 
+#TODO Is the treemodelsort needed?
         satellite_store_sort = Gtk.TreeModelSort( model = satellite_store )
 
         renderer_toggle = Gtk.CellRendererToggle()
@@ -2319,9 +2321,11 @@ class IndicatorLunar( IndicatorBase ):
 # NOT SURE WHAT THE ABOVE TODO IS SAYING...!
 #
 #TODO Allow the user to sort by column header, but need a treesortmodel to do this?
+# Seems not...
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
-                satellite_store_sort,
+#                satellite_store_sort,
+                satellite_store,
                 ( "", _( "Name" ), _( "Number" ), _( "International Designator" ) ),
                 (
                     ( renderer_toggle, "active", satellite_model_column_hide_show ),
@@ -2712,6 +2716,7 @@ class IndicatorLunar( IndicatorBase ):
         return response_type
 
 
+#TODO Review this function...
     def initialise_display_tags_store(
         self,
         display_tags_store ):
@@ -2906,6 +2911,7 @@ class IndicatorLunar( IndicatorBase ):
         translated_tag_column_index,
         indicator_textentry ):
 
+#TODO If we drop the TreeModelSort from the tags treeview, then rename/remove the _sort.
         model_sort, treeiter_sort = tree.get_selection().get_selected()
         value = model_sort[ treeiter_sort ][ translated_tag_column_index ]
         indicator_textentry.insert_text(
@@ -2977,12 +2983,18 @@ class IndicatorLunar( IndicatorBase ):
         sortstore,
         satellite_model_column_hide_show ):
 
+        liststore[ row ][ satellite_model_column_hide_show ] = (
+            not liststore[ row ][ satellite_model_column_hide_show ] )
+
+#TODO Original code below; new code above (for testing if treemodelsort is actually needed).
+        '''
         actual_row = (
             sortstore.convert_path_to_child_path(
                 Gtk.TreePath.new_from_string( row ) ) ) # Convert sorted model index to underlying (child) model index.
 
         liststore[ actual_row ][ satellite_model_column_hide_show ] = (
             not liststore[ actual_row ][ satellite_model_column_hide_show ] )
+        '''
 
 
     def on_columnheader(
@@ -3357,7 +3369,7 @@ class IndicatorLunar( IndicatorBase ):
             IndicatorLunar.CONFIG_SATELLITE_NOTIFICATION_SUMMARY:
                 self.satellite_notification_summary,
 
-            IndicatorLunar.CONFIG_SATELLITE:
+            IndicatorLunar.CONFIG_SATELLITES:
                 satellites,
 
             IndicatorLunar.CONFIG_SATELLITES_ADD_NEW:

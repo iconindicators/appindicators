@@ -89,8 +89,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         menu ):
 
         virtual_machines = [ ]
-        vbox_manage_installed = self.is_vbox_manage_installed()
-        if vbox_manage_installed:
+        vboxmanage_installed = self.is_vboxmanage_installed()
+        if vboxmanage_installed:
             virtual_machines = self.get_virtual_machines()
 
             # Autostart VMs here rather than in __init__ ensures the indicator
@@ -99,7 +99,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self.auto_start_required = False
                 self.auto_start_virtual_machines( virtual_machines )
 
-        self.build_menu( menu, vbox_manage_installed, virtual_machines )
+        self.build_menu( menu, vboxmanage_installed, virtual_machines )
 
         return int( 60 * self.refresh_interval_in_minutes )
 
@@ -107,10 +107,10 @@ class IndicatorVirtualBox( IndicatorBase ):
     def build_menu(
         self,
         menu,
-        vbox_manage_installed,
+        vboxmanage_installed,
         virtual_machines ):
 
-        if vbox_manage_installed:
+        if vboxmanage_installed:
             if virtual_machines:
                 running_names, running_uuids = (
                     self.get_running_virtual_machines() )
@@ -366,7 +366,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         delta,
         scroll_direction ):
 
-        if self.is_vbox_manage_installed():
+        if self.is_vboxmanage_installed():
             running_names, running_uuids = self.get_running_virtual_machines()
             if running_uuids:
 #TODO Shorten
@@ -464,6 +464,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def get_virtual_machines( self ):
+
         def add_virtual_machine( group, name, uuid, groups ):
             for group_name in groups:
                 the_group = (
@@ -481,9 +482,10 @@ class IndicatorVirtualBox( IndicatorBase ):
             group.add_item( VirtualMachine( name, uuid ) )
 
 
+#TODO Check to see how this works...does it require that all top level VMs are always first?
         top_group = Group( "" )
-#TODO Shorten
-        for line in self.process_get( "VBoxManage list vms --long" ).splitlines():
+        command = "VBoxManage list vms --long"
+        for line in self.process_get( command ).splitlines():
             if line.startswith( "Name:" ):
                 name = line.split( "Name:" )[ 1 ].strip()
 
@@ -499,7 +501,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         return top_group.get_items()
 
 
-    def is_vbox_manage_installed( self ):
+    def is_vboxmanage_installed( self ):
         return self.process_get( "which VBoxManage" ).find( "VBoxManage" ) > -1
 
 
@@ -534,6 +536,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
 #TODO Change stock_apply to text (pixbuf to text).  Can the tick be made bold?
+# Get this from fortuen/onthisday before they were changed to being checkboxes.
 
         # Group name (remaining data is empty).
         #   or
@@ -541,7 +544,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         treestore = Gtk.TreeStore( str, str, str, str )
 
         items = [ ]
-        if self.is_vbox_manage_installed():
+        if self.is_vboxmanage_installed():
             items = self.get_virtual_machines()
 
         groups_exist = self._add_items_to_store( treestore, None, items )
@@ -679,7 +682,9 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.sort_groups_and_virtual_machines_equally = sort_groups_and_virtual_machines_equally_checkbox.get_active()
             self.refresh_interval_in_minutes = spinner_refresh_interval.get_value_as_int()
             self.virtual_machine_preferences.clear()
-            self._update_virtual_machine_preferences( treestore, treeview.get_model().get_iter_first() )
+
+            self._update_virtual_machine_preferences(
+                treestore, treeview.get_model().get_iter_first() )
 #TODO Shorten
 
             self.set_preferences_common_attributes(
