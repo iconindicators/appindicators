@@ -20,7 +20,6 @@
 
 
 import datetime
-import locale
 import time
 
 import gi
@@ -142,23 +141,11 @@ class IndicatorVirtualBox( IndicatorBase ):
         indent,
         running_uuids ):
 
-        if self.sort_groups_and_virtual_machines_equally:
-            sorted_items = (
-                sorted(
-                    items,
-                    key = lambda x: locale.strxfrm( x.get_name() ) ) )
-
-        else:
-            sorted_items = (
-                sorted(
-                    items,
-                    key = lambda x: (
-                        not isinstance( x, Group ),
-                        locale.strxfrm( x.get_name() ) ) ) )
+        sorted_items = (
+            Group.sort( items, self.sort_groups_and_virtual_machines_equally ) )
 
         for item in sorted_items:
             if isinstance( item, Group ):
-                print( item )
                 self._build_menu(
                     self._add_group_to_menu( menu, item, indent ),
                     item.get_items(),
@@ -231,6 +218,8 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.request_update( delay = 10 )
 
 
+#TODO Check this works...
+# What happens if there is an empty/dummy VM?
     def auto_start_virtual_machines(
         self,
         virtual_machines ):
@@ -465,24 +454,33 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def get_virtual_machines( self ):
 
-        def add_virtual_machine( group, name, uuid, groups ):
-            for group_name in groups:
-                the_group = (
-                    next(
-                        ( x for x in group.get_items()
-                          if isinstance( x, Group ) and x.get_name() == group_name ), None ) )
-#TODO Shorten
+        def add_virtual_machine(
+                start_group,
+                name,
+                uuid,
+                groups ):
 
-                if the_group is None:
-                    the_group = Group( group_name )
-                    group.add_item( the_group )
+            current_group = start_group
+            for group in groups:
+                group_to_find = None
+                for item in current_group.get_items():
+                    if (
+                        isinstance( item, Group )
+                        and
+                        item.get_name() == group
+                    ):
+                        group_to_find = item
+                        break # Assume group names within a group are unique.
 
-                group = the_group
+                if group_to_find is None:
+                    group_to_find = Group( group )
+                    current_group.add_item( group_to_find )
 
-            group.add_item( VirtualMachine( name, uuid ) )
+                current_group = group_to_find
+
+            current_group.add_item( VirtualMachine( name, uuid ) )
 
 
-#TODO Check to see how this works...does it require that all top level VMs are always first?
         top_group = Group( "" )
         command = "VBoxManage list vms --long"
         for line in self.process_get( command ).splitlines():
@@ -498,6 +496,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 uuid = line.split( "UUID:" )[ 1 ].strip()
                 add_virtual_machine( top_group, name, uuid, groups )
 
+        print( top_group.get_items() ) #TODO
         return top_group.get_items()
 
 
@@ -535,9 +534,6 @@ class IndicatorVirtualBox( IndicatorBase ):
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
-#TODO Change stock_apply to text (pixbuf to text).  Can the tick be made bold?
-# Get this from fortuen/onthisday before they were changed to being checkboxes.
-
         # Group name (remaining data is empty).
         #   or
         # Virtual machine name, autostart, start command, UUID.
@@ -553,7 +549,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.create_treeview_within_scrolledwindow(
                 treestore,
                 (
-                    _( "Virtual Machine" ),
+                    _( "Groups / Virtual Machines" ),
                     _( "Autostart" ),
                     _( "Start Command" ) ),
                 (
@@ -562,8 +558,8 @@ class IndicatorVirtualBox( IndicatorBase ):
                         "text",
                         IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHINE_NAME ),
                     (
-                        Gtk.CellRendererPixbuf(),
-                        "stock_id",
+                        Gtk.CellRendererText(),
+                        "text",
                         IndicatorVirtualBox.COLUMN_AUTOSTART ),
                     (
                         Gtk.CellRendererText(),
@@ -677,6 +673,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
             self.virtualbox_manager_window_name = window_name.get_text().strip()
+#TODO Shorten
             self.delay_between_autostart_in_seconds = spinner_delay.get_value_as_int()
             self.show_submenu = show_as_submenus_checkbox.get_active()
             self.sort_groups_and_virtual_machines_equally = sort_groups_and_virtual_machines_equally_checkbox.get_active()
@@ -685,7 +682,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
             self._update_virtual_machine_preferences(
                 treestore, treeview.get_model().get_iter_first() )
-#TODO Shorten
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),
@@ -702,19 +698,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         items ):
 
         groups_exist = False
-        if self.sort_groups_and_virtual_machines_equally:
-            sorted_items = (
-                sorted(
-                    items,
-                    key = lambda x: locale.strxfrm( x.get_name() ) ) )
-
-        else:
-            sorted_items = (
-                sorted(
-                    items,
-                    key = lambda x: (
-                        not isinstance( x, Group ),
-                        locale.strxfrm( x.get_name() ) ) ) )
+        sorted_items = (
+            Group.sort( items, self.sort_groups_and_virtual_machines_equally ) )
 
         for item in sorted_items:
             if isinstance( item, Group ):
@@ -728,7 +713,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             else:
                 row = [
                     item.get_name(),
-                    Gtk.STOCK_APPLY
+                    IndicatorBase.TICK_SYMBOL
                     if self.is_autostart( item.get_uuid() )
                     else
                     None,
@@ -747,7 +732,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 #TODO Shorten
         while treeiter:
             is_virtual_machine = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
-            is_autostart = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY
+            is_autostart = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == IndicatorBase.TICK_SYMBOL
             is_default_start_command = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
             if ( is_virtual_machine and is_autostart ) or ( is_virtual_machine and not is_default_start_command ): # Only record VMs with different settings to default.
                 key = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
@@ -772,6 +757,11 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.edit_virtual_machine( tree, model, treeiter )
 
 
+#TODO This function appears to be only called from one place...above.
+# If that is the case, maybe just merge the code below with that above.
+#
+#TODO Maybe make the autostart a checkbox in the treeview (same as fortune/onthisday)?
+# Maybe try making the textfield editable in place rather than have the popup below?
     def edit_virtual_machine(
         self,
         tree,
@@ -806,7 +796,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 active = (
                     model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None
                     and
-                    model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == Gtk.STOCK_APPLY ) ) )
+                    model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == IndicatorBase.TICK_SYMBOL ) ) )
 
         grid.attach( autostart_checkbutton, 0, 1, 2, 1 )
 
@@ -832,7 +822,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 start_command.grab_focus()
                 continue
 
-            model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] = Gtk.STOCK_APPLY if autostart_checkbutton.get_active() else None
+            model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] = IndicatorBase.TICK_SYMBOL if autostart_checkbutton.get_active() else None
             model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = start_command.get_text().strip()
 
             break
