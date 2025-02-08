@@ -25,10 +25,10 @@ Application indicator to run a terminal command/script from the indicator menu.
 # if the script's group still exists, maybe
 # select the first script of that group.
 # Otherwise, select first script.
-
-
-#TODO When add/edit a script, see fortune/onthisday...maybe there is a simpler
+#
+# When add/edit a script, see fortune/onthisday...maybe there is a simpler
 # way to select the script (similarly for remove).
+
 
 import concurrent.futures
 import copy
@@ -68,8 +68,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
     COMMAND_NOTIFY_TAG_SCRIPT_RESULT = "[SCRIPT_RESULT]"
 
-#TODO Shorten
-    COLUMN_MODEL_GROUP = 0 # Group name when displaying a group; empty when displaying a script.
+    COLUMN_MODEL_GROUP = 0 # Group name for groups; empty for scripts.
     COLUMN_MODEL_NAME = 1 # Script name.
     COLUMN_MODEL_SOUND = 2 # Icon name for the APPLY icon; None otherwise.
     COLUMN_MODEL_NOTIFICATION = 3 # Icon name for the APPLY icon; None otherwise.
@@ -111,19 +110,39 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def __init__( self ):
-#TODO Shorten
         super().__init__(
-            comments = _( "Runs a terminal command or script;\noptionally display results in the icon label." ) )
+            comments = _(
+                "Runs a terminal command or script;\noptionally display " 
+                +
+                "results in the icon label." ) )
+
+        command_notify_common = (
+            "notify-send -i "
+            +
+            self.get_icon_name() +
+            " \""
+            +
+            IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME
+            +
+            "\" " )
 
         self.command_notify_background = (
-            "notify-send -i " + self.get_icon_name() +
-            " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " +
-            "\"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT + "\"" )
+            command_notify_common
+            +
+            "\""
+            +
+            IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT
+            +
+            "\"" )
 
         self.command_notify_nonbackground = (
-            "notify-send -i " + self.get_icon_name() +
-            " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " +
-            "\"" + _( "...has completed." ) + "\"" )
+            command_notify_common
+            +
+            "\""
+            +
+            _( "...has completed." )
+            +
+            "\"" )
 
 
     def update(
@@ -636,7 +655,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     def background_scripts_filter_func( self, model, treeiter, scripts ):
         group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
         if group is None:
-            show = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ] == '✔'
+            show = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ] == IndicatorBase.TICK_SYMBOL
 
         else:
             background_scripts_by_group = (
@@ -698,16 +717,16 @@ class IndicatorScriptRunner( IndicatorBase ):
                 row = [
                    None, # Don't add in the group name as it will be displayed.
                    script.get_name(),
-                   '✔' if script.get_play_sound() else None,
-                   '✔' if script.get_show_notification() else None,
-                   '✔' if isinstance( script, Background ) else None,
+                   IndicatorBase.TICK_SYMBOL if script.get_play_sound() else None,
+                   IndicatorBase.TICK_SYMBOL if script.get_show_notification() else None,
+                   IndicatorBase.TICK_SYMBOL if isinstance( script, Background ) else None,
                    '—'
                    if isinstance( script, Background ) else
-                   ( '✔' if script.get_terminal_open() else None ),
+                   ( IndicatorBase.TICK_SYMBOL if script.get_terminal_open() else None ),
                    str( script.get_interval_in_minutes() )
                    if isinstance( script, Background ) else
                    '—',
-                   ( '✔' if script.get_force_update() else None )
+                   ( IndicatorBase.TICK_SYMBOL if script.get_force_update() else None )
                    if isinstance( script, Background ) else
                    '—' ]
 
@@ -1502,11 +1521,22 @@ class IndicatorScriptRunner( IndicatorBase ):
                     " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi",
                     False, False, False, True ) )
 
+            system_usage = " \"System Usage:\" "
+            ram = "\"RAM: $( free | grep Mem | awk \'\\'' { printf \"%.0f\", $3/$2*100 } \'\\'' )%  "
+            hdd = "HDD: $( df -h /dev/sda2 | grep sda2 | awk \'\\'' { print $5 } \'\\''  )\""
             self.scripts.append(
                 NonBackground(
                     "System",
                     "RAM + HDD (/dev/sda2)",
-                    "notify-send -i " + self.get_icon_name() + " \"System Usage:\" \"RAM: $( free | grep Mem | awk \'\\'' { printf \"%.0f\", $3/$2*100 } \'\\'' )%  HDD: $( df -h /dev/sda2 | grep sda2 | awk \'\\'' { print $5 } \'\\''  )\"",
+                    "notify-send -i "
+                    +
+                    self.get_icon_name()
+                    +
+                    system_usage
+                    +
+                    ram
+                    +
+                    hdd,
                     False, False, False, False ) )
 
             self.scripts.append(

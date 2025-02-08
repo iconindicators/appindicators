@@ -155,6 +155,8 @@ class IndicatorBase( ABC ):
     SESSION_TYPE_WAYLAND = "wayland"
     SESSION_TYPE_X11 = "x11"
 
+    TICK_SYMBOL = '✔'
+
     TIMEOUT_IN_SECONDS = 10
 
     # Obtain name of indicator from the call stack and initialise gettext.
