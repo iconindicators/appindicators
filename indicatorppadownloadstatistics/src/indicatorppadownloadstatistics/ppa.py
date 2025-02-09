@@ -217,6 +217,35 @@ class PPA():
         return has_status_error
 
 
+    def __str__( self ):
+        return (
+            self.user + ' | ' +
+            self.name + ' | ' +
+            '[ ' + ' '.join( self.filters ) + ' ]' +
+            str( self.published_binaries ) )
+
+
+    def __repr__( self ):
+        return self.__str__()
+
+
+    def __eq__( self, other ):
+        return (
+            self.__class__ == other.__class__
+            and
+            self.get_user() == other.get_user()
+            and
+            self.get_name() == other.get_name()
+            and
+            self.get_filters() == other.get_filters()
+            and
+            self.get_status() == other.get_status()
+            and
+            len( self.get_published_binaries() ) == len( other.get_published_binaries() )
+            and
+            self.get_published_binaries().__eq__( other.get_published_binaries() ) )
+
+
     @staticmethod
     def sort_ppas_by_user_then_name_then_published_binaries(
         ppas,
@@ -332,43 +361,3 @@ class PPA():
                 sort_value = 0
 
         return sort_value
-
-
-    def __str__( self ):
-        return (
-            self.user + ' | ' +
-            self.name + ' | ' +
-            '[ ' + ' '.join( self.filters ) + ' ]' +
-            str( self.published_binaries ) )
-
-
-    def __repr__( self ):
-        return self.__str__()
-
-
-    def __eq__( self, other ):
-        equal = (
-            self.__class__ == other.__class__ and
-            self.get_user() == other.get_user() and
-            self.get_name() == other.get_name() and
-            self.get_filters() == other.get_filters() and
-            self.get_status() == other.get_status() and
-            len( self.get_published_binaries() ) == len( other.get_published_binaries() ) )
-
-#TODO I don't think sorting should be used...if two objects are the same except for the sort order, then they are not the same...
-        if equal:
-            z = (
-                zip(
-                    sorted(
-                        self.get_published_binaries(),
-                        key = operator.methodcaller( "__str__" ) ),
-                    sorted(
-                        other.get_published_binaries(),
-                        key = operator.methodcaller( "__str__" ) ) ) )
-
-            for published_binary_self, published_binary_other in z:
-                if not published_binary_self.__eq__( published_binary_other ):
-                    equal = False
-                    break
-
-        return equal
