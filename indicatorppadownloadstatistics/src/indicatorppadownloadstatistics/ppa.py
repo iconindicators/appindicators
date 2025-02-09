@@ -355,6 +355,7 @@ class PPA():
             self.get_status() == other.get_status() and
             len( self.get_published_binaries() ) == len( other.get_published_binaries() ) )
 
+#TODO I don't think sorting should be used...if two objects are the same except for the sort order, then they are not the same...
         if equal:
             z = (
                 zip(
