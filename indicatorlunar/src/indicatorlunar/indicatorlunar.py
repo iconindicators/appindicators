@@ -2928,6 +2928,7 @@ class IndicatorLunar( IndicatorBase ):
         natural_body_model_column_translated_name,
         natural_body_view_column_hide_show ):
 
+#TODO Goes into indicatorbase?
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect(
             "toggled",
@@ -2975,6 +2976,7 @@ class IndicatorLunar( IndicatorBase ):
             not liststore[ row ][ natural_body_model_column_hide_show ] )
 
 
+#TODO Goes into indicatorbase?
     def on_satellite_checkbox(
         self,
         cell_renderer_toggle,

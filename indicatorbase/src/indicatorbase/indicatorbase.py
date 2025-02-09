@@ -2727,6 +2727,7 @@ class IndicatorBase( ABC ):
         return directory
 
 
+#TODO Check every call to this to ensure things still work.
     def process_call(
         self,
         command ):

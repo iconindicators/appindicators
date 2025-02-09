@@ -229,6 +229,7 @@ class PPA():
         return self.__str__()
 
 
+#TODO Test this.
     def __eq__( self, other ):
         return (
             self.__class__ == other.__class__

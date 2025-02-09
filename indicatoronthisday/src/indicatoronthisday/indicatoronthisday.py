@@ -512,6 +512,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         return response_type
 
 
+#TODO Goes into indicatorbase
     def on_checkbox(
         self,
         cell_renderer_toggle,

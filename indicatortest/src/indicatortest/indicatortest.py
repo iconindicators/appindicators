@@ -484,6 +484,12 @@ class IndicatorTest( IndicatorBase ):
         store.append( [ "Sunday" ] )
 
         renderer_text_for_column_dayofweek = Gtk.CellRendererText()
+
+        renderer_text_for_column_dayofweek.connect(
+            "edited",
+            self.on_edit,
+            store )
+
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 store,
@@ -491,7 +497,7 @@ class IndicatorTest( IndicatorBase ):
                 ( ( renderer_text_for_column_dayofweek, "text", 0 ), ),
                 celldatafunctionandarguments_renderers_columnviewids = (
                     (
-                        ( self.data_function, "" ),
+                        ( self.data_function, renderer_text_for_column_dayofweek ),
                         renderer_text_for_column_dayofweek, 0 ), ),
                 tooltip_text = _(
                     "Days of week containing an 'n' are bold." ) ) )
@@ -524,7 +530,7 @@ class IndicatorTest( IndicatorBase ):
         cell_renderer,
         tree_model,
         tree_iter,
-        data ):
+        renderer_text_for_column_dayofweek ):
         '''
         References
             https://stackoverflow.com/q/52798356/2156453
@@ -533,8 +539,22 @@ class IndicatorTest( IndicatorBase ):
         '''
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
         day_of_week = tree_model.get_value( tree_iter, 0 )
+        renderer_text_for_column_dayofweek.set_property( "editable", False )
         if 'n' in day_of_week:
             cell_renderer.set_property( "weight", Pango.Weight.BOLD )
+            renderer_text_for_column_dayofweek.set_property( "editable", True )
+
+
+#TODO Revert this stuff...should not be here...only for testing/prototyping virtual box...
+# Once that is done, revert this back out.
+    def on_edit(
+            self,
+            cell_renderer,
+            path,
+            text_new,
+            store ):
+
+        store[ path ][ 0 ] = text_new
 
 
     def load_config(
