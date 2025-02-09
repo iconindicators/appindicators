@@ -218,8 +218,6 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.request_update( delay = 10 )
 
 
-#TODO Check this works...
-# What happens if there is an empty/dummy VM?
     def auto_start_virtual_machines(
         self,
         virtual_machines ):
@@ -227,7 +225,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         virtual_machines_for_autostart = (
             self._get_virtual_machines_for_autostart( virtual_machines ) )
 
-        # Start up each virtual machine and only insert the time delay if the
+        # Start up each virtual machine, inserting a delay if the virtual
         # machine was not already running.
         previous_virtual_machine_was_already_running = True
         need_one_last_sleep = False
@@ -245,8 +243,8 @@ class IndicatorVirtualBox( IndicatorBase ):
                 need_one_last_sleep = True
 
         if need_one_last_sleep:
-            # Small delay so that the running status of the last VM to start is
-            # captured (and displayed correctly in the subsequent menu build).
+            # Delay ensuring the running status of the last virtual machine
+            # starts up and is captured in the immediate update.
             time.sleep( 10 )
 
 
@@ -257,7 +255,9 @@ class IndicatorVirtualBox( IndicatorBase ):
         virtual_machines_for_autostart = [ ]
         for item in virtual_machines:
             if isinstance( item, Group ):
-                self._get_virtual_machines_for_autostart( item.get_items() )
+                virtual_machines_for_autostart += ( 
+                    self._get_virtual_machines_for_autostart(
+                        item.get_items() ) )
 
             else:
                 if self.is_autostart( item.get_uuid() ):
@@ -448,8 +448,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         self,
         uuid ):
 
-#TODO Shorten
-        return self.process_get( "VBoxManage list runningvms | grep " + uuid ) is not None  #TODO Check if can ever be None.
+        command = "VBoxManage list runningvms | grep " + uuid
+        return bool( self.process_get( command ) )
 
 
     def get_virtual_machines( self ):
@@ -508,9 +508,9 @@ class IndicatorVirtualBox( IndicatorBase ):
         uuid ):
 
         start_command = IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
-#TODO Shorten
         if uuid in self.virtual_machine_preferences:
-            start_command = self.virtual_machine_preferences[ uuid ][ IndicatorVirtualBox.PREFERENCES_START_COMMAND ]
+            preferences_for_uuid = self.virtual_machine_preferences[ uuid ]
+            start_command = preferences_for_uuid[ IndicatorVirtualBox.PREFERENCES_START_COMMAND ]
 
         return start_command
 
@@ -536,13 +536,29 @@ class IndicatorVirtualBox( IndicatorBase ):
         # Group name (remaining data is empty).
         #   or
         # Virtual machine name, autostart, start command, UUID.
-        treestore = Gtk.TreeStore( str, str, str, str )
+        treestore = Gtk.TreeStore( str, bool, str, str )
 
         items = [ ]
         if self.is_vboxmanage_installed():
             items = self.get_virtual_machines()
 
         groups_exist = self._add_items_to_store( treestore, None, items )
+
+#TODO Can/should this go into indicatorbase?
+# (along with the on_checkbox function below)
+# Used by fortune, onthisday, lunar.
+        renderer_toggle = Gtk.CellRendererToggle()
+        renderer_toggle.connect(
+            "toggled",
+            self.on_checkbox,
+            treestore,
+            IndicatorVirtualBox.COLUMN_AUTOSTART )
+
+        renderer_start_command = Gtk.CellRendererText()
+        renderer_start_command.connect(
+            "edited",
+            self.on_edited_start_command,
+            treestore )
 
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
@@ -557,19 +573,25 @@ class IndicatorVirtualBox( IndicatorBase ):
                         "text",
                         IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHINE_NAME ),
                     (
-                        Gtk.CellRendererText(),
-                        "text",
+                        renderer_toggle,
+                        "active",
                         IndicatorVirtualBox.COLUMN_AUTOSTART ),
                     (
-                        Gtk.CellRendererText(),
+                        # Gtk.CellRendererText(),  #THIS CAN GO
+                        renderer_start_command,
                         "text",
                         IndicatorVirtualBox.COLUMN_START_COMMAND ) ),
                 alignments_columnviewids = (
                     ( 0.5, IndicatorVirtualBox.COLUMN_AUTOSTART ), ),
                 tooltip_text = _(
-                    "Double click to edit a virtual machine's properties." ),
-                rowactivatedfunctionandarguments = (
-                    self.on_virtual_machine_double_click, ) ) )
+                    "Double click to edit a virtual machine's properties." ),  #TODO Change
+                celldatafunctionandarguments_renderers_columnviewids = (
+                    (
+                        ( self.data_function, renderer_start_command ),
+                        renderer_start_command, IndicatorVirtualBox.COLUMN_START_COMMAND ), ),
+                # rowactivatedfunctionandarguments = ( #TODO THIS CAN GO
+                #     self.on_virtual_machine_double_click, ) ) )
+                ) )
 
         notebook.append_page(
             scrolledwindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
@@ -712,15 +734,68 @@ class IndicatorVirtualBox( IndicatorBase ):
             else:
                 row = [
                     item.get_name(),
-                    IndicatorBase.TICK_SYMBOL
-                    if self.is_autostart( item.get_uuid() )
-                    else
-                    None,
+                    self.is_autostart( item.get_uuid() ),
                     self.get_start_command( item.get_uuid() ),
                     item.get_uuid() ]
                 treestore.append( parent, row )
 
         return groups_exist
+
+
+#TODO Goes into indicatorbase?
+    def on_checkbox(
+        self,
+        cell_renderer_toggle,
+        path,
+        store,
+        checkbox_model_column_id ):
+
+        path_ = path
+        store_ = store
+        if isinstance( store, Gtk.TreeModelSort ):  #TODO Need to handle filter?
+            print( "THIS IS A SORT")#TODO Remove
+            path_ = (
+                store_.convert_path_to_child_path(
+                    Gtk.TreePath.new_from_string( path_ ) ) )
+
+            store_ = store_.get_model()
+
+        store_[ path_ ][ checkbox_model_column_id ] = (
+            not store_[ path_ ][ checkbox_model_column_id ] )
+
+
+    def data_function(
+        self,
+        treeviewcolumn,
+        cell_renderer,
+        tree_model,
+        tree_iter,
+        renderer_start_command ):
+        '''
+        References
+            https://stackoverflow.com/q/52798356/2156453
+            https://stackoverflow.com/q/27745585/2156453
+            https://stackoverflow.com/q/49836499/2156453
+        '''
+
+        uuid = tree_model[ tree_iter ][ IndicatorVirtualBox.COLUMN_UUID ]
+        renderer_start_command.set_property( "editable", uuid is not None )
+
+
+    def on_edited_start_command(
+            self,
+            cell_renderer,
+            path,
+            text_new,
+            treestore ):
+
+        start_command = text_new.strip()
+        if len( start_command ) == 0:
+            start_command = (
+                IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT )
+
+        treestore[ path ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = (
+            start_command )
 
 
     def _update_virtual_machine_preferences(
@@ -731,7 +806,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 #TODO Shorten
         while treeiter:
             is_virtual_machine = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
-            is_autostart = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == IndicatorBase.TICK_SYMBOL
+            is_autostart = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ]
             is_default_start_command = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
             if ( is_virtual_machine and is_autostart ) or ( is_virtual_machine and not is_default_start_command ): # Only record VMs with different settings to default.
                 key = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
@@ -745,6 +820,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             treeiter = treestore.iter_next( treeiter )
 
 
+#TODO THIS CAN GO.
     def on_virtual_machine_double_click(
         self,
         tree,
@@ -753,7 +829,8 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         model, treeiter = tree.get_selection().get_selected()
         if treeiter and model[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]:
-            self.edit_virtual_machine( tree, model, treeiter )
+            pass
+            # self.edit_virtual_machine( tree, model, treeiter )
 
 
 #TODO This function appears to be only called from one place...above.
@@ -761,6 +838,8 @@ class IndicatorVirtualBox( IndicatorBase ):
 #
 #TODO Maybe make the autostart a checkbox in the treeview (same as fortune/onthisday)?
 # Maybe try making the textfield editable in place rather than have the popup below?
+#
+# I THINK THIS CAN GO...
     def edit_virtual_machine(
         self,
         tree,
