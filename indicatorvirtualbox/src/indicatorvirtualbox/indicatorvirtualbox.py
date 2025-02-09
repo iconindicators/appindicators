@@ -496,7 +496,6 @@ class IndicatorVirtualBox( IndicatorBase ):
                 uuid = line.split( "UUID:" )[ 1 ].strip()
                 add_virtual_machine( top_group, name, uuid, groups )
 
-        print( top_group.get_items() ) #TODO
         return top_group.get_items()
 
 
