@@ -577,21 +577,27 @@ class IndicatorVirtualBox( IndicatorBase ):
                         "active",
                         IndicatorVirtualBox.COLUMN_AUTOSTART ),
                     (
-                        # Gtk.CellRendererText(),  #THIS CAN GO
                         renderer_start_command,
                         "text",
                         IndicatorVirtualBox.COLUMN_START_COMMAND ) ),
                 alignments_columnviewids = (
                     ( 0.5, IndicatorVirtualBox.COLUMN_AUTOSTART ), ),
                 tooltip_text = _(
-                    "Double click to edit a virtual machine's properties." ),  #TODO Change
+                    "Click on a virtual machine's start command to edit. \n" +
+                    "An empty start command will reset back to default." ),
+
+#TODO INcorporate below into above.
+                    # "The terminal command to start the virtual machine such as\n\n" +
+                    # "\tVBoxManage startvm %VM%\n" +
+                    # "or\n" +
+                    # "\tVBoxHeadless --startvm %VM% --vrde off" ),
+
+
                 celldatafunctionandarguments_renderers_columnviewids = (
                     (
                         ( self.data_function, renderer_start_command ),
-                        renderer_start_command, IndicatorVirtualBox.COLUMN_START_COMMAND ), ),
-                # rowactivatedfunctionandarguments = ( #TODO THIS CAN GO
-                #     self.on_virtual_machine_double_click, ) ) )
-                ) )
+                        renderer_start_command,
+                        IndicatorVirtualBox.COLUMN_START_COMMAND ), ), ) )
 
         notebook.append_page(
             scrolledwindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
@@ -753,7 +759,6 @@ class IndicatorVirtualBox( IndicatorBase ):
         path_ = path
         store_ = store
         if isinstance( store, Gtk.TreeModelSort ):  #TODO Need to handle filter?
-            print( "THIS IS A SORT")#TODO Remove
             path_ = (
                 store_.convert_path_to_child_path(
                     Gtk.TreePath.new_from_string( path_ ) ) )
@@ -797,6 +802,15 @@ class IndicatorVirtualBox( IndicatorBase ):
         treestore[ path ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = (
             start_command )
 
+#TODO Need to check for %VM% ... see old code below.
+            # if not "%VM%" in start_command.get_text().strip():
+            #     message = _(
+            #         "The start command must contain %VM% which is substituted for the virtual machine name/id." )
+            #
+            #     self.show_dialog_ok( dialog, message )
+            #     start_command.grab_focus()
+            #     continue
+
 
     def _update_virtual_machine_preferences(
         self,
@@ -818,94 +832,6 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self._update_virtual_machine_preferences( treestore, childiter )
 
             treeiter = treestore.iter_next( treeiter )
-
-
-#TODO THIS CAN GO.
-    def on_virtual_machine_double_click(
-        self,
-        tree,
-        row_number,
-        treeviewcolumn ):
-
-        model, treeiter = tree.get_selection().get_selected()
-        if treeiter and model[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]:
-            pass
-            # self.edit_virtual_machine( tree, model, treeiter )
-
-
-#TODO This function appears to be only called from one place...above.
-# If that is the case, maybe just merge the code below with that above.
-#
-#TODO Maybe make the autostart a checkbox in the treeview (same as fortune/onthisday)?
-# Maybe try making the textfield editable in place rather than have the popup below?
-#
-# I THINK THIS CAN GO...
-    def edit_virtual_machine(
-        self,
-        tree,
-        model,
-        treeiter ):
-
-        grid = self.create_grid()
-
-        start_command = (
-#TODO Shorten
-            self.create_entry(
-                model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] if model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] else "",
-                tooltip_text = _(
-                    "The terminal command to start the virtual machine such as\n\n" +
-                    "\tVBoxManage startvm %VM%\n" +
-                    "or\n" +
-                    "\tVBoxHeadless --startvm %VM% --vrde off" ),
-                make_longer = True ) )
-
-        grid.attach(
-            self.create_box(
-                (
-                    ( Gtk.Label.new( _( "Start Command" ) ), False ),
-                    ( start_command, True ) ) ),
-            0, 0, 2, 1 )
-
-        autostart_checkbutton = (
-            self.create_checkbutton(
-                _( "Autostart" ),
-                tooltip_text = _(
-                    "Run the virtual machine when the indicator starts." ),
-                active = (
-                    model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] is not None
-                    and
-                    model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] == IndicatorBase.TICK_SYMBOL ) ) )
-
-        grid.attach( autostart_checkbutton, 0, 1, 2, 1 )
-
-        dialog = self.create_dialog( tree, _( "Virtual Machine Properties" ), content_widget = grid )
-        while True:
-            dialog.show_all()
-
-            if dialog.run() != Gtk.ResponseType.OK:
-                break
-
-            if start_command.get_text().strip() == "":
-                self.show_dialog_ok(
-                    dialog, _( "The start command cannot be empty." ) )
-
-                start_command.grab_focus()
-                continue
-
-            if not "%VM%" in start_command.get_text().strip():
-                message = _(
-                    "The start command must contain %VM% which is substituted for the virtual machine name/id." )
-
-                self.show_dialog_ok( dialog, message )
-                start_command.grab_focus()
-                continue
-
-            model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ] = IndicatorBase.TICK_SYMBOL if autostart_checkbutton.get_active() else None
-            model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = start_command.get_text().strip()
-
-            break
-
-        dialog.destroy()
 
 
     def load_config(
