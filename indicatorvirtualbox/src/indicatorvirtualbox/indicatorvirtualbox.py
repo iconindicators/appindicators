@@ -558,7 +558,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         renderer_start_command.connect(
             "edited",
             self.on_edited_start_command,
-            treestore )
+            treestore,
+            dialog )
 
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
@@ -583,21 +584,17 @@ class IndicatorVirtualBox( IndicatorBase ):
                 alignments_columnviewids = (
                     ( 0.5, IndicatorVirtualBox.COLUMN_AUTOSTART ), ),
                 tooltip_text = _(
-                    "Click on a virtual machine's start command to edit. \n" +
+                    "Click on a virtual machine's start command to edit.\n" +
+                    "The start command will take the form of:\n\n" +
+                    "\tVBoxManage startvm %VM%\n" +
+                    "or\n" +
+                    "\tVBoxHeadless --startvm %VM% --vrde off\n\n" +
                     "An empty start command will reset back to default." ),
-
-#TODO INcorporate below into above.
-                    # "The terminal command to start the virtual machine such as\n\n" +
-                    # "\tVBoxManage startvm %VM%\n" +
-                    # "or\n" +
-                    # "\tVBoxHeadless --startvm %VM% --vrde off" ),
-
-
                 celldatafunctionandarguments_renderers_columnviewids = (
                     (
                         ( self.data_function, renderer_start_command ),
                         renderer_start_command,
-                        IndicatorVirtualBox.COLUMN_START_COMMAND ), ), ) )
+                        IndicatorVirtualBox.COLUMN_START_COMMAND ), ) ) )
 
         notebook.append_page(
             scrolledwindow, Gtk.Label.new( _( "Virtual Machines" ) ) )
@@ -782,7 +779,6 @@ class IndicatorVirtualBox( IndicatorBase ):
             https://stackoverflow.com/q/27745585/2156453
             https://stackoverflow.com/q/49836499/2156453
         '''
-
         uuid = tree_model[ tree_iter ][ IndicatorVirtualBox.COLUMN_UUID ]
         renderer_start_command.set_property( "editable", uuid is not None )
 
@@ -792,24 +788,25 @@ class IndicatorVirtualBox( IndicatorBase ):
             cell_renderer,
             path,
             text_new,
-            treestore ):
+            treestore,
+            dialog ):
 
         start_command = text_new.strip()
         if len( start_command ) == 0:
             start_command = (
                 IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT )
 
-        treestore[ path ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = (
-            start_command )
+        if "%VM%" in start_command:
+            treestore[ path ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = (
+                start_command )
 
-#TODO Need to check for %VM% ... see old code below.
-            # if not "%VM%" in start_command.get_text().strip():
-            #     message = _(
-            #         "The start command must contain %VM% which is substituted for the virtual machine name/id." )
-            #
-            #     self.show_dialog_ok( dialog, message )
-            #     start_command.grab_focus()
-            #     continue
+        else:
+            self.show_dialog_ok(
+                dialog,
+                _(
+                    "The start command must contain\n" +
+                    "\t%VM%\n\n" +
+                    "which is substituted for the UUID." ) )
 
 
     def _update_virtual_machine_preferences(
