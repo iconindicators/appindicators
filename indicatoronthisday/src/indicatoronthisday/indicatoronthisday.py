@@ -340,6 +340,14 @@ class IndicatorOnThisDay( IndicatorBase ):
             store,
             IndicatorOnThisDay.COLUMN_ENABLED )
 
+#TODO Testing new way to edit.
+        renderer_calendar = Gtk.CellRendererText()
+        renderer_calendar.connect(
+            "edited",
+            self.on_edited_calendar,
+            store,
+            dialog )
+
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 store,
@@ -348,7 +356,8 @@ class IndicatorOnThisDay( IndicatorBase ):
                     _( "Enabled" ) ),
                 (
                     (
-                        Gtk.CellRendererText(),
+                        # Gtk.CellRendererText(),#TODO Original
+                        renderer_calendar,
                         "text",
                         IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
                     (
@@ -359,7 +368,12 @@ class IndicatorOnThisDay( IndicatorBase ):
                     ( 0.5, IndicatorOnThisDay.COLUMN_ENABLED ), ),
                 tooltip_text = _( "Double click to edit a calendar." ),
                 rowactivatedfunctionandarguments =
-                    ( self.on_calendar_double_click, dialog ) ) )
+                    ( self.on_calendar_double_click, dialog ),
+                celldatafunctionandarguments_renderers_columnviewids = (
+                    (
+                        ( self.data_function, renderer_calendar ),
+                        renderer_calendar,
+                        IndicatorOnThisDay.COLUMN_CALENDAR_FILE ), ), ) )
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
@@ -372,7 +386,8 @@ class IndicatorOnThisDay( IndicatorBase ):
                     _( "Add a new calendar." ),
                     _( "Remove the selected calendar." ) ),
                 (
-                    ( self.on_calendar_add, treeview ),
+                    # ( self.on_calendar_add, treeview ),
+                    ( self.on_add, treeview, dialog ),
                     ( self.on_calendar_remove, treeview ) ) ) )
 
         grid.attach( box, 0, 1, 1, 1 )
@@ -533,6 +548,64 @@ class IndicatorOnThisDay( IndicatorBase ):
             not store_[ path_ ][ checkbox_model_column_id ] )
 
 
+    def data_function(
+        self,
+        treeviewcolumn,
+        cell_renderer,
+        tree_model,
+        tree_iter,
+        renderer_calendar ):
+        '''
+        References
+            https://stackoverflow.com/q/52798356/2156453
+            https://stackoverflow.com/q/27745585/2156453
+            https://stackoverflow.com/q/49836499/2156453
+        '''
+        calendar = (
+            tree_model[ tree_iter ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
+
+        renderer_calendar.set_property(
+            "editable",
+            IndicatorOnThisDay.SYSTEM_CALENDARS not in calendar )
+
+
+    def on_edited_calendar(
+            self,
+            cell_renderer,
+            path,
+            text_new,
+            treestore,
+            dialog ):
+
+        calendar = text_new.strip()
+        if len( calendar ) == 0:
+            self.show_dialog_ok(
+                dialog, _( "The calendar path cannot be empty." ) )
+
+        elif IndicatorOnThisDay.SYSTEM_CALENDARS in calendar:
+            self.show_dialog_ok(
+                dialog,
+                _( "This calendar is part of your system and is already included." ) )
+
+
+
+
+            start_command = (
+                IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT )
+
+        if "%VM%" in start_command:
+            treestore[ path ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = (
+                start_command )
+
+        else:
+            self.show_dialog_ok(
+                dialog,
+                _(
+                    "The start command must contain\n" +
+                    "\t%VM%\n\n" +
+                    "which is substituted for the UUID." ) )
+
+
     def on_event_click_radio(
         self,
         source,
@@ -591,6 +664,53 @@ class IndicatorOnThisDay( IndicatorBase ):
                     if has_previous:
                         treeview.get_selection().select_path( treepath )
                         treeview.set_cursor( treepath, None, False )
+
+
+#TODO Testing
+    def on_add(
+        self,
+        button,
+        treeview,
+        dialog ):
+
+        dialog = (
+            self.create_filechooser_dialog(
+                _( "Choose a calendar file" ),
+                dialog, 
+                str( Path.home() ) ) )
+
+        response = dialog.run()
+        if response == Gtk.ResponseType.OK:
+#TODO Check if the filename has already been added.
+
+#TODO Check if not a system calendar?
+# Perhaps already covered in the duplicate check above.
+                # if IndicatorOnThisDay.SYSTEM_CALENDARS in path:
+                #     self.show_dialog_ok(
+                #         dialog,
+                #         _( "This calendar is part of your system and is "
+                #            +
+                #            "already included." ) )
+            
+            model = treeview.get_model().get_model()
+            filename = dialog.get_filename()
+            model.append( [ filename, True ] )
+            treepath = 0
+            for row in model:
+                if row[ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] == filename:
+                    break
+
+                treepath += 1
+
+            treepath = (
+                treeview.get_model().convert_child_path_to_path(
+                    Gtk.TreePath.new_from_string( str( treepath ) ) ) )
+
+            treeview.get_selection().select_path( treepath )
+            treeview.set_cursor( treepath, None, False )
+
+        dialog.destroy()
+
 
 
     def on_calendar_add(
