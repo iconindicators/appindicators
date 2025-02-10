@@ -673,13 +673,12 @@ class IndicatorOnThisDay( IndicatorBase ):
         treeview,
         dialog ):
 
-        dialog = (
+        response = (
             self.create_filechooser_dialog(
                 _( "Choose a calendar file" ),
-                dialog, 
-                str( Path.home() ) ) )
+                dialog,
+                str( Path.home() ) ) ).run()
 
-        response = dialog.run()
         if response == Gtk.ResponseType.OK:
 #TODO Check if the filename has already been added.
 
@@ -691,7 +690,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 #         _( "This calendar is part of your system and is "
                 #            +
                 #            "already included." ) )
-            
+
             model = treeview.get_model().get_model()
             filename = dialog.get_filename()
             model.append( [ filename, True ] )
@@ -741,10 +740,63 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         else:
             self._on_calendar_double_click(
-                treeview, row_number, treeviewcolumn )
+                treeview, row_number, treeviewcolumn, preferences_dialog )
 
 
     def _on_calendar_double_click(
+        self,
+        treeview,
+        row_number,
+        treeviewcolumn,
+        preferences_dialog ):
+
+        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        adding_calendar = row_number is None
+
+        dialog = (
+            self.create_filechooser_dialog(
+                _( "Choose a calendar file" ),
+                preferences_dialog,
+                str( Path.home() ) ) )
+
+        response = dialog.run()
+        dialog.destroy()
+
+        if response == Gtk.ResponseType.OK:
+            calendar_is_valid = True
+            for row in model_sort:
+                calendar = row[ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
+                if calendar == dialog.get_filename():
+                    self.show_dialog_ok(
+                        preferences_dialog,
+                        _( "This calendar already exists!" ) )
+
+                    calendar_is_valid = False
+                    break
+
+            if calendar_is_valid:
+                if not adding_calendar:
+                    model_sort.get_model().remove(
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) ) #TODO Check if correct - also see top of function and also remove.
+
+                model_sort.get_model().append( [ filename, True ] )
+                treepath = 0 for row in model_sort.get_model():
+                    calendar = row[ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
+                    if calendar == dialog.get_filename():
+                        break
+
+                    treepath += 1
+
+                treepath = (
+                    model_sort.convert_child_path_to_path(
+                        Gtk.TreePath.new_from_string( str( treepath ) ) ) )
+
+                treeview.get_selection().select_path( treepath )
+                treeview.set_cursor( treepath, None, False )
+
+
+#TODO Delete maybe?
+    def _on_calendar_double_clickORIGINAL(
         self,
         treeview,
         row_number,
