@@ -5,6 +5,19 @@
 #TODO In onthisday, I had a set of user calendars and system calendars...
 # but not so in fortune.
 # How to ensure the system fortune is always present in the preferences?
+#
+# Not sure if the above still applies...but...
+# Perhaps change the fortunes displayed in the preferences to the same as onthisday.
+# That is, rather than show a default/system directory, show all the .dat files
+# (after ensuring this is a corresponding file without extension) to the user,
+# with a checkbox next to each.
+#
+# Maybe also allow the checkbox column header to be clickable to select/clear all
+# as in lunar.
+
+
+#TODO onthisday now has a better, hopefully, add/edit.
+# Make that happen here too.
 
 
 # This program is free software: you can redistribute it and/or modify
