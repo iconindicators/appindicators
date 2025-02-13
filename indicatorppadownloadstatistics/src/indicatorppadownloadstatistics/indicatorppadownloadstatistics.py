@@ -22,6 +22,7 @@
 import concurrent.futures
 import locale
 
+from packaging.version import Version
 from threading import Lock
 
 import gi
@@ -890,10 +891,52 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         dialog.destroy()
 
 
-#TODO When all is sorted out with download and preferences,
-# use an old .json from old indicator name with hyphens
-# and ensure the old is copied to new location (name without hyphens)
-# and loads up.
+    def _upgrade_1_0_81(
+        self,
+        ppas,
+        filters ):
+
+        # In version 1.0.81, PPAs changed from
+        #   user | name | series | architecture
+        # to
+        #   user | name | filter
+        # and filters which had the format
+        #   user | name | series | architecture | filter text
+        # no longer exist.
+        for ppa in ppas:
+            user = ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ]
+            name = ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
+
+            no_duplicate_found = True
+            for ppa_ in self.ppas:
+                if ppa_.get_name() == name and ppa_.get_user() == user:
+                    no_duplicate_found = False
+                    break
+
+            if no_duplicate_found:
+                self.ppas.append( PPA( user, name ) )
+
+        for filter_ in filters:
+            user = filter_[ 0 ] # Indices of old format.
+            name = filter_[ 1 ]
+            filter_text = filter_[ 4 ]
+
+            for ppa in self.ppas:
+                if ppa.get_name() == name and ppa.get_user() == user:
+                    if ppa.has_default_filter():
+                        ppa.set_filters( filter_text )
+
+                    else:
+                        ppa.set_filters(
+                            list(
+                                set(
+                                    filter_text + ppa.get_filters() ) ) )
+
+                    break
+
+        self.request_save_config( 1 )
+
+
     def load_config(
         self,
         config ):
@@ -918,61 +961,23 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 IndicatorPPADownloadStatistics.CONFIG_SORT_BY_DOWNLOAD_AMOUNT,
                 5 ) )
 
-        if config:
-#TODO SHould use the version in the config here...?            
-            self.ppas = [ ]
-            ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
-            if ppas and len( ppas[ 0 ] ) == 3:
-                for ppa in ppas:
-                    self.ppas.append(
-                        PPA(
-                            ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ],
-                            ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
-
-                    self.ppas[ -1 ].set_filters(
-                        ppa[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] )
-
-            if ppas and len( ppas[ 0 ] ) == 4:
-                # In version 81, PPAs changed from
-                #   user / name / series / architecture
-                # to
-                #   user / name / filter
-                # and filters which had the format
-                #   user / name / series / architecture / filter text
-                # no longer exist.
-                for ppa in ppas:
-                    user = ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ]
-                    name = ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
-
-                    no_duplicate_found = True
-                    for ppa_ in self.ppas:
-                        if ppa_.get_name() == name and ppa_.get_user() == user:
-                            no_duplicate_found = False
-                            break
-
-                    if no_duplicate_found:
-                        self.ppas.append( PPA( user, name ) )
-
-                filters = config.get( "filters", [ ] )
-                for filter_ in filters:
-                    user = filter_[ 0 ] # Indices of old format.
-                    name = filter_[ 1 ]
-                    filter_text = filter_[ 4 ]
-
-                    for ppa in self.ppas:
-                        if ppa.get_name() == name and ppa.get_user() == user:
-                            if ppa.has_default_filter():
-                                ppa.set_filters( filter_text )
-
-                            else:
-                                ppa.set_filters(
-                                    list(
-                                        set(
-                                            filter_text + ppa.get_filters() ) ) )
-
-                            break
+        ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
+        self.ppas = [ ]
+        version_from_config = Version( self.get_version_from_config( config ) )
+        if version_from_config < Version( "1.0.81" ):
+            self._upgrade_1_0_81( ppas, config.get( "filters", [ ] ) )
 
         else:
+            for ppa in ppas:
+                self.ppas.append(
+                    PPA(
+                        ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ],
+                        ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
+
+                self.ppas[ -1 ].set_filters(
+                    ppa[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] )
+
+        if len( self.ppas ) == 0:
             self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
             self.ppas[ 0 ].set_filters( [
                 "indicator-fortune",
