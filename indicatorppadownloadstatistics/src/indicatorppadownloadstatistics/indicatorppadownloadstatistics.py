@@ -919,6 +919,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 5 ) )
 
         if config:
+#TODO SHould use the version in the config here...?            
             self.ppas = [ ]
             ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
             if ppas and len( ppas[ 0 ] ) == 3:
