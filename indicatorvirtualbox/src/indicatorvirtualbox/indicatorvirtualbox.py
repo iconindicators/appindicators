@@ -541,16 +541,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         groups_exist = self._add_items_to_store( treestore, None, items )
 
-#TODO Can/should this go into indicatorbase?
-# (along with the on_checkbox function below)
-# Used by fortune, onthisday, lunar.
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect(
-            "toggled",
-            self.on_checkbox,
-            treestore,
-            IndicatorVirtualBox.COLUMN_AUTOSTART )
-
         renderer_start_command = Gtk.CellRendererText()
         renderer_start_command.connect(
             "edited",
@@ -571,7 +561,9 @@ class IndicatorVirtualBox( IndicatorBase ):
                         "text",
                         IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHINE_NAME ),
                     (
-                        renderer_toggle,
+                        self.create_cell_renderer_toggle_for_checkbox_within_treeview(
+                            treestore,
+                            IndicatorVirtualBox.COLUMN_AUTOSTART ),
                         "active",
                         IndicatorVirtualBox.COLUMN_AUTOSTART ),
                     (
@@ -740,27 +732,6 @@ class IndicatorVirtualBox( IndicatorBase ):
                 treestore.append( parent, row )
 
         return groups_exist
-
-
-#TODO Goes into indicatorbase?
-    def on_checkbox(
-        self,
-        cell_renderer_toggle,
-        path,
-        store,
-        checkbox_model_column_id ):
-
-        path_ = path
-        store_ = store
-        if isinstance( store, Gtk.TreeModelSort ):  #TODO Need to handle filter?
-            path_ = (
-                store_.convert_path_to_child_path(
-                    Gtk.TreePath.new_from_string( path_ ) ) )
-
-            store_ = store_.get_model()
-
-        store_[ path_ ][ checkbox_model_column_id ] = (
-            not store_[ path_ ][ checkbox_model_column_id ] )
 
 
     def data_function(

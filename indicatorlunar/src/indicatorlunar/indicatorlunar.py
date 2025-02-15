@@ -2392,9 +2392,15 @@ class IndicatorLunar( IndicatorBase ):
 
         grid = self.create_grid()
 
-        satellite_tag_translations = (
-            self.list_of_lists_to_liststore(
-                IndicatorLunar.astro_backend.SATELLITE_TAG_TRANSLATIONS ) )
+        # Convert from list of lists to a Gtk ListStore.
+        types = [ ]
+        for item in IndicatorLunar.astro_backend.SATELLITE_TAG_TRANSLATIONS[ 0 ]:
+            types.append( type( item[ 0 ] ) )
+
+        satellite_tag_translations = Gtk.ListStore()
+        satellite_tag_translations.set_column_types( types )
+        for item in IndicatorLunar.astro_backend.SATELLITE_TAG_TRANSLATIONS:
+            satellite_tag_translations.append( item )
 
         message_text = (
             self.translate_text_using_tags(
@@ -2878,25 +2884,6 @@ class IndicatorLunar( IndicatorBase ):
                             body_tag + " " + data_tag, translated_tag, value ] )
 
 
-    def list_of_lists_to_liststore(
-        self,
-        list_of_lists ):
-        '''
-        Converts a list of lists to a GTK ListStore.
-        Each row of the returned ListStore contains one inner list.
-        '''
-        types = [ ]
-        for item in list_of_lists[ 0 ]:
-            types.append( type( item[ 0 ] ) )
-
-        liststore = Gtk.ListStore()
-        liststore.set_column_types( types )
-        for item in list_of_lists:
-            liststore.append( item )
-
-        return liststore
-
-
     def translate_text_using_tags(
         self,
         tags_list_store,
@@ -2940,14 +2927,13 @@ class IndicatorLunar( IndicatorBase ):
     def on_tags_values_double_click(
         self,
         tree,
-        row_number,
+        path,
         treeviewcolumn,
         translated_tag_column_index,
         indicator_textentry ):
 
-#TODO If we drop the TreeModelSort from the tags treeview, then rename/remove the _sort.
-        model_sort, treeiter_sort = tree.get_selection().get_selected()
-        value = model_sort[ treeiter_sort ][ translated_tag_column_index ]
+        model, treeiter = tree.get_selection().get_selected()
+        value = model[ treeiter ][ translated_tag_column_index ]
         indicator_textentry.insert_text(
             "[" + value + "]",
             indicator_textentry.get_position() )
