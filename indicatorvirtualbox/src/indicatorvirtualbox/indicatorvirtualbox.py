@@ -411,18 +411,15 @@ class IndicatorVirtualBox( IndicatorBase ):
             # window title.
             window_id = None
             command = (
-                "wmctrl -l | grep \"" +
-                self.virtualbox_manager_window_name + "\"" )
+                f"wmctrl -l | grep \"{ self.virtualbox_manager_window_name }\"" )
 
             result = self.process_get( command )
             if result:
                 window_id = result.split()[ 0 ]
-
-            if window_id is None or window_id == "":   #TODO Check if window_id can ever be None
-                start_virtualbox_manager()
+                self.process_call( f"wmctrl -ia { window_id }" )
 
             else:
-                self.process_call( "wmctrl -ia " + window_id )
+                start_virtualbox_manager()
 
 
     def get_running_virtual_machines( self ):
@@ -584,12 +581,12 @@ class IndicatorVirtualBox( IndicatorBase ):
                 alignments_columnviewids = (
                     ( 0.5, IndicatorVirtualBox.COLUMN_AUTOSTART ), ),
                 tooltip_text = _(
-                    "Click on a virtual machine's start command to edit.\n" +
-                    "The start command will take the form of:\n\n" +
+                    "Click on a virtual machine's start command to edit.\n\n" +
+                    "The start command takes the form:\n\n" +
                     "\tVBoxManage startvm %VM%\n" +
                     "or\n" +
                     "\tVBoxHeadless --startvm %VM% --vrde off\n\n" +
-                    "An empty start command will reset back to default." ),
+                    "An empty start command resets to default." ),
                 celldatafunctionandarguments_renderers_columnviewids = (
                     (
                         ( self.data_function, renderer_start_command ),

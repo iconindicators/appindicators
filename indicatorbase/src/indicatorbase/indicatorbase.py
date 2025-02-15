@@ -60,6 +60,7 @@ import webbrowser
 from abc import ABC, abstractmethod
 from bisect import bisect_right
 from importlib import metadata
+from packaging.version import Version
 from pathlib import Path, PosixPath
 from threading import Lock
 from urllib.error import HTTPError, URLError
@@ -289,8 +290,8 @@ class IndicatorBase( ABC ):
 
         data_json, error_network, error_timeout = self.get_json( url )
         if data_json:
-            version_latest = data_json[ "info" ][ "version" ]
-            if version_latest != str( self.version ):
+            version_pypi = Version( data_json[ "info" ][ "version" ] )
+            if Version( self.version ) < version_pypi:
                 self.new_version_available = True
                 self.show_notification( summary, message )
 
@@ -2012,13 +2013,17 @@ class IndicatorBase( ABC ):
         title,
         parent,
         filename,
-        action = Gtk.FileChooserAction.OPEN ):
+        action = Gtk.FileChooserAction.OPEN,
+        file_filter = None ):
 
         dialog = (
             Gtk.FileChooserDialog(
                 title = title,
                 parent = parent,
                 action = action ) )
+
+        if file_filter:
+            dialog.add_filter( file_filter )
 
         dialog.add_buttons(
             Gtk.STOCK_CANCEL,
@@ -2294,6 +2299,13 @@ class IndicatorBase( ABC ):
 
         if not config_file.is_file() and config_file_old.is_file():
             shutil.copyfile( config_file_old, config_file )
+
+
+    def get_version_from_config(
+            self,
+            config ):
+        ''' Return the version from the config file. '''
+        return config[ IndicatorBase._CONFIG_VERSION ]
 
 
     def request_save_config(

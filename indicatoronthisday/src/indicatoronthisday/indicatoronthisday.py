@@ -49,6 +49,7 @@ import time
 
 from datetime import datetime, timedelta
 from itertools import chain, groupby
+from packaging.version import Version
 from pathlib import Path
 
 import gi
@@ -723,6 +724,20 @@ class IndicatorOnThisDay( IndicatorBase ):
         return system_calendar_default
 
 
+    def _upgrade_1_0_17( self ):
+        # Prior to 1.0.17, calendars were saved as a list of paths.
+        # Convert to new format where each calendar path is stored with a
+        # corresponding boolean (whether the calendar is enabled or not).
+        if self.calendars:
+            calendars = [ ]
+            for calendar in self.calendars:
+                calendars.append( [ calendar, True ] )
+
+            self.calendars = calendars
+
+        self.request_save_config( 1 )
+
+
     def load_config(
         self,
         config ):
@@ -736,15 +751,9 @@ class IndicatorOnThisDay( IndicatorBase ):
                 else
                 [ ] ) )
 
-        if self.calendars and isinstance( self.calendars[ 0 ], str ):
-            # Prior to 1.0.17, calendars were saved as a list of paths.
-            # Convert to new format where each calendar path is save with a
-            # corresponding boolean (whether the calendar is enabled or not).
-            calendars = [ ]
-            for calendar in self.calendars:
-                calendars.append( [ calendar, True ] )
-
-            self.calendars = calendars
+        version_from_config = Version( self.get_version_from_config( config ) )
+        if version_from_config < Version( "1.0.17" ):
+            self._upgrade_1_0_17()
 
         self.copy_to_clipboard = (
             config.get(

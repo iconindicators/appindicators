@@ -713,8 +713,8 @@ class IndicatorLunar( IndicatorBase ):
             int( round( float(
                 self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_ILLUMINATION, ) ] ) ) ) )
 
-        bright_limb_angle_in_degrees = \
-            int( math.degrees( float( self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) )
+        bright_limb_angle_in_degrees = (
+            int( math.degrees( float( self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) ) )
 
         svg_icon_text = (
             self.get_svg_icon_text(
@@ -963,9 +963,9 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Third Quarter: " ), key + ( IndicatorLunar.astro_backend.DATA_TAG_THIRD_QUARTER, ) ] )
 
             for date_time, display_text, key in sorted( next_phases, key = lambda pair: pair[ 0 ] ): # Sort by date of each phase (the first element).
-                label = \
+                label = (
                     display_text + \
-                    self.format_data( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] )
+                    self.format_data( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] ) )
 
                 self.create_and_append_menuitem(
                     submenu,
@@ -1567,9 +1567,9 @@ class IndicatorLunar( IndicatorBase ):
 
                 else: # Satellite will rise more than five minutes from now; look at previous transit.
                     if key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) in self.data_previous:
-                        in_transit = \
+                        in_transit = (
                             self.data_previous[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] < utc_now_plus_five_minutes and \
-                            self.data_previous[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] > utc_now
+                            self.data_previous[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] > utc_now )
 
                         if in_transit:
                             satellites.append( [
@@ -1918,8 +1918,8 @@ class IndicatorLunar( IndicatorBase ):
 
         else: # First/Third Quarter or Waning/Waxing Crescent or Waning/Waxing Gibbous
             body = (
-                '<path d="M ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + ' ' + \
-                'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' + \
+                '<path d="M ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + ' ' +
+                'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' +
                 str( width / 2 + radius ) + ' ' + str( height / 2 ) )
 
             is_first_quarter_or_third_quarter = (
@@ -1962,9 +1962,11 @@ class IndicatorLunar( IndicatorBase ):
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
-        # Pages in the notebooks are numbered leftwise from zero,
-        # with only some pages needing to be referenced.
+        page_icon = 0
         page_menu = 1
+        page_natural_bodies = 2
+        page_satellite = 3
+        page_notifications = 4
         page_location = 5
 
         # Icon text.
@@ -2008,9 +2010,9 @@ class IndicatorLunar( IndicatorBase ):
                     ( indicator_text_separator, False ) ) ),
             0, 1, 1, 1 )
 
-        # Treeview to display attributes of selected/checked bodies.
+        # Calculated attributes of selected/checked bodies.
         # If a body's magnitude passes through the magnitude filter,
-        # all attributes (rise/set/az/alt) will be displayed in this table,
+        # all attributes (rise/set/az/alt) will be displayed,
         # irrespective of the setting to hide bodies below the horizon.
         column_model_tag = 0
         column_model_translated_tag = 1
@@ -2029,13 +2031,12 @@ class IndicatorLunar( IndicatorBase ):
                 True,
                 self.indicator_text ) ) # Translate tags into local language.
 
-#TODO Allow user sorting...but is the treemodelsort needed for this to work?
-# Seems not...
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
-#                Gtk.TreeModelSort( model = display_tags_store ),
                 display_tags_store,
-                ( _( "Tag" ), _( "Value" ) ),
+                (
+                    _( "Tag" ),
+                    _( "Value" ) ),
                 (
                     (
                         Gtk.CellRendererText(),
@@ -2052,7 +2053,8 @@ class IndicatorLunar( IndicatorBase ):
                     "Double click to add a tag to the icon text." ),
                 rowactivatedfunctionandarguments = (
                     self.on_tags_values_double_click,
-                    column_model_translated_tag, indicator_text ) ) )
+                    column_model_translated_tag,
+                    indicator_text ) ) )
 
         grid.attach( scrolledwindow, 0, 2, 1, 1 )
 
@@ -2095,8 +2097,11 @@ class IndicatorLunar( IndicatorBase ):
         grid.attach(
             self.create_box(
                 (
-                    ( Gtk.Label.new( _( "Hide bodies fainter than magnitude" ) ), False ),
-                    ( spinner_magnitude, False ) ),
+                    (
+                        Gtk.Label.new( _( "Hide bodies fainter than magnitude" ) ),
+                        False ),
+                    (   spinner_magnitude,
+                        False ) ),
                     margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
                     margin_left = 5 ),
             0, 2, 1, 1 )
@@ -2162,10 +2167,18 @@ class IndicatorLunar( IndicatorBase ):
         grid.attach(
             self.create_box(
                 (
-                    ( Gtk.Label.new( _( "Show satellites passes from" ) ), False ),
-                    ( spinner_satellite_limit_start, False ),
-                    ( Gtk.Label.new( _( "to" ) ), False ),
-                    ( spinner_satellite_limit_end, False ) ),
+                    (
+                        Gtk.Label.new( _( "Show satellites passes from" ) ),
+                        False ),
+                    (
+                        spinner_satellite_limit_start,
+                        False ),
+                    (
+                        Gtk.Label.new( _( "to" ) ),
+                        False ),
+                    (
+                        spinner_satellite_limit_end,
+                        False ) ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
                 margin_left = 5 ),
             0, 7, 1, 1 )
@@ -2194,8 +2207,8 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Planets" ),
                 _(
                     "Check a planet to display in the menu.\n\n" +
-                    "Clicking the header of the first column\n" +
-                    "will toggle all checkboxes." ),
+                    "Click the header of the first column\n" +
+                    "to toggle all checkboxes." ),
                 natural_body_model_column_hide_show,
                 natural_body_model_column_translated_name,
                 natural_body_view_column_hide_show ) )
@@ -2208,19 +2221,27 @@ class IndicatorLunar( IndicatorBase ):
                 minor_planet,
                 self.minor_planet_orbital_element_data[ minor_planet ].get_name() ] )
 
+        minor_planet_data_available = (
+            self.minor_planet_orbital_element_data
+            and
+            self.minor_planet_apparent_magnitude_data )
+
+        tooltip = (
+            _(
+                "Check a minor planet to display in the menu.\n\n" +
+                "Click the header of the first column\n" +
+                "to toggle all checkboxes." )
+                if minor_planet_data_available else _(
+                "Minor planet data is unavailable;\n" +
+                "the source could not be reached,\n" +
+                "or no data was available, or the data\n" +
+                "was completely filtered by magnitude." ) )
+
         scrolledwindow_minor_planets = (
             self.create_natural_body_treeview_within_scrolledwindow(
                 minor_planet_store,
                 _( "Minor Planets" ),
-                _(
-                    "Check a minor planet to display in the menu.\n\n" +
-                    "Clicking the header of the first column\n" +
-                    "will toggle all checkboxes." )
-                    if self.minor_planet_orbital_element_data and self.minor_planet_apparent_magnitude_data else _(
-                    "Minor planet data is unavailable;\n" +
-                    "the source could not be reached,\n" +
-                    "or no data was available, or the data\n" +
-                    "was completely filtered by magnitude." ),
+                tooltip,
                 natural_body_model_column_hide_show,
                 natural_body_model_column_translated_name,
                 natural_body_view_column_hide_show ) )
@@ -2239,8 +2260,8 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Comets" ),
                 _(
                     "Check a comet to display in the menu.\n\n" +
-                    "Clicking the header of the first column\n" +
-                    "will toggle all checkboxes." )
+                    "Click the header of the first column\n" +
+                    "to toggle all checkboxes." )
                     if self.comet_orbital_element_data else _(
                     "Comet data is unavailable; the source\n" +
                     "could not be reached, or no data was\n" +
@@ -2268,8 +2289,8 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Stars" ),
                 _(
                     "Check a star to display in the menu.\n\n" +
-                    "Clicking the header of the first column\n" +
-                    "will toggle all checkboxes." ),
+                    "Click the header of the first column\n" +
+                    "to toggle all checkboxes." ),
                 natural_body_model_column_hide_show,
                 natural_body_model_column_translated_name,
                 natural_body_view_column_hide_show ) )
@@ -2298,15 +2319,19 @@ class IndicatorLunar( IndicatorBase ):
         # Show/hide, name, number, international designator.
         satellite_store = Gtk.ListStore( bool, str, str, str )
         for satellite in self.satellite_general_perturbation_data:
+            satellite_object = (
+                self.satellite_general_perturbation_data[ satellite ] )
+
             satellite_store.append( [
                 satellite in self.satellites,
-                self.satellite_general_perturbation_data[ satellite ].get_name(),
+                satellite_object.get_name(),
                 satellite,
-                self.satellite_general_perturbation_data[ satellite ].get_international_designator() ] )
+                satellite_object.get_international_designator() ] )
 
 #TODO Is the treemodelsort needed?
         satellite_store_sort = Gtk.TreeModelSort( model = satellite_store )
 
+#TODO Can this be a generic function?  See fortune etc...
         renderer_toggle = Gtk.CellRendererToggle()
         renderer_toggle.connect(
             "toggled",
@@ -2315,48 +2340,64 @@ class IndicatorLunar( IndicatorBase ):
             satellite_store_sort,
             satellite_model_column_hide_show )
 
-#TODO Can this instead use the (eventual) generic function to create
-# a treeview with multiple columns, one of which is a boolean/checkbox?
-#
-# NOT SURE WHAT THE ABOVE TODO IS SAYING...!
-#
-#TODO Allow the user to sort by column header, but need a treesortmodel to do this?
-# Seems not...
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
 #                satellite_store_sort,
                 satellite_store,
-                ( "", _( "Name" ), _( "Number" ), _( "International Designator" ) ),
+                ( "",
+                  _( "Name" ),
+                  _( "Number" ),
+                  _( "International Designator" ) ),
                 (
-                    ( renderer_toggle, "active", satellite_model_column_hide_show ),
-                    ( Gtk.CellRendererText(), "text", satellite_model_column_name ),
-                    ( Gtk.CellRendererText(), "text", satellite_model_column_number ),
-                    ( Gtk.CellRendererText(), "text", satellite_model_column_international_designator ) ),
-                alignments_columnviewids = ( ( 0.5, satellite_view_column_hide_show ), ),
+                    (
+                        renderer_toggle,
+                        "active",
+                        satellite_model_column_hide_show ),
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        satellite_model_column_name ),
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        satellite_model_column_number ),
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        satellite_model_column_international_designator ) ),
+                alignments_columnviewids = (
+                    ( 0.5, satellite_view_column_hide_show ), ),
                 sortcolumnviewids_columnmodelids = (
-                    ( satellite_view_column_name, satellite_model_column_name ),
-                    ( satellite_view_column_number, satellite_model_column_number ),
-                    ( satellite_view_column_international_designator, satellite_model_column_international_designator ) ),
+                    (
+                        satellite_view_column_name,
+                        satellite_model_column_name ),
+                    (
+                        satellite_view_column_number,
+                        satellite_model_column_number ),
+                    (
+                        satellite_view_column_international_designator,
+                        satellite_model_column_international_designator ) ),
                 tooltip_text = _(
                     "Check a satellite to display in the menu.\n\n" +
-                    "Clicking the header of the first column\n" +
-                    "will toggle all checkboxes." )
+                    "Click the header of the first column\n" +
+                    "to toggle all checkboxes." )
                     if self.satellite_general_perturbation_data else _(
                     "Satellite data is unavailable;\n" +
                     "the source could not be reached,\n" +
-                    "or data was available." ),
+                    "or no data was available." ),
                 clickablecolumnviewids_functionsandarguments = (
                 (
                     satellite_view_column_hide_show,
                     (
                         self.on_columnheader,
-                        satellite_store, satellite_model_column_hide_show ), ), ) ) )
+                        satellite_store,
+                        satellite_model_column_hide_show ), ), ) ) )
 
         notebook.append_page(
             self.create_box( ( ( scrolledwindow, True ), ) ),
             Gtk.Label.new( _( "Satellites" ) ) )
 
-        # Notifications (satellite and full moon).
+        # Notifications.
         notify_osd_information = _(
             "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD" )
 
@@ -2379,16 +2420,22 @@ class IndicatorLunar( IndicatorBase ):
                 self.satellite_notification_summary ) )
 
         tooltip_common = (
-            IndicatorLunar.astro_backend.SATELLITE_TAG_NAME_TRANSLATION + "\n\t" +
-            IndicatorLunar.astro_backend.SATELLITE_TAG_NUMBER_TRANSLATION + "\n\t" +
-            IndicatorLunar.astro_backend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION + "\n\t" +
-            IndicatorLunar.astro_backend.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION + "\n\t" +
-            IndicatorLunar.astro_backend.SATELLITE_TAG_RISE_TIME_TRANSLATION + "\n\t" +
-            IndicatorLunar.astro_backend.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION + "\n\t" +
-            IndicatorLunar.astro_backend.SATELLITE_TAG_SET_TIME_TRANSLATION + "\n\t" +
+            IndicatorLunar.astro_backend.SATELLITE_TAG_NAME_TRANSLATION +
+            "\n\t" +
+            IndicatorLunar.astro_backend.SATELLITE_TAG_NUMBER_TRANSLATION +
+            "\n\t" +
+            IndicatorLunar.astro_backend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION +
+            "\n\t" +
+            IndicatorLunar.astro_backend.SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION +
+            "\n\t" +
+            IndicatorLunar.astro_backend.SATELLITE_TAG_RISE_TIME_TRANSLATION +
+            "\n\t" +
+            IndicatorLunar.astro_backend.SATELLITE_TAG_SET_AZIMUTH_TRANSLATION +
+            "\n\t" +
+            IndicatorLunar.astro_backend.SATELLITE_TAG_SET_TIME_TRANSLATION +
+            "\n\n" +
             _( notify_osd_information ) )
 
-#TODO Something broken here...
         summary_tooltip = _(
             "The summary for the satellite rise notification.\n\n" +
             "Available tags:\n\t" +
@@ -2399,7 +2446,6 @@ class IndicatorLunar( IndicatorBase ):
             "Available tags:\n\t" +
             tooltip_common )
 
-        # Additional lines are added to the message to ensure the textview for the message text is not too small.
         show_satellite_notification_checkbox, satellite_notification_summary_text, satellite_notification_messaget_ext = (
             self.create_notification_panel(
                 grid,
@@ -2417,7 +2463,6 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Show the notification using the current summary/message." ),
                 False ) )
 
-        # Additional lines are added to the message to ensure the textview for the message text is not too small.
         show_werewolf_warning_checkbox, werewolf_notification_summary_text, werewolf_notification_message_text = (
             self.create_notification_panel(
                 grid,
@@ -2430,8 +2475,10 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Hourly screen notification leading up to full moon." ),
                 _( "Message" ) + "\n \n ",
                 self.werewolf_warning_message,
-                _( "The message for the werewolf notification.\n\n" ) + notify_osd_information,
-                _( "Test" ), _( "Show the notification using the current summary/message." ),
+                _( "The message for the werewolf notification.\n\n" ) +
+                notify_osd_information,
+                _( "Test" ),
+                _( "Show the notification using the current summary/message." ),
                 True ) )
 
         show_werewolf_warning_checkbox.set_margin_top(
@@ -2509,9 +2556,8 @@ class IndicatorLunar( IndicatorBase ):
 
         city.set_active( cities.index( self.city ) )
 
-        # Must set the values here AFTER city is selected,
-        # as the user may set a different latitude/longitude/elevation
-        # to that defaulted with the city.
+        # Set the latitude/longitude/elevation after city is selected,
+        # as the user may have set different values to the city defaults.
         latitude.set_text( str( self.latitude ) )
         longitude.set_text( str( self.longitude ) )
         elevation.set_text( str( self.elevation ) )
@@ -2716,7 +2762,6 @@ class IndicatorLunar( IndicatorBase ):
         return response_type
 
 
-#TODO Review this function...
     def initialise_display_tags_store(
         self,
         display_tags_store ):
@@ -2936,10 +2981,12 @@ class IndicatorLunar( IndicatorBase ):
             treemodel,
             natural_body_model_column_hide_show )
 
-        treeview, scrolledwindow = \
+        treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 treemodel,
-                ( "", title, ),
+                (
+                    "",
+                    title, ),
                 (
                     (
                         renderer_toggle,
@@ -2958,7 +3005,7 @@ class IndicatorLunar( IndicatorBase ):
                     (
                         self.on_columnheader,
                         treemodel,
-                        natural_body_model_column_hide_show ), ), ) )
+                        natural_body_model_column_hide_show ), ), ) ) )
 
         return scrolledwindow
 

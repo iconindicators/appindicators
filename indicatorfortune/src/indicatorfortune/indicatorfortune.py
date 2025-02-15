@@ -38,7 +38,10 @@
 
 
 import codecs
+import fnmatch
+import os
 
+from packaging.version import Version
 from pathlib import Path
 
 import gi
@@ -59,7 +62,7 @@ class IndicatorFortune( IndicatorBase ):
     indicator_categories = "Categories=Utility;Amusement"
 
     # Fortune treeview columns; model and view have same columns.
-    COLUMN_FILE_OR_DIRECTORY = 0 # Either the fortune filename or directory.
+    COLUMN_FORTUNE_FILE = 0 # Path to fortune .dat file.
     COLUMN_ENABLED = 1 # Boolean.
 
     CONFIG_FORTUNES = "fortunes"
@@ -89,9 +92,8 @@ class IndicatorFortune( IndicatorBase ):
         self,
         menu ):
 
-#TODO Testing...uncomment the next two lines
-        # self.refresh_fortune()
-        # self.show_fortune()
+        self.refresh_fortune()
+        self.show_fortune()
         self.build_menu( menu )
         return int( self.refresh_interval_in_minutes ) * 60
 
@@ -146,10 +148,7 @@ class IndicatorFortune( IndicatorBase ):
         for location, enabled in self.fortunes:
             if enabled:
                 at_least_one_fortune_is_enabled = True
-                if Path( location ).is_dir():
-                    locations.append( " '" + location + "/' " )
-
-                elif Path( location ).is_file():
+                if Path( location ).is_file():
                     locations.append(
                         " '" + location.replace( ".dat", "" ) + "' " )
 
@@ -159,8 +158,8 @@ class IndicatorFortune( IndicatorBase ):
 
         summary = _( "WARNING. . ." )
         if locations:
+            command = "fortune" + ''.join( locations )
             while True:
-                command = "fortune" + ''.join( locations )
                 fortune = self.process_get( command )
                 if not fortune: # No fortune data found.
                     message = _( "Ensure enabled fortunes contain data!" )
@@ -216,11 +215,13 @@ class IndicatorFortune( IndicatorBase ):
 
     def show_history( self ):
 
-        # Scroll to the end:
-        #   https://stackoverflow.com/q/5218948/2156453
         def textview_changed(
             textview,
             rectangle ):
+            '''
+            Scrolls to the end:
+                https://stackoverflow.com/q/5218948/2156453
+            '''
 
             adjustment = textview.get_parent().get_vadjustment()
             adjustment.set_value(
@@ -276,20 +277,20 @@ class IndicatorFortune( IndicatorBase ):
         for location, enabled in self.fortunes:
             store.append( [ location, enabled ] )
 
-        # Ensure the system fortune is present in the list of fortunes,
+        # Ensure the system fortunes are present in the list of fortunes,
         # not just those selected/defined by the user.
-        system_fortune = self.get_system_fortune()
-        system_fortune_in_user_fortunes = (
-            [ system_fortune, True ] in self.fortunes
-            or
-            [ system_fortune, False ] in self.fortunes )
+        for system_fortune in self.get_system_fortunes():
+            system_fortune_in_user_fortunes = (
+                [ system_fortune, True ] in self.fortunes
+                or
+                [ system_fortune, False ] in self.fortunes )
 
-        if not system_fortune_in_user_fortunes:
-            store.append( [ system_fortune, False ] )
+            if not system_fortune_in_user_fortunes:
+                store.append( [ system_fortune, False ] )
 
         store = Gtk.TreeModelSort( model = store )
         store.set_sort_column_id(
-            IndicatorFortune.COLUMN_FILE_OR_DIRECTORY, Gtk.SortType.ASCENDING )
+            IndicatorFortune.COLUMN_FORTUNE_FILE, Gtk.SortType.ASCENDING )
 
 #TODO Can/should this go into indicatorbase?
 # (along with the on_checkbox function below)
@@ -305,26 +306,20 @@ class IndicatorFortune( IndicatorBase ):
             self.create_treeview_within_scrolledwindow(
                 store,
                 (
-                    _( "Fortune File/Directory" ),
+                    _( "Fortune" ),
                     _( "Enabled" ) ),
                 (
                     (
                         Gtk.CellRendererText(),
                         "text",
-                        IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ),
+                        IndicatorFortune.COLUMN_FORTUNE_FILE ),
                     (
                         renderer_toggle,
                         "active",
                         IndicatorFortune.COLUMN_ENABLED ) ),
                 alignments_columnviewids = (
                     ( 0.5, IndicatorFortune.COLUMN_ENABLED ), ),
-                tooltip_text = _(
-                    "Double click to edit a fortune.\n\n" +
-                    "English language fortunes are\n" +
-                    "installed by default.\n\n" +
-                    "There may be other fortune\n" +
-                    "packages available in your\n" +
-                    "native language." ),
+                tooltip_text = _( "Double click to edit a fortune." ),
                 rowactivatedfunctionandarguments =
                     ( self.on_fortune_double_click, dialog ) ) )
 
@@ -339,7 +334,7 @@ class IndicatorFortune( IndicatorBase ):
                     _( "Add a new fortune location." ),
                     _( "Remove the selected fortune location." ) ),
                 (
-                    ( self.on_fortune_add, treeview ),
+                    ( self.on_fortune_add, treeview, dialog ),
                     ( self.on_fortune_remove, treeview ) ) ) )
 
         grid.attach( box, 0, 1, 1, 1 )
@@ -397,7 +392,6 @@ class IndicatorFortune( IndicatorBase ):
                     ( spinner_character_count, False ) ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 2, 1, 1 )
-
 
         label = Gtk.Label.new( _( "Middle mouse click of the icon" ) )
 
@@ -494,7 +488,7 @@ class IndicatorFortune( IndicatorBase ):
                 row = store[ treeiter ]
                 self.fortunes.append(
                     [
-                        row[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ],
+                        row[ IndicatorFortune.COLUMN_FORTUNE_FILE ],
                         row[ IndicatorFortune.COLUMN_ENABLED ] ] )
 
                 treeiter = store.iter_next( treeiter )
@@ -542,10 +536,9 @@ class IndicatorFortune( IndicatorBase ):
         else:
             selected_fortune = (
                 model_sort[
-                    treeiter_sort ][
-                        IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] )
+                    treeiter_sort ][ IndicatorFortune.COLUMN_FORTUNE_FILE ] )
 
-            if selected_fortune == self.get_system_fortune():
+            if selected_fortune in self.get_system_fortunes():
                 self.show_dialog_ok(
                     treeview,
                     _( "This is the system fortune and cannot be removed." ) )
@@ -574,246 +567,228 @@ class IndicatorFortune( IndicatorBase ):
     def on_fortune_add(
         self,
         button,
-        treeview ):
+        treeview,
+        preferences_dialog ):
 
-        self._on_fortune_double_click( treeview, None, None )
+        self._on_fortune_double_click(
+            treeview, None, None, preferences_dialog )
 
 
     def on_fortune_double_click(
         self,
         treeview,
-        row_number,
+        path,
         treeviewcolumn,
         preferences_dialog ):
 
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        path = (
+        fortune = (
             model_sort[
-                treeiter_sort ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] )
+                treeiter_sort ][ IndicatorFortune.COLUMN_FORTUNE_FILE ] )
 
-        if path == self.get_system_fortune():
+        if fortune in self.get_system_fortunes():
             self.show_dialog_ok(
                 preferences_dialog,
-                _( "This is the system fortune and cannot be modified." ) )
+                _( "This is a system fortune and cannot be modified." ) )
 
         else:
             self._on_fortune_double_click(
-                treeview, row_number, treeviewcolumn )
+                treeview, path, treeviewcolumn, preferences_dialog )
 
 
+#TODO Can this function and the add/remove be combined with indicatoronthisday?
     def _on_fortune_double_click(
         self,
         treeview,
-        row_number,
-        treeviewcolumn ):
+        path,
+        treeviewcolumn,
+        preferences_dialog ):
 
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        adding_fortune = row_number is None
-
-        grid = self.create_grid()
+        adding_fortune = path is None
 
         if adding_fortune:
-            title = _( "Add Fortune" )
+            start_file = str( Path.home() )
 
         else:
-            title = _( "Edit Fortune" )
+            start_file = (
+                model_sort[ path ][ IndicatorFortune.COLUMN_FORTUNE_FILE ] )
 
-        dialog = self.create_dialog( treeview, title, content_widget = grid )
+        dot_dat_file_filter = Gtk.FileFilter()
+        dot_dat_file_filter.set_name( "Fortune files" )
+        dot_dat_file_filter.add_pattern( "*.dat" )
 
-        fortune_file_directory = (
-            self.create_entry(
-                ''
-                if adding_fortune
-                else
-                model_sort[ treeiter_sort ][ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ],  #TODO Should model be model.get_model() or however the treeiter is supposed to be converted?
-                tooltip_text = _(
-                    "The path to a fortune .dat file,\n" +
-                    "or a directory containing\n" +
-                    "fortune .dat files.\n\n" +
-                    "Ensure the corresponding\n" +
-                    "fortune text file(s) is present." ),
-                editable = False,
-                make_longer = True ) )
+        dialog = (
+            self.create_filechooser_dialog(
+                _( "Choose a fortune .dat file" ),
+                preferences_dialog,
+                str( Path.home() )
+                if adding_fortune else
+                model_sort[ path ][ IndicatorFortune.COLUMN_FORTUNE_FILE ],
+                file_filter = dot_dat_file_filter ) )
 
-        grid.attach(
-            self.create_box(
-                (
-                    ( Gtk.Label.new( _( "Fortune file/directory" ) ), False ),
-                    ( fortune_file_directory, True ) ) ),
-            0, 0, 1, 1 )
+        response = dialog.run()
+        filename = dialog.get_filename()
+        dialog.destroy()
 
-        browse_file_button = (
-            self.create_button(
-                _( "File" ),
-                tooltip_text = _(
-                    "Choose a fortune .dat file.\n\n" +
-                    "Ensure the corresponding text\n" +
-                    "file is present." ),
-                clicked_functionandarguments = (
-                    self.on_browse_fortune,
-                    dialog,
-                    fortune_file_directory,
-                    True ) ) )
-
-        browse_directory_button = (
-            self.create_button(
-                _( "Directory" ),
-                tooltip_text = _(
-                    "Choose a directory containing\n" +
-                    "a fortune .dat file(s).\n\n" +
-                    "Ensure the corresponding text\n" +
-                    "file is present." ),
-                clicked_functionandarguments = (
-                    self.on_browse_fortune,
-                    dialog,
-                    fortune_file_directory,
-                    False ) ) )
-
-        grid.attach(
-            self.create_box(
-                (
-                    ( browse_file_button, True ),
-                    ( browse_directory_button, True ) ),
-                halign = Gtk.Align.END,
-                homogeneous = True ),
-            0, 1, 1, 1 )
-
-        while True:
-            dialog.show_all()
-            if dialog.run() == Gtk.ResponseType.OK:
-                path = fortune_file_directory.get_text().strip()
-                if path == "":
+        if response == Gtk.ResponseType.OK:
+            fortune_already_present = False
+            for row in model_sort:
+                fortune = row[ IndicatorFortune.COLUMN_FORTUNE_FILE ]
+                if fortune == filename:
                     self.show_dialog_ok(
-                        dialog, _( "The fortune path cannot be empty." ) )
+                        preferences_dialog,
+                        _( "This fortune already exists!" ) )
 
-                    fortune_file_directory.grab_focus()
-                    continue
+                    fortune_already_present = True
+                    break
 
-                if self.get_system_fortune() in path:
-                    self.show_dialog_ok(
-                        dialog,
-                        _(
-                            "This fortune is part of your system and is " +
-                            "already included." ) )
-
-                    continue
-
-                if not adding_fortune: # This is an edit; remove the old path.
+            if not fortune_already_present:
+                if not adding_fortune:
                     model_sort.get_model().remove(
-                        model_sort.convert_iter_to_child_iter( treeiter_sort ) ) #TODO Check if correct - also see top of function and also remove.
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
 
-                model_sort.get_model().append( [ path, True ] )
+                model_sort.get_model().append( [ filename, True ] )
 
                 treepath = 0
                 for row in model_sort.get_model():
-                    if row[ IndicatorFortune.COLUMN_FILE_OR_DIRECTORY ] == path:
+                    fortune = row[ IndicatorFortune.COLUMN_FORTUNE_FILE ]
+                    if fortune == filename:
                         break
 
                     treepath += 1
 
-#TODO Is all the code below needed?
-#                treeview.expand_all()
                 treepath = (
                     model_sort.convert_child_path_to_path(
                         Gtk.TreePath.new_from_string( str( treepath ) ) ) )
 
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
-#                treeview.scroll_to_cell( treepath )
-
-            break
-
-        dialog.destroy()
 
 
-    def on_browse_fortune(
-        self,
-        file_or_directory_button,
-        add_edit_dialog,
-        fortune_file_directory,
-        is_file ):
-
-        if is_file:
-            title = _( "Choose a fortune .dat file" )
-            action = Gtk.FileChooserAction.OPEN
-
-        else:
-            title = _( "Choose a directory containing a fortune .dat file(s)" )
-            action = Gtk.FileChooserAction.SELECT_FOLDER
-
-        dialog = (
-            self.create_filechooser_dialog(
-                title,
-                add_edit_dialog,
-                fortune_file_directory.get_text(),
-                action = action ) )
-
-        response = dialog.run()
-        if response == Gtk.ResponseType.OK:
-            fortune_file_directory.set_text( dialog.get_filename() )
-
-        dialog.destroy()
-
-
-    def get_system_fortune( self ):
+    def _get_system_fortune_path( self ):
         SYSTEM_FORTUNE_DEBIAN = "/usr/share/games/fortunes"
         SYSTEM_FORTUNE_FEDORA = "/usr/share/games/fortune"
         SYSTEM_FORTUNE_MANJARO = "/usr/share/fortune"
         SYSTEM_FORTUNE_OPENSUSE = "/usr/share/fortune"
 
-        system_fortune = None
+        system_fortune_path = None
         if Path( SYSTEM_FORTUNE_DEBIAN ).exists():
-            system_fortune = SYSTEM_FORTUNE_DEBIAN
+            system_fortune_path = SYSTEM_FORTUNE_DEBIAN
 
         elif Path( SYSTEM_FORTUNE_FEDORA ).exists():
-            system_fortune = SYSTEM_FORTUNE_FEDORA
+            system_fortune_path = SYSTEM_FORTUNE_FEDORA
 
         elif Path( SYSTEM_FORTUNE_MANJARO ).exists():
-            system_fortune = SYSTEM_FORTUNE_MANJARO
+            system_fortune_path = SYSTEM_FORTUNE_MANJARO
 
         elif Path( SYSTEM_FORTUNE_OPENSUSE ).exists():
-            system_fortune = SYSTEM_FORTUNE_OPENSUSE
+            system_fortune_path = SYSTEM_FORTUNE_OPENSUSE
 
-        return system_fortune
+        return system_fortune_path
+
+
+    def get_system_fortunes( self ):
+        '''
+        Returns a list of the system fortunes; may be empty.
+        '''
+        fortunes = [ ]
+
+        system_fortune_path = self._get_system_fortune_path()
+        if system_fortune_path:
+            # Ideally use Path.walk() but only available in Python 3.12.
+            walk_generator = os.walk( system_fortune_path )
+            for root, directories, filenames in walk_generator:
+                for filename in fnmatch.filter( filenames, "*.dat" ):
+                    fortunes.append( str( Path( root ).joinpath( filename ) ) )
+
+            fortunes.sort()
+
+        return fortunes
+
+
+    def get_system_fortune_default( self ):
+        '''
+        Get the default system fortune.
+
+        On success returns fortunes.dat.
+        Otherwise, returns None.
+        '''
+        system_fortune_default = None
+        system_fortune_path = self._get_system_fortune_path()
+        if system_fortune_path:
+            system_fortune_default = (
+                Path( system_fortune_path ) / "fortunes.dat" )
+
+        return system_fortune_default
+
+
+    def _upgrade_1_0_44( self ):
+        if self.fortunes:
+            # Prior to 1.0.44, fortunes were specified as either a directory
+            # of .dat files, or as a single .dat file.
+            #
+            # Fortunes are now only specified as single .dat files.
+            #
+            # Any fortune specified as a directory must be converted to
+            # individual their respective .dat files within.
+            fortunes = [ ]
+            for fortune in self.fortunes:
+                path = Path( fortune[ 0 ] )
+                if path.is_dir():
+                    walk_generator = os.walk( path )
+                    for root, directories, filenames in walk_generator:
+                        for filename in fnmatch.filter( filenames, "*.dat" ):
+                            fortunes.append( [
+                                str( Path( root ).joinpath( filename ) ),
+                                fortune[ 1 ] ] )
+
+                else:
+                    fortunes.append( fortune )
+
+            self.fortunes = fortunes
+
+        if self.notification_summary == "":
+            # Prior to 1.0.44 it was possible for the user to set an empty
+            # notification summary.
+            # On some platforms a notification of "" causes an error and so
+            # a notification of "" was amended " " prior to display.
+            #
+            # Now the preferences checks for "" and sets to " " on a save.
+            #
+            # If a notification in the user properties file is set to "",
+            # correct for this here.
+            self.notification_summary = " "
+
+        self.request_save_config( 1 )
 
 
     def load_config(
         self,
         config ):
 
+        system_fortune_default = self.get_system_fortune_default()
         self.fortunes = (
             config.get(
                 IndicatorFortune.CONFIG_FORTUNES,
-                [ self.get_system_fortune(), True ]
-                if self.get_system_fortune()
+                [ system_fortune_default, True ]
+                if system_fortune_default
                 else
                 [ ] ) )
-
-        # self.fortunes.append( [ "/home/bernard/Downloads", True ] ) #TODO Testing
-        # self.fortunes.append( [ "/home/bernard/Programming", False ] ) #TODO Testing
-        # self.fortunes.append( [ "/home/bernard/UnknownDirectory", True ] ) #TODO Testing
-        # self.fortunes.append( [ "/home/bernard/AnotherUnknownDirectory", False ] ) #TODO Testing
-
-        self.middle_mouse_click_on_icon = (
-            config.get(
-                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON,
-                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
 
         self.notification_summary = (
             config.get(
                 IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY,
                 IndicatorFortune.NOTIFICATION_SUMMARY ) )
 
-        # Prior to 1.0.44 it was possible for the user to set an empty
-        # notification summary which was amended from "" to " " prior to the
-        # notification being displayed.
-        #
-        # Now the preferences checks for "" and sets to " " on a save.
-        #
-        # However it is possible a user has "" still saved in their properties
-        # file, so need this check here.
-        if self.notification_summary == "":
-            self.notification_summary = " "
+        version_from_config = Version( self.get_version_from_config( config ) )
+        if version_from_config < Version( "1.0.44" ):
+            self._upgrade_1_0_44()
+
+        self.middle_mouse_click_on_icon = (
+            config.get(
+                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON,
+                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
 
         self.refresh_interval_in_minutes = (
             config.get(
@@ -821,8 +796,8 @@ class IndicatorFortune( IndicatorBase ):
                 15 ) )
 
         # From experimentation, estimate around 45 characters per line.
-        # However, to ensure word boundaries are maintained,
-        # reduce to 40 characters per line (with at most 9 lines).
+        # To ensure word boundaries are maintained, reduce to 40 characters,
+        # with at most 9 lines.
         self.skip_fortune_character_count = (
             config.get(
                 IndicatorFortune.CONFIG_SKIP_FORTUNE_CHARACTER_COUNT,

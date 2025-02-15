@@ -2,6 +2,7 @@
 
 ## v1.0.44 (2024-09-04)
 
+- Fortunes are now defined by their .dat file, rather than an entire directory, allowing for precise control.
 - Fixed PyGObject 3.11 deprecation warnings.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Now includes an opt-in check during start up for the latest version at PyPI.

@@ -265,8 +265,8 @@ class AstroBase( ABC ):
     #        Contains around 96 stars, with some names misspelt.
     #        Not all stars in PyEphem are present in this list.
     #
-    # Ultimately, start with PyEphem's list of stars and drop those which are not
-    # listed in the IAU CSN Catalog.
+    # Ultimately, start with PyEphem's list of stars and drop those which are
+    # not listed in the IAU CSN Catalog.
     #
     # DO NOT EDIT: Content must be created using 'create_ephemeris_stars.py'.
     STARS = [
@@ -377,7 +377,8 @@ class AstroBase( ABC ):
         [ "ZAURAK",            18543,  _( "Zaurak" ),            _( "ZAURAK" ) ],
         [ "ZUBENELGENUBI",     72622,  _( "Zubenelgenubi" ),     _( "ZUBENELGENUBI" ) ] ]
 
-    SATELLITE_SEARCH_DURATION_HOURS = 75 # Number of hours to search from 'now' for visible satellite passes.
+    # Number of hours to search from 'now' for visible satellite passes.
+    SATELLITE_SEARCH_DURATION_HOURS = 75
 
     SATELLITE_TAG_NAME = "[NAME]"
     SATELLITE_TAG_NUMBER = "[NUMBER]"
@@ -426,9 +427,11 @@ class AstroBase( ABC ):
             SATELLITE_TAG_SET_TIME.strip( "[]" ),
             SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
 
-    # Miscellaneous.
     MAGNITUDE_MAXIMUM = 15.0 # More than adequate for the home astronomer.
-    MAGNITUDE_MINIMUM = -10.0 # Have found (erroneous) magnitudes in comet OE data which are brighter than the sun, so set a lower limit.
+
+    # Comet OE data occasionally contains erroneous magnitudes
+    # which are brighter than the sun, so set a lower limit.
+    MAGNITUDE_MINIMUM = -10.0
 
 
     @staticmethod
@@ -605,8 +608,10 @@ class AstroBase( ABC ):
         # Not really sure what can be done, or should be done;
         # leave things as they are and the caller can catch the error/exception.
         numerator = (
-            body_sun_distance_au * body_sun_distance_au +
-            body_earth_distance_au * body_earth_distance_au -
+            body_sun_distance_au * body_sun_distance_au
+            +
+            body_earth_distance_au * body_earth_distance_au
+            -
             earth_sun_distance_au * earth_sun_distance_au )
 
         denominator = 2 * body_sun_distance_au * body_earth_distance_au
@@ -618,8 +623,10 @@ class AstroBase( ABC ):
         psi_2 = math.exp( -1.87 * psi_t )
 
         apparent_magnitude = (
-            h_absolute_magnitude +
-            5.0 * math.log10( body_sun_distance_au * body_earth_distance_au ) -
+            h_absolute_magnitude
+            +
+            5.0 * math.log10( body_sun_distance_au * body_earth_distance_au )
+            -
             2.5 * math.log10( ( 1 - g_slope ) * psi_1 + g_slope * psi_2 ) )
 
         return apparent_magnitude
@@ -671,8 +678,7 @@ class AstroBase( ABC ):
         utc_now,
         longitude ):
         '''
-        Compute the sidereal decimal time for the given longitude (in
-        floating point radians).
+        The sidereal decimal time for the given longitude in radians.
 
         Reference
             Practical Astronomy with Your Calculator by Peter Duffett-Smith.
@@ -705,8 +711,13 @@ class AstroBase( ABC ):
         # Find universal time.  Section 12 of the reference.
         s = julian_date - 2451545.0
         t = s / 36525.0
+
         t0 = ( 6.697374558 + ( 2400.051336 * t ) + ( 0.000025862 * t * t ) ) % 24
-        universal_time_decimal = ( ( ( utc_now.second / 60 ) + utc_now.minute ) / 60 ) + utc_now.hour
+        universal_time_decimal = (
+            ( ( ( utc_now.second / 60 ) + utc_now.minute ) / 60 )
+            +
+            utc_now.hour )
+
         a = universal_time_decimal * 1.002737909
         greenwich_sidereal_time_decimal = ( a + t0 ) % 24
 
@@ -746,9 +757,9 @@ class AstroBase( ABC ):
         Other references
             http://www.mat.uc.pt/~efemast/help/en/lua_fas.htm
             https://sites.google.com/site/astronomicalalgorithms
-            http://stackoverflow.com/questions/13463965/pyephem-sidereal-time-gives-unexpected-result
+            https://stackoverflow.com/q/13463965/2156453
             https://github.com/brandon-rhodes/pyephem/issues/24
-            http://stackoverflow.com/questions/13314626/local-solar-time-function-from-utc-and-longitudeInDegrees/13425515#13425515
+            https://stackoverflow.com/a/13425515/2156453
             http://astro.ukho.gov.uk/data/tn/naotn74.pdf
         '''
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
@@ -781,7 +792,10 @@ class AstroBase( ABC ):
 
         parallactic_angle = math.atan2( y, x )
 
-        return ( position_angle_of_bright_limb - parallactic_angle ) % ( 2.0 * math.pi )
+        return (
+            ( position_angle_of_bright_limb - parallactic_angle )
+            %
+            ( 2.0 * math.pi ) )
 
 
     @staticmethod
