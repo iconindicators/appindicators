@@ -2328,21 +2328,8 @@ class IndicatorLunar( IndicatorBase ):
                 satellite,
                 satellite_object.get_international_designator() ] )
 
-#TODO Is the treemodelsort needed?
-        satellite_store_sort = Gtk.TreeModelSort( model = satellite_store )
-
-#TODO Can this be a generic function?  See fortune etc...
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect(
-            "toggled",
-            self.on_satellite_checkbox,
-            satellite_store,
-            satellite_store_sort,
-            satellite_model_column_hide_show )
-
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
-#                satellite_store_sort,
                 satellite_store,
                 ( "",
                   _( "Name" ),
@@ -2350,7 +2337,9 @@ class IndicatorLunar( IndicatorBase ):
                   _( "International Designator" ) ),
                 (
                     (
-                        renderer_toggle,
+                        self.create_cell_renderer_toggle_for_checkbox_within_treeview(
+                            satellite_store,
+                            satellite_model_column_hide_show ),
                         "active",
                         satellite_model_column_hide_show ),
                     (
@@ -2973,14 +2962,6 @@ class IndicatorLunar( IndicatorBase ):
         natural_body_model_column_translated_name,
         natural_body_view_column_hide_show ):
 
-#TODO Goes into indicatorbase?
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect(
-            "toggled",
-            self.on_natural_body_checkbox,
-            treemodel,
-            natural_body_model_column_hide_show )
-
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 treemodel,
@@ -2989,7 +2970,9 @@ class IndicatorLunar( IndicatorBase ):
                     title, ),
                 (
                     (
-                        renderer_toggle,
+                        self.create_cell_renderer_toggle_for_checkbox_within_treeview(
+                            treemodel,
+                            natural_body_model_column_hide_show ),
                         "active",
                         natural_body_model_column_hide_show ),
                     (
@@ -3008,42 +2991,6 @@ class IndicatorLunar( IndicatorBase ):
                         natural_body_model_column_hide_show ), ), ) ) )
 
         return scrolledwindow
-
-
-#TODO Can this function and the one below be made generic and put into indicatorbase?
-# See also fortune/onthisday.
-    def on_natural_body_checkbox(
-        self,
-        cell_renderer_toggle,
-        row,
-        liststore,
-        natural_body_model_column_hide_show ):
-
-        liststore[ row ][ natural_body_model_column_hide_show ] = (
-            not liststore[ row ][ natural_body_model_column_hide_show ] )
-
-
-#TODO Goes into indicatorbase?
-    def on_satellite_checkbox(
-        self,
-        cell_renderer_toggle,
-        row,
-        liststore,
-        sortstore,
-        satellite_model_column_hide_show ):
-
-        liststore[ row ][ satellite_model_column_hide_show ] = (
-            not liststore[ row ][ satellite_model_column_hide_show ] )
-
-#TODO Original code below; new code above (for testing if treemodelsort is actually needed).
-        '''
-        actual_row = (
-            sortstore.convert_path_to_child_path(
-                Gtk.TreePath.new_from_string( row ) ) ) # Convert sorted model index to underlying (child) model index.
-
-        liststore[ actual_row ][ satellite_model_column_hide_show ] = (
-            not liststore[ actual_row ][ satellite_model_column_hide_show ] )
-        '''
 
 
     def on_columnheader(

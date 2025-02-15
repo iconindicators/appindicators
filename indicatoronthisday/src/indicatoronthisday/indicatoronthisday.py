@@ -331,16 +331,6 @@ class IndicatorOnThisDay( IndicatorBase ):
         store.set_sort_column_id(
             IndicatorOnThisDay.COLUMN_CALENDAR_FILE, Gtk.SortType.ASCENDING )
 
-#TODO Can/should this go into indicatorbase?
-# (along with the on_checkbox function below)
-# Used by fortune, onthisday, lunar.
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect(
-            "toggled",
-            self.on_checkbox,
-            store,
-            IndicatorOnThisDay.COLUMN_ENABLED )
-
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 store,
@@ -353,7 +343,9 @@ class IndicatorOnThisDay( IndicatorBase ):
                         "text",
                         IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
                     (
-                        renderer_toggle,
+                        self.create_cell_renderer_toggle_for_checkbox_within_treeview(
+                            store,
+                            IndicatorOnThisDay.COLUMN_ENABLED ),
                         "active",
                         IndicatorOnThisDay.COLUMN_ENABLED ) ),
                 alignments_columnviewids = (
@@ -511,27 +503,6 @@ class IndicatorOnThisDay( IndicatorBase ):
                 latest_version_checkbox.get_active() )
 
         return response_type
-
-
-#TODO Goes into indicatorbase
-    def on_checkbox(
-        self,
-        cell_renderer_toggle,
-        path,
-        store,
-        checkbox_model_column_id ):
-
-        path_ = path
-        store_ = store
-        if isinstance( store, Gtk.TreeModelSort ):  #TODO Need to handle filter?
-            path_ = (
-                store_.convert_path_to_child_path(
-                    Gtk.TreePath.new_from_string( path_ ) ) )
-
-            store_ = store_.get_model()
-
-        store_[ path_ ][ checkbox_model_column_id ] = (
-            not store_[ path_ ][ checkbox_model_column_id ] )
 
 
     def on_event_click_radio(

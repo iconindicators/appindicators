@@ -2,24 +2,6 @@
 # -*- coding: utf-8 -*-
 
 
-#TODO In onthisday, I had a set of user calendars and system calendars...
-# but not so in fortune.
-# How to ensure the system fortune is always present in the preferences?
-#
-# Not sure if the above still applies...but...
-# Perhaps change the fortunes displayed in the preferences to the same as onthisday.
-# That is, rather than show a default/system directory, show all the .dat files
-# (after ensuring this is a corresponding file without extension) to the user,
-# with a checkbox next to each.
-#
-# Maybe also allow the checkbox column header to be clickable to select/clear all
-# as in lunar.
-
-
-#TODO onthisday now has a better, hopefully, add/edit.
-# Make that happen here too.
-
-
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -292,16 +274,6 @@ class IndicatorFortune( IndicatorBase ):
         store.set_sort_column_id(
             IndicatorFortune.COLUMN_FORTUNE_FILE, Gtk.SortType.ASCENDING )
 
-#TODO Can/should this go into indicatorbase?
-# (along with the on_checkbox function below)
-# Used by fortune, onthisday, lunar.
-        renderer_toggle = Gtk.CellRendererToggle()
-        renderer_toggle.connect(
-            "toggled",
-            self.on_checkbox,
-            store,
-            IndicatorFortune.COLUMN_ENABLED )
-
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 store,
@@ -314,7 +286,9 @@ class IndicatorFortune( IndicatorBase ):
                         "text",
                         IndicatorFortune.COLUMN_FORTUNE_FILE ),
                     (
-                        renderer_toggle,
+                        self.create_cell_renderer_toggle_for_checkbox_within_treeview(
+                            store,
+                            IndicatorFortune.COLUMN_ENABLED ),
                         "active",
                         IndicatorFortune.COLUMN_ENABLED ) ),
                 alignments_columnviewids = (
@@ -499,28 +473,6 @@ class IndicatorFortune( IndicatorBase ):
                 latest_version_checkbox.get_active() )
 
         return response_type
-
-
-#TODO This will likely go into indicatorbase...
-# ...but also check that something similar has not already been done.
-    def on_checkbox(
-        self,
-        cell_renderer_toggle,
-        path,
-        store,
-        checkbox_model_column_id ):
-
-        path_ = path
-        store_ = store
-        if isinstance( store, Gtk.TreeModelSort ):  #TODO Need/how to handle filter?
-            path_ = (
-                store_.convert_path_to_child_path(
-                    Gtk.TreePath.new_from_string( path_ ) ) )
-
-            store_ = store_.get_model()
-
-        store_[ path_ ][ checkbox_model_column_id ] = (
-            not store_[ path_ ][ checkbox_model_column_id ] )
 
 
     def on_fortune_remove(
