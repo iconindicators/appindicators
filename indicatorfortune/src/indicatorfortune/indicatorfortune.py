@@ -308,8 +308,19 @@ class IndicatorFortune( IndicatorBase ):
                     _( "Add a new fortune location." ),
                     _( "Remove the selected fortune location." ) ),
                 (
-                    ( self.on_fortune_add, treeview, dialog ),
+                    None,
                     ( self.on_fortune_remove, treeview ) ) ) )
+
+        add.connect(
+            "clicked", self.on_fortune_add, treeview, dialog, remove )
+
+        if len( store ):
+            treepath = Gtk.TreePath.new_from_string( '0' )
+            treeview.get_selection().select_path( treepath )
+            treeview.set_cursor( treepath, None, False )
+
+        else:
+            remove.set_sensitive( False )
 
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -481,49 +492,51 @@ class IndicatorFortune( IndicatorBase ):
         treeview ):
 
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        if treeiter_sort is None:
+        selected_fortune = (
+            model_sort[
+                treeiter_sort ][ IndicatorFortune.COLUMN_FORTUNE_FILE ] )
+
+        if selected_fortune in self.get_system_fortunes():
             self.show_dialog_ok(
-                treeview, _( "No fortune has been selected for removal." ) )
+                treeview,
+                _( "This is a system fortune and cannot be removed." ) )
 
         else:
-            selected_fortune = (
-                model_sort[
-                    treeiter_sort ][ IndicatorFortune.COLUMN_FORTUNE_FILE ] )
+            response = (
+                self.show_dialog_ok_cancel(
+                    treeview, _( "Remove the selected fortune?" ) ) )
 
-            if selected_fortune in self.get_system_fortunes():
-                self.show_dialog_ok(
-                    treeview,
-                    _( "This is the system fortune and cannot be removed." ) )
+            if response == Gtk.ResponseType.OK:
+                treepath = (
+                    Gtk.TreePath.new_from_string(
+                        model_sort.get_string_from_iter( treeiter_sort ) ) )
 
-            else:
-                response = (
-                    self.show_dialog_ok_cancel(
-                        treeview,
-                        _( "Remove the selected fortune?" ) ) )
+                has_previous = treepath.prev()
 
-                if response == Gtk.ResponseType.OK:
-                    treepath = (
-                        Gtk.TreePath.new_from_string(
-                            model_sort.get_string_from_iter( treeiter_sort ) ) )
+                model_sort.get_model().remove(
+                    model_sort.convert_iter_to_child_iter( treeiter_sort ) )
 
-                    has_previous = treepath.prev()
+#TODO Test these two clauses.
+                if has_previous:
+                    treeview.get_selection().select_path( treepath )
+                    treeview.set_cursor( treepath, None, False )
 
-                    model_sort.get_model().remove(
-                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
-
-                    if has_previous:
-                        treeview.get_selection().select_path( treepath )
-                        treeview.set_cursor( treepath, None, False )
+                else:
+                    button.set_sensitive( False )
 
 
     def on_fortune_add(
         self,
         button,
         treeview,
-        preferences_dialog ):
+        preferences_dialog,
+        button_remove ):
 
         self._on_fortune_double_click(
             treeview, None, None, preferences_dialog )
+
+        if len( treeview.get_model() ) > 0:
+            button_remove.set_sensitive( True )
 
 
     def on_fortune_double_click(

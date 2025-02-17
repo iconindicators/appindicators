@@ -24,6 +24,8 @@ Implementation classes for background and non-background scripts.
 '''
 
 
+import locale
+
 from abc import ABC
 
 
@@ -101,6 +103,36 @@ class Info( ABC ):
 
     def __repr__( self ):
         return self.__str__()
+
+
+    @staticmethod
+    def compare(
+        group1,
+        name1,
+        group2,
+        name2 ):
+        ''' Compare two Infos by group, then by name. '''
+        group1_ = locale.strxfrm( group1 )
+        group2_ = locale.strxfrm( group2 )
+        if group1_ < group2_:
+            sort_value = -1
+
+        elif group1_ > group2_:
+            sort_value = 1
+
+        else:
+            name1_ = locale.strxfrm( name1 )
+            name2_ = locale.strxfrm( name2 )
+            if name1_ < name2_:
+                sort_value = -1
+
+            elif name1_ > name2_:
+                sort_value = 1
+
+            else:
+                sort_value = 0
+
+        return sort_value
 
 
 class Background( Info ):

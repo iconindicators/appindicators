@@ -287,6 +287,7 @@ class PPA():
         return ppas_sorted
 
 
+#TODO I think this should be moved to within the PublishedBinary class and renamed to _compare
     @staticmethod
     def _compare_published_binaries(
         published_binary1,
@@ -322,6 +323,7 @@ class PPA():
         return sort_value
 
 
+#TODO I think this should be renamed to _compare
     @staticmethod
     def _compare_ppas(
         ppa1,
@@ -334,6 +336,7 @@ class PPA():
                 ppa2.get_user(), ppa2.get_name() ) )
 
 
+#TODO I think this should be renamed to compare
     @staticmethod
     def compare_ppas(
         user1,

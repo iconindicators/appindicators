@@ -611,13 +611,12 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         treeview,
         invalid_ppas ):
 
-        model, treeiter = treeview.get_selection().get_selected()
         response = (
             self.show_dialog_ok_cancel(
-                treeview,
-                _( "Remove the selected PPA?" ) ) )
+                treeview, _( "Remove the selected PPA?" ) ) )
 
         if response == Gtk.ResponseType.OK:
+            model, treeiter = treeview.get_selection().get_selected()
             row = model[ treeiter ]
             invalid_ppas.append( (
                 row[ IndicatorPPADownloadStatistics.COLUMN_USER ],

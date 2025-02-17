@@ -365,8 +365,19 @@ class IndicatorOnThisDay( IndicatorBase ):
                     _( "Add a new calendar." ),
                     _( "Remove the selected calendar." ) ),
                 (
-                    ( self.on_calendar_add, treeview, dialog ),
+                    None,
                     ( self.on_calendar_remove, treeview ) ) ) )
+
+        add.connect(
+            "clicked", self.on_calendar_add, treeview, dialog, remove )
+
+        if len( store ):
+            treepath = Gtk.TreePath.new_from_string( '0' )
+            treeview.get_selection().select_path( treepath )
+            treeview.set_cursor( treepath, None, False )
+
+        else:
+            remove.set_sensitive( False )
 
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -529,50 +540,51 @@ class IndicatorOnThisDay( IndicatorBase ):
         treeview ):
 
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        if treeiter_sort is None:
+        selected_calendar = (
+            model_sort[
+                treeiter_sort ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
+
+        if selected_calendar in self.get_system_calendars():
             self.show_dialog_ok(
-                treeview, _( "No calendar has been selected for removal." ) )
+                treeview,
+                _( "This is a system calendar and cannot be removed." ) )
 
         else:
-            selected_calendar = (
-                model_sort[
-                    treeiter_sort ][
-                        IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
+            response = (
+                self.show_dialog_ok_cancel(
+                    treeview, _( "Remove the selected calendar?" ) ) )
 
-            if selected_calendar in self.get_system_calendars():
-                self.show_dialog_ok(
-                    treeview,
-                    _( "This is a system calendar and cannot be removed." ) )
+            if response == Gtk.ResponseType.OK:
+                treepath = (
+                    Gtk.TreePath.new_from_string(
+                        model_sort.get_string_from_iter( treeiter_sort ) ) )
 
-            else:
-                response = (
-                    self.show_dialog_ok_cancel(
-                        treeview,
-                        _( "Remove the selected calendar?" ) ) )
+                has_previous = treepath.prev()
 
-                if response == Gtk.ResponseType.OK:
-                    treepath = (
-                        Gtk.TreePath.new_from_string(
-                            model_sort.get_string_from_iter( treeiter_sort ) ) )
+                model_sort.get_model().remove(
+                    model_sort.convert_iter_to_child_iter( treeiter_sort ) )
 
-                    has_previous = treepath.prev()
+#TODO Test these two clauses.
+                if has_previous:
+                    treeview.get_selection().select_path( treepath )
+                    treeview.set_cursor( treepath, None, False )
 
-                    model_sort.get_model().remove(
-                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
-
-                    if has_previous:
-                        treeview.get_selection().select_path( treepath )
-                        treeview.set_cursor( treepath, None, False )
+                else:
+                    button.set_sensitive( False )
 
 
     def on_calendar_add(
         self,
         button,
         treeview,
-        preferences_dialog ):
+        preferences_dialog,
+        button_remove ):
 
         self._on_calendar_double_click(
             treeview, None, None, preferences_dialog )
+
+        if len( treeview.get_model() ) > 0:
+            button_remove.set_sensitive( True )
 
 
     def on_calendar_double_click(
@@ -585,8 +597,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
         calendar = (
             model_sort[
-                treeiter_sort ][
-                IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
+                treeiter_sort ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
 
         if calendar in self.get_system_calendars():
             self.show_dialog_ok(
