@@ -1108,6 +1108,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                 textentry.get_text().replace( old_tag_, "" ) )
 
 
+#TODO Should really handle double click of a group (which will edit that group name).
+#TODO Should really handle copy of a group.
+#TODO Should really handle delete of a group.
+
+
+
 #TODO Once sorted, remove unused parameters.
     def on_script_remove(
         self,
@@ -1117,6 +1123,51 @@ class IndicatorScriptRunner( IndicatorBase ):
         background_scripts_treeview,
         textentry,
         button_copy ):
+
+        model, treeiter = scripts_treeview.get_selection().get_selected()
+        treepath = (
+            Gtk.TreePath.new_from_string(
+                model.get_string_from_iter( treeiter ) ) )
+
+        group = model[ treeiter ][ 8 ] #TODO Change to new constant.
+        script = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_NAME ]
+        if script is None:
+            print( f"Remove { group }")
+            #TODO Delete group and all scripts within.
+            #TODO Select group above if available,
+            # then below if available,
+            # then disable remove/copy buttons.
+
+        else:
+            print( f"Remove { group } | { script }")
+            #TODO Delete script.  Delete group if was last script.
+            #TODO Select script above if available,
+            # then script below if available,
+            # then group if available,
+            # then group below/above if available,  OR last script above of above group if available,
+            # then disable remove/copy buttons.
+
+        if True:
+            return
+
+        # has_previous = treepath.prev()
+        # if has_previous:
+        #     scripts_treeview.get_selection().select_path( treepath )
+        #     model, treeiter = scripts_treeview.get_selection().get_selected()
+        #     # print( model[ treeiter ][ 8 ] )
+        #     print( "has previous" )
+
+        treepath.next()
+        scripts_treeview.get_selection().select_path( treepath )
+        model, treeiter = scripts_treeview.get_selection().get_selected()
+        # print( model[ treeiter ][ 8 ] )
+        print( "has next" )
+
+
+        if True:
+            return
+
+
 
         response = (
             self.show_dialog_ok_cancel(
@@ -1128,7 +1179,26 @@ class IndicatorScriptRunner( IndicatorBase ):
                 Gtk.TreePath.new_from_string(
                     model.get_string_from_iter( treeiter ) ) )
 
-            has_previous = treepath.prev()
+#TODO Remove group if no more scripts.
+            while True:
+                has_previous = treepath.prev()
+                if has_previous:
+                    scripts_treeview.get_selection().select_path( treepath )
+                    model, treeiter = scripts_treeview.get_selection().get_selected()
+
+                    if model[ treeiter ][ 0 ] is None:
+                        print( model[ treeiter ][ 8 ] + "\t" + model[ treeiter ][ 1 ] )
+
+                    else:
+                        print( model[ treeiter ][ 8 ] + "\t" + model[ treeiter ][ 1 ] )
+
+                else:
+                    break
+
+            if True:
+                return
+
+            has_previous = treepath.prev()  #TODO I think need to keep looking for a prev until we hit a script (not a group or false).
             model.remove( treeiter )
             if has_previous:
                 scripts_treeview.get_selection().select_path( treepath )
@@ -1185,10 +1255,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                 #
                 #     i += 1
 
-        else:
-            self.show_dialog_ok(
-                scripts_treeview,
-                _( "No script has been selected for removal." ) )
+        # else:
+        #     self.show_dialog_ok(
+        #         scripts_treeview,
+        #         _( "No script has been selected for removal." ) )
 
 
     def on_script_add(
@@ -1213,6 +1283,12 @@ class IndicatorScriptRunner( IndicatorBase ):
             background_scripts_treeview,
             None,
             scripts )
+
+#TODO Need something like this to enable the remove/copy buttons
+        # if len( treeview.get_model() ) > 0:
+        #     button_remove.set_sensitive( True )
+
+
 
 
 #TODO Delete
