@@ -1,5 +1,5 @@
 # Portable Object Template for indicatorbase.
-# Copyright (C) 2017-2024 Bernard Giannetti
+# Copyright (C) 2017-2025 Bernard Giannetti
 # This file is distributed under the same license as the indicatorbase package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorbase 1.0.1\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-09-11 11:20+1000\n"
+"POT-Creation-Date: 2025-02-19 08:41+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,11 +20,11 @@ msgstr ""
 msgid "Initialising..."
 msgstr ""
 
-#, python-brace-format
-msgid "New version of {0} available..."
+msgid "Refer to the Preferences for details."
 msgstr ""
 
-msgid "Refer to the Preferences for details."
+#, python-brace-format
+msgid "New version of {0} available..."
 msgstr ""
 
 msgid "Preferences"

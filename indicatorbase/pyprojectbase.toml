@@ -10,6 +10,7 @@ authors = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
 maintainers = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
+#TODO I think need to add 'packaging' after PyGObject below for packaging.version.
 dependencies = [
   "PyGObject"{dependencies} ]
 readme = "README.md"

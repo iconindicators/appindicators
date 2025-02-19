@@ -44,13 +44,17 @@ sys.path.append( "indicatorbase/src/indicatorbase" )
 try:
     import indicatorbase
 except ModuleNotFoundError:
-    # If the script is called from a directory other than the correct directory,
-    # this import will fail before the check for the correct directory is done,
-    # resulting in a "ModuleNotFoundError: No module named 'indicatorbase'"
-    # which is a red herring...
+#TODO Hit this exception on Debian 12 on laptop...why?  Might need to test with a clean VENV ($HOME/.local/venv_indicators) on Ubuntu 20.04, Debian 12.04 32 bit and 64 bit.
+    # This script must be called from within the project directory.
+    # If not, this import will fail before the check for the correct directory is done,
+    # resulting in a
+    #   ModuleNotFoundError: No module named 'indicatorbase'
+    # which is a red herring.
     print(
-        "indicatorbase could not be found;" +
-        "ensure you are running this script from the correct directory!" )
+        "indicatorbase could not be found; " +
+        "this script must be run from within the project directory!" )
+
+    sys.exit( 1 ) #TODO Look for all calls to sys.exit and ensure they all call with a value of 1.
 
 
 VENV = Path.home() / ".local" / "venv_indicators"
@@ -520,7 +524,7 @@ if __name__ == "__main__":
             VENV,
             "build",
             "pip",
-            "PyGObject",
+            "PyGObject",  #TODO Why is this here?  Surely it will be pulled in as a dependency from the pyproject.toml when installing?  This should not be a build dependencey...or is it?
             "readme_renderer[md]" )
 
         for indicator in args.indicators:
