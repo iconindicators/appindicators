@@ -17,7 +17,7 @@
 
 
 '''
-Build a Python .whl / .tar.gz for one or more indicators.
+Build a Python .whl and .tar.gz for one or more indicators.
 
 To view the contents of a .whl:
    unzip -l indicatortest-1.0.7-py3-none-any.whl
@@ -44,7 +44,8 @@ sys.path.append( "indicatorbase/src/indicatorbase" )
 try:
     import indicatorbase
 except ModuleNotFoundError:
-#TODO Hit this exception on Debian 12 on laptop...why?  Might need to test with a clean VENV ($HOME/.local/venv_indicators) on Ubuntu 20.04, Debian 12.04 32 bit and 64 bit.
+#TODO Hit this exception on Debian 12 on laptop and 64 bit...why?
+# Works on Ubuntu 24.04 so seems to be a Debian only issue.
     # This script must be called from within the project directory.
     # If not, this import will fail before the check for the correct directory is done,
     # resulting in a
@@ -57,33 +58,38 @@ except ModuleNotFoundError:
     sys.exit( 1 ) #TODO Look for all calls to sys.exit and ensure they all call with a value of 1.
 
 
-VENV = Path.home() / ".local" / "venv_indicators"
+VENV = Path( "./venv_development" )
 
 
-def _run_checks_on_indicator(
+def _check_for_t_o_d_o_s(
     indicator_name ):
 
     paths = [
-        Path( '.' ) / "indicatorbase",
-        Path( '.' ) / indicator_name,
-        Path( '.' ) / "tools" ]
+        "indicatorbase",
+        indicator_name,
+        "tools" ]
 
-    exclusions = [
-        "__pycache__",
-        "indicatorlunar/development",
-        "indicatorlunar/frink",
-        "indicatorlunar/src/indicatorlunar/data" ]
+    file_types = [
+        "*.desktop",
+        "*.htm*",
+        "*.in",
+        "LINGUAS",
+        "*.md",
+        "*.po*",
+        "*.py",
+        "*.sh",
+        "*.svg",
+        "*.toml" ]
 
     t_o_d_o = ''.join( [ 't', 'o', 'd', 'o' ] )
 
     message = ""
     for path in paths:
-        for path_ in ( path_.resolve() for path_ in path.glob( '**/*' ) if path_.is_file() and not any( exclusion in str( path_ ) for exclusion in exclusions ) ):
-            print( path_ )  #TODO Why is this print here?
-            with open( path_, 'r', encoding = "utf-8" ) as f:
-                if t_o_d_o in f.read().lower():
-                    message += f"\t{ path_ }\n"
-
+        for file_type in file_types:
+            for file in ( Path( '.' ) / path ).resolve().rglob( file_type ):
+                with open( file, 'r', encoding = "utf-8" ) as f:
+                    if t_o_d_o in f.read().lower():
+                        message += f"\t{ file }\n"
     if message:
         message = f"Found one or more { t_o_d_o.upper() }s:\n" + message
 
@@ -104,54 +110,55 @@ def _create_pyproject_dot_toml(
     indicator_name,
     directory_out ):
 
-    indicator_pyproject_toml = Path( '.' ) / indicator_name / "pyproject.toml"
+    indicator_pyproject_toml = (
+        Path( '.' ) / indicator_name / "pyprojectspecific.toml" )
 
-    config = configparser.ConfigParser()
-    with open( indicator_pyproject_toml, encoding = "utf-8" ) as stream:
-        config.read_string( "[top]\n" + stream.read() )
-
-    version = config[ "top" ][ "version" ].replace( '\"', '' ).strip()
-
-    # The description may contain a ' which must be replaced with "
-    # as it causes an error when parsing the pyproject.toml.
-    description = config[ "top" ][ "description" ].replace( '\"', '' ).replace( '\'', '\"' ).strip()
-
-    classifiers = config[ "top" ][ "classifiers" ].replace( '[', '' ).replace( ']', '' ).strip()
-    classifiers = ',\n' + re.sub( "^", "  ", classifiers, flags = re.M )
-
-    dependencies = ""
-    if "dependencies" in config[ "top" ]:
-        dependencies = config[ "top" ][ "dependencies" ].replace( '[', '' ).replace( ']', '' ).strip()
-        dependencies = ',\n' + re.sub( "^", "  ", dependencies, flags = re.M )
+    config_indicator = configparser.ConfigParser()
+    config_indicator.read( indicator_pyproject_toml )
 
     indicatorbase_pyproject_toml = (
         Path( '.' ) / "indicatorbase" / "pyprojectbase.toml" )
 
-    text = ""
-    with open( indicatorbase_pyproject_toml, encoding = "utf-8" ) as f:
-        for line in f:
-            if not line.startswith( '#' ):
-                if line.startswith( "version = " ):
-                    version_indicator_base = line.split( "\"" )[ 1 ]
+    config_indicatorbase = configparser.ConfigParser()
+    config_indicatorbase.read( indicatorbase_pyproject_toml )
 
-                else:
-                    text += line
+    version_indicatorbase = (
+        config_indicatorbase.get( "project", "version" ).replace( '"', '' ) )
 
-    text = text.replace( "{classifiers}", classifiers )
-    text = text.replace( "{dependencies}", dependencies )
-    text = text.replace( "{indicator_name}", indicator_name )
+    config_indicatorbase.set(
+        "project",
+        "name",
+        f"\"{ indicator_name }\"" )
 
-    text = (
-        text.replace(
-        "[project]",
-        "[project]\n" + \
-        "name = \'" + indicator_name + '\'\n' + \
-        "version = \'" + version + '\'\n' + \
-        "description = \'" + description + '\'' ) )
+    config_indicatorbase.set(
+        "project",
+        "version",
+        config_indicator.get( "project", "version" ) )
+
+    config_indicatorbase.set(
+        "project",
+        "description",
+        config_indicator.get( "project", "description" ) )
+
+    if config_indicator.has_option( "project", "classifiers" ):
+        config_indicatorbase.set(
+            "project",
+            "classifiers",
+            config_indicatorbase.get( "project", "classifiers" ).replace( ' ]', "," )
+            +
+            config_indicator.get( "project", "classifiers" ).replace( '[', '' ) )
+
+    if config_indicator.has_option( "project", "dependencies" ):
+        config_indicatorbase.set(
+            "project",
+            "dependencies",
+            config_indicatorbase.get( "project", "dependencies" ).replace( ' ]', ',' )
+            +
+            config_indicator.get( "project", "dependencies" ).replace( '[', '' ) )
 
     out_pyproject_toml = directory_out / indicator_name / "pyproject.toml"
     with open( out_pyproject_toml, 'w', encoding = "utf-8" ) as f:
-        f.write( text + '\n' )
+        config_indicatorbase.write( f )
 
     _chmod(
         out_pyproject_toml,
@@ -159,14 +166,91 @@ def _create_pyproject_dot_toml(
         stat.S_IRGRP,
         stat.S_IROTH )
 
-    return out_pyproject_toml, version_indicator_base
+    return out_pyproject_toml, version_indicatorbase
+
+
+def _create_manifest_dot_in(
+    indicator_name,
+    directory_out ):
+
+    indicatorbase_manifest_in = (
+        Path( '.' ) / "indicatorbase" / "MANIFESTbase.in" )
+
+    with open( indicatorbase_manifest_in, 'r', encoding = "utf-8" ) as f:
+        manifest_text = f.read().replace( "{indicator_name}", indicator_name )
+
+    indicator_manifest_in = (
+        Path( '.' ) / indicator_name / "MANIFESTspecific.in" )
+
+    if Path( indicator_manifest_in ).exists():
+        with open( indicator_manifest_in, 'r', encoding = "utf-8" ) as f:
+            manifest_text += f.read() #TODO Ensure this works with indicatorlunar
+
+    release_manifest_in = directory_out / indicator_name / "MANIFEST.in"
+    with open( release_manifest_in, 'w', encoding = "utf-8" ) as f:
+        f.write( manifest_text + '\n' )
+
+    _chmod(
+        release_manifest_in,
+        stat.S_IRUSR | stat.S_IWUSR,
+        stat.S_IRGRP,
+        stat.S_IROTH )
+
+
+def _get_version_in_changelog_markdown(
+    changelog_markdown ):
+
+    version = ""
+    with open( changelog_markdown, 'r', encoding = "utf-8" ) as f:
+        for line in f.readlines():
+            if line.startswith( "## v" ):
+                version = line.split( ' ' )[ 1 ][ 1 : ]
+                break
+
+    return version
+
+
+def get_pyproject_toml_authors(
+    pyproject_toml_config ):
+
+    authors = (
+        pyproject_toml_config.get( "project", "authors" )
+        .replace( '[', '' )
+        .replace( ']', '' )
+        .replace( '{', '' )
+        .replace( '},', '' )
+        .replace( '}', '' )
+        .strip() )
+    
+    names_emails = [ ]
+    for line in authors.split( '\n' ):
+        line_ = line.split( '=' )
+        if "name" in line and "email" in line:
+            name = line_[ 1 ].split( '\"' )[ 1 ]
+            email = line_[ 2 ].split( '\"' )[ 1 ]
+            names_emails.append( ( name, email ) )
+
+        elif "name" in line:
+            name = line_[ 1 ].split( '\"' )[ 1 ]
+            names_emails.append( ( name, "" ) )
+
+        elif "email" in line:
+            email = line_[ 1 ].split( '\"' )[ 1 ]
+            names_emails.append( ( "", email ) )
+
+    return tuple( names_emails )
 
 
 def _get_name_categories_comments_from_indicator(
     indicator_name,
     directory_indicator ):
 
-    indicator_source = Path( '.' ) / directory_indicator / "src" / indicator_name / ( indicator_name + ".py" )
+    def parse( line ):
+        return line.split( '\"' )[ 1 ].replace( '\"', '' ).strip()
+
+
+    indicator_source = (
+        Path( '.' ) / directory_indicator / "src" / indicator_name / ( indicator_name + ".py" ) )  #TODO Can this be split over lines?
 
     name = ""
     categories = ""
@@ -175,101 +259,24 @@ def _get_name_categories_comments_from_indicator(
     with open( indicator_source, 'r', encoding = "utf-8" ) as f:
         for line in f:
             if re.search( r"indicator_name_for_desktop_file = _\( ", line ):
-                name = line.split( '\"' )[ 1 ].replace( '\"', '' ).strip()
+                name = parse( line )
 
             if re.search( r"indicator_categories = ", line ):
-                categories = line.split( '\"' )[ 1 ].replace( '\"', '' ).strip()
+                categories = parse( line )
 
             if re.search( r"comments = _\(", line ):
-                comments = line.split( '\"' )[ 1 ].replace( '\"', '' ).strip()
+                comments = parse( line )
 
     if name == "":
         message += f"ERROR: Unable to obtain 'indicator_name' from \n\t{ indicator_source }"
+
+    if categories == "":
+        message += f"ERROR: Unable to obtain 'categories' from \n\t{ indicator_source }"
 
     if comments == "":
         message += f"ERROR: Unable to obtain 'comments' from the constructor of\n\t{ indicator_source }"
 
     return name, categories, comments, message
-
-
-def _create_scripts_for_linux(
-    directory_platform_linux,
-    indicator_name ):
-
-    class SafeDict( dict ):
-        '''
-        If a shell script contains a variable (of the form ${}),
-        the formatter views this as a missing key (unknown text to replace).
-        In this case, ignore and return the key so the shell variable remains intact.
-        https://stackoverflow.com/a/17215533/2156453
-        '''
-
-        def __missing__(
-            self,
-            key ):
-
-            return '{' + key + '}'
-
-
-    def read_format_write(
-        indicatorbase_platform_linux_path,
-        source_script_name,
-        destination_script_name ):
-
-        with open( indicatorbase_platform_linux_path / source_script_name, 'r', encoding = "utf-8" ) as f:
-            script_text = f.read()
-
-        script_text = script_text.format_map( SafeDict( indicator_name = indicator_name ) )
-
-        with open( directory_platform_linux / destination_script_name, 'w', encoding = "utf-8" ) as f:
-            f.write( script_text + '\n' )
-
-        _chmod(
-            directory_platform_linux / destination_script_name,
-            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR,
-            stat.S_IRGRP | stat.S_IXGRP,
-            stat.S_IROTH | stat.S_IXOTH )
-
-
-    indicatorbase_platform_linux_path = (
-        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" )
-
-    read_format_write(
-        indicatorbase_platform_linux_path,
-        "run.sh",
-        indicator_name + ".sh" )
-
-    install_script = "install.sh"
-    read_format_write(
-        indicatorbase_platform_linux_path,
-        install_script,
-        install_script )
-
-    uninstall_script = "uninstall.sh"
-    read_format_write(
-        indicatorbase_platform_linux_path,
-        uninstall_script,
-        uninstall_script )
-
-
-def _create_symbolic_icons(
-    directory_wheel,
-    indicator_name ):
-
-    directory_icons = directory_wheel / indicator_name / "src" / indicator_name / "icons"
-    for hicolor_icon in list( ( Path( '.' ) / directory_icons ).glob( "*.svg" ) ):
-        symbolic_icon = directory_icons / ( str( hicolor_icon.name )[ 0 : -4 ] + "-symbolic.svg" )
-        shutil.copy( hicolor_icon, symbolic_icon )
-        with open( symbolic_icon, 'r', encoding = "utf-8" ) as f:
-            svg_text = f.read()
-            for m in re.finditer( r"fill:#", svg_text ):
-                svg_text = svg_text[ 0 : m.start() + 6 ] + "777777" + svg_text[ m.start() + 6 + 6 : ]
-
-            for m in re.finditer( r"stroke:#", svg_text ):
-                svg_text = svg_text[ 0 : m.start() + 6 ] + "777777" + svg_text[ m.start() + 6 + 6 : ]
-
-        with open( symbolic_icon, 'w', encoding = "utf-8" ) as f:
-            f.write( svg_text + '\n' )
 
 
 def _create_dot_desktop(
@@ -290,26 +297,31 @@ def _create_dot_desktop(
             if not line.startswith( '#' ):
                 dot_desktop_text += line
 
+#TODO Test this with an indicator that has translated name(s).
     names = name
-    for language, _name in names_from_mo_files.items():
-        names += f"\nName[{ language }]={ _name }"
+    for language, name_ in names_from_mo_files.items():
+        names += f"\nName[{ language }]={ name_ }"
 
     newline = '\\n'
 
-    # If the comments are broken up by '\n' to fit the About dialog, replace with ' '.
-    comment = comments.replace( newline, ' ' )
+#TODO Test this with indicatorscriptrunner.
+    # Comments may be separated by '\n' to fit the About dialog;
+    # if so, replace with ' '.
+    comments_ = comments.replace( newline, ' ' )
 
-    for language, _comment in comments_from_mo_files.items():
-        comment += f"\nComment[{ language }]={ _comment.replace( newline, ' ' ) }"
+#TODO Test this with an indicator that has translated comment(s).
+    for language, comment in comments_from_mo_files.items():
+        comments_ += f"\nComment[{ language }]={ comment.replace( newline, ' ' ) }"
 
     dot_desktop_text = (
         dot_desktop_text.format(
             indicator_name = indicator_name,
             names = "Name=" + names,
-            comment = "Comment=" + comment,
+            comment = "Comment=" + comments_,
             categories = categories ) )
 
-    indicator_dot_desktop_path = directory_platform_linux / ( indicator_name + ".py.desktop" )
+    indicator_dot_desktop_path = (
+        directory_platform_linux / ( indicator_name + ".py.desktop" ) )
 
     with open( indicator_dot_desktop_path, 'w', encoding = "utf-8" ) as f:
         f.write( dot_desktop_text + '\n' )
@@ -321,155 +333,171 @@ def _create_dot_desktop(
         stat.S_IROTH )
 
 
-def _get_value_from_pyproject_toml(
-    pyproject_toml,
-    key ):
+def _create_scripts_for_linux(
+    directory_platform_linux,
+    indicator_name ):
 
-    config = configparser.ConfigParser()
-    config.read( pyproject_toml )
-    return config[ key[ 0 ] ][ key[ 1 ] ]
+    indicatorbase_platform_linux_path = (
+        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" )
 
+    def process(
+        source_script_name,
+        destination_script_name ):
 
-def get_pyproject_toml_authors(
-    pyproject_toml ):
+        source = indicatorbase_platform_linux_path / source_script_name
+        with open( source, 'r', encoding = "utf-8" ) as f:
+            text = f.read()
 
-    authors = _get_value_from_pyproject_toml( pyproject_toml, ( "project", "authors" ) )
-    authors = authors.replace( '[', '' ).replace( ']', '' )
-    authors = authors.replace( '{', '' ).replace( '},', '' ).replace( '}', '' ).strip()
+        destination = directory_platform_linux / destination_script_name
+        with open( destination, 'w', encoding = "utf-8" ) as f:
+            f.write( text.replace( "{indicator_name}", indicator_name ) + '\n' )
 
-    names_emails = [ ]
-    for line in authors.split( '\n' ):
-        line_ = line.split( '=' )
-        if "name" in line and "email" in line:
-            name = line_[ 1 ].split( '\"' )[ 1 ]
-            email = line_[ 2 ].split( '\"' )[ 1 ]
-            names_emails.append( ( name, email ) )
-
-        elif "name" in line:
-            name = line_[ 1 ].split( '\"' )[ 1 ]
-            names_emails.append( ( name, "" ) )
-
-        elif "email" in line:
-            email = line_[ 1 ].split( '\"' )[ 1 ]
-            names_emails.append( ( "", email ) )
-
-    return tuple( names_emails )
+        _chmod(
+            destination,
+            stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR,
+            stat.S_IRGRP | stat.S_IXGRP,
+            stat.S_IROTH | stat.S_IXOTH )
 
 
-def get_pyproject_toml_version(
-    pyproject_toml ):
+    process( "run.sh", indicator_name + ".sh" )
 
-    version = _get_value_from_pyproject_toml( pyproject_toml, ( "project", "version" ) )
-    return version.replace( '\'', '' ).strip()
+    install_script = "install.sh"
+    process( install_script, install_script )
+
+    uninstall_script = "uninstall.sh"
+    process( uninstall_script, uninstall_script )
 
 
-def _get_version_in_changelog_markdown(
-    changelog_markdown ):
+#TODO Perhaps create the symbolic icons and commit to repository instead of creating each time?
+def _create_symbolic_icons(
+    directory_wheel,
+    indicator_name ):
 
-    version = ""
-    with open( changelog_markdown, 'r', encoding = "utf-8" ) as f:
-        for line in f.readlines():
-            if line.startswith( "## v" ):
-                version = line.split( ' ' )[ 1 ][ 1 : ]
-                break
+    directory_icons = directory_wheel / indicator_name / "src" / indicator_name / "icons"
+    for hicolor_icon in list( ( Path( '.' ) / directory_icons ).glob( "*.svg" ) ):
+        symbolic_icon = directory_icons / ( str( hicolor_icon.name )[ 0 : -4 ] + "-symbolic.svg" )
+        shutil.copy( hicolor_icon, symbolic_icon )
+        with open( symbolic_icon, 'r', encoding = "utf-8" ) as f:
+            svg_text = f.read()
+            for m in re.finditer( r"fill:#", svg_text ):
+                svg_text = svg_text[ 0 : m.start() + 6 ] + "777777" + svg_text[ m.start() + 6 + 6 : ]
 
-    return version
+            for m in re.finditer( r"stroke:#", svg_text ):
+                svg_text = svg_text[ 0 : m.start() + 6 ] + "777777" + svg_text[ m.start() + 6 + 6 : ]
+
+        with open( symbolic_icon, 'w', encoding = "utf-8" ) as f:
+            f.write( svg_text + '\n' )
 
 
 def _package_source_for_build_wheel_process(
     directory_dist,
     indicator_name ):
 
-    message = ""
-
-    # Using copytree, the ENTIRE project is copied across.
-    # However, the pyproject.toml explicitly defines what files/folders
-    # are included in the build (and conversely what is excluded).
     directory_indicator = directory_dist / indicator_name
-    shutil.copytree( indicator_name, directory_indicator )
 
-    # Remove any __pycache__
-    for pycache in ( Path( '.' ) / directory_indicator / "src" / indicator_name ).glob( "__pycache__" ):
-        shutil.rmtree( pycache )
+    # Copy the ENTIRE project across and use pyproject.toml and MANIFEST.in
+    # to include/exclude files/folders in the build.
+    shutil.copytree( indicator_name, directory_indicator )
 
     shutil.copy(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "indicatorbase.py",
         Path( '.' ) / directory_indicator / "src" / indicator_name )
 
     pyproject_toml, version_indicator_base = (
-        _create_pyproject_dot_toml( indicator_name, directory_dist ) )
+        _create_pyproject_dot_toml(
+            indicator_name,
+            directory_dist ) )
 
-    authors = get_pyproject_toml_authors( pyproject_toml )
-    version = get_pyproject_toml_version( pyproject_toml )
+    _create_manifest_dot_in(
+        indicator_name,
+        directory_dist )
+
+    config = configparser.ConfigParser()
+    config.read( pyproject_toml )
+
+    version_from_pyproject_toml = (
+        config.get( "project", "version" ).replace( "\"", '' ).strip() )
 
     version_from_changelog_markdown = (
         _get_version_in_changelog_markdown(
             Path( '.' ) / indicator_name / "src" / indicator_name / "CHANGELOG.md" ) )
 
-    if version != version_from_changelog_markdown:
-        message = f"{ indicator_name }: The (most recent) version in CHANGELOG.md does not match that in pyproject.toml\n"
+    message = ""
+    if version_from_pyproject_toml != version_from_changelog_markdown:
+        message = (
+            f"{ indicator_name }: The most recent version in " +
+            f"CHANGELOG.md does not match that in pyproject.toml\n" )
 
-    else:
+    if not message:
+        authors = get_pyproject_toml_authors( config )
+
         start_year = (
             indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
                 Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" ) )
 
-        message = (
-            utils_locale.update_locale_source(
+        utils_locale.update_locale_source(
+            indicator_name,
+            authors,
+            start_year,
+            version_from_pyproject_toml,
+            version_indicator_base )
+
+        utils_locale.build_locale_for_release(
+            directory_dist,
+            indicator_name )
+
+        name, categories, comments, message = (
+            _get_name_categories_comments_from_indicator(
                 indicator_name,
-                authors,
-                start_year,
-                version,
-                version_indicator_base ) )
+                directory_indicator ) )
 
-        if not message:
-            utils_locale.build_locale_release( directory_dist, indicator_name )
+    if not message:
+        utils_readme.create_readme(
+            directory_indicator,
+            indicator_name,
+            name,
+            authors,
+            start_year )
 
-            name, categories, comments, message = (
-                _get_name_categories_comments_from_indicator(
-                    indicator_name, directory_indicator ) )
+        subprocess.call(
+            f". { VENV }/bin/activate && " +
+            f"python3 -m readme_renderer " +
+            f"{ directory_dist }/{ indicator_name }/README.md " +
+            f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html " +
+            "&& deactivate",
+            shell = True )
 
-            if not message:
-                utils_readme.create_readme(
-                    directory_indicator,
-                    indicator_name,
-                    name,
-                    authors,
-                    start_year )
+        directory_indicator_locale = (
+            Path( '.' ) / directory_indicator / "src" / indicator_name / "locale" )
 
-                command = (
-                    f". { VENV }/bin/activate && " +
-                    f"python3 -m readme_renderer" +
-                    f"    { directory_dist }/{ indicator_name }/README.md" +
-                    f"    -o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html && " +
-                    f"deactivate" )
+        names_from_mo_files, comments_from_mo_files = (
+            utils_locale.get_names_and_comments_from_mo_files(
+                indicator_name,
+                directory_indicator_locale,
+                name,
+                comments ) )
 
-                subprocess.call( command, shell = True )
+        directory_platform_linux = (
+            directory_dist / indicator_name / "src" / indicator_name / "platform" / "linux" )
 
-                directory_indicator_locale = Path( '.' ) / directory_indicator / "src" / indicator_name / "locale"
+        directory_platform_linux.mkdir( parents = True )
 
-                names_from_mo_files, comments_from_mo_files = (
-                    utils_locale.get_names_and_comments_from_mo_files(
-                        indicator_name,
-                        directory_indicator_locale,
-                        name,
-                        comments ) )
+        _create_dot_desktop(
+            directory_platform_linux,
+            indicator_name,
+            name,
+            names_from_mo_files,
+            comments,
+            comments_from_mo_files,
+            categories )
 
-                directory_platform_linux = directory_dist / indicator_name / "src" / indicator_name / "platform" / "linux"
-                directory_platform_linux.mkdir( parents = True )
+        _create_scripts_for_linux(
+            directory_platform_linux,
+            indicator_name )
 
-                _create_dot_desktop(
-                    directory_platform_linux,
-                    indicator_name,
-                    name,
-                    names_from_mo_files,
-                    comments,
-                    comments_from_mo_files,
-                    categories )
-
-                _create_scripts_for_linux( directory_platform_linux, indicator_name )
-
-                _create_symbolic_icons( directory_dist, indicator_name )
+        _create_symbolic_icons(
+            directory_dist,
+            indicator_name )
 
     return message
 
@@ -478,7 +506,7 @@ def _build_wheel_for_indicator(
     directory_release,
     indicator_name ):
 
-    message = _run_checks_on_indicator( indicator_name )
+    message = _check_for_t_o_d_o_s( indicator_name )
     if not message:
         directory_dist = Path( '.' ) / directory_release / "wheel" / ( "dist_" + indicator_name )
         if Path( directory_dist ).exists():
@@ -494,7 +522,8 @@ def _build_wheel_for_indicator(
 
             subprocess.call( command, shell = True )
 
-            shutil.rmtree( directory_dist / indicator_name )
+#TODO Uncomment
+#            shutil.rmtree( directory_dist / indicator_name )
 
     return message
 
@@ -524,7 +553,6 @@ if __name__ == "__main__":
             VENV,
             "build",
             "pip",
-            "PyGObject",  #TODO Why is this here?  Surely it will be pulled in as a dependency from the pyproject.toml when installing?  This should not be a build dependencey...or is it?
             "readme_renderer[md]" )
 
         for indicator in args.indicators:

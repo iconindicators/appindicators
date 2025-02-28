@@ -1,14 +1,14 @@
 # Portable Object Template for indicatortest.
-# Copyright (C) 2016-2024 Bernard Giannetti
+# Copyright (C) 2016-2025 Bernard Giannetti
 # This file is distributed under the same license as the indicatortest package.
-# Automatically generated, 2023-2024.
+# Automatically generated, 2025.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: indicatortest 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-10-28 12:33+1100\n"
-"PO-Revision-Date: 2024-07-09 22:05+1100\n"
+"POT-Creation-Date: 2025-02-22 08:26+1100\n"
+"PO-Revision-Date: 2025-02-22 08:26+1100\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: ru\n"
@@ -62,6 +62,9 @@ msgstr ""
 msgid "Terminal: "
 msgstr ""
 
+msgid "Unknown terminal!"
+msgstr ""
+
 msgid "Execution flag: "
 msgstr ""
 
@@ -69,10 +72,6 @@ msgid "Terminal"
 msgstr ""
 
 msgid "Reset icon"
-msgstr ""
-
-#, python-brace-format
-msgid "Show '{0}' rendered to {1}"
 msgstr ""
 
 msgid "Icon"
@@ -112,13 +111,10 @@ msgid "Cannot run script as qterminal incorrectly parses arguments; please insta
 msgstr ""
 
 msgid "Enable/disable X"
-msgstr "Enable/disable X (ru)"
+msgstr ""
 
 msgid "Day of Week"
 msgstr ""
 
 msgid "Days of week containing an 'n' are bold."
 msgstr ""
-
-#~ msgid "Test"
-#~ msgstr "Test (ru)"

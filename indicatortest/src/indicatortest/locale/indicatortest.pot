@@ -1,5 +1,5 @@
 # Portable Object Template for indicatortest.
-# Copyright (C) 2016-2024 Bernard Giannetti
+# Copyright (C) 2016-2025 Bernard Giannetti
 # This file is distributed under the same license as the indicatortest package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatortest 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-10-28 12:33+1100\n"
+"POT-Creation-Date: 2025-02-22 08:26+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -62,6 +62,9 @@ msgstr ""
 msgid "Terminal: "
 msgstr ""
 
+msgid "Unknown terminal!"
+msgstr ""
+
 msgid "Execution flag: "
 msgstr ""
 
@@ -69,10 +72,6 @@ msgid "Terminal"
 msgstr ""
 
 msgid "Reset icon"
-msgstr ""
-
-#, python-brace-format
-msgid "Show '{0}' rendered to {1}"
 msgstr ""
 
 msgid "Icon"

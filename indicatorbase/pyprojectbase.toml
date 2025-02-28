@@ -10,9 +10,9 @@ authors = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
 maintainers = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
-#TODO I think need to add 'packaging' after PyGObject below for packaging.version.
 dependencies = [
-  "PyGObject"{dependencies} ]
+  "packaging",
+  "PyGObject" ]
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
@@ -22,21 +22,10 @@ classifiers = [
   "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
   "Natural Language :: English",
   "Operating System :: POSIX :: Linux",
-  "Programming Language :: Python :: 3.8"{classifiers} ]
+  "Programming Language :: Python :: 3.8" ]
 
 [project.urls]
 homepage = "https://appindicators.sourceforge.io"
 
 [tool.setuptools.packages.find]
 where = [ "src" ]
-
-[tool.setuptools.package-data]
-{indicator_name} = [
-  "CHANGELOG.md",
-  "README.html",
-  "icons/*.svg",
-  "locale/*.pot",
-  "locale/*/LC_MESSAGES/*.mo",
-  "locale/*/LC_MESSAGES/*.po",
-  "platform/linux/*.desktop",
-  "platform/linux/*.sh" ]
