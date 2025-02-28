@@ -1,0 +1,3 @@
+exclude src/indicatorlunar/astroskyfield.py
+exclude src/indicatorlunar/meteorshowertest.py
+
