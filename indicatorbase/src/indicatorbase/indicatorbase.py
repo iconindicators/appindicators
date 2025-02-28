@@ -41,50 +41,19 @@ References
 '''
 
 
-#TODO Need to check if the project layout is correct:
-#   indicatorbase/src/indicatorbase
-# versus
-#   indicatorbase/src
+#TODO Should running a tools/....py use python3 -m?
 #
-# Because I use setuptools to build the .whl, 
-# seems that using src layout works best for setuptools.
+# FYI, the indicators should be run using python3 without the -m
+# as they are not libraries (packages).
 #
-# https://discuss.python.org/t/describe-python-project-structure/28959/15
-# https://stackoverflow.com/questions/193161/what-is-the-best-project-structure-for-a-python-application
-# https://stackoverflow.com/questions/73900006/best-directory-structure-for-a-repository-with-several-python-entry-points-and-i
-# https://packaging.python.org/en/latest/specifications/entry-points/
-# https://discuss.python.org/t/python-project-structure/36119/6
-# https://packaging.python.org/en/latest/discussions/src-layout-vs-flat-layout/
-# https://www.reddit.com/r/learnpython/comments/seu5l6/what_is_the_correct_way_to_structure_your_files/
-# https://www.reddit.com/r/learnpython/comments/gzf3b4/where_can_i_learn_how_to_structure_a_python/
-# 
-# Is __init.py__ needed?
-# Given I'm making an application which is to be directly executed,
-# rather than a library (package) which is to be imported,
-# __init__.py is NOT needed.
-# https://www.geeksforgeeks.org/what-is-__init__-py-file-in-python/
-# https://stackoverflow.com/a/51481809/2156453
-# Build/install indicatortest.whl and see if it installs and then runs.
-# Seems to work; build indicatortest.whl without a __init__.py
-# installed to a new venv and the indicator ran.
-#
-# https://stackoverflow.com/questions/37139786/is-init-py-not-required-for-packages-in-python-3-3
-# https://python-notes.curiousefficiency.org/en/latest/python_concepts/import_traps.html
-# https://stackoverflow.com/questions/61754993/do-we-still-need-to-use-init-py-in-2020-in-python-packages
-# https://docs.python.org/3/tutorial/modules.html#
-# https://stackoverflow.com/questions/59837593/is-the-init-py-really-not-necessary-for-python-3-7-packages
-# 
-# Should starting the indicators use python3 -m?
-# Should running a tools/....py use python3 -m?
-#
-# The indicators I think should be run using python3 without the -m as they are not libraries (packages).
 # Not sure yet about tools.
+# Doing so (with -m) might fix the issue with calling build_wheel.py on Debian
+# and unable to import indicatorbase.
 #
 # https://realpython.com/run-python-scripts/
 # https://stackoverflow.com/questions/22241420/execution-of-python-code-with-m-option-or-not
 # https://stackoverflow.com/questions/7610001/what-is-the-purpose-of-the-m-switch?noredirect=1&lq=1
 # https://stackoverflow.com/questions/46319694/what-does-it-mean-to-run-library-module-as-a-script-with-the-m-option
-
 
 
 #TODO Not sure if this applies:
