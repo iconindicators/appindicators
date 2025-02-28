@@ -40,6 +40,7 @@ from . import utils
 from . import utils_locale
 from . import utils_readme
 
+
 # sys.path.append( "indicatorbase/src/indicatorbase" )
 try:
     from indicatorbase.src.indicatorbase import indicatorbase
@@ -47,6 +48,12 @@ try:
 except ModuleNotFoundError:
 #TODO Hit this exception on Debian 12 on laptop and 64 bit...why?
 # Works on Ubuntu 24.04 so seems to be a Debian only issue.
+#
+# Still does not work on Debian using new and supposedly correct import mechanism.
+# Maybe create a small demo and then post to StackExchange.
+#
+# Regardless, once this is working, really need this try/except stuff at all?
+# Just do the import and if it fails, it fails.
     # This script must be called from within the project directory.
     # If not, this import will fail before the check for the correct directory is done,
     # resulting in a
