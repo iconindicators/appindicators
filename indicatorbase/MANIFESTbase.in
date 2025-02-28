@@ -1,7 +1,7 @@
 include src/{indicator_name}/CHANGELOG.md
 include src/{indicator_name}/README.html
 include src/{indicator_name}/locale/{indicator_name}.pot
-recursive-include src/{indicator_name}/platform/{indicator_name}.py.desktop
+include src/{indicator_name}/platform/{indicator_name}.py.desktop
 recursive-include src/{indicator_name}/icons *.svg
 recursive-include src/{indicator_name}/locale *.mo
 recursive-include src/{indicator_name}/locale *.po
