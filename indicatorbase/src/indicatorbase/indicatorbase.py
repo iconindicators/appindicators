@@ -40,6 +40,13 @@ References
     https://guicommits.com/organize-python-code-like-a-pro/
 '''
 
+#TODO As per tools/build_wheel.py, to import our own classes,
+# should ALL classes use 
+#  from . import utils
+# ???
+#
+# Have made this change to fortune...so build a wheel and test in a venv.
+
 
 #TODO Should running a tools/....py use python3 -m?
 #
