@@ -3,6 +3,9 @@
 which is probably
     $HOME/.localvenv_indicators 
 
+#TODO Where venv is used for building/development,
+# change to the dev directory root and venv_development.
+ 
 
 # AppIndicators for Ubuntu et al...
 

@@ -1,6 +1,6 @@
 # Immediate
 
-# No autostart on Kubuntu and Manjaro
+## No autostart on Kubuntu and Manjaro
 Given there is no autostart on Kubuntu 24.04 and Manjaro 24.04.7,
 should the autostart checkbox and delay spinner be hidden?
 If some fix through an OS update appears in the meantime,
@@ -10,7 +10,7 @@ Otherwise just leave as is...and keep the entry in the changelog.
 What to do?
 
 
-# Update date CHANGELOG.md
+## Update date CHANGELOG.md
 For each indicator's CHANGELOG.md, at release time, update the release date in
 the latest entry to the date of release.
 
@@ -97,8 +97,8 @@ Releases:
 
 # Long Term
 
-# Icons which do not utilise symbolic
-Some distros/desktops do not utilise the symbolic icon system as does GNOME.
+## Create non-symbolic icons
+Some distros/desktops do not utilise the GNOME symbolic icon mechanism.
 Determine which distros/desktops these are and if anything can be done.
 
 
@@ -108,21 +108,23 @@ May need to continue to run as GTK3 simulataneously.
 - https://stackoverflow.com/questions/73006299/unable-to-get-application-icons-to-display-with-gtk4-under-ubuntu
 
 
-# Installation other than via PyPI
+## Installation other than via PyPI
 Current implementation builds a self-contained wheel uploaded to PyPI.
+
 An end-user installs an indicator by:
-- installing OS packages (copy/paste a command)
+- installing OS packages
 - creating a venv
 - installing wheel from PyPI
-- copy icons/desktop/locale (copy/paste command)
+- copy icons/desktop/locale
 - some distros require setting an extension
 
-Whilst creating a .deb/.rpm would make an install easier, consider submitting
-to each distro's package repository (Debian, Fedora, openSUSE).
-Need to consider in this case perhaps changing the venv location to /opt
-rather than the user $HOME, particulary given icons/locale/.desktop will then
-be installed under /usr/share or similar.
+Whilsts installing via .deb/.rpm is easier for the end-user,
+it would be even easier (for the end-user) if each indicator was present in
+a distro's package repository (Debian, Fedora, openSUSE).
 
-The tool https://github.com/jordansissel/fpm takes a Python project 
-and convert to .deb/.rpm which may be a helpful first step.
+May need to change the venv location to /opt rather than the user $HOME,
+particulary given icons/locale/.desktop will then be installed under /usr/share.
+
+https://github.com/jordansissel/fpm
+Takes a Python project and converts to .deb/.rpm
 Does not yet support pyproject.toml
