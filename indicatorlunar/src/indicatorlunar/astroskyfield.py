@@ -19,30 +19,33 @@
 ''' Calculate astronomical information using Skyfield. '''
 
 
-#TODO If/when included in the release,
-# ephem is will likely be dropped and
-# will need to include the planets.bsp and stars.dat in the wheel.
+#TODO If/when astroskyfield is included in the release and ephem is dropped...
 #
-# So add to tools/build_wheel.py :: _run_checks_on_indicator()
+# In pyprojectspecific.toml, replace
+#     dependencies = [
+#       "ephem",
+#       "requests",
+#       "sgp4" ]
+# with
+#     dependencies = [
+#       "numpy",
+#       "pandas",
+#       "requests",
+#       "sgp4",
+#       "skyfield" ]
 #
-#   if "indicatorlunar" in indicator_name:
-#       # astroskyfield.py assumes planets.bsp/stars.dat are in
-#       #   indicatorlunar/src/indicatorlunar/data
-#       # Whilst that directory will be copied across automatically,
-#       # must also determine planets.bsp/stars.dat are also present.
-#       # data_directory = Path( indicator_name ) / "src" / "indicatorlunar" / "data"
-#       # planets_bsp = data_directory / "planets.bsp"
-#       # if not planets_bsp.is_file():
-#       #   message += f"{ indicator_name }: Unable to locate { planets_bsp } - may need to be created - aborting.\n"
+# In MANIFESTspecific.in, replace
+#     exclude src/indicatorlunar/astroskyfield.py
+#     exclude src/indicatorlunar/meteorshowertest.py
+#     recursive-exclude src/{indicator_name}/data *
+# with
+#     exclude src/indicatorlunar/meteorshowertest.py
+#     recursive-include src/{indicator_name}/data *   <--- Is this needed?  Will the data files be included by default?
 #
-#       # stars_dat = Path( str( data_directory ) + "/stars.dat" )
-#       # if not stars_dat.is_file():
-#       #   message += f"{ indicator_name }: Unable to locate { stars_dat } - may need to be created - aborting.\n"
-
-
-#TODO If/when this is included in the release,
-# obviously move to the src/indicatorlunar folder...
-# ...BUT ALSO add to the locale/POTFILES.in.
+# Still need a check in tools/build_wheel.py to ensure planets.bsp / starts.dat
+# are present?
+#
+# Add astroskyfield.py to locale/POTFILES.in.
 
 
 #TODO Might be able to use new OMM method to load satellite data:
@@ -63,36 +66,6 @@
 # Perhaps do some timing tests...to see how long it takes to process comets (of around 22)
 # and whatever the minor planets currently sits at with a maximum apparent magnitude of 15.
 # Minor planets is around 560...maybe too much to switch over to Skyfield.
-
-
-#TODO If/when astroskyfield.py is included in the release,
-# put a data directory at
-#   indicatorlunar/src/indicatorlunar/data
-# with planets.bsp and stars.dat in it (created) ... copied from top level directory.
-# Then in pyproject.toml:
-#dependencies = [
-#  "skyfield",
-#  "numpy",
-#  "pandas",
-#  "PyGObject",
-#  "requests",
-#  "sgp4"
-#]
-#
-# and
-#
-#[tool.setuptools.package-data]
-#indicatorlunar = [
-#  "CHANGELOG.md",
-#  "icons/*/*.svg",
-#  "data/planets.bsp",
-#  "data/stars.dat",
-#  "locale/*.pot",
-#  "locale/*/LC_MESSAGES/*.mo",
-#  "locale/*/LC_MESSAGES/*.po",
-#  "packaging/linux/*.desktop",
-#  "packaging/linux/*.sh"
-#]
 
 
 import datetime
