@@ -6,3 +6,4 @@ version = "1.0.17"
 description = "Application indicator to test indicator functionality."
 classifiers = [
   "Topic :: Software Development :: Testing" ]
+

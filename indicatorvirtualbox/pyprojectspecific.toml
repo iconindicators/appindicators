@@ -1,7 +1,8 @@
 # THIS IS AN INCOMPLETE PYPROJECT.TOML
 # USED BY THE BUILD WHEEL SCRIPT
 # TO CREATE A COMPLETE PYPROJECT.TOML.
-version = "1.0.81"
-description = "Application indicator which displays PPA download statistics."
+version = "1.0.75"
+description = "Application indicator for VirtualBox™ virtual machines."
 classifiers = [
   "Topic :: Utilities" ]
+

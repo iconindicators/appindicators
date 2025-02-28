@@ -395,8 +395,9 @@ def _package_source_for_build_wheel_process(
 
     directory_indicator = directory_dist / indicator_name
 
-    # Copy the ENTIRE project across and use pyproject.toml and MANIFEST.in
-    # to include/exclude files/folders in the build.
+    # Copy the ENTIRE project across and create a pyproject.toml and MANIFEST.in
+    # by combining those from indicatorbase and the indicator to include/exclude
+    # files/folders in the build.
     shutil.copytree( indicator_name, directory_indicator )
 
     shutil.copy(
@@ -426,7 +427,7 @@ def _package_source_for_build_wheel_process(
     if version_from_pyproject_toml != version_from_changelog_markdown:
         message = (
             f"{ indicator_name }: The most recent version in " +
-            f"CHANGELOG.md does not match that in pyproject.toml\n" )
+            f"CHANGELOG.md does not match that in pyprojectspecific.toml\n" )
 
     if not message:
         authors = get_pyproject_toml_authors( config )
