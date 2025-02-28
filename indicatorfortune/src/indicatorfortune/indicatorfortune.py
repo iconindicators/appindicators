@@ -33,7 +33,7 @@ from gi.repository import Gtk
 
 from indicatorbase import IndicatorBase
 
-from fortune import Fortune
+from . import fortune
 
 
 class IndicatorFortune( IndicatorBase ):
@@ -182,7 +182,7 @@ class IndicatorFortune( IndicatorBase ):
         else:
             message = _( "No fortunes are enabled!" )
 
-        self.fortune = Fortune( message, summary )
+        self.fortune = fortune.Fortune( message, summary )
 
 
     def show_fortune( self ):
