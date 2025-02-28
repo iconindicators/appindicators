@@ -54,6 +54,9 @@ References
 # https://stackoverflow.com/questions/22241420/execution-of-python-code-with-m-option-or-not
 # https://stackoverflow.com/questions/7610001/what-is-the-purpose-of-the-m-switch?noredirect=1&lq=1
 # https://stackoverflow.com/questions/46319694/what-does-it-mean-to-run-library-module-as-a-script-with-the-m-option
+# https://stackoverflow.com/questions/16981921/relative-imports-in-python-3
+# https://stackoverflow.com/questions/7505988/importing-from-a-relative-path-in-python
+# https://stackoverflow.com/questions/72852/how-can-i-do-relative-imports-in-python
 
 
 #TODO Not sure if this applies:
@@ -209,6 +212,13 @@ class IndicatorBase( ABC ):
 
             gettext.install( INDICATOR_NAME, localedir = locale_directory )
             break
+
+
+#TODO Delete me once able to be called in build_wheel on both Ubuntu and Debian.
+    @staticmethod
+    def get_me():
+        print( "got me" )
+
 
 
     def __init__(

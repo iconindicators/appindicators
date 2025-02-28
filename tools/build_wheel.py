@@ -36,13 +36,14 @@ import sys
 
 from pathlib import Path
 
-import utils
-import utils_locale
-import utils_readme
+from . import utils
+from . import utils_locale
+from . import utils_readme
 
-sys.path.append( "indicatorbase/src/indicatorbase" )
+# sys.path.append( "indicatorbase/src/indicatorbase" )
 try:
-    import indicatorbase
+    from indicatorbase.src.indicatorbase import indicatorbase
+    indicatorbase.IndicatorBase.get_me() #TODO Remove
 except ModuleNotFoundError:
 #TODO Hit this exception on Debian 12 on laptop and 64 bit...why?
 # Works on Ubuntu 24.04 so seems to be a Debian only issue.
