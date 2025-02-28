@@ -7,6 +7,10 @@ which is probably
 # change to the dev directory root and venv_development.
  
 
+#TODO Check that when running scripts in tools the command is according to new method:
+#   python3 -m tools.build_wheel release indicatortest
+
+
 # AppIndicators for Ubuntu et al...
 
 
