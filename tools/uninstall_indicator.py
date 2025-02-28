@@ -23,9 +23,13 @@ if no more indicators are installed.
 '''
 
 
+#TODO Check that this script now runs according to new method:
+#   python3 -m tools.build_wheel release indicatortest
+
+
 import subprocess
 
-import utils
+from . import utils
 
 
 if __name__ == "__main__":

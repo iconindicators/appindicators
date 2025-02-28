@@ -40,7 +40,7 @@ def is_correct_directory(
             Path( '.' ) / path_of_caller_parts[ -2 ] / path_of_caller_parts[ -1 ] )
 
         message = (
-            f"The script must be run from the top level directory (one above tools).\n"
+            f"The script must be run from the project/top directory (one above tools).\n"
             f"For example:\n"
             f"\tpython3 { script_path_and_name } { '' if example_arguments is None else example_arguments }" )
 

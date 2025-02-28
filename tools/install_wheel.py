@@ -23,11 +23,15 @@ run script and icons.
 '''
 
 
+#TODO Check that this script now runs according to new method:
+#   python3 -m tools.build_wheel release indicatortest
+
+
 import subprocess
 
 from pathlib import Path
 
-import utils
+from . import utils
 
 
 if __name__ == "__main__":
