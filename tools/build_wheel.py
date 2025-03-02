@@ -36,13 +36,6 @@ import subprocess
 from pathlib import Path
 
 from . import utils
-VENV = Path( "./venv_development" )
-utils.initialise_virtual_environment(
-    VENV,
-    "build",
-    "packaging",
-    "pip",
-    "readme_renderer[md]" )
 from . import utils_locale
 from . import utils_readme
 # import utils
@@ -67,7 +60,7 @@ from ..indicatorbase.src.indicatorbase import indicatorbase #TODO ORiginal
 #import indicatorbase
 
 
-#VENV = Path( "./venv_development" )
+VENV = Path( "./venv_development" )
 
 
 def _check_for_t_o_d_o_s(
@@ -560,14 +553,12 @@ if __name__ == "__main__":
                     "indicators" :
                         "+" } ) )
 
-        '''
         utils.initialise_virtual_environment(
             VENV,
             "build",
             "packaging",
             "pip",
             "readme_renderer[md]" )
-        '''
 
         for indicator in args.indicators:
             print( indicator )
