@@ -16,6 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO What happens if a config is read (or no config exists) and there are no 
+# fortunes enabled?  This is the default for a user running out of the box.
+# Need to ensure a default fortune is enabled.
+
+
 ''' Application indicator which displays fortunes. '''
 
 
@@ -31,9 +36,13 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from indicatorbase import IndicatorBase
+#TODO Roll out this import method to all indicators / tools.
 
-from . import fortune
+# from .indicatorbase import IndicatorBase
+from indicatorbase import IndicatorBase #TODO For Eclipse; remove before release and uncomment above.
+
+# from .fortune import Fortune
+from fortune import Fortune #TODO For Eclipse; remove before release and uncomment above.
 
 
 class IndicatorFortune( IndicatorBase ):
@@ -63,9 +72,7 @@ class IndicatorFortune( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            comments = _(
-                "Calls the 'fortune' program displaying the result in the " +
-                "on-screen notification." ) )
+            comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
 
         self.remove_file_from_cache( IndicatorFortune.HISTORY_FILE )
 
@@ -142,12 +149,12 @@ class IndicatorFortune( IndicatorBase ):
         if locations:
             command = "fortune" + ''.join( locations )
             while True:
-                fortune = self.process_get( command )
-                if not fortune: # No fortune data found.
+                fortune_ = self.process_get( command )
+                if not fortune_: # No fortune data found.
                     message = _( "Ensure enabled fortunes contain data!" )
                     break
 
-                if len( fortune ) <= self.skip_fortune_character_count:
+                if len( fortune_ ) <= self.skip_fortune_character_count:
                     history = (
                         self.read_cache_text_without_timestamp(
                             IndicatorFortune.HISTORY_FILE ) )
@@ -160,7 +167,7 @@ class IndicatorFortune( IndicatorBase ):
                     #        *** System shutdown message from root
                     #    It's a very *__UN*lucky week in which to be took
                     output = ""
-                    for c in fortune:
+                    for c in fortune_:
                         char_as_hex = codecs.encode( str.encode( c ), "hex" )
                         if char_as_hex == b'07' or char_as_hex == b'08':
                             continue
@@ -182,7 +189,7 @@ class IndicatorFortune( IndicatorBase ):
         else:
             message = _( "No fortunes are enabled!" )
 
-        self.fortune = fortune.Fortune( message, summary )
+        self.fortune = Fortune( message, summary )
 
 
     def show_fortune( self ):
@@ -676,14 +683,16 @@ class IndicatorFortune( IndicatorBase ):
         '''
         Get the default system fortune.
 
-        On success returns fortunes.dat.
+        On success returns the full text path to fortunes.dat.
         Otherwise, returns None.
         '''
-        system_fortune_default = None
         system_fortune_path = self._get_system_fortune_path()
         if system_fortune_path:
             system_fortune_default = (
-                Path( system_fortune_path ) / "fortunes.dat" )
+                str( Path( system_fortune_path ) / "fortunes.dat" ) )
+
+        else:
+            system_fortune_default = None
 
         return system_fortune_default
 
@@ -732,14 +741,7 @@ class IndicatorFortune( IndicatorBase ):
         self,
         config ):
 
-        system_fortune_default = self.get_system_fortune_default()
-        self.fortunes = (
-            config.get(
-                IndicatorFortune.CONFIG_FORTUNES,
-                [ system_fortune_default, True ]
-                if system_fortune_default
-                else
-                [ ] ) )
+        self.fortunes = config.get( IndicatorFortune.CONFIG_FORTUNES, [ ] )
 
         self.notification_summary = (
             config.get(
@@ -749,6 +751,14 @@ class IndicatorFortune( IndicatorBase ):
         version_from_config = Version( self.get_version_from_config( config ) )
         if version_from_config < Version( "1.0.44" ):
             self._upgrade_1_0_44()
+
+        if len( self.fortunes ) == 0:
+            system_fortune_default = self.get_system_fortune_default()
+            if system_fortune_default:
+                self.fortunes = [ [ system_fortune_default, True ] ]
+
+            else:
+                self.fortunes = [ ]
 
         self.middle_mouse_click_on_icon = (
             config.get(
