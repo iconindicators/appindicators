@@ -40,31 +40,6 @@ References
     https://guicommits.com/organize-python-code-like-a-pro/
 '''
 
-#TODO As per tools/build_wheel.py, to import our own classes,
-# should ALL classes use 
-#  from . import utils
-# ???
-#
-# Have made this change to fortune...so build a wheel and test in a venv.
-
-
-#TODO Should running a tools/....py use python3 -m?
-#
-# FYI, the indicators should be run using python3 without the -m
-# as they are not libraries (packages).
-#
-# Not sure yet about tools.
-# Doing so (with -m) might fix the issue with calling build_wheel.py on Debian
-# and unable to import indicatorbase.
-#
-# https://realpython.com/run-python-scripts/
-# https://stackoverflow.com/questions/22241420/execution-of-python-code-with-m-option-or-not
-# https://stackoverflow.com/questions/7610001/what-is-the-purpose-of-the-m-switch?noredirect=1&lq=1
-# https://stackoverflow.com/questions/46319694/what-does-it-mean-to-run-library-module-as-a-script-with-the-m-option
-# https://stackoverflow.com/questions/16981921/relative-imports-in-python-3
-# https://stackoverflow.com/questions/7505988/importing-from-a-relative-path-in-python
-# https://stackoverflow.com/questions/72852/how-can-i-do-relative-imports-in-python
-
 
 #TODO Not sure if this applies:
 #   https://setuptools.pypa.io/en/latest/userguide/datafiles.html#accessing-data-files-at-runtime
@@ -80,7 +55,6 @@ References
 import datetime
 import email.policy
 import gettext
-import inspect
 import json
 import logging.handlers
 import pickle
@@ -133,9 +107,7 @@ except ValueError:
 
 
 class IndicatorBase( ABC ):
-    '''
-    Base class from which all indicators inherit.
-    '''
+    ''' Base class for all indicators. '''
 
     _CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS = "%Y%m%d%H%M%S"
 
@@ -196,36 +168,19 @@ class IndicatorBase( ABC ):
 
     TIMEOUT_IN_SECONDS = 10
 
-    # Obtain name of indicator from the call stack and initialise gettext.
-    INDICATOR_NAME = None
-    for frame_record in inspect.stack():
-        in_indicator_source = (
-            "from indicatorbase import IndicatorBase"
-            in
-            str( frame_record.code_context ) )
-
-        if in_indicator_source:
-            INDICATOR_NAME = Path( frame_record.filename ).stem
-            if INDICATOR_NAME == Path( __file__ ).parent.stem:
-                # Running installed under a virtual environment.
-                locale_directory = Path( __file__ ).parent / "locale"
-
-            else:
-#TODO When running under development,
-# check this works under Eclipse, Visual Studio Code and via a terminal.
-                # Running in development.
-                locale_directory = (
-                    Path( __file__ ).parent.parent.parent.parent / INDICATOR_NAME / "src" / INDICATOR_NAME / "locale" )
-
-            gettext.install( INDICATOR_NAME, localedir = locale_directory )
-            break
+    INDICATOR_NAME = Path( sys.argv[ 0 ] ).parent.stem
+    print( f"INDICATOR_NAME = { INDICATOR_NAME }" ) #TODO Remove
+    locale_directory = Path( sys.argv[ 0 ] ).parent / "locale" #TODO Remove
+    print( f"locale_directory = { locale_directory }" ) #TODO Remove
+    gettext.install(
+        INDICATOR_NAME,
+        localedir = Path( sys.argv[ 0 ] ).parent / "locale" )
 
 
 #TODO Delete me once able to be called in build_wheel on both Ubuntu and Debian.
     @staticmethod
     def get_me():
         print( "got me" )
-
 
 
     def __init__(
@@ -285,8 +240,8 @@ class IndicatorBase( ABC ):
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
 
-        self.website = (
-            project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip() )
+        project_url = project_metadata.get_all( "Project-URL" )[ 0 ]
+        self.website = project_url.split( ',' )[ 1 ].strip()
 
         self.log = Path.home() / ( self.indicator_name + ".log" )
         logging.basicConfig(
@@ -381,21 +336,6 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def _get_wheel_in_release( indicator_name ):
-        error_message = None
-        path_release = Path( __file__ ).parent.parent.parent.parent
-        path_wheel = (
-            path_release / "release" / "wheel" / f"dist_{ indicator_name }" )
-
-        first_wheel = next( path_wheel.glob( "*.whl" ), None )
-        if first_wheel is None:
-            error_message = (
-                f"Unable to locate a .whl in { path_wheel.absolute() }" )
-
-        return first_wheel, error_message
-
-
-    @staticmethod
     def get_project_metadata( indicator_name ):
         '''
         Read in the project metadata,
@@ -435,6 +375,21 @@ class IndicatorBase( ABC ):
                     project_metadata = first_metadata.metadata
 
         return project_metadata, error_message
+
+
+    @staticmethod
+    def _get_wheel_in_release( indicator_name ):
+        error_message = None
+        path_release = Path( __file__ ).parent.parent.parent.parent
+        path_wheel = (
+            path_release / "release" / "wheel" / f"dist_{ indicator_name }" )
+
+        first_wheel = next( path_wheel.glob( "*.whl" ), None )
+        if first_wheel is None:
+            error_message = (
+                f"Unable to locate a .whl in { path_wheel.absolute() }" )
+
+        return first_wheel, error_message
 
 
     def _initialise_desktop_file_in_user_home( self ):
@@ -2382,8 +2337,16 @@ class IndicatorBase( ABC ):
     def get_version_from_config(
             self,
             config ):
-        ''' Return the version from the config file. '''
-        return config[ IndicatorBase._CONFIG_VERSION ]
+        '''
+        Return the version from the config file.
+
+        If the user has never having modified their preferences, or,
+        the user is running an older version of the indicator which contains
+        no version number in the .json, there will be no version number.
+
+        In this case, return a dummy version of "0.0.0"
+        '''
+        return config.get( IndicatorBase._CONFIG_VERSION, "0.0.0" )
 
 
     def request_save_config(
