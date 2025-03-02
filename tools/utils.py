@@ -69,6 +69,23 @@ def initialiase_parser_and_get_arguments(
     return parser.parse_args()
 
 
+def initialise_virtual_environment_and_activate(
+    venv_directory,
+    *modules_to_install ):
+
+    if not venv_directory.is_dir():
+        command = f"python3 -m venv { venv_directory }"
+        subprocess.call( command, shell = True )
+
+    command = (
+        f". { venv_directory.absolute() / 'bin' / 'activate' } && " +
+        f"python3 -m pip install --upgrade --force-reinstall { ' '.join( modules_to_install ) }" +
+        f". { VENV }/bin/activate" )
+
+    subprocess.call( command, shell = True )
+
+
+#TODO Possibly old.
 def initialise_virtual_environment(
     venv_directory,
     *modules_to_install ):
@@ -82,3 +99,4 @@ def initialise_virtual_environment(
         f"python3 -m pip install --upgrade --force-reinstall { ' '.join( modules_to_install ) }" )
 
     subprocess.call( command, shell = True )
+

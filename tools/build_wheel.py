@@ -36,6 +36,13 @@ import subprocess
 from pathlib import Path
 
 from . import utils
+VENV = Path( "./venv_development" )
+utils.initialise_virtual_environment(
+    VENV,
+    "build",
+    "packaging",
+    "pip",
+    "readme_renderer[md]" )
 from . import utils_locale
 from . import utils_readme
 # import utils
@@ -55,12 +62,12 @@ from . import utils_readme
 # https://stackoverflow.com/questions/16981921/relative-imports-in-python-3
 # https://stackoverflow.com/questions/7505988/importing-from-a-relative-path-in-python
 # https://stackoverflow.com/questions/72852/how-can-i-do-relative-imports-in-python
-from indicatorbase.src.indicatorbase import indicatorbase
+from ..indicatorbase.src.indicatorbase import indicatorbase #TODO ORiginal
 # indicatorbase.IndicatorBase.get_me() #TODO Remove
 #import indicatorbase
 
 
-VENV = Path( "./venv_development" )
+#VENV = Path( "./venv_development" )
 
 
 def _check_for_t_o_d_o_s(
@@ -463,11 +470,9 @@ def _package_source_for_build_wheel_process(
             start_year )
 
         subprocess.call(
-            f". { VENV }/bin/activate && " +
             f"python3 -m readme_renderer " +
             f"{ directory_dist }/{ indicator_name }/README.md " +
-            f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html " +
-            "&& deactivate",
+            f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html",
             shell = True )
 
         directory_indicator_locale = (
@@ -520,7 +525,6 @@ def _build_wheel_for_indicator(
         message = _package_source_for_build_wheel_process( directory_dist, indicator_name )
         if not message:
             command = (
-                f". { VENV }/bin/activate && " +
                 f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }" )
 
             subprocess.call( command, shell = True )
@@ -532,10 +536,13 @@ def _build_wheel_for_indicator(
 
 
 if __name__ == "__main__":
+    '''
     correct_directory, error_message = (
         utils.is_correct_directory(
             example_arguments = "release indicatorfortune" ) )
+    '''
 
+    correct_directory = True #TODO Testing
     if correct_directory:
         args = (
             utils.initialiase_parser_and_get_arguments(
@@ -552,24 +559,28 @@ if __name__ == "__main__":
                     "indicators" :
                         "+" } ) )
 
+        '''
         utils.initialise_virtual_environment(
             VENV,
             "build",
+            "packaging",
             "pip",
             "readme_renderer[md]" )
+        '''
 
         for indicator in args.indicators:
-            error_message = _build_wheel_for_indicator( args.directory_release, indicator )
-            if error_message:
-                print( error_message )
+            print( indicator )
+#            error_message = _build_wheel_for_indicator( args.directory_release, indicator )
+#            if error_message:
+#                print( error_message )
 
         # As a convenience, convert the project README.md to README.html
-        command_ = (
-            f". { VENV }/bin/activate && " +
-            f"python3 -m readme_renderer README.md -o README.html && " +
-            f"deactivate" )
+        command_ = f"python3 -m readme_renderer README.md -o README.html"
+#        subprocess.call( command_, shell = True )
 
-        subprocess.call( command_, shell = True )
+#TODO Don't think this is needed.
+#        subprocess.call( "deactivate", shell = True )
 
     else:
         print( error_message )
+
