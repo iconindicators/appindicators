@@ -559,14 +559,12 @@ if __name__ == "__main__":
                     "indicators" :
                         "+" } ) )
 
-        '''
-        utils.initialise_virtual_environment(
+        utils.initialise_virtual_environment_and_activate
             VENV,
             "build",
             "packaging",
             "pip",
             "readme_renderer[md]" )
-        '''
 
         for indicator in args.indicators:
             print( indicator )
