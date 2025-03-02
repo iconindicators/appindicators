@@ -38,14 +38,26 @@ from pathlib import Path
 from . import utils
 from . import utils_locale
 from . import utils_readme
+# import utils
+# import utils_locale
+# import utils_readme
 
 
 # sys.path.append( "indicatorbase/src/indicatorbase" ) #TODO Not needed hopefully.
 
 #TODO Get a ModuleNotFoundError exception/error on Debian, but not Ubuntu.
 # Create a small demo and then post to StackExchange.
+#
+# https://realpython.com/run-python-scripts/
+# https://stackoverflow.com/questions/22241420/execution-of-python-code-with-m-option-or-not
+# https://stackoverflow.com/questions/7610001/what-is-the-purpose-of-the-m-switch?noredirect=1&lq=1
+# https://stackoverflow.com/questions/46319694/what-does-it-mean-to-run-library-module-as-a-script-with-the-m-option
+# https://stackoverflow.com/questions/16981921/relative-imports-in-python-3
+# https://stackoverflow.com/questions/7505988/importing-from-a-relative-path-in-python
+# https://stackoverflow.com/questions/72852/how-can-i-do-relative-imports-in-python
 from indicatorbase.src.indicatorbase import indicatorbase
-indicatorbase.IndicatorBase.get_me() #TODO Remove
+# indicatorbase.IndicatorBase.get_me() #TODO Remove
+#import indicatorbase
 
 
 VENV = Path( "./venv_development" )
