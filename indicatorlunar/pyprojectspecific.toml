@@ -1,6 +1,7 @@
 # THIS IS AN INCOMPLETE PYPROJECT.TOML
 # USED BY THE BUILD WHEEL SCRIPT
 # TO CREATE A COMPLETE PYPROJECT.TOML.
+[project]
 version = "1.0.101"
 description = "Application indicator for the home astronomer."
 classifiers = [
