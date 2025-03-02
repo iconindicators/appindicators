@@ -169,9 +169,9 @@ class IndicatorBase( ABC ):
     TIMEOUT_IN_SECONDS = 10
 
     INDICATOR_NAME = Path( sys.argv[ 0 ] ).parent.stem
-    print( f"INDICATOR_NAME = { INDICATOR_NAME }" ) #TODO Remove
+#    print( f"INDICATOR_NAME = { INDICATOR_NAME }" ) #TODO Remove
     locale_directory = Path( sys.argv[ 0 ] ).parent / "locale" #TODO Remove
-    print( f"locale_directory = { locale_directory }" ) #TODO Remove
+#    print( f"locale_directory = { locale_directory }" ) #TODO Remove
     gettext.install(
         INDICATOR_NAME,
         localedir = Path( sys.argv[ 0 ] ).parent / "locale" )

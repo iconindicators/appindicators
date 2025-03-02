@@ -55,7 +55,7 @@ from . import utils_readme
 # https://stackoverflow.com/questions/16981921/relative-imports-in-python-3
 # https://stackoverflow.com/questions/7505988/importing-from-a-relative-path-in-python
 # https://stackoverflow.com/questions/72852/how-can-i-do-relative-imports-in-python
-from ..indicatorbase.src.indicatorbase import indicatorbase #TODO ORiginal
+#from ..indicatorbase.src.indicatorbase import indicatorbase #TODO ORiginal
 # indicatorbase.IndicatorBase.get_me() #TODO Remove
 #import indicatorbase
 
@@ -210,6 +210,47 @@ def _get_version_in_changelog_markdown(
                 break
 
     return version
+
+
+def _get_year_in_changelog_markdown(
+    indicator_name ):
+
+    command = (
+        f". { VENV }/bin/activate && " +
+        f"python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " +
+        f"import IndicatorBase; " +
+        f"print( IndicatorBase.get_year_in_changelog_markdown( " +
+#            f"'/home/bernard/Programming/Indicators/{ indicator_name }/src/{ indicator_name }/CHANGELOG.md' ) )\"" )
+            f"'{ Path( indicator_name ) }/src/{ indicator_name }/CHANGELOG.md' ) )\"" )
+
+#        print( "xxx" )
+#        print( command )
+#        print( "xxx" )
+
+    result = (
+        subprocess.run(
+            command,
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE,
+            shell = True,
+            check = False ) )
+
+    stderr_ = result.stderr.decode()
+    if stderr_:
+        message = "TODO Need some sort of message..."
+        year = -1
+        print( message )
+        print( stderr_ )
+
+    else:
+        year = result.stdout.decode().strip()
+        message = ""
+        #TODO Remove stuff below
+        print( "---------------" )
+        print( result )
+        print( "---------------" )
+
+    return year, message
 
 
 def get_pyproject_toml_authors(
@@ -434,10 +475,15 @@ def _package_source_for_build_wheel_process(
     if not message:
         authors = get_pyproject_toml_authors( config )
 
+        '''
+        TODO Remove hopefully
         start_year = (
             indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
                 Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" ) )
+        '''
+        start_year, message = _get_year_in_changelog_markdown( indicator_name )
 
+    if not message:
         utils_locale.update_locale_source(
             indicator_name,
             authors,
@@ -558,20 +604,66 @@ if __name__ == "__main__":
             "build",
             "packaging",
             "pip",
+            "PyGObject",
             "readme_renderer[md]" )
 
+#TODO Remove
+        '''
+
+        command = (
+            f". { VENV }/bin/activate && " +
+            f"python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase; IndicatorBase.get_me()\"" )
+
+
+        indicator_name = args.indicators[ 0 ]
+
+        command = (
+            f". { VENV }/bin/activate && " +
+            f"python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " +
+            f"import IndicatorBase; " +
+            f"print( IndicatorBase.get_year_in_changelog_markdown( " +
+#            f"'/home/bernard/Programming/Indicators/{ indicator_name }/src/{ indicator_name }/CHANGELOG.md' ) )\"" )
+            f"'{ Path( indicator_name ) }/src/{ indicator_name }/CHANGELOG.md' ) )\"" )
+
+        print( "xxx" )
+        print( command )
+        print( "xxx" )
+
+        result = (
+            subprocess.run(
+                command,
+                stdout = subprocess.PIPE,
+                stderr = subprocess.PIPE,
+                shell = True,
+                check = False ) )
+
+        stderr_ = result.stderr.decode()
+        if stderr_:
+            result = ""
+            print("TODO: error accessing indicatorbase..." )
+            print( stderr_ )
+
+        else:
+            result = result.stdout.decode().strip()
+            print( "---------------" )
+            print( result )
+            print( "---------------" )
+
+        import sys
+        sys.exit()
+        '''
+
         for indicator in args.indicators:
-            print( indicator )
-#            error_message = _build_wheel_for_indicator( args.directory_release, indicator )
-#            if error_message:
-#                print( error_message )
+            error_message = _build_wheel_for_indicator( args.directory_release, indicator )
+            if error_message:
+                print( error_message )
 
         # As a convenience, convert the project README.md to README.html
         command_ = (
             f". { VENV }/bin/activate && " +
             f"python3 -m readme_renderer README.md -o README.html" )
 
-#        subprocess.call( command_, shell = True )
+        subprocess.call( command_, shell = True )
 
     else:
         print( error_message )
