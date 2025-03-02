@@ -30,9 +30,11 @@ from gi.repository import Gdk
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from indicatorbase import IndicatorBase
+# from .indicatorbase import IndicatorBase
+from indicatorbase import IndicatorBase #TODO For Eclipse; remove before release and uncomment above.
 
-from virtualmachine import Group, VirtualMachine
+# from .virtualmachine import Group, VirtualMachine
+from virtualmachine import Group, VirtualMachine #TODO For Eclipse; remove before release and uncomment above.
 
 
 class IndicatorVirtualBox( IndicatorBase ):

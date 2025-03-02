@@ -57,9 +57,11 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from indicatorbase import IndicatorBase
+# from .indicatorbase import IndicatorBase
+from indicatorbase import IndicatorBase #TODO For Eclipse; remove before release and uncomment above.
 
-from event import Event
+# from .event import Event
+from event import Event #TODO For Eclipse; remove before release and uncomment above.
 
 
 class IndicatorOnThisDay( IndicatorBase ):

@@ -30,9 +30,11 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from indicatorbase import IndicatorBase
+# from .indicatorbase import IndicatorBase
+from indicatorbase import IndicatorBase #TODO For Eclipse; remove before release and uncomment above.
 
-from ppa import PPA, PublishedBinary
+# from .ppa import PPA, PublishedBinary
+from ppa import PPA, PublishedBinary #TODO For Eclipse; remove before release and uncomment above.
 
 
 class IndicatorPPADownloadStatistics( IndicatorBase ):
