@@ -29,7 +29,7 @@ if no more indicators are installed.
 
 import subprocess
 
-from . import utils
+from . import utils  #TODO Fix to new way and check all works.
 
 
 if __name__ == "__main__":

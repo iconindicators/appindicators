@@ -26,6 +26,13 @@ import subprocess
 from pathlib import Path
 
 
+#TODO If this is kept, see if the way to ensure this is the correct path, etc, etc 
+# can be done differently.  See indicatorbase and how it gets the execution script name.
+#
+# Something like this???
+#         import sys
+#         print( Path( sys.argv[ 0 ] ) )
+#         print( Path( sys.argv[ 0 ] ).parent.parent )
 def is_correct_directory(
     example_arguments = None ):
     correct_directory = (

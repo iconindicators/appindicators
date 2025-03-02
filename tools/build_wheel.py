@@ -38,26 +38,6 @@ from pathlib import Path
 from . import utils
 from . import utils_locale
 from . import utils_readme
-# import utils
-# import utils_locale
-# import utils_readme
-
-
-# sys.path.append( "indicatorbase/src/indicatorbase" ) #TODO Not needed hopefully.
-
-#TODO Get a ModuleNotFoundError exception/error on Debian, but not Ubuntu.
-# Create a small demo and then post to StackExchange.
-#
-# https://realpython.com/run-python-scripts/
-# https://stackoverflow.com/questions/22241420/execution-of-python-code-with-m-option-or-not
-# https://stackoverflow.com/questions/7610001/what-is-the-purpose-of-the-m-switch?noredirect=1&lq=1
-# https://stackoverflow.com/questions/46319694/what-does-it-mean-to-run-library-module-as-a-script-with-the-m-option
-# https://stackoverflow.com/questions/16981921/relative-imports-in-python-3
-# https://stackoverflow.com/questions/7505988/importing-from-a-relative-path-in-python
-# https://stackoverflow.com/questions/72852/how-can-i-do-relative-imports-in-python
-#from ..indicatorbase.src.indicatorbase import indicatorbase #TODO ORiginal
-# indicatorbase.IndicatorBase.get_me() #TODO Remove
-#import indicatorbase
 
 
 VENV = Path( "./venv_development" )
@@ -95,8 +75,7 @@ def _check_for_t_o_d_o_s(
     if message:
         message = f"Found one or more { t_o_d_o.upper() }s:\n" + message
 
-    return ""
-    # return message #TODO Uncomment in final release.
+    return message
 
 
 def _chmod(
@@ -214,18 +193,23 @@ def _get_version_in_changelog_markdown(
 
 def _get_year_in_changelog_markdown(
     indicator_name ):
+    '''
+    Obtains the (most recent) year from the CHANGELOG.md, typically done by
+    calling a function in indicatorbase.
+
+    Unfortunately, seems next to impossible to do so because the import fails.
+    Next best thing: call the function externally and retrieve the result.
+
+    Returns the most recent year from the CHANGELOG.md and an empty message.
+    On error, returns -1 for the year and an non-empty message.
+    '''
 
     command = (
         f". { VENV }/bin/activate && " +
         f"python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " +
         f"import IndicatorBase; " +
         f"print( IndicatorBase.get_year_in_changelog_markdown( " +
-#            f"'/home/bernard/Programming/Indicators/{ indicator_name }/src/{ indicator_name }/CHANGELOG.md' ) )\"" )
-            f"'{ Path( indicator_name ) }/src/{ indicator_name }/CHANGELOG.md' ) )\"" )
-
-#        print( "xxx" )
-#        print( command )
-#        print( "xxx" )
+        f"'{ Path( indicator_name ) }/src/{ indicator_name }/CHANGELOG.md' ) )\"" )
 
     result = (
         subprocess.run(
@@ -237,18 +221,12 @@ def _get_year_in_changelog_markdown(
 
     stderr_ = result.stderr.decode()
     if stderr_:
-        message = "TODO Need some sort of message..."
+        message = f"Unable to obtain year from CHANGELOG.md: { stderr_ }"
         year = -1
-        print( message )
-        print( stderr_ )
 
     else:
         year = result.stdout.decode().strip()
         message = ""
-        #TODO Remove stuff below
-        print( "---------------" )
-        print( result )
-        print( "---------------" )
 
     return year, message
 
@@ -475,12 +453,6 @@ def _package_source_for_build_wheel_process(
     if not message:
         authors = get_pyproject_toml_authors( config )
 
-        '''
-        TODO Remove hopefully
-        start_year = (
-            indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
-                Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" ) )
-        '''
         start_year, message = _get_year_in_changelog_markdown( indicator_name )
 
     if not message:
@@ -553,7 +525,8 @@ def _build_wheel_for_indicator(
     directory_release,
     indicator_name ):
 
-    message = _check_for_t_o_d_o_s( indicator_name )
+    # message = _check_for_t_o_d_o_s( indicator_name ) #TODO Uncomment
+    message = ""
     if not message:
         directory_dist = Path( '.' ) / directory_release / "wheel" / ( "dist_" + indicator_name )
         if Path( directory_dist ).exists():
@@ -576,13 +549,10 @@ def _build_wheel_for_indicator(
 
 
 if __name__ == "__main__":
-    '''
     correct_directory, error_message = (
         utils.is_correct_directory(
             example_arguments = "release indicatorfortune" ) )
-    '''
 
-    correct_directory = True #TODO Testing
     if correct_directory:
         args = (
             utils.initialiase_parser_and_get_arguments(
@@ -607,63 +577,15 @@ if __name__ == "__main__":
             "PyGObject",
             "readme_renderer[md]" )
 
-#TODO Remove
-        '''
-
-        command = (
-            f". { VENV }/bin/activate && " +
-            f"python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase; IndicatorBase.get_me()\"" )
-
-
-        indicator_name = args.indicators[ 0 ]
-
-        command = (
-            f". { VENV }/bin/activate && " +
-            f"python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " +
-            f"import IndicatorBase; " +
-            f"print( IndicatorBase.get_year_in_changelog_markdown( " +
-#            f"'/home/bernard/Programming/Indicators/{ indicator_name }/src/{ indicator_name }/CHANGELOG.md' ) )\"" )
-            f"'{ Path( indicator_name ) }/src/{ indicator_name }/CHANGELOG.md' ) )\"" )
-
-        print( "xxx" )
-        print( command )
-        print( "xxx" )
-
-        result = (
-            subprocess.run(
-                command,
-                stdout = subprocess.PIPE,
-                stderr = subprocess.PIPE,
-                shell = True,
-                check = False ) )
-
-        stderr_ = result.stderr.decode()
-        if stderr_:
-            result = ""
-            print("TODO: error accessing indicatorbase..." )
-            print( stderr_ )
-
-        else:
-            result = result.stdout.decode().strip()
-            print( "---------------" )
-            print( result )
-            print( "---------------" )
-
-        import sys
-        sys.exit()
-        '''
-
         for indicator in args.indicators:
             error_message = _build_wheel_for_indicator( args.directory_release, indicator )
             if error_message:
                 print( error_message )
 
-        # As a convenience, convert the project README.md to README.html
-        command_ = (
+        subprocess.call(
             f". { VENV }/bin/activate && " +
-            f"python3 -m readme_renderer README.md -o README.html" )
-
-        subprocess.call( command_, shell = True )
+            f"python3 -m readme_renderer README.md -o README.html",
+            shell = True )
 
     else:
         print( error_message )

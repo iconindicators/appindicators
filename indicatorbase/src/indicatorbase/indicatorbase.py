@@ -169,18 +169,10 @@ class IndicatorBase( ABC ):
     TIMEOUT_IN_SECONDS = 10
 
     INDICATOR_NAME = Path( sys.argv[ 0 ] ).parent.stem
-#    print( f"INDICATOR_NAME = { INDICATOR_NAME }" ) #TODO Remove
-    locale_directory = Path( sys.argv[ 0 ] ).parent / "locale" #TODO Remove
-#    print( f"locale_directory = { locale_directory }" ) #TODO Remove
+
     gettext.install(
         INDICATOR_NAME,
         localedir = Path( sys.argv[ 0 ] ).parent / "locale" )
-
-
-#TODO Delete me once able to be called in build_wheel on both Ubuntu and Debian.
-    @staticmethod
-    def get_me():
-        print( "got me" )
 
 
     def __init__(
