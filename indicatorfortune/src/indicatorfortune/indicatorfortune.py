@@ -16,11 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO What happens if a config is read (or no config exists) and there are no 
-# fortunes enabled?  This is the default for a user running out of the box.
-# Need to ensure a default fortune is enabled.
-
-
 ''' Application indicator which displays fortunes. '''
 
 
