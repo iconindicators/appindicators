@@ -694,13 +694,16 @@ class IndicatorOnThisDay( IndicatorBase ):
         '''
         Get the default system calendar.
 
-        On success returns the history calendar.
+        On success returns the full text path to the history calendar.
         Otherwise, returns None.
         '''
         system_calendar_default = (
             Path( IndicatorOnThisDay.SYSTEM_CALENDARS ) / "calendar.history" )
 
-        if not system_calendar_default.exists():
+        if system_calendar_default.exists():
+            system_calendar_default = str( system_calendar_default )
+
+        else:
             system_calendar_default = None
 
         return system_calendar_default
@@ -733,6 +736,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 else
                 [ ] ) )
 
+#TODO CHeck when a 0.0.0 is returned...that is, no .json or a config without a version.
         version_from_config = Version( self.get_version_from_config( config ) )
         if version_from_config < Version( "1.0.17" ):
             self._upgrade_1_0_17()

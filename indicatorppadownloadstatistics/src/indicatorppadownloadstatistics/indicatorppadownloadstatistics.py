@@ -962,6 +962,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
         self.ppas = [ ]
+#TODO CHeck when a 0.0.0 is returned...that is, no .json or a config without a version.
         version_from_config = Version( self.get_version_from_config( config ) )
         if version_from_config < Version( "1.0.81" ):
             self._upgrade_1_0_81( ppas, config.get( "filters", [ ] ) )
