@@ -525,6 +525,7 @@ def _build_wheel_for_indicator(
         message = _package_source_for_build_wheel_process( directory_dist, indicator_name )
         if not message:
             command = (
+                f". { VENV }/bin/activate && " +
                 f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }" )
 
             subprocess.call( command, shell = True )
@@ -559,12 +560,14 @@ if __name__ == "__main__":
                     "indicators" :
                         "+" } ) )
 
-        utils.initialise_virtual_environment_and_activate
+        '''
+        utils.initialise_virtual_environment(
             VENV,
             "build",
             "packaging",
             "pip",
             "readme_renderer[md]" )
+        '''
 
         for indicator in args.indicators:
             print( indicator )
@@ -573,12 +576,11 @@ if __name__ == "__main__":
 #                print( error_message )
 
         # As a convenience, convert the project README.md to README.html
-        command_ = f"python3 -m readme_renderer README.md -o README.html"
-#        subprocess.call( command_, shell = True )
+        command_ = (
+            f". { VENV }/bin/activate && " +
+            f"python3 -m readme_renderer README.md -o README.html" )
 
-#TODO Don't think this is needed.
-#        subprocess.call( "deactivate", shell = True )
+#        subprocess.call( command_, shell = True )
 
     else:
         print( error_message )
-
