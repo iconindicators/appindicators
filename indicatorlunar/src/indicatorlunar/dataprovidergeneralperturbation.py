@@ -25,8 +25,8 @@ general perturbations for satellites.
 from sgp4 import alpha5, exporter, omm
 from sgp4.api import Satrec
 
-from dataprovider import DataProvider
-from indicatorbase import IndicatorBase
+from .dataprovider import DataProvider
+from .indicatorbase import IndicatorBase
 
 
 class DataProviderGeneralPerturbation( DataProvider ):

@@ -46,11 +46,9 @@ from gi.repository import Gtk
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
-# from .indicatorbase import IndicatorBase
-from indicatorbase import IndicatorBase #TODO For Eclipse; remove before release and uncomment above.
+from .indicatorbase import IndicatorBase
 
-# from .script import Background, NonBackground, Info
-from script import Background, NonBackground, Info #TODO For Eclipse; remove before release and uncomment above.
+from .script import Background, NonBackground, Info
 
 
 class IndicatorScriptRunner( IndicatorBase ):

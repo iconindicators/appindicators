@@ -28,8 +28,8 @@ from enum import Enum
 
 import requests
 
-from dataprovider import DataProvider
-from indicatorbase import IndicatorBase
+from .dataprovider import DataProvider
+from .indicatorbase import IndicatorBase
 
 
 class DataProviderOrbitalElement( DataProvider ):

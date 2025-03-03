@@ -85,7 +85,7 @@ from skyfield.trigonometry import position_angle_of
 
 import eclipse
 
-from astrobase import AstroBase
+from .astrobase import AstroBase
 
 
 class AstroSkyfield( AstroBase ):

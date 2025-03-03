@@ -31,11 +31,9 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-# from .indicatorbase import IndicatorBase
-from indicatorbase import IndicatorBase #TODO For Eclipse; remove before release and uncomment above.
+from .indicatorbase import IndicatorBase
 
-# from .fortune import Fortune
-from fortune import Fortune #TODO For Eclipse; remove before release and uncomment above.
+from .fortune import Fortune
 
 
 class IndicatorFortune( IndicatorBase ):

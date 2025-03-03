@@ -25,7 +25,7 @@ apparent magnitude for comets and minor planets.
 import datetime
 import requests
 
-from dataprovider import DataProvider
+from .dataprovider import DataProvider
 
 
 class DataProviderApparentMagnitude( DataProvider ):

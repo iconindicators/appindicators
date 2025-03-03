@@ -29,7 +29,7 @@ from ephem.cities import _city_data
 
 import eclipse
 
-from astrobase import AstroBase
+from .astrobase import AstroBase
 
 
 class AstroPyEphem( AstroBase ):

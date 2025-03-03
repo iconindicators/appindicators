@@ -33,14 +33,13 @@ import requests
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-# from .indicatorbase import IndicatorBase
-from indicatorbase import IndicatorBase #TODO For Eclipse; remove before release and uncomment above.
+from .indicatorbase import IndicatorBase
 
 import eclipse
 
-from dataproviderapparentmagnitude import DataProviderApparentMagnitude
-from dataprovidergeneralperturbation import DataProviderGeneralPerturbation
-from dataproviderorbitalelement import DataProviderOrbitalElement, OrbitalElement
+from .dataproviderapparentmagnitude import DataProviderApparentMagnitude
+from .dataprovidergeneralperturbation import DataProviderGeneralPerturbation
+from .dataproviderorbitalelement import DataProviderOrbitalElement, OrbitalElement
 
 
 class IndicatorLunar( IndicatorBase ):
