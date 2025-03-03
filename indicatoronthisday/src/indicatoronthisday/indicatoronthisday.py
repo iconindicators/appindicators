@@ -89,9 +89,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            comments = _(
-                "Calls the 'calendar' program and displays events " +
-                "in the menu." ) )
+            comments = _( "Calls the 'calendar' program and displays events in the menu." ) )
 
 
     def update(

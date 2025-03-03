@@ -1,5 +1,5 @@
 # Russian translation for indicatoronthisday.
-# Copyright (C) 2017-2024 Bernard Giannetti
+# Copyright (C) 2017-2025 Bernard Giannetti
 # This file is distributed under the same license as the indicatoronthisday package.
 # Oleg Moiseichuk <berroll@mail.ru>, 2017-2024.
 #

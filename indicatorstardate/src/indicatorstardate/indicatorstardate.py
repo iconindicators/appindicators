@@ -46,8 +46,7 @@ class IndicatorStardate( IndicatorBase ):
         super().__init__(
             comments = _( "Shows the current Star Trek™ stardate." ),
             creditz = [
-                "STARDATES IN STAR TREK FAQ by Andrew Main. "
-                +
+                "STARDATES IN STAR TREK FAQ by Andrew Main. " +
                 "http://www.faqs.org/faqs/star-trek/stardates",
                 "Wikipedia::Stardate https://en.wikipedia.org/wiki/Stardate" ] )
 
