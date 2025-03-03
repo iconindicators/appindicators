@@ -18,53 +18,42 @@
 
 '''
 Install a Python wheel package for one or more indicators to a virtual
-environment within $HOME/.local/venv_indicators and copy across the .desktop,
-run script and icons.
+environment to $HOME/.local and copy across the .desktop, run script and icons.
 '''
 
 
 import subprocess
 
-from pathlib import Path
-
 from . import utils
 
 
 if __name__ == "__main__":
-    correct_directory, message = (
-        utils.is_correct_directory(
-            example_arguments = "release indicatorfortune" ) )
+    args = (
+        utils.initialiase_parser_and_get_arguments(
+            f"Install a Python wheel package for one or more indicators to "
+            f"a virtual environment within { utils.VENV_INSTALL } "
+            f"and copy across the .desktop, run script and icons.",
+            ( "directory_release", "indicators" ),
+            {
+                "directory_release" :
+                    f"The directory containing the Python wheel. "
+                    f"If the directory specified is 'release', "
+                    "the Python wheel must be located at 'release/wheel'.",
+                "indicators" :
+                    f"List of indicators, space separated, to install." },
+            {
+                "indicators" :
+                    "+" } ) )
 
-    if correct_directory:
-        args = (
-            utils.initialiase_parser_and_get_arguments(
-                f"Install a Python wheel package for one or more indicators to "
-                f"a virtual environment within $HOME/.local/venv_indicators "
-                f"and copy across the .desktop, run script and icons.",
-                ( "directory_release", "indicators" ),
-                {
-                    "directory_release" :
-                        f"The directory containing the Python wheel. "
-                        f"If the directory specified is 'release', "
-                        "the Python wheel must be located at 'release/wheel'.",
-                    "indicators" :
-                        f"List of indicators, space separated, to install." },
-                {
-                    "indicators" :
-                        "+" } ) )
+    for indicator_name in args.indicators:
+        utils.initialise_virtual_environment(
+            utils.VENV_INSTALL,
+            f"pip",
+            f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)" )
 
-        for indicator_name in args.indicators:
-            utils.initialise_virtual_environment(
-                Path.home() / ".local" / "venv_indicators",
-                f"pip",
-                f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)" )
+        command = (
+            f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | " +
+            f" head -1)/site-packages/{indicator_name}/platform/" +
+            f"linux/install.sh" )
 
-            command = (
-                f"$(ls -d $HOME/.local/venv_indicators/lib/python3.* | " +
-                f" head -1)/site-packages/{indicator_name}/platform/" +
-                f"linux/install.sh" )
-
-            subprocess.call( command, shell = True )
-
-    else:
-        print( message )
+        subprocess.call( command, shell = True )

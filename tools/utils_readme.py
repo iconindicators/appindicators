@@ -26,11 +26,16 @@ References:
 '''
 
 
+#TODO Check {{indicator}} and other {{ }}...are they correct/needed?
+  
+
 import datetime
 import re
 
 from enum import auto, Enum
 from pathlib import Path
+
+from . import utils
 
 
 class OperatingSystem( Enum ):
@@ -183,7 +188,7 @@ def _get_installation_additional_python_modules(
     common = (
         f"For example, to install the `requests` module:\n"
         f"    ```\n"
-        f"    . $HOME/.local/venv_indicators/bin/activate && \\\n"
+        f"    . { utils.VENV_INSTALL }/bin/activate && \\\n"
         f"    python3 -m pip install --upgrade requests && \\\n"
         f"    deactivate\n"
         f"    ```\n" )
@@ -209,12 +214,14 @@ def _get_installation_python_virtual_environment(
         f"Install the indicator to a `Python` virtual environment:\n"
         f"    ```\n"
         f"    indicator={ indicator_name } && \\\n"
-        f"    venv=$HOME/.local/venv_indicators && \\\n"
-        f"    if [ ! -d ${{venv}} ]; then python3 -m venv ${{venv}}; fi && \\\n"
-        f"    . ${{venv}}/bin/activate && \\\n"
+        f"    venv={ utils.VENV_INSTALL } && \\\n"
+        f"    if [ ! -d { utils.VENV_INSTALL } ]; "
+        f"    then python3 -m venv { utils.VENV_INSTALL }; fi && \\\n"
+        f"    . { utils.VENV_INSTALL }/bin/activate && \\\n"
         f"    python3 -m pip install --upgrade ${{indicator}} && \\\n"
         f"    deactivate && \\\n"
-        f"    . $(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/${{indicator}}/platform/linux/install.sh\n"
+        f"    . $(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
+        f"    site-packages/${{indicator}}/platform/linux/install.sh\n"
         f"    ```\n" )
 
     return message
@@ -338,13 +345,15 @@ def _get_uninstall_for_operating_system(
             f"2. Uninstall the indicator from virtual environment:\n"
             f"    ```\n"
             f"    indicator={ indicator_name } && \\\n"
-            f"    venv=$HOME/.local/venv_indicators && \\\n"
-            f"    $(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n"
-            f"    . ${{venv}}/bin/activate && \\\n"
+            f"    venv={ utils.VENV_INSTALL } && \\\n"
+            f"    $(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
+            f"    site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n" 
+            f"    . { utils.VENV_INSTALL }/bin/activate && \\\n"
             f"    python3 -m pip uninstall --yes ${{indicator}} && \\\n"
             f"    count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && \\\n"
             f"    deactivate && \\\n"
-            f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
+            f"    if [ \"$count\" -eq \"0\" ]; "
+            f"    then rm -f -r { utils.VENV_INSTALL }; fi \n"
             f"    ```\n"
             f"    If no other indicators are installed, the virtual environment will be deleted.\n\n"
 
@@ -562,7 +571,8 @@ def _get_install_uninstall(
             f"-----------------------\n\n"
             f"Installation and updating follow the same process:\n"
             f"1. Install operating system packages.\n"
-            f"2. Install `{ indicator_name }` via `pip` into a `Python3` virtual environment at `$HOME/.local/venv_indicators`.\n"
+            f"2. Install `{ indicator_name }` via `pip` into a `Python3` "
+            f"virtual environment at `{ utils.VENV_INSTALL }`.\n"
             f"{ additional_text }\n\n" )
 
     else:
@@ -650,9 +660,10 @@ def _get_usage(
         f"Alternatively, to run from the terminal:\n\n"
         f"```\n"
         f"indicator={ indicator_name } && \\\n"
-        f"venv=$HOME/.local/venv_indicators && \\\n"
-        f". ${{venv}}/bin/activate && \\\n"
-        f"python3 $(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/${{indicator}}/${{indicator}}.py && \\\n"
+        f"venv={ utils.VENV_INSTALL } && \\\n"
+        f". { utils.VENV_INSTALL }/bin/activate && \\\n"
+        f"python3 $(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
+        f"site-packages/${{indicator}}/${{indicator}}.py && \\\n"
         f"deactivate\n"
         f"```\n\n" )
 

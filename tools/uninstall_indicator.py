@@ -23,48 +23,36 @@ if no more indicators are installed.
 '''
 
 
-#TODO Check that this script now runs according to new method:
-#   python3 -m tools.build_wheel release indicatortest
-
-
 import subprocess
 
 from . import utils
 
 
 if __name__ == "__main__":
-    correct_directory, message = (
-        utils.is_correct_directory( example_arguments = "indicatorfortune" ) )
+    args = (
+        utils.initialiase_parser_and_get_arguments(
+            f"Uninstall one or more indicators, including the run script, "
+            f"icons, .desktop and .config/.cache. and additionally removing"
+            f" the shared virtual environment $HOME/.local/venv_indicators "
+            f"if no indicators are installed.",
+            ( "indicators", ),
+            {
+                "indicators" :
+                    "List of indicators, space separated, to uninstall." },
+            {
+                "indicators" :
+                    "+" } ) )
 
-    if correct_directory:
-        args = (
-            utils.initialiase_parser_and_get_arguments(
-                f"Uninstall one or more indicators, including the run script, "
-                f"icons, .desktop and .config/.cache. and additionally removing"
-                f" the shared virtual environment $HOME/.local/venv_indicators "
-                f"if no indicators are installed.",
-                ( "indicators", ),
-                {
-                    "indicators" :
-                        "List of indicators, space separated, to uninstall." },
-                {
-                    "indicators" :
-                        "+" } ) )
+    for indicator_name in args.indicators:
+        command = (
+            f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
+            f"site-packages/{indicator_name}/platform/linux/uninstall.sh && "
+            f". { utils.VENV_INSTALL }/bin/activate && "
+            f"python3 -m pip uninstall --yes {indicator_name} && "
+            f"count=$(python3 -m pip --disable-pip-version-check list | "
+            f"grep -o \"indicator\" | wc -l) && "
+            f"deactivate && "
+            f"if [ \"$count\" -eq \"0\" ]; "
+            f"then rm -f -r { utils.VENV_INSTALL }; fi" )
 
-        for indicator_name in args.indicators:
-            command = (
-                f"indicator={indicator_name} && " +
-                f"venv=$HOME/.local/venv_indicators && " +
-                f"$(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages/" +
-                f"{indicator_name}/platform/linux/uninstall.sh && " +
-                f". ${{venv}}/bin/activate && " +
-                f"python3 -m pip uninstall --yes {indicator_name} && " +
-                f"count=$(python3 -m pip --disable-pip-version-check list | " +
-                f"grep -o \"indicator\" | wc -l) && " +
-                f"deactivate && " +
-                f"if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi" )
-
-            subprocess.call( command, shell = True )
-
-    else:
-        print( message )
+        subprocess.call( command, shell = True )

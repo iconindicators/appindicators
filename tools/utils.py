@@ -20,38 +20,12 @@
 
 
 import argparse
-import inspect
 import subprocess
 
 from pathlib import Path
 
 
-def is_correct_directory(
-    example_arguments = None ):
-
-
-    print(         Path( inspect.stack()[ 1 ].filename ).parent.parent.absolute() )
-    print( Path.cwd())
-    import sys
-    sys.exit()
-    
-    correct_directory = (
-        Path.cwd()
-        ==
-        Path( inspect.stack()[ 1 ].filename ).parent.parent.absolute() )
-
-    message = ""
-    if not correct_directory:
-        path_of_caller_parts = Path( inspect.stack()[ 1 ].filename ).parts
-        script_path_and_name = (
-            Path( '.' ) / path_of_caller_parts[ -2 ] / path_of_caller_parts[ -1 ] )
-
-        message = (
-            f"The script must be run from the project/top directory (one above tools).\n"
-            f"For example:\n"
-            f"\tpython3 { script_path_and_name } { '' if example_arguments is None else example_arguments }" )
-
-    return correct_directory, message
+VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 
 def initialiase_parser_and_get_arguments(
@@ -80,12 +54,12 @@ def initialise_virtual_environment(
     venv_directory,
     *modules_to_install ):
 
-    if not venv_directory.is_dir():
+    if not Path( venv_directory ).is_dir():
         command = f"python3 -m venv { venv_directory }"
         subprocess.call( command, shell = True )
 
     command = (
-        f". { venv_directory.absolute() / 'bin' / 'activate' } && " + \
+        f". { venv_directory }/bin/activate && " + \
         f"python3 -m pip install --upgrade --force-reinstall { ' '.join( modules_to_install ) }" )
 
     subprocess.call( command, shell = True )

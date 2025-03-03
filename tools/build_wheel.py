@@ -40,7 +40,7 @@ from . import utils_locale
 from . import utils_readme
 
 
-VENV = Path( "./venv_development" )
+VENV_DEVELOPMENT = "./venv_development"
 
 
 def _check_for_t_o_d_o_s(
@@ -205,7 +205,7 @@ def _get_year_in_changelog_markdown(
     '''
 
     command = (
-        f". { VENV }/bin/activate && " +
+        f". { VENV_DEVELOPMENT }/bin/activate && " +
         f"python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " +
         f"import IndicatorBase; " +
         f"print( IndicatorBase.get_year_in_changelog_markdown( " +
@@ -371,7 +371,9 @@ def _create_scripts_for_linux(
 
         destination = directory_platform_linux / destination_script_name
         with open( destination, 'w', encoding = "utf-8" ) as f:
-            f.write( text.replace( "{indicator_name}", indicator_name ) + '\n' )
+            text = text.replace( "{indicator_name}", indicator_name )
+            text = text.replace( "{venv_indicators}", utils.VENV_INSTALL )
+            f.write( text + '\n' )
 
         _chmod(
             destination,
@@ -537,7 +539,7 @@ def _build_wheel_for_indicator(
         message = _package_source_for_build_wheel_process( directory_dist, indicator_name )
         if not message:
             command = (
-                f". { VENV }/bin/activate && " +
+                f". { VENV_DEVELOPMENT }/bin/activate && " +
                 f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }" )
 
             subprocess.call( command, shell = True )
@@ -549,43 +551,35 @@ def _build_wheel_for_indicator(
 
 
 if __name__ == "__main__":
-    correct_directory, error_message = (
-        utils.is_correct_directory(
-            example_arguments = "release indicatorfortune" ) )
+    args = (
+        utils.initialiase_parser_and_get_arguments(
+            "Create a Python wheel for one or more indicators.",
+            ( "directory_release", "indicators" ),
+            {
+                "directory_release" :
+                    "The output directory for the Python wheel. " +
+                    "If the directory specified is 'release', " +
+                    "the Python wheel will be created in 'release/wheel'.",
+                "indicators" :
+                    "The list of indicators separated by spaces to build." },
+            {
+                "indicators" :
+                    "+" } ) )
 
-    if correct_directory:
-        args = (
-            utils.initialiase_parser_and_get_arguments(
-                "Create a Python wheel for one or more indicators.",
-                ( "directory_release", "indicators" ),
-                {
-                    "directory_release" :
-                        "The output directory for the Python wheel. " +
-                        "If the directory specified is 'release', " +
-                        "the Python wheel will be created in 'release/wheel'.",
-                    "indicators" :
-                        "The list of indicators separated by spaces to build." },
-                {
-                    "indicators" :
-                        "+" } ) )
+    utils.initialise_virtual_environment(
+        VENV_DEVELOPMENT,
+        "build",
+        "packaging",
+        "pip",
+        "PyGObject",
+        "readme_renderer[md]" )
 
-        utils.initialise_virtual_environment(
-            VENV,
-            "build",
-            "packaging",
-            "pip",
-            "PyGObject",
-            "readme_renderer[md]" )
+    for indicator in args.indicators:
+        error_message = _build_wheel_for_indicator( args.directory_release, indicator )
+        if error_message:
+            print( error_message )
 
-        for indicator in args.indicators:
-            error_message = _build_wheel_for_indicator( args.directory_release, indicator )
-            if error_message:
-                print( error_message )
-
-        subprocess.call(
-            f". { VENV }/bin/activate && " +
-            f"python3 -m readme_renderer README.md -o README.html",
-            shell = True )
-
-    else:
-        print( error_message )
+    subprocess.call(
+        f". { VENV_DEVELOPMENT }/bin/activate && " +
+        f"python3 -m readme_renderer README.md -o README.html",
+        shell = True )
