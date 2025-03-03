@@ -26,15 +26,15 @@ import subprocess
 from pathlib import Path
 
 
-#TODO If this is kept, see if the way to ensure this is the correct path, etc, etc 
-# can be done differently.  See indicatorbase and how it gets the execution script name.
-#
-# Something like this???
-#         import sys
-#         print( Path( sys.argv[ 0 ] ) )
-#         print( Path( sys.argv[ 0 ] ).parent.parent )
 def is_correct_directory(
     example_arguments = None ):
+
+
+    print(         Path( inspect.stack()[ 1 ].filename ).parent.parent.absolute() )
+    print( Path.cwd())
+    import sys
+    sys.exit()
+    
     correct_directory = (
         Path.cwd()
         ==
@@ -89,4 +89,3 @@ def initialise_virtual_environment(
         f"python3 -m pip install --upgrade --force-reinstall { ' '.join( modules_to_install ) }" )
 
     subprocess.call( command, shell = True )
-
