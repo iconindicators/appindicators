@@ -35,7 +35,7 @@ from gi.repository import Gtk
 
 from .indicatorbase import IndicatorBase
 
-import eclipse
+from . import eclipse
 
 from .dataproviderapparentmagnitude import DataProviderApparentMagnitude
 from .dataprovidergeneralperturbation import DataProviderGeneralPerturbation

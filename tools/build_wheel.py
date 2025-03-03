@@ -483,6 +483,7 @@ def _package_source_for_build_wheel_process(
             start_year )
 
         subprocess.call(
+            f". { VENV_DEVELOPMENT }/bin/activate && " +
             f"python3 -m readme_renderer " +
             f"{ directory_dist }/{ indicator_name }/README.md " +
             f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html",

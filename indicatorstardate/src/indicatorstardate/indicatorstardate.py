@@ -27,7 +27,7 @@ from gi.repository import Gtk
 
 from .indicatorbase import IndicatorBase
 
-import stardate
+from . import stardate
 
 
 class IndicatorStardate( IndicatorBase ):
