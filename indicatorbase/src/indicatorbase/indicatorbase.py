@@ -597,7 +597,7 @@ class IndicatorBase( ABC ):
 
         if not Path( changelog ).exists():
             # Assume running in development.
-            changelog = Path( '.' ).absolute() / "CHANGELOG.md"
+            changelog = Path( sys.argv[ 0 ] ).parent / "CHANGELOG.md"
 
         return changelog
 
