@@ -1,6 +1,6 @@
 #!/bin/sh
 
-indicator_path=$(ls -d $HOME/.local/venv_indicators/lib/python3.* | head -1)/site-packages/{indicator_name}
+indicator_path=$(ls -d {venv_indicators}/lib/python3.* | head -1)/site-packages/{indicator_name}
 
 bin_path=$HOME/.local/bin
 mkdir -p ${bin_path}

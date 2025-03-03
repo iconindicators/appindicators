@@ -2,8 +2,8 @@ include src/{indicator_name}/CHANGELOG.md
 include src/{indicator_name}/README.html
 include src/{indicator_name}/locale/{indicator_name}.pot
 include src/{indicator_name}/platform/linux/{indicator_name}.py.desktop
+include src/{indicator_name}/platform/linux/{indicator_name}.sh
 include src/{indicator_name}/platform/linux/install.sh
-include src/{indicator_name}/platform/linux/run.sh
 include src/{indicator_name}/platform/linux/uninstall.sh
 recursive-include src/{indicator_name}/icons *.svg
 recursive-include src/{indicator_name}/locale *.mo
