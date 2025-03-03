@@ -36,9 +36,6 @@ from indicatorbase import IndicatorBase #TODO For Eclipse; remove before release
 
 # from .fortune import Fortune
 from fortune import Fortune #TODO For Eclipse; remove before release and uncomment above.
-                            # Is there a better way rather than having this alternative import?
-                            # When building all scripts, need to amend 10 files (at least).
-                            # Can perhaps the src dirs be added to the Eclipse project?
 
 
 class IndicatorFortune( IndicatorBase ):
