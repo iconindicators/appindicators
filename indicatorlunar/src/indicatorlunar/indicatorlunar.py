@@ -56,7 +56,7 @@ class IndicatorLunar( IndicatorBase ):
 #    astro_backend = getattr( __import__( '.' + astro_backend_name.lower() ), astro_backend_name )
 #TODO Does not work...
     import importlib
-    astro_backend = importlib.import_module( astro_backend_name.lower() )
+    astro_backend = getattr( importlib.import_module( astro_backend_name.lower(), astro_backend_name ) )
 # https://stackoverflow.com/questions/301134/how-can-i-import-a-module-dynamically-given-its-name-as-string
 # https://stackoverflow.com/questions/67631/how-can-i-import-a-module-dynamically-given-the-full-path
 # https://docs.python.org/3/library/importlib.html#importlib.import_module
