@@ -27,7 +27,7 @@ import ephem
 
 from ephem.cities import _city_data
 
-import eclipse
+from . import eclipse
 
 from .astrobase import AstroBase
 

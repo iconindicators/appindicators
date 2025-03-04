@@ -83,7 +83,7 @@ from skyfield.data import hipparcos, mpc
 from skyfield.magnitudelib import planetary_magnitude
 from skyfield.trigonometry import position_angle_of
 
-import eclipse
+from . import eclipse
 
 from .astrobase import AstroBase
 

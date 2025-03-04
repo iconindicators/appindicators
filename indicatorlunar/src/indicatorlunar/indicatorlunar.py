@@ -20,6 +20,7 @@
 
 
 import datetime
+import importlib
 import locale
 import math
 import re
@@ -53,15 +54,12 @@ class IndicatorLunar( IndicatorBase ):
     astro_backend_pyephem = "AstroPyEphem"
     astro_backend_skyfield = "AstroSkyfield"
     astro_backend_name = astro_backend_pyephem
-#    astro_backend = getattr( __import__( '.' + astro_backend_name.lower() ), astro_backend_name )
-#TODO Does not work...
-    import importlib
-    astro_backend = getattr( importlib.import_module( astro_backend_name.lower(), astro_backend_name ) )
-# https://stackoverflow.com/questions/301134/how-can-i-import-a-module-dynamically-given-its-name-as-string
-# https://stackoverflow.com/questions/67631/how-can-i-import-a-module-dynamically-given-the-full-path
-# https://docs.python.org/3/library/importlib.html#importlib.import_module
-# https://stackoverflow.com/questions/64916281/importing-modules-dynamically-in-python-3-x
-# https://stackoverflow.com/questions/72119499/how-do-i-dynamically-import-a-module-similar-to-the-import-x-from-y-syntax-in
+    astro_backend_module = (
+        importlib.import_module(
+            '.' + astro_backend_name.lower(),
+            __package__ ) )
+
+    astro_backend = getattr( astro_backend_module, astro_backend_name )
 
     CONFIG_CITY_ELEVATION = "cityElevation"
     CONFIG_CITY_LATITUDE = "cityLatitude"
