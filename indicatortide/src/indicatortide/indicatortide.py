@@ -2,9 +2,7 @@
 # -*- coding: utf-8 -*-
 
 
-#TODO Does not load user tide class/function any more since running with -m.
-
-#TODO Check header comments of getTideDataFromBOM.py
+#TODO Back up /home/bernard/Programming/getTideDataFromBOM.py
 
 
 # This program is free software: you can redistribute it and/or modify

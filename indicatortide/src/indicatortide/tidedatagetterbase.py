@@ -34,26 +34,31 @@ class TideDataGetterBase( ABC ):
     @abstractmethod
     def get_tide_data( logging = None, url_timeout_in_seconds = 20 ):
         '''
-        User must implement this function within their own class
-        to retrieve tidal data (from whatever source)
+        The end user must create a class and implement this function
+        to retrieve tidal data (from a source of the user's choosing)
         and return a list of tidal readings.
         For example:
 
-        import tide
-        url = "http://url-used-to-obtain-tidal-information"
+            from indicatortide import tide
 
-        # Convert tidal data from your URL to tide.Reading().
+            from indicatortide.tidedatagetterbase import TideDataGetterBase
 
-        return [
-            tide.Reading(
-                "Tuesday May 3rd", "4:07 AM", "The port", True, 1.6, url ),
+            url = "http://url-used-to-obtain-tidal-information"
 
-            tide.Reading(
-                "Tuesday May 3rd", "10:31 AM", "The port", False, 0.3, url ),
+            return [
+                tide.Reading(
+                    "Tuesday May 3rd", "4:07 AM", "The port", True, 1.6, url ),
 
-            tide.Reading(
-                "Wednesday May 4th", "5:26 AM", "The port", True, 1.5, url ) ]
+                tide.Reading(
+                    "Tuesday May 3rd", "10:31 AM", "The port", False, 0.3, url ),
 
-        Do not include @abstractmethod at the top of your own function.
+                tide.Reading(
+                    "Wednesday May 4th", "5:26 AM", "The port", True, 1.5, url ) ]
+
+        Do not include @abstractmethod at the top of your own function!
+
+        To install other packages, such as 'requests':
+
+            . $HOME/.local/venv_indicators/bin/activate && python3 -m pip install --upgrade requests
         '''
         raise NotImplementedError()
