@@ -165,7 +165,7 @@ def _create_manifest_dot_in(
 
     if Path( indicator_manifest_in ).exists():
         with open( indicator_manifest_in, 'r', encoding = "utf-8" ) as f:
-            manifest_text += f.read() #TODO Ensure this works with indicatorlunar
+            manifest_text += f.read().replace( "{indicator_name}", indicator_name )
 
     release_manifest_in = directory_out / indicator_name / "MANIFEST.in"
     with open( release_manifest_in, 'w', encoding = "utf-8" ) as f:
@@ -202,7 +202,7 @@ def _get_pyproject_toml_authors(
         .replace( '},', '' )
         .replace( '}', '' )
         .strip() )
-    
+
     names_emails = [ ]
     for line in authors.split( '\n' ):
         line_ = line.split( '=' )
@@ -309,6 +309,15 @@ def _create_dot_desktop(
     comments_from_mo_files,
     categories ):
 
+    print()
+    print()
+    print( f"names: { names_from_mo_files }" )
+    print()
+    print()
+    print( f"comments: { comments_from_mo_files }" )
+    print()
+    print()
+
     indicatorbase_dot_desktop_path = (
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" / "indicatorbase.py.desktop" )
 
@@ -318,7 +327,6 @@ def _create_dot_desktop(
             if not line.startswith( '#' ):
                 dot_desktop_text += line
 
-#TODO Test this with an indicator that has translated name(s).
     names = name
     for language, name_ in names_from_mo_files.items():
         names += f"\nName[{ language }]={ name_ }"
@@ -330,7 +338,6 @@ def _create_dot_desktop(
     # if so, replace with ' '.
     comments_ = comments.replace( newline, ' ' )
 
-#TODO Test this with an indicator that has translated comment(s).
     for language, comment in comments_from_mo_files.items():
         comments_ += f"\nComment[{ language }]={ comment.replace( newline, ' ' ) }"
 

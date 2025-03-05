@@ -230,7 +230,7 @@ def update_locale_source(
     Create the .pot file for indicatorbase, if required, otherwise update.
     Create the .pot file for indicator_name, if required, otherwise update.
     '''
-
+    print( "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" )#TODO Remove
     current_year_author = (
         f"{ _get_current_year() } { authors_emails[ 0 ][ 0 ] }" )
 
@@ -289,7 +289,7 @@ def build_locale_for_release(
         str( directory_indicator_locale / ( indicator_name + ".pot" ) ) +
         " " +
         str( directory_indicator_base_locale / "indicatorbase.pot" ) +
-        " --output-file=" + 
+        " --output-file=" +
         str( directory_indicator_locale / ( indicator_name + ".pot" ) ),
         shell = True )
 
@@ -336,11 +336,23 @@ def get_names_and_comments_from_mo_files(
                 languages = [ locale ] ) )
 
         translated_string = translation.gettext( name )
+        print( f"xxxxx  { name }" )
+        print( f"xxxxx  { translated_string }" )
 
         if translated_string != name:
             names_from_mo_files[ locale ] = translated_string
 
-        translated_string = translation.gettext( comments )
+#        translated_string = translation.gettext( comments ) #TODO Original
+#TODO I want to figure out why the translation for the comment is not being found
+# because of the \m in the comment.
+# Translated comments for all other indicators ARE being found...just not script runner.
+# I removed the \n from the comment and did a build wheel and the \n still appeared
+# so now check if the POT and PO are regenerated.
+        translated_string = translation.gettext( comments.replace( '\n', 'XXX' ) )
+        print( f"xxxxx  { comments }" )
+        print( f"xxxxx  { translated_string }" )
+        import sys
+        sys.exit()
 
         if translated_string != comments:
             comments_from_mo_files[ locale ] = translated_string
