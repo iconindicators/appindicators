@@ -17,8 +17,8 @@
 
 
 '''
-Install a Python wheel package for one or more indicators to a virtual
-environment to $HOME/.local and copy across the .desktop, run script and icons.
+Install a wheel for one or more indicators to a virtual environment at
+$HOME/.local and then run install.sh.
 '''
 
 

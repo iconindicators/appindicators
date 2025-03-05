@@ -191,6 +191,37 @@ def _get_version_in_changelog_markdown(
     return version
 
 
+def _get_pyproject_toml_authors(
+    pyproject_toml_config ):
+
+    authors = (
+        pyproject_toml_config.get( "project", "authors" )
+        .replace( '[', '' )
+        .replace( ']', '' )
+        .replace( '{', '' )
+        .replace( '},', '' )
+        .replace( '}', '' )
+        .strip() )
+    
+    names_emails = [ ]
+    for line in authors.split( '\n' ):
+        line_ = line.split( '=' )
+        if "name" in line and "email" in line:
+            name = line_[ 1 ].split( '\"' )[ 1 ]
+            email = line_[ 2 ].split( '\"' )[ 1 ]
+            names_emails.append( ( name, email ) )
+
+        elif "name" in line:
+            name = line_[ 1 ].split( '\"' )[ 1 ]
+            names_emails.append( ( name, "" ) )
+
+        elif "email" in line:
+            email = line_[ 1 ].split( '\"' )[ 1 ]
+            names_emails.append( ( "", email ) )
+
+    return tuple( names_emails )
+
+
 def _get_year_in_changelog_markdown(
     indicator_name ):
     '''
@@ -229,37 +260,6 @@ def _get_year_in_changelog_markdown(
         message = ""
 
     return year, message
-
-
-def get_pyproject_toml_authors(
-    pyproject_toml_config ):
-
-    authors = (
-        pyproject_toml_config.get( "project", "authors" )
-        .replace( '[', '' )
-        .replace( ']', '' )
-        .replace( '{', '' )
-        .replace( '},', '' )
-        .replace( '}', '' )
-        .strip() )
-    
-    names_emails = [ ]
-    for line in authors.split( '\n' ):
-        line_ = line.split( '=' )
-        if "name" in line and "email" in line:
-            name = line_[ 1 ].split( '\"' )[ 1 ]
-            email = line_[ 2 ].split( '\"' )[ 1 ]
-            names_emails.append( ( name, email ) )
-
-        elif "name" in line:
-            name = line_[ 1 ].split( '\"' )[ 1 ]
-            names_emails.append( ( name, "" ) )
-
-        elif "email" in line:
-            email = line_[ 1 ].split( '\"' )[ 1 ]
-            names_emails.append( ( "", email ) )
-
-    return tuple( names_emails )
 
 
 def _get_name_categories_comments_from_indicator(
@@ -453,7 +453,7 @@ def _package_source_for_build_wheel_process(
             f"CHANGELOG.md does not match that in pyprojectspecific.toml\n" )
 
     if not message:
-        authors = get_pyproject_toml_authors( config )
+        authors = _get_pyproject_toml_authors( config )
 
         start_year, message = _get_year_in_changelog_markdown( indicator_name )
 

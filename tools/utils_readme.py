@@ -27,7 +27,7 @@ References:
 
 
 #TODO Check {{indicator}} and other {{ }}...are they correct/needed?
-  
+
 
 import datetime
 import re
