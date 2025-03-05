@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from gi.overrides.Gtk import TreeModelSort
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -429,7 +428,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         background_scripts_treeview, background_scripts_scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 # treestore_background_scripts_filter, # TODO Old
-                TreeModelSort.new_with_model( treestore_background_scripts_filter ),
+                Gtk.TreeModelSort.new_with_model( treestore_background_scripts_filter ),
                 (
                     _( "Group" ),
                     _( "Name" ),
