@@ -11,6 +11,11 @@ which is probably
 #   python3 -m tools.build_wheel release indicatortest
 
 
+#TODO Maybe (in the introduction perhaps) have a sentence or two
+# explaining the layout of the project
+# (each indicator is a sub-project with specific pyproject.toml etc).
+
+
 # AppIndicators for Ubuntu et al...
 
 
