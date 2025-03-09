@@ -2781,7 +2781,7 @@ class IndicatorBase( ABC ):
         On exception, logs to file.
         '''
         try:
-            subprocess.call( command, shell = True )
+            subprocess.call( command, shell = True ) #TODO Replace with .run (but can we use the process_get function?
 
         except subprocess.CalledProcessError as e:
             logging.error( e )
