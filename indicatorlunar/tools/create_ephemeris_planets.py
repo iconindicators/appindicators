@@ -71,7 +71,7 @@ def create_ephemeris_planets(
         in_bsp + " " + out_bsp )
 
     print( "Processing...\n\t", command )
-    subprocess.call( command, shell = True )
+    subprocess.call( command, shell = True )  #TODO Replace with .run
 
 
 if __name__ == "__main__":
