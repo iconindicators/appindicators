@@ -55,4 +55,4 @@ if __name__ == "__main__":
             f"if [ \"$count\" -eq \"0\" ]; "
             f"then rm -f -r { utils.VENV_INSTALL }; fi" )
 
-        subprocess.call( command, shell = True )
+        subprocess.call( command, shell = True )   #TODO Replace with .run

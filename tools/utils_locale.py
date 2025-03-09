@@ -21,9 +21,22 @@ Create/update the .pot/.po files for indicatorbase and an indicator's source.
 Create merged .pot/.po files and create the .mo file for an indicator's release.
 '''
 
+#TODO Search all .py for subprocess.run (after above is done)
+# and replace all [] with a string and must use shell = True
+
+
+#TODO Go through all .po and update the first line similarly to
+#   # Russian translation for indicatorlunar.
+#
+# In fact, rename all to .orig or similar
+# and generate new .po files to see how they should look.
+
 
 import datetime
+import filecmp
 import gettext
+import os
+import re
 import subprocess
 
 from pathlib import Path
@@ -70,55 +83,51 @@ def _create_update_pot(
     if Path( pot_file_new ).exists():
         pot_file_new = f"{ locale_directory / indicator_name }.new.pot"
 
-    potfiles_in = locale_directory / "POTFILES.in"
-    input_files_search_directory = (
-        Path( '.' ) / indicator_name / "src" / indicator_name )
-
-    # Use xgettext to create a new POT file and sed to insert some other text:
+    # Create a POT based on current source:
     #   http://www.gnu.org/software/gettext/manual/gettext.html
-    subprocess.run( [
-        f"xgettext",
-        f"--files-from={ potfiles_in }",
-        f"--directory={ input_files_search_directory }",
-        f"--copyright-holder={ authors_emails[ 0 ][ 0 ] }",
-        f"--package-name={ indicator_name }",
-        f"--package-version={ version }",
-        f"--msgid-bugs-address=<{ authors_emails[ 0 ][ 1 ] }>",
-        f"--no-location",
-        f"--no-wrap",
-        f"--output={ pot_file_new }" ] )
+    subprocess.run(
+        f"xgettext " +
+        f"-f { locale_directory / 'POTFILES.in' } " +
+        f"-D { str( Path( indicator_name ) / 'src' / indicator_name ) } " +
+        f"--copyright-holder='{ authors_emails[ 0 ][ 0 ] }' " +
+        f"--package-name={ indicator_name } " +
+        f"--package-version={ version } " +
+        f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' " +
+        f"--no-location --no-wrap -o { pot_file_new }",
+        shell = True )
 
-    some_descriptive_title = f"Portable Object Template for { indicator_name }"
-    subprocess.run( [
-        f"sed",
-        f"--in-place",
-        f"s/SOME DESCRIPTIVE TITLE/{ some_descriptive_title }/ ; " +
-        f"s/YEAR { authors_emails[ 0 ][ 0 ] }/{ copyright_ }/ ; " +
-        f"s/CHARSET/UTF-8/",
-        f"{ pot_file_new }" ] )
+    with open( pot_file_new, 'r', encoding = "utf-8" ) as r:
+        new = (
+            r.read().
+            replace(
+                "SOME DESCRIPTIVE TITLE",
+                f"Portable Object Template for { indicator_name }" ).
+            replace( f"YEAR { authors_emails[ 0 ][ 0 ] }", copyright_ ).
+            replace( "CHARSET", "UTF-8" ) )
+
+        with open( pot_file_new, 'w', encoding = "utf-8" ) as w:
+            w.write( new )
 
     if pot_file_new.endswith( ".new.pot" ):
         pot_file_original = f"{ locale_directory / indicator_name }.pot"
-        command = [
-            f"diff",
-            f"<( sed '/POT-Creation-Date/d' { pot_file_original } )",
-            f"<( sed '/POT-Creation-Date/d' { pot_file_new } )" ]
+        original = ""
+        with open( pot_file_original, 'r', encoding = "utf-8" ) as f:
+            for line in f:
+                if "POT-Creation-Date" not in line:
+                    original += line
 
-        result = subprocess.run( command, capture_output = True, text = True )
-        if result.stdout:
-            subprocess.run( [
-                f"rm",
-                f"{ pot_file_original }" ] )
+        new = ""
+        with open( pot_file_new, 'r', encoding = "utf-8" ) as f:
+            for line in f:
+                if "POT-Creation-Date" not in line:
+                    new += line
 
-            subprocess.run( [
-                f"mv",
-                f"{ pot_file_new }",
-                f"{ pot_file_original }" ] )
+        if original == new:
+            os.remove( pot_file_new )
 
         else:
-            subprocess.run( [
-                f"rm",
-                f"{ pot_file_new }" ] )
+            os.remove( pot_file_original )
+            os.rename( pot_file_new, pot_file_original )
 
 
 def _create_update_po(
@@ -131,67 +140,51 @@ def _create_update_po(
     locale_directory = _get_locale_directory( indicator_name )
     pot_file = locale_directory / ( indicator_name + ".pot" )
     for lingua_code in linguas_codes:
-        po_file = (
+        po_file_original = (
             locale_directory /
             lingua_code /
             "LC_MESSAGES" /
             ( indicator_name + ".po" ) )
 
-        po_file_new = str( po_file ).replace( '.po', '.new.po' )
+        if po_file_original.exists():
+            po_file_new = str( po_file_original ).replace( '.po', '.new.po' )
 
-        if po_file.exists():
-            subprocess.run( [
-                f"msgmerge",
-                f"{ po_file }",
-                f"{ pot_file }",
-                f"--no-location",
-                f"--no-wrap",
-                f"--output-file={ po_file_new }" ] )
+            subprocess.run(
+                f"msgmerge { po_file_original } { pot_file } " +
+                f"--no-location --no-wrap -o { po_file_new }",
+                shell = True )
 
             project_id_version = (
                 f"Project-Id-Version: { indicator_name } { version }\\\\n\"" )
 
-            subprocess.run( [
-                f"sed",
-                f"--in-place",
-                f"s/Copyright (C).*/Copyright (C) { copyright_ }/ ; " +
-                f"s/Project-Id-Version.*/{ project_id_version }/",
-                f"{ po_file_new }" ] )
+            with open( po_file_new, 'r', encoding = "utf-8" ) as r:
+                new = r.read()
+                new = re.sub( "Copyright \(C\).*", f"Copyright (C) { copyright_ }", new )
+                new = re.sub( "Project-Id-Version.*", f"{ project_id_version }", new )
 
-            command = [
-                f"diff",
-                f"{ po_file }",
-                f"{ po_file_new }" ]
+                with open( po_file_new, 'w', encoding = "utf-8" ) as w:
+                    w.write( new )
 
-            result = (
-                subprocess.run( command, capture_output = True, text = True ) )
-
-            if result.stdout:
-                subprocess.run( [
-                    f"rm",
-                    f"{ po_file }" ] )
-
-                subprocess.run( [
-                    f"mv",
-                    f"{ po_file_new }",
-                    f"{ po_file }" ] )
-
+            if filecmp.cmp( po_file_original, po_file_new ):
+                os.remove( po_file_new )
+            
             else:
-                subprocess.run( [
-                    f"rm",
-                    f"{ po_file_new }" ] )
+                os.remove( po_file_original )
+                os.rename( po_file_new, po_file_original )
 
         else:
             # http://www.gnu.org/software/gettext/manual/gettext.html#Creating
-            po_file.parents[ 0 ].mkdir( parents = True, exist_ok = True )
+            po_file_original.parents[ 0 ].mkdir(
+                parents = True,
+                exist_ok = True )
 
-            subprocess.run( [
-                f"msginit",
-                f"--input={ pot_file }",
-                f"--output-file={ po_file }",
-                f"--locale={ lingua_code }",
-                f"--no-wrap",
-                f"--no-translator" ] )
+            subprocess.run(
+                f"msginit " +
+                f"-i { pot_file } " +
+                f"-o { po_file_original } " +
+                f"-l { lingua_code } " +
+                f"--no-wrap --no-translator",
+                shell = True )
 
             print(
                 f"Line 1: replace\n" +
@@ -220,6 +213,7 @@ def _create_update_po(
                 f"\n\n" )
 
 
+
 def update_locale_source(
     indicator_name,
     authors_emails,
@@ -230,7 +224,7 @@ def update_locale_source(
     Create the .pot file for indicatorbase, if required, otherwise update.
     Create the .pot file for indicator_name, if required, otherwise update.
     '''
-    print( "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" )#TODO Remove
+
     current_year_author = (
         f"{ _get_current_year() } { authors_emails[ 0 ][ 0 ] }" )
 
@@ -267,7 +261,12 @@ def update_locale_source(
         copyright_,
         start_year )
 
+    import sys
+    sys.exit() #TODO Remove
 
+
+#TODO Check
+#TODO Can --output-file be changed to -o ?
 def build_locale_for_release(
     directory_release,
     indicator_name ):
@@ -284,31 +283,28 @@ def build_locale_for_release(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" )
 
     # Append translations from indicatorbase POT to indicator POT.
-    subprocess.call(
+    subprocess.run(
         "msgcat --use-first " +
-        str( directory_indicator_locale / ( indicator_name + ".pot" ) ) +
-        " " +
-        str( directory_indicator_base_locale / "indicatorbase.pot" ) +
+        f"{ str( directory_indicator_locale / ( indicator_name + '.pot' ) ) } " +
+        f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } " +
         " --output-file=" +
-        str( directory_indicator_locale / ( indicator_name + ".pot" ) ),
+        f"{ str( directory_indicator_locale / ( indicator_name + '.pot' ) ) }",
         shell = True )
 
     # Append translations from indicatorbase PO to indicator PO for all locales.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         language_code = po.parent.parts[ -2 ]
-        subprocess.call(
-            "msgcat --use-first " +
-            str( po ) +
-            " " +
-            str( directory_indicator_base_locale / language_code / "LC_MESSAGES" / "indicatorbase.po" ) +
-            " --output-file=" + str( po ),
+        subprocess.run(
+            f"msgcat --use-first { str( po ) } " +
+            f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) }" +
+            f" --output-file= + { str( po ) } ",  #TODO What is the extra + for?
             shell = True )
 
     # Create .mo files.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
-        subprocess.call(
-            "msgfmt " + str( po ) +
-            " --output-file=" + str( po.parent / ( str( po.stem ) + ".mo" ) ),
+        subprocess.run(
+            f"msgfmt { str( po ) } " +
+            f" --output-file= { str( po.parent / ( str( po.stem ) + '.mo' ) ) }",
             shell = True )
 
 
@@ -348,6 +344,9 @@ def get_names_and_comments_from_mo_files(
 # Translated comments for all other indicators ARE being found...just not script runner.
 # I removed the \n from the comment and did a build wheel and the \n still appeared
 # so now check if the POT and PO are regenerated.
+#
+#TODO Maybe put in a check for \n and burp to the user?  
+# Do it here or above when the pot/po is generated? 
         translated_string = translation.gettext( comments.replace( '\n', 'XXX' ) )
         print( f"xxxxx  { comments }" )
         print( f"xxxxx  { translated_string }" )

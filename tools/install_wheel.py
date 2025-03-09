@@ -56,4 +56,4 @@ if __name__ == "__main__":
             f" head -1)/site-packages/{indicator_name}/platform/" +
             f"linux/install.sh" )
 
-        subprocess.call( command, shell = True )
+        subprocess.call( command, shell = True )   #TODO Replace with .run

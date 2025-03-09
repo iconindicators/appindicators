@@ -235,16 +235,14 @@ def _get_year_in_changelog_markdown(
     On error, returns -1 for the year and an non-empty message.
     '''
 
-    command = (
-        f". { VENV_DEVELOPMENT }/bin/activate && " +
-        f"python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " +
-        f"import IndicatorBase; " +
-        f"print( IndicatorBase.get_year_in_changelog_markdown( " +
-        f"'{ Path( indicator_name ) }/src/{ indicator_name }/CHANGELOG.md' ) )\"" )
 
     result = (
         subprocess.run(
-            command,
+            f". { VENV_DEVELOPMENT }/bin/activate && " +
+            f"python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " +
+            f"import IndicatorBase; " +
+            f"print( IndicatorBase.get_year_in_changelog_markdown( " +
+            f"'{ Path( indicator_name ) }/src/{ indicator_name }/CHANGELOG.md' ) )\"",
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE,
             shell = True,
@@ -489,7 +487,7 @@ def _package_source_for_build_wheel_process(
             authors,
             start_year )
 
-        subprocess.call(
+        subprocess.run(
             f". { VENV_DEVELOPMENT }/bin/activate && " +
             f"python3 -m readme_renderer " +
             f"{ directory_dist }/{ indicator_name }/README.md " +
@@ -546,11 +544,10 @@ def _build_wheel_for_indicator(
 
         message = _package_source_for_build_wheel_process( directory_dist, indicator_name )
         if not message:
-            command = (
+            subprocess.run(
                 f". { VENV_DEVELOPMENT }/bin/activate && " +
-                f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }" )
-
-            subprocess.call( command, shell = True )
+                f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }",
+                shell = True )
 
 #TODO Uncomment
 #            shutil.rmtree( directory_dist / indicator_name )
@@ -587,7 +584,7 @@ if __name__ == "__main__":
         if error_message:
             print( error_message )
 
-    subprocess.call(
+    subprocess.run(
         f". { VENV_DEVELOPMENT }/bin/activate && " +
         f"python3 -m readme_renderer README.md -o README.html",
         shell = True )
