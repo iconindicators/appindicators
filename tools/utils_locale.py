@@ -213,7 +213,6 @@ def _create_update_po(
                 f"\n\n" )
 
 
-
 def update_locale_source(
     indicator_name,
     authors_emails,
@@ -261,19 +260,14 @@ def update_locale_source(
         copyright_,
         start_year )
 
-    import sys
-    sys.exit() #TODO Remove
 
-
-#TODO Check
-#TODO Can --output-file be changed to -o ?
 def build_locale_for_release(
     directory_release,
     indicator_name ):
     '''
-    Concatenate indicatorbase .pot to indicator_name .pot.
-    Concatenate indicatorbase .po to indicator_name .po for each locale.
-    Create the .mo for each .po.
+    Merge indicatorbase .pot with indicator_name .pot.
+    For each locale, merge indicatorbase .po to indicator_name .po.
+    For each .po, create the .mo.
     '''
 
     directory_indicator_locale = (
@@ -282,32 +276,33 @@ def build_locale_for_release(
     directory_indicator_base_locale = (
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" )
 
-    # Append translations from indicatorbase POT to indicator POT.
+    # Merge indicatorbase POT with indicator POT.
     subprocess.run(
         "msgcat --use-first " +
         f"{ str( directory_indicator_locale / ( indicator_name + '.pot' ) ) } " +
         f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } " +
-        " --output-file=" +
-        f"{ str( directory_indicator_locale / ( indicator_name + '.pot' ) ) }",
+        f"-o { str( directory_indicator_locale / ( indicator_name + '.pot' ) ) }",
         shell = True )
 
-    # Append translations from indicatorbase PO to indicator PO for all locales.
+    # For each locale, merge indicatorbase PO with indicator PO.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         language_code = po.parent.parts[ -2 ]
         subprocess.run(
-            f"msgcat --use-first { str( po ) } " +
-            f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) }" +
-            f" --output-file= + { str( po ) } ",  #TODO What is the extra + for?
+            f"msgcat --use-first " +
+            f"{ str( po ) } " +
+            f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } " +
+            f"-o { str( po ) } ",
             shell = True )
 
     # Create .mo files.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         subprocess.run(
             f"msgfmt { str( po ) } " +
-            f" --output-file= { str( po.parent / ( str( po.stem ) + '.mo' ) ) }",
+            f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }",
             shell = True )
 
 
+#TODO Check
 def get_names_and_comments_from_mo_files(
     indicator_name,
     directory_indicator_locale,
@@ -323,8 +318,14 @@ def get_names_and_comments_from_mo_files(
         locale = mo.parent.parent.stem
 
         # https://stackoverflow.com/q/54638570/2156453
-        # https://stackoverflow.com/q/53316631/2156453
         # https://www.reddit.com/r/learnpython/comments/jkun99/how_do_i_load_a_specific_mo_file_by_giving_its
+        print( indicator_name )
+        print( directory_indicator_locale )
+        print( locale )
+        print( name )
+        print( comments )
+        print()
+
         translation = (
             gettext.translation(
                 indicator_name,
@@ -332,8 +333,10 @@ def get_names_and_comments_from_mo_files(
                 languages = [ locale ] ) )
 
         translated_string = translation.gettext( name )
-        print( f"xxxxx  { name }" )
-        print( f"xxxxx  { translated_string }" )
+        print( "Name and translated name: ")
+        print( f"\t{ name }" )
+        print( f"\t{ translated_string }" )
+        print()
 
         if translated_string != name:
             names_from_mo_files[ locale ] = translated_string
@@ -347,9 +350,13 @@ def get_names_and_comments_from_mo_files(
 #
 #TODO Maybe put in a check for \n and burp to the user?  
 # Do it here or above when the pot/po is generated? 
-        translated_string = translation.gettext( comments.replace( '\n', 'XXX' ) )
-        print( f"xxxxx  { comments }" )
-        print( f"xxxxx  { translated_string }" )
+        translated_string = translation.gettext( comments )
+        translated_string = translation.gettext( "The comment." )
+        # translated_string = translation.gettext( comments.replace( '\n', 'XXX' ) )
+        print( "Comments and translated comments: ")
+        print( f"\t{ comments }" )
+        print( f"\t{ translated_string }" )
+        print()
         import sys
         sys.exit()
 
