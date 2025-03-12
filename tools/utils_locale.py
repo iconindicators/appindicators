@@ -108,15 +108,11 @@ def _create_update_pot(
                 "SOME DESCRIPTIVE TITLE",
                 f"Portable Object Template for { indicator_name }" ).
             replace( f"YEAR { authors_emails[ 0 ][ 0 ] }", copyright_ ).
-#TODO Delete this I think.
-    #         replace(
-    #             "LANGUAGE <LL@li.org>",
-    #             f"Bernard Giannetti <thebernmeister@hotmail.com>, { copyright_[ 0 : 4 ] }\n#" ).
             replace(
                 "FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.\n#\n#, fuzzy",
                 "FIRST AUTHOR <EMAIL@ADDRESS>, YEAR."  ).
             replace( "CHARSET", "UTF-8" ) )
-    
+
     with open( pot_file_new, 'w', encoding = "utf-8" ) as w:
         w.write( text )
 
@@ -163,7 +159,7 @@ def _create_update_po(
 
             subprocess.run(
                 f"msgmerge { po_file_original } { pot_file } " +
-                f"-o { po_file_new }",
+                f"-v -o { po_file_new }",
                 shell = True )
 
             project_id_version = (
@@ -179,9 +175,13 @@ def _create_update_po(
             #     with open( po_file_new, 'w', encoding = "utf-8" ) as w:
             #         w.write( new )
 
+            print( f"Copyright (C) { copyright_ }" )
+            print( f"{ project_id_version }" )
+
+
             if filecmp.cmp( po_file_original, po_file_new ):
                 os.remove( po_file_new )
-            
+
             else:
                 os.remove( po_file_original )
                 os.rename( po_file_new, po_file_original )
@@ -220,31 +220,6 @@ def _create_update_po(
                 w.write( text )
 
             print( f"PLEASE UPDATE LINES 1, 4, 11 and 12." )
-                
-                # f"Line 1: replace\n" +
-                # f"\t# Portable Object Template for { indicator_name }.\n" +
-                # f"with\n" +
-                # f"\t# <name of the language in English for " +
-                # f"{ lingua_code }> translation for { indicator_name }.\n\n" +
-
-                # f"Line 4: replace\n" +
-                # f"\t# Automatically generated, { _get_current_year() }.\n" +
-                # f"with\n" +
-                # f"\t# <author name> <<author email>>, " +
-                # f"{ start_year }-{ _get_current_year() }.\n\n" +
-
-                # f"Line 12: replace\n" +
-                # f"\t\"Last-Translator: Automatically generated\\n\"\n" +
-                # f"with\n" +
-                # f"\t\"Last-Translator: <author name> <<author email>>\\n\"" +
-                # f"\n\n" +
-
-                # f"Line 13: replace\n" +
-                # f"\t\"Language-Team: none\\n\"\n" +
-                # f"with\n" +
-                # f"\t\"Language-Team: <name of the language in English for " +
-                # f"{ lingua_code }>\\n\"" +
-                # f"\n\n" )
 
 
 def update_locale_source(
@@ -386,8 +361,8 @@ def get_names_and_comments_from_mo_files(
 # I removed the \n from the comment and did a build wheel and the \n still appeared
 # so now check if the POT and PO are regenerated.
 #
-#TODO Maybe put in a check for \n and burp to the user?  
-# Do it here or above when the pot/po is generated? 
+#TODO Maybe put in a check for \n and burp to the user?
+# Do it here or above when the pot/po is generated?
         translated_string = translation.gettext( comments )
         translated_string = translation.gettext( "The comment." )
         # translated_string = translation.gettext( comments.replace( '\n', 'XXX' ) )
