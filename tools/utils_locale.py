@@ -19,7 +19,12 @@
 '''
 Create/update the .pot/.po files for indicatorbase and an indicator's source.
 Create merged .pot/.po files and create the .mo file for an indicator's release.
+
+https://www.gnu.org/software/gettext/manual/gettext.html
+https://www.gnu.org/software/trans-coord/manual/gnun/html_node/PO-Header.html
+https://www.labri.fr/perso/fleury/posts/programming/a-quick-gettext-tutorial.html
 '''
+
 
 #TODO Search all .py for subprocess.run (after above is done)
 # and replace all [] with a string and must use shell = True
@@ -89,24 +94,31 @@ def _create_update_pot(
         f"xgettext " +
         f"-f { locale_directory / 'POTFILES.in' } " +
         f"-D { str( Path( indicator_name ) / 'src' / indicator_name ) } " +
-        f"--copyright-holder='{ authors_emails[ 0 ][ 0 ] }' " +
+        f"--copyright-holder='{ authors_emails[ 0 ][ 0 ] }.' " +
         f"--package-name={ indicator_name } " +
         f"--package-version={ version } " +
         f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' " +
-        f"--no-location --no-wrap -o { pot_file_new }",
+        f"-o { pot_file_new }",
         shell = True )
 
     with open( pot_file_new, 'r', encoding = "utf-8" ) as r:
-        new = (
+        text = (
             r.read().
             replace(
                 "SOME DESCRIPTIVE TITLE",
                 f"Portable Object Template for { indicator_name }" ).
             replace( f"YEAR { authors_emails[ 0 ][ 0 ] }", copyright_ ).
+#TODO Delete this I think.
+    #         replace(
+    #             "LANGUAGE <LL@li.org>",
+    #             f"Bernard Giannetti <thebernmeister@hotmail.com>, { copyright_[ 0 : 4 ] }\n#" ).
+            replace(
+                "FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.\n#\n#, fuzzy",
+                "FIRST AUTHOR <EMAIL@ADDRESS>, YEAR."  ).
             replace( "CHARSET", "UTF-8" ) )
-
-        with open( pot_file_new, 'w', encoding = "utf-8" ) as w:
-            w.write( new )
+    
+    with open( pot_file_new, 'w', encoding = "utf-8" ) as w:
+        w.write( text )
 
     if pot_file_new.endswith( ".new.pot" ):
         pot_file_original = f"{ locale_directory / indicator_name }.pot"
@@ -151,19 +163,21 @@ def _create_update_po(
 
             subprocess.run(
                 f"msgmerge { po_file_original } { pot_file } " +
-                f"--no-location --no-wrap -o { po_file_new }",
+                f"-o { po_file_new }",
                 shell = True )
 
             project_id_version = (
                 f"Project-Id-Version: { indicator_name } { version }\\\\n\"" )
 
-            with open( po_file_new, 'r', encoding = "utf-8" ) as r:
-                new = r.read()
-                new = re.sub( "Copyright \(C\).*", f"Copyright (C) { copyright_ }", new )
-                new = re.sub( "Project-Id-Version.*", f"{ project_id_version }", new )
-
-                with open( po_file_new, 'w', encoding = "utf-8" ) as w:
-                    w.write( new )
+            print( "here")
+#TODO Check
+            # with open( po_file_new, 'r', encoding = "utf-8" ) as r:
+            #     new = r.read()
+            #     new = re.sub( "Copyright \(C\).*", f"Copyright (C) { copyright_ }", new )
+            #     new = re.sub( "Project-Id-Version.*", f"{ project_id_version }", new )
+            #
+            #     with open( po_file_new, 'w', encoding = "utf-8" ) as w:
+            #         w.write( new )
 
             if filecmp.cmp( po_file_original, po_file_new ):
                 os.remove( po_file_new )
@@ -183,34 +197,54 @@ def _create_update_po(
                 f"-i { pot_file } " +
                 f"-o { po_file_original } " +
                 f"-l { lingua_code } " +
-                f"--no-wrap --no-translator",
+                f"--no-translator",
                 shell = True )
 
-            print(
-                f"Line 1: replace\n" +
-                f"\t# Portable Object Template for { indicator_name }.\n" +
-                f"with\n" +
-                f"\t# <name of the language in English for " +
-                f"{ lingua_code }> translation for { indicator_name }.\n\n" +
+            with open( po_file_original, 'r', encoding = "utf-8" ) as r:
+                text = (
+                    r.read().
+                    replace(
+                        f"Portable Object Template for { indicator_name }",
+                        f"<English language name for { lingua_code }> translation for { indicator_name }" ).
+                    replace(
+                        f"Automatically generated, { _get_current_year() }",
+                        f"<author name> <<author email>>, { start_year }-{ _get_current_year() }" ).
+                    replace(
+                        f"Last-Translator: Automatically generated",
+                        f"Last-Translator: <author name> <<author email>>" ).
+                    replace(
+                        f"Language-Team: none",
+                        f"Language-Team: <English language name for { lingua_code }>" ) )
 
-                f"Line 4: replace\n" +
-                f"\t# Automatically generated, { _get_current_year() }.\n" +
-                f"with\n" +
-                f"\t# <author name> <<author email>>, " +
-                f"{ start_year }-{ _get_current_year() }.\n\n" +
+            with open( po_file_original, 'w', encoding = "utf-8" ) as w:
+                w.write( text )
 
-                f"Line 12: replace\n" +
-                f"\t\"Last-Translator: Automatically generated\\n\"\n" +
-                f"with\n" +
-                f"\t\"Last-Translator: <author name> <<author email>>\\n\"" +
-                f"\n\n" +
+            print( f"PLEASE UPDATE LINES 1, 4, 11 and 12." )
+                
+                # f"Line 1: replace\n" +
+                # f"\t# Portable Object Template for { indicator_name }.\n" +
+                # f"with\n" +
+                # f"\t# <name of the language in English for " +
+                # f"{ lingua_code }> translation for { indicator_name }.\n\n" +
 
-                f"Line 13: replace\n" +
-                f"\t\"Language-Team: none\\n\"\n" +
-                f"with\n" +
-                f"\t\"Language-Team: <name of the language in English for " +
-                f"{ lingua_code }>\\n\"" +
-                f"\n\n" )
+                # f"Line 4: replace\n" +
+                # f"\t# Automatically generated, { _get_current_year() }.\n" +
+                # f"with\n" +
+                # f"\t# <author name> <<author email>>, " +
+                # f"{ start_year }-{ _get_current_year() }.\n\n" +
+
+                # f"Line 12: replace\n" +
+                # f"\t\"Last-Translator: Automatically generated\\n\"\n" +
+                # f"with\n" +
+                # f"\t\"Last-Translator: <author name> <<author email>>\\n\"" +
+                # f"\n\n" +
+
+                # f"Line 13: replace\n" +
+                # f"\t\"Language-Team: none\\n\"\n" +
+                # f"with\n" +
+                # f"\t\"Language-Team: <name of the language in English for " +
+                # f"{ lingua_code }>\\n\"" +
+                # f"\n\n" )
 
 
 def update_locale_source(
@@ -259,6 +293,10 @@ def update_locale_source(
         version_indicator,
         copyright_,
         start_year )
+
+    import sys #TODO Testing
+    sys.exit()
+
 
 
 def build_locale_for_release(
