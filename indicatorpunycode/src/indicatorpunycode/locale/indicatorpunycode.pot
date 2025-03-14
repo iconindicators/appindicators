@@ -1,14 +1,12 @@
 # Portable Object Template for indicatorpunycode.
-# Copyright (C) 2016-2024 Bernard Giannetti
+# Copyright (C) 2016-2025 Bernard Giannetti.
 # This file is distributed under the same license as the indicatorpunycode package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: indicatorpunycode 1.0.16\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-11-01 07:42+1100\n"
+"POT-Creation-Date: 2025-03-14 18:18+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,60 +15,79 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: indicatorpunycode.py:39
 msgid "Indicator Punycode"
 msgstr ""
 
+#: indicatorpunycode.py:54
 msgid "Converts domain names between Unicode and ASCII."
 msgstr ""
 
+#: indicatorpunycode.py:70
 msgid "Convert"
 msgstr ""
 
+#: indicatorpunycode.py:80
 msgid "Unicode:  "
 msgstr ""
 
+#: indicatorpunycode.py:89
 msgid "ASCII:  "
 msgstr ""
 
+#: indicatorpunycode.py:103
 msgid "Nothing to convert..."
 msgstr ""
 
+#: indicatorpunycode.py:109
 msgid "No text is in the clipboard."
 msgstr ""
 
+#: indicatorpunycode.py:121
 msgid "No text is highlighted/selected."
 msgstr ""
 
+#: indicatorpunycode.py:132
 msgid "Unsupported"
 msgstr ""
 
-msgid "On Ubuntu 20.04 running Wayland, the clipboard is unsupported."
+#: indicatorpunycode.py:133
+msgid "Under Wayland, the clipboard is unsupported."
 msgstr ""
 
+#: indicatorpunycode.py:201
 msgid "Error converting..."
 msgstr ""
 
+#: indicatorpunycode.py:201
 msgid "See log for more details."
 msgstr ""
 
+#: indicatorpunycode.py:233
 msgid "Input source"
 msgstr ""
 
+#: indicatorpunycode.py:239
 msgid "Clipboard"
 msgstr ""
 
+#: indicatorpunycode.py:241
 msgid "Input is taken from the clipboard."
 msgstr ""
 
+#: indicatorpunycode.py:250
 msgid "Primary"
 msgstr ""
 
+#: indicatorpunycode.py:252
 msgid "Input is taken from the currently selected text."
 msgstr ""
 
+#: indicatorpunycode.py:260
 msgid "Output to clipboard and primary"
 msgstr ""
 
+#: indicatorpunycode.py:262
 msgid ""
 "If checked, the converted text is sent\n"
 "to both the clipboard and primary.\n"
@@ -79,14 +96,17 @@ msgid ""
 "only to the input source."
 msgstr ""
 
+#: indicatorpunycode.py:273
 msgid "Drop path/query in output"
 msgstr ""
 
+#: indicatorpunycode.py:275
 msgid ""
 "If checked, the output text will not\n"
 "contain any path/query (if present)."
 msgstr ""
 
+#: indicatorpunycode.py:288
 msgid ""
 "The number of most recent\n"
 "results to show in the menu.\n"
@@ -96,5 +116,6 @@ msgid ""
 "the result to the output."
 msgstr ""
 
+#: indicatorpunycode.py:297
 msgid "Maximum results"
 msgstr ""
