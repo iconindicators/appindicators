@@ -1,8 +1,7 @@
 # Czech translation for indicatorppadownloadstatistics.
 # Copyright (C) 2012-2025 Bernard Giannetti.
 # This file is distributed under the same license as the indicatorppadownloadstatistics package.
-# Pavel Rehak <pavel-rehak@email.cz>, 2017-2024.
-#
+# Pavel Rehak <pavel-rehak@email.cz>, 2017.
 msgid ""
 msgstr ""
 "Project-Id-Version: indicatorppadownloadstatistics 1.0.81\n"
@@ -10,7 +9,6 @@ msgstr ""
 "POT-Creation-Date: 2025-03-14 16:55+1100\n"
 "PO-Revision-Date: 2024-07-09 00:24+1100\n"
 "Last-Translator: Pavel Rehak <pavel-rehak@email.cz>\n"
-"Language-Team: \n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -174,70 +172,3 @@ msgstr ""
 #: indicatorppadownloadstatistics.py:861
 msgid "Filter text may not contain spaces."
 msgstr ""
-
-#~ msgid "(error retrieving PPA)"
-#~ msgstr "(chyba při vyhledávání PPA)"
-
-#~ msgid "Series"
-#~ msgstr "Vydání"
-
-#~ msgid "Architecture"
-#~ msgstr "Architektura"
-
-#~ msgid "Double click to edit a filter."
-#~ msgstr "Dvoujklikem začnete upravovat filtr."
-
-#~ msgid "Add a new filter."
-#~ msgstr "Přidat nový filtr."
-
-#~ msgid "Remove the selected filter."
-#~ msgstr "Odstranit vybraný filtr."
-
-#~ msgid "Filters"
-#~ msgstr "Filtry"
-
-#~ msgid "Combine PPAs"
-#~ msgstr "Kombinovat PPA repozitáře"
-
-#~ msgid "Ignore version for architecture specific"
-#~ msgstr "Ignorovat verze jednotlivých architektur"
-
-#~ msgid "No PPA has been selected for removal."
-#~ msgstr "Nebyl vybrán PPA repozitář, který se má odstranit."
-
-#~ msgid "Duplicates disallowed - there is an identical PPA!"
-#~ msgstr "Duplicity nejsou povoleny - stejný PPA repozitář již existuje!"
-
-#~ msgid "No filter has been selected for removal."
-#~ msgstr "Nebyl vybrán filtr, který se má odstranit."
-
-#~ msgid "Remove the selected filter?"
-#~ msgstr "Odstranit vybraný filtr?"
-
-#~ msgid "Please add a PPA first!"
-#~ msgstr "Nejdříve prosím přidejte PPA repozitář."
-
-#~ msgid "Only one filter per PPA User/Name."
-#~ msgstr "Pouze jeden filtr na uživatele/název PPA repozitáře."
-
-#~ msgid "PPA User/Name"
-#~ msgstr "Uživatel/název PPA repozitáře."
-
-#~ msgid "Filter Text"
-#~ msgstr "Text filtru"
-
-#~ msgid "Edit Filter"
-#~ msgstr "Upravit filtr"
-
-#~ msgid "Add Filter"
-#~ msgstr "Přidat filtr"
-
-#~ msgid "Please enter filter text!"
-#~ msgstr "Zadejte prosím text filtru!"
-
-#, fuzzy
-#~ msgid "(no published binaries and/or completely filtered)"
-#~ msgstr "(uveřejněné binární soubory jsou zcela vyfiltrovány)"
-
-#~ msgid "PPA"
-#~ msgstr "PPA"
