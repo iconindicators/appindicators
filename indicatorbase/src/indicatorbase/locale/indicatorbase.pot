@@ -1,14 +1,12 @@
 # Portable Object Template for indicatorbase.
-# Copyright (C) 2017-2025 Bernard Giannetti
+# Copyright (C) 2017-2025 Bernard Giannetti.
 # This file is distributed under the same license as the indicatorbase package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: indicatorbase 1.0.1\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-02-26 21:58+1100\n"
+"POT-Creation-Date: 2025-03-14 11:29+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,58 +15,76 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: indicatorbase.py:264
 msgid "Initialising..."
 msgstr ""
 
+#: indicatorbase.py:277
 msgid "Refer to the Preferences for details."
 msgstr ""
 
+#: indicatorbase.py:279
 #, python-brace-format
 msgid "New version of {0} available..."
 msgstr ""
 
+#: indicatorbase.py:697 indicatorbase.py:982
 msgid "Preferences"
 msgstr ""
 
+#: indicatorbase.py:697
 msgid "About"
 msgstr ""
 
+#: indicatorbase.py:697
 msgid "Quit"
 msgstr ""
 
+#: indicatorbase.py:911
 msgid "translator-credits"
 msgstr ""
 
+#: indicatorbase.py:917
 msgid "Credits"
 msgstr ""
 
+#: indicatorbase.py:922 indicatorbase.py:931
 msgid "View the"
 msgstr ""
 
+#: indicatorbase.py:923
 msgid "changelog"
 msgstr ""
 
+#: indicatorbase.py:924 indicatorbase.py:933
 msgid "text file."
 msgstr ""
 
+#: indicatorbase.py:932
 msgid "error log"
 msgstr ""
 
+#: indicatorbase.py:1311
 msgid "Autostart"
 msgstr ""
 
+#: indicatorbase.py:1312
 msgid "Run the indicator automatically."
 msgstr ""
 
+#: indicatorbase.py:1320
 msgid "Start up delay (seconds)."
 msgstr ""
 
+#: indicatorbase.py:1338
 msgid "Check Latest Version"
 msgstr ""
 
+#: indicatorbase.py:1340
 msgid "Check for the latest version of the indicator on start up."
 msgstr ""
 
+#: indicatorbase.py:1353
 #, python-brace-format
 msgid "An update is available at <a href=\"{0}\">{1}</a>."
 msgstr ""
