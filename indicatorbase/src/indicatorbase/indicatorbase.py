@@ -52,6 +52,11 @@ References
 # fortune history
 
 
+#TODO Search all .py for subprocess.run (after above is done)
+# and replace all [] with a string and must use shell = True
+
+
+
 import datetime
 import email.policy
 import gettext
