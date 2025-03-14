@@ -26,17 +26,6 @@ https://www.labri.fr/perso/fleury/posts/programming/a-quick-gettext-tutorial.htm
 '''
 
 
-#TODO Search all .py for subprocess.run (after above is done)
-# and replace all [] with a string and must use shell = True
-
-
-#TODO Go through all .po and update the first line similarly to
-#   # Russian translation for indicatorlunar.
-#
-# In fact, rename all to .orig or similar
-# and generate new .po files to see how they should look.
-
-
 import datetime
 import filecmp
 import gettext
@@ -142,8 +131,7 @@ def _create_update_po(
     indicator_name,
     linguas_codes,
     version,
-    copyright_,
-    start_year ):
+    copyright_ ):
 
     locale_directory = _get_locale_directory( indicator_name )
     pot_file = locale_directory / ( indicator_name + ".pot" )
@@ -159,25 +147,26 @@ def _create_update_po(
 
             subprocess.run(
                 f"msgmerge { po_file_original } { pot_file } " +
-                f"-v -o { po_file_new }",
+                f"-o { po_file_new }",
                 shell = True )
 
-            project_id_version = (
-                f"Project-Id-Version: { indicator_name } { version }\\\\n\"" )
+            with open( po_file_new, 'r', encoding = "utf-8" ) as r:
+                new = r.read()
 
-            print( "here")
-#TODO Check
-            # with open( po_file_new, 'r', encoding = "utf-8" ) as r:
-            #     new = r.read()
-            #     new = re.sub( "Copyright \(C\).*", f"Copyright (C) { copyright_ }", new )
-            #     new = re.sub( "Project-Id-Version.*", f"{ project_id_version }", new )
-            #
-            #     with open( po_file_new, 'w', encoding = "utf-8" ) as w:
-            #         w.write( new )
+                new = (
+                    re.sub(
+                        "Copyright \(C\).*",
+                        f"Copyright (C) { copyright_ }.",
+                        new ) )
 
-            print( f"Copyright (C) { copyright_ }" )
-            print( f"{ project_id_version }" )
-
+                new = (
+                    re.sub(
+                        "Project-Id-Version.*",
+                        f"Project-Id-Version: { indicator_name } { version }\\\\n\"",
+                        new ) )
+            
+                with open( po_file_new, 'w', encoding = "utf-8" ) as w:
+                    w.write( new )
 
             if filecmp.cmp( po_file_original, po_file_new ):
                 os.remove( po_file_new )
@@ -208,7 +197,7 @@ def _create_update_po(
                         f"<English language name for { lingua_code }> translation for { indicator_name }" ).
                     replace(
                         f"Automatically generated, { _get_current_year() }",
-                        f"<author name> <<author email>>, { start_year }-{ _get_current_year() }" ).
+                        f"<author name> <<author email>>, { _get_current_year() }" ).
                     replace(
                         f"Last-Translator: Automatically generated",
                         f"Last-Translator: <author name> <<author email>>" ).
@@ -219,7 +208,7 @@ def _create_update_po(
             with open( po_file_original, 'w', encoding = "utf-8" ) as w:
                 w.write( text )
 
-            print( f"PLEASE UPDATE LINES 1, 4, 11 and 12." )
+            print( f"YOU MUST UPDATE LINES 1, 4, 11, 12." )
 
 
 def update_locale_source(
@@ -246,12 +235,12 @@ def update_locale_source(
         version_indicatorbase,
         copyright_ )
 
+
     _create_update_po(
         "indicatorbase",
         _get_linguas_codes( "indicatorbase" ),
         version_indicatorbase,
-        copyright_,
-        start_year_indicatorbase )
+        copyright_ )
 
     copyright_ = f"{ start_year }-{ current_year_author }"
 
@@ -266,12 +255,7 @@ def update_locale_source(
         indicator_name,
         _get_linguas_codes( indicator_name ),
         version_indicator,
-        copyright_,
-        start_year )
-
-    import sys #TODO Testing
-    sys.exit()
-
+        copyright_ )
 
 
 def build_locale_for_release(
