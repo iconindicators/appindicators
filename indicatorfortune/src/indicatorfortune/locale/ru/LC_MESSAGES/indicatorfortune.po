@@ -1,5 +1,5 @@
 # Russian translation for indicatorfortune.
-# Copyright (C) 2013-2025 Bernard Giannetti
+# Copyright (C) 2013-2025 Bernard Giannetti.
 # This file is distributed under the same license as the indicatorfortune package.
 # Oleg Moiseichuk <berroll@mail.ru>, 2015-2024.
 #
@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorfortune 1.0.44\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-11-01 07:42+1100\n"
+"POT-Creation-Date: 2025-03-14 13:54+1100\n"
 "PO-Revision-Date: 2024-07-09 16:04+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -15,104 +15,112 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
+#: indicatorfortune.py:43
 msgid "Indicator Fortune"
 msgstr "Индикатор изречений"
 
+#: indicatorfortune.py:61
 msgid "Fortune. . ."
 msgstr "Изречение. . ."
 
-msgid "Calls the 'fortune' program displaying the result in the on-screen notification."
-msgstr "Вызывает программу 'fortune', показывающую изречения в виде всплывающих сообщений."
+#: indicatorfortune.py:66
+msgid ""
+"Calls the 'fortune' program displaying the result in the on-screen "
+"notification."
+msgstr ""
+"Вызывает программу 'fortune', показывающую изречения в виде всплывающих "
+"сообщений."
 
+#: indicatorfortune.py:87
 msgid "New Fortune"
 msgstr "Новое изречение"
 
+#: indicatorfortune.py:97
 msgid "Copy Last Fortune"
 msgstr "Скопировать последнее"
 
+#: indicatorfortune.py:108
 msgid "Show Last Fortune"
 msgstr "Показать последнее"
 
+#: indicatorfortune.py:120
 msgid "History"
 msgstr "История"
 
-msgid "Fortune History for Session"
-msgstr "История изречений"
-
-#, fuzzy
-msgid "No enabled fortunes!"
-msgstr "Неверно заданы пути у включённых файлов изречений!"
-
-msgid "No enabled fortunes have a valid location!"
-msgstr "Неверно заданы пути у включённых файлов изречений!"
-
-msgid "Ensure enabled fortunes contain fortune data!"
-msgstr "Убедитесь в правильности формата файлов включённых изречений!"
-
+#: indicatorfortune.py:139
 msgid "WARNING. . ."
 msgstr "ПРЕДУПРЕЖДЕНИЕ. . ."
 
-msgid "Fortune File/Directory"
-msgstr "Файл/Папка с изречениями"
+#: indicatorfortune.py:145
+#, fuzzy
+msgid "Ensure enabled fortunes contain data!"
+msgstr "Убедитесь в правильности формата файлов включённых изречений!"
 
+#: indicatorfortune.py:178
+msgid "No enabled fortunes have a valid location!"
+msgstr "Неверно заданы пути у включённых файлов изречений!"
+
+#: indicatorfortune.py:181
+msgid "No fortunes are enabled!"
+msgstr ""
+
+#: indicatorfortune.py:230
+msgid "Fortune History for Session"
+msgstr "История изречений"
+
+#: indicatorfortune.py:279
+#, fuzzy
+msgid "Fortune"
+msgstr "Файлы изречений"
+
+#: indicatorfortune.py:280
 msgid "Enabled"
 msgstr "Включен"
 
-msgid ""
-"Double click to edit a fortune.\n"
-"\n"
-"English language fortunes are\n"
-"installed by default.\n"
-"\n"
-"There may be other fortune\n"
-"packages available in your\n"
-"native language."
+#: indicatorfortune.py:294
+msgid "Double click to edit a fortune."
 msgstr ""
-"Щёлкните дважды, чтобы\n"
-"отредактировать свойства.\n"
-"\n"
-"По умолчанию установлен пакет\n"
-"англоязычных изречений.\n"
-"\n"
-"Другие пакеты с изречениями\n"
-"могут быть доступны\n"
-"на вашем родном языке."
 
+#: indicatorfortune.py:303
 msgid "Add"
 msgstr "Добавить"
 
+#: indicatorfortune.py:304
 msgid "Remove"
 msgstr "Удалить"
 
-msgid "Reset"
-msgstr "Сброс"
-
+#: indicatorfortune.py:306
 msgid "Add a new fortune location."
 msgstr "Добавить новые изречения."
 
+#: indicatorfortune.py:307
 msgid "Remove the selected fortune location."
 msgstr "Удалить выбранные изречения."
 
-msgid "Reset to factory default."
-msgstr "Сбросить к начальным настройкам."
-
+#: indicatorfortune.py:325
 msgid "Fortunes"
 msgstr "Файлы изречений"
 
+#: indicatorfortune.py:335
 msgid "How often a fortune is displayed."
 msgstr "Насколько часто показываются изречения."
 
+#: indicatorfortune.py:337
 msgid "Refresh interval (minutes)"
 msgstr "Интервал обновления (в минутах)"
 
+#: indicatorfortune.py:348
 msgid "The summary text for the notification."
 msgstr "Текст заголовка всплывающего сообщения."
 
+#: indicatorfortune.py:353
 msgid "Notification summary"
 msgstr "Заголовок сообщения"
 
+#: indicatorfortune.py:364
 msgid ""
 "If the fortune exceeds the limit,\n"
 "a new fortune is created.\n"
@@ -130,121 +138,171 @@ msgstr ""
 "будут отброшены, что вызовет чрезмерное\n"
 "обращение к программе 'fortune'."
 
+#: indicatorfortune.py:374
 msgid "Message character limit"
 msgstr "Лимит количества символов"
 
+#: indicatorfortune.py:379
 msgid "Middle mouse click of the icon"
 msgstr "Щелчок средней кнопкой мыши по значку"
 
+#: indicatorfortune.py:395
 msgid "Show a new fortune"
 msgstr "Показать новое изречение"
 
+#: indicatorfortune.py:403
+msgid "Unsupported on Ubuntun 20.04 on Wayland."
+msgstr ""
+
+#: indicatorfortune.py:413
 msgid "Copy current fortune to clipboard"
 msgstr "Скопировать последнее изречение в буфер"
 
-msgid ""
-"\n"
-"\n"
-"Unsupported on Ubuntun 20.04 on Wayland."
-msgstr ""
-
+#: indicatorfortune.py:428
 msgid "Show current fortune"
 msgstr "Показать последнее изречение"
 
+#: indicatorfortune.py:439
 msgid "General"
 msgstr "Общие"
 
-msgid "Reset fortunes to factory default?"
-msgstr "Очистить список и вернуть начальные настройки?"
-
-msgid "No fortune has been selected for removal."
-msgstr "Не выбран элемент списка для удаления."
-
-msgid "This is the default fortune and cannot be deleted."
+#: indicatorfortune.py:500
+#, fuzzy
+msgid "This is a system fortune and cannot be removed."
 msgstr "Стандартный файл с изречениями не может быть удалён."
 
+#: indicatorfortune.py:505
 msgid "Remove the selected fortune?"
 msgstr "Удалить выбранный элемент?"
 
-msgid "Add Fortune"
-msgstr "Добавить изречения"
+#: indicatorfortune.py:555
+#, fuzzy
+msgid "This is a system fortune and cannot be modified."
+msgstr "Стандартный файл с изречениями не может быть удалён."
 
-msgid "Edit Fortune"
-msgstr "Редактировать свойства"
-
-msgid ""
-"The path to a fortune .dat file,\n"
-"or a directory containing\n"
-"fortune .dat files.\n"
-"\n"
-"Ensure the corresponding\n"
-"fortune text file(s) is present."
-msgstr ""
-"Путь к файлу .dat с изречениями\n"
-"или к папке, содержащей\n"
-"файлы .dat с изречениями.\n"
-"\n"
-"Убедитесь, что надлежащие\n"
-"текстовые файлы существуют."
-
-msgid "Fortune file/directory"
-msgstr "Файл/папка с изречениями"
-
-msgid "File"
-msgstr "Файл"
-
-msgid ""
-"This fortune is part of your\n"
-"system and cannot be modified."
-msgstr ""
-"Этот файл с изречениями\n"
-"является частью системы\n"
-"и не может быть изменён."
-
-msgid ""
-"Choose a fortune .dat file.\n"
-"\n"
-"Ensure the corresponding text\n"
-"file is present."
-msgstr ""
-"Выберите файл .dat с изречениями.\n"
-"\n"
-"Убедитесь, что надлежащий\n"
-"текстовый файл существует."
-
-msgid "Directory"
-msgstr "Папка"
-
-msgid ""
-"Choose a directory containing\n"
-"a fortune .dat file(s).\n"
-"\n"
-"Ensure the corresponding text\n"
-"file is present."
-msgstr ""
-"Выберите папку, содержащую\n"
-"файлы .dat с изречениями.\n"
-"\n"
-"Убедитесь, что надлежащие\n"
-"текстовые файлы существуют."
-
-msgid ""
-"Ensure the fortune file/directory\n"
-"works by running through 'fortune'\n"
-"in a terminal."
-msgstr ""
-"Убедитесь, что файл/папка с изречениями\n"
-"работает, используя команду 'fortune'\n"
-"в терминале."
-
-msgid "The fortune path cannot be empty."
-msgstr "Путь не может быть пустым."
-
+#: indicatorfortune.py:586
 msgid "Choose a fortune .dat file"
 msgstr "Выберите файл .dat с изречениями"
 
-msgid "Choose a directory containing a fortune .dat file(s)"
-msgstr "Выберите папку, содержащую файл(ы) .dat с изречениями"
+#: indicatorfortune.py:604
+msgid "This fortune already exists!"
+msgstr ""
 
-msgid "The fortune is part of your system and is already included."
-msgstr "Этот файл с изречениями является частью системы и уже подключён."
+#, fuzzy
+#~ msgid "No enabled fortunes!"
+#~ msgstr "Неверно заданы пути у включённых файлов изречений!"
+
+#~ msgid "Fortune File/Directory"
+#~ msgstr "Файл/Папка с изречениями"
+
+#~ msgid ""
+#~ "Double click to edit a fortune.\n"
+#~ "\n"
+#~ "English language fortunes are\n"
+#~ "installed by default.\n"
+#~ "\n"
+#~ "There may be other fortune\n"
+#~ "packages available in your\n"
+#~ "native language."
+#~ msgstr ""
+#~ "Щёлкните дважды, чтобы\n"
+#~ "отредактировать свойства.\n"
+#~ "\n"
+#~ "По умолчанию установлен пакет\n"
+#~ "англоязычных изречений.\n"
+#~ "\n"
+#~ "Другие пакеты с изречениями\n"
+#~ "могут быть доступны\n"
+#~ "на вашем родном языке."
+
+#~ msgid "Reset"
+#~ msgstr "Сброс"
+
+#~ msgid "Reset to factory default."
+#~ msgstr "Сбросить к начальным настройкам."
+
+#~ msgid "Reset fortunes to factory default?"
+#~ msgstr "Очистить список и вернуть начальные настройки?"
+
+#~ msgid "No fortune has been selected for removal."
+#~ msgstr "Не выбран элемент списка для удаления."
+
+#~ msgid "Add Fortune"
+#~ msgstr "Добавить изречения"
+
+#~ msgid "Edit Fortune"
+#~ msgstr "Редактировать свойства"
+
+#~ msgid ""
+#~ "The path to a fortune .dat file,\n"
+#~ "or a directory containing\n"
+#~ "fortune .dat files.\n"
+#~ "\n"
+#~ "Ensure the corresponding\n"
+#~ "fortune text file(s) is present."
+#~ msgstr ""
+#~ "Путь к файлу .dat с изречениями\n"
+#~ "или к папке, содержащей\n"
+#~ "файлы .dat с изречениями.\n"
+#~ "\n"
+#~ "Убедитесь, что надлежащие\n"
+#~ "текстовые файлы существуют."
+
+#~ msgid "Fortune file/directory"
+#~ msgstr "Файл/папка с изречениями"
+
+#~ msgid "File"
+#~ msgstr "Файл"
+
+#~ msgid ""
+#~ "This fortune is part of your\n"
+#~ "system and cannot be modified."
+#~ msgstr ""
+#~ "Этот файл с изречениями\n"
+#~ "является частью системы\n"
+#~ "и не может быть изменён."
+
+#~ msgid ""
+#~ "Choose a fortune .dat file.\n"
+#~ "\n"
+#~ "Ensure the corresponding text\n"
+#~ "file is present."
+#~ msgstr ""
+#~ "Выберите файл .dat с изречениями.\n"
+#~ "\n"
+#~ "Убедитесь, что надлежащий\n"
+#~ "текстовый файл существует."
+
+#~ msgid "Directory"
+#~ msgstr "Папка"
+
+#~ msgid ""
+#~ "Choose a directory containing\n"
+#~ "a fortune .dat file(s).\n"
+#~ "\n"
+#~ "Ensure the corresponding text\n"
+#~ "file is present."
+#~ msgstr ""
+#~ "Выберите папку, содержащую\n"
+#~ "файлы .dat с изречениями.\n"
+#~ "\n"
+#~ "Убедитесь, что надлежащие\n"
+#~ "текстовые файлы существуют."
+
+#~ msgid ""
+#~ "Ensure the fortune file/directory\n"
+#~ "works by running through 'fortune'\n"
+#~ "in a terminal."
+#~ msgstr ""
+#~ "Убедитесь, что файл/папка с изречениями\n"
+#~ "работает, используя команду 'fortune'\n"
+#~ "в терминале."
+
+#~ msgid "The fortune path cannot be empty."
+#~ msgstr "Путь не может быть пустым."
+
+#~ msgid "Choose a directory containing a fortune .dat file(s)"
+#~ msgstr "Выберите папку, содержащую файл(ы) .dat с изречениями"
+
+#~ msgid "The fortune is part of your system and is already included."
+#~ msgstr "Этот файл с изречениями является частью системы и уже подключён."
