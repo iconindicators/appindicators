@@ -1,14 +1,12 @@
 # Portable Object Template for indicatortest.
-# Copyright (C) 2016-2025 Bernard Giannetti
+# Copyright (C) 2016-2025 Bernard Giannetti.
 # This file is distributed under the same license as the indicatortest package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: indicatortest 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-02-22 08:26+1100\n"
+"POT-Creation-Date: 2025-03-14 18:25+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,104 +15,142 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: indicatortest.py:44
 msgid "Indicator Test"
 msgstr ""
 
+#: indicatortest.py:52
 msgid "Test Indicator"
 msgstr ""
 
+#: indicatortest.py:57
 msgid "Exercises a range of indicator functionality."
 msgstr ""
 
+#: indicatortest.py:90
 msgid "Information"
 msgstr ""
 
+#: indicatortest.py:98
 msgid "Functionality"
 msgstr ""
 
+#: indicatortest.py:113
 msgid "Machine: "
 msgstr ""
 
+#: indicatortest.py:114
 msgid "Node: "
 msgstr ""
 
+#: indicatortest.py:115
 msgid "Processor: "
 msgstr ""
 
+#: indicatortest.py:116
 msgid "Release: "
 msgstr ""
 
+#: indicatortest.py:117
 msgid "System: "
 msgstr ""
 
+#: indicatortest.py:118
 msgid "Version: "
 msgstr ""
 
+#: indicatortest.py:126
 msgid "Platform | Uname"
 msgstr ""
 
+#: indicatortest.py:151
 msgid "Desktop"
 msgstr ""
 
+#: indicatortest.py:187
 msgid "Icon Theme"
 msgstr ""
 
+#: indicatortest.py:201
 msgid "Terminal: "
 msgstr ""
 
+#: indicatortest.py:201 indicatortest.py:209
 msgid "Unknown terminal!"
 msgstr ""
 
+#: indicatortest.py:209
 msgid "Execution flag: "
 msgstr ""
 
+#: indicatortest.py:217
 msgid "Terminal"
 msgstr ""
 
+#: indicatortest.py:229
 msgid "Reset icon"
 msgstr ""
 
+#: indicatortest.py:250
 msgid "Icon"
 msgstr ""
 
+#: indicatortest.py:262
 msgid "Reset label"
 msgstr ""
 
+#: indicatortest.py:270
 msgid "Show current time in label"
 msgstr ""
 
+#: indicatortest.py:280
 msgid "Show current time in OSD"
 msgstr ""
 
+#: indicatortest.py:284
 msgid "Current time..."
 msgstr ""
 
+#: indicatortest.py:289
 msgid "Label | Tooltip | OSD"
 msgstr ""
 
+#: indicatortest.py:308
 msgid "Copy current time to clipboard"
 msgstr ""
 
+#: indicatortest.py:320
 msgid "Copy current time to primary"
 msgstr ""
 
+#: indicatortest.py:332
 msgid "Clipboard"
 msgstr ""
 
+#: indicatortest.py:384
 msgid "Execute Terminal Command"
 msgstr ""
 
-msgid "Cannot run script as no terminal and/or terminal execution flag found; please install gnome-terminal."
+#: indicatortest.py:430
+msgid ""
+"Cannot run script as no terminal and/or terminal execution flag found; "
+"please install gnome-terminal."
 msgstr ""
 
-msgid "Cannot run script as qterminal incorrectly parses arguments; please install gnome-terminal instead."
+#: indicatortest.py:445
+msgid ""
+"Cannot run script as qterminal incorrectly parses arguments; please install "
+"gnome-terminal instead."
 msgstr ""
 
+#: indicatortest.py:471 indicatortest.py:472
 msgid "Enable/disable X"
 msgstr ""
 
+#: indicatortest.py:490
 msgid "Day of Week"
 msgstr ""
 
+#: indicatortest.py:497
 msgid "Days of week containing an 'n' are bold."
 msgstr ""
