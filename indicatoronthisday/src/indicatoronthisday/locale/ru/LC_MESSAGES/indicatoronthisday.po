@@ -1,91 +1,120 @@
 # Russian translation for indicatoronthisday.
-# Copyright (C) 2017-2025 Bernard Giannetti
+# Copyright (C) 2017-2025 Bernard Giannetti.
 # This file is distributed under the same license as the indicatoronthisday package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2017-2024.
-#
+# Oleg Moiseichuk <berroll@mail.ru>, 2024.
 msgid ""
 msgstr ""
 "Project-Id-Version: indicatoronthisday 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-11-01 07:42+1100\n"
-"PO-Revision-Date: 2024-07-09 09:48+1100\n"
+"POT-Creation-Date: 2025-03-14 16:50+1100\n"
+"PO-Revision-Date: 2025-03-14 16:50+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
+#: indicatoronthisday.py:69
 msgid "Indicator On This Day"
 msgstr "Индикатор событий дня"
 
+#: indicatoronthisday.py:84
 msgid "EVENT"
 msgstr "СОБЫТИЕ"
 
+#: indicatoronthisday.py:92
 msgid "Calls the 'calendar' program and displays events in the menu."
 msgstr "Вызывает программу 'calendar' и показывает события в меню."
 
+#: indicatoronthisday.py:132
 msgid "On this day..."
 msgstr "В этот день..."
 
+#: indicatoronthisday.py:235 indicatoronthisday.py:240
+msgid "Warning"
+msgstr ""
+
+#: indicatoronthisday.py:236
+msgid "No enabled calendars have a valid location!"
+msgstr ""
+
+#: indicatoronthisday.py:241
+#, fuzzy
+msgid "No calendars are enabled!"
+msgstr "Ни один календарь не выбран."
+
+#: indicatoronthisday.py:336
 msgid "Calendar"
 msgstr "Календарь"
 
+#: indicatoronthisday.py:337
 msgid "Enabled"
 msgstr "Включен"
 
+#: indicatoronthisday.py:351
 msgid "Double click to edit a calendar."
 msgstr "Щёлкните дважды, чтобы отредактировать календарь."
 
+#: indicatoronthisday.py:360
 msgid "Add"
 msgstr "Добавить"
 
+#: indicatoronthisday.py:361
 msgid "Remove"
 msgstr "Удалить"
 
-msgid "Reset"
-msgstr "Сбросить"
-
+#: indicatoronthisday.py:363
 msgid "Add a new calendar."
 msgstr "Добавить новый календарь."
 
+#: indicatoronthisday.py:364
 msgid "Remove the selected calendar."
 msgstr "Удалить выбранный календарь."
 
-msgid "Reset to factory default."
-msgstr "Сбросить к начальным настройкам."
-
+#: indicatoronthisday.py:382
 msgid "Calendars"
 msgstr "Календари"
 
+#: indicatoronthisday.py:393
 msgid "The number of menu items available for display."
 msgstr "Количество строк событий, отображаемых в меню."
 
+#: indicatoronthisday.py:398
 msgid "Lines"
 msgstr "Строки"
 
+#: indicatoronthisday.py:404
 msgid "On event click"
 msgstr "При щелчке по событию"
 
+#: indicatoronthisday.py:408
 msgid "Copy the event text and date to the clipboard."
 msgstr "Скопировать событие и его дату в буфер обмена."
 
+#: indicatoronthisday.py:410
 msgid ""
 "\n"
 "\n"
 "Unsupported on Ubuntun 20.04 on Wayland."
 msgstr ""
 
+#: indicatoronthisday.py:415
 msgid "Copy event to clipboard"
 msgstr "Скопировать событие в буфер"
 
+#: indicatoronthisday.py:425
 msgid "Search event on the internet"
 msgstr "Искать событие в Интернет"
 
-msgid "Open the default web browser and search for the event."
-msgstr "Открыть обозреватель по умолчанию и искать событие."
+#: indicatoronthisday.py:427
+#, fuzzy
+msgid "Search for the event in the default web browser."
+msgstr "Искать событие в Интернет"
 
+#: indicatoronthisday.py:437
 #, python-brace-format
 msgid ""
 "The URL to search for the event.\n"
@@ -110,12 +139,15 @@ msgstr ""
 "Если ссылка пустая, и задана опция \"Скопировать\",\n"
 "то будет восстановлена ссылка по умолчанию."
 
+#: indicatoronthisday.py:450
 msgid "URL"
 msgstr "Ссылка"
 
+#: indicatoronthisday.py:471
 msgid "Notify"
 msgstr "Уведомлять"
 
+#: indicatoronthisday.py:473
 msgid ""
 "On startup or when saving preferences,\n"
 "show a notification for each of today's events."
@@ -123,71 +155,33 @@ msgstr ""
 "При запуске или сохранении настроек показывать\n"
 "уведомление о всех событиях текущего дня."
 
+#: indicatoronthisday.py:485
 msgid "General"
 msgstr "Общие"
 
-msgid "Reset calendars to factory default?"
-msgstr "Сбросить календари к начальным настройкам?"
-
-msgid "No calendar has been selected."
-msgstr "Ни один календарь не выбран."
-
+#: indicatoronthisday.py:548
 #, fuzzy
 msgid "This is a system calendar and cannot be removed."
 msgstr ""
 "Этот календарь является системным\n"
 "и не может быть удалён."
 
+#: indicatoronthisday.py:553
 msgid "Remove the selected calendar?"
 msgstr "Удалить выбранный календарь?"
 
-msgid "Add Calendar"
-msgstr "Добавить календарь"
-
-msgid "Edit Calendar"
-msgstr "Изменить календарь"
-
-msgid "The path to a calendar file."
-msgstr "Путь к файлу календаря."
-
-msgid "Browse"
-msgstr "Обзор"
-
-msgid ""
-"This calendar is part of your\n"
-"system and cannot be modified."
+#: indicatoronthisday.py:603
+#, fuzzy
+msgid "This is a system calendar and cannot be modified."
 msgstr ""
 "Этот календарь является системным\n"
-"и не может быть изменён."
+"и не может быть удалён."
 
-msgid ""
-"Choose a calendar file.\n"
-"\n"
-"Ensure the calendar file is\n"
-"valid by running through\n"
-"'calendar' in a terminal."
-msgstr ""
-"Выберите файл календаря.\n"
-"\n"
-"Убедитесь, что файл календаря имеет\n"
-"правильный формат, запустив его\n"
-"с помощью команды 'calendar' в терминале."
-
-msgid "Calendar file"
-msgstr "Файл календаря"
-
-msgid "The calendar path cannot be empty."
-msgstr "Путь к файлу календаря не может быть пустым."
-
-msgid "The calendar path does not exist."
-msgstr "Путь к календарю не существует."
-
+#: indicatoronthisday.py:629
 msgid "Choose a calendar file"
 msgstr "Выберите файл календаря"
 
-msgid ""
-"The calendar is part of your system\n"
-"and is already included."
-msgstr ""
-"Этот календарь является системным\n"
-"и уже существует в списке."
+#: indicatoronthisday.py:646
+#, fuzzy
+msgid "This calendar already exists!"
+msgstr "Путь к календарю не существует."
