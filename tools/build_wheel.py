@@ -295,8 +295,6 @@ def _get_name_categories_comments_from_indicator(
     if comments == "":
         message += f"ERROR: Unable to obtain 'comments' from the constructor of\n\t{ indicator_source }"
 
-    print( "COMMENTS")#TODO Remove
-    print( comments )
     return name, categories, comments, message
 
 

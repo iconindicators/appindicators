@@ -164,7 +164,7 @@ def _create_update_po(
                         "Project-Id-Version.*",
                         f"Project-Id-Version: { indicator_name } { version }\\\\n\"",
                         new ) )
-            
+
                 with open( po_file_new, 'w', encoding = "utf-8" ) as w:
                     w.write( new )
 
@@ -316,12 +316,14 @@ def get_names_and_comments_from_mo_files(
 
         # https://stackoverflow.com/q/54638570/2156453
         # https://www.reddit.com/r/learnpython/comments/jkun99/how_do_i_load_a_specific_mo_file_by_giving_its
+        '''TODO Remove
         print( indicator_name )
         print( directory_indicator_locale )
         print( locale )
         print( name )
         print( comments )
         print()
+        '''
 
         translation = (
             gettext.translation(
@@ -339,17 +341,13 @@ def get_names_and_comments_from_mo_files(
             names_from_mo_files[ locale ] = translated_string
 
 #        translated_string = translation.gettext( comments ) #TODO Original
-#TODO I want to figure out why the translation for the comment is not being found
-# because of the \m in the comment.
-# Translated comments for all other indicators ARE being found...just not script runner.
-# I removed the \n from the comment and did a build wheel and the \n still appeared
-# so now check if the POT and PO are regenerated.
-#
-#TODO Maybe put in a check for \n and burp to the user?
+#TODO When a .po contains fuzzy, that translation will NOT appear in the .mo
+# That means the name/comment may not be found.
+# Need to handle.
+# Maybe put in a check for \n and burp to the user?
 # Do it here or above when the pot/po is generated?
         translated_string = translation.gettext( comments )
-        translated_string = translation.gettext( "The comment." )
-        # translated_string = translation.gettext( comments.replace( '\n', 'XXX' ) )
+#        translated_string = translation.gettext( comments.replace( '\n', ' ' ) )
         print( "Comments and translated comments: ")
         print( f"\t{ comments }" )
         print( f"\t{ translated_string }" )
