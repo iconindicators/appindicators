@@ -1,14 +1,12 @@
 # Portable Object Template for indicatorstardate.
-# Copyright (C) 2012-2024 Bernard Giannetti
+# Copyright (C) 2012-2025 Bernard Giannetti.
 # This file is distributed under the same license as the indicatorstardate package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: indicatorstardate 1.0.45\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2024-07-29 16:32+1000\n"
+"POT-Creation-Date: 2025-03-14 18:23+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,21 +15,19 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: indicatorstardate.py:37
 msgid "Indicator Stardate"
 msgstr ""
 
+#: indicatorstardate.py:47
 msgid "Shows the current Star Trek™ stardate."
 msgstr ""
 
-msgid "STARDATES IN STAR TREK FAQ by Andrew Main. http://www.faqs.org/faqs/star-trek/stardates"
-msgstr ""
-
-msgid "Wikipedia::Stardatehttps://en.wikipedia.org/wiki/Stardate"
-msgstr ""
-
+#: indicatorstardate.py:162
 msgid "Show stardate 'classic'"
 msgstr ""
 
+#: indicatorstardate.py:164
 msgid ""
 "If checked, show stardate 'classic' based on\n"
 "\n"
@@ -42,14 +38,18 @@ msgid ""
 "\thttps://en.wikipedia.org/wiki/Stardate"
 msgstr ""
 
+#: indicatorstardate.py:174
 msgid "Show ISSUE"
 msgstr ""
 
+#: indicatorstardate.py:175
 msgid "Show the ISSUE of the stardate 'classic'."
 msgstr ""
 
+#: indicatorstardate.py:184
 msgid "Pad INTEGER"
 msgstr ""
 
+#: indicatorstardate.py:186
 msgid "Pad the INTEGER part of the stardate 'classic' with leading zeros."
 msgstr ""
