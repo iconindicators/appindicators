@@ -35,6 +35,8 @@ import subprocess
 
 from pathlib import Path
 
+from . import build_wheel
+
 
 def _get_linguas_codes(
     indicator_name ):
@@ -312,7 +314,6 @@ def get_names_and_comments_from_mo_files(
 
     print( "TODO TEST START" )
 
-    from . import build_wheel
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         locale = po.parent.parent.stem
         print( f"PO file: { po }" )
@@ -323,7 +324,10 @@ def get_names_and_comments_from_mo_files(
                 f". { build_wheel.VENV_DEVELOPMENT }/bin/activate && " +
                 f"python3 -c \"" +
                 f"import polib; " +
-                f"[ print( entry.msgstr ) for entry in polib.pofile( '{ po }' ) if entry.msgid == '{ comments }'  ]" +
+                f"[ " +
+                f"    print( entry.msgstr ) " +
+                f"    for entry in polib.pofile( '{ po }' ) " +
+                f"    if entry.msgid == '{ comments }'  ]" +
                 f"\"",
                 stdout = subprocess.PIPE,
                 stderr = subprocess.PIPE,

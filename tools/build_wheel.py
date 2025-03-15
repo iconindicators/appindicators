@@ -225,11 +225,13 @@ def _get_pyproject_toml_authors(
 def _get_year_in_changelog_markdown(
     indicator_name ):
     '''
-    Obtains the (most recent) year from the CHANGELOG.md, typically done by
-    calling a function in indicatorbase.
+    Obtains the (most recent) year from the CHANGELOG.md.
+    
+    Typically achieved by calling a function in indicatorbase.
+    Unfortunately, seems next to impossible to do so because the import of
+    indicatorbase fails.
 
-    Unfortunately, seems next to impossible to do so because the import fails.
-    Next best thing: call the function externally and retrieve the result.
+    Next best thing: call the function through the Python console.
 
     Returns the most recent year from the CHANGELOG.md and an empty message.
     On error, returns -1 for the year and an non-empty message.
