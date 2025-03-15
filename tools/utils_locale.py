@@ -309,6 +309,55 @@ def get_names_and_comments_from_mo_files(
     Retrieve the translated name/comments for each locale.
     '''
 
+
+    print( "TODO TEST START" )
+
+    from . import build_wheel
+    for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
+        locale = po.parent.parent.stem
+        print( f"PO file: { po }" )
+
+#TODO Test for when there is no translation.  Set { comments }   to be    { comments }xxx
+        result = (
+            subprocess.run(
+                f". { build_wheel.VENV_DEVELOPMENT }/bin/activate && " +
+                f"python3 -c \"" +
+                f"import polib; " +
+                f"[ print( entry.msgstr ) for entry in polib.pofile( '{ po }' ) if entry.msgid == '{ comments }'  ]" +
+                f"\"",
+                stdout = subprocess.PIPE,
+                stderr = subprocess.PIPE,
+                shell = True,
+                check = False ) )
+
+        stderr_ = result.stderr.decode()
+        if stderr_:
+            print( f"Error { stderr_ }")
+
+        else:
+            print( f"{ result.stdout.decode().strip() }" )
+            x = result.stdout.decode().strip()
+            y = x.replace( '\n', ' ' )
+
+        # for entry in polib.pofile( po ):
+        #     print(entry.msgid, entry.msgstr)
+    
+    
+    print( "TODO TEST END" )
+
+    print( f"ZZZ{ x }ZZZ")
+    print()
+    print()
+    print()
+    print()
+    print( f"AAA{ y }AAA")
+
+
+
+    import sys
+    sys.exit()
+
+
     names_from_mo_files = { }
     comments_from_mo_files = { }
     for mo in list( Path( directory_indicator_locale ).rglob( "*.mo" ) ):

@@ -235,7 +235,6 @@ def _get_year_in_changelog_markdown(
     On error, returns -1 for the year and an non-empty message.
     '''
 
-
     result = (
         subprocess.run(
             f". { VENV_DEVELOPMENT }/bin/activate && " +
@@ -576,6 +575,7 @@ if __name__ == "__main__":
         "build",
         "packaging",
         "pip",
+        "polib",#TODO Not sure if this stays.
         "PyGObject",
         "readme_renderer[md]" )
 
