@@ -303,17 +303,17 @@ def _create_dot_desktop(
     directory_platform_linux,
     indicator_name,
     name,
-    names_from_mo_files,
+    names_from_po_files,
     comments,
-    comments_from_mo_files,
+    comments_from_po_files,
     categories ):
 
     print()
     print()
-    print( f"names: { names_from_mo_files }" )
+    print( f"names: { names_from_po_files }" )
     print()
     print()
-    print( f"comments: { comments_from_mo_files }" )
+    print( f"comments: { comments_from_po_files }" )
     print()
     print()
 
@@ -327,7 +327,7 @@ def _create_dot_desktop(
                 dot_desktop_text += line
 
     names = name
-    for language, name_ in names_from_mo_files.items():
+    for language, name_ in names_from_po_files.items():
         names += f"\nName[{ language }]={ name_ }"
 
     newline = '\\n'
@@ -337,7 +337,7 @@ def _create_dot_desktop(
     # if so, replace with ' '.
     comments_ = comments.replace( newline, ' ' )
 
-    for language, comment in comments_from_mo_files.items():
+    for language, comment in comments_from_po_files.items():
         comments_ += f"\nComment[{ language }]={ comment.replace( newline, ' ' ) }"
 
     dot_desktop_text = (
@@ -498,13 +498,13 @@ def _package_source_for_build_wheel_process(
         directory_indicator_locale = (
             Path( '.' ) / directory_indicator / "src" / indicator_name / "locale" )
 
-        names_from_mo_files, comments_from_mo_files = (
-            utils_locale.get_names_and_comments_from_mo_files(
-                indicator_name,
+        names_from_po_files, comments_from_po_files, message = (
+            utils_locale.get_names_and_comments_from_po_files(
                 directory_indicator_locale,
                 name,
                 comments ) )
 
+    if not message:
         directory_platform_linux = (
             directory_dist / indicator_name / "src" / indicator_name / "platform" / "linux" )
 
@@ -514,9 +514,9 @@ def _package_source_for_build_wheel_process(
             directory_platform_linux,
             indicator_name,
             name,
-            names_from_mo_files,
+            names_from_po_files,
             comments,
-            comments_from_mo_files,
+            comments_from_po_files,
             categories )
 
         _create_scripts_for_linux(

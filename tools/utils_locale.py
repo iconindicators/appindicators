@@ -213,6 +213,34 @@ def _create_update_po(
             print( f"YOU MUST UPDATE LINES 1, 4, 11, 12." )
 
 
+def _get_msgstr_from_po( po, msgid ):
+    result = (
+        subprocess.run(
+            f". { build_wheel.VENV_DEVELOPMENT }/bin/activate && " +
+            f"python3 -c \"" +
+            f"import polib; " +
+            f"[ " +
+            f"    print( entry.msgstr ) " +
+            f"    for entry in polib.pofile( '{ po }' ) " +
+            f"    if entry.msgid == '{ msgid }'  ]" +
+            f"\"",
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE,
+            shell = True,
+            check = False ) )
+
+    stderr_ = result.stderr.decode()
+    if stderr_:
+        message = f"Error retrieving '{ msgid }' from { po }."
+        msgstr = ""
+
+    else:
+        msgstr = result.stdout.decode().strip()
+        message = ""
+
+    return msgstr, message
+
+    
 def update_locale_source(
     indicator_name,
     authors_emails,
@@ -302,8 +330,7 @@ def build_locale_for_release(
 
 
 #TODO Check
-def get_names_and_comments_from_mo_files(
-    indicator_name,
+def get_names_and_comments_from_po_files(
     directory_indicator_locale,
     name,
     comments ):
@@ -311,104 +338,41 @@ def get_names_and_comments_from_mo_files(
     Retrieve the translated name/comments for each locale.
     '''
 
-
-    print( "TODO TEST START" )
-
+    names_from_po_files = { }
+    comments_from_po_files = { }
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         locale = po.parent.parent.stem
-        print( f"PO file: { po }" )
 
-#TODO Test for when there is no translation.  Set { comments }   to be    { comments }xxx
-        result = (
-            subprocess.run(
-                f". { build_wheel.VENV_DEVELOPMENT }/bin/activate && " +
-                f"python3 -c \"" +
-                f"import polib; " +
-                f"[ " +
-                f"    print( entry.msgstr ) " +
-                f"    for entry in polib.pofile( '{ po }' ) " +
-                f"    if entry.msgid == '{ comments }'  ]" +
-                f"\"",
-                stdout = subprocess.PIPE,
-                stderr = subprocess.PIPE,
-                shell = True,
-                check = False ) )
-
-        stderr_ = result.stderr.decode()
-        if stderr_:
-            print( f"Error { stderr_ }")
-
-        else:
-            print( f"{ result.stdout.decode().strip() }" )
-            x = result.stdout.decode().strip()
-            y = x.replace( '\n', ' ' )
-
-        # for entry in polib.pofile( po ):
-        #     print(entry.msgid, entry.msgstr)
-    
-    
-    print( "TODO TEST END" )
-
-    print( f"ZZZ{ x }ZZZ")
-    print()
-    print()
-    print()
-    print()
-    print( f"AAA{ y }AAA")
-
-
-
-    import sys
-    sys.exit()
-
-
-    names_from_mo_files = { }
-    comments_from_mo_files = { }
-    for mo in list( Path( directory_indicator_locale ).rglob( "*.mo" ) ):
-        locale = mo.parent.parent.stem
-
+#TODO Keep these links?
         # https://stackoverflow.com/q/54638570/2156453
         # https://www.reddit.com/r/learnpython/comments/jkun99/how_do_i_load_a_specific_mo_file_by_giving_its
-        '''TODO Remove
-        print( indicator_name )
-        print( directory_indicator_locale )
-        print( locale )
-        print( name )
-        print( comments )
-        print()
-        '''
 
-        translation = (
-            gettext.translation(
-                indicator_name,
-                localedir = directory_indicator_locale,
-                languages = [ locale ] ) )
-
-        translated_string = translation.gettext( name )
-        print( "Name and translated name: ")
-        print( f"\t{ name }" )
-        print( f"\t{ translated_string }" )
-        print()
-
-        if translated_string != name:
-            names_from_mo_files[ locale ] = translated_string
-
-#        translated_string = translation.gettext( comments ) #TODO Original
 #TODO When a .po contains fuzzy, that translation will NOT appear in the .mo
 # That means the name/comment may not be found.
 # Need to handle.
 # Maybe put in a check for \n and burp to the user?
 # Do it here or above when the pot/po is generated?
-        translated_string = translation.gettext( comments )
-#        translated_string = translation.gettext( comments.replace( '\n', ' ' ) )
-        print( "Comments and translated comments: ")
-        print( f"\t{ comments }" )
-        print( f"\t{ translated_string }" )
-        print()
-        import sys
-        sys.exit()
+#
+# EXPLAIN WHY THIS NEW WAY IS BEING USED.
 
-        if translated_string != comments:
-            comments_from_mo_files[ locale ] = translated_string
+        msgstr, error = _get_msgstr_from_po( po, name )
+        if msgstr:
+            if msgstr != name:
+                names_from_po_files[ locale ] = msgstr
 
-    return names_from_mo_files, comments_from_mo_files
+            msgstr, error = _get_msgstr_from_po( po, comments )
+            if msgstr:
+                if msgstr != comments:
+                    comments_from_po_files[ locale ] = msgstr.replace( '\n', ' ' )
+
+        if error:
+            break
+
+#TODO Testing
+    print( name )
+    print( names_from_po_files )
+    print()
+    print( comments )
+    print( comments_from_po_files )
+
+    return names_from_po_files, comments_from_po_files, error
