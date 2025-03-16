@@ -308,13 +308,11 @@ def _create_dot_desktop(
     comments_from_po_files,
     categories ):
 
-    print()
+    #TODO Testing
     print()
     print( f"names: { names_from_po_files }" )
     print()
-    print()
     print( f"comments: { comments_from_po_files }" )
-    print()
     print()
 
     indicatorbase_dot_desktop_path = (
@@ -330,15 +328,22 @@ def _create_dot_desktop(
     for language, name_ in names_from_po_files.items():
         names += f"\nName[{ language }]={ name_ }"
 
-    newline = '\\n'
+#TODO Check with all other indicators if the comments should be split.
+    # Comments may contain a '\n' to fit the About dialog; replace with ' '.
+    print( comments )
+    comments_ = comments.replace( "\\n", ' ' )
+    print( comments_ )
 
-#TODO Test this with indicatorscriptrunner.
-    # Comments may be separated by '\n' to fit the About dialog;
-    # if so, replace with ' '.
-    comments_ = comments.replace( newline, ' ' )
-
+    newline = '\n'
     for language, comment in comments_from_po_files.items():
         comments_ += f"\nComment[{ language }]={ comment.replace( newline, ' ' ) }"
+
+    #TODO Testing
+    print()
+    print( f"names: { names }" )
+    print()
+    print( f"comments: { comments_ }" )
+    print()
 
     dot_desktop_text = (
         dot_desktop_text.format(
@@ -544,6 +549,10 @@ def _build_wheel_for_indicator(
         directory_dist.mkdir( parents = True )
 
         message = _package_source_for_build_wheel_process( directory_dist, indicator_name )
+
+        import sys
+        sys.exit()#TODO Testing        
+
         if not message:
             subprocess.run(
                 f". { VENV_DEVELOPMENT }/bin/activate && " +
@@ -577,7 +586,7 @@ if __name__ == "__main__":
         "build",
         "packaging",
         "pip",
-        "polib",#TODO Not sure if this stays.
+        "polib",
         "PyGObject",
         "readme_renderer[md]" )
 

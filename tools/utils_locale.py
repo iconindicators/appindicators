@@ -28,7 +28,6 @@ https://www.labri.fr/perso/fleury/posts/programming/a-quick-gettext-tutorial.htm
 
 import datetime
 import filecmp
-import gettext
 import os
 import re
 import subprocess
@@ -214,15 +213,25 @@ def _create_update_po(
 
 
 def _get_msgstr_from_po( po, msgid ):
+    # single_quote = "\'"
+    # single_quote_escaped = "\\\'"
+    msgid_escaped = msgid.replace( "\'", "\\\'" )
+    print( msgid )
+    print( msgid_escaped )
+    #TODO indicatorfortune does not work I think because there is a ' in the comments.
+    # Not sure how to handle.
+    # print( re.escape( msgid ))
     result = (
         subprocess.run(
             f". { build_wheel.VENV_DEVELOPMENT }/bin/activate && " +
             f"python3 -c \"" +
             f"import polib; " +
-            f"[ " +
-            f"    print( entry.msgstr ) " +
-            f"    for entry in polib.pofile( '{ po }' ) " +
-            f"    if entry.msgid == '{ msgid }'  ]" +
+            f"[ print( entry.msgstr ) " +
+            f"for entry in polib.pofile( \'{ po }\' ) " +
+            # f"if entry.msgid.replace( { single_quote }, { single_quote_escaped } ) == '{ msgid_escaped }' ]" +
+            f"if entry.msgid == \'{ msgid_escaped }\' ]" +
+            # f"]",
+            # f"print( 'hello' )"
             f"\"",
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE,
@@ -231,13 +240,15 @@ def _get_msgstr_from_po( po, msgid ):
 
     stderr_ = result.stderr.decode()
     if stderr_:
-        message = f"Error retrieving '{ msgid }' from { po }."
+        message = f"Error retrieving\n\t{ msgid }\nfrom\n\t{ po }\n\n{ stderr_ }"
         msgstr = ""
 
     else:
         msgstr = result.stdout.decode().strip()
         message = ""
 
+    print( msgstr )#TODO Remove
+    print( message )
     return msgstr, message
 
     
@@ -329,32 +340,32 @@ def build_locale_for_release(
             shell = True )
 
 
-#TODO Check
 def get_names_and_comments_from_po_files(
     directory_indicator_locale,
     name,
     comments ):
     '''
     Retrieve the translated name/comments for each locale.
+
+    Initially used
+        gettext.translation( ... ).gettext( ... )
+    to read the translation from the .mo files.
+
+    However, when an entry in the .po file is marked as fuzzy,
+    the translation will not appear in the .mo file (by default)
+    thereby appearing to be seemingly missing.
+
+    Further, some comments use the \n to split a line so as to not
+    be too wide for the About dialog.  When a \n is present,
+    the comment is not located within the .mo file.
+
+    Instead, use polib to read the translations rom the .po files.
     '''
 
     names_from_po_files = { }
     comments_from_po_files = { }
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         locale = po.parent.parent.stem
-
-#TODO Keep these links?
-        # https://stackoverflow.com/q/54638570/2156453
-        # https://www.reddit.com/r/learnpython/comments/jkun99/how_do_i_load_a_specific_mo_file_by_giving_its
-
-#TODO When a .po contains fuzzy, that translation will NOT appear in the .mo
-# That means the name/comment may not be found.
-# Need to handle.
-# Maybe put in a check for \n and burp to the user?
-# Do it here or above when the pot/po is generated?
-#
-# EXPLAIN WHY THIS NEW WAY IS BEING USED.
-
         msgstr, error = _get_msgstr_from_po( po, name )
         if msgstr:
             if msgstr != name:
@@ -363,16 +374,9 @@ def get_names_and_comments_from_po_files(
             msgstr, error = _get_msgstr_from_po( po, comments )
             if msgstr:
                 if msgstr != comments:
-                    comments_from_po_files[ locale ] = msgstr.replace( '\n', ' ' )
+                    comments_from_po_files[ locale ] = msgstr
 
         if error:
             break
-
-#TODO Testing
-    print( name )
-    print( names_from_po_files )
-    print()
-    print( comments )
-    print( comments_from_po_files )
 
     return names_from_po_files, comments_from_po_files, error
