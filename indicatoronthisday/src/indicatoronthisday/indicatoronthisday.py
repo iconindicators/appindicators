@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Does not run when installed.
+
+
 '''
 Application indicator which displays calendar events.
 
