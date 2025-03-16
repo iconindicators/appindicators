@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorscriptrunner 1.0.25\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-03-14 18:20+1100\n"
+"POT-Creation-Date: 2025-03-15 09:36+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -21,8 +21,8 @@ msgstr ""
 
 #: indicatorscriptrunner.py:114
 msgid ""
-"Runs a terminal command or script; optionally display results in the icon "
-"label."
+"Runs a terminal command or script;\n"
+"optionally display results in the icon label."
 msgstr ""
 
 #: indicatorscriptrunner.py:126
