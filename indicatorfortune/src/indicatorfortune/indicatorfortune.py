@@ -63,7 +63,7 @@ class IndicatorFortune( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            comments = _( "Calls the 'fortune' program displaying the result in the on-screen notification." ) )
+            comments = _( "Calls the 'fortune' program displaying the result\nin the on-screen notification." ) )
 
         self.remove_file_from_cache( IndicatorFortune.HISTORY_FILE )
 

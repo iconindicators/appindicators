@@ -209,7 +209,7 @@ class IndicatorLunar( IndicatorBase ):
     def __init__( self ):
         super().__init__(
             debug = False,
-            comments = _( "Displays lunar, solar, planetary, minor planet, comet, star and satellite information." ),
+            comments = _( "Displays lunar, solar, planetary, minor planet,\ncomet, star and satellite information." ),
             creditz = IndicatorLunar.CREDIT )
 
         # Dictionary to hold currently calculated (and previously calculated)

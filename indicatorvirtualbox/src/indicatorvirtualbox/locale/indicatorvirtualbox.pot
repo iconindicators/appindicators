@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorvirtualbox 1.0.75\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-03-14 18:30+1100\n"
+"POT-Creation-Date: 2025-03-16 14:11+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,9 @@ msgid "Indicator VirtualBox™"
 msgstr ""
 
 #: indicatorvirtualbox.py:68
-msgid "Shows VirtualBox™ virtual machines and allows them to be started."
+msgid ""
+"Shows VirtualBox™ virtual machines and\n"
+"allows them to be started."
 msgstr ""
 
 #: indicatorvirtualbox.py:124

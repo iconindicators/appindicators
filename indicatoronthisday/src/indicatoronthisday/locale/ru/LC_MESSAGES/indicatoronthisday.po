@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatoronthisday 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-03-14 16:50+1100\n"
+"POT-Creation-Date: 2025-03-16 14:00+1100\n"
 "PO-Revision-Date: 2025-03-14 16:50+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -26,7 +26,10 @@ msgid "EVENT"
 msgstr "СОБЫТИЕ"
 
 #: indicatoronthisday.py:92
-msgid "Calls the 'calendar' program and displays events in the menu."
+#, fuzzy
+msgid ""
+"Calls the 'calendar' program and\n"
+"displays events in the menu."
 msgstr "Вызывает программу 'calendar' и показывает события в меню."
 
 #: indicatoronthisday.py:132

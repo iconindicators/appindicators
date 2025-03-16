@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorlunar 1.0.101\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-03-14 16:45+1100\n"
+"POT-Creation-Date: 2025-03-16 13:58+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1109,8 +1109,8 @@ msgstr ""
 
 #: indicatorlunar.py:212
 msgid ""
-"Displays lunar, solar, planetary, minor planet, comet, star and satellite "
-"information."
+"Displays lunar, solar, planetary, minor planet,\n"
+"comet, star and satellite information."
 msgstr ""
 
 #: indicatorlunar.py:675 indicatorlunar.py:2213

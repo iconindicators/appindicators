@@ -56,7 +56,6 @@ References
 # and replace all [] with a string and must use shell = True
 
 
-
 import datetime
 import email.policy
 import gettext

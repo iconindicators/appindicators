@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorfortune 1.0.44\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-03-14 13:54+1100\n"
+"POT-Creation-Date: 2025-03-16 13:43+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,8 +25,8 @@ msgstr ""
 
 #: indicatorfortune.py:66
 msgid ""
-"Calls the 'fortune' program displaying the result in the on-screen "
-"notification."
+"Calls the 'fortune' program displaying the result\n"
+"in the on-screen notification."
 msgstr ""
 
 #: indicatorfortune.py:87

@@ -65,7 +65,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
-            comments = _( "Shows VirtualBox™ virtual machines and allows them to be started." ) )
+            comments = _( "Shows VirtualBox™ virtual machines and\nallows them to be started." ) )
 
         self.auto_start_required = True
         self.date_time_of_last_notification = datetime.datetime.now()

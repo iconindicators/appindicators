@@ -213,14 +213,10 @@ def _create_update_po(
 
 
 def _get_msgstr_from_po( po, msgid ):
-    # single_quote = "\'"
-    # single_quote_escaped = "\\\'"
+    # The comment for indicatorfortune contains text enclosed with ' which must
+    # be escaped.
     msgid_escaped = msgid.replace( "\'", "\\\'" )
-    print( msgid )
-    print( msgid_escaped )
-    #TODO indicatorfortune does not work I think because there is a ' in the comments.
-    # Not sure how to handle.
-    # print( re.escape( msgid ))
+
     result = (
         subprocess.run(
             f". { build_wheel.VENV_DEVELOPMENT }/bin/activate && " +
@@ -228,10 +224,7 @@ def _get_msgstr_from_po( po, msgid ):
             f"import polib; " +
             f"[ print( entry.msgstr ) " +
             f"for entry in polib.pofile( \'{ po }\' ) " +
-            # f"if entry.msgid.replace( { single_quote }, { single_quote_escaped } ) == '{ msgid_escaped }' ]" +
             f"if entry.msgid == \'{ msgid_escaped }\' ]" +
-            # f"]",
-            # f"print( 'hello' )"
             f"\"",
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE,
@@ -247,8 +240,6 @@ def _get_msgstr_from_po( po, msgid ):
         msgstr = result.stdout.decode().strip()
         message = ""
 
-    print( msgstr )#TODO Remove
-    print( message )
     return msgstr, message
 
     
@@ -257,7 +248,7 @@ def update_locale_source(
     authors_emails,
     start_year,
     version_indicator,
-    version_indicatorbase):
+    version_indicatorbase ):
     '''
     Create the .pot file for indicatorbase, if required, otherwise update.
     Create the .pot file for indicator_name, if required, otherwise update.
@@ -359,7 +350,7 @@ def get_names_and_comments_from_po_files(
     be too wide for the About dialog.  When a \n is present,
     the comment is not located within the .mo file.
 
-    Instead, use polib to read the translations rom the .po files.
+    Instead, use polib to read the translations from the .po files.
     '''
 
     names_from_po_files = { }
