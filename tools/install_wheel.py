@@ -56,4 +56,13 @@ if __name__ == "__main__":
             f" head -1)/site-packages/{indicator_name}/platform/" +
             f"linux/install.sh" )
 
-        subprocess.call( command, shell = True )   #TODO Replace with .run
+        subprocess.run( command, shell = True )
+####
+#TODO Some issue with install of indicatoronthisday.
+
+#TODO Also, fortune, I think the path to the install.sh is wrong (should be indicatorfortune not fortune).
+# Does this mean it is all indicators?
+
+
+####
+
