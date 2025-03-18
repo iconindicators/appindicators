@@ -57,12 +57,3 @@ if __name__ == "__main__":
             f"linux/install.sh" )
 
         subprocess.run( command, shell = True )
-####
-#TODO Some issue with install of indicatoronthisday.
-
-#TODO Also, fortune, I think the path to the install.sh is wrong (should be indicatorfortune not fortune).
-# Does this mean it is all indicators?
-
-
-####
-
