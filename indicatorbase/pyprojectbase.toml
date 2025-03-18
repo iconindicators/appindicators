@@ -12,7 +12,7 @@ maintainers = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
 dependencies = [
   "packaging",
-  "PyGObject" ]
+  "PyGObject==3.50.0" ]  #TODO What to do about this...?
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
