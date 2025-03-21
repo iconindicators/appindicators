@@ -30,6 +30,8 @@ References:
 #   PyGObject <= 2.50.0 and libgirepository 1.0 or equivalent
 # and which can be left as just
 #   PyGObject and libgirepository 2.0 or equivalent.
+#
+# https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
 
 
 #TODO Check {{indicator}} and other {{ }}...are they correct/needed?

@@ -11,15 +11,7 @@ authors = [
 maintainers = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
 dependencies = [
-  "packaging",
-  "PyGObject<=3.50.0" ]  #TODO I think this should be removed and instead,
-# be part of the install instructions.
-# That way, can have PyGObject<=3.50.0 for Debian 12
-# but for Debian 13 just have PyGObject
-# and similarly for other distros/versions are required.
-#
-# When explaining the reasoning, refer to the change in PyGObject here:
-# https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
+  "packaging" ]
   
 readme = "README.md"
 requires-python = ">=3.8"
