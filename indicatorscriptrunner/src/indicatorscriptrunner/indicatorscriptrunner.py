@@ -144,7 +144,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             # background_script_next_update_before_indicator_next_update = (
             #    self.background_script_next_update_time[ key ] < next_update )
             #
-            # background_script_in_indiator_script = 
+            # background_script_in_indiator_script =
             #    self.is_background_script_in_indicator_text( script ):
 
             background_script_in_icon_text_due_for_update = (
@@ -265,16 +265,27 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         background_scripts_to_execute = [ ]
         for script in self.scripts:
-            if isinstance( script, Background ) and self.is_background_script_in_indicator_text( script ):
-                # Script is background AND present in the indicator text, so is a potential candidate to be updated...
-                key = self._create_key( script.get_group(), script.get_name() )
-#TODO Tidy up
-                if ( self.background_script_next_update_time[ key ] < now ) or \
-                   ( script.get_force_update() and self.background_script_results[ key ] ):
+#TODO Check logic of this loop and all if tests.
+            script_is_background_and_in_indicator_text = (
+                isinstance( script, Background )
+                and
+                self.is_background_script_in_indicator_text( script ) )
+
+            key = self._create_key( script.get_group(), script.get_name() )
+            if script_is_background_and_in_indicator_text:
+                update_required = (
+                    self.background_script_next_update_time[ key ] < now )
+
+                force_update_and_has_results = (
+                    script.get_force_update()
+                    and
+                    self.background_script_results[ key ] )
+
+                if update_required or force_update_and_has_results:
                     background_scripts_to_execute.append( script )
 
         # Based on example from
-        #    https://docs.python.org/3.6/library/concurrent.futures.html#threadpoolexecutor-example
+        #    https://docs.python.org/3.6/library/concurrent.futures.html
         with concurrent.futures.ThreadPoolExecutor( max_workers = 5 ) as executor:
             future_to_script = {
                 executor.submit(
@@ -1275,7 +1286,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         button_copy,
         button_remove ):
 
-        if True: 
+        if True:
             print( "add")
             return
 
@@ -1327,21 +1338,21 @@ class IndicatorScriptRunner( IndicatorBase ):
         scripts ):
 
 
-#TODO Original signature which hopefully can go.        
+#TODO Original signature which hopefully can go.
         # button,
         # scripts,
         # scripts_treeview,
         # background_scripts_treeview,
         # textentry ):
 
-        if True: 
+        if True:
             print( "edit")
             return
 
         group, name = self._get_selected_group_name( scripts_treeview )
         self.on_script_edit(
             self.get_script( scripts, group, name ),
-            scripts, 
+            scripts,
             scripts_treeview,
             background_scripts_treeview )
 
