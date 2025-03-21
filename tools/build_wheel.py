@@ -568,7 +568,7 @@ if __name__ == "__main__":
         "packaging",
         "pip",
         "polib",
-        "PyGObject==3.50.0",
+        "PyGObject\<=3.50.0", # Escape < as this will be passed to the terminal.  #TODO Need to maybe print out to the user about this...only needed for certain versions of Debian/Ubuntu.  What about building on Fedora et al?
         "readme_renderer[md]" )
 
     for indicator in args.indicators:
@@ -582,228 +582,28 @@ if __name__ == "__main__":
         shell = True )
 
 '''
-TODO Why are these warnings happening on Debian 12?
-Does not happen for indicaorfortune.
-Do they happen on Ubuntu 20.04?
-
+TODO Why are these warnings happening?
 
 python3 -m tools.build_wheel release indicatorlunar
-Requirement already satisfied: build in ./venv_development/lib/python3.11/site-packages (1.2.2.post1)
-Requirement already satisfied: packaging in ./venv_development/lib/python3.11/site-packages (24.2)
-Requirement already satisfied: pip in ./venv_development/lib/python3.11/site-packages (25.0.1)
-Requirement already satisfied: polib in ./venv_development/lib/python3.11/site-packages (1.2.0)
-Requirement already satisfied: PyGObject==3.50.0 in ./venv_development/lib/python3.11/site-packages (3.50.0)
-Requirement already satisfied: readme_renderer[md] in ./venv_development/lib/python3.11/site-packages (44.0)
-Requirement already satisfied: pycairo>=1.16 in ./venv_development/lib/python3.11/site-packages (from PyGObject==3.50.0) (1.27.0)
-Requirement already satisfied: pyproject_hooks in ./venv_development/lib/python3.11/site-packages (from build) (1.2.0)
-Requirement already satisfied: nh3>=0.2.14 in ./venv_development/lib/python3.11/site-packages (from readme_renderer[md]) (0.2.21)
-Requirement already satisfied: docutils>=0.21.2 in ./venv_development/lib/python3.11/site-packages (from readme_renderer[md]) (0.21.2)
-Requirement already satisfied: Pygments>=2.5.1 in ./venv_development/lib/python3.11/site-packages (from readme_renderer[md]) (2.19.1)
-Requirement already satisfied: cmarkgfm>=0.8.0 in ./venv_development/lib/python3.11/site-packages (from readme_renderer[md]) (2024.11.20)
-Requirement already satisfied: cffi>=1.15.0 in ./venv_development/lib/python3.11/site-packages (from cmarkgfm>=0.8.0->readme_renderer[md]) (1.17.1)
-Requirement already satisfied: pycparser in ./venv_development/lib/python3.11/site-packages (from cffi>=1.15.0->cmarkgfm>=0.8.0->readme_renderer[md]) (2.22)
-.. done.
-.. done.
-...................................... done.
-* Creating isolated environment: venv+pip...
-* Installing packages in isolated environment:
-  - setuptools >= 61.0
-* Getting build dependencies for sdist...
-running egg_info
-creating src/indicatorlunar.egg-info
-writing src/indicatorlunar.egg-info/PKG-INFO
-writing dependency_links to src/indicatorlunar.egg-info/dependency_links.txt
-writing requirements to src/indicatorlunar.egg-info/requires.txt
-writing top-level names to src/indicatorlunar.egg-info/top_level.txt
-writing manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
-reading manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
 reading manifest template 'MANIFEST.in'
 warning: no previously-included files matching '*' found under directory 'src/indicatorlunar/data'
 writing manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
-* Building sdist...
-running sdist
-running egg_info
-writing src/indicatorlunar.egg-info/PKG-INFO
-writing dependency_links to src/indicatorlunar.egg-info/dependency_links.txt
-writing requirements to src/indicatorlunar.egg-info/requires.txt
-writing top-level names to src/indicatorlunar.egg-info/top_level.txt
-reading manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
 reading manifest template 'MANIFEST.in'
 warning: no previously-included files matching '*' found under directory 'src/indicatorlunar/data'
+reading manifest template 'MANIFEST.in'
+warning: no previously-included files found matching 'src/indicatorlunar/astroskyfield.py'
+warning: no previously-included files found matching 'src/indicatorlunar/meteorshowertest.py'
+warning: no previously-included files matching '*' found under directory 'src/indicatorlunar/data'
 writing manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
-running check
-creating indicatorlunar-1.0.101
-creating indicatorlunar-1.0.101/src/indicatorlunar
-creating indicatorlunar-1.0.101/src/indicatorlunar.egg-info
-creating indicatorlunar-1.0.101/src/indicatorlunar/icons
-creating indicatorlunar-1.0.101/src/indicatorlunar/locale
-creating indicatorlunar-1.0.101/src/indicatorlunar/locale/ru/LC_MESSAGES
-creating indicatorlunar-1.0.101/src/indicatorlunar/platform/linux
-copying files to indicatorlunar-1.0.101...
-copying MANIFEST.in -> indicatorlunar-1.0.101
-copying README.md -> indicatorlunar-1.0.101
-copying pyproject.toml -> indicatorlunar-1.0.101
-copying src/indicatorlunar/CHANGELOG.md -> indicatorlunar-1.0.101/src/indicatorlunar
-copying src/indicatorlunar/README.html -> indicatorlunar-1.0.101/src/indicatorlunar
-copying src/indicatorlunar/astrobase.py -> indicatorlunar-1.0.101/src/indicatorlunar
-copying src/indicatorlunar/astropyephem.py -> indicatorlunar-1.0.101/src/indicatorlunar
-copying src/indicatorlunar/dataprovider.py -> indicatorlunar-1.0.101/src/indicatorlunar
-copying src/indicatorlunar/dataproviderapparentmagnitude (copy).py -> indicatorlunar-1.0.101/src/indicatorlunar
-copying src/indicatorlunar/dataproviderapparentmagnitude.py -> indicatorlunar-1.0.101/src/indicatorlunar
-copying src/indicatorlunar/dataprovidergeneralperturbation.py -> indicatorlunar-1.0.101/src/indicatorlunar
-copying src/indicatorlunar/dataproviderorbitalelement.py -> indicatorlunar-1.0.101/src/indicatorlunar
-copying src/indicatorlunar/eclipse.py -> indicatorlunar-1.0.101/src/indicatorlunar
-copying src/indicatorlunar/indicatorbase.py -> indicatorlunar-1.0.101/src/indicatorlunar
-copying src/indicatorlunar/indicatorlunar.py -> indicatorlunar-1.0.101/src/indicatorlunar
-copying src/indicatorlunar.egg-info/PKG-INFO -> indicatorlunar-1.0.101/src/indicatorlunar.egg-info
-copying src/indicatorlunar.egg-info/SOURCES.txt -> indicatorlunar-1.0.101/src/indicatorlunar.egg-info
-copying src/indicatorlunar.egg-info/dependency_links.txt -> indicatorlunar-1.0.101/src/indicatorlunar.egg-info
-copying src/indicatorlunar.egg-info/requires.txt -> indicatorlunar-1.0.101/src/indicatorlunar.egg-info
-copying src/indicatorlunar.egg-info/top_level.txt -> indicatorlunar-1.0.101/src/indicatorlunar.egg-info
-copying src/indicatorlunar/icons/indicatorlunar-symbolic.svg -> indicatorlunar-1.0.101/src/indicatorlunar/icons
-copying src/indicatorlunar/icons/indicatorlunar.svg -> indicatorlunar-1.0.101/src/indicatorlunar/icons
-copying src/indicatorlunar/icons/indicatorlunarsatellite-symbolic.svg -> indicatorlunar-1.0.101/src/indicatorlunar/icons
-copying src/indicatorlunar/icons/indicatorlunarsatellite.svg -> indicatorlunar-1.0.101/src/indicatorlunar/icons
-copying src/indicatorlunar/locale/indicatorlunar.pot -> indicatorlunar-1.0.101/src/indicatorlunar/locale
-copying src/indicatorlunar/locale/ru/LC_MESSAGES/indicatorlunar.mo -> indicatorlunar-1.0.101/src/indicatorlunar/locale/ru/LC_MESSAGES
-copying src/indicatorlunar/locale/ru/LC_MESSAGES/indicatorlunar.po -> indicatorlunar-1.0.101/src/indicatorlunar/locale/ru/LC_MESSAGES
-copying src/indicatorlunar/platform/linux/indicatorlunar.py.desktop -> indicatorlunar-1.0.101/src/indicatorlunar/platform/linux
-copying src/indicatorlunar/platform/linux/indicatorlunar.sh -> indicatorlunar-1.0.101/src/indicatorlunar/platform/linux
-copying src/indicatorlunar/platform/linux/install.sh -> indicatorlunar-1.0.101/src/indicatorlunar/platform/linux
-copying src/indicatorlunar/platform/linux/uninstall.sh -> indicatorlunar-1.0.101/src/indicatorlunar/platform/linux
-copying src/indicatorlunar.egg-info/SOURCES.txt -> indicatorlunar-1.0.101/src/indicatorlunar.egg-info
-Writing indicatorlunar-1.0.101/setup.cfg
-Creating tar archive
-removing 'indicatorlunar-1.0.101' (and everything under it)
-* Building wheel from sdist
-* Creating isolated environment: venv+pip...
-* Installing packages in isolated environment:
-  - setuptools >= 61.0
-* Getting build dependencies for wheel...
-running egg_info
-writing src/indicatorlunar.egg-info/PKG-INFO
-writing dependency_links to src/indicatorlunar.egg-info/dependency_links.txt
-writing requirements to src/indicatorlunar.egg-info/requires.txt
-writing top-level names to src/indicatorlunar.egg-info/top_level.txt
 reading manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
 reading manifest template 'MANIFEST.in'
 warning: no previously-included files found matching 'src/indicatorlunar/astroskyfield.py'
 warning: no previously-included files found matching 'src/indicatorlunar/meteorshowertest.py'
 warning: no previously-included files matching '*' found under directory 'src/indicatorlunar/data'
 writing manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
-* Building wheel...
-running bdist_wheel
-running build
-running build_py
-creating build/lib/indicatorlunar
-copying src/indicatorlunar/astropyephem.py -> build/lib/indicatorlunar
-copying src/indicatorlunar/eclipse.py -> build/lib/indicatorlunar
-copying src/indicatorlunar/dataproviderapparentmagnitude (copy).py -> build/lib/indicatorlunar
-copying src/indicatorlunar/indicatorbase.py -> build/lib/indicatorlunar
-copying src/indicatorlunar/dataproviderapparentmagnitude.py -> build/lib/indicatorlunar
-copying src/indicatorlunar/dataprovidergeneralperturbation.py -> build/lib/indicatorlunar
-copying src/indicatorlunar/dataprovider.py -> build/lib/indicatorlunar
-copying src/indicatorlunar/astrobase.py -> build/lib/indicatorlunar
-copying src/indicatorlunar/indicatorlunar.py -> build/lib/indicatorlunar
-copying src/indicatorlunar/dataproviderorbitalelement.py -> build/lib/indicatorlunar
-running egg_info
-writing src/indicatorlunar.egg-info/PKG-INFO
-writing dependency_links to src/indicatorlunar.egg-info/dependency_links.txt
-writing requirements to src/indicatorlunar.egg-info/requires.txt
-writing top-level names to src/indicatorlunar.egg-info/top_level.txt
-reading manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
-reading manifest template 'MANIFEST.in'
-warning: no previously-included files found matching 'src/indicatorlunar/astroskyfield.py'
-warning: no previously-included files found matching 'src/indicatorlunar/meteorshowertest.py'
-warning: no previously-included files matching '*' found under directory 'src/indicatorlunar/data'
-writing manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
-copying src/indicatorlunar/CHANGELOG.md -> build/lib/indicatorlunar
-copying src/indicatorlunar/README.html -> build/lib/indicatorlunar
-creating build/lib/indicatorlunar/locale
-copying src/indicatorlunar/locale/indicatorlunar.pot -> build/lib/indicatorlunar/locale
-creating build/lib/indicatorlunar/icons
-copying src/indicatorlunar/icons/indicatorlunar-symbolic.svg -> build/lib/indicatorlunar/icons
-copying src/indicatorlunar/icons/indicatorlunar.svg -> build/lib/indicatorlunar/icons
-copying src/indicatorlunar/icons/indicatorlunarsatellite-symbolic.svg -> build/lib/indicatorlunar/icons
-copying src/indicatorlunar/icons/indicatorlunarsatellite.svg -> build/lib/indicatorlunar/icons
-creating build/lib/indicatorlunar/locale/ru/LC_MESSAGES
-copying src/indicatorlunar/locale/ru/LC_MESSAGES/indicatorlunar.mo -> build/lib/indicatorlunar/locale/ru/LC_MESSAGES
-copying src/indicatorlunar/locale/ru/LC_MESSAGES/indicatorlunar.po -> build/lib/indicatorlunar/locale/ru/LC_MESSAGES
-creating build/lib/indicatorlunar/platform/linux
-copying src/indicatorlunar/platform/linux/indicatorlunar.py.desktop -> build/lib/indicatorlunar/platform/linux
-copying src/indicatorlunar/platform/linux/indicatorlunar.sh -> build/lib/indicatorlunar/platform/linux
-copying src/indicatorlunar/platform/linux/install.sh -> build/lib/indicatorlunar/platform/linux
-copying src/indicatorlunar/platform/linux/uninstall.sh -> build/lib/indicatorlunar/platform/linux
-installing to build/bdist.linux-i686/wheel
-running install
-running install_lib
-creating build/bdist.linux-i686/wheel
-creating build/bdist.linux-i686/wheel/indicatorlunar
-creating build/bdist.linux-i686/wheel/indicatorlunar/locale
-copying build/lib/indicatorlunar/locale/indicatorlunar.pot -> build/bdist.linux-i686/wheel/./indicatorlunar/locale
-creating build/bdist.linux-i686/wheel/indicatorlunar/locale/ru
-creating build/bdist.linux-i686/wheel/indicatorlunar/locale/ru/LC_MESSAGES
-copying build/lib/indicatorlunar/locale/ru/LC_MESSAGES/indicatorlunar.po -> build/bdist.linux-i686/wheel/./indicatorlunar/locale/ru/LC_MESSAGES
-copying build/lib/indicatorlunar/locale/ru/LC_MESSAGES/indicatorlunar.mo -> build/bdist.linux-i686/wheel/./indicatorlunar/locale/ru/LC_MESSAGES
-creating build/bdist.linux-i686/wheel/indicatorlunar/icons
-copying build/lib/indicatorlunar/icons/indicatorlunarsatellite-symbolic.svg -> build/bdist.linux-i686/wheel/./indicatorlunar/icons
-copying build/lib/indicatorlunar/icons/indicatorlunar.svg -> build/bdist.linux-i686/wheel/./indicatorlunar/icons
-copying build/lib/indicatorlunar/icons/indicatorlunarsatellite.svg -> build/bdist.linux-i686/wheel/./indicatorlunar/icons
-copying build/lib/indicatorlunar/icons/indicatorlunar-symbolic.svg -> build/bdist.linux-i686/wheel/./indicatorlunar/icons
-copying build/lib/indicatorlunar/astropyephem.py -> build/bdist.linux-i686/wheel/./indicatorlunar
-copying build/lib/indicatorlunar/eclipse.py -> build/bdist.linux-i686/wheel/./indicatorlunar
-copying build/lib/indicatorlunar/README.html -> build/bdist.linux-i686/wheel/./indicatorlunar
-copying build/lib/indicatorlunar/dataproviderapparentmagnitude (copy).py -> build/bdist.linux-i686/wheel/./indicatorlunar
-copying build/lib/indicatorlunar/indicatorbase.py -> build/bdist.linux-i686/wheel/./indicatorlunar
-copying build/lib/indicatorlunar/dataproviderapparentmagnitude.py -> build/bdist.linux-i686/wheel/./indicatorlunar
-creating build/bdist.linux-i686/wheel/indicatorlunar/platform
-creating build/bdist.linux-i686/wheel/indicatorlunar/platform/linux
-copying build/lib/indicatorlunar/platform/linux/indicatorlunar.sh -> build/bdist.linux-i686/wheel/./indicatorlunar/platform/linux
-copying build/lib/indicatorlunar/platform/linux/uninstall.sh -> build/bdist.linux-i686/wheel/./indicatorlunar/platform/linux
-copying build/lib/indicatorlunar/platform/linux/indicatorlunar.py.desktop -> build/bdist.linux-i686/wheel/./indicatorlunar/platform/linux
-copying build/lib/indicatorlunar/platform/linux/install.sh -> build/bdist.linux-i686/wheel/./indicatorlunar/platform/linux
-copying build/lib/indicatorlunar/dataprovidergeneralperturbation.py -> build/bdist.linux-i686/wheel/./indicatorlunar
-copying build/lib/indicatorlunar/dataprovider.py -> build/bdist.linux-i686/wheel/./indicatorlunar
-copying build/lib/indicatorlunar/astrobase.py -> build/bdist.linux-i686/wheel/./indicatorlunar
-copying build/lib/indicatorlunar/CHANGELOG.md -> build/bdist.linux-i686/wheel/./indicatorlunar
-copying build/lib/indicatorlunar/indicatorlunar.py -> build/bdist.linux-i686/wheel/./indicatorlunar
-copying build/lib/indicatorlunar/dataproviderorbitalelement.py -> build/bdist.linux-i686/wheel/./indicatorlunar
-running install_egg_info
-Copying src/indicatorlunar.egg-info to build/bdist.linux-i686/wheel/./indicatorlunar-1.0.101-py3.11.egg-info
-running install_scripts
-creating build/bdist.linux-i686/wheel/indicatorlunar-1.0.101.dist-info/WHEEL
-creating '/home/bernard/Programming/Indicators/release/wheel/dist_indicatorlunar/.tmp-gl4hsiiv/indicatorlunar-1.0.101-py3-none-any.whl' and adding 'build/bdist.linux-i686/wheel' to it
-adding 'indicatorlunar/CHANGELOG.md'
-adding 'indicatorlunar/README.html'
-adding 'indicatorlunar/astrobase.py'
-adding 'indicatorlunar/astropyephem.py'
-adding 'indicatorlunar/dataprovider.py'
-adding 'indicatorlunar/dataproviderapparentmagnitude (copy).py'
-adding 'indicatorlunar/dataproviderapparentmagnitude.py'
-adding 'indicatorlunar/dataprovidergeneralperturbation.py'
-adding 'indicatorlunar/dataproviderorbitalelement.py'
-adding 'indicatorlunar/eclipse.py'
-adding 'indicatorlunar/indicatorbase.py'
-adding 'indicatorlunar/indicatorlunar.py'
-adding 'indicatorlunar/icons/indicatorlunar-symbolic.svg'
-adding 'indicatorlunar/icons/indicatorlunar.svg'
-adding 'indicatorlunar/icons/indicatorlunarsatellite-symbolic.svg'
-adding 'indicatorlunar/icons/indicatorlunarsatellite.svg'
-adding 'indicatorlunar/locale/indicatorlunar.pot'
-adding 'indicatorlunar/locale/ru/LC_MESSAGES/indicatorlunar.mo'
-adding 'indicatorlunar/locale/ru/LC_MESSAGES/indicatorlunar.po'
-adding 'indicatorlunar/platform/linux/indicatorlunar.py.desktop'
-adding 'indicatorlunar/platform/linux/indicatorlunar.sh'
-adding 'indicatorlunar/platform/linux/install.sh'
-adding 'indicatorlunar/platform/linux/uninstall.sh'
-adding 'indicatorlunar-1.0.101.dist-info/METADATA'
-adding 'indicatorlunar-1.0.101.dist-info/WHEEL'
-adding 'indicatorlunar-1.0.101.dist-info/top_level.txt'
-adding 'indicatorlunar-1.0.101.dist-info/RECORD'
-removing build/bdist.linux-i686/wheel
-Successfully built indicatorlunar-1.0.101.tar.gz and indicatorlunar-1.0.101-py3-none-any.whl
-bernard@delllaptop:~/Programming/Indicators$ 
 
+Consider writing a discussion question at 
+https://github.com/pypa/setuptools
+
+https://github.com/pypa/setuptools/discussions/4905
 '''
-
-
