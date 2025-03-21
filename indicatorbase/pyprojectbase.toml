@@ -17,6 +17,9 @@ dependencies = [
 # That way, can have PyGObject<=3.50.0 for Debian 12
 # but for Debian 13 just have PyGObject
 # and similarly for other distros/versions are required.
+#
+# When explaining the reasoning, refer to the change in PyGObject here:
+# https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
   
 readme = "README.md"
 requires-python = ">=3.8"
