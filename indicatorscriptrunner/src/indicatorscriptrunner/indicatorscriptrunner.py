@@ -140,10 +140,19 @@ class IndicatorScriptRunner( IndicatorBase ):
         for script in self.scripts:
             key = self._create_key( script.get_group(), script.get_name() )
 
-#TODO Tidy up
-            if isinstance( script, Background ) and \
-               self.background_script_next_update_time[ key ] < next_update and \
-               self.is_background_script_in_indicator_text( script ):
+            # is_background_script = isinstance( script, Background )
+            # background_script_next_update_before_indicator_next_update = (
+            #    self.background_script_next_update_time[ key ] < next_update )
+            #
+            # background_script_in_indiator_script = 
+            #    self.is_background_script_in_indicator_text( script ):
+
+            background_script_in_icon_text_due_for_update = (
+                isinstance( script, Background ) and
+                self.background_script_next_update_time[ key ] < next_update and
+                self.is_background_script_in_indicator_text( script ) )
+
+            if background_script_in_icon_text_due_for_update:
                 next_update = self.background_script_next_update_time[ key ]
 
         next_update_in_seconds = int( math.ceil( ( next_update - today ).total_seconds() ) )
