@@ -12,7 +12,12 @@ maintainers = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
 dependencies = [
   "packaging",
-  "PyGObject==3.50.0" ]  #TODO What to do about this...?
+  "PyGObject<=3.50.0" ]  #TODO I think this should be removed and instead,
+# be part of the install instructions.
+# That way, can have PyGObject<=3.50.0 for Debian 12
+# but for Debian 13 just have PyGObject
+# and similarly for other distros/versions are required.
+  
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
