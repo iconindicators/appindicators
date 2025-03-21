@@ -56,7 +56,7 @@ def initialise_virtual_environment(
 
     if not Path( venv_directory ).is_dir():
         command = f"python3 -m venv { venv_directory }"
-        subprocess.call( command, shell = True )   #TODO Replace with .run
+        subprocess.run( command, shell = True )
 
     command = (
         f". { venv_directory }/bin/activate && " + \

@@ -52,10 +52,6 @@ References
 # fortune history
 
 
-#TODO Search all .py for subprocess.run (after above is done)
-# and replace all [] with a string and must use shell = True
-
-
 import datetime
 import email.policy
 import gettext
@@ -2785,7 +2781,7 @@ class IndicatorBase( ABC ):
         On exception, logs to file.
         '''
         try:
-            subprocess.call( command, shell = True ) #TODO Replace with .run (but can we use the process_get function?
+            subprocess.call( command, shell = True ) #TODO Replace with .run (but can we use the process_get function)?
 
         except subprocess.CalledProcessError as e:
             logging.error( e )
