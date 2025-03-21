@@ -98,6 +98,40 @@ class PublishedBinary():
             self.get_download_count() == other.get_download_count() )
 
 
+    @staticmethod
+    def compare(
+        published_binary1,
+        published_binary2 ):
+        '''
+        Compare two Published Binaries by download count.
+        If the download count is the same, sort by name then by version.
+        '''
+        if published_binary1.get_download_count() < published_binary2.get_download_count():
+            sort_value = 1
+
+        elif published_binary1.get_download_count() > published_binary2.get_download_count():
+            sort_value = -1
+
+        else:
+            if published_binary1.get_name() < published_binary2.get_name():
+                sort_value = -1
+
+            elif published_binary1.get_name() > published_binary2.get_name():
+                sort_value = 1
+
+            else:
+                if published_binary1.get_version() < published_binary2.get_version():
+                    sort_value = -1
+
+                elif published_binary1.get_version() > published_binary2.get_version():
+                    sort_value = 1
+
+                else:
+                    sort_value = 0
+
+        return sort_value
+
+
 class PPA():
     ''' Specifies a PPA. '''
 
@@ -269,12 +303,12 @@ class PPA():
         When sorting published binaries by name, clip_amount is ignored.
         '''
         ppas_sorted = deepcopy( ppas )
-        ppas_sorted.sort( key = cmp_to_key( PPA._compare_ppas ) )
+        ppas_sorted.sort( key = cmp_to_key( PPA.compare ) )
 
         if sort_by_download:
             for ppa in ppas_sorted:
                 ppa.get_published_binaries().sort(
-                    key = cmp_to_key( PPA._compare_published_binaries ) )
+                    key = cmp_to_key( PublishedBinary.compare ) )
 
                 if clip_amount > 0:
                     del ppa.get_published_binaries()[ clip_amount : ]
@@ -287,48 +321,10 @@ class PPA():
         return ppas_sorted
 
 
-#TODO I think this should be moved to within the PublishedBinary class and renamed to _compare
     @staticmethod
-    def _compare_published_binaries(
-        published_binary1,
-        published_binary2 ):
-        '''
-        Compare two Published Binaries by download count.
-        If the download count is the same, sort by name then by version.
-        '''
-#TODO Shorten
-        if published_binary1.get_download_count() < published_binary2.get_download_count():
-            sort_value = 1
-
-        elif published_binary1.get_download_count() > published_binary2.get_download_count():
-            sort_value = -1
-
-        else:
-            if published_binary1.get_name() < published_binary2.get_name():
-                sort_value = -1
-
-            elif published_binary1.get_name() > published_binary2.get_name():
-                sort_value = 1
-
-            else:
-                if published_binary1.get_version() < published_binary2.get_version():
-                    sort_value = -1
-
-                elif published_binary1.get_version() > published_binary2.get_version():
-                    sort_value = 1
-
-                else:
-                    sort_value = 0
-
-        return sort_value
-
-
-#TODO I think this should be renamed to _compare
-    @staticmethod
-    def _compare_ppas(
+    def _compare(
         ppa1,
         ppa2 ):
-
         ''' Compare two PPAs by user, then by name. '''
         return (
             PPA.compare_ppas(
@@ -336,14 +332,13 @@ class PPA():
                 ppa2.get_user(), ppa2.get_name() ) )
 
 
-#TODO I think this should be renamed to compare
     @staticmethod
-    def compare_ppas(
+    def compare(
         user1,
         name1,
         user2,
         name2 ):
-        ''' Compare two PPAs by user, then by name. '''
+        ''' Compare two PPA users/names, by user, then by name. '''
         user1_ = locale.strxfrm( user1 )
         user2_ = locale.strxfrm( user2 )
         if user1_ < user2_:

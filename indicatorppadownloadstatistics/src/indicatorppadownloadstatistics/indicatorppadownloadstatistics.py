@@ -594,7 +594,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         user_data ):
 
         return (
-            PPA.compare_ppas(
+            PPA.compare(
                 model.get_value(
                     row1, IndicatorPPADownloadStatistics.COLUMN_USER ),
                 model.get_value(
