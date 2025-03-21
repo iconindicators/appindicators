@@ -37,7 +37,6 @@
 # In MANIFESTspecific.in, replace
 #     exclude src/indicatorlunar/astroskyfield.py
 #     exclude src/indicatorlunar/meteorshowertest.py
-#     recursive-exclude src/{indicator_name}/data *
 # with
 #     exclude src/indicatorlunar/meteorshowertest.py
 #     recursive-include src/{indicator_name}/data *   <--- Is this needed?  Will the data files be included by default?

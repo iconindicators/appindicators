@@ -1,7 +1,2 @@
 exclude src/indicatorlunar/astroskyfield.py
 exclude src/indicatorlunar/meteorshowertest.py
-
-
-#TODO I don't think this is needed as it will be a recursive-include
-# when switched to Skyfield.
-#recursive-exclude src/{indicator_name}/data *
