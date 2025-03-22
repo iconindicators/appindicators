@@ -21,13 +21,13 @@ Create a README.md for an indicator.
 
 References:
     https://pygobject.gnome.org/getting_started.html
-    https://stackoverflow.com/questions/70508775/error-could-not-build-wheels-for-pycairo-which-is-required-to-install-pyprojec
-    https://stackoverflow.com/questions/60779139/trouble-installing-pycairo-any-suggestions-on-what-to-try-next
+    https://stackoverflow.com/q/70508775/2156453
+    https://stackoverflow.com/q/60779139/2156453
 '''
 
 
 #TODO Need to work out which distros/versions must be pinned to 
-#   PyGObject <= 2.50.0 and libgirepository 1.0 or equivalent
+#   PyGObject <= 3.50.0 and libgirepository 1.0 or equivalent
 # and which can be left as just
 #   PyGObject and libgirepository 2.0 or equivalent.
 #
