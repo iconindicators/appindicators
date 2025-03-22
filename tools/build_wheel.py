@@ -568,7 +568,12 @@ if __name__ == "__main__":
         "packaging",
         "pip",
         "polib",
-        "PyGObject\<=3.50.0", # Escape < as this will be passed to the terminal.  #TODO Need to maybe print out to the user about this...only needed for certain versions of Debian/Ubuntu.  What about building on Fedora et al?
+        "PyGObject\<=3.50.0", # Escape < as this will be passed to the terminal.
+#TODO Perhaps print out to the user about the PyGObject line
+# so it is clear which version is being used
+# and the user can change if needed.
+# Only needed for certain versions of Debian/Ubuntu.
+# What about building on Fedora et al?
         "readme_renderer[md]" )
 
     for indicator in args.indicators:
@@ -578,33 +583,6 @@ if __name__ == "__main__":
 
     subprocess.run(
         f". { VENV_DEVELOPMENT }/bin/activate && " +
-        f"python3 -m readme_renderer README.md -o README.html",
+        f"python3 -m readme_renderer README.md -o README.html && "+
+        f"deactivate",
         shell = True )
-
-
-'''
-TODO Why are these warnings happening?
-
-python3 -m tools.build_wheel release indicatorlunar
-reading manifest template 'MANIFEST.in'
-warning: no previously-included files matching '*' found under directory 'src/indicatorlunar/data'
-writing manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
-reading manifest template 'MANIFEST.in'
-warning: no previously-included files matching '*' found under directory 'src/indicatorlunar/data'
-reading manifest template 'MANIFEST.in'
-warning: no previously-included files found matching 'src/indicatorlunar/astroskyfield.py'
-warning: no previously-included files found matching 'src/indicatorlunar/meteorshowertest.py'
-warning: no previously-included files matching '*' found under directory 'src/indicatorlunar/data'
-writing manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
-reading manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
-reading manifest template 'MANIFEST.in'
-warning: no previously-included files found matching 'src/indicatorlunar/astroskyfield.py'
-warning: no previously-included files found matching 'src/indicatorlunar/meteorshowertest.py'
-warning: no previously-included files matching '*' found under directory 'src/indicatorlunar/data'
-writing manifest file 'src/indicatorlunar.egg-info/SOURCES.txt'
-
-Consider writing a discussion question at 
-https://github.com/pypa/setuptools
-
-https://github.com/pypa/setuptools/discussions/4905
-'''
