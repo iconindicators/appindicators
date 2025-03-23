@@ -326,6 +326,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 store.append( [ system_calendar, False ] )
 
         store = Gtk.TreeModelSort( model = store )
+        # store = Gtk.TreeModelSort.new_with_model( store ) #TODO I think this is the correct call, not the one above.
         store.set_sort_column_id(
             IndicatorOnThisDay.COLUMN_CALENDAR_FILE, Gtk.SortType.ASCENDING )
 

@@ -269,6 +269,7 @@ class IndicatorFortune( IndicatorBase ):
                 store.append( [ system_fortune, False ] )
 
         store = Gtk.TreeModelSort( model = store )
+        # store = Gtk.TreeModelSort.new_with_model( store ) #TODO I think this is the correct call, not the one above.
         store.set_sort_column_id(
             IndicatorFortune.COLUMN_FORTUNE_FILE, Gtk.SortType.ASCENDING )
 
