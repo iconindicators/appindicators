@@ -45,9 +45,12 @@ from gi.repository import Gtk
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
-from .indicatorbase import IndicatorBase
+#from .indicatorbase import IndicatorBase
 
-from .script import Background, NonBackground, Info
+#from .script import Background, NonBackground, Info
+from indicatorbase import IndicatorBase #TODO Restore to above.
+
+from script import Background, NonBackground, Info
 
 
 class IndicatorScriptRunner( IndicatorBase ):
@@ -141,22 +144,20 @@ class IndicatorScriptRunner( IndicatorBase ):
         for script in self.scripts:
             key = self._create_key( script.get_group(), script.get_name() )
 
-            # is_background_script = isinstance( script, Background )
-            # background_script_next_update_before_indicator_next_update = (
-            #    self.background_script_next_update_time[ key ] < next_update )
-            #
-            # background_script_in_indiator_script =
-            #    self.is_background_script_in_indicator_text( script ):
-
-            background_script_in_icon_text_due_for_update = (
-                isinstance( script, Background ) and
-                self.background_script_next_update_time[ key ] < next_update and
+#TODO Check this...
+            is_background_and_update_due_and_in_indicator_text = (
+                isinstance( script, Background )
+                and
+                self.background_script_next_update_time[ key ] < next_update
+                and
                 self.is_background_script_in_indicator_text( script ) )
 
-            if background_script_in_icon_text_due_for_update:
+            if is_background_and_update_due_and_in_indicator_text:
                 next_update = self.background_script_next_update_time[ key ]
 
-        next_update_in_seconds = int( math.ceil( ( next_update - today ).total_seconds() ) )
+        next_update_in_seconds = (
+            int( math.ceil( ( next_update - today ).total_seconds() ) ) )
+
         return 60 if next_update_in_seconds < 60 else next_update_in_seconds
 
 
@@ -406,57 +407,77 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "The terminal script/command, along with any arguments." ),
                 editable = False ) )
 
-#TODO List the items
-        treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str )
-
-#TODO New
-        #TODO Document columns and why group is twice at the beginning.
-        treestore_new = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
+        # Add the group name to the first column always as this allows any row
+        # to be interrogated and obtain the group.
+        # Remaining coluns are part of a group's row containing the group name,
+        # or a script's row containing the script's attributes.
+        treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
 
         scripts_by_group = self.get_scripts_by_group( copy_of_scripts )
         for group in scripts_by_group.keys():
             row = [ group, group, None, None, None, None, None, None, None ]
-            parent = treestore_new.append( None, row )
+            parent = treestore.append( None, row )
             for script in scripts_by_group[ group ]:
+                print( script.get_name() )
+                print( type( script ) )
+                print( isinstance( script, Background ) )
+                print( isinstance( script, NonBackground ) )
+                print()
                 row = [
                     group,
                     None,
                     script.get_name(),
-                    self.get_tick_symbol( script.get_play_sound() ),
-                    self.get_tick_symbol( script.get_show_notification() ),
-                    self.get_tick_symbol( isinstance( script, Background ) ),
-#TODO Can these be simplified?  Another function to call the tick function?
-                    '—'
-                    if isinstance( script, Background )
+                    self.get_symbol( script.get_play_sound() ),
+                    self.get_symbol( script.get_show_notification() ),
+                    self.get_symbol( isinstance( script, Background ) ),
+                    self.get_symbol(
+                        isinstance( script, Background ),
+                        symbol = '—',
+                        else_ = self.get_symbol( script.get_terminal_open() ) ),
+#TODO The nots below are incorrect...logic is backwards for both nots.
+                    self.get_symbol(
+                        not isinstance( script, Background ),
+                        symbol = '—',
+                        else_ = str( script.get_interval_in_minutes() ) ),
+                    self.get_symbol(
+                        not isinstance( script, Background ),
+                        symbol = '—',
+                        else_ = self.get_symbol( script.get_force_update() ) ) ]
+
+                '''
+                row = [
+                    None, # Omit the group name otherwise it will be displayed.
+                    script.get_name(),
+                    IndicatorBase.TICK_SYMBOL if script.get_play_sound()
+                    else None,
+                    IndicatorBase.TICK_SYMBOL if script.get_show_notification()
+                    else None,
+                    IndicatorBase.TICK_SYMBOL if isinstance( script, Background )
+                    else None,
+                    '—' if isinstance( script, Background )
                     else (
-                        IndicatorBase.TICK_SYMBOL
-                        if script.get_terminal_open()
-                        else
-                        None ),
+                        IndicatorBase.TICK_SYMBOL if script.get_terminal_open()
+                        else None ),
                     str( script.get_interval_in_minutes() )
                     if isinstance( script, Background )
-                    else
-                    '—',
+                    else '—',
                     (
-                        IndicatorBase.TICK_SYMBOL
-                        if script.get_force_update()
-                        else
-                        None )
-                    if isinstance( script, Background )
-                    else
-                    '—' ]
+                        IndicatorBase.TICK_SYMBOL if script.get_force_update()
+                        else None )
+                    if isinstance( script, Background ) else '—',
+                    group ]
+                '''
 
-                treestore_new.append( parent, row )
 
-        # treestore_background_scripts_filter = treestore.filter_new()
-        treestore_background_scripts_filter = treestore_new.filter_new() #TODO New
+                treestore.append( parent, row )
+
+        treestore_background_scripts_filter = treestore.filter_new()
         treestore_background_scripts_filter.set_visible_func(
             self.background_scripts_filter, copy_of_scripts )
 
         background_scripts_treeview, background_scripts_scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
-                # treestore_background_scripts_filter, # TODO Old
-                Gtk.TreeModelSort.new_with_model( treestore_background_scripts_filter ),  #TODO Use the treemodelsort here?  Why then have the default sort func below?
+                Gtk.TreeModelSort.new_with_model( treestore_background_scripts_filter ),
                 (
                     _( "Group" ),
                     _( "Name" ),
@@ -513,7 +534,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         scripts_treeview, scripts_scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
-                treestore_new,
+                treestore,
                 # Gtk.TreeModelSort.new_with_model( treestore_new ), #TODO Should be this instead of above?  There is a default sort func below...so which should it be?
                 (
                     _( "Group" ),
@@ -613,35 +634,19 @@ class IndicatorScriptRunner( IndicatorBase ):
              0, 21, 1, 10 )
 
         box, add, copy_, remove = (
-        # box, add, edit, copy_, remove = (#TODO Delete
             self.create_buttons_in_box(
                 (
                     _( "Add" ),
-                    # _( "Edit" ),#TODO Delete
                     _( "Copy" ),
                     _( "Remove" ) ),
                 (
                     _( "Add a new script." ),
-                    # _( "Edit the selected script." ),#TODO Delete
                     _( "Duplicate the selected script." ),
                     _( "Remove the selected script." ) ),
                 (
                     None,
-                    # (
-                    #     self.on_script_edit,
-                    #     copy_of_scripts,
-                    #     scripts_treeview,
-                    #     background_scripts_treeview,
-                    #     indicator_text_entry ),#TODO Delete
                     None,
-                    None
-                    # (
-                    #     self.on_script_remove,
-                    #     copy_of_scripts,
-                    #     scripts_treeview,
-                    #     background_scripts_treeview,
-                    #     indicator_text_entry )
-                    ) ) )
+                    None ) ) )
 
         add.connect(
             "clicked",
@@ -670,7 +675,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             indicator_text_entry,
             copy_ )
 
-        if len( treestore_new ):
+        if len( treestore ):
             treepath = Gtk.TreePath.new_from_string( "0:0" )
             scripts_treeview.get_selection().select_path( treepath )
             scripts_treeview.set_cursor( treepath, None, False )
@@ -761,10 +766,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( indicator_text_separator_entry, False ) ) ),
             0, 1, 1, 1 )
 
-#TODO Hopefully can go...
-        # self.populate_treestore_and_select_script(
-        #     scripts_treeview, background_scripts_treeview, copy_of_scripts, "", "" )
-
         grid.attach( background_scripts_scrolledwindow, 0, 2, 1, 20 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
@@ -811,19 +812,24 @@ class IndicatorScriptRunner( IndicatorBase ):
         return response_type
 
 
-    def get_tick_symbol(
+    def get_symbol(
         self,
-        test_for_tick_symbol,
-        else_case = None ):
+        test,
+        symbol = IndicatorBase.TICK_SYMBOL,
+        else_ = None ):
         '''
-        #TODO Document
+        Return the symbol (character) if the test case returns True.
+        Otherwise, return the value submitted for the else case or None.
         '''
 
-        return (
-            IndicatorBase.TICK_SYMBOL
-            if test_for_tick_symbol
-            else
-            else_case )
+        if test:
+            print( f"Symbol: { symbol }" )
+            return symbol
+        else:
+            print( f"else: { else_ }" )
+            return else_
+
+#        return symbol if test else else_
 
 
     def background_scripts_filter(
@@ -884,7 +890,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 cell_renderer.set_property( "weight", Pango.Weight.BOLD )
 
 
-#TODO New
     def _script_sort(
         self,
         model,
@@ -895,11 +900,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         return (
             Info.compare(
                 model.get_value(
-                    row1, IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE + 1 ),  #TODO Need a new ID for hidden group
+                    row1, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ),
                 model.get_value(
                     row1, IndicatorScriptRunner.COLUMN_MODEL_NAME ),
                 model.get_value(
-                    row2, IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE + 1 ),
+                    row2, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ),
                 model.get_value(
                     row2, IndicatorScriptRunner.COLUMN_MODEL_NAME ) ) )
 
