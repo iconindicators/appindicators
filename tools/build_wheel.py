@@ -16,6 +16,25 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+
+#TODO When building on Debian 12 getting this:
+'''
+/tmp/build-env-jpjcrpni/lib/python3.11/site-packages/setuptools/config/_apply_pyprojecttoml.py:61: SetuptoolsDeprecationWarning: License classifiers are deprecated.
+!!
+
+        ********************************************************************************
+        Please consider removing the following classifiers in favor of a SPDX license expression:
+
+        License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
+
+        See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
+        ********************************************************************************
+
+!!
+  dist._finalize_license_expression()
+'''
+
+
 '''
 Build a Python .whl and .tar.gz for one or more indicators.
 
@@ -226,7 +245,7 @@ def _get_year_in_changelog_markdown(
     indicator_name ):
     '''
     Obtains the (most recent) year from the CHANGELOG.md.
-    
+
     Typically achieved by calling a function in indicatorbase.
     Unfortunately, seems next to impossible to do so because the import of
     indicatorbase fails.
