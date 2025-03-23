@@ -68,30 +68,31 @@ class IndicatorScriptRunner( IndicatorBase ):
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
     COMMAND_NOTIFY_TAG_SCRIPT_RESULT = "[SCRIPT_RESULT]"
 
-    COLUMN_MODEL_GROUP = 0 # Group name for groups; empty for scripts.
-    COLUMN_MODEL_NAME = 1 # Script name.
-    COLUMN_MODEL_SOUND = 2 # Icon name for the APPLY icon; None otherwise.
-    COLUMN_MODEL_NOTIFICATION = 3 # Icon name for the APPLY icon; None otherwise.
-    COLUMN_MODEL_BACKGROUND = 4 # Icon name for the APPLY icon; None otherwise.
-    COLUMN_MODEL_TERMINAL = 5 # Icon name for the APPLY icon; None otherwise.
-    COLUMN_MODEL_INTERVAL = 6 # Numeric amount as a string.
-    COLUMN_MODEL_FORCE_UPDATE = 7 # Icon name for the APPLY icon; None otherwise.
+    COLUMN_MODEL_GROUP_HIDDEN = 0 # Never shown; used to obtain group name.
+    COLUMN_MODEL_GROUP = 1 # Group name for groups; empty for scripts.
+    COLUMN_MODEL_NAME = 2 # Script name.
+    COLUMN_MODEL_SOUND = 3 # Tick symbol or None.
+    COLUMN_MODEL_NOTIFICATION = 4 # Tick symbol or None.
+    COLUMN_MODEL_BACKGROUND = 5 # Tick symbol or None.
+    COLUMN_MODEL_TERMINAL = 6 # Tick symbol or None.
+    COLUMN_MODEL_INTERVAL = 7 # Numeric amount as a string.
+    COLUMN_MODEL_FORCE_UPDATE = 8 # Tick symbol or None.
 
-    COLUMN_VIEW_SCRIPTS_ALL_GROUP = 0 # Group name when displaying a group; empty when displaying a script.
+    COLUMN_VIEW_SCRIPTS_ALL_GROUP = 0 # Group name or None.
     COLUMN_VIEW_SCRIPTS_ALL_NAME = 1 # Script name.
-    COLUMN_VIEW_SCRIPTS_ALL_SOUND = 2 # Icon name for the APPLY icon; None otherwise.
-    COLUMN_VIEW_SCRIPTS_ALL_NOTIFICATION = 3 # Icon name for the APPLY icon; None otherwise.
-    COLUMN_VIEW_SCRIPTS_ALL_BACKGROUND = 4 # Icon name for the APPLY icon; None otherwise.
-    COLUMN_VIEW_SCRIPTS_ALL_TERMINAL = 5 # Icon name for the APPLY icon; None otherwise.
+    COLUMN_VIEW_SCRIPTS_ALL_SOUND = 2 # Tick symbol or None.
+    COLUMN_VIEW_SCRIPTS_ALL_NOTIFICATION = 3 # Tick symbol or None.
+    COLUMN_VIEW_SCRIPTS_ALL_BACKGROUND = 4 # Tick symbol or None.
+    COLUMN_VIEW_SCRIPTS_ALL_TERMINAL = 5 # Tick symbol or None.
     COLUMN_VIEW_SCRIPTS_ALL_INTERVAL = 6 # Numeric amount as a string.
-    COLUMN_VIEW_SCRIPTS_ALL_FORCE_UPDATE = 7 # Icon name for the APPLY icon; None otherwise.
+    COLUMN_VIEW_SCRIPTS_ALL_FORCE_UPDATE = 7 # Tick symbol or None.
 
-    COLUMN_VIEW_SCRIPTS_BACKGROUND_GROUP = 0 # Group name when displaying a group; empty when displaying a script.
+    COLUMN_VIEW_SCRIPTS_BACKGROUND_GROUP = 0 # Group name or None.
     COLUMN_VIEW_SCRIPTS_BACKGROUND_NAME = 1 # Script name.
-    COLUMN_VIEW_SCRIPTS_BACKGROUND_SOUND = 2 # Icon name for the APPLY icon; None otherwise.
-    COLUMN_VIEW_SCRIPTS_BACKGROUND_NOTIFICATION = 3 # Icon name for the APPLY icon; None otherwise.
+    COLUMN_VIEW_SCRIPTS_BACKGROUND_SOUND = 2 # Tick symbol or None.
+    COLUMN_VIEW_SCRIPTS_BACKGROUND_NOTIFICATION = 3 # Tick symbol or None.
     COLUMN_VIEW_SCRIPTS_BACKGROUND_INTERVAL = 4 # Numeric amount as a string.
-    COLUMN_VIEW_SCRIPTS_BACKGROUND_FORCE_UPDATE = 5 # Icon name for the APPLY icon; None otherwise.
+    COLUMN_VIEW_SCRIPTS_BACKGROUND_FORCE_UPDATE = 5 # Tick symbol or None.
 
     # Indices for the scripts saved in JSON.
     JSON_GROUP = 0
@@ -409,34 +410,41 @@ class IndicatorScriptRunner( IndicatorBase ):
         treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str )
 
 #TODO New
+        #TODO Document columns and why group is twice at the beginning.
         treestore_new = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
 
         scripts_by_group = self.get_scripts_by_group( copy_of_scripts )
         for group in scripts_by_group.keys():
-            row = [ group, None, None, None, None, None, None, None, group ]
+            row = [ group, group, None, None, None, None, None, None, None ]
             parent = treestore_new.append( None, row )
             for script in scripts_by_group[ group ]:
                 row = [
-                    None, # Omit the group name otherwise it will be displayed.
+                    group,
+                    None,
                     script.get_name(),
-                    IndicatorBase.TICK_SYMBOL if script.get_play_sound()
-                    else None,
-                    IndicatorBase.TICK_SYMBOL if script.get_show_notification()
-                    else None,
-                    IndicatorBase.TICK_SYMBOL if isinstance( script, Background )
-                    else None,
-                    '—' if isinstance( script, Background )
+                    self.get_tick_symbol( script.get_play_sound() ),
+                    self.get_tick_symbol( script.get_show_notification() ),
+                    self.get_tick_symbol( isinstance( script, Background ) ),
+#TODO Can these be simplified?  Another function to call the tick function?
+                    '—'
+                    if isinstance( script, Background )
                     else (
-                        IndicatorBase.TICK_SYMBOL if script.get_terminal_open()
-                        else None ),
+                        IndicatorBase.TICK_SYMBOL
+                        if script.get_terminal_open()
+                        else
+                        None ),
                     str( script.get_interval_in_minutes() )
                     if isinstance( script, Background )
-                    else '—',
+                    else
+                    '—',
                     (
-                        IndicatorBase.TICK_SYMBOL if script.get_force_update()
-                        else None )
-                    if isinstance( script, Background ) else '—',
-                    group ]
+                        IndicatorBase.TICK_SYMBOL
+                        if script.get_force_update()
+                        else
+                        None )
+                    if isinstance( script, Background )
+                    else
+                    '—' ]
 
                 treestore_new.append( parent, row )
 
@@ -448,7 +456,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         background_scripts_treeview, background_scripts_scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 # treestore_background_scripts_filter, # TODO Old
-                Gtk.TreeModelSort.new_with_model( treestore_background_scripts_filter ),
+                Gtk.TreeModelSort.new_with_model( treestore_background_scripts_filter ),  #TODO Use the treemodelsort here?  Why then have the default sort func below?
                 (
                     _( "Group" ),
                     _( "Name" ),
@@ -506,6 +514,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         scripts_treeview, scripts_scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 treestore_new,
+                # Gtk.TreeModelSort.new_with_model( treestore_new ), #TODO Should be this instead of above?  There is a default sort func below...so which should it be?
                 (
                     _( "Group" ),
                     _( "Name" ),
@@ -802,6 +811,21 @@ class IndicatorScriptRunner( IndicatorBase ):
         return response_type
 
 
+    def get_tick_symbol(
+        self,
+        test_for_tick_symbol,
+        else_case = None ):
+        '''
+        #TODO Document
+        '''
+
+        return (
+            IndicatorBase.TICK_SYMBOL
+            if test_for_tick_symbol
+            else
+            else_case )
+
+
     def background_scripts_filter(
         self,
         model,
@@ -824,7 +848,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                     background = True ) )
 
             if group in background_scripts_by_group:
-                show = len( background_scripts_by_group[ group ] ) > 0
+                show = len( background_scripts_by_group[ group ] ) > 0  #TODO How can this happen?
+                # Surely if a group has background scripts then show = True right?
 
             else:
                 show = False
@@ -840,7 +865,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         treeiter,
         scripts ):
         '''
-        If/when a non-background script is default, render the script name bold.
+        Render a script's name bold if that script is non-background and default.
         '''
 
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
