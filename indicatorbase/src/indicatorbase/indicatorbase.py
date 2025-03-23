@@ -168,7 +168,7 @@ class IndicatorBase( ABC ):
 
     TIMEOUT_IN_SECONDS = 10
 
-    INDICATOR_NAME = Path( sys.argv[ 0 ] ).parent.stem
+    INDICATOR_NAME = Path( sys.argv[ 0 ] ).stem
 
     gettext.install(
         INDICATOR_NAME,
@@ -2003,22 +2003,21 @@ class IndicatorBase( ABC ):
             store,
             model_column_id ):
 
-
         def on_checkbox(
             cell_renderer_toggle,
             path,
             store,
             model_column_id ):
-    
+
             path_ = path
             store_ = store
             if isinstance( store, Gtk.TreeModelSort ):
                 path_ = (
                     store_.convert_path_to_child_path(
                         Gtk.TreePath.new_from_string( path_ ) ) )
-    
+
                 store_ = store_.get_model()
-    
+
             store_[ path_ ][ model_column_id ] = (
                 not store_[ path_ ][ model_column_id ] )
 
