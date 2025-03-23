@@ -111,7 +111,10 @@ class Info( ABC ):
         name1,
         group2,
         name2 ):
-        ''' Compare two Infos by group, then by name. '''
+        '''
+        Compare two Infos by group, then by name,
+        if the groups are equal.
+        '''
         group1_ = locale.strxfrm( group1 )
         group2_ = locale.strxfrm( group2 )
         if group1_ < group2_:
