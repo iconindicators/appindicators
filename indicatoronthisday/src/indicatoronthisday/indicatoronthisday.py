@@ -325,8 +325,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             if not system_calendar_in_user_calendars:
                 store.append( [ system_calendar, False ] )
 
-        store = Gtk.TreeModelSort( model = store )
-        # store = Gtk.TreeModelSort.new_with_model( store ) #TODO I think this is the correct call, not the one above.
+        store = Gtk.TreeModelSort.new_with_model( store )
         store.set_sort_column_id(
             IndicatorOnThisDay.COLUMN_CALENDAR_FILE, Gtk.SortType.ASCENDING )
 
@@ -533,6 +532,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 IndicatorOnThisDay.SEARCH_URL_DEFAULT )
 
 
+#TODO Can this function be generalised and called by fortune and onthisday?
     def on_calendar_remove(
         self,
         button,
@@ -554,24 +554,28 @@ class IndicatorOnThisDay( IndicatorBase ):
                     treeview, _( "Remove the selected calendar?" ) ) )
 
             if response == Gtk.ResponseType.OK:
-                treepath = (
-                    Gtk.TreePath.new_from_string(
-                        model_sort.get_string_from_iter( treeiter_sort ) ) )
+                if len( model_sort ) == 1:
+                    model_sort.get_model().remove(
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
 
-                has_previous = treepath.prev()
+                    button.set_sensitive( False )
 
-                model_sort.get_model().remove(
-                    model_sort.convert_iter_to_child_iter( treeiter_sort ) )
+                else:
+                    treepath = (
+                        Gtk.TreePath.new_from_string(
+                            model_sort.get_string_from_iter( treeiter_sort ) ) )
 
-#TODO Test these two clauses.
-                if has_previous:
+                    if not treepath.prev():
+                        treepath = Gtk.TreePath.new_from_string( '0' )
+
                     treeview.get_selection().select_path( treepath )
                     treeview.set_cursor( treepath, None, False )
 
-                else:
-                    button.set_sensitive( False )
+                    model_sort.get_model().remove(
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
 
 
+#TODO Can this function be generalised and called by fortune and onthisday?
     def on_calendar_add(
         self,
         button,
@@ -580,12 +584,12 @@ class IndicatorOnThisDay( IndicatorBase ):
         button_remove ):
 
         self._on_calendar_double_click(
-            treeview, None, None, preferences_dialog )
+            treeview, None, preferences_dialog )
 
-        if len( treeview.get_model() ) > 0:
-            button_remove.set_sensitive( True )
+        button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
 
 
+#TODO Can this function be generalised and called by fortune and onthisday?
     def on_calendar_double_click(
         self,
         treeview,
@@ -605,25 +609,18 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         else:
             self._on_calendar_double_click(
-                treeview, path, treeviewcolumn, preferences_dialog )
+                treeview, path, preferences_dialog )
 
 
+#TODO Can this function be generalised and called by fortune and onthisday?
     def _on_calendar_double_click(
         self,
         treeview,
         path,
-        treeviewcolumn,
         preferences_dialog ):
 
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
         adding_calendar = path is None
-
-        if adding_calendar:
-            start_file = str( Path.home() )
-
-        else:
-            start_file = (
-                model_sort[ path ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
 
         dialog = (
             self.create_filechooser_dialog(
@@ -638,7 +635,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         dialog.destroy()
 
         if response == Gtk.ResponseType.OK:
-            calendar_already_present = False
+            calendar_exists = False
             for row in model_sort:
                 calendar = row[ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
                 if calendar == filename:
@@ -646,10 +643,10 @@ class IndicatorOnThisDay( IndicatorBase ):
                         preferences_dialog,
                         _( "This calendar already exists!" ) )
 
-                    calendar_already_present = True
+                    calendar_exists = True
                     break
 
-            if not calendar_already_present:
+            if not calendar_exists:
                 if not adding_calendar:
                     model_sort.get_model().remove(
                         model_sort.convert_iter_to_child_iter( treeiter_sort ) )

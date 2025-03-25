@@ -31,9 +31,11 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from .indicatorbase import IndicatorBase
+#TODO Put dot back in
+from indicatorbase import IndicatorBase
 
-from .fortune import Fortune
+#TODO Put dot back in
+from fortune import Fortune
 
 
 class IndicatorFortune( IndicatorBase ):
@@ -484,6 +486,7 @@ class IndicatorFortune( IndicatorBase ):
         return response_type
 
 
+#TODO Can this function be generalised and called by fortune and onthisday?
     def on_fortune_remove(
         self,
         button,
@@ -498,56 +501,35 @@ class IndicatorFortune( IndicatorBase ):
             self.show_dialog_ok(
                 treeview,
                 _( "This is a system fortune and cannot be removed." ) )
-
+        
         else:
             response = (
                 self.show_dialog_ok_cancel(
                     treeview, _( "Remove the selected fortune?" ) ) )
 
             if response == Gtk.ResponseType.OK:
-                if len( model_sort ):
-                    pass #TODO Implement!
-                    '''
-                    has_previous = treepath.prev()
-                    if has_previous:
-                        treepath = (
-                            Gtk.TreePath.new_from_string(
-                                model_sort.get_string_from_iter( treeiter_sort ) ) )
-
-                        treeview.get_selection().select_path( treepath )
-                        treeview.set_cursor( treepath, None, False )
-
-                    else:
-                        treepath = Gtk.TreePath.new_from_string( '0' )
-                        treeview.get_selection().select_path( treepath )
-                        treeview.set_cursor( treepath, None, False )
-                    '''
-
-                else:
+                if len( model_sort ) == 1:
                     model_sort.get_model().remove(
                         model_sort.convert_iter_to_child_iter( treeiter_sort ) )
 
                     button.set_sensitive( False )
 
+                else:
+                    treepath = (
+                        Gtk.TreePath.new_from_string(
+                            model_sort.get_string_from_iter( treeiter_sort ) ) )
 
-                treepath = (
-                    Gtk.TreePath.new_from_string(
-                        model_sort.get_string_from_iter( treeiter_sort ) ) )
+                    if not treepath.prev():
+                        treepath = Gtk.TreePath.new_from_string( '0' )
 
-                has_previous = treepath.prev()
-
-                model_sort.get_model().remove(
-                    model_sort.convert_iter_to_child_iter( treeiter_sort ) )
-
-#TODO Test these two clauses.
-                if has_previous:
                     treeview.get_selection().select_path( treepath )
                     treeview.set_cursor( treepath, None, False )
 
-                else:
-                    button.set_sensitive( False )
+                    model_sort.get_model().remove(
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
 
 
+#TODO Can this function be generalised and called by fortune and onthisday?
     def on_fortune_add(
         self,
         button,
@@ -556,12 +538,12 @@ class IndicatorFortune( IndicatorBase ):
         button_remove ):
 
         self._on_fortune_double_click(
-            treeview, None, None, preferences_dialog )
+            treeview, None, preferences_dialog )
 
-        if len( treeview.get_model() ) > 0:
-            button_remove.set_sensitive( True )
+        button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
 
 
+#TODO Can this function be generalised and called by fortune and onthisday?
     def on_fortune_double_click(
         self,
         treeview,
@@ -581,26 +563,18 @@ class IndicatorFortune( IndicatorBase ):
 
         else:
             self._on_fortune_double_click(
-                treeview, path, treeviewcolumn, preferences_dialog )
+                treeview, path, preferences_dialog )
 
 
-#TODO Can this function and the add/remove be combined with indicatoronthisday?
+#TODO Can this function be generalised and called by fortune and onthisday?
     def _on_fortune_double_click(
         self,
         treeview,
         path,
-        treeviewcolumn,
         preferences_dialog ):
 
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
         adding_fortune = path is None
-
-        if adding_fortune:
-            start_file = str( Path.home() )
-
-        else:
-            start_file = (
-                model_sort[ path ][ IndicatorFortune.COLUMN_FORTUNE_FILE ] )
 
         dot_dat_file_filter = Gtk.FileFilter()
         dot_dat_file_filter.set_name( "Fortune files" )
@@ -620,7 +594,7 @@ class IndicatorFortune( IndicatorBase ):
         dialog.destroy()
 
         if response == Gtk.ResponseType.OK:
-            fortune_already_present = False
+            fortune_exists = False
             for row in model_sort:
                 fortune = row[ IndicatorFortune.COLUMN_FORTUNE_FILE ]
                 if fortune == filename:
@@ -628,10 +602,10 @@ class IndicatorFortune( IndicatorBase ):
                         preferences_dialog,
                         _( "This fortune already exists!" ) )
 
-                    fortune_already_present = True
+                    fortune_exists = True
                     break
 
-            if not fortune_already_present:
+            if not fortune_exists:
                 if not adding_fortune:
                     model_sort.get_model().remove(
                         model_sort.convert_iter_to_child_iter( treeiter_sort ) )
@@ -681,7 +655,6 @@ class IndicatorFortune( IndicatorBase ):
         Returns a list of the system fortunes; may be empty.
         '''
         fortunes = [ ]
-
         system_fortune_path = self._get_system_fortune_path()
         if system_fortune_path:
             # Ideally use Path.walk() but only available in Python 3.12.
