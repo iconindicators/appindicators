@@ -268,8 +268,7 @@ class IndicatorFortune( IndicatorBase ):
             if not system_fortune_in_user_fortunes:
                 store.append( [ system_fortune, False ] )
 
-        store = Gtk.TreeModelSort( model = store )
-        # store = Gtk.TreeModelSort.new_with_model( store ) #TODO I think this is the correct call, not the one above.
+        store = Gtk.TreeModelSort.new_with_model( store )
         store.set_sort_column_id(
             IndicatorFortune.COLUMN_FORTUNE_FILE, Gtk.SortType.ASCENDING )
 
@@ -506,6 +505,31 @@ class IndicatorFortune( IndicatorBase ):
                     treeview, _( "Remove the selected fortune?" ) ) )
 
             if response == Gtk.ResponseType.OK:
+                if len( model_sort ):
+                    pass #TODO Implement!
+                    '''
+                    has_previous = treepath.prev()
+                    if has_previous:
+                        treepath = (
+                            Gtk.TreePath.new_from_string(
+                                model_sort.get_string_from_iter( treeiter_sort ) ) )
+
+                        treeview.get_selection().select_path( treepath )
+                        treeview.set_cursor( treepath, None, False )
+
+                    else:
+                        treepath = Gtk.TreePath.new_from_string( '0' )
+                        treeview.get_selection().select_path( treepath )
+                        treeview.set_cursor( treepath, None, False )
+                    '''
+
+                else:
+                    model_sort.get_model().remove(
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
+
+                    button.set_sensitive( False )
+
+
                 treepath = (
                     Gtk.TreePath.new_from_string(
                         model_sort.get_string_from_iter( treeiter_sort ) ) )
