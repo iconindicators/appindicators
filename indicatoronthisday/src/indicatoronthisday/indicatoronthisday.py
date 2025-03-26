@@ -57,9 +57,11 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from .indicatorbase import IndicatorBase
+#TODO Put . back in
+from indicatorbase import IndicatorBase
 
-from .event import Event
+#TODO Put . back in
+from event import Event
 
 
 class IndicatorOnThisDay( IndicatorBase ):
@@ -366,7 +368,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 (
                     None,
                     (
-                        self._remove_fortune_or_event,
+                        self._on_fortune_or_event_remove,
                         treeview,
                         IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
                         self.get_system_calendars(),

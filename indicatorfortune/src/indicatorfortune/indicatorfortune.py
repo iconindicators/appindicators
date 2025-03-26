@@ -275,6 +275,13 @@ class IndicatorFortune( IndicatorBase ):
         store.set_sort_column_id(
             IndicatorFortune.COLUMN_FORTUNE_FILE, Gtk.SortType.ASCENDING )
 
+        file_filter = Gtk.FileFilter()
+        file_filter.set_name( "Fortune files" )
+        file_filter.add_pattern( "*.dat" )
+
+        file_chooser_title = _( "Choose a fortune .dat file" )
+        fortune_exists = _( "This fortune already exists!" )
+
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 store,
@@ -296,7 +303,14 @@ class IndicatorFortune( IndicatorBase ):
                     ( 0.5, IndicatorFortune.COLUMN_ENABLED ), ),
                 tooltip_text = _( "Double click to edit a fortune." ),
                 rowactivatedfunctionandarguments =
-                    ( self.on_fortune_double_click, dialog ) ) )
+                    (
+                        self._on_fortune_or_event_double_click,
+                        dialog,
+                        file_chooser_title,
+                        IndicatorFortune.COLUMN_FORTUNE_FILE,
+                        fortune_exists,
+                        _( "This is a system fortune and cannot be modified." ),
+                        file_filter ) ) )
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
@@ -311,7 +325,7 @@ class IndicatorFortune( IndicatorBase ):
                 (
                     None,
                     (
-                        self._remove_fortune_or_event,
+                        self._on_fortune_or_event_remove,
                         treeview,
                         IndicatorFortune.COLUMN_FORTUNE_FILE,
                         self.get_system_fortunes(),
@@ -319,7 +333,15 @@ class IndicatorFortune( IndicatorBase ):
                         _( "Remove the selected fortune?" ) ) ) ) )
 
         add.connect(
-            "clicked", self.on_fortune_add, treeview, dialog, remove )
+            "clicked",
+            self._on_fortune_or_event_add,
+            treeview,
+            dialog,
+            remove,
+            file_chooser_title,
+            IndicatorFortune.COLUMN_FORTUNE_FILE,
+            fortune_exists,
+            file_filter )
 
         if len( store ):
             treepath = Gtk.TreePath.new_from_string( '0' )
@@ -491,105 +513,6 @@ class IndicatorFortune( IndicatorBase ):
                 latest_version_checkbox.get_active() )
 
         return response_type
-
-
-#TODO Can this function be generalised and called by fortune and onthisday?
-    def on_fortune_add(
-        self,
-        button,
-        treeview,
-        preferences_dialog,
-        button_remove ):
-
-        self._on_fortune_double_click(
-            treeview, None, preferences_dialog )
-
-        button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
-
-
-#TODO Can this function be generalised and called by fortune and onthisday?
-    def on_fortune_double_click(
-        self,
-        treeview,
-        path,
-        treeviewcolumn,
-        preferences_dialog ):
-
-        model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        fortune = (
-            model_sort[
-                treeiter_sort ][ IndicatorFortune.COLUMN_FORTUNE_FILE ] )
-
-        if fortune in self.get_system_fortunes():
-            self.show_dialog_ok(
-                preferences_dialog,
-                _( "This is a system fortune and cannot be modified." ) )
-
-        else:
-            self._on_fortune_double_click(
-                treeview, path, preferences_dialog )
-
-
-#TODO Can this function be generalised and called by fortune and onthisday?
-    def _on_fortune_double_click(
-        self,
-        treeview,
-        path,
-        preferences_dialog ):
-
-        model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        adding_fortune = path is None
-
-        dot_dat_file_filter = Gtk.FileFilter()
-        dot_dat_file_filter.set_name( "Fortune files" )
-        dot_dat_file_filter.add_pattern( "*.dat" )
-
-        dialog = (
-            self.create_filechooser_dialog(
-                _( "Choose a fortune .dat file" ),
-                preferences_dialog,
-                str( Path.home() )
-                if adding_fortune else
-                model_sort[ path ][ IndicatorFortune.COLUMN_FORTUNE_FILE ],
-                file_filter = dot_dat_file_filter ) )
-
-        response = dialog.run()
-        filename = dialog.get_filename()
-        dialog.destroy()
-
-        if response == Gtk.ResponseType.OK:
-            fortune_exists = False
-            for row in model_sort:
-                fortune = row[ IndicatorFortune.COLUMN_FORTUNE_FILE ]
-                if fortune == filename:
-                    self.show_dialog_ok(
-                        preferences_dialog,
-                        _( "This fortune already exists!" ) )
-
-                    fortune_exists = True
-                    break
-
-            if not fortune_exists:
-                if not adding_fortune:
-                    model_sort.get_model().remove(
-                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
-
-                model_sort.get_model().append( [ filename, True ] )
-
-                treepath = 0
-                for row in model_sort.get_model():
-                    fortune = row[ IndicatorFortune.COLUMN_FORTUNE_FILE ]
-                    if fortune == filename:
-                        break
-
-                    treepath += 1
-
-                treepath = (
-                    model_sort.convert_child_path_to_path(
-                        Gtk.TreePath.new_from_string( str( treepath ) ) ) )
-
-                treeview.get_selection().select_path( treepath )
-                treeview.set_cursor( treepath, None, False )
 
 
     def _get_system_fortune_path( self ):

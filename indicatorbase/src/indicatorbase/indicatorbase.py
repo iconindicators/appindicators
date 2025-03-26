@@ -2099,18 +2099,18 @@ class IndicatorBase( ABC ):
             f.write( output )
 
 
-    def _remove_fortune_or_event(
+    def _on_fortune_or_event_remove(
         self,
         button,
         treeview,
         model_column_id_for_fortune_or_event,
         system_fortunes_or_events,
-        message_system_fortune_or_event,
+        message_system_fortune_or_event_exists,
         message_remove_fortune_or_event ):
         '''
         Prompts user to remove selected item, checking first if the item is
         a system item (and so cannot be deleted).  On confirmation, the item
-        is removed and the item above is selected or as appropriate. 
+        is removed and the item above is selected or as appropriate.
         '''
 
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
@@ -2119,7 +2119,8 @@ class IndicatorBase( ABC ):
                 treeiter_sort ][ model_column_id_for_fortune_or_event ] )
 
         if selected_fortune_or_event in system_fortunes_or_events:
-            self.show_dialog_ok( treeview, message_system_fortune_or_event )
+            self.show_dialog_ok(
+                treeview, message_system_fortune_or_event_exists )
 
         else:
             response = (
@@ -2146,6 +2147,132 @@ class IndicatorBase( ABC ):
 
                     model_sort.get_model().remove(
                         model_sort.convert_iter_to_child_iter( treeiter_sort ) )
+
+
+    def _on_fortune_or_event_add(
+        self,
+        button,
+        treeview,
+        preferences_dialog,
+        button_remove,
+        file_chooser_title,
+        model_column_id_for_fortune_or_event,
+        message_fortune_or_event_exists,
+        file_filter = None ):
+        '''
+        TODO Add documention.
+        '''
+
+        self._on_fortune_or_event_double_click_internal(
+            treeview,
+            None,
+            preferences_dialog,
+            file_chooser_title,
+            model_column_id_for_fortune_or_event,
+            message_fortune_or_event_exists,
+            file_filter )
+
+        button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
+
+
+    def _on_fortune_or_event_double_click(
+        self,
+        treeview,
+        path,
+        treeviewcolumn,
+        preferences_dialog,
+        file_chooser_title,
+        model_column_id_for_fortune_or_event,
+        message_fortune_or_event_exists,
+        message_fortune_or_event_cannot_be_modified,
+        file_filter = None ):
+        '''
+        TODO Add documention.
+        '''
+
+        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        fortune_or_event = (
+            model_sort[
+                treeiter_sort ][ model_column_id_for_fortune_or_event ] )
+
+        if fortune_or_event in self.get_system_fortunes():
+            self.show_dialog_ok(
+                preferences_dialog,
+                message_fortune_or_event_cannot_be_modified )
+
+        else:
+            self._on_fortune_or_event_double_click_internal(
+            treeview,
+            path,
+            preferences_dialog,
+            file_chooser_title,
+            model_column_id_for_fortune_or_event,
+            message_fortune_or_event_exists,
+            file_filter )
+
+
+    def _on_fortune_or_event_double_click_internal(
+        self,
+        treeview,
+        path,
+        preferences_dialog,
+        file_chooser_title,
+        model_column_id_for_fortune_or_event,
+        message_fortune_or_event_exists,
+        file_filter = None ):
+        '''
+        TODO Add documention.
+        '''
+
+        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        adding_fortune_or_event = path is None
+
+        dialog = (
+            self.create_filechooser_dialog(
+                file_chooser_title,
+                preferences_dialog,
+                str( Path.home() )
+                if adding_fortune_or_event else
+                model_sort[ path ][ model_column_id_for_fortune_or_event ],
+                file_filter = file_filter ) )
+
+        response = dialog.run()
+        filename = dialog.get_filename()
+        dialog.destroy()
+
+        if response == Gtk.ResponseType.OK:
+            fortune_or_event_exists = False
+            for row in model_sort:
+                fortune_or_event = row[ model_column_id_for_fortune_or_event ]
+                if fortune_or_event == filename:
+                    self.show_dialog_ok(
+                        preferences_dialog,
+                        message_fortune_or_event_exists )
+
+                    fortune_or_event_exists = True
+                    break
+
+            if not fortune_or_event_exists:
+                if not adding_fortune_or_event:
+                    model_sort.get_model().remove(
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
+
+                model_sort.get_model().append( [ filename, True ] )
+
+                treepath = 0
+                for row in model_sort.get_model():
+                    fortune_or_event = row[ model_column_id_for_fortune_or_event ]
+                    if fortune_or_event == filename:
+                        break
+
+                    treepath += 1
+
+                treepath = (
+                    model_sort.convert_child_path_to_path(
+                        Gtk.TreePath.new_from_string( str( treepath ) ) ) )
+
+                treeview.get_selection().select_path( treepath )
+                treeview.set_cursor( treepath, None, False )
 
 
     @staticmethod
