@@ -308,6 +308,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
         # Calendars.
+#TODO Can this section be generalised for fortune/onthisday?
         grid = self.create_grid()
 
         store = Gtk.ListStore( str, bool ) # Path to calendar; enabled or not.

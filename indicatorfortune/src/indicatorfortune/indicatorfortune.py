@@ -253,6 +253,7 @@ class IndicatorFortune( IndicatorBase ):
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
         # Fortunes.
+#TODO Can this section be generalised for fortune/onthisday?
         grid = self.create_grid()
 
         store = Gtk.ListStore( str, bool ) # Path to fortune; enabled or not.
