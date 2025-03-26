@@ -596,13 +596,17 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return (
             PPA.compare(
                 model.get_value(
-                    row1, IndicatorPPADownloadStatistics.COLUMN_USER ),
+                    row1,
+                    IndicatorPPADownloadStatistics.COLUMN_USER ),
                 model.get_value(
-                    row1, IndicatorPPADownloadStatistics.COLUMN_NAME ),
+                    row1,
+                    IndicatorPPADownloadStatistics.COLUMN_NAME ),
                 model.get_value(
-                    row2, IndicatorPPADownloadStatistics.COLUMN_USER ),
+                    row2,
+                    IndicatorPPADownloadStatistics.COLUMN_USER ),
                 model.get_value(
-                    row2, IndicatorPPADownloadStatistics.COLUMN_NAME ) ) )
+                    row2,
+                    IndicatorPPADownloadStatistics.COLUMN_NAME ) ) )
 
 
     def on_ppa_remove(
@@ -622,6 +626,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 row[ IndicatorPPADownloadStatistics.COLUMN_USER ],
                 row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
 
+#TODO Compare against fortune in terms of selecting row above the deleted,
+# or first row if first row was deleted, or nothing if now empty.
             treepath = (
                 Gtk.TreePath.new_from_string(
                     model.get_string_from_iter( treeiter ) ) )
@@ -636,6 +642,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 button.set_sensitive( False )
 
 
+#TODO Compare against fortune.
     def on_ppa_add(
         self,
         button_add,
@@ -648,6 +655,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             button_remove.set_sensitive( True )
 
 
+#TODO Compare against fortune...need another function to wrap around this function?
     def on_ppa_double_click(
         self,
         treeview,
