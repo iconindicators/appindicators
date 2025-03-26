@@ -253,105 +253,120 @@ class IndicatorFortune( IndicatorBase ):
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
         # Fortunes.
-#TODO Can this section be generalised for fortune/onthisday?
-        grid = self.create_grid()
-
-        store = Gtk.ListStore( str, bool ) # Path to fortune; enabled or not.
-        for location, enabled in self.fortunes:
-            store.append( [ location, enabled ] )
-
-        # Ensure the system fortunes are present in the list of fortunes,
-        # not just those selected/defined by the user.
-        for system_fortune in self.get_system_fortunes():
-            system_fortune_in_user_fortunes = (
-                [ system_fortune, True ] in self.fortunes
-                or
-                [ system_fortune, False ] in self.fortunes )
-
-            if not system_fortune_in_user_fortunes:
-                store.append( [ system_fortune, False ] )
-
-        store = Gtk.TreeModelSort.new_with_model( store )
-        store.set_sort_column_id(
-            IndicatorFortune.COLUMN_FORTUNE_FILE, Gtk.SortType.ASCENDING )
-
         file_filter = Gtk.FileFilter()
         file_filter.set_name( "Fortune files" )
         file_filter.add_pattern( "*.dat" )
 
-        file_chooser_title = _( "Choose a fortune .dat file" )
-        fortune_exists = _( "This fortune already exists!" )
+#TODO Check this new function call against existing code.
+        grid, store = (
+            self._create_fortune_or_calendar_preferences_panel(
+                dialog,
+                self.fortunes,
+                self.get_system_fortunes(),
+                IndicatorFortune.COLUMN_FORTUNE_FILE,
+                IndicatorFortune.COLUMN_ENABLED,
+                _( "Fortune" ),
+                _( "Double click to edit a fortune." ),
+                _( "Choose a fortune .dat file" ),
+                _( "This fortune already exists!" ),
+                _( "This is a system fortune and cannot be modified." ),
+                _( "Add a new fortune location." ),
+                _( "Remove the selected fortune location." ),
+                _( "This is a system fortune and cannot be removed." ),
+                _( "Remove the selected fortune?" ),
+                file_filter ) )
 
-        treeview, scrolledwindow = (
-            self.create_treeview_within_scrolledwindow(
-                store,
-                (
-                    _( "Fortune" ),
-                    _( "Enabled" ) ),
-                (
-                    (
-                        Gtk.CellRendererText(),
-                        "text",
-                        IndicatorFortune.COLUMN_FORTUNE_FILE ),
-                    (
-                        self.create_cell_renderer_toggle_for_checkbox_within_treeview(
-                            store,
-                            IndicatorFortune.COLUMN_ENABLED ),
-                        "active",
-                        IndicatorFortune.COLUMN_ENABLED ) ),
-                alignments_columnviewids = (
-                    ( 0.5, IndicatorFortune.COLUMN_ENABLED ), ),
-                tooltip_text = _( "Double click to edit a fortune." ),
-                rowactivatedfunctionandarguments =
-                    (
-                        self._on_fortune_or_event_double_click,
-                        dialog,
-                        file_chooser_title,
-                        IndicatorFortune.COLUMN_FORTUNE_FILE,
-                        fortune_exists,
-                        _( "This is a system fortune and cannot be modified." ),
-                        file_filter ) ) )
-
-        grid.attach( scrolledwindow, 0, 0, 1, 1 )
-
-        box, add, remove = (
-            self.create_buttons_in_box(
-                (
-                    _( "Add" ),
-                    _( "Remove" ) ),
-                (
-                    _( "Add a new fortune location." ),
-                    _( "Remove the selected fortune location." ) ),
-                (
-                    None,
-                    (
-                        self._on_fortune_or_event_remove,
-                        treeview,
-                        IndicatorFortune.COLUMN_FORTUNE_FILE,
-                        self.get_system_fortunes(),
-                        _( "This is a system fortune and cannot be removed." ),
-                        _( "Remove the selected fortune?" ) ) ) ) )
-
-        add.connect(
-            "clicked",
-            self._on_fortune_or_event_add,
-            treeview,
-            dialog,
-            remove,
-            file_chooser_title,
-            IndicatorFortune.COLUMN_FORTUNE_FILE,
-            fortune_exists,
-            file_filter )
-
-        if len( store ):
-            treepath = Gtk.TreePath.new_from_string( '0' )
-            treeview.get_selection().select_path( treepath )
-            treeview.set_cursor( treepath, None, False )
-
-        else:
-            remove.set_sensitive( False )
-
-        grid.attach( box, 0, 1, 1, 1 )
+        # grid = self.create_grid()
+        #
+        # store = Gtk.ListStore( str, bool ) # Path to fortune; enabled or not.
+        # for location, enabled in self.fortunes:
+        #     store.append( [ location, enabled ] )
+        #
+        # # Ensure the system fortunes are present in the list of fortunes,
+        # # not just those selected/defined by the user.
+        # for system_fortune in self.get_system_fortunes():
+        #     system_fortune_in_user_fortunes = (
+        #         [ system_fortune, True ] in self.fortunes
+        #         or
+        #         [ system_fortune, False ] in self.fortunes )
+        #
+        #     if not system_fortune_in_user_fortunes:
+        #         store.append( [ system_fortune, False ] )
+        #
+        # store = Gtk.TreeModelSort.new_with_model( store )
+        # store.set_sort_column_id(
+        #     IndicatorFortune.COLUMN_FORTUNE_FILE, Gtk.SortType.ASCENDING )
+        #
+        # treeview, scrolledwindow = (
+        #     self.create_treeview_within_scrolledwindow(
+        #         store,
+        #         (
+        #             _( "Fortune" ),
+        #             _( "Enabled" ) ),
+        #         (
+        #             (
+        #                 Gtk.CellRendererText(),
+        #                 "text",
+        #                 IndicatorFortune.COLUMN_FORTUNE_FILE ),
+        #             (
+        #                 self.create_cell_renderer_toggle_for_checkbox_within_treeview(
+        #                     store,
+        #                     IndicatorFortune.COLUMN_ENABLED ),
+        #                 "active",
+        #                 IndicatorFortune.COLUMN_ENABLED ) ),
+        #         alignments_columnviewids = (
+        #             ( 0.5, IndicatorFortune.COLUMN_ENABLED ), ),
+        #         tooltip_text = _( "Double click to edit a fortune." ),
+        #         rowactivatedfunctionandarguments =
+        #             (
+        #                 self._on_fortune_or_event_double_click,
+        #                 dialog,
+        #                 file_chooser_title,
+        #                 IndicatorFortune.COLUMN_FORTUNE_FILE,
+        #                 fortune_exists,
+        #                 _( "This is a system fortune and cannot be modified." ),
+        #                 file_filter ) ) )
+        #
+        # grid.attach( scrolledwindow, 0, 0, 1, 1 )
+        #
+        # box, add, remove = (
+        #     self.create_buttons_in_box(
+        #         (
+        #             _( "Add" ),
+        #             _( "Remove" ) ),
+        #         (
+        #             _( "Add a new fortune location." ),
+        #             _( "Remove the selected fortune location." ) ),
+        #         (
+        #             None,
+        #             (
+        #                 self._on_fortune_or_event_remove,
+        #                 treeview,
+        #                 IndicatorFortune.COLUMN_FORTUNE_FILE,
+        #                 self.get_system_fortunes(),
+        #                 _( "This is a system fortune and cannot be removed." ),
+        #                 _( "Remove the selected fortune?" ) ) ) ) )
+        #
+        # add.connect(
+        #     "clicked",
+        #     self._on_fortune_or_event_add,
+        #     treeview,
+        #     dialog,
+        #     remove,
+        #     file_chooser_title,
+        #     IndicatorFortune.COLUMN_FORTUNE_FILE,
+        #     fortune_exists,
+        #     file_filter )
+        #
+        # if len( store ):
+        #     treepath = Gtk.TreePath.new_from_string( '0' )
+        #     treeview.get_selection().select_path( treepath )
+        #     treeview.set_cursor( treepath, None, False )
+        #
+        # else:
+        #     remove.set_sensitive( False )
+        #
+        # grid.attach( box, 0, 1, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Fortunes" ) ) )
 

@@ -311,6 +311,9 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         # Calendars.
 #TODO Can this section be generalised for fortune/onthisday?
+        file_chooser_title = _( "Choose a calendar file" )
+        calendar_exists = _( "This calendar already exists!" )
+
         grid = self.create_grid()
 
         store = Gtk.ListStore( str, bool ) # Path to calendar; enabled or not.
@@ -353,7 +356,14 @@ class IndicatorOnThisDay( IndicatorBase ):
                     ( 0.5, IndicatorOnThisDay.COLUMN_ENABLED ), ),
                 tooltip_text = _( "Double click to edit a calendar." ),
                 rowactivatedfunctionandarguments =
-                    ( self.on_calendar_double_click, dialog ), ) )
+                    (
+                        self._on_fortune_or_event_double_click,
+                        dialog,
+                        file_chooser_title,
+                        IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
+                        calendar_exists,
+                        _( "This is a system calendar and cannot be modified." ),
+                        None ) ) )
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
@@ -376,7 +386,15 @@ class IndicatorOnThisDay( IndicatorBase ):
                         _( "Remove the selected calendar?" ) ) ) ) )
 
         add.connect(
-            "clicked", self.on_calendar_add, treeview, dialog, remove )
+            "clicked",
+            self._on_fortune_or_event_add,
+            treeview,
+            dialog,
+            remove,
+            file_chooser_title,
+            IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
+            calendar_exists,
+            None )
 
         if len( store ):
             treepath = Gtk.TreePath.new_from_string( '0' )
@@ -539,100 +557,6 @@ class IndicatorOnThisDay( IndicatorBase ):
         if copy_to_clipboard_and_empty_search:
             search_engine_entry.set_text(
                 IndicatorOnThisDay.SEARCH_URL_DEFAULT )
-
-
-#TODO Can this function be generalised and called by fortune and onthisday?
-    def on_calendar_add(
-        self,
-        button,
-        treeview,
-        preferences_dialog,
-        button_remove ):
-
-        self._on_calendar_double_click(
-            treeview, None, preferences_dialog )
-
-        button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
-
-
-#TODO Can this function be generalised and called by fortune and onthisday?
-    def on_calendar_double_click(
-        self,
-        treeview,
-        path,
-        treeviewcolumn,
-        preferences_dialog ):
-
-        model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        calendar = (
-            model_sort[
-                treeiter_sort ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] )
-
-        if calendar in self.get_system_calendars():
-            self.show_dialog_ok(
-                preferences_dialog,
-                _( "This is a system calendar and cannot be modified." ) )
-
-        else:
-            self._on_calendar_double_click(
-                treeview, path, preferences_dialog )
-
-
-#TODO Can this function be generalised and called by fortune and onthisday?
-    def _on_calendar_double_click(
-        self,
-        treeview,
-        path,
-        preferences_dialog ):
-
-        model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        adding_calendar = path is None
-
-        dialog = (
-            self.create_filechooser_dialog(
-                _( "Choose a calendar file" ),
-                preferences_dialog,
-                str( Path.home() )
-                if adding_calendar else
-                model_sort[ path ][ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ] ) )
-
-        response = dialog.run()
-        filename = dialog.get_filename()
-        dialog.destroy()
-
-        if response == Gtk.ResponseType.OK:
-            calendar_exists = False
-            for row in model_sort:
-                calendar = row[ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
-                if calendar == filename:
-                    self.show_dialog_ok(
-                        preferences_dialog,
-                        _( "This calendar already exists!" ) )
-
-                    calendar_exists = True
-                    break
-
-            if not calendar_exists:
-                if not adding_calendar:
-                    model_sort.get_model().remove(
-                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
-
-                model_sort.get_model().append( [ filename, True ] )
-
-                treepath = 0
-                for row in model_sort.get_model():
-                    calendar = row[ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ]
-                    if calendar == filename:
-                        break
-
-                    treepath += 1
-
-                treepath = (
-                    model_sort.convert_child_path_to_path(
-                        Gtk.TreePath.new_from_string( str( treepath ) ) ) )
-
-                treeview.get_selection().select_path( treepath )
-                treeview.set_cursor( treepath, None, False )
 
 
     def get_system_calendars( self ):

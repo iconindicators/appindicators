@@ -2099,33 +2099,157 @@ class IndicatorBase( ABC ):
             f.write( output )
 
 
-    def _on_fortune_or_event_remove(
+    def _create_fortune_or_calendar_preferences_panel(
+        self,
+        dialog,
+        user_fortunes_or_calendars,
+        system_fortunes_or_calendars,
+        model_column_id_for_fortune_or_calendar_file,
+        model_column_id_for_fortune_or_calendar_enabled,
+        treeview_column_fortunes_or_calendars_title,
+        treeview_tool_tip,
+        file_chooser_title,
+        message_fortune_or_calendar_exists,
+        message_fortune_or_calendar_cannot_be_modified,
+        message_add_fortune_or_calendar,
+        message_remove_fortune_or_calendar,
+        message_system_fortune_or_calendar_cannot_be_removed,
+        message_confirm_removal_fortune_or_calendar,
+        file_filter = None ):
+        '''
+        TODO DOcument
+        '''
+
+        print( 1 )
+        print( file_filter.get_name())#TODO Testing
+
+        grid = self.create_grid()
+
+        store = Gtk.ListStore( str, bool ) # Path to fortune/calendar; enabled or not.
+        for location, enabled in user_fortunes_or_calendars:
+            store.append( [ location, enabled ] )
+
+        # Ensure the system fortunes/calendars are present in the list of
+        # fortunes/calendars, not just those selected/defined by the user.
+        for system_fortune_or_calendar in system_fortunes_or_calendars:
+            system_fortune_or_calendar_in_user_fortunes_or_calendars = (
+                [ system_fortune_or_calendar, True ] in user_fortunes_or_calendars
+                or
+                [ system_fortune_or_calendar, False ] in user_fortunes_or_calendars )
+
+            if not system_fortune_or_calendar_in_user_fortunes_or_calendars:
+                store.append( [ system_fortune_or_calendar, False ] )
+
+        store = Gtk.TreeModelSort.new_with_model( store )
+        store.set_sort_column_id(
+            model_column_id_for_fortune_or_calendar_file,
+            Gtk.SortType.ASCENDING )
+
+        treeview, scrolledwindow = (
+            self.create_treeview_within_scrolledwindow(
+                store,
+                (
+                    treeview_column_fortunes_or_calendars_title,
+                    _( "Enabled" ) ),
+                (
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        model_column_id_for_fortune_or_calendar_file ),
+                    (
+                        self.create_cell_renderer_toggle_for_checkbox_within_treeview(
+                            store,
+                            model_column_id_for_fortune_or_calendar_enabled ),
+                        "active",
+                        model_column_id_for_fortune_or_calendar_enabled ) ),
+                alignments_columnviewids = (
+                    ( 0.5, model_column_id_for_fortune_or_calendar_enabled ), ),
+                tooltip_text = treeview_tool_tip,
+                rowactivatedfunctionandarguments =
+                    (
+                        self._on_fortune_or_calendar_double_click,
+                        dialog,
+                        file_chooser_title,
+                        model_column_id_for_fortune_or_calendar_file,
+                        system_fortunes_or_calendars,
+                        message_fortune_or_calendar_exists,
+                        message_fortune_or_calendar_cannot_be_modified,
+                        file_filter ) ) )
+
+        grid.attach( scrolledwindow, 0, 0, 1, 1 )
+
+        box, add, remove = (
+            self.create_buttons_in_box(
+                (
+                    _( "Add" ),
+                    _( "Remove" ) ),
+                (
+                    message_add_fortune_or_calendar,
+                    message_remove_fortune_or_calendar ),
+                (
+                    None,
+                    (
+                        self._on_fortune_or_calendar_remove,
+                        treeview,
+                        model_column_id_for_fortune_or_calendar_file,
+                        system_fortunes_or_calendars,
+                        message_system_fortune_or_calendar_cannot_be_removed,
+                        message_confirm_removal_fortune_or_calendar ) ) ) )
+
+        add.connect(
+            "clicked",
+            self._on_fortune_or_calendar_add,
+            treeview,
+            dialog,
+            remove,
+            file_chooser_title,
+            model_column_id_for_fortune_or_calendar_file,
+            message_fortune_or_calendar_exists,
+            file_filter )
+
+        if len( store ):
+            treepath = Gtk.TreePath.new_from_string( '0' )
+            treeview.get_selection().select_path( treepath )
+            treeview.set_cursor( treepath, None, False )
+
+        else:
+            remove.set_sensitive( False )
+
+        grid.attach( box, 0, 1, 1, 1 )
+
+        return grid, store
+
+
+    def _on_fortune_or_calendar_remove(
         self,
         button,
         treeview,
-        model_column_id_for_fortune_or_event,
-        system_fortunes_or_events,
-        message_system_fortune_or_event_exists,
-        message_remove_fortune_or_event ):
+        model_column_id_for_fortune_or_calendar,
+        system_fortunes_or_calendars,
+        message_system_fortune_or_calendar_exists,
+        message_remove_fortune_or_calendar ):
         '''
-        Prompts user to remove selected item, checking first if the item is
-        a system item (and so cannot be deleted).  On confirmation, the item
-        is removed and the item above is selected or as appropriate.
+        Functionality common to both 'fortune' and 'on this day' which prompts
+        a user to remove the selected fortune/calendar, checking if the
+        fortune/calendar is part of the system (and so cannot be deleted).
+
+        On confirmation, the fortune/calendar is removed and the
+        fortune/calendar above is selected or as appropriate.
         '''
 
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        selected_fortune_or_event = (
+        selected_fortune_or_calendar = (
             model_sort[
-                treeiter_sort ][ model_column_id_for_fortune_or_event ] )
+                treeiter_sort ][ model_column_id_for_fortune_or_calendar ] )
 
-        if selected_fortune_or_event in system_fortunes_or_events:
+        if selected_fortune_or_calendar in system_fortunes_or_calendars:
             self.show_dialog_ok(
-                treeview, message_system_fortune_or_event_exists )
+                treeview, message_system_fortune_or_calendar_exists )
 
         else:
             response = (
                 self.show_dialog_ok_cancel(
-                    treeview, message_remove_fortune_or_event ) )
+                    treeview, message_remove_fortune_or_calendar ) )
 
             if response == Gtk.ResponseType.OK:
                 if len( model_sort ) == 1:
@@ -2149,91 +2273,111 @@ class IndicatorBase( ABC ):
                         model_sort.convert_iter_to_child_iter( treeiter_sort ) )
 
 
-    def _on_fortune_or_event_add(
+    def _on_fortune_or_calendar_add(
         self,
         button,
         treeview,
         preferences_dialog,
         button_remove,
         file_chooser_title,
-        model_column_id_for_fortune_or_event,
-        message_fortune_or_event_exists,
+        model_column_id_for_fortune_or_calendar,
+        message_fortune_or_calendar_exists,
         file_filter = None ):
         '''
-        TODO Add documention.
+        Functionality common to both 'fortune' and 'on this day' which prompts
+        a user to add a fortune/calendar, preventing duplicates.
+
+        On success, the fortune/calendar is added and selected.
         '''
 
-        self._on_fortune_or_event_double_click_internal(
+        print( 2 )
+        print( file_filter.get_name())#TODO Testing
+
+        self._on_fortune_or_calendar_double_click_internal(
             treeview,
             None,
             preferences_dialog,
             file_chooser_title,
-            model_column_id_for_fortune_or_event,
-            message_fortune_or_event_exists,
+            model_column_id_for_fortune_or_calendar,
+            message_fortune_or_calendar_exists,
             file_filter )
 
         button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
 
 
-    def _on_fortune_or_event_double_click(
+    def _on_fortune_or_calendar_double_click(
         self,
         treeview,
         path,
         treeviewcolumn,
         preferences_dialog,
         file_chooser_title,
-        model_column_id_for_fortune_or_event,
-        message_fortune_or_event_exists,
-        message_fortune_or_event_cannot_be_modified,
+        model_column_id_for_fortune_or_calendar,
+        system_fortunes_or_calendars,
+        message_fortune_or_calendar_exists,
+        message_fortune_or_calendar_cannot_be_modified,
         file_filter = None ):
         '''
-        TODO Add documention.
+        Functionality common to both 'fortune' and 'on this day' which prompts
+        a user to edit the selected fortune/calendar, checking if the
+        fortune/calendar is part of the system (and so cannot be modified).
+
+        On confirmation, the fortune/calendar is modified and selected.
         '''
 
-        model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        fortune_or_event = (
-            model_sort[
-                treeiter_sort ][ model_column_id_for_fortune_or_event ] )
+        print( 3 )
+        print( file_filter.get_name())#TODO Testing
 
-        if fortune_or_event in self.get_system_fortunes():
+        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        fortune_or_calendar = (
+            model_sort[
+                treeiter_sort ][ model_column_id_for_fortune_or_calendar ] )
+
+        if fortune_or_calendar in system_fortunes_or_calendars:
             self.show_dialog_ok(
                 preferences_dialog,
-                message_fortune_or_event_cannot_be_modified )
+                message_fortune_or_calendar_cannot_be_modified )
 
         else:
-            self._on_fortune_or_event_double_click_internal(
+            self._on_fortune_or_calendar_double_click_internal(
             treeview,
             path,
             preferences_dialog,
             file_chooser_title,
-            model_column_id_for_fortune_or_event,
-            message_fortune_or_event_exists,
+            model_column_id_for_fortune_or_calendar,
+            message_fortune_or_calendar_exists,
             file_filter )
 
 
-    def _on_fortune_or_event_double_click_internal(
+    def _on_fortune_or_calendar_double_click_internal(
         self,
         treeview,
         path,
         preferences_dialog,
         file_chooser_title,
-        model_column_id_for_fortune_or_event,
-        message_fortune_or_event_exists,
+        model_column_id_for_fortune_or_calendar,
+        message_fortune_or_calendar_exists,
         file_filter = None ):
         '''
-        TODO Add documention.
+        Functionality common to both 'fortune' and 'on this day' to handle
+        both the add and edit of a fortune/calendar.
+        
+        Not to be called directly.
         '''
 
+        print( 4 )
+        print( file_filter.get_name())#TODO Testing
+
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        adding_fortune_or_event = path is None
+        adding_fortune_or_calendar = path is None
 
         dialog = (
             self.create_filechooser_dialog(
                 file_chooser_title,
                 preferences_dialog,
                 str( Path.home() )
-                if adding_fortune_or_event else
-                model_sort[ path ][ model_column_id_for_fortune_or_event ],
+                if adding_fortune_or_calendar else
+                model_sort[ path ][ model_column_id_for_fortune_or_calendar ],
                 file_filter = file_filter ) )
 
         response = dialog.run()
@@ -2241,19 +2385,19 @@ class IndicatorBase( ABC ):
         dialog.destroy()
 
         if response == Gtk.ResponseType.OK:
-            fortune_or_event_exists = False
+            fortune_or_calendar_exists = False
             for row in model_sort:
-                fortune_or_event = row[ model_column_id_for_fortune_or_event ]
-                if fortune_or_event == filename:
+                fortune_or_calendar = row[ model_column_id_for_fortune_or_calendar ]
+                if fortune_or_calendar == filename:
                     self.show_dialog_ok(
                         preferences_dialog,
-                        message_fortune_or_event_exists )
+                        message_fortune_or_calendar_exists )
 
-                    fortune_or_event_exists = True
+                    fortune_or_calendar_exists = True
                     break
 
-            if not fortune_or_event_exists:
-                if not adding_fortune_or_event:
+            if not fortune_or_calendar_exists:
+                if not adding_fortune_or_calendar:
                     model_sort.get_model().remove(
                         model_sort.convert_iter_to_child_iter( treeiter_sort ) )
 
@@ -2261,8 +2405,10 @@ class IndicatorBase( ABC ):
 
                 treepath = 0
                 for row in model_sort.get_model():
-                    fortune_or_event = row[ model_column_id_for_fortune_or_event ]
-                    if fortune_or_event == filename:
+                    fortune_or_calendar = (
+                        row[ model_column_id_for_fortune_or_calendar ] )
+
+                    if fortune_or_calendar == filename:
                         break
 
                     treepath += 1
