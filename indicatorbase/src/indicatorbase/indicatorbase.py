@@ -2108,7 +2108,9 @@ class IndicatorBase( ABC ):
         message_system_fortune_or_event,
         message_remove_fortune_or_event ):
         '''
-        TODO Add comment.
+        Prompts user to remove selected item, checking first if the item is
+        a system item (and so cannot be deleted).  On confirmation, the item
+        is removed and the item above is selected or as appropriate. 
         '''
 
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
