@@ -310,7 +310,13 @@ class IndicatorFortune( IndicatorBase ):
                     _( "Remove the selected fortune location." ) ),
                 (
                     None,
-                    ( self.on_fortune_remove, treeview ) ) ) )
+                    (
+                        self._remove_fortune_or_event,
+                        treeview,
+                        IndicatorFortune.COLUMN_FORTUNE_FILE,
+                        self.get_system_fortunes(),
+                        _( "This is a system fortune and cannot be removed." ),
+                        _( "Remove the selected fortune?" ) ) ) ) )
 
         add.connect(
             "clicked", self.on_fortune_add, treeview, dialog, remove )
@@ -485,49 +491,6 @@ class IndicatorFortune( IndicatorBase ):
                 latest_version_checkbox.get_active() )
 
         return response_type
-
-
-#TODO Can this function be generalised and called by fortune and onthisday?
-    def on_fortune_remove(
-        self,
-        button,
-        treeview ):
-
-        model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        selected_fortune = (
-            model_sort[
-                treeiter_sort ][ IndicatorFortune.COLUMN_FORTUNE_FILE ] )
-
-        if selected_fortune in self.get_system_fortunes():
-            self.show_dialog_ok(
-                treeview,
-                _( "This is a system fortune and cannot be removed." ) )
-        
-        else:
-            response = (
-                self.show_dialog_ok_cancel(
-                    treeview, _( "Remove the selected fortune?" ) ) )
-
-            if response == Gtk.ResponseType.OK:
-                if len( model_sort ) == 1:
-                    model_sort.get_model().remove(
-                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
-
-                    button.set_sensitive( False )
-
-                else:
-                    treepath = (
-                        Gtk.TreePath.new_from_string(
-                            model_sort.get_string_from_iter( treeiter_sort ) ) )
-
-                    if not treepath.prev():
-                        treepath = Gtk.TreePath.new_from_string( '0' )
-
-                    treeview.get_selection().select_path( treepath )
-                    treeview.set_cursor( treepath, None, False )
-
-                    model_sort.get_model().remove(
-                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
 
 
 #TODO Can this function be generalised and called by fortune and onthisday?

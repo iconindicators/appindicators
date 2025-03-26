@@ -2099,6 +2099,53 @@ class IndicatorBase( ABC ):
             f.write( output )
 
 
+    def _remove_fortune_or_event(
+        self,
+        button,
+        treeview,
+        model_column_id_for_fortune_or_event,
+        system_fortunes_or_events,
+        message_system_fortune_or_event,
+        message_remove_fortune_or_event ):
+        '''
+        TODO Add comment.
+        '''
+
+        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        selected_fortune_or_event = (
+            model_sort[
+                treeiter_sort ][ model_column_id_for_fortune_or_event ] )
+
+        if selected_fortune_or_event in system_fortunes_or_events:
+            self.show_dialog_ok( treeview, message_system_fortune_or_event )
+
+        else:
+            response = (
+                self.show_dialog_ok_cancel(
+                    treeview, message_remove_fortune_or_event ) )
+
+            if response == Gtk.ResponseType.OK:
+                if len( model_sort ) == 1:
+                    model_sort.get_model().remove(
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
+
+                    button.set_sensitive( False )
+
+                else:
+                    treepath = (
+                        Gtk.TreePath.new_from_string(
+                            model_sort.get_string_from_iter( treeiter_sort ) ) )
+
+                    if not treepath.prev():
+                        treepath = Gtk.TreePath.new_from_string( '0' )
+
+                    treeview.get_selection().select_path( treepath )
+                    treeview.set_cursor( treepath, None, False )
+
+                    model_sort.get_model().remove(
+                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
+
+
     @staticmethod
     def get_menuitems_guess():
         '''
