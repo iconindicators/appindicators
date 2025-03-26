@@ -2117,7 +2117,9 @@ class IndicatorBase( ABC ):
         message_confirm_removal_fortune_or_calendar,
         file_filter = None ):
         '''
-        TODO DOcument
+        Create a Preferences panel for 'fortune' and 'on this day' to display
+        in a treeview the system and user-defined fortunes/calendars,
+        connecting functions to handle remove, add and edit. 
         '''
 
         grid = self.create_grid()

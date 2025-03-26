@@ -621,28 +621,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         if response == Gtk.ResponseType.OK:
             model, treeiter = treeview.get_selection().get_selected()
-            row = model[ treeiter ]
-            invalid_ppas.append( (
-                row[ IndicatorPPADownloadStatistics.COLUMN_USER ],
-                row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
+            if len( model ) == 1:
+                model.remove( treeiter )
+                button.set_sensitive( False )
 
-#TODO Compare against fortune in terms of selecting row above the deleted,
-# or first row if first row was deleted, or nothing if now empty.
-            treepath = (
-                Gtk.TreePath.new_from_string(
-                    model.get_string_from_iter( treeiter ) ) )
+            else:
+                treepath = (
+                    Gtk.TreePath.new_from_string(
+                        model.get_string_from_iter( treeiter ) ) )
 
-            has_previous = treepath.prev()
-            model.remove( treeiter )
-            if has_previous:
+                if not treepath.prev():
+                    treepath = Gtk.TreePath.new_from_string( '0' )
+
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
 
-            else:
-                button.set_sensitive( False )
+                model.get_model().remove( treeiter )
 
 
-#TODO Compare against fortune.
     def on_ppa_add(
         self,
         button_add,
@@ -651,8 +647,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         invalid_ppas ):
 
         self.on_ppa_double_click( treeview, None, None, invalid_ppas )
-        if len( treeview.get_model() ) > 0:
-            button_remove.set_sensitive( True )
+        button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
 
 
 #TODO Compare against fortune...need another function to wrap around this function?
