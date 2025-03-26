@@ -2120,9 +2120,6 @@ class IndicatorBase( ABC ):
         TODO DOcument
         '''
 
-        print( 1 )
-        print( file_filter.get_name())#TODO Testing
-
         grid = self.create_grid()
 
         store = Gtk.ListStore( str, bool ) # Path to fortune/calendar; enabled or not.
@@ -2290,9 +2287,6 @@ class IndicatorBase( ABC ):
         On success, the fortune/calendar is added and selected.
         '''
 
-        print( 2 )
-        print( file_filter.get_name())#TODO Testing
-
         self._on_fortune_or_calendar_double_click_internal(
             treeview,
             None,
@@ -2324,9 +2318,6 @@ class IndicatorBase( ABC ):
 
         On confirmation, the fortune/calendar is modified and selected.
         '''
-
-        print( 3 )
-        print( file_filter.get_name())#TODO Testing
 
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
         fortune_or_calendar = (
@@ -2364,9 +2355,6 @@ class IndicatorBase( ABC ):
         
         Not to be called directly.
         '''
-
-        print( 4 )
-        print( file_filter.get_name())#TODO Testing
 
         model_sort, treeiter_sort = treeview.get_selection().get_selected()
         adding_fortune_or_calendar = path is None

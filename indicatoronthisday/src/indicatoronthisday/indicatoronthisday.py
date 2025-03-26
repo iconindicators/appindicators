@@ -310,101 +310,23 @@ class IndicatorOnThisDay( IndicatorBase ):
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
         # Calendars.
-#TODO Can this section be generalised for fortune/onthisday?
-        file_chooser_title = _( "Choose a calendar file" )
-        calendar_exists = _( "This calendar already exists!" )
-
-        grid = self.create_grid()
-
-        store = Gtk.ListStore( str, bool ) # Path to calendar; enabled or not.
-        for location, enabled in self.calendars:
-            store.append( [ location, enabled ] )
-
-        # Ensure the system calendars are present in the list of calendars,
-        # not just those selected/defined by the user.
-        for system_calendar in self.get_system_calendars():
-            system_calendar_in_user_calendars = (
-                [ system_calendar, True ] in self.calendars
-                or
-                [ system_calendar, False ] in self.calendars )
-
-            if not system_calendar_in_user_calendars:
-                store.append( [ system_calendar, False ] )
-
-        store = Gtk.TreeModelSort.new_with_model( store )
-        store.set_sort_column_id(
-            IndicatorOnThisDay.COLUMN_CALENDAR_FILE, Gtk.SortType.ASCENDING )
-
-        treeview, scrolledwindow = (
-            self.create_treeview_within_scrolledwindow(
-                store,
-                (
-                    _( "Calendar" ),
-                    _( "Enabled" ) ),
-                (
-                    (
-                        Gtk.CellRendererText(),
-                        "text",
-                        IndicatorOnThisDay.COLUMN_CALENDAR_FILE ),
-                    (
-                        self.create_cell_renderer_toggle_for_checkbox_within_treeview(
-                            store,
-                            IndicatorOnThisDay.COLUMN_ENABLED ),
-                        "active",
-                        IndicatorOnThisDay.COLUMN_ENABLED ) ),
-                alignments_columnviewids = (
-                    ( 0.5, IndicatorOnThisDay.COLUMN_ENABLED ), ),
-                tooltip_text = _( "Double click to edit a calendar." ),
-                rowactivatedfunctionandarguments =
-                    (
-                        self._on_fortune_or_event_double_click,
-                        dialog,
-                        file_chooser_title,
-                        IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
-                        calendar_exists,
-                        _( "This is a system calendar and cannot be modified." ),
-                        None ) ) )
-
-        grid.attach( scrolledwindow, 0, 0, 1, 1 )
-
-        box, add, remove = (
-            self.create_buttons_in_box(
-                (
-                    _( "Add" ),
-                    _( "Remove" ) ),
-                (
-                    _( "Add a new calendar." ),
-                    _( "Remove the selected calendar." ) ),
-                (
-                    None,
-                    (
-                        self._on_fortune_or_event_remove,
-                        treeview,
-                        IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
-                        self.get_system_calendars(),
-                        _( "This is a system calendar and cannot be removed." ),
-                        _( "Remove the selected calendar?" ) ) ) ) )
-
-        add.connect(
-            "clicked",
-            self._on_fortune_or_event_add,
-            treeview,
-            dialog,
-            remove,
-            file_chooser_title,
-            IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
-            calendar_exists,
-            None )
-
-        if len( store ):
-            treepath = Gtk.TreePath.new_from_string( '0' )
-            treeview.get_selection().select_path( treepath )
-            treeview.set_cursor( treepath, None, False )
-
-        else:
-            remove.set_sensitive( False )
-
-        grid.attach( box, 0, 1, 1, 1 )
+        grid, store = (
+            self._create_fortune_or_calendar_preferences_panel(
+                dialog,
+                self.calendars,
+                self.get_system_calendars(),
+                IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
+                IndicatorOnThisDay.COLUMN_ENABLED,
+                _( "Calendar" ),
+                _( "Double click to edit a calendar." ),
+                _( "Choose a calendar file" ),
+                _( "This calendar already exists!" ),
+                _( "This is a system calendar and cannot be modified." ),
+                _( "Add a new calendar." ),
+                _( "Remove the selected calendar." ),
+                _( "This is a system calendar and cannot be modified." ),
+                _( "Remove the selected calendar?" ),
+                None ) )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Calendars" ) ) )
 
