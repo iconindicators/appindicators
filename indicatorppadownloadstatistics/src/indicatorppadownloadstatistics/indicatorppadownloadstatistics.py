@@ -535,6 +535,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.sort_by_download = sort_by_download_checkbutton.get_active()
             self.sort_by_download_amount = spinner.get_value_as_int()
 
+#TODO Check logic from here down... 
             ppas_original = self.ppas
             self.ppas = [ ]
             treeiter = store.get_iter_first()
@@ -575,6 +576,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return response_type
 
 
+#TODO Can/should this live in ppa.py?
     def _ppas_are_identical(
         self,
         ppa1,
@@ -586,6 +588,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return users_equal and names_equal and filters_equal
 
 
+#TODO Can/should this live in ppa.py?
     def _ppa_sort(
         self,
         model,
@@ -621,6 +624,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         if response == Gtk.ResponseType.OK:
             model, treeiter = treeview.get_selection().get_selected()
+            row = model[ treeiter ]
+            invalid_ppas.append( (
+                row[ IndicatorPPADownloadStatistics.COLUMN_USER ],
+                row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
+
             if len( model ) == 1:
                 model.remove( treeiter )
                 button.set_sensitive( False )
@@ -650,8 +658,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
 
 
-#TODO Compare against fortune...need another function to wrap around this function?
-    def  on_ppa_double_click(
+    def on_ppa_double_click(
         self,
         treeview,
         row_number,
@@ -788,8 +795,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa_name.grab_focus()
                     continue
 
-
-
+#TODO Check from here down.
                 user_and_name_in_use = (
                     any(
                         row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
@@ -810,40 +816,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                     continue
 
-
-#TODO Original and hopefully replaced correctly by code above!
-#                 message = _( "User and name already in use!" )
-#                 if adding_ppa:
-#                     user_and_name_in_use = (
-#                         any(
-#                             row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
-#                             and
-#                             row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
-#                             for row in model ) )
-#
-#                     if user_and_name_in_use:
-#                         self.show_dialog_ok( dialog, message )
-#                         continue
-#
-#                 else:
-#                     row = model[ treeiter ]
-#                     user_original = row[ IndicatorPPADownloadStatistics.COLUMN_USER ]
-#                     name_original = row[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
-#                     if not( user == user_original and name == name_original ):
-# #TODO Check this ensures we don't allow a duplicate PPA user/name combination through.
-# #TODO See if add/edit check can be combined with an additional check for edit.
-#                         user_and_name_in_use = (
-#                             any(
-#                                 row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
-#                                 and
-#                                 row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
-#                                 for row in model ) )
-#
-#                         if user_and_name_in_use:
-#                             self.show_dialog_ok( dialog, message )
-#                             continue
-
-#TODO Check from here down.
                 # Remove blank lines.
                 filter_text = self.get_textview_text( textview ).split( '\n' )
                 filter_text = [ f for f in filter_text if f ]
@@ -853,7 +825,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 if duplicates_in_filter_text:
                     # Could have removed the duplicates using a set().
-                    # However, assume the user made a mistake...
+                    # However, assume the user made a mistake and allow the
+                    # user to correct...
                     self.show_dialog_ok(
                         dialog,
                         _( "Filter text may not contain duplicates." ) )
@@ -885,11 +858,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 treepath = 0
                 for row in model:
-                    user_ = row[ IndicatorPPADownloadStatistics.COLUMN_USER ]
-                    name_ = row[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
-                    if user == user_ and name == name_:
+                    user_original = row[ IndicatorPPADownloadStatistics.COLUMN_USER ]
+                    name_original = row[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
+                    if user == user_original and name == name_original:
                         break
-                
+
                     treepath += 1
                 
                 treepath = Gtk.TreePath.new_from_string( str( treepath ) )
