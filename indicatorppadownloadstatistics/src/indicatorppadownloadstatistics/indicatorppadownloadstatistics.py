@@ -606,8 +606,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         if response == Gtk.ResponseType.OK:
             model, treeiter = treeview.get_selection().get_selected()
-            row = model[ treeiter ]
-
             if len( model ) == 1:
                 model.remove( treeiter )
                 button.set_sensitive( False )
