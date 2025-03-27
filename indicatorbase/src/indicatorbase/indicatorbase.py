@@ -2123,7 +2123,7 @@ class IndicatorBase( ABC ):
         '''
         Create a Preferences panel for 'fortune' and 'on this day' to display
         in a treeview the system and user-defined fortunes/calendars,
-        connecting functions to handle remove, add and edit. 
+        connecting functions to handle remove, add and edit.
         '''
 
         grid = self.create_grid()
@@ -2358,7 +2358,7 @@ class IndicatorBase( ABC ):
         '''
         Functionality common to both 'fortune' and 'on this day' to handle
         both the add and edit of a fortune/calendar.
-        
+
         Not to be called directly.
         '''
 

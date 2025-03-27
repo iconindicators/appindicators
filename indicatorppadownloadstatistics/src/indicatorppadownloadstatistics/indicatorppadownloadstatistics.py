@@ -392,8 +392,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
-        invalid_ppas = [ ]#TODO Remove?
-
         # PPAs.
         grid = self.create_grid()
 
@@ -428,7 +426,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 default_sort_func = self._ppa_sort,
                 tooltip_text = _( "Double click to edit a PPA." ),
                 rowactivatedfunctionandarguments = (
-                    self.on_ppa_double_click, invalid_ppas ) ) )
+                    self.on_ppa_double_click, ) ) )
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
@@ -442,12 +440,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     _( "Remove the selected PPA." ) ),
                 (
                     None,
-                    ( self.on_ppa_remove, treeview, invalid_ppas ) ) ) )
+                    ( self.on_ppa_remove, treeview ) ) ) )
 
         grid.attach( box, 0, 1, 1, 1 )
 
-        add.connect(
-            "clicked", self.on_ppa_add, treeview, remove, invalid_ppas )
+        add.connect( "clicked", self.on_ppa_add, treeview, remove )
 
         if len( store ):
             treepath = Gtk.TreePath.new_from_string( '0' )
@@ -538,7 +535,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.sort_by_download = sort_by_download_checkbutton.get_active()
             self.sort_by_download_amount = spinner.get_value_as_int()
 
-#TODO Check logic from here down... 
+#TODO Check logic from here down...
             ppas_original = self.ppas
             self.ppas = [ ]
             treeiter = store.get_iter_first()
@@ -556,7 +553,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     row[ IndicatorPPADownloadStatistics.COLUMN_STATUS ] )
 
                 for ppa_original in ppas_original:
-                    if self._ppas_are_identical( ppa, ppa_original ):
+                    if PPA.identical( ppa, ppa_original ):
                         for published_binary in ppa_original.get_published_binaries():
                             ppa.add_published_binary( published_binary )
 
@@ -564,45 +561,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 self.ppas.append( ppa )
                 treeiter = store.iter_next( treeiter )
-
-
-
-
-
-            ppas_original = self.ppas
-            self.ppas = [ ]
-            treeiter = store.get_iter_first()
-            while treeiter is not None:
-                ppa = store[ treeiter ]
-                self.ppas.append(
-                    PPA(
-                        ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ],
-                        ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
-
-                filter_text = (
-                    ppa[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] )
-                
-                self.ppas[ -1 ].set_filters( filter_text.split( '\n' ) )
-
-                treeiter = store.iter_next( treeiter )
-
-
-#TODO Under what conditions does a PPA need to be downloaded?
-# On removal, NO.
-# On addition, YES.
-# On edit of user/name/filter, YES.
-            for ppa in self.ppas:
-                if ( ppa.get_user(), ppa.get_name() ) not in invalid_ppas:
-                    for ppa_original in ppas_original:
-                        if self._ppas_are_identical( ppa, ppa_original ):
-                            if not ppa_original.has_status_error():
-                                # No download required, but need to copy across
-                                # the status and published binaries.
-                                ppa.set_status( ppa_original.get_status() )
-                                for published_binary in ppa_original.get_published_binaries():
-                                    ppa.add_published_binary( published_binary )
-
-                            break
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),
@@ -614,19 +572,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         return response_type
 
 
-#TODO Can/should this live in ppa.py?
-    def _ppas_are_identical(
-        self,
-        ppa1,
-        ppa2 ):
-
-        users_equal = ppa1.get_user() == ppa2.get_user()
-        names_equal = ppa1.get_name() == ppa2.get_name()
-        filters_equal = ppa1.get_filters() == ppa2.get_filters()
-        return users_equal and names_equal and filters_equal
-
-
-#TODO Can/should this live in ppa.py?
     def _ppa_sort(
         self,
         model,
@@ -635,7 +580,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         user_data ):
 
         return (
-            PPA.compare(
+            PPA.compare_by_user_and_name(
                 model.get_value(
                     row1,
                     IndicatorPPADownloadStatistics.COLUMN_USER ),
@@ -653,8 +598,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def on_ppa_remove(
         self,
         button,
-        treeview,
-        invalid_ppas ):  #TODO Not sure if this is needed...see what happens at end of Preferences on OK.
+        treeview ):
 
         response = (
             self.show_dialog_ok_cancel(
@@ -663,9 +607,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if response == Gtk.ResponseType.OK:
             model, treeiter = treeview.get_selection().get_selected()
             row = model[ treeiter ]
-            # invalid_ppas.append( (
-            #     row[ IndicatorPPADownloadStatistics.COLUMN_USER ],
-            #     row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )#TODO Remove?
 
             if len( model ) == 1:
                 model.remove( treeiter )
@@ -689,10 +630,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self,
         button_add,
         treeview,
-        button_remove,
-        invalid_ppas ): #TODO Remove?
+        button_remove ):
 
-        self.on_ppa_double_click( treeview, None, None, invalid_ppas )
+        self.on_ppa_double_click( treeview, None, None )
         button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
 
 
@@ -700,8 +640,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self,
         treeview,
         row_number,
-        treeviewcolumn,
-        invalid_ppas ): #TODO Remove?
+        treeviewcolumn ):
 
         model, treeiter = treeview.get_selection().get_selected()
         first_ppa = len( model ) == 0
@@ -884,10 +823,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                     continue
 
-                # invalid_ppas.append( (
-                #     model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ],
-                #     model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )#TODO Remove?
-
                 if not adding_ppa:
                     model.remove( treeiter )
 
@@ -896,7 +831,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     name,
                     '\n'.join( filter_text ),
                     PPA.Status.NEEDS_DOWNLOAD ] )
-                # invalid_ppas.append( ( user, name ) )#TODO Remove?
 
                 treepath = 0
                 for row in model:
@@ -906,7 +840,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         break
 
                     treepath += 1
-                
+
                 treepath = Gtk.TreePath.new_from_string( str( treepath ) )
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )

@@ -378,7 +378,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         self,
         dialog ):
 
-        copy_of_scripts = copy.deepcopy( self.scripts )
+        copy_of_scripts = copy.deepcopy( self.scripts )  #TODO Is this needed if the treestore is used?
 
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
@@ -407,12 +407,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "The terminal script/command, along with any arguments." ),
                 editable = False ) )
 
-        # Add the group name to the first column always as this allows any row
-        # to be interrogated and obtain the group.
-        # Remaining columns are part of a group's row containing the group name,
-        # or a script's row containing the script's attributes.
+        # Rows pertain to a group (showing only the group name) or a script
+        # (showing the script name and the script's attributes).
+        #
+        # Each row additinoally contains the group name in the first column,
+        # allowing the group to be determined for a row containing a script.
         treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
-
         scripts_by_group = self.get_scripts_by_group( copy_of_scripts )
         for group in scripts_by_group.keys():
             row = [ group, group, None, None, None, None, None, None, None ]
@@ -965,7 +965,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         textview,
         scripts ):
 
-        group, name = self._get_selected_group_name( treeview )
+        group, name = self._get_selected_script( treeview )
         command_text = ""
         if group and name:
             command_text = self.get_script( scripts, group, name ).get_command()
@@ -980,133 +980,195 @@ class IndicatorScriptRunner( IndicatorBase ):
         treeviewcolumn,
         textentry ):
 
-        group, name = self._get_selected_group_name( treeview )
+        group, name = self._get_selected_script( treeview )
         if group and name:
             textentry.insert_text(
-                "[" +self._create_key( group, name ) + "]",
+                '[' + self._create_key( group, name ) + ']',
                 textentry.get_position() )
+
+
+    def script_exists(
+        self,
+        group,
+        name,
+        model ):
+
+        script_exists = False
+        iter_groups = model.get_iter_first()
+        while iter_groups:
+            iter_scripts = model.iter_children( iter_groups )
+            while iter_scripts:
+                group_ = (
+                    model.get_value(
+                        iter_scripts,
+                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
+                name_ = (
+                    model.get_value(
+                        iter_scripts,
+                        IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+
+                script_exists = group == group_ and name == name_
+                if script_exists:
+                    break
+
+                iter_scripts = model.iter_next( iter_scripts )
+
+            if script_exists:
+                break
+
+            iter_groups = model.iter_next( iter_groups )
+
+        return script_exists
+
+
+    def get_script(
+        self,
+        group,
+        name,
+        model ):
+
+        iter_script = None
+        iter_groups = model.get_iter_first()
+        while iter_groups:
+            iter_scripts = model.iter_children( iter_groups )
+            while iter_scripts:
+                group_ = (
+                    model.get_value(
+                        iter_scripts,
+                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
+                name_ = (
+                    model.get_value(
+                        iter_scripts,
+                        IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+
+                script_exists = group == group_ and name == name_
+                if script_exists:
+                    break
+
+                iter_scripts = model.iter_next( iter_scripts )
+
+            if script_exists:
+                break
+
+            iter_groups = model.iter_next( iter_groups )
+
+        return script_exists
 
 
     def on_script_copy(
         self,
         button,
-        scripts,
+        scripts, #TODO Probably of no use being passed in.
         scripts_treeview,
-        background_scripts_treeview,
+        background_scripts_treeview,  #TODO Is this needed?
         add,
         remove ):
 
-        group, name = self._get_selected_group_name( scripts_treeview )
-        if group and name:  #TODO Do I need to check for this?  Try to make copy button enabled only when it should be.
-            grid = self.create_grid()
+        group, name = self._get_selected_script( scripts_treeview )
+        model = scripts_treeview.get_model()
+        grid = self.create_grid()
 
-            script = self.get_script( scripts, group, name )
-            groups = (
-                sorted(
-                    self.get_scripts_by_group( scripts ).keys(),
-                    key = str.lower ) )
+        groups = [
+            row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
+            for row in model ]
 
-            script_group_combo = (
-                self.create_comboboxtext(
-                      groups,
-                      tooltip_text = _(
-                          "The group to which the script belongs.\n\n" +
-                          "Choose an existing group or enter a new one." ),
-                      active = groups.index( script.get_group() ),
-                      editable = True ) )
+        if True:
+            return
 
-            grid.attach(
-                self.create_box(
-                    (
-                        ( Gtk.Label.new( _( "Group" ) ), False ),
-                        ( script_group_combo, True ) ) ),
-                0, 0, 1, 1 )
 
-            script_name_entry = (
-                self.create_entry(
-                    script.get_name(),
-                    tooltip_text = _( "The name of the script." ) ) )
+        script_group_combo = (
+            self.create_comboboxtext(
+                  groups,
+                  tooltip_text = _(
+                      "Choose an existing group or enter a new one." ),
+                  active = groups.index( script.get_group() ),
+                  editable = True ) )
 
-            grid.attach(
-                self.create_box(
-                    (
-                        ( Gtk.Label.new( _( "Name" ) ), False ),
-                        ( script_name_entry, True ) ),
-                    margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
-                0, 1, 1, 1 )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Group" ) ), False ),
+                    ( script_group_combo, True ) ) ),
+            0, 0, 1, 1 )
 
-            dialog = (
-                self.create_dialog(
-                    scripts_treeview,
-                    _( "Copy Script" ),
-                    content_widget = grid ) )
+        script_name_entry = self.create_entry( name )
 
-            while True:
-                dialog.show_all()
-                if dialog.run() == Gtk.ResponseType.OK:
-                    if script_group_combo.get_active_text().strip() == "":
-                        self.show_dialog_ok(
-                            dialog,
-                            _( "The group cannot be empty." ) )
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Name" ) ), False ),
+                    ( script_name_entry, True ) ),
+                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+            0, 1, 1, 1 )
 
-                        script_group_combo.grab_focus()
-                        continue
+        dialog = (
+            self.create_dialog(
+                scripts_treeview,
+                _( "Copy Script" ),
+                content_widget = grid ) )
 
-                    if script_name_entry.get_text().strip() == "":
-                        self.show_dialog_ok(
-                            dialog,
-                            _( "The name cannot be empty." ) )
+        while True:
+            dialog.show_all()
+            if dialog.run() == Gtk.ResponseType.OK:
+                if script_group_combo.get_active_text().strip() == "":
+                    self.show_dialog_ok(
+                        dialog,
+                        _( "The group cannot be empty." ) )
 
-                        script_name_entry.grab_focus()
-                        continue
+                    script_group_combo.grab_focus()
+                    continue
 
-                    script_exists = (
-                        self.get_script(
-                            scripts,
-                            script_group_combo.get_active_text().strip(),
-                            script_name_entry.get_text().strip() ) )
+                if script_name_entry.get_text().strip() == "":
+                    self.show_dialog_ok(
+                        dialog,
+                        _( "The name cannot be empty." ) )
 
-                    if script_exists:
-                        self.show_dialog_ok(
-                            dialog,
-                            _( "A script of the same group and name already exists." ) )
+                    script_name_entry.grab_focus()
+                    continue
 
-                        script_group_combo.grab_focus()
-                        continue
+                if self.script_exists( group, name, model ):
+                    self.show_dialog_ok(
+                        dialog,
+                        _( "A script of the same group and name already exists!" ) )
 
-                    if isinstance( script, Background ):
-                        new_script = Background(
-                            script_group_combo.get_active_text().strip(),
-                            script_name_entry.get_text().strip(),
-                            script.get_command(),
-                            script.get_play_sound(),
-                            script.get_show_notification(),
-                            script.get_interval_in_minutes(),
-                            script.get_force_update() )
+                    script_group_combo.grab_focus()
+                    continue
 
-                    else:
-                        new_script = NonBackground(
-                            script_group_combo.get_active_text().strip(),
-                            script_name_entry.get_text().strip(),
-                            script.get_command(),
-                            script.get_play_sound(),
-                            script.get_show_notification(),
-                            script.get_terminal_open(),
-                            False )
+                if isinstance( script, Background ):
+                    new_script = Background(
+                        script_group_combo.get_active_text().strip(),
+                        script_name_entry.get_text().strip(),
+                        script.get_command(),
+                        script.get_play_sound(),
+                        script.get_show_notification(),
+                        script.get_interval_in_minutes(),
+                        script.get_force_update() )
 
-                    scripts.append( new_script )
+                else:
+                    new_script = NonBackground(
+                        script_group_combo.get_active_text().strip(),
+                        script_name_entry.get_text().strip(),
+                        script.get_command(),
+                        script.get_play_sound(),
+                        script.get_show_notification(),
+                        script.get_terminal_open(),
+                        False )
+
+                scripts.append( new_script )
 
 #TODO Need a new way to add the script in...
-                    # self.populate_treestore_and_select_script(
-                    #     scripts_treeview,
-                    #     background_scripts_treeview,
-                    #     scripts,
-                    #     new_script.get_group(),
-                    #     new_script.get_name() )
+                # self.populate_treestore_and_select_script(
+                #     scripts_treeview,
+                #     background_scripts_treeview,
+                #     scripts,
+                #     new_script.get_group(),
+                #     new_script.get_name() )
 
-                break
+            break
 
-            dialog.destroy()
+        dialog.destroy()
 
 
     def update_indicator_textentry(
@@ -1175,8 +1237,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 model_sort.get_model().remove(
                     model_sort.convert_iter_to_child_iter( treeiter_sort ) )
 
-                
-                #TODO Delete script.  
+
+                #TODO Delete script.
                 #TODO Delete group if was last script.
                 #TODO Select script above if available,
                 # then script below if available,
@@ -1264,7 +1326,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         #
         # else:
 
-        # group, name = self._get_selected_group_name( scripts_treeview )
+        # group, name = self._get_selected_script( scripts_treeview )
         # if group and name:
         #     response = (
         #         self.show_dialog_ok_cancel(
@@ -1370,7 +1432,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             print( "edit")
             return
 
-        group, name = self._get_selected_group_name( scripts_treeview )
+        group, name = self._get_selected_script( scripts_treeview )
         self.on_script_edit(
             self.get_script( scripts, group, name ),
             scripts,
@@ -1379,7 +1441,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
 
-        # group, name = self._get_selected_group_name( scripts_treeview )
+        # group, name = self._get_selected_script( scripts_treeview )
         # if group and name:  #TODO Surely don't need to do this if we're double clicking.
         #     the_script = self.get_script( scripts, group, name )
         #     edited_script = (
@@ -1411,7 +1473,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         scripts ):
 
         script = None
-        group, name = self._get_selected_group_name( scripts_treeview )
+        group, name = self._get_selected_script( scripts_treeview )
         if group and name:
             script = self.get_script( scripts, group, name )
 
@@ -1736,6 +1798,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         return new_script
 
 
+#TODO Who calls this and why/when?
     def get_script(
         self,
         scripts,
@@ -1769,7 +1832,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 script_is_non_background_and_want_non_background
                 or
                 script_is_background_and_want_background )
-            
+
             if want_script:
                 if script.get_group() not in scripts_by_group:
                     scripts_by_group[ script.get_group() ] = [ ]
@@ -1779,16 +1842,18 @@ class IndicatorScriptRunner( IndicatorBase ):
         return scripts_by_group
 
 
-    def _get_selected_group_name(
+    def _get_selected_script(
         self,
         treeview ):
+        '''
+        Returns the group and name of the currently selected script.
+        Must ONLY be called when at least one script is present.
+        '''
 
-        group = None
-        name = None
         model, treeiter = treeview.get_selection().get_selected()
-        if treeiter:
-            group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
-            name = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_NAME ]
+        row = model[ treeiter ]
+        group = row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
+        name = row[ IndicatorScriptRunner.COLUMN_MODEL_NAME ]
 
         return group, name
 

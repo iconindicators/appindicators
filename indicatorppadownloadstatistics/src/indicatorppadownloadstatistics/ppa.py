@@ -19,9 +19,6 @@
 ''' Store a PPA's user, name, filters and published binaries. '''
 
 
-#TODO Check all compare functions here and in the indicator.
-
-
 import locale
 import operator
 
@@ -109,6 +106,7 @@ class PublishedBinary():
         Compare two Published Binaries by download count.
         If the download count is the same, sort by name then by version.
         '''
+
         if published_binary1.get_download_count() < published_binary2.get_download_count():
             sort_value = 1
 
@@ -306,7 +304,7 @@ class PPA():
         When sorting published binaries by name, clip_amount is ignored.
         '''
         ppas_sorted = deepcopy( ppas )
-        ppas_sorted.sort( key = cmp_to_key( PPA._compare ) )
+        ppas_sorted.sort( key = cmp_to_key( PPA.compare_by_ppa ) )
 
         if sort_by_download:
             for ppa in ppas_sorted:
@@ -325,23 +323,25 @@ class PPA():
 
 
     @staticmethod
-    def _compare(
+    def compare_by_ppa(
         ppa1,
         ppa2 ):
         ''' Compare two PPAs by user, then by name. '''
+
         return (
-            PPA.compare(
+            PPA.compare_by_user_and_name(
                 ppa1.get_user(), ppa1.get_name(),
                 ppa2.get_user(), ppa2.get_name() ) )
 
 
     @staticmethod
-    def compare(
+    def compare_by_user_and_name(
         user1,
         name1,
         user2,
         name2 ):
         ''' Compare two PPA users/names, by user, then by name. '''
+
         user1_ = locale.strxfrm( user1 )
         user2_ = locale.strxfrm( user2 )
         if user1_ < user2_:
@@ -363,3 +363,18 @@ class PPA():
                 sort_value = 0
 
         return sort_value
+
+
+    @staticmethod
+    def identical(
+        self,
+        ppa1,
+        ppa2 ):
+        '''
+        Returns true if both PPAs have the user, name and filters.
+        '''
+
+        return (
+            PPA.compare_by_ppa( ppa1, ppa2 ) == 0
+            and
+            ppa1.get_filters() == ppa2.get_filters() )
