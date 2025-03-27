@@ -74,12 +74,13 @@ class IndicatorScriptRunner( IndicatorBase ):
     COLUMN_MODEL_GROUP_HIDDEN = 0 # Never shown; used to obtain group name.
     COLUMN_MODEL_GROUP = 1 # Group name for groups; empty for scripts.
     COLUMN_MODEL_NAME = 2 # Script name.
-    COLUMN_MODEL_SOUND = 3 # Tick symbol or None.
-    COLUMN_MODEL_NOTIFICATION = 4 # Tick symbol or None.
-    COLUMN_MODEL_BACKGROUND = 5 # Tick symbol or None.
-    COLUMN_MODEL_TERMINAL = 6 # Tick symbol or None.
-    COLUMN_MODEL_INTERVAL = 7 # Numeric amount as a string.
-    COLUMN_MODEL_FORCE_UPDATE = 8 # Tick symbol or None.
+    COLUMN_MODEL_COMMAND_HIDDEN = 3 # Never shown; used to obtain command.
+    COLUMN_MODEL_SOUND = 4 # Tick symbol or None.
+    COLUMN_MODEL_NOTIFICATION = 5 # Tick symbol or None.
+    COLUMN_MODEL_BACKGROUND = 6 # Tick symbol or None.
+    COLUMN_MODEL_TERMINAL = 7 # Tick symbol or None.
+    COLUMN_MODEL_INTERVAL = 8 # Numeric amount as a string.
+    COLUMN_MODEL_FORCE_UPDATE = 9 # Tick symbol or None.
 
     COLUMN_VIEW_SCRIPTS_ALL_GROUP = 0 # Group name or None.
     COLUMN_VIEW_SCRIPTS_ALL_NAME = 1 # Script name.
@@ -410,18 +411,19 @@ class IndicatorScriptRunner( IndicatorBase ):
         # Rows pertain to a group (showing only the group name) or a script
         # (showing the script name and the script's attributes).
         #
-        # Each row additinoally contains the group name in the first column,
+        # Each row additionally contains the group name in the first column,
         # allowing the group to be determined for a row containing a script.
-        treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str )
+        treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str )
         scripts_by_group = self.get_scripts_by_group( copy_of_scripts )
         for group in scripts_by_group.keys():
-            row = [ group, group, None, None, None, None, None, None, None ]
+            row = [ group, group, None, None, None, None, None, None, None, None ]
             parent = treestore.append( None, row )
             for script in scripts_by_group[ group ]:
                 row = [
                     group,
                     None,
                     script.get_name(),
+                    script.get_command(),
                     IndicatorBase.TICK_SYMBOL if script.get_play_sound()
                     else None,
                     IndicatorBase.TICK_SYMBOL if script.get_show_notification()
@@ -632,14 +634,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             copy_,
             remove )
 
-        copy_.connect(
-            "clicked",
-            self.on_script_copy,
-            copy_of_scripts,
-            scripts_treeview,
-            background_scripts_treeview,
-            add,
-            remove )
+        copy_.connect( "clicked", self.on_script_copy, scripts_treeview )
 
         remove.connect(
             "clicked",
@@ -771,7 +766,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
-            self.scripts = copy_of_scripts
+            self.scripts = copy_of_scripts #TODO Will need to create all scripts from the treestore.
             self.send_command_to_log = send_command_to_log_checkbutton.get_active()
             self.show_scripts_in_submenus = radio_show_scripts_submenu.get_active()
             self.hide_groups = hide_groups_checkbutton.get_active()
@@ -1022,13 +1017,13 @@ class IndicatorScriptRunner( IndicatorBase ):
         return script_exists
 
 
-    def get_script(
+    def get_iter_to_script(
         self,
         group,
         name,
         model ):
 
-        iter_script = None
+        iter_to_script = None
         iter_groups = model.get_iter_first()
         while iter_groups:
             iter_scripts = model.iter_children( iter_groups )
@@ -1043,48 +1038,76 @@ class IndicatorScriptRunner( IndicatorBase ):
                         iter_scripts,
                         IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
-                script_exists = group == group_ and name == name_
-                if script_exists:
+                if group == group_ and name == name_:
+                    iter_to_script = iter_scripts
                     break
 
                 iter_scripts = model.iter_next( iter_scripts )
 
-            if script_exists:
+            if iter_to_script:
                 break
 
             iter_groups = model.iter_next( iter_groups )
 
-        return script_exists
+        return iter_to_script
+
+
+    def get_iter_to_selected_group(
+        self,
+        group,
+        model ):
+
+        iter_to_group = None
+        iter_groups = model.get_iter_first()
+        while iter_groups:
+            group_ = model.get_value( iter_groups )
+            if group == group_:
+                iter_to_group = iter_groups
+                break
+
+            if iter_to_group:
+                break
+
+            iter_groups = model.iter_next( iter_groups )
+
+        return iter_to_group
 
 
     def on_script_copy(
         self,
         button,
-        scripts, #TODO Probably of no use being passed in.
-        scripts_treeview,
-        background_scripts_treeview,  #TODO Is this needed?
-        add,
-        remove ):
+        scripts_treeview ):
 
         group, name = self._get_selected_script( scripts_treeview )
         model = scripts_treeview.get_model()
-        grid = self.create_grid()
-
         groups = [
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
             for row in model ]
 
-        if True:
-            return
+        iter_to_script = self.get_iter_to_script( group, name, model ) #TODO Needed?
 
+#TODO Needed?        
+        # print( model.get_value( iter_to_script, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+        # print( model.get_value( iter_to_script, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+        # print( model.get_value( iter_to_script, IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+        # is_background = (
+        #     model.get_value( iter_to_script, IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND )
+        #     ==
+        #     IndicatorBase.TICK_SYMBOL )
+        # print( is_background )
+
+        if True:
+            return #TODO Testing
 
         script_group_combo = (
             self.create_comboboxtext(
                   groups,
                   tooltip_text = _(
                       "Choose an existing group or enter a new one." ),
-                  active = groups.index( script.get_group() ),
+                  active = groups.index( group ),
                   editable = True ) )
+
+        grid = self.create_grid()
 
         grid.attach(
             self.create_box(
@@ -1112,7 +1135,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
-                if script_group_combo.get_active_text().strip() == "":
+                group_ = script_group_combo.get_active_text().strip()
+                if group_ == "":
                     self.show_dialog_ok(
                         dialog,
                         _( "The group cannot be empty." ) )
@@ -1120,7 +1144,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                     script_group_combo.grab_focus()
                     continue
 
-                if script_name_entry.get_text().strip() == "":
+                name_ = script_name_entry.get_text().strip()
+                if name_ == "":
                     self.show_dialog_ok(
                         dialog,
                         _( "The name cannot be empty." ) )
@@ -1136,37 +1161,44 @@ class IndicatorScriptRunner( IndicatorBase ):
                     script_group_combo.grab_focus()
                     continue
 
-                if isinstance( script, Background ):
-                    new_script = Background(
-                        script_group_combo.get_active_text().strip(),
-                        script_name_entry.get_text().strip(),
-                        script.get_command(),
-                        script.get_play_sound(),
-                        script.get_show_notification(),
-                        script.get_interval_in_minutes(),
-                        script.get_force_update() )
+#TODO Check all below, both when a group is the same and when new.
+#TODO This code below may be reused when add/edit and end of Preferences on OK.
+                if group_ not in groups:
+                    row = [ group_, group_, None, None, None, None, None, None, None, None ]
+                    parent = model.append( None, row )
 
                 else:
-                    new_script = NonBackground(
-                        script_group_combo.get_active_text().strip(),
-                        script_name_entry.get_text().strip(),
-                        script.get_command(),
-                        script.get_play_sound(),
-                        script.get_show_notification(),
-                        script.get_terminal_open(),
-                        False )
+                    parent = self.get_iter_to_selected_group( group, model )
 
-                scripts.append( new_script )
+                model.append(
+                    parent,
+                    [
+                        group_,
+                        None,
+                        name_,
+                        model.get_value(
+                            iter_to_script,
+                            IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
+                        model.get_value(
+                            iter_to_script,
+                            IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
+                        model.get_value(
+                            iter_to_script,
+                            IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
+                        model.get_value(
+                            iter_to_script,
+                            IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
+                        model.get_value(
+                            iter_to_script,
+                            IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
+                        model.get_value(
+                            iter_to_script,
+                            IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
+                        model.get_value(
+                            iter_to_script,
+                            IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ] )
 
-#TODO Need a new way to add the script in...
-                # self.populate_treestore_and_select_script(
-                #     scripts_treeview,
-                #     background_scripts_treeview,
-                #     scripts,
-                #     new_script.get_group(),
-                #     new_script.get_name() )
-
-            break
+                break
 
         dialog.destroy()
 
