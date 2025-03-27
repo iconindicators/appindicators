@@ -16,6 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+
+#TODO Look for Enum and see where each is used and instead use IntEnum.
+
+
 '''
 Base class for application indicators.
 
