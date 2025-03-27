@@ -636,7 +636,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
 
-                model.get_model().remove( treeiter )
+                model.remove( treeiter )
 
 
     def on_ppa_add(
@@ -651,7 +651,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
 #TODO Compare against fortune...need another function to wrap around this function?
-    def on_ppa_double_click(
+    def  on_ppa_double_click(
         self,
         treeview,
         row_number,
@@ -673,23 +673,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         else:
             ppa_users = [
-                row[ IndicatorPPADownloadStatistics.COLUMN_USER ]
-                for row in model ]
+                row[ IndicatorPPADownloadStatistics.COLUMN_USER ] for row in model ]
 
             ppa_users = list( set( ppa_users ) )
             ppa_users.sort( key = locale.strxfrm )
             if adding_ppa:
                 ppa_users.insert( 0, "" )
+                active = 0
+
+            else:
+                active = (
+                    ppa_users.index(
+                        model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] ) )
 
             ppa_user = (
                 self.create_comboboxtext(
                     ppa_users,
-                    active =
-                        0
-                        if adding_ppa else
-                        ppa_users.index(
-                            model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] ),
-                        editable = True ) )
+                    active = active,
+                    editable = True ) )
 
         grid.attach( ppa_user, 1, 0, 1, 1 )
 
@@ -701,21 +702,25 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             ppa_name = self.create_entry( "" )
 
         else:
-            ppa_names = [ row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] for row in model ]
+            ppa_names = [
+                row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] for row in model ]
+
             ppa_names = list( set( ppa_names ) )
             ppa_names.sort( key = locale.strxfrm )
             if adding_ppa:
                 ppa_names.insert( 0, "" )
+                active = 0
+
+            else:
+                active = (
+                    ppa_names.index(
+                        model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
 
             ppa_name = (
                 self.create_comboboxtext(
                     ppa_names,
-                    active =
-                        0
-                        if adding_ppa else
-                        ppa_names.index(
-                            model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ),
-                        editable = True ) )
+                    active = active,
+                    editable = True ) )
 
         grid.attach( ppa_name, 1, 1, 1, 1 )
 
@@ -724,14 +729,16 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         label.set_valign( Gtk.Align.START )
         grid.attach( label, 0, 2, 1, 1 )
 
+        if adding_ppa:
+            text = ""
+
+        else:
+            text = (
+                model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] )
+
         textview = (
             self.create_textview(
-                text =
-                    ""
-                    if adding_ppa else
-                    model[
-                        treeiter ][
-                            IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ],
+                text = text,
                 tooltip_text = _(
                     "Each line of plain text is compared\n" +
                     "against the name of each built package,\n" +
@@ -771,22 +778,17 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     user = ppa_user.get_active_text().strip()
                     name = ppa_name.get_active_text().strip()
 
-                if user == "":
-                    self.show_dialog_ok(
-                        dialog,
-                        _( "User cannot be empty." )  )
-
+                if len( user ) == 0:
+                    self.show_dialog_ok( dialog, _( "User cannot be empty." ) )
                     ppa_user.grab_focus()
                     continue
 
-                if name == "":
-                    self.show_dialog_ok(
-                        dialog,
-                        _( "Name cannot be empty." ) )
-
+                if len( name ) == 0:
+                    self.show_dialog_ok( dialog, _( "Name cannot be empty." ) )
                     ppa_name.grab_focus()
                     continue
 
+                message = _( "User and name already in use!" )
                 if adding_ppa:
                     user_and_name_in_use = (
                         any(
@@ -796,46 +798,28 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                             for row in model ) )
 
                     if user_and_name_in_use:
-                        self.show_dialog_ok(
-                            dialog,
-                            _( "User and name already in use!" ) )
-
+                        self.show_dialog_ok( dialog, message )
                         continue
 
                 else:
-#TODO Shorten
-                    user_is_unchanged = (
-                        model[
-                            treeiter ][
-                                IndicatorPPADownloadStatistics.COLUMN_USER ]
-                        == user )
+                    row = model[ treeiter ]
+                    user_original = row[ IndicatorPPADownloadStatistics.COLUMN_USER ]
+                    name_original = row[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
+                    if not( user == user_original and name == name_original ):
+#TODO Check this ensures we don't allow a duplicate PPA user/name combination through.
+#TODO See if add/edit check can be combined with an additional check for edit.
+                        user_and_name_in_use = (
+                            any(
+                                row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
+                                and
+                                row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
+                                for row in model ) )
 
-                    name_is_unchanged = (
-                        model[
-                            treeiter ][
-                                IndicatorPPADownloadStatistics.COLUMN_NAME ]
-                        == name )
-
-                    if not( user_is_unchanged and name_is_unchanged ):
-                        user_exists = False
-                        name_exists = False
-                        for row in model:
-                            user_exists = (
-                                row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user )
-
-                            name_exists = (
-                                row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name )
-
-                            if user_exists and name_exists:
-                                break
-
-                        if user_exists and name_exists:
-                            self.show_dialog_ok(
-                                dialog,
-                                _( "User and name already in use!" ) )
-
+                        if user_and_name_in_use:
+                            self.show_dialog_ok( dialog, message )
                             continue
 
+#TODO Check from here down.
                 # Remove blank lines.
                 filter_text = self.get_textview_text( textview ).split( '\n' )
                 filter_text = [ f for f in filter_text if f ]
