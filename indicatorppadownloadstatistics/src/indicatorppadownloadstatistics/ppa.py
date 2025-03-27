@@ -371,7 +371,8 @@ class PPA():
         ppa1,
         ppa2 ):
         '''
-        Returns true if both PPAs have the user, name and filters.
+        Returns True if both PPAs have the user, name and filters,
+        otherwise returns False.
         '''
 
         return (
