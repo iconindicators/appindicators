@@ -553,6 +553,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 treeiter = store.iter_next( treeiter )
 
+
+#TODO Under what conditions does a PPA need to be downloaded?
+# On removal, NO.
+# On addition, YES.
+# On edit of user/name/filter, YES.
             for ppa in self.ppas:
                 if ( ppa.get_user(), ppa.get_name() ) not in invalid_ppas:
                     for ppa_original in ppas_original:
@@ -616,7 +621,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self,
         button,
         treeview,
-        invalid_ppas ):
+        invalid_ppas ):  #TODO Not sure if this is needed...see what happens at end of Preferences on OK.
 
         response = (
             self.show_dialog_ok_cancel(
