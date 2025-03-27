@@ -788,36 +788,60 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa_name.grab_focus()
                     continue
 
-                message = _( "User and name already in use!" )
-                if adding_ppa:
-                    user_and_name_in_use = (
-                        any(
-                            row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
-                            and
-                            row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
-                            for row in model ) )
 
-                    if user_and_name_in_use:
-                        self.show_dialog_ok( dialog, message )
-                        continue
 
-                else:
+                user_and_name_in_use = (
+                    any(
+                        row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
+                        and
+                        row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
+                        for row in model ) )
+
+                if not adding_ppa:
                     row = model[ treeiter ]
                     user_original = row[ IndicatorPPADownloadStatistics.COLUMN_USER ]
                     name_original = row[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
-                    if not( user == user_original and name == name_original ):
-#TODO Check this ensures we don't allow a duplicate PPA user/name combination through.
-#TODO See if add/edit check can be combined with an additional check for edit.
-                        user_and_name_in_use = (
-                            any(
-                                row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
-                                and
-                                row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
-                                for row in model ) )
+                    if user == user_original and name == name_original:
+                        user_and_name_in_use = False
 
-                        if user_and_name_in_use:
-                            self.show_dialog_ok( dialog, message )
-                            continue
+                if user_and_name_in_use:
+                    self.show_dialog_ok(
+                        dialog, _( "User and name already in use!" ) )
+
+                    continue
+
+
+#TODO Original and hopefully replaced correctly by code above!
+#                 message = _( "User and name already in use!" )
+#                 if adding_ppa:
+#                     user_and_name_in_use = (
+#                         any(
+#                             row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
+#                             and
+#                             row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
+#                             for row in model ) )
+#
+#                     if user_and_name_in_use:
+#                         self.show_dialog_ok( dialog, message )
+#                         continue
+#
+#                 else:
+#                     row = model[ treeiter ]
+#                     user_original = row[ IndicatorPPADownloadStatistics.COLUMN_USER ]
+#                     name_original = row[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
+#                     if not( user == user_original and name == name_original ):
+# #TODO Check this ensures we don't allow a duplicate PPA user/name combination through.
+# #TODO See if add/edit check can be combined with an additional check for edit.
+#                         user_and_name_in_use = (
+#                             any(
+#                                 row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
+#                                 and
+#                                 row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] == name
+#                                 for row in model ) )
+#
+#                         if user_and_name_in_use:
+#                             self.show_dialog_ok( dialog, message )
+#                             continue
 
 #TODO Check from here down.
                 # Remove blank lines.
