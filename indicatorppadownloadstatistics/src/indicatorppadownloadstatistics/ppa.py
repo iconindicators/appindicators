@@ -19,11 +19,14 @@
 ''' Store a PPA's user, name, filters and published binaries. '''
 
 
+#TODO Check all compare functions here and in the indicator.
+
+
 import locale
 import operator
 
 from copy import deepcopy
-from enum import Enum
+from enum import IntEnum
 from functools import cmp_to_key
 
 
@@ -135,7 +138,7 @@ class PublishedBinary():
 class PPA():
     ''' Specifies a PPA. '''
 
-    class Status( Enum ):
+    class Status( IntEnum ):
         ''' Download status of a PPA. '''
         NEEDS_DOWNLOAD = 0
         OK = 1
@@ -303,7 +306,7 @@ class PPA():
         When sorting published binaries by name, clip_amount is ignored.
         '''
         ppas_sorted = deepcopy( ppas )
-        ppas_sorted.sort( key = cmp_to_key( PPA.compare ) )
+        ppas_sorted.sort( key = cmp_to_key( PPA._compare ) )
 
         if sort_by_download:
             for ppa in ppas_sorted:
@@ -327,7 +330,7 @@ class PPA():
         ppa2 ):
         ''' Compare two PPAs by user, then by name. '''
         return (
-            PPA.compare_ppas(
+            PPA.compare(
                 ppa1.get_user(), ppa1.get_name(),
                 ppa2.get_user(), ppa2.get_name() ) )
 

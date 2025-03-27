@@ -30,9 +30,10 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from .indicatorbase import IndicatorBase
+#TODO Put dot back in
+from indicatorbase import IndicatorBase
 
-from .ppa import PPA, PublishedBinary
+from ppa import PPA, PublishedBinary
 
 
 class IndicatorPPADownloadStatistics( IndicatorBase ):
@@ -52,6 +53,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     COLUMN_USER = 0
     COLUMN_NAME = 1
     COLUMN_FILTER_TEXT = 2
+    COLUMN_STATUS = 3 # Not used in json config.
 
     MESSAGE_ERROR_NETWORK = _( "(network error - check the log)" )
     MESSAGE_ERROR_OTHER = _( "(unknown error - check the log)" )
@@ -390,17 +392,18 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
-        invalid_ppas = [ ]
+        invalid_ppas = [ ]#TODO Remove?
 
         # PPAs.
         grid = self.create_grid()
 
-        store = Gtk.ListStore( str, str, str ) # User, name, filter.
+        store = Gtk.ListStore( str, str, str, int ) # User, name, filter, status.
         for ppa in self.ppas:
             store.append( [
                 ppa.get_user(),
                 ppa.get_name(),
-                '\n'.join( ppa.get_filters() ) ] )
+                '\n'.join( ppa.get_filters() ),
+                ppa.get_status() ] )
 
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
@@ -540,6 +543,36 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.ppas = [ ]
             treeiter = store.get_iter_first()
             while treeiter is not None:
+                row = store[ treeiter ]
+                ppa = (
+                    PPA(
+                        row[ IndicatorPPADownloadStatistics.COLUMN_USER ],
+                        row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
+
+                ppa.set_filters(
+                    row[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ].split( '\n' ) )
+
+                ppa.set_status(
+                    row[ IndicatorPPADownloadStatistics.COLUMN_STATUS ] )
+
+                for ppa_original in ppas_original:
+                    if self._ppas_are_identical( ppa, ppa_original ):
+                        for published_binary in ppa_original.get_published_binaries():
+                            ppa.add_published_binary( published_binary )
+
+                        break
+
+                self.ppas.append( ppa )
+                treeiter = store.iter_next( treeiter )
+
+
+
+
+
+            ppas_original = self.ppas
+            self.ppas = [ ]
+            treeiter = store.get_iter_first()
+            while treeiter is not None:
                 ppa = store[ treeiter ]
                 self.ppas.append(
                     PPA(
@@ -630,9 +663,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         if response == Gtk.ResponseType.OK:
             model, treeiter = treeview.get_selection().get_selected()
             row = model[ treeiter ]
-            invalid_ppas.append( (
-                row[ IndicatorPPADownloadStatistics.COLUMN_USER ],
-                row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
+            # invalid_ppas.append( (
+            #     row[ IndicatorPPADownloadStatistics.COLUMN_USER ],
+            #     row[ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )#TODO Remove?
 
             if len( model ) == 1:
                 model.remove( treeiter )
@@ -657,7 +690,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         button_add,
         treeview,
         button_remove,
-        invalid_ppas ):
+        invalid_ppas ): #TODO Remove?
 
         self.on_ppa_double_click( treeview, None, None, invalid_ppas )
         button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
@@ -668,7 +701,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         treeview,
         row_number,
         treeviewcolumn,
-        invalid_ppas ):
+        invalid_ppas ): #TODO Remove?
 
         model, treeiter = treeview.get_selection().get_selected()
         first_ppa = len( model ) == 0
@@ -851,15 +884,19 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                     continue
 
-                invalid_ppas.append( (
-                    model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ],
-                    model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
+                # invalid_ppas.append( (
+                #     model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ],
+                #     model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )#TODO Remove?
 
                 if not adding_ppa:
                     model.remove( treeiter )
 
-                model.append( [ user, name, '\n'.join( filter_text ) ] )
-                invalid_ppas.append( ( user, name ) )
+                model.append( [
+                    user,
+                    name,
+                    '\n'.join( filter_text ),
+                    PPA.Status.NEEDS_DOWNLOAD ] )
+                # invalid_ppas.append( ( user, name ) )#TODO Remove?
 
                 treepath = 0
                 for row in model:
