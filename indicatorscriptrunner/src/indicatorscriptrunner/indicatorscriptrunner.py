@@ -954,18 +954,20 @@ class IndicatorScriptRunner( IndicatorBase ):
     #         treeview_background_scripts, background_groups )
 
 
+#TODO Needs to change to obtain command text from store.
     def on_script_selection(
         self,
         treeview,
         textview,
         scripts ):
 
-        group, name = self._get_selected_script( treeview )
-        command_text = ""
-        if group and name:
-            command_text = self.get_script( scripts, group, name ).get_command()
-
-        textview.get_buffer().set_text( command_text )
+        # group, name = self._get_selected_script( treeview )
+        # command_text = ""
+        # if group and name:
+        #     command_text = self.get_script( scripts, group, name ).get_command()
+        #
+        # textview.get_buffer().set_text( command_text )
+        pass
 
 
     def on_background_script_double_click(
@@ -1052,7 +1054,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         return iter_to_script
 
 
-    def get_iter_to_selected_group(
+    def get_iter_to_group(
         self,
         group,
         model ):
@@ -1060,7 +1062,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         iter_to_group = None
         iter_groups = model.get_iter_first()
         while iter_groups:
-            group_ = model.get_value( iter_groups )
+            group_ = (
+                model.get_value(
+                    iter_groups,
+                    IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
             if group == group_:
                 iter_to_group = iter_groups
                 break
@@ -1076,28 +1082,13 @@ class IndicatorScriptRunner( IndicatorBase ):
     def on_script_copy(
         self,
         button,
-        scripts_treeview ):
+        treeview ):
 
-        group, name = self._get_selected_script( scripts_treeview )
-        model = scripts_treeview.get_model()
+        group, name = self._get_selected_script( treeview )
+        model = treeview.get_model()
         groups = [
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
             for row in model ]
-
-        iter_to_script = self.get_iter_to_script( group, name, model ) #TODO Needed?
-
-#TODO Needed?        
-        # print( model.get_value( iter_to_script, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
-        # print( model.get_value( iter_to_script, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
-        # print( model.get_value( iter_to_script, IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
-        # is_background = (
-        #     model.get_value( iter_to_script, IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND )
-        #     ==
-        #     IndicatorBase.TICK_SYMBOL )
-        # print( is_background )
-
-        if True:
-            return #TODO Testing
 
         script_group_combo = (
             self.create_comboboxtext(
@@ -1128,7 +1119,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dialog = (
             self.create_dialog(
-                scripts_treeview,
+                treeview,
                 _( "Copy Script" ),
                 content_widget = grid ) )
 
@@ -1153,7 +1144,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     script_name_entry.grab_focus()
                     continue
 
-                if self.script_exists( group, name, model ):
+                if self.script_exists( group_, name_, model ):
                     self.show_dialog_ok(
                         dialog,
                         _( "A script of the same group and name already exists!" ) )
@@ -1161,15 +1152,14 @@ class IndicatorScriptRunner( IndicatorBase ):
                     script_group_combo.grab_focus()
                     continue
 
-#TODO Check all below, both when a group is the same and when new.
-#TODO This code below may be reused when add/edit and end of Preferences on OK.
                 if group_ not in groups:
                     row = [ group_, group_, None, None, None, None, None, None, None, None ]
                     parent = model.append( None, row )
 
                 else:
-                    parent = self.get_iter_to_selected_group( group, model )
+                    parent = self.get_iter_to_group( group_, model )
 
+                iter_to_original = self.get_iter_to_script( group, name, model )
                 model.append(
                     parent,
                     [
@@ -1177,26 +1167,35 @@ class IndicatorScriptRunner( IndicatorBase ):
                         None,
                         name_,
                         model.get_value(
-                            iter_to_script,
+                            iter_to_original,
                             IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
                         model.get_value(
-                            iter_to_script,
+                            iter_to_original,
                             IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
                         model.get_value(
-                            iter_to_script,
+                            iter_to_original,
                             IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
                         model.get_value(
-                            iter_to_script,
+                            iter_to_original,
                             IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
                         model.get_value(
-                            iter_to_script,
+                            iter_to_original,
                             IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
                         model.get_value(
-                            iter_to_script,
+                            iter_to_original,
                             IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
                         model.get_value(
-                            iter_to_script,
+                            iter_to_original,
                             IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ] )
+
+                treepath = (
+                    Gtk.TreePath.new_from_string(
+                        model.get_string_from_iter(
+                            self.get_iter_to_script( group_, name_, model ) ) ) )
+
+                treeview.expand_to_path( treepath )
+                treeview.get_selection().select_path( treepath )
+                treeview.set_cursor( treepath, None, False )
 
                 break
 
