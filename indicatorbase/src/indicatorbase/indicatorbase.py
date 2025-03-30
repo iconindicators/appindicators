@@ -20,10 +20,6 @@
 #TODO Look for Enum and see where each is used and instead use IntEnum.
 
 
-#TODO Look for deepcopy?  Is this still needed for when in Preferences
-#making a backup of data?
-
-
 '''
 Base class for application indicators.
 
