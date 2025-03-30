@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from _operator import add
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -104,6 +105,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     COLUMN_MODEL_TERMINAL = 7 # Tick symbol or None.
     COLUMN_MODEL_INTERVAL = 8 # Numeric amount as a string.
     COLUMN_MODEL_FORCE_UPDATE = 9 # Tick symbol or None.
+    COLUMN_MODEL_DEFAULT_HIDDEN = 10 # Never shown; indicates if script is default.
 
     COLUMN_VIEW_SCRIPTS_ALL_GROUP = 0 # Group name or None.
     COLUMN_VIEW_SCRIPTS_ALL_NAME = 1 # Script name.
@@ -436,10 +438,10 @@ class IndicatorScriptRunner( IndicatorBase ):
         #
         # Each row additionally contains the group name in the first column,
         # allowing the group to be determined for a row containing a script.
-        treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str )
+        treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str, str )
         scripts_by_group = self.get_scripts_by_group( copy_of_scripts )
         for group in scripts_by_group.keys():
-            row = [ group, group, None, None, None, None, None, None, None, None ]
+            row = [ group, group, None, None, None, None, None, None, None, None, None ]
             parent = treestore.append( None, row )
             for script in scripts_by_group[ group ]:
                 row = [
@@ -466,7 +468,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                         else None
                     )
                     if isinstance( script, Background )
-                    else '—' ]
+                    else '—',
+                    None if isinstance( script, Background )
+                    else script.get_default() ]
 
                 treestore.append( parent, row )
 
@@ -535,7 +539,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         scripts_treeview, scripts_scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 treestore,
-                # Gtk.TreeModelSort.new_with_model( treestore_new ), #TODO Should be this instead of above?  There is a default sort func below...so which should it be?
+                # Gtk.TreeModelSort.new_with_model( treestore_new ), #TODO Should be this instead of above? 
+                #There is a default sort func below...so which should it be?
+                #Check PPA I think it has a sort func but does not use a treemodelsort.
                 (
                     _( "Group" ),
                     _( "Name" ),
@@ -616,9 +622,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                     command_text_view,
                     copy_of_scripts ),
                 rowactivatedfunctionandarguments = (
-                    self.on_script_edit,
-                    background_scripts_treeview,
-                    indicator_text_entry, copy_of_scripts ), ) )
+                    self.on_edit,
+                    indicator_text_entry ), ) )
 
         grid.attach( scripts_scrolledwindow, 0, 0, 1, 20 )
 
@@ -661,10 +666,8 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         remove.connect(
             "clicked",
-            self.on_script_remove,
-            copy_of_scripts,
+            self.on_remove,
             scripts_treeview,
-            background_scripts_treeview,
             indicator_text_entry,
             copy_ )
 
@@ -1001,7 +1004,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         textentry ):
 
         group, name = self._get_selected_script( treeview )
-        if group and name:
+        if group and name:  #TODO Maybe just check for name; group should ALWAYS be present.
             textentry.insert_text(
                 '[' + self._create_key( group, name ) + ']',
                 textentry.get_position() )
@@ -1345,129 +1348,129 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
 #TODO Hopefully can delete.
-    def on_copyORIGINAL(
-        self,
-        button,
-        treeview ):
-
-        group, name = self._get_selected_script( treeview )
-        model = treeview.get_model()
-        groups = [
-            row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
-            for row in model ]
-
-        script_group_combo = (
-            self.create_comboboxtext(
-                  groups,
-                  tooltip_text = _(
-                      "Choose an existing group or enter a new one." ),
-                  active = groups.index( group ),
-                  editable = True ) )
-
-        grid = self.create_grid()
-
-        grid.attach(
-            self.create_box(
-                (
-                    ( Gtk.Label.new( _( "Group" ) ), False ),
-                    ( script_group_combo, True ) ) ),
-            0, 0, 1, 1 )
-
-        script_name_entry = self.create_entry( name )
-
-        grid.attach(
-            self.create_box(
-                (
-                    ( Gtk.Label.new( _( "Name" ) ), False ),
-                    ( script_name_entry, True ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
-            0, 1, 1, 1 )
-
-        dialog = (
-            self.create_dialog(
-                treeview,
-                _( "Copy Script" ),
-                content_widget = grid ) )
-
-        while True:
-            dialog.show_all()
-            if dialog.run() == Gtk.ResponseType.OK:
-                group_ = script_group_combo.get_active_text().strip()
-                if group_ == "":
-                    self.show_dialog_ok(
-                        dialog,
-                        _( "The group cannot be empty." ) )
-
-                    script_group_combo.grab_focus()
-                    continue
-
-                name_ = script_name_entry.get_text().strip()
-                if name_ == "":
-                    self.show_dialog_ok(
-                        dialog,
-                        _( "The name cannot be empty." ) )
-
-                    script_name_entry.grab_focus()
-                    continue
-
-                if self.script_exists( group_, name_, model ):
-                    self.show_dialog_ok(
-                        dialog,
-                        _( "A script of the same group and name already exists!" ) )
-
-                    script_group_combo.grab_focus()
-                    continue
-
-                if group_ not in groups:
-                    row = [ group_, group_, None, None, None, None, None, None, None, None ]
-                    parent = model.append( None, row )
-
-                else:
-                    parent = self.get_iter_to_group( group_, model )
-
-                iter_to_original = self.get_iter_to_script( group, name, model )
-                model.append(
-                    parent,
-                    [
-                        group_,
-                        None,
-                        name_,
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ] )
-
-                treepath = (
-                    Gtk.TreePath.new_from_string(
-                        model.get_string_from_iter(
-                            self.get_iter_to_script( group_, name_, model ) ) ) )
-
-                treeview.expand_to_path( treepath )
-                treeview.get_selection().select_path( treepath )
-                treeview.set_cursor( treepath, None, False )
-#TODO Ensure that one of the lines above selects the script and
-# that in turn shows the command (same command as original script).
-
-                break
-
-        dialog.destroy()
+#     def on_copyORIGINAL(
+#         self,
+#         button,
+#         treeview ):
+#
+#         group, name = self._get_selected_script( treeview )
+#         model = treeview.get_model()
+#         groups = [
+#             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
+#             for row in model ]
+#
+#         script_group_combo = (
+#             self.create_comboboxtext(
+#                   groups,
+#                   tooltip_text = _(
+#                       "Choose an existing group or enter a new one." ),
+#                   active = groups.index( group ),
+#                   editable = True ) )
+#
+#         grid = self.create_grid()
+#
+#         grid.attach(
+#             self.create_box(
+#                 (
+#                     ( Gtk.Label.new( _( "Group" ) ), False ),
+#                     ( script_group_combo, True ) ) ),
+#             0, 0, 1, 1 )
+#
+#         script_name_entry = self.create_entry( name )
+#
+#         grid.attach(
+#             self.create_box(
+#                 (
+#                     ( Gtk.Label.new( _( "Name" ) ), False ),
+#                     ( script_name_entry, True ) ),
+#                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+#             0, 1, 1, 1 )
+#
+#         dialog = (
+#             self.create_dialog(
+#                 treeview,
+#                 _( "Copy Script" ),
+#                 content_widget = grid ) )
+#
+#         while True:
+#             dialog.show_all()
+#             if dialog.run() == Gtk.ResponseType.OK:
+#                 group_ = script_group_combo.get_active_text().strip()
+#                 if group_ == "":
+#                     self.show_dialog_ok(
+#                         dialog,
+#                         _( "The group cannot be empty." ) )
+#
+#                     script_group_combo.grab_focus()
+#                     continue
+#
+#                 name_ = script_name_entry.get_text().strip()
+#                 if name_ == "":
+#                     self.show_dialog_ok(
+#                         dialog,
+#                         _( "The name cannot be empty." ) )
+#
+#                     script_name_entry.grab_focus()
+#                     continue
+#
+#                 if self.script_exists( group_, name_, model ):
+#                     self.show_dialog_ok(
+#                         dialog,
+#                         _( "A script of the same group and name already exists!" ) )
+#
+#                     script_group_combo.grab_focus()
+#                     continue
+#
+#                 if group_ not in groups:
+#                     row = [ group_, group_, None, None, None, None, None, None, None, None ]
+#                     parent = model.append( None, row )
+#
+#                 else:
+#                     parent = self.get_iter_to_group( group_, model )
+#
+#                 iter_to_original = self.get_iter_to_script( group, name, model )
+#                 model.append(
+#                     parent,
+#                     [
+#                         group_,
+#                         None,
+#                         name_,
+#                         model.get_value(
+#                             iter_to_original,
+#                             IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
+#                         model.get_value(
+#                             iter_to_original,
+#                             IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
+#                         model.get_value(
+#                             iter_to_original,
+#                             IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
+#                         model.get_value(
+#                             iter_to_original,
+#                             IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
+#                         model.get_value(
+#                             iter_to_original,
+#                             IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
+#                         model.get_value(
+#                             iter_to_original,
+#                             IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
+#                         model.get_value(
+#                             iter_to_original,
+#                             IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ] )
+#
+#                 treepath = (
+#                     Gtk.TreePath.new_from_string(
+#                         model.get_string_from_iter(
+#                             self.get_iter_to_script( group_, name_, model ) ) ) )
+#
+#                 treeview.expand_to_path( treepath )
+#                 treeview.get_selection().select_path( treepath )
+#                 treeview.set_cursor( treepath, None, False )
+# #TODO Ensure that one of the lines above selects the script and
+# # that in turn shows the command (same command as original script).
+#
+#                 break
+#
+#         dialog.destroy()
 
 
     def update_indicator_textentry(
@@ -1487,21 +1490,20 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
 #TODO Once sorted, remove unused parameters.
-    def on_script_remove(
+#TODO Implement for script and group simultaneously, or instead, have separate functions?
+    def on_remove(
         self,
         button_remove,
-        scripts,
-        scripts_treeview,
-        background_scripts_treeview,
+        treeview,
         textentry,
         button_copy ):
 
-        group, name = self._get_selected_script( scripts_treeview )
-        model_sort = scripts_treeview.get_model()
+        group, name = self._get_selected_script( treeview )
+        model_sort = treeview.get_model()
         if name is None:
             response = (
                 self.show_dialog_ok_cancel(
-                    scripts_treeview,
+                    treeview,
                     _(
                         "Remove the selected group and\n" +
                         "all scripts within the group?" ) ) )
@@ -1516,7 +1518,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         else:
             response = (
                 self.show_dialog_ok_cancel(
-                    scripts_treeview, _( "Remove the selected script?" ) ) )
+                    treeview, _( "Remove the selected script?" ) ) )
 
             if response == Gtk.ResponseType.OK:
                 print( f"Remove { name } from { group }")
@@ -1535,7 +1537,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         if True:
             return
 
-        model_sort, treeiter_sort = scripts_treeview.get_selection().get_selected()
+        model_sort, treeiter_sort = treeview.get_selection().get_selected()
         treepath = (
             Gtk.TreePath.new_from_string(
                 model_sort.get_string_from_iter( treeiter_sort ) ) )
@@ -1545,7 +1547,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         if script is None:
             response = (
                 self.show_dialog_ok_cancel(
-                    scripts_treeview,
+                    treeview,
                     _(
                         "Remove the selected group and\n" +
                         "all scripts within the group?" ) ) )
@@ -1560,7 +1562,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         else:
             response = (
                 self.show_dialog_ok_cancel(
-                    scripts_treeview, _( "Remove the selected script?" ) ) )
+                    treeview, _( "Remove the selected script?" ) ) )
 
             if response == Gtk.ResponseType.OK:
                 print( f"Remove { script } from { group }")
@@ -1589,8 +1591,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         #     print( "has previous" )
 
         treepath.next()
-        scripts_treeview.get_selection().select_path( treepath )
-        model, treeiter = scripts_treeview.get_selection().get_selected()
+        treeview.get_selection().select_path( treepath )
+        model, treeiter = treeview.get_selection().get_selected()
         # print( model[ treeiter ][ 8 ] )
         print( "has next" )
 
@@ -1602,10 +1604,10 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         response = (
             self.show_dialog_ok_cancel(
-                scripts_treeview, _( "Remove the selected script?" ) ) )
+                treeview, _( "Remove the selected script?" ) ) )
 
         if response == Gtk.ResponseType.OK:
-            model, treeiter = scripts_treeview.get_selection().get_selected()
+            model, treeiter = treeview.get_selection().get_selected()
             treepath = (
                 Gtk.TreePath.new_from_string(
                     model.get_string_from_iter( treeiter ) ) )
@@ -1614,8 +1616,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             while True:
                 has_previous = treepath.prev()
                 if has_previous:
-                    scripts_treeview.get_selection().select_path( treepath )
-                    model, treeiter = scripts_treeview.get_selection().get_selected()
+                    treeview.get_selection().select_path( treepath )
+                    model, treeiter = treeview.get_selection().get_selected()
 
                     if model[ treeiter ][ 0 ] is None:
                         print( model[ treeiter ][ 8 ] + "\t" + model[ treeiter ][ 1 ] )
@@ -1632,8 +1634,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             has_previous = treepath.prev()  #TODO I think need to keep looking for a prev until we hit a script (not a group or false).
             model.remove( treeiter )
             if has_previous:
-                scripts_treeview.get_selection().select_path( treepath )
-                scripts_treeview.set_cursor( treepath, None, False )
+                treeview.get_selection().select_path( treepath )
+                treeview.set_cursor( treepath, None, False )
 
 #TODO What to select, if anything, in the background scripts treeview?
 # Maybe don't need to worry...seems focus is on the icon textentry field.
@@ -1692,12 +1694,16 @@ class IndicatorScriptRunner( IndicatorBase ):
         #         _( "No script has been selected for removal." ) )
 
 
-    def on_script_add(
+#TODO Implement    
+# Check for when we click ADD and a group is selected...
+# is this the group we select by default to add in the new script?
+# Or just select the first group?
+#
+# If a script is selected, as above, use that script's group as the default group? 
+    def on_add(
         self,
         button,
-        scripts,
-        scripts_treeview,
-        background_scripts_treeview,
+        treeview,
         button_copy,
         button_remove ):
 
@@ -1708,12 +1714,10 @@ class IndicatorScriptRunner( IndicatorBase ):
         # self._add_edit_script(
         #     None, scripts, scripts_treeview, background_scripts_treeview )
         self.on_script_edit(
-            scripts_treeview,
+            treeview,
             None,
             None,
-            background_scripts_treeview,
-            None,
-            scripts )
+            None )
 
 #TODO Need something like this to enable the remove/copy buttons
         # if len( treeview.get_model() ) > 0:
@@ -1742,57 +1746,57 @@ class IndicatorScriptRunner( IndicatorBase ):
 #             textentry )
 
 
-    def on_script_edit_DELETE(
-        self,
-
-        scripts_treeview,
-        treepath,
-        treeviewcolumn,
-        background_scripts_treeview,
-        textentry,
-        scripts ):
-
-
-#TODO Original signature which hopefully can go.
-        # button,
-        # scripts,
-        # scripts_treeview,
-        # background_scripts_treeview,
-        # textentry ):
-
-        if True:
-            print( "edit")
-            return
-
-        group, name = self._get_selected_script( scripts_treeview )
-        self.on_script_edit(
-            self.get_script( scripts, group, name ),
-            scripts,
-            scripts_treeview,
-            background_scripts_treeview )
-
-
-
-        # group, name = self._get_selected_script( scripts_treeview )
-        # if group and name:  #TODO Surely don't need to do this if we're double clicking.
-        #     the_script = self.get_script( scripts, group, name )
-        #     edited_script = (
-        #         self._add_edit_script(
-        #             the_script,
-        #             scripts, scripts_treeview,
-        #             background_scripts_treeview ) )
-
-#TODO Copy/move this to function below but only when edit
-            # if edited_script:
-            #     if isinstance( the_script, Background ) and isinstance( edited_script, NonBackground ):
-            #         old_tag = self._create_key( group, name )
-            #         self.update_indicator_textentry( textentry, old_tag, "" )
-            #
-            #     if not( group == edited_script.get_group() and name == edited_script.get_name() ):
-            #         old_tag = self._create_key( group, name )
-            #         new_tag = self._create_key( edited_script.get_group(), edited_script.get_name() )
-            #         self.update_indicator_textentry(
-            #             textentry, old_tag, new_tag )
+#     def on_script_edit_DELETE(
+#         self,
+#
+#         scripts_treeview,
+#         treepath,
+#         treeviewcolumn,
+#         background_scripts_treeview,
+#         textentry,
+#         scripts ):
+#
+#
+# #TODO Original signature which hopefully can go.
+#         # button,
+#         # scripts,
+#         # scripts_treeview,
+#         # background_scripts_treeview,
+#         # textentry ):
+#
+#         if True:
+#             print( "edit")
+#             return
+#
+#         group, name = self._get_selected_script( scripts_treeview )
+#         self.on_script_edit(
+#             self.get_script( scripts, group, name ),
+#             scripts,
+#             scripts_treeview,
+#             background_scripts_treeview )
+#
+#
+#
+#         # group, name = self._get_selected_script( scripts_treeview )
+#         # if group and name:  #TODO Surely don't need to do this if we're double clicking.
+#         #     the_script = self.get_script( scripts, group, name )
+#         #     edited_script = (
+#         #         self._add_edit_script(
+#         #             the_script,
+#         #             scripts, scripts_treeview,
+#         #             background_scripts_treeview ) )
+#
+# #TODO Copy/move this to function below but only when edit
+#             # if edited_script:
+#             #     if isinstance( the_script, Background ) and isinstance( edited_script, NonBackground ):
+#             #         old_tag = self._create_key( group, name )
+#             #         self.update_indicator_textentry( textentry, old_tag, "" )
+#             #
+#             #     if not( group == edited_script.get_group() and name == edited_script.get_name() ):
+#             #         old_tag = self._create_key( group, name )
+#             #         new_tag = self._create_key( edited_script.get_group(), edited_script.get_name() )
+#             #         self.update_indicator_textentry(
+#             #             textentry, old_tag, new_tag )
 
 
     def on_edit(
@@ -1800,46 +1804,37 @@ class IndicatorScriptRunner( IndicatorBase ):
         treeview,
         treepath,
         treeviewcolumn,
-        background_scripts_treeview,
-        textentry,
-        scripts ):
+        textentry ):
 
-        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        model, treeiter = treeview.get_selection().get_selected()
         group = (
-            model_sort.get_value(
-                treeiter_sort,
+            model.get_value(
+                treeiter,
                 IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
         name = (
-            model_sort.get_value(
-                treeiter_sort,
+            model.get_value(
+                treeiter,
                 IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
         if name is None:
-            self._on_edit_group( group, treeview )
+            self._on_edit_group( group, treeview, textentry )
 
         else:
-            self._on_edit_script( group, name, treeview )
+            self._on_edit_script( group, name, treeview, textentry )
 
 
     def _on_edit_group(
         self,
+        group,
         treeview,
-        treepath,
-        treeviewcolumn,
-        background_scripts_treeview,
-        textentry,
-        scripts ):
+        textentry ): #TODO Handle textentry
 
-        model_sort, treeiter_sort = treeview.get_selection().get_selected()
-        group = (
-            model_sort.get_value(
-                treeiter_sort,
-                IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+        model, treeiter = treeview.get_selection().get_selected()
 
         groups = [
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
-            for row in model_sort ]
+            for row in model ]
 
         grid = self.create_grid()
 
@@ -1848,7 +1843,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         grid.attach(
             self.create_box(
                 (
-                    ( Gtk.Label.new( _( "Group Name" ) ), False ),
+                    ( Gtk.Label.new( _( "Group" ) ), False ),
                     ( group_entry, True ) ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 0, 1, 1 )
@@ -1879,42 +1874,28 @@ class IndicatorScriptRunner( IndicatorBase ):
                     group_entry.grab_focus()
                     continue
 
-#TODO Rename group in model.
-# Change group in each child.
-                row = [ group_, group_, None, None, None, None, None, None, None, None ]
-                parent = model.append( None, row )
-                iter_to_group = self.get_iter_to_group( group, model )
-                iter_scripts = model.iter_children( iter_to_group )
+#TODO Check this code!
+                model.set_value(
+                    treeiter,
+                    IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN,
+                    group_ )
+
+                model.set_value(
+                    treeiter,
+                    IndicatorScriptRunner.COLUMN_MODEL_GROUP,
+                    group_ )
+
+                iter_scripts = model.iter_children( treeiter )
                 while iter_scripts:
-                    model.append(
-                        parent,
-                        [
-                            group_,
-                            None,
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_NAME ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ] )
+                    model.set_value(
+                        iter_scripts,
+                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN,
+                        group_ )
+
+                    model.set_value(
+                        iter_scripts,
+                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN,
+                        group_ )
 
                     iter_scripts = model.iter_next( iter_scripts )
 
@@ -1926,7 +1907,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 treeview.expand_to_path( treepath )
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
-#TODO Selecting a group should clear the command.
 
                 break
 
@@ -1934,35 +1914,24 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
 
+#TODO Implement!
     def _on_edit_script(
         self,
-        treeview_scripts,
-        treepath,
-        treeviewcolumn,
-        background_scripts_treeview,
-        textentry,
-        scripts ):
+        treeview,
+        textentry ):
 
-        group, name = self._get_selected_script( treeview_scripts )
-        model = treeview_scripts.get_model()
+        group, name = self._get_selected_script( treeview )  #TODO This won't work if we are adding first script ever.
+        add = name is None
+
+        model = treeview.get_model()
+
         groups = [
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
             for row in model ]
 
-        add = name is None
-        if add:
-            index = 0
-            model, treeiter = scripts_treeview.get_selection().get_selected()
-            if treeiter:
-                group = model[ treeiter ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
-                if group is None: # A script is selected, so find the parent group.
-                    parent = scripts_treeview.get_model().iter_parent( treeiter )
-                    group = model[ parent ][ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
-
-                index = groups.index( group )
-
-        else:
-            index = groups.index( script.get_group() )
+        index = 0
+        if not add:
+            index = groups.index( group )
 
         group_combo = (
             self.create_comboboxtext(
@@ -1974,7 +1943,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 editable = True ) )
 
         grid = self.create_grid()
-
+        
         grid.attach(
             self.create_box(
                 (
@@ -1984,7 +1953,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         name_entry = (
             self.create_entry(
-                "" if add else script.get_name(),
+                "" if add else name,
                 tooltip_text = _( "The name of the script." ) ) )
 
         grid.attach(
@@ -2001,9 +1970,15 @@ class IndicatorScriptRunner( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 2, 1, 1 )
 
+        iter_to_script = self.get_iter_to_script( group, name, model )
+
         command_text_view = (
             self.create_textview(
-                text = "" if add else script.get_command(),
+                text =
+                    "" if add else
+                    model.get_value(
+                        iter_to_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
                 tooltip_text = _( "The terminal script/command, along with any arguments." ) ) )
 
         grid.attach(
@@ -2019,7 +1994,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "on script completion.\n\n" +
                     "For background scripts, play a sound\n" +
                     "only if the script returns non-empty text." ),
-                active = False if add else script.get_play_sound() ) )
+                active = 
+                    False if add else
+                    model.get_value(
+                        iter_to_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_SOUND ) ) )
 
         grid.attach( sound_checkbutton, 0, 13, 1, 1 )
 
@@ -2031,9 +2010,18 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "notification on script completion.\n\n" +
                     "For background scripts, show a notification\n" +
                     "only if the script returns non-empty text." ),
-                active = False if add else script.get_show_notification() ) )
+                active =
+                    False if add else
+                    model.get_value(
+                        iter_to_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ) ) )
 
         grid.attach( notification_checkbutton, 0, 14, 1, 1 )
+
+        is_background = (
+            model.get_value(
+                iter_to_script,
+                IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
 
         script_non_background_radio = (
             self.create_radiobutton(
@@ -2043,7 +2031,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "Non-background scripts are displayed\n" +
                     "in the menu and run when the user\n" +
                     "clicks on the corresponding menu item." ),
-                active = True if add else isinstance( script, NonBackground ) ) )
+                active = True if add else not is_background ) )
 
         grid.attach( script_non_background_radio, 0, 15, 1, 1 )
 
@@ -2051,9 +2039,15 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_checkbutton(
                 _( "Leave terminal open" ),
                 tooltip_text = _( "Leave the terminal open on script completion." ),
-                sensitive = True if add else isinstance( script, NonBackground ),
+                sensitive = True if add else not is_background,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = False if add else isinstance( script, NonBackground ) and script.get_terminal_open() ) )
+                active =
+                    False if add else
+                    not is_background
+                    and
+                    model.get_value(
+                        iter_to_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ) ) )
 
         grid.attach( terminal_checkbutton, 0, 16, 1, 1 )
 
@@ -2065,9 +2059,15 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "which is run on a middle mouse\n" +
                     "click of the indicator icon.\n\n" +
                     "Not supported on all desktops." ),
-                sensitive = True if add else isinstance( script, NonBackground ),
+                sensitive = True if add else not is_background,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = False if add else isinstance( script, NonBackground ) and script.get_default() ) )
+                active =
+                    False if add else
+                    not is_background
+                    and
+                    model.get_value(
+                        iter_to_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) ) )
 
         grid.attach( default_script_checkbutton, 0, 17, 1, 1 )
 
@@ -2083,14 +2083,16 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "execution will be logged to a file in the\n" +
                     "user's home directory and the script tag\n" +
                     "will remain in the icon text." ),
-                active = False if add else isinstance( script, Background ) ) )
+                active = False if add else is_background ) )
 
         grid.attach( script_background_radio, 0, 18, 1, 1 )
 
         interval_spinner = (
             self.create_spinbutton(
-                script.get_interval_in_minutes()
-                if isinstance( script, Background )
+                model.get_value(
+                    iter_to_script,
+                    IndicatorScriptRunner.COLUMN_MODEL_INTERVAL )
+                if is_background
                 else
                 60,
                 1,
@@ -2103,7 +2105,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Interval" ) ), False ),
                     ( interval_spinner, False ) ),
-                sensitive = False if add else isinstance( script, Background ),
+                sensitive = False if add else is_background,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ) ) # Approximate alignment with the checkboxes above.
 
         grid.attach( label_and_interval_spinner_box, 0, 19, 1, 1 )
@@ -2115,9 +2117,16 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "If the script returns non-empty text\n" +
                     "on its update, the script will run\n" +
                     "on the next update of ANY script." ),
-                sensitive = True if add else isinstance( script, Background ),
+                sensitive = True if add else is_background,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = False if add else isinstance( script, Background ) and script.get_force_update() ) )
+                active =
+                    False if add
+                    else
+                        is_background
+                        and
+                        model.get_value(
+                            iter_to_script,
+                            IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ) )
 
         grid.attach( force_update_checkbutton, 0, 20, 1, 1 )
 
@@ -2151,7 +2160,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dialog = (
             self.create_dialog(
-                scripts_treeview,
+                treeview,
                 _( "Add Script" ) if add else _( "Edit Script" ),
                 content_widget = grid ) )
 
@@ -2159,58 +2168,74 @@ class IndicatorScriptRunner( IndicatorBase ):
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
-                if group_combo.get_active_text().strip() == "":
+                group_ = group_combo.get_active_text().strip()
+                if group_ == "":
                     self.show_dialog_ok(
                         dialog, _( "The group cannot be empty." ) )
 
                     group_combo.grab_focus()
                     continue
 
-                if name_entry.get_text().strip() == "":
+                name_ = name_entry.get_text().strip()
+                if name_ == "":
                     self.show_dialog_ok(
                         dialog, _( "The name cannot be empty." ) )
 
                     name_entry.grab_focus()
                     continue
 
-                if self.get_textview_text( command_text_view ).strip() == "":
+                command_ = self.get_textview_text( command_text_view ).strip()
+                if command_ == "":
                     self.show_dialog_ok(
                         dialog, _( "The command cannot be empty." ) )
 
                     command_text_view.grab_focus()
                     continue
 
-                # Check for duplicates...
-                #    For an add, find an existing script with the same group/name.
-                #    For an edit, the group and/or name must change (and then match with an existing script other than the original).
-                script_of_same_name_and_group_exists = (
-                    self.get_script(
-                        scripts,
-                        group_combo.get_active_text().strip(),
-                        name_entry.get_text().strip() ) is not None )
+                script_exists = self.get_iter_to_script( group_, name_, model )  #TODO Check for when None and not None.
+                message = _(
+                    "A script of the same group and name already exists." )
 
-                edited_script_group_or_name_different = (
-                    not add and
-                    (
-                        group_combo.get_active_text().strip() != script.get_group() or
-                        name_entry.get_text().strip() != script.get_name() ) )
+                if add:
+                    if script_exists:
+                        self.show_dialog_ok( dialog, message )
+                        group_combo.grab_focus()
+                        continue
 
-                if ( add or edited_script_group_or_name_different ) and script_of_same_name_and_group_exists:
-                    self.show_dialog_ok( dialog, _( "A script of the same group and name already exists." ) )
-                    group_combo.grab_focus()
-                    continue
+                else:
+                    if ( group != group_ or name != name_ ) and script_exists:
+                        self.show_dialog_ok( dialog, message )
+                        group_combo.grab_focus()
+                        continue
 
-                # For an edit, remove the original script...
                 if not add:
-                    i = 0
-                    for skript in scripts:
-                        if script.get_group() == skript.get_group() and script.get_name() == skript.get_name():
-                            break
+                    model.remove( iter_to_script )
 
-                        i += 1
+                is_background_and_default = (
+                    script_non_background_radio.get_active()
+                    and
+                    default_script_checkbutton.get_active() )
 
-                    del scripts[ i ]
+                if is_background_and_default:
+                    iter_scripts = model.iter_children( treeiter )
+                    while iter_scripts:
+                        model.set_value(
+                            iter_scripts,
+                            IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN,
+                            group_ )
+    
+                        model.set_value(
+                            iter_scripts,
+                            IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN,
+                            group_ )
+    
+                        iter_scripts = model.iter_next( iter_scripts )
 
+                    
+                    pass
+#TODO If this script is set to be default, 
+# this overrides a previous script marked as default (if present).
+# Find that script and remove default from it.
                 # If this script is marked as default (and is non-background),
                 # check for an existing default script and if found, undefault it...
                 if script_non_background_radio.get_active() and default_script_checkbutton.get_active():
