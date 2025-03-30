@@ -470,7 +470,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     if isinstance( script, Background )
                     else '—',
                     None if isinstance( script, Background )
-                    else script.get_default() ]
+                    else str( script.get_default() ) ]
 
                 treestore.append( parent, row )
 
@@ -539,7 +539,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         scripts_treeview, scripts_scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 treestore,
-                # Gtk.TreeModelSort.new_with_model( treestore_new ), #TODO Should be this instead of above? 
+                # Gtk.TreeModelSort.new_with_model( treestore_new ), #TODO Should be this instead of above?
                 #There is a default sort func below...so which should it be?
                 #Check PPA I think it has a sort func but does not use a treemodelsort.
                 (
@@ -655,10 +655,8 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         add.connect(
             "clicked",
-            self.on_script_add,
-            copy_of_scripts,
+            self.on_add,
             scripts_treeview,
-            background_scripts_treeview,
             copy_,
             remove )
 
@@ -1010,6 +1008,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 textentry.get_position() )
 
 
+#TODO Can this be re-written to use treemodel.foreach()?
     def script_exists(
         self,
         group,
@@ -1694,12 +1693,12 @@ class IndicatorScriptRunner( IndicatorBase ):
         #         _( "No script has been selected for removal." ) )
 
 
-#TODO Implement    
+#TODO Implement
 # Check for when we click ADD and a group is selected...
 # is this the group we select by default to add in the new script?
 # Or just select the first group?
 #
-# If a script is selected, as above, use that script's group as the default group? 
+# If a script is selected, as above, use that script's group as the default group?
     def on_add(
         self,
         button,
@@ -1913,8 +1912,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         dialog.destroy()
 
 
-
-#TODO Implement!
     def _on_edit_script(
         self,
         treeview,
@@ -1943,7 +1940,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 editable = True ) )
 
         grid = self.create_grid()
-        
+
         grid.attach(
             self.create_box(
                 (
@@ -1994,7 +1991,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "on script completion.\n\n" +
                     "For background scripts, play a sound\n" +
                     "only if the script returns non-empty text." ),
-                active = 
+                active =
                     False if add else
                     model.get_value(
                         iter_to_script,
@@ -2217,45 +2214,18 @@ class IndicatorScriptRunner( IndicatorBase ):
                     default_script_checkbutton.get_active() )
 
                 if is_background_and_default:
-                    iter_scripts = model.iter_children( treeiter )
-                    while iter_scripts:
-                        model.set_value(
-                            iter_scripts,
-                            IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN,
-                            group_ )
-    
-                        model.set_value(
-                            iter_scripts,
-                            IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN,
-                            group_ )
-    
-                        iter_scripts = model.iter_next( iter_scripts )
 
-                    
-                    pass
-#TODO If this script is set to be default, 
-# this overrides a previous script marked as default (if present).
-# Find that script and remove default from it.
-                # If this script is marked as default (and is non-background),
-                # check for an existing default script and if found, undefault it...
-                if script_non_background_radio.get_active() and default_script_checkbutton.get_active():
-                    i = 0
-                    for skript in scripts:
-                        if isinstance( skript, NonBackground ) and skript.get_default():
-                            undefault_script = NonBackground(
-                                skript.get_group(),
-                                skript.get_name(),
-                                skript.get_command(),
-                                skript.get_play_sound(),
-                                skript.get_show_notification(),
-                                skript.get_terminal_open(),
-                                False )
+                    def remove_default( model, treepath, iter ):
+                        #TODO Only process scripts (skip groups)
+                        # and if a script is marked as default = True,
+                        # mark as default = False.
+                        print( model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+                        print( model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+                        pass
+                        print()
 
-                            del scripts[ i ]
-                            scripts.append( undefault_script )
-                            break
 
-                        i += 1
+                    treestore.foreach( remove_default )
 
                 # Create new script (add or edit) and add to scripts...
                 if script_background_radio.get_active():
