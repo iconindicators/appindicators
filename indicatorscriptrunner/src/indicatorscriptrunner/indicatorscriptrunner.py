@@ -95,17 +95,17 @@ class IndicatorScriptRunner( IndicatorBase ):
     COMMAND_NOTIFY_TAG_SCRIPT_NAME = "[SCRIPT_NAME]"
     COMMAND_NOTIFY_TAG_SCRIPT_RESULT = "[SCRIPT_RESULT]"
 
-    COLUMN_MODEL_GROUP_HIDDEN = 0 # Never shown; used to obtain group name.
-    COLUMN_MODEL_GROUP = 1 # Group name for groups; empty for scripts.
-    COLUMN_MODEL_NAME = 2 # Script name.
-    COLUMN_MODEL_COMMAND_HIDDEN = 3 # Never shown; used to obtain command.
-    COLUMN_MODEL_SOUND = 4 # Tick symbol or None.
-    COLUMN_MODEL_NOTIFICATION = 5 # Tick symbol or None.
-    COLUMN_MODEL_BACKGROUND = 6 # Tick symbol or None.
-    COLUMN_MODEL_TERMINAL = 7 # Tick symbol or None.
-    COLUMN_MODEL_INTERVAL = 8 # Numeric amount as a string.
-    COLUMN_MODEL_FORCE_UPDATE = 9 # Tick symbol or None.
-    COLUMN_MODEL_DEFAULT_HIDDEN = 10 # Never shown; indicates if script is default.
+    COLUMN_MODEL_GROUP_HIDDEN = 0
+    COLUMN_MODEL_GROUP = 1
+    COLUMN_MODEL_NAME = 2
+    COLUMN_MODEL_COMMAND_HIDDEN = 3
+    COLUMN_MODEL_SOUND = 4
+    COLUMN_MODEL_NOTIFICATION = 5
+    COLUMN_MODEL_BACKGROUND = 6
+    COLUMN_MODEL_TERMINAL = 7
+    COLUMN_MODEL_DEFAULT_HIDDEN = 8
+    COLUMN_MODEL_INTERVAL = 9
+    COLUMN_MODEL_FORCE_UPDATE = 10
 
     COLUMN_VIEW_SCRIPTS_ALL_GROUP = 0 # Group name or None.
     COLUMN_VIEW_SCRIPTS_ALL_NAME = 1 # Script name.
@@ -460,17 +460,14 @@ class IndicatorScriptRunner( IndicatorBase ):
                         IndicatorBase.TICK_SYMBOL if script.get_terminal_open()
                         else None
                     ),
+                    None if isinstance( script, Background )
+                    else str( script.get_default() ),
                     str( script.get_interval_in_minutes() )
                     if isinstance( script, Background )
                     else '—',
                     (
                         IndicatorBase.TICK_SYMBOL if script.get_force_update()
-                        else None
-                    )
-                    if isinstance( script, Background )
-                    else '—',
-                    None if isinstance( script, Background )
-                    else str( script.get_default() ) ]
+                        else None ) ]
 
                 treestore.append( parent, row )
 
@@ -539,9 +536,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         scripts_treeview, scripts_scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 treestore,
-                # Gtk.TreeModelSort.new_with_model( treestore_new ), #TODO Should be this instead of above?
-                #There is a default sort func below...so which should it be?
-                #Check PPA I think it has a sort func but does not use a treemodelsort.
                 (
                     _( "Group" ),
                     _( "Name" ),
@@ -1165,7 +1159,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     group_entry.grab_focus()
                     continue
 
-                row = [ group_, group_, None, None, None, None, None, None, None, None ]
+                row = [ group_, group_, None, None, None, None, None, None, None, None, None ]
                 parent = model.append( None, row )
                 iter_to_group = self.get_iter_to_group( group, model )
                 iter_scripts = model.iter_children( iter_to_group )
@@ -1193,6 +1187,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                             model.get_value(
                                 iter_scripts,
                                 IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
+                            model.get_value(
+                                iter_scripts,
+                                IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ),
                             model.get_value(
                                 iter_scripts,
                                 IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
@@ -1293,7 +1290,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     continue
 
                 if group_ not in groups:
-                    row = [ group_, group_, None, None, None, None, None, None, None, None ]
+                    row = [ group_, group_, None, None, None, None, None, None, None, None, None ]
                     parent = model.append( None, row )
 
                 else:
@@ -1323,6 +1320,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                         model.get_value(
                             iter_to_original,
                             IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
+                        model.get_value(
+                            iter_to_original,
+                            IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ),
                         model.get_value(
                             iter_to_original,
                             IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
@@ -1891,11 +1891,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                         IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN,
                         group_ )
 
-                    model.set_value(
-                        iter_scripts,
-                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN,
-                        group_ )
-
                     iter_scripts = model.iter_next( iter_scripts )
 
                 treepath = (
@@ -2216,46 +2211,58 @@ class IndicatorScriptRunner( IndicatorBase ):
                 if is_background_and_default:
 
                     def remove_default( model, treepath, iter ):
-                        #TODO Only process scripts (skip groups)
-                        # and if a script is marked as default = True,
-                        # mark as default = False.
-                        print( model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
-                        print( model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
-                        pass
-                        print()
+                        is_background = (
+                            model.get_value(
+                                iter,
+                                IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+
+                        if is_background:
+                            model.set_value(
+                                iter,
+                                IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND,
+                                False )
 
 
-                    treestore.foreach( remove_default )
+                    model.foreach( remove_default )
 
-                # Create new script (add or edit) and add to scripts...
-                if script_background_radio.get_active():
-                    new_script = Background(
-                        group_combo.get_active_text().strip(),
-                        name_entry.get_text().strip(),
-                        self.get_textview_text( command_text_view ).strip(),
-                        sound_checkbutton.get_active(),
-                        notification_checkbutton.get_active(),
-                        interval_spinner.get_value_as_int(),
-                        force_update_checkbutton.get_active() )
+                if group_ not in groups:
+                    row = [ group_, group_, None, None, None, None, None, None, None, None, None ]
+                    parent = model.append( None, row )
 
                 else:
-                    new_script = NonBackground(
-                        group_combo.get_active_text().strip(),
-                        name_entry.get_text().strip(),
+                    parent = self.get_iter_to_group( group_, model )
+
+#TODO Can this code be put into a function to be
+# called by copy_group and copy_script and here?
+                model.append(
+                    parent,
+                    [
+                        group_,
+                        None,
+                        name_,
                         self.get_textview_text( command_text_view ).strip(),
-                        sound_checkbutton.get_active(),
-                        notification_checkbutton.get_active(),
-                        terminal_checkbutton.get_active(),
-                        default_script_checkbutton.get_active() )
+                        str( sound_checkbutton.get_active() ),
+                        str( notification_checkbutton.get_active() ),
+                        str( script_background_radio.get_active() ),
+                        str( terminal_checkbutton.get_active() )
+                        if script_non_background_radio.get_active() else None,
+                        str( default_script_checkbutton.get_active() )
+                        if script_non_background_radio.get_active() else None,
+                        str( interval_spinner.get_value_as_int() )
+                        if script_background_radio.get_active() else None,
+                        str( force_update_checkbutton.get_active() )
+                        if script_background_radio.get_active() else None ] )
 
-                scripts.append( new_script )
+                treepath = (
+                    Gtk.TreePath.new_from_string(
+                        model.get_string_from_iter(
+                            self.get_iter_to_script( group_, name_, model ) ) ) )
 
-                self.populate_treestore_and_select_script(
-                    scripts_treeview,
-                    background_scripts_treeview,
-                    scripts,
-                    new_script.get_group(),
-                    new_script.get_name() )
+                treeview.expand_to_path( treepath )
+                treeview.get_selection().select_path( treepath )
+                treeview.set_cursor( treepath, None, False )
+#TODO Ensure that one of the lines above selects the script and
+# that in turn shows the command (same command as original script).
 
             break
 
