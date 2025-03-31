@@ -460,16 +460,20 @@ class IndicatorScriptRunner( IndicatorBase ):
                         IndicatorBase.TICK_SYMBOL if script.get_terminal_open()
                         else None
                     ),
-                    None if isinstance( script, Background )
+                    str( False ) if isinstance( script, Background )
                     else str( script.get_default() ),
                     str( script.get_interval_in_minutes() )
                     if isinstance( script, Background )
                     else '—',
                     (
                         IndicatorBase.TICK_SYMBOL if script.get_force_update()
-                        else None ) ]
+                        else None )
+                    if isinstance( script, Background ) else '—' ]
 
                 treestore.append( parent, row )
+
+        dump = self.dump_treestore( treestore )
+        print( dump )
 
         treestore_background_scripts_filter = treestore.filter_new()
         treestore_background_scripts_filter.set_visible_func(
@@ -1907,6 +1911,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         dialog.destroy()
 
 
+#TODO Need to also deal with add script.
     def _on_edit_script(
         self,
         treeview,
@@ -2663,6 +2668,23 @@ class IndicatorScriptRunner( IndicatorBase ):
         name = row[ IndicatorScriptRunner.COLUMN_MODEL_NAME ]
 
         return group, name
+
+
+#TODO For testing
+    def dump_treestore(
+        self,
+        model ):
+
+
+        def dump_treestore_( model, treepath, iter, dump ):
+            for i in list( range( 11 ) ):
+                dump += f"{ model.get_value( iter, i ) } | "
+
+
+        dump = ""
+        model.foreach( dump_treestore_, dump )
+        return dump[ 0 : -1 ]
+
 
 
     def initialise_background_scripts( self ):
