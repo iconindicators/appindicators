@@ -1108,24 +1108,28 @@ class IndicatorScriptRunner( IndicatorBase ):
         button,
         treeview ):
 
-        group, name = self._get_selected_script( treeview )
-        if name is None:
-            self._on_copy_group( group, treeview )
-
-        else:
-            self._on_copy_script( group, name, treeview )
-
-
-    def _on_copy_group(
-        self,
-        group,
-        treeview ):
-
-        model = treeview.get_model()
+        model, iter = treeview.get_selection().get_selected()
+        group = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN )
+        name = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
 
         groups = [
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
             for row in model ]
+
+        if name is None:
+            self._on_copy_group( model, iter, group, groups, treeview )
+
+        else:
+            self._on_copy_script( model, iter, group, name, groups, treeview )
+
+
+    def _on_copy_group(
+        self,
+        model,
+        iter,
+        group,
+        groups,
+        treeview ):
 
         grid = self.create_grid()
 
@@ -1167,8 +1171,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 row = [ group_, group_, None, None, None, None, None, None, None, None, None ]
                 parent = model.append( None, row )
-                iter_to_group = self.get_iter_to_group( group, model )
-                iter_scripts = model.iter_children( iter_to_group )
+                iter_scripts = model.iter_children( iter )
                 while iter_scripts:
                     model.append(
                         parent,
@@ -1207,8 +1210,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 treepath = (
                     Gtk.TreePath.new_from_string(
-                        model.get_string_from_iter(
-                        self.get_iter_to_group( group_, model ) ) ) )
+                        model.get_string_from_iter( parent ) ) )
 
                 treeview.expand_to_path( treepath )
                 treeview.get_selection().select_path( treepath )
@@ -1226,15 +1228,12 @@ class IndicatorScriptRunner( IndicatorBase ):
 
     def _on_copy_script(
         self,
+        model,
+        iter,
         group,
         name,
+        groups,
         treeview ):
-
-        model = treeview.get_model()
-
-        groups = [
-            row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
-            for row in model ]
 
         script_group_combo = (
             self.create_comboboxtext(
@@ -1307,42 +1306,41 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 #TODO Can this code be put into a function to be called by copy_group and copy_script?
 # Maybe also used by edit script/group?
-                iter_to_original = self.get_iter_to_script( group, name, model )
-                model.append(
-                    parent,
-                    [
-                        group_,
-                        None,
-                        name_,
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
-                        model.get_value(
-                            iter_to_original,
-                            IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ] )
+                iter = (
+                    model.append(
+                        parent,
+                        [
+                            group_,
+                            None,
+                            name_,
+                            model.get_value(
+                                iter,
+                                IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
+                            model.get_value(
+                                iter,
+                                IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
+                            model.get_value(
+                                iter,
+                                IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
+                            model.get_value(
+                                iter,
+                                IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
+                            model.get_value(
+                                iter,
+                                IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
+                            model.get_value(
+                                iter,
+                                IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ),
+                            model.get_value(
+                                iter,
+                                IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
+                            model.get_value(
+                                iter,
+                                IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ] ) )
 
                 treepath = (
                     Gtk.TreePath.new_from_string(
-                        model.get_string_from_iter(
-                            self.get_iter_to_script( group_, name_, model ) ) ) )
+                        model.get_string_from_iter( iter ) ) )
 
                 treeview.expand_to_path( treepath )
                 treeview.get_selection().select_path( treepath )
@@ -1688,11 +1686,11 @@ class IndicatorScriptRunner( IndicatorBase ):
     def on_edit(
         self,
         treeview,
-        treepath,
+        treepath,  #TODO Given the treepath (also for remove, add, copy) why then need _get_selected_script() below?
         treeviewcolumn,
         textentry ):
 
-        group, name = self._get_selected_script( treeview )
+        group, name = self._get_selected_script( treeview )  #TODO Instead of this, just call get_value_at converting the treepath to an iter?
         if name is None:
             self._on_edit_group( group, treeview, textentry )
 
