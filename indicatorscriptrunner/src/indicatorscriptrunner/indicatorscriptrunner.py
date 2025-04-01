@@ -20,6 +20,7 @@
 Application indicator to run a terminal command/script from the indicator menu.
 '''
 
+
 #TODO When a script is selected, change tooltip of Copy button to copy script.
 # When a group is selected, change tooltip of Copy button to copy group and scripts within.
 
@@ -1793,16 +1794,14 @@ class IndicatorScriptRunner( IndicatorBase ):
     def _on_edit_script(
         self,
         treeview,
-        textentry ):  #TODO Handle textentry???
+        model,
+        iter,
+        group,
+        name,
+        groups,
+        textentry ): #TODO Handle textentry...or not?  
 
-        group, name = self._get_selected_script( treeview )  #TODO This won't work if we are adding first script ever.
         add = name is None
-
-        model = treeview.get_model()
-
-        groups = [
-            row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
-            for row in model ]
 
         index = 0
         if not add:
@@ -1845,14 +1844,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, 2, 1, 1 )
 
-        iter_to_script = self.get_iter_to_script( group, name, model )
-
         command_text_view = (
             self.create_textview(
                 text =
                     "" if add else
                     model.get_value(
-                        iter_to_script,
+                        iter,
                         IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
                 tooltip_text = _( "The terminal script/command, along with any arguments." ) ) )
 
@@ -1872,8 +1869,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 active =
                     False if add else
                     model.get_value(
-                        iter_to_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_SOUND ) ) )
+                        iter, IndicatorScriptRunner.COLUMN_MODEL_SOUND ) ) )
 
         grid.attach( sound_checkbutton, 0, 13, 1, 1 )
 
@@ -1888,15 +1884,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                 active =
                     False if add else
                     model.get_value(
-                        iter_to_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ) ) )
+                        iter, IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ) ) )
 
         grid.attach( notification_checkbutton, 0, 14, 1, 1 )
 
         is_background = (
             model.get_value(
-                iter_to_script,
-                IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+                iter, IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
 
         script_non_background_radio = (
             self.create_radiobutton(
@@ -1921,8 +1915,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     not is_background
                     and
                     model.get_value(
-                        iter_to_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ) ) )
+                        iter, IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ) ) )
 
         grid.attach( terminal_checkbutton, 0, 16, 1, 1 )
 
@@ -1941,7 +1934,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     not is_background
                     and
                     model.get_value(
-                        iter_to_script,
+                        iter,
                         IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) ) )
 
         grid.attach( default_script_checkbutton, 0, 17, 1, 1 )
@@ -1965,23 +1958,21 @@ class IndicatorScriptRunner( IndicatorBase ):
         interval_spinner = (
             self.create_spinbutton(
                 model.get_value(
-                    iter_to_script,
-                    IndicatorScriptRunner.COLUMN_MODEL_INTERVAL )
-                if is_background
-                else
-                60,
+                    iter, IndicatorScriptRunner.COLUMN_MODEL_INTERVAL )
+                if is_background else 60,
                 1,
                 10000,
                 page_increment = 100,
                 tooltip_text = _( "Interval, in minutes, between runs." ) ) )
 
+        # Set margin left to approximately align with the checkboxes above.
         label_and_interval_spinner_box = (
             self.create_box(
                 (
                     ( Gtk.Label.new( _( "Interval" ) ), False ),
                     ( interval_spinner, False ) ),
                 sensitive = False if add else is_background,
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ) ) # Approximate alignment with the checkboxes above.
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ) )
 
         grid.attach( label_and_interval_spinner_box, 0, 19, 1, 1 )
 
@@ -2000,7 +1991,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         is_background
                         and
                         model.get_value(
-                            iter_to_script,
+                            iter,
                             IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ) )
 
         grid.attach( force_update_checkbutton, 0, 20, 1, 1 )
@@ -2084,7 +2075,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                         continue
 
                 if not add:
-                    model.remove( iter_to_script )
+#TODO If this is the last script in this group, will there be a group left over?
+                    model.remove( iter )
 
                 is_background_and_default = (
                     script_non_background_radio.get_active()
