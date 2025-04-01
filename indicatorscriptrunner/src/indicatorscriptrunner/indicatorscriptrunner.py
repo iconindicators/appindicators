@@ -472,8 +472,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 treestore.append( parent, row )
 
-        dump = self.dump_treestore( treestore )
+        dump = self.dump_treestore( treestore ) #TODO Testing
         print( dump )
+        print()
 
         treestore_background_scripts_filter = treestore.filter_new()
         treestore_background_scripts_filter.set_visible_func(
@@ -1094,7 +1095,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 iter_to_group = iter_groups
                 break
 
-            if iter_to_group:
+            if iter_to_group:  #TODO What is this for???
+                print( "HIT THIS LINE...WHAT AND WHY IS THIS HERE?" )
                 break
 
             iter_groups = model.iter_next( iter_groups )
@@ -1217,15 +1219,17 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dialog.destroy()
 
+        dump = self.dump_treestore( model ) #TODO Testing
+        print( dump )
+        print()
+
 
     def _on_copy_script(
         self,
-        button,
         group,
         name,
         treeview ):
 
-        group, name = self._get_selected_script( treeview )
         model = treeview.get_model()
         groups = [
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
@@ -1348,6 +1352,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                 break
 
         dialog.destroy()
+
+        dump = self.dump_treestore( model ) #TODO Testing
+        print( dump )
+        print()
 
 
 #TODO Hopefully can delete.
@@ -2678,12 +2686,14 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         def dump_treestore_( model, treepath, iter, dump ):
             for i in list( range( 11 ) ):
-                dump += f"{ model.get_value( iter, i ) } | "
+                dump[ 0 ] += f"{ model.get_value( iter, i ) } | "
+
+            dump[ 0 ] = dump[ 0 ][ 0 : -2 ] + '\n'
 
 
-        dump = ""
+        dump = [ "" ]
         model.foreach( dump_treestore_, dump )
-        return dump[ 0 : -1 ]
+        return dump[ 0 ]
 
 
 
