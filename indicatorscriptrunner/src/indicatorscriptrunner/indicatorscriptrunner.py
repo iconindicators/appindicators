@@ -1117,19 +1117,19 @@ class IndicatorScriptRunner( IndicatorBase ):
             for row in model ]
 
         if name is None:
-            self._on_copy_group( model, iter, group, groups, treeview )
+            self._on_copy_group( treeview, model, iter, group, groups )
 
         else:
-            self._on_copy_script( model, iter, group, name, groups, treeview )
+            self._on_copy_script( treeview, model, iter, group, name, groups )
 
 
     def _on_copy_group(
         self,
+        treeview,
         model,
         iter,
         group,
-        groups,
-        treeview ):
+        groups ):
 
         grid = self.create_grid()
 
@@ -1228,12 +1228,12 @@ class IndicatorScriptRunner( IndicatorBase ):
 
     def _on_copy_script(
         self,
+        treeview,
         model,
         iter,
         group,
         name,
-        groups,
-        treeview ):
+        groups ):
 
         script_group_combo = (
             self.create_comboboxtext(
@@ -1690,25 +1690,30 @@ class IndicatorScriptRunner( IndicatorBase ):
         treeviewcolumn,
         textentry ):
 
-        group, name = self._get_selected_script( treeview )  #TODO Instead of this, just call get_value_at converting the treepath to an iter?
-        if name is None:
-            self._on_edit_group( group, treeview, textentry )
-
-        else:
-            self._on_edit_script( group, name, treeview, textentry )
-
-
-    def _on_edit_group(
-        self,
-        group,
-        treeview,
-        textentry ): #TODO Handle textentry...or not?  
-
-        model = treeview.get_model()
+        model, iter = treeview.get_selection().get_selected()
+        group = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN )
+        name = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
 
         groups = [
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
             for row in model ]
+
+        if name is None:
+            self._on_edit_group(
+                treeview, model, iter, group, groups, textentry )
+
+        else:
+            self._on_edit_script( model, iter, group, name, groups, treeview )
+
+
+    def _on_edit_group(
+        self,
+        treeview,
+        model,
+        iter,
+        group,
+        groups,
+        textentry ): #TODO Handle textentry...or not?  
 
         grid = self.create_grid()
 
@@ -1748,18 +1753,17 @@ class IndicatorScriptRunner( IndicatorBase ):
                     group_entry.grab_focus()
                     continue
 
-                iter_to_group = self.get_iter_to_group( group, model )
                 model.set_value(
-                    iter_to_group,
+                    iter,
                     IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN,
                     group_ )
 
                 model.set_value(
-                    iter_to_group,
+                    iter,
                     IndicatorScriptRunner.COLUMN_MODEL_GROUP,
                     group_ )
 
-                iter_scripts = model.iter_children( iter_to_group )
+                iter_scripts = model.iter_children( iter )
                 while iter_scripts:
                     model.set_value(
                         iter_scripts,
@@ -1770,8 +1774,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 treepath = (
                     Gtk.TreePath.new_from_string(
-                        model.get_string_from_iter(
-                        self.get_iter_to_group( group_, model ) ) ) )
+                        model.get_string_from_iter( iter ) ) )
 
                 treeview.expand_to_path( treepath )
                 treeview.get_selection().select_path( treepath )
