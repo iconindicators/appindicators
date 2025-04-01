@@ -2397,6 +2397,9 @@ class IndicatorBase( ABC ):
 
                 model_sort.get_model().append( [ filename, True ] )
 
+#TODO What is the purpose of this code here?
+# If it is to find the added/appended item,
+# we should have an iter to that from the append above...right?
                 treepath = 0
                 for row in model_sort.get_model():
                     fortune_or_calendar = (

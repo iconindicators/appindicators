@@ -830,6 +830,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     '\n'.join( filter_text ),
                     PPA.Status.NEEDS_DOWNLOAD ] )
 
+#TODO Does the code below simply find the added/appended item?
+# If so, the append above should return an iter to the added/appended item...right?
                 treepath = 0
                 for row in model:
                     user_original = row[ IndicatorPPADownloadStatistics.COLUMN_USER ]
