@@ -1307,10 +1307,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     else:
                         iter_select = model.iter_next( iter )
 
-                    model.remove( iter )
-
-                else:
-                    model.remove( iter )
+                model.remove( iter )
 
         else:
             response = (
@@ -1320,42 +1317,31 @@ class IndicatorScriptRunner( IndicatorBase ):
             if response == Gtk.ResponseType.OK:
                 iter_group = model.iter_parent( iter )
                 if model.iter_n_children( iter_group ) > 1:
-                    print( "Multiple scripts" ) #TODO Test
                     iter_previous = model.iter_previous( iter )
                     if iter_previous:
-                        print( "Select previous script" ) #TODO Test
                         iter_select = iter_previous
 
                     else:
-                        print( "Select next script" ) #TODO Test
                         iter_select = model.iter_next( iter )
 
                     model.remove( iter )
 
                 else:
-                    print( "One script" ) #TODO Test
-                    model.remove( iter )
                     if len( model ) > 1:
-                        print( "Multiple groups" ) #TODO Test
                         iter_previous = model.iter_previous( iter_group )
                         if iter_previous:
-                            print( "Select previous group" ) #TODO Test
                             iter_select = (
                                 model.iter_nth_child(
                                     iter_previous,
                                     model.iter_n_children( iter_previous ) - 1 ) )
 
                         else:
-                            print( "Select next group" ) #TODO Test
                             iter_select = (
                                 model.iter_nth_child(
                                     model.iter_next( iter_group ), 0 ) )
 
-                        model.remove( iter_group )
-
-                    else:
-                        print( "One group" ) #TODO Test
-                        model.remove( iter_group )
+                    model.remove( iter_group )
+                    model.remove( iter )
 
         if iter_select:
             treepath = (
