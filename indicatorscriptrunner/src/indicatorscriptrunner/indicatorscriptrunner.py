@@ -1299,14 +1299,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                         "all scripts within the group?" ) ) )
 
             if response == Gtk.ResponseType.OK:
-                iter_children = model.iter_children( iter )
-                while iter_children:
-#                    model.remove( iter_children )  #TODO This causes some exception in GTK...
-                    print( model.get_value( iter_children, 0 ) )
-                    print( model.get_value( iter_children, 2 ) )
-                    print()
-                    iter_children = model.iter_next( iter_children )
-
                 if len( model ) > 1:
                     iter_previous = model.iter_previous( iter )
                     if iter_previous:
@@ -1315,7 +1307,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     else:
                         iter_select = model.iter_next( iter )
 
-#                    model.remove( iter )
+                    model.remove( iter )
 
                 else:
                     model.remove( iter )
@@ -1344,7 +1336,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     print( "One script" ) #TODO Test
                     model.remove( iter )
                     if len( model ) > 1:
-                        print( "Mutliple groups" ) #TODO Test
+                        print( "Multiple groups" ) #TODO Test
                         iter_previous = model.iter_previous( iter_group )
                         if iter_previous:
                             print( "Select previous group" ) #TODO Test
@@ -1956,8 +1948,8 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dump = [ "" ]
         model.foreach( dump_treestore_, dump )
-#        return dump[ 0 ]
-        return ""
+        return dump[ 0 ]
+        # return ""
 
 
 
