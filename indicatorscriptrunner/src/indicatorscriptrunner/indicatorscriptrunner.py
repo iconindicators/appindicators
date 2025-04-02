@@ -1280,8 +1280,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 textentry.get_text().replace( old_tag_, "" ) )
 
 
-#TODO Should this be a wrapper to then call remove group or remove script,
-# or instead, remove group/script in the one function?
     def on_remove(
         self,
         button_remove,
@@ -1290,7 +1288,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         button_copy ):
 
         model, iter = treeview.get_selection().get_selected()
-        group = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN )
         name = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
         if name is None:
             response = (
@@ -1306,7 +1303,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     model.remove( iter_children )
                     iter_children = model.iter_next( iter_children )
 
-                if len( treestore ) > 1:
+                if len( model ) > 1:
                     iter_previous = model.iter_previous( iter )
                     if iter_previous:
                         iter_select = iter_previous
@@ -1339,7 +1336,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 else:
                     model.remove( iter )
-                    if len( treestore ) > 1:
+                    if len( model ) > 1:
                         iter_previous = model.iter_previous( iter_group )
                         if iter_previous:
                             iter_select = iter_previous
@@ -1354,22 +1351,18 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 treepath = (
                     Gtk.TreePath.new_from_string(
-                        model_sort.get_string_from_iter( iter_select ) ) )
+                        model.get_string_from_iter( iter_select ) ) )
 
                 treeview.expand_to_path( treepath )
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
 
-                break
-
-        dialog.destroy()
-
 #TODO When to disable/enable copy/remove buttons?
+#TODO Need to update textentry?  If the script(s) removed was(were) background then yes.
 
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
         print()
-
 
 
 #TODO Implement
@@ -1676,8 +1669,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         interval_spinner = (
             self.create_spinbutton(
-                model.get_value(
-                    iter, IndicatorScriptRunner.COLUMN_MODEL_INTERVAL )
+                int(
+                    model.get_value(
+                        iter, IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ) )
                 if is_background else 60,
                 1,
                 10000,
