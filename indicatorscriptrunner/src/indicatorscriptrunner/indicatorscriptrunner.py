@@ -1378,21 +1378,31 @@ class IndicatorScriptRunner( IndicatorBase ):
         button_copy,
         button_remove ):
 
-        if True:
-            print( "add")
-            return
 
-        # self._add_edit_script(
-        #     None, scripts, scripts_treeview, background_scripts_treeview )
-        self.on_script_edit(
+        model, iter = treeview.get_selection().get_selected()
+        group = None
+        if iter:
+            group = (
+                model.get_value(
+                    iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
+        groups = [
+            row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
+            for row in model ]
+
+        self._on_edit_script(
             treeview,
+            treeview.get_model(),
             None,
+            group,
             None,
+            groups,
             None )
 
 #TODO Need something like this to enable the remove/copy buttons
-        # if len( treeview.get_model() ) > 0:
-        #     button_remove.set_sensitive( True )
+        '''
+        button_remove.set_sensitive( len( model ) )
+        '''
 
 
     def on_edit(
@@ -1510,16 +1520,16 @@ class IndicatorScriptRunner( IndicatorBase ):
         self,
         treeview,
         model,
-        iter_script,  #TODO If this is None presume this is an add.
+        iter_script,
         group,
         name,
         groups,
-        textentry ): #TODO Handle textentry...or not?
+        textentry ): #TODO Handle textentry for edit.
 
         add = name is None
 
         index = 0
-        if not add:
+        if groups: #TODO Test with no scripts (adding first script).
             index = groups.index( group )
 
         group_combo = (
@@ -1606,6 +1616,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         grid.attach( notification_checkbutton, 0, 14, 1, 1 )
 
         is_background = (
+            not add
+            and
             model.get_value(
                 iter_script, IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
 
@@ -1822,35 +1834,37 @@ class IndicatorScriptRunner( IndicatorBase ):
                     parent = model.append( None, row )
 
                 else:
-#TODO This would happen if we are changing something about the script EXCEPT the group
-# so the group remains the same (so parent = iter.parent())
-# or
-# the group is changed to another existing group, so need to find the iter to the group.
-#
-# Check/verify these two situations.
                     parent = self.get_iter_to_group( group_, model )
 
 #TODO Can this code be put into a function to be
 # called by copy_group and copy_script and here?
-                iter = (
-                    model.append(
-                        parent,
-                        [
-                            group_,
-                            None,
-                            name_,
-                            self.get_textview_text( command_text_view ).strip(),
-                            str( sound_checkbutton.get_active() ),
-                            str( notification_checkbutton.get_active() ),
-                            str( script_background_radio.get_active() ),
-                            str( terminal_checkbutton.get_active() )
-                            if script_non_background_radio.get_active() else None,
-                            str( default_script_checkbutton.get_active() )
-                            if script_non_background_radio.get_active() else None,
-                            str( interval_spinner.get_value_as_int() )
-                            if script_background_radio.get_active() else None,
-                            str( force_update_checkbutton.get_active() )
-                            if script_background_radio.get_active() else None ] ) )
+                row = [
+                    group_,
+                    None,
+                    name_,
+                    self.get_textview_text( command_text_view ).strip(),
+                    IndicatorBase.TICK_SYMBOL if sound_checkbutton.get_active()
+                    else None,
+                    IndicatorBase.TICK_SYMBOL if notification_checkbutton.get_active()
+                    else None,
+                    IndicatorBase.TICK_SYMBOL if script_background_radio.get_active()
+                    else None,
+                    '—' if script_background_radio.get_active()
+                    else (
+                        IndicatorBase.TICK_SYMBOL if terminal_checkbutton.get_active()
+                        else None
+                    ),
+                    str( False ) if script_background_radio.get_active()
+                    else str( default_script_checkbutton.get_active() ),
+                    str( interval_spinner.get_value_as_int() )
+                    if script_background_radio.get_active()
+                    else '—',
+                    (
+                        IndicatorBase.TICK_SYMBOL if force_update_checkbutton.get_active()
+                        else None )
+                    if script_background_radio.get_active() else '—' ]
+
+                iter = model.append( parent, row )
 
                 treepath = (
                     Gtk.TreePath.new_from_string(
