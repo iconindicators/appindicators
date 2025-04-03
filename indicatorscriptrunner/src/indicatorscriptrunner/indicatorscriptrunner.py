@@ -914,6 +914,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
 #TODO Can this be re-written to use treemodel.foreach()?
+#Maybe see get_iter_to_script below...if the iter returned is None, then the script does not exist.
     def script_exists(
         self,
         group,
@@ -1010,14 +1011,35 @@ class IndicatorScriptRunner( IndicatorBase ):
         return iter_to_group
 
 
+#TODO This function and those above: can/should they be moved to below the copy/add/edit/remove functions
+# as these are helper functions?
+    def update_indicator_textentry(
+        self,
+        textentry,
+        old_tag,
+        new_tag ):
+
+        old_tag_ = "[" + old_tag + "]"
+        if new_tag:
+            textentry.set_text(
+                textentry.get_text().replace( old_tag_, "[" + new_tag + "]" ) )
+
+        else:
+            textentry.set_text(
+                textentry.get_text().replace( old_tag_, "" ) )
+
+
     def on_copy(
         self,
         button,
         treeview ):
 
         model, iter = treeview.get_selection().get_selected()
-        group = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN )
+
         name = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
+        group = (
+            model.get_value(
+                iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
         groups = [
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
@@ -1034,7 +1056,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         self,
         treeview,
         model,
-        iter,
+        iter_group,
         group,
         groups ):
 
@@ -1078,7 +1100,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 row = [ group_, group_, None, None, None, None, None, None, None, None, None ]
                 parent = model.append( None, row )
-                iter_scripts = model.iter_children( iter )
+                iter_scripts = model.iter_children( iter_group )
                 while iter_scripts:
                     model.append(
                         parent,
@@ -1137,7 +1159,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         self,
         treeview,
         model,
-        iter,
+        iter_script,
         group,
         name,
         groups ):
@@ -1213,37 +1235,36 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 #TODO Can this code be put into a function to be called by copy_group and copy_script?
 # Maybe also used by edit script/group?
-                iter = (
-                    model.append(
-                        parent,
-                        [
-                            group_,
-                            None,
-                            name_,
-                            model.get_value(
-                                iter,
-                                IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
-                            model.get_value(
-                                iter,
-                                IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
-                            model.get_value(
-                                iter,
-                                IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
-                            model.get_value(
-                                iter,
-                                IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
-                            model.get_value(
-                                iter,
-                                IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
-                            model.get_value(
-                                iter,
-                                IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ),
-                            model.get_value(
-                                iter,
-                                IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
-                            model.get_value(
-                                iter,
-                                IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ] ) )
+                row = [
+                    group_,
+                    None,
+                    name_,
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ),
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ]
+
+                iter = model.append( parent, row )
 
                 treepath = (
                     Gtk.TreePath.new_from_string(
@@ -1262,22 +1283,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
         print()
-
-
-    def update_indicator_textentry(
-        self,
-        textentry,
-        old_tag,
-        new_tag ):
-
-        old_tag_ = "[" + old_tag + "]"
-        if new_tag:
-            textentry.set_text(
-                textentry.get_text().replace( old_tag_, "[" + new_tag + "]" ) )
-
-        else:
-            textentry.set_text(
-                textentry.get_text().replace( old_tag_, "" ) )
 
 
     def on_remove(
@@ -1398,8 +1403,10 @@ class IndicatorScriptRunner( IndicatorBase ):
         textentry ):
 
         model, iter = treeview.get_selection().get_selected()
-        group = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN )
         name = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
+        group = (
+            model.get_value(
+                iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
         groups = [
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
@@ -1418,7 +1425,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         self,
         treeview,
         model,
-        iter,
+        iter_group,
         group,
         groups,
         textentry ): #TODO Handle textentry...or not?
@@ -1462,16 +1469,16 @@ class IndicatorScriptRunner( IndicatorBase ):
                     continue
 
                 model.set_value(
-                    iter,
+                    iter_group,
                     IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN,
                     group_ )
 
                 model.set_value(
-                    iter,
+                    iter_group,
                     IndicatorScriptRunner.COLUMN_MODEL_GROUP,
                     group_ )
 
-                iter_scripts = model.iter_children( iter )
+                iter_scripts = model.iter_children( iter_group )
                 while iter_scripts:
                     model.set_value(
                         iter_scripts,
@@ -1482,7 +1489,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 treepath = (
                     Gtk.TreePath.new_from_string(
-                        model.get_string_from_iter( iter ) ) )
+                        model.get_string_from_iter( iter_group ) ) )
 
                 treeview.expand_to_path( treepath )
                 treeview.get_selection().select_path( treepath )
