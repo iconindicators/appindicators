@@ -843,25 +843,40 @@ class IndicatorScriptRunner( IndicatorBase ):
         cell_renderer,
         treemodel,
         treeiter,
-        scripts ):
+        scripts ): #TODO Remove scripts
         '''
         Render a script name bold if that script is non-background and default.
         '''
-
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
-        name = (
+
+        is_script = (
             treemodel.get_value(
-                treeiter, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+                treeiter, IndicatorScriptRunner.COLUMN_MODEL_GROUP ) is None )
 
-        if name:
-            group = (
+        if is_script:
+            default = (
                 treemodel.get_value(
-                    treemodel.iter_parent( treeiter ),
-                    IndicatorScriptRunner.COLUMN_MODEL_GROUP ) )
+                    treeiter,
+                    IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) )
 
-            script = self.get_script( scripts, group, name )
-            if isinstance( script, NonBackground ) and script.get_default():
+            if default == "True":
                 cell_renderer.set_property( "weight", Pango.Weight.BOLD )
+
+#TODO Original
+        # cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
+        # name = (
+        #     treemodel.get_value(
+        #         treeiter, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+        #
+        # if name:
+        #     group = (
+        #         treemodel.get_value(
+        #             treemodel.iter_parent( treeiter ),
+        #             IndicatorScriptRunner.COLUMN_MODEL_GROUP ) )
+        #
+        #     script = self.get_script( scripts, group, name )
+        #     if isinstance( script, NonBackground ) and script.get_default():
+        #         cell_renderer.set_property( "weight", Pango.Weight.BOLD )
 
 
     def _script_sort(
@@ -1583,6 +1598,14 @@ class IndicatorScriptRunner( IndicatorBase ):
                 ( ( self.create_scrolledwindow( command_text_view ), True ), ) ),
             0, 3, 1, 10 )
 
+        active = False
+        if not add:
+            sound = (
+                model.get_value(
+                    iter_script, IndicatorScriptRunner.COLUMN_MODEL_SOUND ) )
+
+            active = True if sound else False
+
         sound_checkbutton = (
             self.create_checkbutton(
                 _( "Play sound" ),
@@ -1591,13 +1614,18 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "on script completion.\n\n" +
                     "For background scripts, play a sound\n" +
                     "only if the script returns non-empty text." ),
-                active =
-                    False if add else
-                    model.get_value(
-                        iter_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_SOUND ) ) )
+                active = active ) )
 
         grid.attach( sound_checkbutton, 0, 13, 1, 1 )
+
+        active = False
+        if not add:
+            notification = (
+                model.get_value(
+                    iter_script,
+                    IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ) )
+
+            active = True if notification else False
 
         notification_checkbutton = (
             self.create_checkbutton(
@@ -1607,19 +1635,18 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "notification on script completion.\n\n" +
                     "For background scripts, show a notification\n" +
                     "only if the script returns non-empty text." ),
-                active =
-                    False if add else
-                    model.get_value(
-                        iter_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ) ) )
+                active = active ) )
 
         grid.attach( notification_checkbutton, 0, 14, 1, 1 )
 
-        is_background = (
-            not add
-            and
-            model.get_value(
-                iter_script, IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+        is_background = False
+        if not add:
+            background = (
+                model.get_value(
+                    iter_script,
+                    IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+
+            is_background = True if background else False
 
         script_non_background_radio = (
             self.create_radiobutton(
@@ -1629,25 +1656,45 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "Non-background scripts are displayed\n" +
                     "in the menu and run when the user\n" +
                     "clicks on the corresponding menu item." ),
-                active = True if add else not is_background ) )
+                active = not is_background ) )
 
         grid.attach( script_non_background_radio, 0, 15, 1, 1 )
+
+        active = False
+        if not add:
+            if is_background:
+                active = False
+
+            else:
+                terminal = (
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ) )
+
+                active = True if terminal else False
 
         terminal_checkbutton = (
             self.create_checkbutton(
                 _( "Leave terminal open" ),
                 tooltip_text = _( "Leave the terminal open on script completion." ),
-                sensitive = True if add else not is_background,
+                sensitive = not is_background,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active =
-                    False if add else
-                    not is_background
-                    and
-                    model.get_value(
-                        iter_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ) ) )
+                active = active ) )
 
         grid.attach( terminal_checkbutton, 0, 16, 1, 1 )
+
+        active = False
+        if not add:
+            if is_background:
+                active = False
+
+            else:
+                default = (
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) )
+
+                active = True if default == "True" else False
 
         default_script_checkbutton = (
             self.create_checkbutton(
@@ -1657,15 +1704,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "which is run on a middle mouse\n" +
                     "click of the indicator icon.\n\n" +
                     "Not supported on all desktops." ),
-                sensitive = True if add else not is_background,
+                sensitive = not is_background,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active =
-                    False if add else
-                    not is_background
-                    and
-                    model.get_value(
-                        iter_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) ) )
+                active = active ) )
 
         grid.attach( default_script_checkbutton, 0, 17, 1, 1 )
 
@@ -1681,7 +1722,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "execution will be logged to a file in the\n" +
                     "user's home directory and the script tag\n" +
                     "will remain in the icon text." ),
-                active = False if add else is_background ) )
+                active = is_background ) )
 
         grid.attach( script_background_radio, 0, 18, 1, 1 )
 
@@ -1703,10 +1744,20 @@ class IndicatorScriptRunner( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Interval" ) ), False ),
                     ( interval_spinner, False ) ),
-                sensitive = False if add else is_background,
+                sensitive = is_background,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ) )
 
         grid.attach( label_and_interval_spinner_box, 0, 19, 1, 1 )
+
+        active = False
+        if not add:
+            if is_background:
+                force_update = (
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) )
+
+                active = True if force_update else False
 
         force_update_checkbutton = (
             self.create_checkbutton(
@@ -1715,16 +1766,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "If the script returns non-empty text\n" +
                     "on its update, the script will run\n" +
                     "on the next update of ANY script." ),
-                sensitive = True if add else is_background,
+                sensitive = is_background,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active =
-                    False if add
-                    else
-                        is_background
-                        and
-                        model.get_value(
-                            iter_script,
-                            IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ) )
+                active = active ) )
 
         grid.attach( force_update_checkbutton, 0, 20, 1, 1 )
 
@@ -1819,12 +1863,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                     default_script_checkbutton.get_active() )
 
                 if is_non_background_and_default:
-
+#TODO I created a new non-background script, marked as default, 
+# but this code did not clear the existing default non-background script.
                     def remove_default( model, treepath, iter ):
                         model.set_value(
                             iter,
-                            IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND,
-                            False )
+                            IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN,
+                            "False" )
 
 
                     model.foreach( remove_default )
@@ -1886,19 +1931,20 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
 #TODO Who calls this and why/when?
-    def get_script(
-        self,
-        scripts,
-        group,
-        name ):
-
-        the_script = None
-        for script in scripts:
-            if script.get_group() == group and script.get_name() == name:
-                the_script = script
-                break
-
-        return the_script
+# Should be able to delete.
+    # def get_script(
+    #     self,
+    #     scripts,
+    #     group,
+    #     name ):
+    #
+    #     the_script = None
+    #     for script in scripts:
+    #         if script.get_group() == group and script.get_name() == name:
+    #             the_script = script
+    #             break
+    #
+    #     return the_script
 
 
     def get_scripts_by_group(
