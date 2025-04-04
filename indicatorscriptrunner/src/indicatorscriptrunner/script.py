@@ -73,7 +73,10 @@ class Info( ABC ):
         return self.show_notification
 
 
-    def __eq__( self, other ):
+    def __eq__(
+            self,
+            other ):
+
         return (
             self.__class__ == other.__class__
             and
@@ -173,7 +176,10 @@ class Background( Info ):
         return self.force_update
 
 
-    def __eq__( self, other ):
+    def __eq__(
+            self,
+            other ):
+
         return (
             super().__eq__( other )
             and
@@ -234,7 +240,10 @@ class NonBackground( Info ):
         return self.default
 
 
-    def __eq__( self, other ):
+    def __eq__(
+            self,
+            other ):
+
         return (
             super().__eq__( other )
             and
