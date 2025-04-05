@@ -34,11 +34,6 @@ Application indicator to run a terminal command/script from the indicator menu.
 # way to select the script (similarly for remove).
 
 
-#TODO Double click a group; dialog which pops up does not go away on
-# click of cancel nor hitting escape key.
-# Where else is this dialog used?
-
-
 #TODO If Copy/edit/remove of groups is implemented, add this to changelog.
 
 
@@ -1011,7 +1006,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 treeview.set_cursor( treepath, None, False )
 #TODO Selecting a group should clear the command.
 
-                break
+            break
 
         dialog.destroy()
 
@@ -1141,7 +1136,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 #TODO Ensure that one of the lines above selects the script and
 # that in turn shows the command (same command as original script).
 
-                break
+            break
 
         dialog.destroy()
 
@@ -1407,7 +1402,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
 
-                break
+            break
 
         dialog.destroy()
 
