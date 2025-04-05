@@ -25,9 +25,6 @@ Application indicator to run a terminal command/script from the indicator menu.
 # When a group is selected, change tooltip of Copy button to copy group and scripts within.
 
 
-#TODO When selecting a group, ensure command is cleared.
-
-
 #TODO When deleting a script,
 # if the script's group still exists, maybe
 # select the first script of that group.
@@ -37,25 +34,15 @@ Application indicator to run a terminal command/script from the indicator menu.
 # way to select the script (similarly for remove).
 
 
-#TODO Should really handle double click of a group (which will edit that group name).
-
-
-#TODO Should really handle copy of a group.
-
-
-#TODO Should really handle delete of a group.
-
-
-#TODO Ensure double clicking of a group does nothing...
-# ...now it opens up the script edit dialog!
-# Assuming we don't want to allow edit/rename of a group.
+#TODO Double click a group; dialog which pops up does not go away on
+# click of cancel nor hitting escape key.
+# Where else is this dialog used?
 
 
 #TODO If Copy/edit/remove of groups is implemented, add this to changelog.
 
 
 import concurrent.futures
-import copy
 import datetime
 import math
 
@@ -404,8 +391,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         self,
         dialog ):
 
-        copy_of_scripts = copy.deepcopy( self.scripts )  #TODO Is this needed if the treestore is used?
-
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
 
@@ -434,12 +419,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                 editable = False ) )
 
         # Rows pertain to a group (showing only the group name) or a script
-        # (showing the script name and the script's attributes).
+        # (showing the script name and the script's attributes but not group).
         #
         # Each row additionally contains the group name in the first column,
-        # allowing the group to be determined for a row containing a script.
+        # allowing the group to be determined for a row containing a script;
+        # a script's command and whether is default is stored but not shown.
         treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str, str )
-        scripts_by_group = self.get_scripts_by_group( copy_of_scripts )
+        scripts_by_group = self.get_scripts_by_group( self.scripts )
         for group in scripts_by_group.keys():
             row = [ group, group, None, None, None, None, None, None, None, None, None ]
             parent = treestore.append( None, row )
@@ -478,7 +464,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         treestore_background_scripts_filter = treestore.filter_new()
         treestore_background_scripts_filter.set_visible_func(
-            self._background_scripts_filter, copy_of_scripts )
+            self._background_scripts_filter )
 
         background_scripts_treeview, background_scripts_scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
@@ -533,7 +519,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 tooltip_text = _(
                     "Double click on a script to add to the icon text." ),
                 rowactivatedfunctionandarguments = (
-                    self.on_background_script_double_click,
+                    self._on_background_script_double_click,
                     indicator_text_entry ), ) )
 
         renderer_column_name_text = Gtk.CellRendererText()
@@ -605,8 +591,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 celldatafunctionandarguments_renderers_columnviewids = (
                     (
                         (
-                            self.column_name_renderer,
-                            copy_of_scripts ),
+                            self._column_name_renderer,
+                            self.scripts ),
                         renderer_column_name_text,
                         IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_NAME ), ),
                 default_sort_func = self._script_sort,
@@ -617,9 +603,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "If a non-background script is checked as\n" +
                     "default, the name will appear in bold." ),
                 cursorchangedfunctionandarguments = (
-                    self.on_script_selection,
-                    command_text_view,
-                    copy_of_scripts ),
+                    self._on_script_selection, command_text_view ),
                 rowactivatedfunctionandarguments = (
                     self.on_edit,
                     indicator_text_entry ), ) )
@@ -789,7 +773,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
-            self.scripts = copy_of_scripts #TODO Will need to create all scripts from the treestore.
+            # self.scripts = copy_of_scripts #TODO Will need to create all scripts from the treestore.
             self.send_command_to_log = send_command_to_log_checkbutton.get_active()
             self.show_scripts_in_submenus = radio_show_scripts_submenu.get_active()
             self.hide_groups = hide_groups_checkbutton.get_active()
@@ -809,35 +793,33 @@ class IndicatorScriptRunner( IndicatorBase ):
         self,
         model,
         treeiter,
-        scripts ):
+        data ):
         '''
+        Show a row for a group if any script within the group is background.
         Show a row for a script if the script is background.
-        Show a row for a group if the associated script is background.
         '''
-
         row = model[ treeiter ]
         group = row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
         if group is None:
-            # Row is a script.
-            show = (
-                row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
-                ==
-                IndicatorBase.TICK_SYMBOL )
+            background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
+            show = background == IndicatorBase.TICK_SYMBOL
 
         else:
-            # Row is a group.
-            background_scripts_by_group = (
-                self.get_scripts_by_group(
-                    scripts,
-                    non_background = False,
-                    background = True ) )
+            show = False
+            iter_scripts = model.iter_children( treeiter )
+            while iter_scripts:
+                row = model[ iter_scripts ]
+                background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
+                if background == IndicatorBase.TICK_SYMBOL:
+                    show = True
+                    break
 
-            show = group in background_scripts_by_group
+                iter_scripts = model.iter_next( iter_scripts )
 
         return show
 
 
-    def column_name_renderer(
+    def _column_name_renderer(
         self,
         treeviewcolumn,
         cell_renderer,
@@ -849,11 +831,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         '''
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
 
-        is_script = (
+        group = (
             treemodel.get_value(
-                treeiter, IndicatorScriptRunner.COLUMN_MODEL_GROUP ) is None )
+                treeiter, IndicatorScriptRunner.COLUMN_MODEL_GROUP ) )
 
-        if is_script:
+        if group is None:
             default = (
                 treemodel.get_value(
                     treeiter,
@@ -861,22 +843,6 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             if default == "True":
                 cell_renderer.set_property( "weight", Pango.Weight.BOLD )
-
-#TODO Original
-        # cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
-        # name = (
-        #     treemodel.get_value(
-        #         treeiter, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
-        #
-        # if name:
-        #     group = (
-        #         treemodel.get_value(
-        #             treemodel.iter_parent( treeiter ),
-        #             IndicatorScriptRunner.COLUMN_MODEL_GROUP ) )
-        #
-        #     script = self.get_script( scripts, group, name )
-        #     if isinstance( script, NonBackground ) and script.get_default():
-        #         cell_renderer.set_property( "weight", Pango.Weight.BOLD )
 
 
     def _script_sort(
@@ -898,150 +864,35 @@ class IndicatorScriptRunner( IndicatorBase ):
                     row2, IndicatorScriptRunner.COLUMN_MODEL_NAME ) ) )
 
 
-#TODO Needs to change to obtain command text from store.
-    def on_script_selection(
+    def _on_script_selection(
         self,
         treeview,
-        textview,
-        scripts ):
+        textview ):
 
-        # group, name = self._get_selected_script( treeview )
-        # command_text = ""
-        # if group and name:
-        #     command_text = self.get_script( scripts, group, name ).get_command()
-        #
-        # textview.get_buffer().set_text( command_text )
-        pass
+        command_text = ""
+        model, iter = treeview.get_selection().get_selected()
+        name = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
+        if name:
+            command_text = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN )
+        
+        textview.get_buffer().set_text( command_text )
 
 
-    def on_background_script_double_click(
+    def _on_background_script_double_click(
         self,
         treeview,
         treepath,
         treeviewcolumn,
         textentry ):
 
-        group, name = self._get_selected_script( treeview )
-        if group and name:  #TODO Maybe just check for name; group should ALWAYS be present.
+        model = treeview.get_model()
+        iter = model.get_iter( treepath )
+        name = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
+        if name:
+            group = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN )
             textentry.insert_text(
                 '[' + self._create_key( group, name ) + ']',
                 textentry.get_position() )
-
-
-#TODO Can this be re-written to use treemodel.foreach()?
-#Maybe see get_iter_to_script below...if the iter returned is None, then the script does not exist.
-    def script_exists(
-        self,
-        group,
-        name,
-        model ):
-
-        script_exists = False
-        iter_groups = model.get_iter_first()
-        while iter_groups:
-            iter_scripts = model.iter_children( iter_groups )
-            while iter_scripts:
-                group_ = (
-                    model.get_value(
-                        iter_scripts,
-                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
-
-                name_ = (
-                    model.get_value(
-                        iter_scripts,
-                        IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
-
-                script_exists = group == group_ and name == name_
-                if script_exists:
-                    break
-
-                iter_scripts = model.iter_next( iter_scripts )
-
-            if script_exists:
-                break
-
-            iter_groups = model.iter_next( iter_groups )
-
-        return script_exists
-
-
-    def get_iter_to_script(
-        self,
-        group,
-        name,
-        model ):
-
-        iter_to_script = None
-        iter_groups = model.get_iter_first()
-        while iter_groups:
-            iter_scripts = model.iter_children( iter_groups )
-            while iter_scripts:
-                group_ = (
-                    model.get_value(
-                        iter_scripts,
-                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
-
-                name_ = (
-                    model.get_value(
-                        iter_scripts,
-                        IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
-
-                if group == group_ and name == name_:
-                    iter_to_script = iter_scripts
-                    break
-
-                iter_scripts = model.iter_next( iter_scripts )
-
-            if iter_to_script:
-                break
-
-            iter_groups = model.iter_next( iter_groups )
-
-        return iter_to_script
-
-
-    def get_iter_to_group(
-        self,
-        group,
-        model ):
-
-        iter_to_group = None
-        iter_groups = model.get_iter_first()
-        while iter_groups:
-            group_ = (
-                model.get_value(
-                    iter_groups,
-                    IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
-
-            if group == group_:
-                iter_to_group = iter_groups
-                break
-
-            if iter_to_group:  #TODO What is this for???
-                print( "HIT THIS LINE...WHAT AND WHY IS THIS HERE?" )
-                break
-
-            iter_groups = model.iter_next( iter_groups )
-
-        return iter_to_group
-
-
-#TODO This function and those above: can/should they be moved to below the copy/add/edit/remove functions
-# as these are helper functions?
-    def update_indicator_textentry(
-        self,
-        textentry,
-        old_tag,
-        new_tag ):
-
-        old_tag_ = "[" + old_tag + "]"
-        if new_tag:
-            textentry.set_text(
-                textentry.get_text().replace( old_tag_, "[" + new_tag + "]" ) )
-
-        else:
-            textentry.set_text(
-                textentry.get_text().replace( old_tag_, "" ) )
 
 
     def on_copy(
@@ -1050,7 +901,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         treeview ):
 
         model, iter = treeview.get_selection().get_selected()
-
         name = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
         group = (
             model.get_value(
@@ -1233,7 +1083,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     script_name_entry.grab_focus()
                     continue
 
-                if self.script_exists( group_, name_, model ):
+                if self._script_exists( group_, name_, model ):
                     self.show_dialog_ok(
                         dialog,
                         _( "A script of the same group and name already exists!" ) )
@@ -1246,7 +1096,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     parent = model.append( None, row )
 
                 else:
-                    parent = self.get_iter_to_group( group_, model )
+                    parent = self._get_iter_to_group( group_, model )
 
 #TODO Can this code be put into a function to be called by copy_group and copy_script?
 # Maybe also used by edit script/group?
@@ -1298,6 +1148,43 @@ class IndicatorScriptRunner( IndicatorBase ):
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
         print()
+
+
+#TODO Can this be re-written to use treemodel.foreach()?
+#Maybe see get_iter_to_script function...if the iter returned is None, then the script does not exist.
+    def _script_exists(
+        self,
+        group,
+        name,
+        model ):
+
+        script_exists = False
+        iter_groups = model.get_iter_first()
+        while iter_groups:
+            iter_scripts = model.iter_children( iter_groups )
+            while iter_scripts:
+                group_ = (
+                    model.get_value(
+                        iter_scripts,
+                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
+                name_ = (
+                    model.get_value(
+                        iter_scripts,
+                        IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+
+                script_exists = group == group_ and name == name_
+                if script_exists:
+                    break
+
+                iter_scripts = model.iter_next( iter_scripts )
+
+            if script_exists:
+                break
+
+            iter_groups = model.iter_next( iter_groups )
+
+        return script_exists
 
 
     def on_remove(
@@ -1833,7 +1720,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     command_text_view.grab_focus()
                     continue
 
-                script_exists = self.get_iter_to_script( group_, name_, model )  #TODO Check for when None and not None.
+                script_exists = self._get_iter_to_script( group_, name_, model )  #TODO Check for when None and not None.
                 message = _(
                     "A script of the same group and name already exists." )
 
@@ -1879,7 +1766,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     parent = model.append( None, row )
 
                 else:
-                    parent = self.get_iter_to_group( group_, model )
+                    parent = self._get_iter_to_group( group_, model )
 
 #TODO Can this code be put into a function to be
 # called by copy_group and copy_script and here?
@@ -1930,21 +1817,84 @@ class IndicatorScriptRunner( IndicatorBase ):
         print()
 
 
-#TODO Who calls this and why/when?
-# Should be able to delete.
-    # def get_script(
-    #     self,
-    #     scripts,
-    #     group,
-    #     name ):
-    #
-    #     the_script = None
-    #     for script in scripts:
-    #         if script.get_group() == group and script.get_name() == name:
-    #             the_script = script
-    #             break
-    #
-    #     return the_script
+    def _get_iter_to_group(
+        self,
+        group,
+        model ):
+
+        iter_to_group = None
+        iter_groups = model.get_iter_first()
+        while iter_groups:
+            group_ = (
+                model.get_value(
+                    iter_groups,
+                    IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
+            if group == group_:
+                iter_to_group = iter_groups
+                break
+
+            if iter_to_group:  #TODO What is this for???
+                print( "HIT THIS LINE...WHAT AND WHY IS THIS HERE?" )
+                break
+
+            iter_groups = model.iter_next( iter_groups )
+
+        return iter_to_group
+
+
+    def _get_iter_to_script(
+        self,
+        group,
+        name,
+        model ):
+
+        iter_to_script = None
+        iter_groups = model.get_iter_first()
+        while iter_groups:
+            iter_scripts = model.iter_children( iter_groups )
+            while iter_scripts:
+                group_ = (
+                    model.get_value(
+                        iter_scripts,
+                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
+                name_ = (
+                    model.get_value(
+                        iter_scripts,
+                        IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+
+                if group == group_ and name == name_:
+                    iter_to_script = iter_scripts
+                    break
+
+                iter_scripts = model.iter_next( iter_scripts )
+
+            if iter_to_script:
+                break
+
+            iter_groups = model.iter_next( iter_groups )
+
+        return iter_to_script
+
+
+#TODO Not called anywhere...why?
+# Needed presumably for when a script (or group) is removed.
+# Needed presumably for when a script (or group) is edited.
+    def _update_textentry(
+        self,
+        textentry,
+        old_tag,
+        new_tag ):
+
+        old_tag_ = "[" + old_tag + "]"
+        if new_tag:
+            textentry.set_text(
+                textentry.get_text().replace( old_tag_, "[" + new_tag + "]" ) )
+
+        else:
+            textentry.set_text(
+                textentry.get_text().replace( old_tag_, "" ) )
 
 
     def get_scripts_by_group(
@@ -1973,22 +1923,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 scripts_by_group[ script.get_group() ].append( script )
 
         return scripts_by_group
-
-
-    def _get_selected_script(
-        self,
-        treeview ):
-        '''
-        Returns the group and name of the currently selected script.
-        Must ONLY be called when at least one script is present.
-        '''
-
-        model, treeiter = treeview.get_selection().get_selected()
-        row = model[ treeiter ]
-        group = row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
-        name = row[ IndicatorScriptRunner.COLUMN_MODEL_NAME ]
-
-        return group, name
 
 
 #TODO For testing
