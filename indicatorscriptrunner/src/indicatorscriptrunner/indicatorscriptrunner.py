@@ -1210,6 +1210,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         iter_select = model.iter_next( iter )
 
                 model.remove( iter )
+                #TODO Update textentry.
 
         else:
             response = (
@@ -1244,6 +1245,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                     model.remove( iter_group )
                     model.remove( iter )  #TODO May not need to do this for the case of the last script in the group...check.
+                    #TODO Update textentry.
+                    # self.update_indicator_textentry(
+                    #     textentry, self._create_key( group, name ), "" )
 
         if iter_select:
             treepath = (
@@ -1255,7 +1259,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             treeview.set_cursor( treepath, None, False )
 
 #TODO When to disable/enable copy/remove buttons?
-#TODO Need to update textentry?  If the script(s) removed was(were) background then yes.
 
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
@@ -1335,7 +1338,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         iter_group,
         group,
         groups,
-        textentry ): #TODO Handle textentry...or not?
+        textentry ):
 
         grid = self.create_grid()
 
@@ -1402,6 +1405,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
 
+                #TODO Update textentry.
+
             break
 
         dialog.destroy()
@@ -1411,7 +1416,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         print()
 
 
-#TODO Need to also deal with add script.
 #TODO Test when adding very first script (there will be no group to select).
     def _on_edit_script(
         self,
@@ -1421,7 +1425,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         group,
         name,
         groups,
-        textentry ): #TODO Handle textentry for edit.
+        textentry ):
 
         add = name is None
 
@@ -1803,6 +1807,17 @@ class IndicatorScriptRunner( IndicatorBase ):
 #TODO Ensure that one of the lines above selects the script and
 # that in turn shows the command (same command as original script).
 
+                #TODO Update textentry.
+                #     if isinstance( the_script, Background ) and isinstance( edited_script, NonBackground ):
+                #         old_tag = self._create_key( group, name )
+                #         self.update_indicator_textentry( textentry, old_tag, "" )
+                #
+                #     if not( group == edited_script.get_group() and name == edited_script.get_name() ):
+                #         old_tag = self._create_key( group, name )
+                #         new_tag = self._create_key( edited_script.get_group(), edited_script.get_name() )
+                #         self.update_indicator_textentry(
+                #             textentry, old_tag, new_tag )
+
             break
 
         dialog.destroy()
@@ -1873,9 +1888,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         return iter_to_script
 
 
-#TODO Not called anywhere...why?
-# Needed presumably for when a script (or group) is removed.
-# Needed presumably for when a script (or group) is edited.
     def _update_textentry(
         self,
         textentry,
