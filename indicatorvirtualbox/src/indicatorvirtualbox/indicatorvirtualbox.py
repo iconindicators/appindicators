@@ -253,7 +253,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         virtual_machines_for_autostart = [ ]
         for item in virtual_machines:
             if isinstance( item, Group ):
-                virtual_machines_for_autostart += ( 
+                virtual_machines_for_autostart += (
                     self._get_virtual_machines_for_autostart(
                         item.get_items() ) )
 
@@ -737,7 +737,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         treeviewcolumn,
         cell_renderer,
         model,
-        iter,
+        treeiter,
         renderer_start_command ):
         '''
         References
@@ -745,7 +745,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             https://stackoverflow.com/q/27745585/2156453
             https://stackoverflow.com/q/49836499/2156453
         '''
-        uuid = model[ iter ][ IndicatorVirtualBox.COLUMN_UUID ]
+        uuid = model[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
         renderer_start_command.set_property( "editable", uuid is not None )
 
 
@@ -778,23 +778,23 @@ class IndicatorVirtualBox( IndicatorBase ):
     def _update_virtual_machine_preferences(
         self,
         model,
-        iter ):
+        treeiter ):
 
 #TODO Shorten
-        while iter:
-            is_virtual_machine = model[ iter ][ IndicatorVirtualBox.COLUMN_UUID ]
-            is_autostart = model[ iter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ]
-            is_default_start_command = model[ iter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
+        while treeiter:
+            is_virtual_machine = model[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
+            is_autostart = model[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ]
+            is_default_start_command = model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
             if ( is_virtual_machine and is_autostart ) or ( is_virtual_machine and not is_default_start_command ): # Only record VMs with different settings to default.
-                key = model[ iter ][ IndicatorVirtualBox.COLUMN_UUID ]
-                value = [ is_autostart, model[ iter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ]
+                key = model[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
+                value = [ is_autostart, model[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ]
                 self.virtual_machine_preferences[ key ] = value
 
-            if model.iter_has_child( iter ):
-                childiter = model.iter_children( iter )
+            if model.iter_has_child( treeiter ):
+                childiter = model.iter_children( treeiter )
                 self._update_virtual_machine_preferences( model, childiter )
 
-            iter = model.iter_next( iter )
+            treeiter = model.iter_next( treeiter )
 
 
     def load_config(
