@@ -280,7 +280,7 @@ pylint --disable=line-too-long --disable=unused-argument --recursive=y ...
 ## Convert this Document from MD to HTML
 
 ```
-    venv=$HOME/.local/venv_indicators && \
+    venv=$HOME/  TODO What is this part?  /venv_development && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
     python3 -m pip install readme_renderer[md] && \

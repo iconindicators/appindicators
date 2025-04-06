@@ -468,7 +468,6 @@ def _package_source_for_build_wheel_process(
 
     if not message:
         authors = _get_pyproject_toml_authors( config )
-
         start_year, message = _get_year_in_changelog_markdown( indicator_name )
 
     if not message:
@@ -551,16 +550,18 @@ def _build_wheel_for_indicator(
 
         directory_dist.mkdir( parents = True )
 
-        message = _package_source_for_build_wheel_process( directory_dist, indicator_name )
+        message = (
+            _package_source_for_build_wheel_process(
+                directory_dist, indicator_name ) )
 
-        if not message:
-            subprocess.run(
-                f". { VENV_DEVELOPMENT }/bin/activate && " +
-                f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }",
-                shell = True )
+    if not message:
+        subprocess.run(
+            f". { VENV_DEVELOPMENT }/bin/activate && " +
+            f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }",
+            shell = True )
 
-#TODO Uncomment
-#            shutil.rmtree( directory_dist / indicator_name )
+# TODO Uncomment
+#         shutil.rmtree( directory_dist / indicator_name )
 
     return message
 
@@ -599,9 +600,3 @@ if __name__ == "__main__":
         error_message = _build_wheel_for_indicator( args.directory_release, indicator )
         if error_message:
             print( error_message )
-
-    subprocess.run(
-        f". { VENV_DEVELOPMENT }/bin/activate && " +
-        f"python3 -m readme_renderer README.md -o README.html && "+
-        f"deactivate",
-        shell = True )
