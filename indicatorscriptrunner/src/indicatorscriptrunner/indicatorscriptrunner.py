@@ -788,7 +788,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         self,
         model,
         treeiter,
-        data ):
+        user_data ):
         '''
         Show a row for a group if any script within the group is background.
         Show a row for a script if the script is background.
@@ -820,7 +820,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         cell_renderer,
         treemodel,
         treeiter,
-        data ):
+        user_data ):
         '''
         Render a script name bold if that script is non-background and default.
         '''
@@ -879,7 +879,10 @@ class IndicatorScriptRunner( IndicatorBase ):
         iter = model.get_iter( treepath )
         name = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
         if name:
-            group = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN )
+            group = (
+                model.get_value(
+                    iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
             textentry.insert_text(
                 '[' + self._create_key( group, name ) + ']',
                 textentry.get_position() )
@@ -1073,7 +1076,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     script_name_entry.grab_focus()
                     continue
 
-                if self._script_exists( group_, name_, model ):
+                if self._get_iter_to_script( group_, name_, model ):
                     self.show_dialog_ok(
                         dialog,
                         _( "A script of the same group and name already exists!" ) )
@@ -1138,43 +1141,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
         print()
-
-
-#TODO Can this be re-written to use treemodel.foreach()?
-#Maybe see get_iter_to_script function...if the iter returned is None, then the script does not exist.
-    def _script_exists(
-        self,
-        group,
-        name,
-        model ):
-
-        script_exists = False
-        iter_groups = model.get_iter_first()
-        while iter_groups:
-            iter_scripts = model.iter_children( iter_groups )
-            while iter_scripts:
-                group_ = (
-                    model.get_value(
-                        iter_scripts,
-                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
-
-                name_ = (
-                    model.get_value(
-                        iter_scripts,
-                        IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
-
-                script_exists = group == group_ and name == name_
-                if script_exists:
-                    break
-
-                iter_scripts = model.iter_next( iter_scripts )
-
-            if script_exists:
-                break
-
-            iter_groups = model.iter_next( iter_groups )
-
-        return script_exists
 
 
     def on_remove(
@@ -1273,7 +1239,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         button_copy,
         button_remove ):
 
-
         model, iter = treeview.get_selection().get_selected()
         group = None
         if iter:
@@ -1295,9 +1260,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             None )
 
 #TODO Need something like this to enable the remove/copy buttons
-        '''
-        button_remove.set_sensitive( len( model ) )
-        '''
+        # button_remove.set_sensitive( len( model ) )
+
 
 
     def on_edit(
@@ -1839,10 +1803,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 iter_to_group = iter_groups
                 break
 
-            if iter_to_group:  #TODO What is this for???
-                print( "HIT THIS LINE...WHAT AND WHY IS THIS HERE?" )
-                break
-
             iter_groups = model.iter_next( iter_groups )
 
         return iter_to_group
@@ -1855,30 +1815,26 @@ class IndicatorScriptRunner( IndicatorBase ):
         model ):
 
         iter_to_script = None
-        iter_groups = model.get_iter_first()
-        while iter_groups:
-            iter_scripts = model.iter_children( iter_groups )
-            while iter_scripts:
-                group_ = (
-                    model.get_value(
-                        iter_scripts,
-                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+        iter_groups = self._get_iter_to_group( group, model )
+        if iter_groups:
+            group_ = (
+                model.get_value(
+                    iter_groups,
+                    IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
-                name_ = (
-                    model.get_value(
-                        iter_scripts,
-                        IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
-
-                if group == group_ and name == name_:
-                    iter_to_script = iter_scripts
-                    break
-
-                iter_scripts = model.iter_next( iter_scripts )
-
-            if iter_to_script:
-                break
-
-            iter_groups = model.iter_next( iter_groups )
+            if group == group_:
+                iter_scripts = model.iter_children( iter_groups )
+                while iter_scripts:
+                    name_ = (
+                        model.get_value(
+                            iter_scripts,
+                            IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+    
+                    if name == name_:
+                        iter_to_script = iter_scripts
+                        break
+    
+                    iter_scripts = model.iter_next( iter_scripts )
 
         return iter_to_script
 
@@ -1976,14 +1932,13 @@ class IndicatorScriptRunner( IndicatorBase ):
         return group + "::" + name
 
 
-#TODO Test to see if this returns a boolean...used to not have ( ).
     def is_background_script_in_indicator_text(
         self,
         script ):
 
-        return (
-            '[' + self._create_key( script.get_group(), script.get_name() ) + ']'
-            in self.indicator_text )
+        key = self._create_key( script.get_group(), script.get_name() )
+        indicator_text = '[' + key + ']'
+        return indicator_text in self.indicator_text
 
 
     def load_config(
