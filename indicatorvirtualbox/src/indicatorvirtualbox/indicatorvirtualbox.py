@@ -704,7 +704,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def _add_items_to_store(
         self,
-        treestore,
+        model,
         parent,
         items ):
 
@@ -716,8 +716,8 @@ class IndicatorVirtualBox( IndicatorBase ):
             if isinstance( item, Group ):
                 groups_exist = True
                 self._add_items_to_store(
-                    treestore,
-                    treestore.append(
+                    model,
+                    model.append(
                         parent, [ item.get_name(), None, None, None ] ),
                     item.get_items() )
 
@@ -727,7 +727,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     self.is_autostart( item.get_uuid() ),
                     self.get_start_command( item.get_uuid() ),
                     item.get_uuid() ]
-                treestore.append( parent, row )
+                model.append( parent, row )
 
         return groups_exist
 
@@ -736,8 +736,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         self,
         treeviewcolumn,
         cell_renderer,
-        tree_model,
-        tree_iter,
+        model,
+        iter,
         renderer_start_command ):
         '''
         References
@@ -745,7 +745,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             https://stackoverflow.com/q/27745585/2156453
             https://stackoverflow.com/q/49836499/2156453
         '''
-        uuid = tree_model[ tree_iter ][ IndicatorVirtualBox.COLUMN_UUID ]
+        uuid = model[ iter ][ IndicatorVirtualBox.COLUMN_UUID ]
         renderer_start_command.set_property( "editable", uuid is not None )
 
 
@@ -754,7 +754,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             cell_renderer,
             path,
             text_new,
-            treestore,
+            model,
             dialog ):
 
         start_command = text_new.strip()
@@ -763,7 +763,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT )
 
         if "%VM%" in start_command:
-            treestore[ path ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = (
+            model[ path ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] = (
                 start_command )
 
         else:
@@ -777,24 +777,24 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def _update_virtual_machine_preferences(
         self,
-        treestore,
-        treeiter ):
+        model,
+        iter ):
 
 #TODO Shorten
-        while treeiter:
-            is_virtual_machine = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
-            is_autostart = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ]
-            is_default_start_command = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
+        while iter:
+            is_virtual_machine = model[ iter ][ IndicatorVirtualBox.COLUMN_UUID ]
+            is_autostart = model[ iter ][ IndicatorVirtualBox.COLUMN_AUTOSTART ]
+            is_default_start_command = model[ iter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
             if ( is_virtual_machine and is_autostart ) or ( is_virtual_machine and not is_default_start_command ): # Only record VMs with different settings to default.
-                key = treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_UUID ]
-                value = [ is_autostart, treestore[ treeiter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ]
+                key = model[ iter ][ IndicatorVirtualBox.COLUMN_UUID ]
+                value = [ is_autostart, model[ iter ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ]
                 self.virtual_machine_preferences[ key ] = value
 
-            if treestore.iter_has_child( treeiter ):
-                childiter = treestore.iter_children( treeiter )
-                self._update_virtual_machine_preferences( treestore, childiter )
+            if model.iter_has_child( iter ):
+                childiter = model.iter_children( iter )
+                self._update_virtual_machine_preferences( model, childiter )
 
-            treeiter = treestore.iter_next( treeiter )
+            iter = model.iter_next( iter )
 
 
     def load_config(

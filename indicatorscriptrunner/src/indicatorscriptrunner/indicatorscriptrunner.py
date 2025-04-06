@@ -413,12 +413,14 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "The terminal script/command, along with any arguments." ),
                 editable = False ) )
 
-        # Rows pertain to a group (showing only the group name) or a script
-        # (showing the script name and the script's attributes but not group).
+        # Rows describe either a
+        #   group, showing only the group name,
+        # or a
+        #   script, showing the script name and the script's attributes,
+        #   but not the enclosing group.
         #
-        # Each row additionally contains the group name in the first column,
-        # allowing the group to be determined for a row containing a script;
-        # a script's command and whether is default is stored but not shown.
+        # Each row contains columns hidden from view, used programmatically:
+        #   group, script command and script default.
         treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str, str )
         scripts_by_group = self.get_scripts_by_group( self.scripts )
         for group in scripts_by_group.keys():
@@ -585,9 +587,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_FORCE_UPDATE ) ),
                 celldatafunctionandarguments_renderers_columnviewids = (
                     (
-                        (
-                            self._column_name_renderer,
-                            self.scripts ),
+                        ( self._column_name_renderer, ),
                         renderer_column_name_text,
                         IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_ALL_NAME ), ),
                 default_sort_func = self._script_sort,
@@ -820,24 +820,19 @@ class IndicatorScriptRunner( IndicatorBase ):
         cell_renderer,
         treemodel,
         treeiter,
-        scripts ): #TODO Remove scripts
+        data ):
         '''
         Render a script name bold if that script is non-background and default.
         '''
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
 
-        group = (
+        default = (
             treemodel.get_value(
-                treeiter, IndicatorScriptRunner.COLUMN_MODEL_GROUP ) )
+                treeiter,
+                IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) )
 
-        if group is None:
-            default = (
-                treemodel.get_value(
-                    treeiter,
-                    IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) )
-
-            if default == "True":
-                cell_renderer.set_property( "weight", Pango.Weight.BOLD )
+        if default and default == "True":
+            cell_renderer.set_property( "weight", Pango.Weight.BOLD )
 
 
     def _script_sort(

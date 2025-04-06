@@ -522,8 +522,8 @@ class IndicatorTest( IndicatorBase ):
         self,
         treeviewcolumn,
         cell_renderer,
-        tree_model,
-        tree_iter,
+        model,
+        iter,
         data ):
         '''
         References
@@ -532,7 +532,7 @@ class IndicatorTest( IndicatorBase ):
             https://stackoverflow.com/q/49836499/2156453
         '''
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
-        day_of_week = tree_model.get_value( tree_iter, 0 )
+        day_of_week = model.get_value( iter, 0 )
         if 'n' in day_of_week:
             cell_renderer.set_property( "weight", Pango.Weight.BOLD )
 
