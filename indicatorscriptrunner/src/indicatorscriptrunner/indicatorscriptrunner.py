@@ -459,66 +459,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         print( dump )
         print()
 
-        treestore_background_scripts_filter = treestore.filter_new()
-        treestore_background_scripts_filter.set_visible_func(
-            self._background_scripts_filter )
-
-        background_scripts_treeview, background_scripts_scrolledwindow = (
-            self.create_treeview_within_scrolledwindow(
-                Gtk.TreeModelSort.new_with_model(
-                    treestore_background_scripts_filter ),
-                (
-                    _( "Group" ),
-                    _( "Name" ),
-                    _( "Sound" ),
-                    _( "Notification" ),
-                    _( "Interval" ),
-                    _( "Force Update" ) ),
-                (
-                    (
-                        Gtk.CellRendererText(),
-                        "text",
-                        IndicatorScriptRunner.COLUMN_MODEL_GROUP ),
-                    (
-                        Gtk.CellRendererText(),
-                        "text",
-                        IndicatorScriptRunner.COLUMN_MODEL_NAME ),
-                    (
-                        Gtk.CellRendererText(),
-                        "text",
-                        IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
-                    (
-                        Gtk.CellRendererText(),
-                        "text",
-                        IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
-                    (
-                        Gtk.CellRendererText(),
-                        "text",
-                        IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
-                    (
-                        Gtk.CellRendererText(),
-                        "text",
-                        IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ),
-                alignments_columnviewids = (
-                    (
-                        0.5,
-                        IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_SOUND ),
-                    (
-                        0.5,
-                        IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_NOTIFICATION ),
-                    (
-                        0.5,
-                        IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_INTERVAL ),
-                    (
-                        0.5,
-                        IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_FORCE_UPDATE) ),
-                default_sort_func = self._script_sort,
-                tooltip_text = _(
-                    "Double click on a script to add to the icon text." ),
-                rowactivatedfunctionandarguments = (
-                    self._on_background_script_double_click,
-                    indicator_text_entry ), ) )
-
         renderer_column_name_text = Gtk.CellRendererText()
 
         scripts_treeview, scripts_scrolledwindow = (
@@ -636,7 +576,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.on_add,
             scripts_treeview,
             copy_,
-            remove )
+            remove,
+            indicator_text_entry )
 
         copy_.connect( "clicked", self.on_copy, scripts_treeview )
 
@@ -647,6 +588,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             indicator_text_entry,
             copy_ )
 
+#TODO Can/should this be put into a function to be called at end of remove/add/copy/edit?
         if len( treestore ):
             treepath = Gtk.TreePath.new_from_string( "0:0" )
             scripts_treeview.get_selection().select_path( treepath )
@@ -738,6 +680,66 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( indicator_text_separator_entry, False ) ) ),
             0, 1, 1, 1 )
 
+        treestore_background_scripts_filter = treestore.filter_new()
+        treestore_background_scripts_filter.set_visible_func(
+            self._background_scripts_filter )
+
+        background_scripts_treeview, background_scripts_scrolledwindow = (
+            self.create_treeview_within_scrolledwindow(
+                Gtk.TreeModelSort.new_with_model(
+                    treestore_background_scripts_filter ),
+                (
+                    _( "Group" ),
+                    _( "Name" ),
+                    _( "Sound" ),
+                    _( "Notification" ),
+                    _( "Interval" ),
+                    _( "Force Update" ) ),
+                (
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        IndicatorScriptRunner.COLUMN_MODEL_GROUP ),
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        IndicatorScriptRunner.COLUMN_MODEL_NAME ),
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
+                    (
+                        Gtk.CellRendererText(),
+                        "text",
+                        IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ),
+                alignments_columnviewids = (
+                    (
+                        0.5,
+                        IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_SOUND ),
+                    (
+                        0.5,
+                        IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_NOTIFICATION ),
+                    (
+                        0.5,
+                        IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_INTERVAL ),
+                    (
+                        0.5,
+                        IndicatorScriptRunner.COLUMN_VIEW_SCRIPTS_BACKGROUND_FORCE_UPDATE) ),
+                default_sort_func = self._script_sort,
+                tooltip_text = _(
+                    "Double click on a script to add to the icon text." ),
+                rowactivatedfunctionandarguments = (
+                    self._on_background_script_double_click,
+                    indicator_text_entry ), ) )
+
         grid.attach( background_scripts_scrolledwindow, 0, 2, 1, 20 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Icon" ) ) )
@@ -787,13 +789,13 @@ class IndicatorScriptRunner( IndicatorBase ):
     def _background_scripts_filter(
         self,
         model,
-        treeiter,
+        iter,
         user_data ):
         '''
         Show a row for a group if any script within the group is background.
         Show a row for a script if the script is background.
         '''
-        row = model[ treeiter ]
+        row = model[ iter ]
         group = row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
         if group is None:
             background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
@@ -801,7 +803,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         else:
             show = False
-            iter_scripts = model.iter_children( treeiter )
+            iter_scripts = model.iter_children( iter )
             while iter_scripts:
                 row = model[ iter_scripts ]
                 background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
@@ -818,8 +820,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         self,
         treeviewcolumn,
         cell_renderer,
-        treemodel,
-        treeiter,
+        model,
+        iter,
         user_data ):
         '''
         Render a script name bold if that script is non-background and default.
@@ -827,9 +829,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
 
         default = (
-            treemodel.get_value(
-                treeiter,
-                IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) )
+            model.get_value(
+                iter, IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) )
 
         if default and default == "True":
             cell_renderer.set_property( "weight", Pango.Weight.BOLD )
@@ -863,20 +864,22 @@ class IndicatorScriptRunner( IndicatorBase ):
         model, iter = treeview.get_selection().get_selected()
         name = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
         if name:
-            command_text = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN )
-        
+            command_text = (
+                model.get_value(
+                    iter, IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ) )
+
         textview.get_buffer().set_text( command_text )
 
 
     def _on_background_script_double_click(
         self,
         treeview,
-        treepath,
+        path,
         treeviewcolumn,
         textentry ):
 
         model = treeview.get_model()
-        iter = model.get_iter( treepath )
+        iter = model.get_iter( path )
         name = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
         if name:
             group = (
@@ -890,7 +893,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
     def on_copy(
         self,
-        button,
+        button_copy,
         treeview ):
 
         model, iter = treeview.get_selection().get_selected()
@@ -995,6 +998,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                     iter_scripts = model.iter_next( iter_scripts )
 
+#TODO Can this be made into a function?
                 treepath = (
                     Gtk.TreePath.new_from_string(
                         model.get_string_from_iter( parent ) ) )
@@ -1002,7 +1006,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 treeview.expand_to_path( treepath )
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
-#TODO Selecting a group should clear the command.
 
             break
 
@@ -1124,6 +1127,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 iter = model.append( parent, row )
 
+#TODO Can this be made into a function which takes the treeview and iter?
                 treepath = (
                     Gtk.TreePath.new_from_string(
                         model.get_string_from_iter( iter ) ) )
@@ -1131,8 +1135,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 treeview.expand_to_path( treepath )
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
-#TODO Ensure that one of the lines above selects the script and
-# that in turn shows the command (same command as original script).
 
             break
 
@@ -1152,65 +1154,48 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         model, iter = treeview.get_selection().get_selected()
         name = model.get_value( iter, IndicatorScriptRunner.COLUMN_MODEL_NAME )
-        iter_select = None
         if name is None:
-            response = (
-                self.show_dialog_ok_cancel(
-                    treeview,
-                    _(
-                        "Remove the selected group and\n" +
-                        "all scripts within the group?" ) ) )
-
-            if response == Gtk.ResponseType.OK:
-                if len( model ) > 1:
-                    iter_previous = model.iter_previous( iter )
-                    if iter_previous:
-                        iter_select = iter_previous
-
-                    else:
-                        iter_select = model.iter_next( iter )
-
-                model.remove( iter )
-                #TODO Update textentry.
+            self._on_remove_group( )
 
         else:
-            response = (
-                self.show_dialog_ok_cancel(
-                    treeview, _( "Remove the selected script?" ) ) )
+            self._on_remove_script( )
 
-            if response == Gtk.ResponseType.OK:
-                iter_group = model.iter_parent( iter )
-                if model.iter_n_children( iter_group ) > 1:
-                    iter_previous = model.iter_previous( iter )
-                    if iter_previous:
-                        iter_select = iter_previous
 
-                    else:
-                        iter_select = model.iter_next( iter )
+    def _on_remove_group(
+        self,
+        button_remove,
+        treeview,
+        model,
+        iter_to_group,
+        textentry,
+        button_copy ):
 
-                    model.remove( iter )
+        response = (
+            self.show_dialog_ok_cancel(
+                treeview,
+                _(
+                    "Remove the selected group and\n" +
+                    "all scripts within the group?" ) ) )
+
+        iter_select = None
+        if response == Gtk.ResponseType.OK:
+            if len( model ) > 1:
+                iter_previous = model.iter_previous( iter_to_group )
+                if iter_previous:
+                    iter_select = iter_previous  #TODO Should this be the last script of the previous group?  See below..
+                        # iter_select = (
+                        #     model.iter_nth_child(
+                        #         iter_previous,
+                        #         model.iter_n_children( iter_previous ) - 1 ) )
 
                 else:
-                    if len( model ) > 1:
-                        iter_previous = model.iter_previous( iter_group )
-                        if iter_previous:
-                            iter_select = (
-                                model.iter_nth_child(
-                                    iter_previous,
-                                    model.iter_n_children( iter_previous ) - 1 ) )
+                    iter_select = model.iter_next( iter_to_group )
 
-                        else:
-                            iter_select = (
-                                model.iter_nth_child(
-                                    model.iter_next( iter_group ), 0 ) )
-
-                    model.remove( iter_group )
-                    model.remove( iter )  #TODO May not need to do this for the case of the last script in the group...check.
-                    #TODO Update textentry.
-                    # self.update_indicator_textentry(
-                    #     textentry, self._create_key( group, name ), "" )
+            model.remove( iter_to_group )
+#TODO Double check that all scripts within the group are also removed.
 
         if iter_select:
+#TODO Can this be put into a function?
             treepath = (
                 Gtk.TreePath.new_from_string(
                     model.get_string_from_iter( iter_select ) ) )
@@ -1219,49 +1204,74 @@ class IndicatorScriptRunner( IndicatorBase ):
             treeview.get_selection().select_path( treepath )
             treeview.set_cursor( treepath, None, False )
 
-#TODO When to disable/enable copy/remove buttons?
+#TODO Disable remove/copy button if last group.
+# When to update textentry?
 
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
         print()
 
 
-#TODO Implement
-# Check for when we click ADD and a group is selected...
-# is this the group we select by default to add in the new script?
-# Or just select the first group?
-#
-# If a script is selected, as above, use that script's group as the default group?
-    def on_add(
+    def _on_remove_script(
         self,
-        button,
+        button_remove,
         treeview,
-        button_copy,
-        button_remove ):
+        model,
+        iter_to_script,
+        textentry,
+        button_copy ):
 
-        model, iter = treeview.get_selection().get_selected()
-        group = None
-        if iter:
-            group = (
-                model.get_value(
-                    iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+        response = (
+            self.show_dialog_ok_cancel(
+                treeview, _( "Remove the selected script?" ) ) )
 
-        groups = [
-            row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
-            for row in model ]
+        if response == Gtk.ResponseType.OK:
+            iter_group = model.iter_parent( iter_to_script )
+            if model.iter_n_children( iter_group ) > 1:
+                iter_previous = model.iter_previous( iter_to_script )
+                if iter_previous:
+                    iter_select = iter_previous
 
-        self._on_edit_script(
-            treeview,
-            treeview.get_model(),
-            None,
-            group,
-            None,
-            groups,
-            None )
+                else:
+                    iter_select = model.iter_next( iter_to_script )
 
-#TODO Need something like this to enable the remove/copy buttons
-        # button_remove.set_sensitive( len( model ) )
+                model.remove( iter_to_script )
 
+            else:
+                if len( model ) > 1:
+                    iter_previous = model.iter_previous( iter_group )
+                    if iter_previous:
+                        iter_select = (
+                            model.iter_nth_child(
+                                iter_previous,
+                                model.iter_n_children( iter_previous ) - 1 ) )
+
+                    else:
+                        #TODO Perhaps select next group rather than first child of next group.
+                        iter_select = (
+                            model.iter_nth_child(
+                                model.iter_next( iter_group ), 0 ) )
+
+                model.remove( iter_group )
+                # model.remove( iter_to_script )  #TODO May not need to do this for the case of the last script in the group...check.
+
+        if iter_select:
+#TODO Can this be put into a function?
+            treepath = (
+                Gtk.TreePath.new_from_string(
+                    model.get_string_from_iter( iter_select ) ) )
+
+            treeview.expand_to_path( treepath )
+            treeview.get_selection().select_path( treepath )
+            treeview.set_cursor( treepath, None, False )
+
+#TODO When to disable copy/remove buttons?  
+# Maybe part of the function above?
+# When to update textentry?
+
+        dump = self.dump_treestore( model ) #TODO Testing
+        print( dump )
+        print()
 
 
     def on_edit(
@@ -1373,6 +1383,44 @@ class IndicatorScriptRunner( IndicatorBase ):
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
         print()
+
+
+#TODO
+# Check for when we click ADD and a group is selected...
+# is this the group we select by default to add in the new script?
+# Or just select the first group?
+#
+# If a script is selected, as above, use that script's group as the default group?
+    def on_add(
+        self,
+        button_add,
+        treeview,
+        button_copy,
+        button_remove,
+        textentry ):
+
+        model, iter = treeview.get_selection().get_selected()
+        group = None
+        if iter:
+            group = (
+                model.get_value(
+                    iter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
+        groups = [
+            row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
+            for row in model ]
+
+        self._on_edit_script(
+            treeview,
+            treeview.get_model(),
+            None,
+            group,
+            None,
+            groups,
+            textentry )
+
+#TODO If the add happened, need to enable the copy/remove buttons.
+# Or should these only be enabled/disabled when something is selected?
 
 
 #TODO Test when adding very first script (there will be no group to select).
