@@ -789,13 +789,13 @@ class IndicatorScriptRunner( IndicatorBase ):
     def _background_scripts_filter(
         self,
         model,
-        treeiter,
+        iter_,
         data ):
         '''
         Show a row for a group if any script within the group is background.
         Show a row for a script if the script is background.
         '''
-        row = model[ treeiter ]
+        row = model[ iter_ ]
         group = row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
         if group is None:
             background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
@@ -803,7 +803,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         else:
             show = False
-            iter_scripts = model.iter_children( treeiter )
+            iter_scripts = model.iter_children( iter_ )
             while iter_scripts:
                 row = model[ iter_scripts ]
                 background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
@@ -821,7 +821,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         tree_column,
         cell_renderer,
         model,
-        treeiter,
+        iter_,
         data ):
         '''
         Render a script name bold if that script is non-background and default.
@@ -830,7 +830,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         default = (
             model.get_value(
-                treeiter, IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) )
+                iter_, IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) )
 
         if default and default == "True":
             cell_renderer.set_property( "weight", Pango.Weight.BOLD )
@@ -861,16 +861,14 @@ class IndicatorScriptRunner( IndicatorBase ):
         textview ):
 
         command_text = ""
-        model, treeiter = treeview.get_selection().get_selected()
+        model, iter_ = treeview.get_selection().get_selected()
         name = (
-            model.get_value(
-                treeiter, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+            model.get_value( iter_, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
         if name:
             command_text = (
                 model.get_value(
-                    treeiter,
-                    IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ) )
+                    iter_, IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ) )
 
         textview.get_buffer().set_text( command_text )
 
@@ -883,16 +881,14 @@ class IndicatorScriptRunner( IndicatorBase ):
         textentry ):
 
         model = treeview.get_model()
-        treeiter = model.get_iter( path )
+        iter_ = model.get_iter( path )
         name = (
-            model.get_value(
-            treeiter, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+            model.get_value( iter_, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
         if name:
             group = (
                 model.get_value(
-                    treeiter,
-                    IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+                    iter_, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
             textentry.insert_text(
                 '[' + self._create_key( group, name ) + ']',
@@ -904,25 +900,24 @@ class IndicatorScriptRunner( IndicatorBase ):
         button_copy,
         treeview ):
 
-        model, treeiter = treeview.get_selection().get_selected()
+        model, iter_ = treeview.get_selection().get_selected()
         name = (
-            model.get_value(
-            treeiter, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+            model.get_value( iter_, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
         group = (
             model.get_value(
-                treeiter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+                iter_, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
         groups = [
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
             for row in model ]
 
         if name is None:
-            self._on_copy_group( treeview, model, treeiter, group, groups )
+            self._on_copy_group( treeview, model, iter_, group, groups )
 
         else:
             self._on_copy_script(
-                treeview, model, treeiter, group, name, groups )
+                treeview, model, iter_, group, name, groups )
 
 
     def _on_copy_group(
@@ -1164,16 +1159,15 @@ class IndicatorScriptRunner( IndicatorBase ):
         textentry,
         button_copy ):
 
-        model, treeiter = treeview.get_selection().get_selected()
+        model, iter_ = treeview.get_selection().get_selected()
         name = (
-            model.get_value(
-                treeiter, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+            model.get_value( iter_, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
         if name is None:
-            self._on_remove_group( treeview, model, treeiter )
+            self._on_remove_group( treeview, model, iter_ )
 
         else:
-            self._on_remove_script( )
+            self._on_remove_script( treeview, model, iter_ )
 
 
     def _on_remove_group(
@@ -1225,12 +1219,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 
     def _on_remove_script(
         self,
-        button_remove,
         treeview,
         model,
-        iter_to_script,
-        textentry,
-        button_copy ):
+        iter_to_script ):
 
         response = (
             self.show_dialog_ok_cancel(
@@ -1258,13 +1249,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                                 model.iter_n_children( iter_previous ) - 1 ) )
 
                     else:
-                        #TODO Perhaps select next group rather than first child of next group.
-                        iter_select = (
-                            model.iter_nth_child(
-                                model.iter_next( iter_group ), 0 ) )
+                        iter_select = iter_group
 
                 model.remove( iter_group )
-                # model.remove( iter_to_script )  #TODO May not need to do this for the case of the last script in the group...check.
 
         if iter_select:
 #TODO Can this be put into a function?
@@ -1291,14 +1278,13 @@ class IndicatorScriptRunner( IndicatorBase ):
         treeviewcolumn,
         textentry ):
 
-        model, treeiter = treeview.get_selection().get_selected()
+        model, iter_ = treeview.get_selection().get_selected()
         name = (
-            model.get_value(
-                treeiter, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+            model.get_value( iter_, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
         group = (
             model.get_value(
-                treeiter, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+                iter_, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
         groups = [
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
@@ -1306,11 +1292,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         if name is None:
             self._on_edit_group(
-                treeview, model, treeiter, group, groups, textentry )
+                treeview, model, iter_, group, groups, textentry )
 
         else:
             self._on_edit_script(
-                treeview, model, treeiter, group, name, groups, textentry )
+                treeview, model, iter_, group, name, groups, textentry )
 
 
     def _on_edit_group(
@@ -1412,13 +1398,12 @@ class IndicatorScriptRunner( IndicatorBase ):
         button_remove,
         textentry ):
 
-        model, treeiter = treeview.get_selection().get_selected()
+        model, iter_ = treeview.get_selection().get_selected()
         group = None
-        if treeiter:
+        if iter_:
             group = (
                 model.get_value(
-                    treeiter,
-                    IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+                    iter_, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
         groups = [
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
@@ -1772,9 +1757,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                 if is_non_background_and_default:
 #TODO I created a new non-background script, marked as default,
 # but this code did not clear the existing default non-background script.
-                    def remove_default( model, path, treeiter, data ):
+                    def remove_default( model, path, iter_, data ):
                         model.set_value(
-                            treeiter,
+                            iter_,
                             IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN,
                             "False" )
 
