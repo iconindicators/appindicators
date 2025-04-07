@@ -413,6 +413,21 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "The terminal script/command, along with any arguments." ),
                 editable = False ) )
 
+        box, add, copy_, remove = (
+            self.create_buttons_in_box(
+                (
+                    _( "Add" ),
+                    _( "Copy" ),
+                    _( "Remove" ) ),
+                (
+                    _( "Add a new script." ),
+                    _( "Duplicate the selected script." ),
+                    _( "Remove the selected script." ) ),
+                (
+                    None,
+                    None,
+                    None ) ) )
+
         # Rows describe either a
         #   group, showing only the group name,
         # or a
@@ -541,6 +556,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                     self._on_row_selection, command_text_view ),
                 rowactivatedfunctionandarguments = (
                     self.on_edit,
+                    copy_,
+                    remove,
                     indicator_text_entry ), ) )
 
         grid.attach( scripts_scrolledwindow, 0, 0, 1, 20 )
@@ -555,21 +572,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_box(
                 ( ( self.create_scrolledwindow( command_text_view ), True ), ) ),
              0, 21, 1, 10 )
-
-        box, add, copy_, remove = (
-            self.create_buttons_in_box(
-                (
-                    _( "Add" ),
-                    _( "Copy" ),
-                    _( "Remove" ) ),
-                (
-                    _( "Add a new script." ),
-                    _( "Duplicate the selected script." ),
-                    _( "Remove the selected script." ) ),
-                (
-                    None,
-                    None,
-                    None ) ) )
 
         add.connect(
             "clicked",
@@ -652,7 +654,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                 active = self.hide_groups ) )
 
         radio_show_scripts_indented.connect(
-            "toggled", self.on_radio_or_checkbox, True, hide_groups_checkbutton )
+            "toggled",
+            self.on_radio_or_checkbox,
+            True,
+            hide_groups_checkbutton )
 
         grid.attach( hide_groups_checkbutton, 0, 3, 1, 1 )
 
@@ -671,7 +676,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         indicator_text_separator_entry = (
             self.create_entry(
                 self.indicator_text_separator,
-                tooltip_text = _( "The separator will be added between script tags." ) ) )
+                tooltip_text = _(
+                    "The separator will be added between script tags." ) ) )
 
         grid.attach(
             self.create_box(
@@ -841,7 +847,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         model,
         row1,
         row2,
-        user_data ):
+        data ):
 
         return (
             Info.compare(
@@ -913,11 +919,16 @@ class IndicatorScriptRunner( IndicatorBase ):
             for row in model ]
 
         if name is None:
-            self._on_copy_group( treeview, model, iter_, group, groups )
+            iter_select = (
+                self._on_copy_group( treeview, model, iter_, group, groups ) )
 
         else:
-            self._on_copy_script(
-                treeview, model, iter_, group, name, groups )
+            iter_select = (
+                self._on_copy_script(
+                    treeview, model, iter_, group, name, groups ) )
+
+        self._update_user_interface(
+            treeview, model, iter_select, None, None, None )
 
 
     def _on_copy_group(
@@ -946,6 +957,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 _( "Copy Group" ),
                 content_widget = grid ) )
 
+        parent = None
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -970,49 +982,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                 parent = model.append( None, row )
                 iter_scripts = model.iter_children( iter_group )
                 while iter_scripts:
-                    model.append(
-                        parent,
-                        [
-                            group_,
-                            None,
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_NAME ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ] )
+                    row = [ group_, None ]
+                    for column in range( model.get_n_columns() - 2 ):
+                        row.append( model.get_value( iter_scripts, column + 2 ) )
 
+                    model.append( parent, row )
                     iter_scripts = model.iter_next( iter_scripts )
-
-#TODO Can this be made into a function?
-                treepath = (
-                    Gtk.TreePath.new_from_string(
-                        model.get_string_from_iter( parent ) ) )
-
-                treeview.expand_to_path( treepath )
-                treeview.get_selection().select_path( treepath )
-                treeview.set_cursor( treepath, None, False )
 
             break
 
@@ -1021,6 +996,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
         print()
+
+        return parent
 
 
     def _on_copy_script(
@@ -1065,6 +1042,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 _( "Copy Script" ),
                 content_widget = grid ) )
 
+        iter_select = None
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -1101,47 +1079,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                 else:
                     parent = self._get_iter_to_group( group_, model )
 
-#TODO Can this code be put into a function to be called by copy_group and copy_script?
-# Maybe also used by edit script/group?
-                row = [
-                    group_,
-                    None,
-                    name_,
-                    model.get_value(
-                        iter_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
-                    model.get_value(
-                        iter_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_SOUND ),
-                    model.get_value(
-                        iter_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ),
-                    model.get_value(
-                        iter_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ),
-                    model.get_value(
-                        iter_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ),
-                    model.get_value(
-                        iter_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ),
-                    model.get_value(
-                        iter_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ),
-                    model.get_value(
-                        iter_script,
-                        IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) ]
+                row = [ group_, None, name_ ]
+                for column in range( model.get_n_columns() - 3 ):
+                    row.append( model.get_value( iter_script, column + 3 ) )
 
                 iter_select = model.append( parent, row )
-
-#TODO Can this be made into a function which takes the treeview and iter?
-                treepath = (
-                    Gtk.TreePath.new_from_string(
-                        model.get_string_from_iter( iter_select ) ) )
-
-                treeview.expand_to_path( treepath )
-                treeview.get_selection().select_path( treepath )
-                treeview.set_cursor( treepath, None, False )
 
             break
 
@@ -1151,23 +1093,34 @@ class IndicatorScriptRunner( IndicatorBase ):
         print( dump )
         print()
 
+        return iter_select
+
 
     def on_remove(
         self,
         button_remove,
         treeview,
-        textentry,
-        button_copy ):
+        button_copy,
+        textentry ):
 
         model, iter_ = treeview.get_selection().get_selected()
         name = (
             model.get_value( iter_, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
+        iter_select = None
         if name is None:
-            self._on_remove_group( treeview, model, iter_ )
+            iter_select = self._on_remove_group( treeview, model, iter_ )
 
         else:
-            self._on_remove_script( treeview, model, iter_ )
+            iter_select = self._on_remove_script( treeview, model, iter_ )
+
+        self._update_user_interface(
+            treeview,
+            model,
+            iter_select,
+            button_copy,
+            button_remove,
+            textentry )
 
 
     def _on_remove_group(
@@ -1198,23 +1151,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             model.remove( iter_to_group )
 
-        if iter_select:
-#TODO Can this be put into a function?
-            treepath = (
-                Gtk.TreePath.new_from_string(
-                    model.get_string_from_iter( iter_select ) ) )
-
-            treeview.expand_to_path( treepath )
-            treeview.get_selection().select_path( treepath )
-            treeview.set_cursor( treepath, None, False )
-
-#TODO Disable remove/copy button if last group.
-# When to update textentry?
-# Maybe return iter_select and do the selecting (and disable of buttons and textentry) in the caller?
-
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
         print()
+        
+        return iter_select
 
 
     def _on_remove_script(
@@ -1227,6 +1168,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.show_dialog_ok_cancel(
                 treeview, _( "Remove the selected script?" ) ) )
 
+        iter_select = None
         if response == Gtk.ResponseType.OK:
             iter_group = model.iter_parent( iter_to_script )
             if model.iter_n_children( iter_group ) > 1:
@@ -1253,22 +1195,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 model.remove( iter_group )
 
-        if iter_select:
-#TODO Can this be put into a function?
-            treepath = (
-                Gtk.TreePath.new_from_string(
-                    model.get_string_from_iter( iter_select ) ) )
-
-            treeview.expand_to_path( treepath )
-            treeview.get_selection().select_path( treepath )
-            treeview.set_cursor( treepath, None, False )
-#TODO Disable remove/copy button if last group.
-# When to update textentry?
-# Maybe return iter_select and do the selecting (and disable of buttons and textentry) in the caller?
-
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
         print()
+        
+        return iter_select
 
 
     def on_edit(
@@ -1276,6 +1207,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         treeview,
         treepath,
         treeviewcolumn,
+        button_copy,
+        button_remove,
         textentry ):
 
         model, iter_ = treeview.get_selection().get_selected()
@@ -1291,12 +1224,21 @@ class IndicatorScriptRunner( IndicatorBase ):
             for row in model ]
 
         if name is None:
-            self._on_edit_group(
-                treeview, model, iter_, group, groups, textentry )
+            self._on_edit_group( treeview, model, iter_, group, groups )
+            iter_select = iter_
 
         else:
-            self._on_edit_script(
-                treeview, model, iter_, group, name, groups, textentry )
+            iter_select = (
+                self._on_edit_script(
+                    treeview, model, iter_, group, name, groups ) )
+
+        self._update_user_interface(
+            treeview,
+            model,
+            iter_select,
+            button_copy,
+            button_remove,
+            textentry )
 
 
     def _on_edit_group(
@@ -1305,8 +1247,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         model,
         iter_group,
         group,
-        groups,
-        textentry ):
+        groups ):
 
         grid = self.create_grid()
 
@@ -1365,16 +1306,6 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                     iter_scripts = model.iter_next( iter_scripts )
 
-                treepath = (
-                    Gtk.TreePath.new_from_string(
-                        model.get_string_from_iter( iter_group ) ) )
-
-                treeview.expand_to_path( treepath )
-                treeview.get_selection().select_path( treepath )
-                treeview.set_cursor( treepath, None, False )
-
-                #TODO Update textentry.
-
             break
 
         dialog.destroy()
@@ -1395,8 +1326,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         button_add,
         treeview,
         button_copy,
-        button_remove,
-        textentry ):
+        button_remove ):
 
         model, iter_ = treeview.get_selection().get_selected()
         group = None
@@ -1409,17 +1339,12 @@ class IndicatorScriptRunner( IndicatorBase ):
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
             for row in model ]
 
-        self._on_edit_script(
-            treeview,
-            treeview.get_model(),
-            None,
-            group,
-            None,
-            groups,
-            textentry )
+        iter_select = (
+            self._on_edit_script(
+                treeview, treeview.get_model(), None, group, None, groups ) )
 
-#TODO If the add happened, need to enable the copy/remove buttons.
-# Or should these only be enabled/disabled when something is selected?
+        self._update_user_interface(
+            treeview, model, iter_select, button_copy, button_remove, None )
 
 
 #TODO Test when adding very first script (there will be no group to select).
@@ -1430,8 +1355,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         iter_script,
         group,
         name,
-        groups,
-        textentry ):
+        groups ):
 
         add = name is None
 
@@ -1698,6 +1622,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 _( "Add Script" ) if add else _( "Edit Script" ),
                 content_widget = grid ) )
 
+        iter_select = None
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -1773,8 +1698,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 else:
                     parent = self._get_iter_to_group( group_, model )
 
-#TODO Can this code be put into a function to be
-# called by copy_group and copy_script and here?
                 row = [
                     group_,
                     None,
@@ -1802,27 +1725,17 @@ class IndicatorScriptRunner( IndicatorBase ):
                     if script_background_radio.get_active() else '—' ]
 
                 iter_select = model.append( parent, row )
-
-                treepath = (
-                    Gtk.TreePath.new_from_string(
-                        model.get_string_from_iter( iter_select ) ) )
-
-                treeview.expand_to_path( treepath )
-                treeview.get_selection().select_path( treepath )
-                treeview.set_cursor( treepath, None, False )
-#TODO Ensure that one of the lines above selects the script and
-# that in turn shows the command (same command as original script).
-
-                #TODO Update textentry.
-                #     if isinstance( the_script, Background ) and isinstance( edited_script, NonBackground ):
-                #         old_tag = self._create_key( group, name )
-                #         self.update_indicator_textentry( textentry, old_tag, "" )
-                #
-                #     if not( group == edited_script.get_group() and name == edited_script.get_name() ):
-                #         old_tag = self._create_key( group, name )
-                #         new_tag = self._create_key( edited_script.get_group(), edited_script.get_name() )
-                #         self.update_indicator_textentry(
-                #             textentry, old_tag, new_tag )
+#TODO Update textentry.
+# Was originally here...should be put into the function that handles button update, select row and textentry.
+#     if isinstance( the_script, Background ) and isinstance( edited_script, NonBackground ):
+#         old_tag = self._create_key( group, name )
+#         self.update_indicator_textentry( textentry, old_tag, "" )
+#
+#     if not( group == edited_script.get_group() and name == edited_script.get_name() ):
+#         old_tag = self._create_key( group, name )
+#         new_tag = self._create_key( edited_script.get_group(), edited_script.get_name() )
+#         self.update_indicator_textentry(
+#             textentry, old_tag, new_tag )
 
             break
 
@@ -1831,6 +1744,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
         print()
+
+        return iter_select
 
 
     def _get_iter_to_group(
@@ -1947,6 +1862,36 @@ class IndicatorScriptRunner( IndicatorBase ):
         model.foreach( dump_treestore_, dump )
         return dump[ 0 ]
         # return ""
+
+
+    def _update_user_interface(
+        self,
+        treeview,
+        model,
+        treeiter,
+        button_copy,
+        button_remove,
+        textentry ):
+
+        if treeiter:
+            treepath = (
+                Gtk.TreePath.new_from_string(
+                    model.get_string_from_iter( treeiter ) ) )
+
+        else:
+            treepath = Gtk.TreePath.new_from_string( "0:0" )
+
+        treeview.expand_to_path( treepath )
+        treeview.get_selection().select_path( treepath )
+        treeview.set_cursor( treepath, None, False )
+
+        if button_copy:
+            button_copy.set_sensitive( len( model ) )
+
+        if button_remove:
+            button_remove.set_sensitive( len( model ) )
+
+#TODO Handle textentry.
 
 
 
