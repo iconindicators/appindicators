@@ -927,8 +927,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 self._on_copy_script(
                     treeview, model, iter_, group, name, groups ) )
 
-        self._update_user_interface(
-            treeview, model, iter_select, None, None, None )
+        self._update_user_interface( treeview, iter_select )
 
 
     def _on_copy_group(
@@ -1107,20 +1106,32 @@ class IndicatorScriptRunner( IndicatorBase ):
         name = (
             model.get_value( iter_, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
+        group = (
+            model.get_value(
+                iter_, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
         iter_select = None
+        old_tag_new_tag_pairs = None
         if name is None:
             iter_select = self._on_remove_group( treeview, model, iter_ )
+            if iter_select:
+                iter_scripts = self._get_iter_to_group( group, model )
+                while iter_scripts:
+                    pass
 
         else:
             iter_select = self._on_remove_script( treeview, model, iter_ )
+            if iter_select:
+                old_tag_new_tag_pairs = (
+                    ( self._create_key( group, name ), "" ), )
 
         self._update_user_interface(
             treeview,
-            model,
             iter_select,
-            button_copy,
-            button_remove,
-            textentry )
+            button_copy = button_copy,
+            button_remove = button_remove,
+            textentry = textentry,
+            old_tag_new_tag_pairs = old_tag_new_tag_pairs )
 
 
     def _on_remove_group(
@@ -1154,7 +1165,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
         print()
-        
+
         return iter_select
 
 
@@ -1198,7 +1209,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         dump = self.dump_treestore( model ) #TODO Testing
         print( dump )
         print()
-        
+
         return iter_select
 
 
@@ -1234,11 +1245,10 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         self._update_user_interface(
             treeview,
-            model,
             iter_select,
-            button_copy,
-            button_remove,
-            textentry )
+            button_copy = button_copy,
+            button_remove = button_remove,
+            textentry = textentry )
 
 
     def _on_edit_group(
@@ -1344,7 +1354,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                 treeview, treeview.get_model(), None, group, None, groups ) )
 
         self._update_user_interface(
-            treeview, model, iter_select, button_copy, button_remove, None )
+            treeview,
+            iter_select,
+            button_copy = button_copy,
+            button_remove = button_remove )
 
 
 #TODO Test when adding very first script (there will be no group to select).
@@ -1840,16 +1853,16 @@ class IndicatorScriptRunner( IndicatorBase ):
     def _update_user_interface(
         self,
         treeview,
-        model,
         treeiter,
-        button_copy,
-        button_remove,
-        textentry ):
+        button_copy = None,
+        button_remove = None,
+        textentry = None,
+        old_tag_new_tag_pairs = None ):
 
         if treeiter:
             treepath = (
                 Gtk.TreePath.new_from_string(
-                    model.get_string_from_iter( treeiter ) ) )
+                    treeview.get_model().get_string_from_iter( treeiter ) ) )
 
         else:
             treepath = Gtk.TreePath.new_from_string( "0:0" )
@@ -1864,37 +1877,50 @@ class IndicatorScriptRunner( IndicatorBase ):
         if button_remove:
             button_remove.set_sensitive( len( model ) )
 
-#TODO Handle textentry.
+        if textentry and old_tag_new_tag_pairs:
+            for old_tag, new_tag in old_tag_new_tag_pairs:
+                '''
+                textentry.set_text(
+                    textentry.get_text().replace(
+                        "[" + old_tag + "]",
+                        "[" + new_tag + "]" if new_tag else "" ) )
+                '''
+                print( old_tag )
+                print( new_tag )
+                print() #TODO Remove
+
+            pass #TODO Handle remove.
+            # self.update_indicator_textentry(
+            #     textentry, self._create_key( group, name ), "" )
 
 
-#TODO Update textentry.
-# Was originally here...should be put into the function that handles button update, select row and textentry.
-#     if isinstance( the_script, Background ) and isinstance( edited_script, NonBackground ):
-#         old_tag = self._create_key( group, name )
-#         self.update_indicator_textentry( textentry, old_tag, "" )
-#
-#     if not( group == edited_script.get_group() and name == edited_script.get_name() ):
-#         old_tag = self._create_key( group, name )
-#         new_tag = self._create_key( edited_script.get_group(), edited_script.get_name() )
-#         self.update_indicator_textentry(
-#             textentry, old_tag, new_tag )
+            pass #TODO Handle edit.
+            # if edited_script:
+            #     if isinstance( the_script, Background ) and isinstance( edited_script, NonBackground ):
+            #         old_tag = self._create_key( group, name )
+            #         self.update_indicator_textentry( textentry, old_tag, "" )
+            #
+            #     if not( group == edited_script.get_group() and name == edited_script.get_name() ):
+            #         old_tag = self._create_key( group, name )
+            #         new_tag = self._create_key( edited_script.get_group(), edited_script.get_name() )
+            #         self.update_indicator_textentry(
+            #             textentry, old_tag, new_tag )
+        '''
+        def update_indicator_textentry(
+            self,
+            textentry,
+            old_tag,
+            new_tag ):
 
+            old_tag_ = "[" + old_tag + "]"
+            if new_tag:
+                textentry.set_text(
+                    textentry.get_text().replace( old_tag_, "[" + new_tag + "]" ) )
 
-    # def _update_textentry(
-    #     self,
-    #     textentry,
-    #     old_tag,
-    #     new_tag ):
-    #
-    #     old_tag_ = "[" + old_tag + "]"
-    #     if new_tag:
-    #         textentry.set_text(
-    #             textentry.get_text().replace( old_tag_, "[" + new_tag + "]" ) )
-    #
-    #     else:
-    #         textentry.set_text(
-    #             textentry.get_text().replace( old_tag_, "" ) )
-
+            else:
+                textentry.set_text(
+                    textentry.get_text().replace( old_tag_, "" ) )
+        '''
 
 
     def initialise_background_scripts( self ):
