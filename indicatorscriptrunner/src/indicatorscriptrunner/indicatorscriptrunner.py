@@ -1725,17 +1725,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                     if script_background_radio.get_active() else '—' ]
 
                 iter_select = model.append( parent, row )
-#TODO Update textentry.
-# Was originally here...should be put into the function that handles button update, select row and textentry.
-#     if isinstance( the_script, Background ) and isinstance( edited_script, NonBackground ):
-#         old_tag = self._create_key( group, name )
-#         self.update_indicator_textentry( textentry, old_tag, "" )
-#
-#     if not( group == edited_script.get_group() and name == edited_script.get_name() ):
-#         old_tag = self._create_key( group, name )
-#         new_tag = self._create_key( edited_script.get_group(), edited_script.get_name() )
-#         self.update_indicator_textentry(
-#             textentry, old_tag, new_tag )
 
             break
 
@@ -1799,22 +1788,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                     iter_scripts = model.iter_next( iter_scripts )
 
         return iter_to_script
-
-
-    def _update_textentry(
-        self,
-        textentry,
-        old_tag,
-        new_tag ):
-
-        old_tag_ = "[" + old_tag + "]"
-        if new_tag:
-            textentry.set_text(
-                textentry.get_text().replace( old_tag_, "[" + new_tag + "]" ) )
-
-        else:
-            textentry.set_text(
-                textentry.get_text().replace( old_tag_, "" ) )
 
 
     def get_scripts_by_group(
@@ -1892,6 +1865,35 @@ class IndicatorScriptRunner( IndicatorBase ):
             button_remove.set_sensitive( len( model ) )
 
 #TODO Handle textentry.
+
+
+#TODO Update textentry.
+# Was originally here...should be put into the function that handles button update, select row and textentry.
+#     if isinstance( the_script, Background ) and isinstance( edited_script, NonBackground ):
+#         old_tag = self._create_key( group, name )
+#         self.update_indicator_textentry( textentry, old_tag, "" )
+#
+#     if not( group == edited_script.get_group() and name == edited_script.get_name() ):
+#         old_tag = self._create_key( group, name )
+#         new_tag = self._create_key( edited_script.get_group(), edited_script.get_name() )
+#         self.update_indicator_textentry(
+#             textentry, old_tag, new_tag )
+
+
+    # def _update_textentry(
+    #     self,
+    #     textentry,
+    #     old_tag,
+    #     new_tag ):
+    #
+    #     old_tag_ = "[" + old_tag + "]"
+    #     if new_tag:
+    #         textentry.set_text(
+    #             textentry.get_text().replace( old_tag_, "[" + new_tag + "]" ) )
+    #
+    #     else:
+    #         textentry.set_text(
+    #             textentry.get_text().replace( old_tag_, "" ) )
 
 
 
