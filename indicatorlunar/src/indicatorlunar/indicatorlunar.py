@@ -384,7 +384,8 @@ class IndicatorLunar( IndicatorBase ):
                 [ IndicatorLunar.MINOR_PLANET_DATA_TYPE ] ) )
 
         if self.minor_planets_add_new:
-            self.add_new_bodies( self.minor_planet_orbital_element_data, self.minor_planets )
+            self.add_new_bodies(
+                self.minor_planet_orbital_element_data, self.minor_planets )
 
         # Update minor planet apparent magnitudes.
         self.minor_planet_apparent_magnitude_data, self.download_count_apparent_magnitude, self.next_download_time_apparent_magnitude = (
@@ -599,7 +600,12 @@ class IndicatorLunar( IndicatorBase ):
 
         # Remove the last separator if present.
         if last_separator_index > -1:
-#TODO Tidy up
+            processed_text = (
+                processed_text[ 0 : last_separator_index ]
+                +
+                processed_text[
+                    last_separator_index + len( self.indicator_text_separator ) : ] )
+
             processed_text = (
                 processed_text[ 0 : last_separator_index ]
                 +
@@ -616,7 +622,6 @@ class IndicatorLunar( IndicatorBase ):
         date_times = [ ]
         for key in self.data:
             data_name = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
-            #TODO TIDY up
             if key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] == IndicatorLunar.astro_backend.BodyType.SATELLITE:
                 if data_name == IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME:
                     date_time = self.data[ key ]
@@ -650,14 +655,18 @@ class IndicatorLunar( IndicatorBase ):
         utc_now = datetime.datetime.now( datetime.timezone.utc )
         utc_now_plus_one_minute = utc_now + datetime.timedelta( minutes = 1 ) # Ensure updates don't happen more frequently than every minute.
         next_update_time = utc_now + datetime.timedelta( minutes = 20 ) # Do an update at most twenty minutes from now (keeps the moon icon and data fresh).
-        next_update_in_seconds = int( math.ceil( ( next_update_time - utc_now ).total_seconds() ) )
+        next_update_in_seconds = (
+            int( math.ceil( ( next_update_time - utc_now ).total_seconds() ) ) )
+
         for date_time in sorted( date_times ):
             if date_time > next_update_time:
                 break
 
             if date_time > utc_now_plus_one_minute:
                 next_update_time = date_time
-                next_update_in_seconds = int( math.ceil( ( next_update_time - utc_now ).total_seconds() ) )
+                next_update_in_seconds = (
+                    int( math.ceil( ( next_update_time - utc_now ).total_seconds() ) ) )
+
                 break
 
         return next_update_in_seconds
@@ -711,16 +720,14 @@ class IndicatorLunar( IndicatorBase ):
             IndicatorLunar.astro_backend.BodyType.MOON,
             IndicatorLunar.astro_backend.NAME_TAG_MOON )
 
-        phase = (
-            self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_PHASE, ) ] )
+        key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_PHASE, )
+        phase = self.data[ key_ ]
 
-#TODO Tidy up
-        illumination_percentage = (
-            int( round( float(
-                self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_ILLUMINATION, ) ] ) ) ) )
+        key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_ILLUMINATION, )
+        illumination_percentage = int( round( float( self.data[ key_ ] ) ) )
 
-        bright_limb_angle_in_degrees = (
-            int( math.degrees( float( self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_BRIGHT_LIMB, ) ] ) ) ) )
+        key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_BRIGHT_LIMB, )
+        bright_limb_angle_in_degrees = int( math.degrees( float( self.data[ key ] ) ) )
 
         svg_icon_text = (
             self.get_svg_icon_text(
@@ -743,22 +750,31 @@ class IndicatorLunar( IndicatorBase ):
             IndicatorLunar.astro_backend.BodyType.MOON,
             IndicatorLunar.astro_backend.NAME_TAG_MOON )
 
-        phase = (
-            self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_PHASE, ) ] )
+        key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_PHASE, )
+        phase = self.data[ key ]
 
-#TODO Tidy up
-        illumination_percentage = (
-            int( round( float( self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_ILLUMINATION, ) ] ) ) ) )
+        key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_ILLUMINATION, )
+        illumination_percentage = int( round( float( self.data[ key ] ) ) )
 
         is_waxing_gibbous_or_full = (
             phase in {
                 IndicatorLunar.astro_backend.LUNAR_PHASE_WAXING_GIBBOUS,
                 IndicatorLunar.astro_backend.LUNAR_PHASE_FULL_MOON } )
 
-        last_notification_more_than_one_hour_ago = (
-            ( self.last_full_moon_notfication + datetime.timedelta( hours = 1 ) ) < utc_now )
+        last_notification_plus_one_hour = (
+            self.last_full_moon_notfication + datetime.timedelta( hours = 1 )
 
-        if is_waxing_gibbous_or_full and illumination_percentage >= 96 and last_notification_more_than_one_hour_ago:
+        last_notification_more_than_one_hour_ago = (
+            last_notification_plus_one_hour < utc_now )
+
+        show_notification = (
+            is_waxing_gibbous_or_full
+            and
+            illumination_percentage >= 96
+            and
+            last_notification_more_than_one_hour_ago )
+
+        if show_notification:
             summary = self.werewolf_warning_summary
             if self.werewolf_warning_summary == "":
                 summary = " " # The notification summary text cannot be empty (at least on Unity).
@@ -790,19 +806,20 @@ class IndicatorLunar( IndicatorBase ):
         utc_now = datetime.datetime.now( datetime.timezone.utc )
         for number in self.satellites:
             key = ( IndicatorLunar.astro_backend.BodyType.SATELLITE, number )
-            #TODO Tidy up
-            if \
-                key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_AZIMUTH, ) in self.data and \
-                number not in self.satellite_previous_notifications:
-
+            key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_AZIMUTH, )
+            if key_ in self.data and number not in self.satellite_previous_notifications:
                 # About to rise and no notification already sent.
-                rise_time = self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ]
+                rise_time = (
+                    self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] )
+
                 if ( rise_time - datetime.timedelta( minutes = 2 ) ) <= utc_now: # Two minute buffer.
                     satellite_current_notifications.append( [ number, rise_time ] )
                     self.satellite_previous_notifications.append( number )
 
             if key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) in self.data:
-                set_time = self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ]
+                set_time = (
+                    self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] )
+
                 if number in self.satellite_previous_notifications and set_time < utc_now:
                     # Notification has been sent and satellite has now set.
                     self.satellite_previous_notifications.remove( number )
@@ -949,29 +966,26 @@ class IndicatorLunar( IndicatorBase ):
             # The phase (illumination) is rounded and so a given phase is
             # entered earlier than what occurs in reality.
             next_phases = [ ]
-#TODO Tidy up
-            next_phases.append(
-                [
-                    self.data[
-                        key + ( IndicatorLunar.astro_backend.DATA_TAG_FIRST_QUARTER, ) ],
-                 _( "First Quarter: " ), key + ( IndicatorLunar.astro_backend.DATA_TAG_FIRST_QUARTER, ) ] )
 
-            next_phases.append(
-                [ self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_FULL, ) ],
-                _( "Full: " ), key + ( IndicatorLunar.astro_backend.DATA_TAG_FULL, ) ] )
+            key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_FIRST_QUARTER, )
+            next_phases.append( [ self.data[ key_ ], _( "First Quarter: " ), key_ ] )
 
-            next_phases.append(
-                [ self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_NEW, ) ],
-                _( "New: " ), key + ( IndicatorLunar.astro_backend.DATA_TAG_NEW, ) ] )
+            key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_FULL, )
+            next_phases.append( [ self.data[ key_ ], _( "Full: " ), key_ ] )
 
-            next_phases.append(
-                [ self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_THIRD_QUARTER, ) ],
-                _( "Third Quarter: " ), key + ( IndicatorLunar.astro_backend.DATA_TAG_THIRD_QUARTER, ) ] )
+            key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_NEW, )
+            next_phases.append( [ self.data[ key_ ], _( "New: " ), key_ ] )
 
-            for date_time, display_text, key in sorted( next_phases, key = lambda pair: pair[ 0 ] ): # Sort by date of each phase (the first element).
-                label = (
-                    display_text + \
-                    self.format_data( key[ IndicatorLunar.DATA_INDEX_DATA_NAME ], self.data[ key ] ) )
+            key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_THIRD_QUARTER, )
+            next_phases.append( [ self.data[ key_ ], _( "Third Quarter: " ), key_ ] )
+
+            for date_time, display_text, key in sorted( next_phases, key = lambda pair: pair[ 0 ] ): # Sort by date of each phase.
+                formatted_data = (
+                    self.format_data(
+                        key[ IndicatorLunar.DATA_INDEX_DATA_NAME ],
+                        self.data[ key ] ) )
+
+                label = display_text + formatted_data
 
                 self.create_and_append_menuitem(
                     submenu,

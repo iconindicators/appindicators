@@ -474,21 +474,22 @@ class AstroPyEphem( AstroBase ):
         apparent_magnitude_data ):
 
         for key in minor_planets:
-#TODO Remove \
-            if key in orbital_element_data and \
-               key in apparent_magnitude_data and \
-               float( apparent_magnitude_data[ key ].get_apparent_magnitude() ) < apparent_magnitude_maximum:
-                body = (
-                    AstroPyEphem._compute_minor_planet_or_comet_for_observer(
-                        observer,
-                        orbital_element_data[ key ].get_data() ) )
+            if key in orbital_element_data and key in apparent_magnitude_data:
+                apparent_magnitude = (
+                   float( apparent_magnitude_data[ key ].get_apparent_magnitude() ) )
 
-                if not AstroPyEphem._is_body_bad( body ):
-                    AstroPyEphem._calculate_common(
-                        data,
-                        ( AstroBase.BodyType.MINOR_PLANET, key ),
-                        observer,
-                        body )
+                if apparent_magnitude < apparent_magnitude_maximum:
+                    body = (
+                        AstroPyEphem._compute_minor_planet_or_comet_for_observer(
+                            observer,
+                            orbital_element_data[ key ].get_data() ) )
+
+                    if not AstroPyEphem._is_body_bad( body ):
+                        AstroPyEphem._calculate_common(
+                            data,
+                            ( AstroBase.BodyType.MINOR_PLANET, key ),
+                            observer,
+                            body )
 
 
     @staticmethod
@@ -592,8 +593,7 @@ class AstroPyEphem( AstroBase ):
                         *satellite_data[ satellite ].get_tle_line_one_line_two() ) )
 
                 for start_date_time, end_date_time in windows:
-#TODO Remove \
-                    if \
+                    found_pass = (
                         AstroPyEphem._calculate_satellite(
                             ephem.Date( start_date_time ),
                             ephem.Date( end_date_time ),
@@ -601,8 +601,9 @@ class AstroPyEphem( AstroBase ):
                             key,
                             earth_satellite,
                             observer,
-                            observer_visible_passes ):
+                            observer_visible_passes ) )
 
+                    if found_pass:
                         break
 
         # Observer's date was changed in the calculate satellite method,

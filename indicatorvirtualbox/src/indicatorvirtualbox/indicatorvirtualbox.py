@@ -42,7 +42,6 @@ class IndicatorVirtualBox( IndicatorBase ):
     indicator_name_for_desktop_file = _( "Indicator VirtualBox™" )
     indicator_categories = "Categories=Utility"
 
-#TODO Shorten
     CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS = "delayBetweenAutoStartInSeconds"
     CONFIG_REFRESH_INTERVAL_IN_MINUTES = "refreshIntervalInMinutes"
     CONFIG_SHOW_SUBMENU = "showSubmenu"
@@ -356,7 +355,6 @@ class IndicatorVirtualBox( IndicatorBase ):
         if self.is_vboxmanage_installed():
             running_names, running_uuids = self.get_running_virtual_machines()
             if running_uuids:
-#TODO Shorten
                 if self.scroll_uuid is None or self.scroll_uuid not in running_uuids:
                     self.scroll_uuid = running_uuids[ 0 ]
 
@@ -514,7 +512,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         self,
         uuid ):
 
-#TODO Shorten
+#TODO Shorten if possible/feasible.
+#TODO Why need to check if uuid in preferences?
         return (
             uuid in self.virtual_machine_preferences
             and
@@ -684,7 +683,6 @@ class IndicatorVirtualBox( IndicatorBase ):
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
             self.virtualbox_manager_window_name = window_name.get_text().strip()
-#TODO Shorten
             self.delay_between_autostart_in_seconds = spinner_delay.get_value_as_int()
             self.show_submenu = show_as_submenus_checkbox.get_active()
             self.sort_groups_and_virtual_machines_equally = sort_groups_and_virtual_machines_equally_checkbox.get_active()
@@ -782,12 +780,18 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 #TODO Shorten
         while iter_:
-            is_virtual_machine = model[ iter_ ][ IndicatorVirtualBox.COLUMN_UUID ]
-            is_autostart = model[ iter_ ][ IndicatorVirtualBox.COLUMN_AUTOSTART ]
-            is_default_start_command = model[ iter_ ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] == IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
+            row = model[ iter_ ]
+            is_virtual_machine = row[ IndicatorVirtualBox.COLUMN_UUID ]
+            is_autostart = row[ IndicatorVirtualBox.COLUMN_AUTOSTART ]
+            is_default_start_command = (
+                row[ IndicatorVirtualBox.COLUMN_START_COMMAND ]
+                ==
+                IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT )
+
+#TODO Shorten.
             if ( is_virtual_machine and is_autostart ) or ( is_virtual_machine and not is_default_start_command ): # Only record VMs with different settings to default.
-                key = model[ iter_ ][ IndicatorVirtualBox.COLUMN_UUID ]
-                value = [ is_autostart, model[ iter_ ][ IndicatorVirtualBox.COLUMN_START_COMMAND ] ]
+                key = row[ IndicatorVirtualBox.COLUMN_UUID ]
+                value = [ is_autostart, row[ IndicatorVirtualBox.COLUMN_START_COMMAND ] ]
                 self.virtual_machine_preferences[ key ] = value
 
             if model.iter_has_child( iter_ ):

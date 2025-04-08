@@ -318,13 +318,13 @@ class IndicatorBase( ABC ):
             else:
                 error_network = True
 
-            self.get_logging().error( f"Problem with { url }" )  #TODO URL is underscored...an error/warning?  What does pylint say?
+            self.get_logging().error( f"Problem with { url }" )
             self.get_logging().exception( e )
             json_ = None
 
         except socket.timeout as e:
             error_timeout = True
-            self.get_logging().error( f"Problem with { url }" )  #TODO URL is underscored...an error/warning?  What does pylint say?
+            self.get_logging().error( f"Problem with { url }" )
             self.get_logging().exception( e )
             json_ = None
 
@@ -501,7 +501,6 @@ class IndicatorBase( ABC ):
                         made_a_change = True
 
         if made_a_change:
-#TODO Make shorter
             with open( self.desktop_file_user_home, 'w', encoding = "utf-8" ) as f:
                 f.write( output )
 
@@ -1089,7 +1088,6 @@ class IndicatorBase( ABC ):
         '''
         if self.is_clipboard_supported():
             if self.is_session_type_wayland():
-#TODO Make shorter
                 with tempfile.NamedTemporaryFile( mode = 'w', delete = False ) as temporary_named_file:
                     temporary_named_file.write( text )
 
@@ -2591,7 +2589,6 @@ class IndicatorBase( ABC ):
         '''
         terminal = None
         execution_flag = None
-#TODO Make shorter
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
             terminal = self.process_get( "which " + _terminal )
             if terminal:
@@ -2609,7 +2606,6 @@ class IndicatorBase( ABC ):
         ''' Download the contents of the given URL and save to file. '''
         downloaded = False
         try:
-#TODO Make shorter
             with urlopen( url, timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) as f_in:
                 with open( filename, 'w', encoding = "utf-8" ) as f_out:
                     f_out.write( f_in.read().decode() )

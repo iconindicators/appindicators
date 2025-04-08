@@ -1217,7 +1217,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         iter_select = iter_group
 
 
-                                
+
                 model.remove( iter_group )
 
         dump = self.dump_treestore( model ) #TODO Testing
@@ -1248,15 +1248,18 @@ class IndicatorScriptRunner( IndicatorBase ):
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
             for row in model ]
 
+        iter_select = None
+        old_tag_new_tag_pairs = None
+
         if name is None:
-#TODO For any script in the group that is background, create tags.            
+#TODO For any script in the group that is background, create tags.
             self._on_edit_group( treeview, model, iter_, group, groups )
             iter_select = iter_
 
         else:
-#TODO 
+#TODO
 # If the script was background and is now not background, create tags.
-# If the script name or group was changed and is background, create tags.            
+# If the script name or group was changed and is background, create tags.
             iter_select = (
                 self._on_edit_script(
                     treeview, model, iter_, group, name, groups ) )

@@ -347,7 +347,6 @@ class IndicatorTide( IndicatorBase ):
                 self.show_as_submenus_except_first_day = (
                     show_as_submenus_except_first_day_checkbutton.get_active() )
 
-#TODO Shorten
                 if user_script_path_and_filename.get_text() and user_script_class_name.get_text():
                     if not Path( user_script_path_and_filename.get_text().strip() ).is_file():
                         message = _(
