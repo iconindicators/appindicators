@@ -587,8 +587,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             "clicked",
             self.on_remove,
             scripts_treeview,
-            indicator_text_entry,
-            copy_ )
+            copy_,
+            indicator_text_entry )
 
 #TODO Can/should this be put into a function to be called at end of remove/add/copy/edit?
         if len( treestore ):
@@ -1112,12 +1112,24 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         iter_select = None
         old_tag_new_tag_pairs = None
+
         if name is None:
+            scripts = [ ]
+            iter_children = model.iter_children( iter_ )
+            while iter_children:
+                scripts.append(
+                    model.get_value(
+                        iter_children,
+                        IndicatorScriptRunner.COLUMN_MODEL_NAME)  )
+
+                iter_children = model.iter_next( iter_children )
+
             iter_select = self._on_remove_group( treeview, model, iter_ )
+            old_tag_new_tag_pairs = ( )
             if iter_select:
-                iter_scripts = self._get_iter_to_group( group, model )
-                while iter_scripts:
-                    pass
+                for script in scripts:
+                    old_tag_new_tag_pairs += (
+                        ( self._create_key( group, script ), "" ), )
 
         else:
             iter_select = self._on_remove_script( treeview, model, iter_ )
@@ -1204,6 +1216,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                     else:
                         iter_select = iter_group
 
+
+                                
                 model.remove( iter_group )
 
         dump = self.dump_treestore( model ) #TODO Testing
@@ -1235,10 +1249,14 @@ class IndicatorScriptRunner( IndicatorBase ):
             for row in model ]
 
         if name is None:
+#TODO For any script in the group that is background, create tags.            
             self._on_edit_group( treeview, model, iter_, group, groups )
             iter_select = iter_
 
         else:
+#TODO 
+# If the script was background and is now not background, create tags.
+# If the script name or group was changed and is background, create tags.            
             iter_select = (
                 self._on_edit_script(
                     treeview, model, iter_, group, name, groups ) )
@@ -1859,10 +1877,14 @@ class IndicatorScriptRunner( IndicatorBase ):
         textentry = None,
         old_tag_new_tag_pairs = None ):
 
+        model = treeview.get_model()
+
+#TODO Check to see who will call this function...
+#... surely treeiter will ALWAYS be valid?
         if treeiter:
             treepath = (
                 Gtk.TreePath.new_from_string(
-                    treeview.get_model().get_string_from_iter( treeiter ) ) )
+                    model.get_string_from_iter( treeiter ) ) )
 
         else:
             treepath = Gtk.TreePath.new_from_string( "0:0" )
@@ -1879,12 +1901,10 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         if textentry and old_tag_new_tag_pairs:
             for old_tag, new_tag in old_tag_new_tag_pairs:
-                '''
                 textentry.set_text(
                     textentry.get_text().replace(
                         "[" + old_tag + "]",
                         "[" + new_tag + "]" if new_tag else "" ) )
-                '''
                 print( old_tag )
                 print( new_tag )
                 print() #TODO Remove
@@ -1892,7 +1912,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             pass #TODO Handle remove.
             # self.update_indicator_textentry(
             #     textentry, self._create_key( group, name ), "" )
-
 
             pass #TODO Handle edit.
             # if edited_script:
@@ -1905,22 +1924,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             #         new_tag = self._create_key( edited_script.get_group(), edited_script.get_name() )
             #         self.update_indicator_textentry(
             #             textentry, old_tag, new_tag )
-        '''
-        def update_indicator_textentry(
-            self,
-            textentry,
-            old_tag,
-            new_tag ):
-
-            old_tag_ = "[" + old_tag + "]"
-            if new_tag:
-                textentry.set_text(
-                    textentry.get_text().replace( old_tag_, "[" + new_tag + "]" ) )
-
-            else:
-                textentry.set_text(
-                    textentry.get_text().replace( old_tag_, "" ) )
-        '''
 
 
     def initialise_background_scripts( self ):
