@@ -1250,26 +1250,88 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         iter_select = None
         old_tag_new_tag_pairs = None
-
         if name is None:
-#TODO For any script in the group that is background, create tags.
             self._on_edit_group( treeview, model, iter_, group, groups )
-            iter_select = iter_
+            group_ = (
+                model.get_value(
+                    iter_, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
+            if group != group_:
+                iter_select = iter_
+
+                iter_scripts = model.iter_children( iter_ )
+                old_tag_new_tag_pairs = ( )
+                while iter_scripts:
+                    background = (
+                        model.get_value(
+                            iter_scripts,
+                            IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+
+                    if background == IndicatorBase.TICK_SYMBOL:
+                        script = (
+                            model.get_value(
+                                iter_scripts,
+                                IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+
+                        old_tag_new_tag_pairs += (
+                            (
+                                self._create_key( group, script ),
+                                self._create_key( group_, script ) ), )
+
+                    iter_scripts = model.iter_next( iter_scripts )
 
         else:
-#TODO
-# If the script was background and is now not background, create tags.
-# If the script name or group was changed and is background, create tags.
+            background = (
+                model.get_value(
+                    iter_,
+                    IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+
             iter_select = (
                 self._on_edit_script(
                     treeview, model, iter_, group, name, groups ) )
+
+            if iter_select:
+                group_ = (
+                    model.get_value(
+                        iter_select,
+                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
+                name_ = (
+                    model.get_value(
+                        iter_select,
+                        IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+
+                background_ = (
+                    model.get_value(
+                        iter_select,
+                        IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+
+                group_or_name_changed_or_both = group != group or name != name_
+                was_background = background == IndicatorBase.TICK_SYMBOL
+
+                no_longer_background = (
+                    background == IndicatorBase.TICK_SYMBOL
+                    and
+                    background_ is None )
+
+                update_indicator_text = (
+                    ( group_or_name_changed_or_both and was_background )
+                    or
+                    no_longer_background )
+
+                if update_indicator_text:
+                    old_tag_new_tag_pairs = (
+                        (
+                            self._create_key( group, name ),
+                            self._create_key( group_, name_ ) ), )
 
         self._update_user_interface(
             treeview,
             iter_select,
             button_copy = button_copy,
             button_remove = button_remove,
-            textentry = textentry )
+            textentry = textentry,
+            old_tag_new_tag_pairs = old_tag_new_tag_pairs )
 
 
     def _on_edit_group(
@@ -1903,6 +1965,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             button_remove.set_sensitive( len( model ) )
 
         if textentry and old_tag_new_tag_pairs:
+#TODO Test this section.
             for old_tag, new_tag in old_tag_new_tag_pairs:
                 textentry.set_text(
                     textentry.get_text().replace(
@@ -1911,22 +1974,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 print( old_tag )
                 print( new_tag )
                 print() #TODO Remove
-
-            pass #TODO Handle remove.
-            # self.update_indicator_textentry(
-            #     textentry, self._create_key( group, name ), "" )
-
-            pass #TODO Handle edit.
-            # if edited_script:
-            #     if isinstance( the_script, Background ) and isinstance( edited_script, NonBackground ):
-            #         old_tag = self._create_key( group, name )
-            #         self.update_indicator_textentry( textentry, old_tag, "" )
-            #
-            #     if not( group == edited_script.get_group() and name == edited_script.get_name() ):
-            #         old_tag = self._create_key( group, name )
-            #         new_tag = self._create_key( edited_script.get_group(), edited_script.get_name() )
-            #         self.update_indicator_textentry(
-            #             textentry, old_tag, new_tag )
 
 
     def initialise_background_scripts( self ):
