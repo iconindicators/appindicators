@@ -25,16 +25,9 @@ Application indicator to run a terminal command/script from the indicator menu.
 # When a group is selected, change tooltip of Copy button to copy group and scripts within.
 
 
-#TODO When deleting a script,
-# if the script's group still exists, maybe
-# select the first script of that group.
-# Otherwise, select first script.
-#
+#TODO 
 # When add/edit a script, see fortune/onthisday...maybe there is a simpler
 # way to select the script (similarly for remove).
-
-
-#TODO If Copy/edit/remove of groups is implemented, add this to changelog.
 
 
 import concurrent.futures
