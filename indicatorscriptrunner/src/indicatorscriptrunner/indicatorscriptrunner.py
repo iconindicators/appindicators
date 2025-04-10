@@ -1742,12 +1742,15 @@ class IndicatorScriptRunner( IndicatorBase ):
                         continue
 
                 if not add:
-#TODO If this is the last script in this group, will there be a group left over?
-# Will occur if the script group is changed (to a new group or another group).
-# So maybe before removing the script, get the parent and if the children count
-# is 1, then also remove the parent.
-#Might be able just to remove the parent.
-                    model.remove( iter_script )
+                    number_of_children = (
+                        model.iter_n_children( model.iter_parent( iter_script ) ) )
+
+                    iter_group = model.iter_parent( iter_script )
+                    if model.iter_n_children( iter_group ) == 1:
+                        model.remove( iter_group ) # Remove group and last script.
+
+                    else:
+                        model.remove( iter_script )
 
                 is_non_background_and_default = (
                     script_non_background_radio.get_active()
