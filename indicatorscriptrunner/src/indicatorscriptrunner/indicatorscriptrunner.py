@@ -21,11 +21,7 @@ Application indicator to run a terminal command/script from the indicator menu.
 '''
 
 
-#TODO When a script is selected, change tooltip of Copy button to copy script.
-# When a group is selected, change tooltip of Copy button to copy group and scripts within.
-
-
-#TODO 
+#TODO
 # When add/edit a script, see fortune/onthisday...maybe there is a simpler
 # way to select the script (similarly for remove).
 
@@ -426,18 +422,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         box, add, copy_, remove = (
             self.create_buttons_in_box(
-                (
-                    _( "Add" ),
-                    _( "Copy" ),
-                    _( "Remove" ) ),
-                (
-                    _( "Add a new script." ),
-                    _( "Duplicate the selected script." ),
-                    _( "Remove the selected script." ) ),
-                (
-                    None,
-                    None,
-                    None ) ) )
+                ( _( "Add" ), _( "Copy" ), _( "Remove" ) ),
+                (  _( "Add a new script." ), "", "" ),
+                ( None, None, None ) ) )
 
         # Rows describe either a
         #   group, displaying only the group name,
@@ -561,7 +548,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "If a non-background script is checked as\n" +
                     "default, the name will appear in bold." ),
                 cursorchangedfunctionandarguments = (
-                    self._on_row_selection, command_text_view ),
+                    self._on_row_selection, command_text_view, copy_, remove ),
                 rowactivatedfunctionandarguments = (
                     self.on_edit,
                     copy_,
@@ -859,7 +846,9 @@ class IndicatorScriptRunner( IndicatorBase ):
     def _on_row_selection(
         self,
         treeview,
-        textview ):
+        textview,
+        copy,
+        remove ):
 
         command_text = ""
         model, iter_ = treeview.get_selection().get_selected()
@@ -870,6 +859,18 @@ class IndicatorScriptRunner( IndicatorBase ):
             command_text = (
                 model.get_value(
                     iter_, IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ) )
+
+            copy.set_tooltip_text( _( "Duplicate the selected script." ) )
+            remove.set_tooltip_text( _( "Remove the selected script." ) )
+
+        else:
+            copy.set_tooltip_text( _(
+                "Duplicate the selected group,\n" +
+                "and all scripts within the group." ) )
+
+            remove.set_tooltip_text( _(
+                "Remove the selected script and\n." +
+                "all scripts within the group." ) )
 
         textview.get_buffer().set_text( command_text )
 
