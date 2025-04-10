@@ -26,16 +26,16 @@ https://eclipse.gsfc.nasa.gov/eclipse.html
 
 import datetime
 
-from enum import Enum
+from enum import auto, IntEnum
 
 
-class EclipseType( Enum ):
+class EclipseType( IntEnum ):
     ''' Types of eclipses. '''
-    ANNULAR = 0
-    HYBRID = 1
-    PARTIAL = 2
-    PENUMBRAL = 3
-    TOTAL = 4
+    ANNULAR = auto()
+    HYBRID = auto()
+    PARTIAL = auto()
+    PENUMBRAL = auto()
+    TOTAL = auto()
 
 
 _months = {

@@ -24,7 +24,7 @@ orbital elements for comets and minor planets.
 
 import datetime
 
-from enum import Enum
+from enum import auto, IntEnum
 
 import requests
 
@@ -410,12 +410,12 @@ class DataProviderOrbitalElement( DataProvider ):
 class OrbitalElement():
     ''' Orbital element for a comet or minor planet. '''
 
-    class DataType( Enum ):
+    class DataType( IntEnum ):
         ''' Data types for supported real objects. '''
-        SKYFIELD_COMET = 0
-        SKYFIELD_MINOR_PLANET = 1
-        XEPHEM_COMET = 2
-        XEPHEM_MINOR_PLANET = 3
+        SKYFIELD_COMET = auto()
+        SKYFIELD_MINOR_PLANET = auto()
+        XEPHEM_COMET = auto()
+        XEPHEM_MINOR_PLANET = auto()
 
 
     def __init__(

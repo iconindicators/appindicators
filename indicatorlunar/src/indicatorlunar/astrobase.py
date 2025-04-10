@@ -44,21 +44,21 @@ import datetime
 import math
 
 from abc import ABC, abstractmethod
-from enum import Enum
+from enum import auto, IntEnum
 
 
 class AstroBase( ABC ):
     ''' Base class for classes which access PyEphem and Skyfield. '''
 
-    class BodyType( Enum ):
+    class BodyType( IntEnum ):
         ''' Astronomical objects. '''
-        COMET = 0
-        MINOR_PLANET = 1
-        MOON = 2
-        PLANET = 3
-        SATELLITE = 4
-        STAR = 5
-        SUN = 6
+        COMET = auto()
+        MINOR_PLANET = auto()
+        MOON = auto()
+        PLANET = auto()
+        SATELLITE = auto()
+        STAR = auto()
+        SUN = auto()
 
 
     # Data tags representing calculated astronomical information.
