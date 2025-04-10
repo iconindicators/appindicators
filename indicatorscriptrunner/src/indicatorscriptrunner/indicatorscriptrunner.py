@@ -1937,15 +1937,11 @@ class IndicatorScriptRunner( IndicatorBase ):
             button_remove.set_sensitive( len( model ) )
 
         if textentry and old_tag_new_tag_pairs:
-#TODO Test this section.
             for old_tag, new_tag in old_tag_new_tag_pairs:
                 textentry.set_text(
                     textentry.get_text().replace(
                         "[" + old_tag + "]",
                         "[" + new_tag + "]" if new_tag else "" ) )
-                print( old_tag )
-                print( new_tag )
-                print() #TODO Remove
 
 
     def initialise_background_scripts( self ):
