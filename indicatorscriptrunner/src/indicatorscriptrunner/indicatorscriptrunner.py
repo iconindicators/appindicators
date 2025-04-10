@@ -167,21 +167,33 @@ class IndicatorScriptRunner( IndicatorBase ):
         menu ):
 
         if self.show_scripts_in_submenus:
-            scripts_by_group = self.get_scripts_by_group( self.scripts, True, False )
+            scripts_by_group = (
+                self.get_scripts_by_group( self.scripts, True, False ) )
+
             for group in sorted( scripts_by_group.keys(), key = str.lower ):
                 submenu = Gtk.Menu()
-                self.create_and_append_menuitem( menu, group ).set_submenu( submenu )
+                self.create_and_append_menuitem(
+                    menu, group ).set_submenu( submenu )
+
                 self.add_scripts_to_menu(
                     scripts_by_group[ group ], submenu, indent = ( 1, 0 ) )
 
         else:
             if self.hide_groups:
-                for script in sorted( self.scripts, key = lambda script: script.get_name().lower() ):
+                sorted_scripts_by_name = (
+                    sorted(
+                        self.scripts,
+                        key = lambda script: script.get_name().lower() ) )
+
+                for script in sorted_scripts_by_name:
                     if isinstance( script, NonBackground ):
-                        self.add_scripts_to_menu( [ script ], menu, indent = ( 0, 0 ) )
+                        self.add_scripts_to_menu(
+                            [ script ], menu, indent = ( 0, 0 ) )
 
             else:
-                scripts_by_group = self.get_scripts_by_group( self.scripts, True, False )
+                scripts_by_group = (
+                    self.get_scripts_by_group( self.scripts, True, False ) )
+
                 for group in sorted( scripts_by_group.keys(), key = str.lower ):
                     self.create_and_append_menuitem( menu, group )
                     self.add_scripts_to_menu(
@@ -213,7 +225,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         self,
         script ):
 
-        terminal, terminal_execution_flag = self.get_terminal_and_execution_flag()
+        terminal, terminal_execution_flag = (
+            self.get_terminal_and_execution_flag() )
+
         if terminal is None:
             message = _(
                 "Cannot run script as no terminal and/or terminal execution " +
@@ -225,9 +239,10 @@ class IndicatorScriptRunner( IndicatorBase ):
         elif self.is_qterminal_and_broken( terminal ):
             # As a result of
             #   https://github.com/lxqt/qterminal/issues/335
-            # the default terminal in Lubuntu (qterminal) fails to parse arguments.
-            # Although a fix has been made, it is unlikely the repository will be updated any time soon.
-            # So the quickest/easiest workaround is to install gnome-terminal.
+            # the default terminal in Lubuntu (qterminal) fails to parse
+            # arguments.  A fix has been made, however, it is unlikely the
+            # repository will be updated any time soon, if ever.
+            # The quickest/easiest workaround is to install gnome-terminal.
             message = _(
                 "Cannot run script as qterminal incorrectly parses arguments;" +
                 " install gnome-terminal instead." )
@@ -333,13 +348,14 @@ class IndicatorScriptRunner( IndicatorBase ):
         # return codes.
         command_result = (
             self.process_get(
-                script.get_command(),
-                log_non_zero_error_code = True ) )
+                script.get_command(), log_non_zero_error_code = True ) )
 
         key = self._create_key( script.get_group(), script.get_name() )
         self.background_script_results[ key ] = command_result
         self.background_script_next_update_time[ key ] = (
-            now + datetime.timedelta( minutes = script.get_interval_in_minutes() ) )
+            now
+            +
+            datetime.timedelta( minutes = script.get_interval_in_minutes() ) )
 
         return key
 
@@ -348,7 +364,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         indicator_text_processed = self.indicator_text
         for script in self.scripts:
             key = self._create_key( script.get_group(), script.get_name() )
-            if isinstance( script, Background ) and "[" + key + "]" in indicator_text_processed:
+            is_background = isinstance( script, Background )
+            contains_key = "[" + key + "]" in indicator_text_processed
+            if is_background and contains_key:
                 command_result = self.background_script_results[ key ]
                 if command_result is None:
                     # Background script failed so leave the tag in place for
@@ -422,13 +440,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                     None ) ) )
 
         # Rows describe either a
-        #   group, showing only the group name,
+        #   group, displaying only the group name,
         # or a
-        #   script, showing the script name and the script's attributes,
-        #   but not the enclosing group.
+        #   script, displaying the script name and attributes.
         #
-        # Each row contains columns hidden from view, used programmatically:
-        #   group, script command and script default.
+        # Each row contains columns containing group, script command and
+        # script default, which are not displayed, but used programmatically.
         treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str, str )
         scripts_by_group = self.get_scripts_by_group( self.scripts )
         for group in scripts_by_group.keys():
@@ -463,9 +480,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 treestore.append( parent, row )
 
-        dump = self.dump_treestore( treestore ) #TODO Testing
-        print( dump )
-        print()
+        print( self.dump_treestore( treestore ) ) #TODO Testing
 
         renderer_column_name_text = Gtk.CellRendererText()
 
@@ -566,13 +581,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 ( ( self.create_scrolledwindow( command_text_view ), True ), ) ),
              0, 21, 1, 10 )
 
-        add.connect(
-            "clicked",
-            self.on_add,
-            scripts_treeview,
-            copy_,
-            remove,
-            indicator_text_entry )
+        add.connect( "clicked", self.on_add, scripts_treeview, copy_, remove )
 
         copy_.connect( "clicked", self.on_copy, scripts_treeview )
 
@@ -583,15 +592,8 @@ class IndicatorScriptRunner( IndicatorBase ):
             copy_,
             indicator_text_entry )
 
-#TODO Can/should this be put into a function to be called at end of remove/add/copy/edit?
-        if len( treestore ):
-            treepath = Gtk.TreePath.new_from_string( "0:0" )
-            scripts_treeview.get_selection().select_path( treepath )
-            scripts_treeview.set_cursor( treepath, None, False )
-
-        else:
-            copy_.set_sensitive( False )
-            remove.set_sensitive( False )
+        self._update_user_interface(
+            scripts_treeview, None, copy_, remove, None, None )
 
         box.set_margin_top( IndicatorBase.INDENT_WIDGET_TOP )
         grid.attach( box, 0, 31, 1, 1 )
@@ -831,7 +833,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             model.get_value(
                 iter_, IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) )
 
-        if default and default == "True":
+        if default == "True":
             cell_renderer.set_property( "weight", Pango.Weight.BOLD )
 
 
@@ -920,7 +922,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 self._on_copy_script(
                     treeview, model, iter_, group, name, groups ) )
 
-        self._update_user_interface( treeview, iter_select )
+        self._update_user_interface(
+            treeview, iter_select if iter_select else iter_ )
 
 
     def _on_copy_group(
@@ -985,9 +988,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dialog.destroy()
 
-        dump = self.dump_treestore( model ) #TODO Testing
-        print( dump )
-        print()
+        print( self.dump_treestore( model ) ) #TODO Testing
 
         return parent
 
@@ -1081,9 +1082,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dialog.destroy()
 
-        dump = self.dump_treestore( model ) #TODO Testing
-        print( dump )
-        print()
+        print( self.dump_treestore( model ) ) #TODO Testing
 
         return iter_select
 
@@ -1103,7 +1102,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             model.get_value(
                 iter_, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
-        iter_select = None
         old_tag_new_tag_pairs = None
 
         if name is None:
@@ -1132,7 +1130,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         self._update_user_interface(
             treeview,
-            iter_select,
+            iter_select if iter_select else iter_,
             button_copy = button_copy,
             button_remove = button_remove,
             textentry = textentry,
@@ -1167,9 +1165,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             model.remove( iter_to_group )
 
-        dump = self.dump_treestore( model ) #TODO Testing
-        print( dump )
-        print()
+        print( self.dump_treestore( model ) ) #TODO Testing
 
         return iter_select
 
@@ -1209,13 +1205,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                     else:
                         iter_select = iter_group
 
-
-
                 model.remove( iter_group )
 
-        dump = self.dump_treestore( model ) #TODO Testing
-        print( dump )
-        print()
+        print( self.dump_treestore( model ) ) #TODO Testing
 
         return iter_select
 
@@ -1241,7 +1233,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
             for row in model ]
 
-        iter_select = None
         old_tag_new_tag_pairs = None
         if name is None:
             self._on_edit_group( treeview, model, iter_, group, groups )
@@ -1249,9 +1240,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 model.get_value(
                     iter_, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
+            iter_select = iter_
             if group != group_:
-                iter_select = iter_
-
                 iter_scripts = model.iter_children( iter_ )
                 old_tag_new_tag_pairs = ( )
                 while iter_scripts:
@@ -1299,7 +1289,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         iter_select,
                         IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
 
-                group_or_name_changed_or_both = group != group or name != name_
+                group_or_name_changed_or_both = group != group_ or name != name_
                 was_background = background == IndicatorBase.TICK_SYMBOL
 
                 no_longer_background = (
@@ -1317,6 +1307,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                         (
                             self._create_key( group, name ),
                             self._create_key( group_, name_ ) ), )
+
+            else:
+                iter_select = iter_
 
         self._update_user_interface(
             treeview,
@@ -1396,17 +1389,10 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dialog.destroy()
 
-        dump = self.dump_treestore( model ) #TODO Testing
-        print( dump )
-        print()
+        print( self.dump_treestore( model ) ) #TODO Testing
 
 
-#TODO
-# Check for when we click ADD and a group is selected...
-# is this the group we select by default to add in the new script?
-# Or just select the first group?
-#
-# If a script is selected, as above, use that script's group as the default group?
+#TODO Check for adding first script (start empty).
     def on_add(
         self,
         button_add,
@@ -1431,12 +1417,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         self._update_user_interface(
             treeview,
-            iter_select,
+            iter_select if iter_select else iter_,
             button_copy = button_copy,
             button_remove = button_remove )
 
 
-#TODO Test when adding very first script (there will be no group to select).
     def _on_edit_script(
         self,
         treeview,
@@ -1739,7 +1724,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     command_text_view.grab_focus()
                     continue
 
-                script_exists = self._get_iter_to_script( group_, name_, model )  #TODO Check for when None and not None.
+                script_exists = self._get_iter_to_script( group_, name_, model )
                 message = _(
                     "A script of the same group and name already exists." )
 
@@ -1769,9 +1754,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     default_script_checkbutton.get_active() )
 
                 if is_non_background_and_default:
-#TODO I created a new non-background script, marked as default,
-# but this code did not clear the existing default non-background script.
-                    def remove_default( model, path, iter_, data ):
+                    def remove_default( model, path, iter_ ):
                         model.set_value(
                             iter_,
                             IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN,
@@ -1819,9 +1802,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dialog.destroy()
 
-        dump = self.dump_treestore( model ) #TODO Testing
-        print( dump )
-        print()
+        print( self.dump_treestore( model ) ) #TODO Testing
 
         return iter_select
 
@@ -1922,8 +1903,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dump = [ "" ]
         model.foreach( dump_treestore_, dump )
-        return dump[ 0 ]
-        # return ""
+        return dump[ 0 ]+ "\n\n"
 
 
     def _update_user_interface(
@@ -1937,8 +1917,6 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         model = treeview.get_model()
 
-#TODO Check to see who will call this function...
-#... surely treeiter will ALWAYS be valid?
         if treeiter:
             treepath = (
                 Gtk.TreePath.new_from_string(
@@ -1947,7 +1925,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         else:
             treepath = Gtk.TreePath.new_from_string( "0:0" )
 
-        treeview.expand_to_path( treepath )
+        treeview.expand_all()
         treeview.get_selection().select_path( treepath )
         treeview.set_cursor( treepath, None, False )
 
