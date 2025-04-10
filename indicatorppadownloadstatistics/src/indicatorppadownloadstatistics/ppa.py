@@ -23,7 +23,7 @@ import locale
 import operator
 
 from copy import deepcopy
-from enum import IntEnum
+from enum import auto, IntEnum
 from functools import cmp_to_key
 
 
@@ -138,13 +138,13 @@ class PPA():
 
     class Status( IntEnum ):
         ''' Download status of a PPA. '''
-        NEEDS_DOWNLOAD = 0
-        OK = 1
-        FILTERED = 2
-        NO_PUBLISHED_BINARIES = 3
-        ERROR_NETWORK = 4
-        ERROR_OTHER = 5
-        ERROR_TIMEOUT = 6
+        NEEDS_DOWNLOAD = auto()
+        OK = auto()
+        FILTERED = auto()
+        NO_PUBLISHED_BINARIES = auto()
+        ERROR_NETWORK = auto()
+        ERROR_OTHER = auto()
+        ERROR_TIMEOUT = auto()
 
 
     def __init__(
@@ -367,7 +367,6 @@ class PPA():
 
     @staticmethod
     def identical(
-        self,
         ppa1,
         ppa2 ):
         '''
