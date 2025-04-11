@@ -539,7 +539,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             ppas_original = self.ppas
             self.ppas = [ ]
             treeiter = store.get_iter_first()
-            while treeiter is not None:
+            while treeiter:
                 row = store[ treeiter ]
                 ppa = (
                     PPA(

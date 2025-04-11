@@ -441,7 +441,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 #TODO Check below
             self.calendars = [ ]
             treeiter = store.get_iter_first()
-            while treeiter is not None:
+            while treeiter:
                 row = store[ treeiter ]
                 self.calendars.append(
                     [
