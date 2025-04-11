@@ -300,14 +300,18 @@ class IndicatorLunar( IndicatorBase ):
         self.data = (
             IndicatorLunar.astro_backend.calculate(
                 utc_now,
-                self.latitude, self.longitude, self.elevation,
+                self.latitude,
+                self.longitude,
+                self.elevation,
                 self.planets,
                 self.stars,
-                self.satellites, self.satellite_general_perturbation_data,
+                self.satellites,
+                self.satellite_general_perturbation_data,
                 *self.convert_start_hour_and_end_hour_to_date_time_in_utc(
                     self.satellite_limit_start,
                     self.satellite_limit_end ),
-                self.comets, self.comet_orbital_element_data, None,
+                self.comets,
+                self.comet_orbital_element_data,
                 self.minor_planets,
                 self.minor_planet_orbital_element_data,
                 self.minor_planet_apparent_magnitude_data,
@@ -762,7 +766,7 @@ class IndicatorLunar( IndicatorBase ):
                 IndicatorLunar.astro_backend.LUNAR_PHASE_FULL_MOON } )
 
         last_notification_plus_one_hour = (
-            self.last_full_moon_notfication + datetime.timedelta( hours = 1 )
+            self.last_full_moon_notfication + datetime.timedelta( hours = 1 ) )
 
         last_notification_more_than_one_hour_ago = (
             last_notification_plus_one_hour < utc_now )

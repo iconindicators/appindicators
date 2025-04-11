@@ -449,7 +449,6 @@ class AstroBase( ABC ):
         end_hour_as_date_time_in_utc,
         comets,
         comet_data,
-        comet_apparent_magnitude_data,
         minor_planets,
         minor_planet_data,
         minor_planet_apparent_magnitude_data,
