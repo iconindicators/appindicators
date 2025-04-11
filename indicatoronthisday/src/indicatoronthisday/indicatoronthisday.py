@@ -539,14 +539,16 @@ class IndicatorOnThisDay( IndicatorBase ):
         self.calendars = (
             config.get(
                 IndicatorOnThisDay.CONFIG_CALENDARS,
-                [ system_calendar_default, True ]
-                if system_calendar_default
-                else
-                [ ] ) )
+                [ [ system_calendar_default, True ] ] if system_calendar_default
+                else [ ] ) )
 
-#TODO CHeck when a 0.0.0 is returned...that is, no .json or a config without a version.
         version_from_config = Version( self.get_version_from_config( config ) )
-        if version_from_config < Version( "1.0.17" ):
+        upgrade = (
+            version_from_config > Version( "0.0.0" )
+            and
+            version_from_config < Version( "1.0.17" ) )
+
+        if upgrade:
             self._upgrade_1_0_17()
 
         self.copy_to_clipboard = (
