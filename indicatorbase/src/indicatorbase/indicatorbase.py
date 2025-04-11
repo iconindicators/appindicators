@@ -332,7 +332,8 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def get_project_metadata( indicator_name ):
+    def get_project_metadata(
+        indicator_name ):
         '''
         Read in the project metadata,
             either via pip if the indicator is installed,
@@ -374,7 +375,9 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def _get_wheel_in_release( indicator_name ):
+    def _get_wheel_in_release(
+        indicator_name ):
+
         error_message = None
         path_release = Path( __file__ ).parent.parent.parent.parent
         path_wheel = (
@@ -551,7 +554,8 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def get_authors_emails( project_metadata ):
+    def get_authors_emails(
+        project_metadata ):
         '''
         Extract the authors (and emails) from the project metadata.
         https://stackoverflow.com/a/75803208/2156453
