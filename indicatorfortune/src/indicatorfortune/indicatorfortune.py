@@ -497,10 +497,10 @@ class IndicatorFortune( IndicatorBase ):
 
     def _upgrade_1_0_44( self ):
         if self.fortunes:
-            # Prior to 1.0.44, fortunes were specified as either a directory
-            # of .dat files, or as a single .dat file.
+            # Prior to 1.0.44, fortunes were specified as a directory of .dat
+            # files, or as a single .dat file.
             #
-            # Fortunes are now only specified as single .dat files.
+            # Fortunes are now specified only as a single .dat file.
             #
             # Any fortune specified as a directory must be converted to
             # individual their respective .dat files within.
@@ -523,6 +523,7 @@ class IndicatorFortune( IndicatorBase ):
         if self.notification_summary == "":
             # Prior to 1.0.44 it was possible for the user to set an empty
             # notification summary.
+            #
             # On some platforms a notification of "" causes an error and so
             # a notification of "" was amended " " prior to display.
             #
