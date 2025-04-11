@@ -177,7 +177,7 @@ class AstroPyEphem( AstroBase ):
         end_hour_as_date_time_in_utc,
         comets,
         comet_data,
-        comet_apparent_magnitude_data,
+        comet_apparent_magnitude_data,  #TODO Why is this not used...?
         minor_planets,
         minor_planet_data,
         minor_planet_apparent_magnitude_data,
