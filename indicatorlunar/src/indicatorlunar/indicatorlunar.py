@@ -731,7 +731,7 @@ class IndicatorLunar( IndicatorBase ):
         illumination_percentage = int( round( float( self.data[ key_ ] ) ) )
 
         key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_BRIGHT_LIMB, )
-        bright_limb_angle_in_degrees = int( math.degrees( float( self.data[ key ] ) ) )
+        bright_limb_angle_in_degrees = int( math.degrees( float( self.data[ key_ ] ) ) )
 
         svg_icon_text = (
             self.get_svg_icon_text(
@@ -755,10 +755,10 @@ class IndicatorLunar( IndicatorBase ):
             IndicatorLunar.astro_backend.NAME_TAG_MOON )
 
         key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_PHASE, )
-        phase = self.data[ key ]
+        phase = self.data[ key_ ]
 
         key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_ILLUMINATION, )
-        illumination_percentage = int( round( float( self.data[ key ] ) ) )
+        illumination_percentage = int( round( float( self.data[ key_ ] ) ) )
 
         is_waxing_gibbous_or_full = (
             phase in {
@@ -950,10 +950,7 @@ class IndicatorLunar( IndicatorBase ):
                 _( "Phase: " ) +
                 self.format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_PHASE,
-                    self.data[
-                        key
-                        +
-                        ( IndicatorLunar.astro_backend.DATA_TAG_PHASE, ) ] ),
+                    self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_PHASE, ) ] ),
                 name = IndicatorLunar.SEARCH_URL_MOON,
                 activate_functionandarguments = (
                     self.get_on_click_menuitem_open_browser_function(), ),
@@ -1032,18 +1029,14 @@ class IndicatorLunar( IndicatorBase ):
                 self.format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_EQUINOX,
                     self.data[
-                        key
-                        +
-                        ( IndicatorLunar.astro_backend.DATA_TAG_EQUINOX, ) ] ) )
+                        key + ( IndicatorLunar.astro_backend.DATA_TAG_EQUINOX, ) ] ) )
 
             solstice_label = (
                 _( "Solstice: " ) +
                 self.format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE,
                     self.data[
-                        key
-                        +
-                        ( IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE, ) ] ) )
+                        key + ( IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE, ) ] ) )
 
             if self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_EQUINOX, ) ] < self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE, ) ]:
                 self.create_and_append_menuitem(
@@ -1110,9 +1103,7 @@ class IndicatorLunar( IndicatorBase ):
             self.format_data(
                 IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME,
                 self.data[
-                    key
-                    +
-                    ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
+                    key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
             name = url,
             activate_functionandarguments = (
                 self.get_on_click_menuitem_open_browser_function(), ),
@@ -1124,9 +1115,7 @@ class IndicatorLunar( IndicatorBase ):
             self.format_data(
                 IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_TYPE,
                 self.data[
-                    key
-                    +
-                    ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_TYPE, ) ] ),
+                    key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_TYPE, ) ] ),
             name = url,
             activate_functionandarguments = (
                 self.get_on_click_menuitem_open_browser_function(), ),
@@ -1137,16 +1126,13 @@ class IndicatorLunar( IndicatorBase ):
                 self.format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE,
                     self.data[
-                        key +
-                        ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE, ) ] ) )
+                        key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE, ) ] ) )
 
             longitude = (
                 self.format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LONGITUDE,
                     self.data[
-                        key
-                        +
-                        ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LONGITUDE, ) ] ) )
+                        key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LONGITUDE, ) ] ) )
 
             self.create_and_append_menuitem(
                 menu,
@@ -1416,15 +1402,13 @@ class IndicatorLunar( IndicatorBase ):
 
                     sun_rise = (
                         self.data[
-                            key_sun
-                            +
-                            ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] )
+                            key_sun + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] )
 
                     sun_set = (
                         self.data[
-                            key_sun +
-                            ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] )
+                            key_sun + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] )
 
+#TODO Remove \
                     if \
                         target_body_type and \
                         self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] < sun_set < sun_rise:
