@@ -8,6 +8,7 @@
   - Published binaries of the same name/version and are architecture specific are unique for each architecture.
 - Each published binary displays the name, version and if architecture specific, the architecture, otherwise blank, followed by the download count.
 - When updating preferences, only PPAs which have been modified are updated.
+- Default display option to NOT show PPAs in submenus.
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhauled to adhere to the pyproject.toml standard.
