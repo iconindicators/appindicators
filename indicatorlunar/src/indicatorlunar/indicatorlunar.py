@@ -1408,10 +1408,11 @@ class IndicatorLunar( IndicatorBase ):
                         self.data[
                             key_sun + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] )
 
-#TODO Remove \
-                    if \
-                        target_body_type and \
-                        self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] < sun_set < sun_rise:
+                    body_set_date_time = (
+                        self.data[
+                            key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] )
+
+                    if target_body_type and body_set_date_time < sun_set < sun_rise:
 
                         if not self.hide_bodies_below_horizon:
                             self._update_menuitems_rise_azimuth_altitude_set(
