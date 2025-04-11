@@ -45,7 +45,11 @@ class DataProviderApparentMagnitude( DataProvider ):
         '''
 
         if is_comet:
-            downloaded = False # COBS apparent magnitude data is separate.
+            # COBS does not provide apparent magnitude data.
+            # Instead, when downloading orbital element data,
+            # a maximum apparent magnitude can be specified which filters out
+            # comets with an apparent magnitude greater.
+            downloaded = False
 
         else:
             downloaded = (
