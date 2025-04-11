@@ -32,7 +32,9 @@ class TideDataGetterBase( ABC ):
 
     @staticmethod
     @abstractmethod
-    def get_tide_data( logging = None, url_timeout_in_seconds = 20 ):
+    def get_tide_data(
+        logging = None,
+        url_timeout_in_seconds = 20 ):
         '''
         The end user must create a class and implement this function
         to retrieve tidal data (from a source of the user's choosing)
