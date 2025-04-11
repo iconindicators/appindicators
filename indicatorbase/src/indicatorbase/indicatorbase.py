@@ -2683,9 +2683,9 @@ class IndicatorBase( ABC ):
         '''
         Return the version from the config file.
 
-        If the user has never having modified their preferences, or,
-        the user is running an older version of the indicator which contains
-        no version number in the .json, there will be no version number.
+        If the user has never modified their preferences, or, the user is
+        running an older version of the indicator which contains no version
+        number in the .json, there will be no version number.
 
         In this case, return a dummy version of "0.0.0"
         '''
