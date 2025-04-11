@@ -778,7 +778,6 @@ class IndicatorVirtualBox( IndicatorBase ):
         model,
         iter_ ):
 
-#TODO Shorten
         while iter_:
             row = model[ iter_ ]
             is_virtual_machine = row[ IndicatorVirtualBox.COLUMN_UUID ]
@@ -787,9 +786,13 @@ class IndicatorVirtualBox( IndicatorBase ):
                 row[ IndicatorVirtualBox.COLUMN_START_COMMAND ]
                 ==
                 IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT )
+            
+            if (
+                ( is_virtual_machine and is_autostart )
+                or
+                ( is_virtual_machine and not is_default_start_command ) ):
 
-#TODO Shorten.
-            if ( is_virtual_machine and is_autostart ) or ( is_virtual_machine and not is_default_start_command ): # Only record VMs with different settings to default.
+                # Only record VMs with different settings to default.
                 key = row[ IndicatorVirtualBox.COLUMN_UUID ]
                 value = [ is_autostart, row[ IndicatorVirtualBox.COLUMN_START_COMMAND ] ]
                 self.virtual_machine_preferences[ key ] = value
