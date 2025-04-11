@@ -50,7 +50,10 @@ class VirtualMachine():
         return self.__str__()
 
 
-    def __eq__( self, other ):
+    def __eq__(
+        self,
+        other ):
+
         return (
             self.__class__ == other.__class__ and
             self.get_name() == other.get_name() and
@@ -95,7 +98,10 @@ class Group():
         return self.__str__()
 
 
-    def __eq__( self, other ):
+    def __eq__(
+        self,
+        other ):
+
         return (
             self.__class__ == other.__class__
             and

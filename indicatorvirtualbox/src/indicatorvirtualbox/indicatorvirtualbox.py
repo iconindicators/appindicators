@@ -502,8 +502,8 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         start_command = IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
         if uuid in self.virtual_machine_preferences:
-            preferences_for_uuid = self.virtual_machine_preferences[ uuid ]
-            start_command = preferences_for_uuid[ IndicatorVirtualBox.PREFERENCES_START_COMMAND ]
+            preferences = self.virtual_machine_preferences[ uuid ]
+            start_command = preferences[ IndicatorVirtualBox.PREFERENCES_START_COMMAND ]
 
         return start_command
 
@@ -512,8 +512,6 @@ class IndicatorVirtualBox( IndicatorBase ):
         self,
         uuid ):
 
-#TODO Shorten if possible/feasible.
-#TODO Why need to check if uuid in preferences?
         return (
             uuid in self.virtual_machine_preferences
             and
