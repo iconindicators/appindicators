@@ -3,6 +3,7 @@
 ## v1.0.75 (2024-09-04)
 
 - Can now edit in place in the Preferences a virtual machine's autostart and start command.
+- Preference to show groups in submenus defaults to True.
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhauled to adhere to the pyproject.toml standard.

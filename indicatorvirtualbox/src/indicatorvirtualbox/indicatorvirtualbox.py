@@ -819,7 +819,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         self.show_submenu = (
             config.get(
                 IndicatorVirtualBox.CONFIG_SHOW_SUBMENU,
-                False ) )
+                True ) )
 
         self.sort_groups_and_virtual_machines_equally = (
             config.get(
