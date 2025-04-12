@@ -438,7 +438,6 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
-#TODO Check below
             self.calendars = [ ]
             treeiter = store.get_iter_first()
             while treeiter:

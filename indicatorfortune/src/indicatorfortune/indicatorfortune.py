@@ -407,6 +407,17 @@ class IndicatorFortune( IndicatorBase ):
 
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
+            self.fortunes = [ ]
+            treeiter = store.get_iter_first()
+            while treeiter:
+                row = store[ treeiter ]
+                self.fortunes.append(
+                    [
+                        row[ IndicatorFortune.COLUMN_FORTUNE_FILE ],
+                        row[ IndicatorFortune.COLUMN_ENABLED ] ] )
+
+                treeiter = store.iter_next( treeiter )
+
             if radio_middle_mouse_click_new_fortune.get_active():
                 self.middle_mouse_click_on_icon = (
                     IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
@@ -428,17 +439,6 @@ class IndicatorFortune( IndicatorBase ):
             self.notification_summary = notification_summary.get_text()
             if self.notification_summary == "":
                 self.notification_summary = " "
-
-            self.fortunes = [ ]
-            treeiter = store.get_iter_first()
-            while treeiter is not None:
-                row = store[ treeiter ]
-                self.fortunes.append(
-                    [
-                        row[ IndicatorFortune.COLUMN_FORTUNE_FILE ],
-                        row[ IndicatorFortune.COLUMN_ENABLED ] ] )
-
-                treeiter = store.iter_next( treeiter )
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),
