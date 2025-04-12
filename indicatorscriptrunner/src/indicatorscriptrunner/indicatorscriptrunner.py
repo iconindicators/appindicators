@@ -1746,9 +1746,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                         continue
 
                 if not add:
-                    number_of_children = (
-                        model.iter_n_children( model.iter_parent( iter_script ) ) )
-
                     iter_group = model.iter_parent( iter_script )
                     if model.iter_n_children( iter_group ) == 1:
                         model.remove( iter_group ) # Remove group and last script.
