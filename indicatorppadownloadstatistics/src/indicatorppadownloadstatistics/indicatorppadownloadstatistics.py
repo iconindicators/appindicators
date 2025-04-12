@@ -634,7 +634,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         button_remove ):
 
         self.on_ppa_double_click( treeview, None, None )
-        button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
+        button_remove.set_sensitive( len( treeview.get_model() ) )
 
 
     def on_ppa_double_click(
