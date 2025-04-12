@@ -2275,10 +2275,10 @@ class IndicatorBase( ABC ):
         fortune/calendar above is selected or as appropriate.
         '''
 
-        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        model_sort, iter_sort = treeview.get_selection().get_selected()
         selected_fortune_or_calendar = (
             model_sort[
-                treeiter_sort ][ model_column_id_for_fortune_or_calendar ] )
+                iter_sort ][ model_column_id_for_fortune_or_calendar ] )
 
         if selected_fortune_or_calendar in system_fortunes_or_calendars:
             self.show_dialog_ok(
@@ -2292,14 +2292,14 @@ class IndicatorBase( ABC ):
             if response == Gtk.ResponseType.OK:
                 if len( model_sort ) == 1:
                     model_sort.get_model().remove(
-                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
+                        model_sort.convert_iter_to_child_iter( iter_sort ) )
 
                     button.set_sensitive( False )
 
                 else:
                     treepath = (
                         Gtk.TreePath.new_from_string(
-                            model_sort.get_string_from_iter( treeiter_sort ) ) )
+                            model_sort.get_string_from_iter( iter_sort ) ) )
 
                     if not treepath.prev():
                         treepath = Gtk.TreePath.new_from_string( '0' )
@@ -2308,7 +2308,7 @@ class IndicatorBase( ABC ):
                     treeview.set_cursor( treepath, None, False )
 
                     model_sort.get_model().remove(
-                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
+                        model_sort.convert_iter_to_child_iter( iter_sort ) )
 
 
     def _on_fortune_or_calendar_add(
@@ -2360,10 +2360,10 @@ class IndicatorBase( ABC ):
         On confirmation, the fortune/calendar is modified and selected.
         '''
 
-        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        model_sort, iter_sort = treeview.get_selection().get_selected()
         fortune_or_calendar = (
             model_sort[
-                treeiter_sort ][ model_column_id_for_fortune_or_calendar ] )
+                iter_sort ][ model_column_id_for_fortune_or_calendar ] )
 
         if fortune_or_calendar in system_fortunes_or_calendars:
             self.show_dialog_ok(
@@ -2397,7 +2397,7 @@ class IndicatorBase( ABC ):
         Not to be called directly.
         '''
 
-        model_sort, treeiter_sort = treeview.get_selection().get_selected()
+        model_sort, iter_sort = treeview.get_selection().get_selected()
         adding_fortune_or_calendar = path is None
 
         dialog = (
@@ -2428,7 +2428,7 @@ class IndicatorBase( ABC ):
             if not fortune_or_calendar_exists:
                 if not adding_fortune_or_calendar:
                     model_sort.get_model().remove(
-                        model_sort.convert_iter_to_child_iter( treeiter_sort ) )
+                        model_sort.convert_iter_to_child_iter( iter_sort ) )
 
                 model_sort.get_model().append( [ filename, True ] )
 

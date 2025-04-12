@@ -2941,8 +2941,8 @@ class IndicatorLunar( IndicatorBase ):
         translated_tag_column_index,
         indicator_textentry ):
 
-        model, treeiter = tree.get_selection().get_selected()
-        value = model[ treeiter ][ translated_tag_column_index ]
+        model, iter_ = tree.get_selection().get_selected()
+        value = model[ iter_ ][ translated_tag_column_index ]
         indicator_textentry.insert_text(
             "[" + value + "]",
             indicator_textentry.get_position() )

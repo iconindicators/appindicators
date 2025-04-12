@@ -315,11 +315,11 @@ class DataProviderOrbitalElement( DataProvider ):
         Database and save to the given filename.
         '''
 
-        url = "https://cobs.si/api/elements.api?"
-        url += "mag=obs&"
-        url += "is-active=true&"
-        url += "is-observed=true&"
-        url += "cur-mag=" + str( int( apparent_magnitude_maximum ) )
+        url = "https://cobs.si/api/elements.api"
+        url += "?mag=obs"
+        url += "&is-active=true"
+        url += "&is-observed=true"
+        url += "&cur-mag=" + str( int( apparent_magnitude_maximum ) )
 
         if orbital_element_data_type == OrbitalElement.DataType.SKYFIELD_COMET:
             url += "&format=mpc"
@@ -402,10 +402,12 @@ class DataProviderOrbitalElement( DataProvider ):
 
         else:
             oe_data = { }
-            logging.error(
-                "Unknown data type encountered when loading orbital elements from file: '"
-                +
-                str( orbital_element_data_type ) + "', '" + filename + "'" )
+            message = (
+                "Unknown data type encountered when loading orbital elements " +
+                "from file: " +
+                f"'{ str( orbital_element_data_type ) }', '{ filename }'" )
+
+            logging.error( message )
 
         return oe_data
 

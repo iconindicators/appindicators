@@ -439,15 +439,15 @@ class IndicatorOnThisDay( IndicatorBase ):
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
             self.calendars = [ ]
-            treeiter = store.get_iter_first()
-            while treeiter:
-                row = store[ treeiter ]
+            iter_ = store.get_iter_first()
+            while iter_:
+                row = store[ iter_ ]
                 self.calendars.append(
                     [
                         row[ IndicatorOnThisDay.COLUMN_CALENDAR_FILE ],
                         row[ IndicatorOnThisDay.COLUMN_ENABLED ] ] )
 
-                treeiter = store.iter_next( treeiter )
+                iter_ = store.iter_next( iter_ )
 
             self.lines = spinner.get_value_as_int()
             self.copy_to_clipboard = radio_copy_to_clipboard.get_active()

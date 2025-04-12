@@ -1917,7 +1917,7 @@ class IndicatorScriptRunner( IndicatorBase ):
     def _update_user_interface(
         self,
         treeview,
-        treeiter,
+        iter_,
         button_copy = None,
         button_remove = None,
         textentry = None,
@@ -1925,10 +1925,10 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         model = treeview.get_model()
 
-        if treeiter:
+        if iter_:
             treepath = (
                 Gtk.TreePath.new_from_string(
-                    model.get_string_from_iter( treeiter ) ) )
+                    model.get_string_from_iter( iter_ ) ) )
 
         else:
             treepath = Gtk.TreePath.new_from_string( "0:0" )

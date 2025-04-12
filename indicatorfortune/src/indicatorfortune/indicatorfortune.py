@@ -408,15 +408,15 @@ class IndicatorFortune( IndicatorBase ):
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
             self.fortunes = [ ]
-            treeiter = store.get_iter_first()
-            while treeiter:
-                row = store[ treeiter ]
+            iter_ = store.get_iter_first()
+            while iter_:
+                row = store[ iter_ ]
                 self.fortunes.append(
                     [
                         row[ IndicatorFortune.COLUMN_FORTUNE_FILE ],
                         row[ IndicatorFortune.COLUMN_ENABLED ] ] )
 
-                treeiter = store.iter_next( treeiter )
+                iter_ = store.iter_next( iter_ )
 
             if radio_middle_mouse_click_new_fortune.get_active():
                 self.middle_mouse_click_on_icon = (

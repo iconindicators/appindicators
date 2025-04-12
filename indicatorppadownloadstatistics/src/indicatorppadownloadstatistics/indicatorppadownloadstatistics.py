@@ -30,7 +30,11 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-#TODO Put dot back in
+
+# from .indicatorbase import IndicatorBase
+#
+# from .ppa import PPA, PublishedBinary
+#TODO Revert
 from indicatorbase import IndicatorBase
 
 from ppa import PPA, PublishedBinary
@@ -235,7 +239,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     def download_ppa_statistics( self ):
         '''
-        For each PPA's binary packages, get the download count if required.
+        For each PPA's binary packages, get the download count.
 
         References
             https://launchpad.net/+apidoc/devel.html
@@ -267,7 +271,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self,
         ppa,
         filter_text ):
-
         '''
         Get the published binaries for the PPA, then for each published binary,
         get the download count.
@@ -538,9 +541,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 #TODO Check logic from here down...
             ppas_original = self.ppas
             self.ppas = [ ]
-            treeiter = store.get_iter_first()
-            while treeiter:
-                row = store[ treeiter ]
+            iter_ = store.get_iter_first()
+            while iter_:
+                row = store[ iter_ ]
                 ppa = (
                     PPA(
                         row[ IndicatorPPADownloadStatistics.COLUMN_USER ],
@@ -560,7 +563,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         break
 
                 self.ppas.append( ppa )
-                treeiter = store.iter_next( treeiter )
+                iter_ = store.iter_next( iter_ )
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),
@@ -605,15 +608,15 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 treeview, _( "Remove the selected PPA?" ) ) )
 
         if response == Gtk.ResponseType.OK:
-            model, treeiter = treeview.get_selection().get_selected()
+            model, iter_ = treeview.get_selection().get_selected()
             if len( model ) == 1:
-                model.remove( treeiter )
+                model.remove( iter_ )
                 button.set_sensitive( False )
 
             else:
                 treepath = (
                     Gtk.TreePath.new_from_string(
-                        model.get_string_from_iter( treeiter ) ) )
+                        model.get_string_from_iter( iter_ ) ) )
 
                 if not treepath.prev():
                     treepath = Gtk.TreePath.new_from_string( '0' )
@@ -621,7 +624,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
 
-                model.remove( treeiter )
+                model.remove( iter_ )
 
 
     def on_ppa_add(
@@ -640,7 +643,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         row_number,
         treeviewcolumn ):
 
-        model, treeiter = treeview.get_selection().get_selected()
+        model, iter_ = treeview.get_selection().get_selected()
         first_ppa = len( model ) == 0
         adding_ppa = row_number is None
 
@@ -666,7 +669,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             else:
                 active = (
                     ppa_users.index(
-                        model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_USER ] ) )
+                        model[ iter_ ][ IndicatorPPADownloadStatistics.COLUMN_USER ] ) )
 
             ppa_user = (
                 self.create_comboboxtext(
@@ -696,7 +699,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             else:
                 active = (
                     ppa_names.index(
-                        model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
+                        model[ iter_ ][ IndicatorPPADownloadStatistics.COLUMN_NAME ] ) )
 
             ppa_name = (
                 self.create_comboboxtext(
@@ -716,7 +719,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         else:
             text = (
-                model[ treeiter ][ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] )
+                model[ iter_ ][ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] )
 
         textview = (
             self.create_textview(
@@ -779,7 +782,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         for row in model ) )
 
                 if not adding_ppa:
-                    row = model[ treeiter ]
+                    row = model[ iter_ ]
                     user_original = row[ IndicatorPPADownloadStatistics.COLUMN_USER ]
                     name_original = row[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
                     if user == user_original and name == name_original:
@@ -822,7 +825,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     continue
 
                 if not adding_ppa:
-                    model.remove( treeiter )
+                    model.remove( iter_ )
 
                 model.append( [
                     user,
