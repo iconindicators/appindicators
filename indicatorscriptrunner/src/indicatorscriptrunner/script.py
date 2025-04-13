@@ -74,8 +74,8 @@ class Info( ABC ):
 
 
     def __eq__(
-            self,
-            other ):
+        self,
+        other ):
 
         return (
             self.__class__ == other.__class__
@@ -177,8 +177,8 @@ class Background( Info ):
 
 
     def __eq__(
-            self,
-            other ):
+        self,
+        other ):
 
         return (
             super().__eq__( other )
@@ -241,8 +241,8 @@ class NonBackground( Info ):
 
 
     def __eq__(
-            self,
-            other ):
+        self,
+        other ):
 
         return (
             super().__eq__( other )

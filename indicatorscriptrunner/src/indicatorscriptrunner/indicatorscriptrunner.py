@@ -1983,9 +1983,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def _create_key(
-            self,
-            group,
-            name ):
+        self,
+        group,
+        name ):
 
         return group + "::" + name
 

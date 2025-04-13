@@ -2686,8 +2686,8 @@ class IndicatorBase( ABC ):
 
 
     def get_version_from_config(
-            self,
-            config ):
+        self,
+        config ):
         '''
         Return the version from the config file.
 
