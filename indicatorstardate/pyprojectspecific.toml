@@ -6,4 +6,3 @@ version = "1.0.45"
 description = "Application indicator which displays the current Star Trek™ stardate."
 classifiers = [
   "Topic :: Games/Entertainment" ]
-

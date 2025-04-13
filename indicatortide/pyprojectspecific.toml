@@ -6,4 +6,3 @@ version = "1.0.30"
 description = "Application indicator which displays tidal information."
 classifiers = [
   "Topic :: Utilities" ]
-

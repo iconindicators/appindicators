@@ -6,4 +6,3 @@ version = "1.0.17"
 description = "Application indicator which displays calendar events."
 classifiers = [
   "Topic :: Games/Entertainment" ]
-

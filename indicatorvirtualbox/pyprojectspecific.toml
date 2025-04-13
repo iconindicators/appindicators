@@ -6,4 +6,3 @@ version = "1.0.75"
 description = "Application indicator for VirtualBox™ virtual machines."
 classifiers = [
   "Topic :: Utilities" ]
-
