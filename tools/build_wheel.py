@@ -16,6 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Check in release if there is any LICENSE file or similar.
+
 
 #TODO When building on Debian 12 getting this:
 '''
@@ -33,6 +35,11 @@
 !!
   dist._finalize_license_expression()
 '''
+# https://packaging.python.org/en/latest/specifications/pyproject-toml/
+# https://stackoverflow.com/questions/79408101/what-is-the-correct-way-of-specifying-the-license-in-pyproject-toml-file-for-a-n
+#
+# Made changes to pyproject.toml and builds successfully on Debian 12.
+# Check on Ubuntu 20.04.
 
 
 '''
