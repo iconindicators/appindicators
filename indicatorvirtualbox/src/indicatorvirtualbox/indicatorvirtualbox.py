@@ -455,10 +455,10 @@ class IndicatorVirtualBox( IndicatorBase ):
     def get_virtual_machines( self ):
 
         def add_virtual_machine(
-                start_group,
-                name,
-                uuid,
-                groups ):
+            start_group,
+            name,
+            uuid,
+            groups ):
 
             current_group = start_group
             for group in groups:
@@ -543,9 +543,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         groups_exist = self._add_items_to_store( treestore, None, items )
 
-        #TODO Hopefully keep 
-        print()
-
         renderer_autostart = (
             self.create_cell_renderer_toggle_for_checkbox_within_treeview(
                 treestore,
@@ -571,10 +568,6 @@ class IndicatorVirtualBox( IndicatorBase ):
                         "text",
                         IndicatorVirtualBox.COLUMN_GROUP_OR_VIRTUAL_MACHINE_NAME ),
                     (
-                        #TODO Hopefully remove.
-                        # self.create_cell_renderer_toggle_for_checkbox_within_treeview(
-                        #     treestore,
-                        #     IndicatorVirtualBox.COLUMN_AUTOSTART ),
                         renderer_autostart,
                         "active",
                         IndicatorVirtualBox.COLUMN_AUTOSTART ),
@@ -591,12 +584,6 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "or\n" +
                     "\tVBoxHeadless --startvm %VM% --vrde off\n\n" +
                     "An empty start command resets to default." ),
-                #TODO Hopefully remove
-                # celldatafunctionandarguments_renderers_columnviewids = (
-                #     (
-                #         ( self.data_function, renderer_start_command ),
-                #         renderer_start_command,
-                #         IndicatorVirtualBox.COLUMN_START_COMMAND ), ) ) )
                 celldatafunctionandarguments_renderers_columnviewids = (
                     (
                         ( self.column_renderer_function, ),
@@ -771,42 +758,20 @@ class IndicatorVirtualBox( IndicatorBase ):
         '''
         uuid = model[ iter_ ][ IndicatorVirtualBox.COLUMN_UUID ]
         treeview = treeviewcolumn.get_tree_view()
-        print( uuid )
         if treeview.get_column( IndicatorVirtualBox.COLUMN_AUTOSTART ) == treeviewcolumn:
-            print( "autostart" )
             cell_renderer.set_visible( uuid is not None )
 
         if treeview.get_column( IndicatorVirtualBox.COLUMN_START_COMMAND ) == treeviewcolumn:
-            print( "start command" )
             cell_renderer.set_property( "editable", uuid is not None )
-
-        print()
-
-
-# def data_function(
-    #     self,
-    #     treeviewcolumn,
-    #     cell_renderer,
-    #     model,
-    #     iter_,
-    #     renderer_start_command ):
-    #     '''
-    #     References
-    #         https://stackoverflow.com/q/52798356/2156453
-    #         https://stackoverflow.com/q/27745585/2156453
-    #         https://stackoverflow.com/q/49836499/2156453
-    #     '''
-    #     uuid = model[ iter_ ][ IndicatorVirtualBox.COLUMN_UUID ]
-    #     renderer_start_command.set_property( "editable", uuid is not None )
 
 
     def on_edited_start_command(
-            self,
-            cell_renderer,
-            path,
-            text_new,
-            model,
-            dialog ):
+        self,
+        cell_renderer,
+        path,
+        text_new,
+        model,
+        dialog ):
 
         start_command = text_new.strip()
         if len( start_command ) == 0:
