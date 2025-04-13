@@ -52,6 +52,14 @@ References
 # fortune history
 
 
+#TODO When removing last script from scriptrunner, so the treeview is now empty,
+# the tooltip on the treeview and buttons et al say "double click to edit".
+# Should the tooltip be changed to say "No script ; please add" or similar?
+# Similarly for the buttons et al?
+#
+# Similarly for fortune/ppa/onthisday/virtualbox? 
+
+
 import datetime
 import email.policy
 import gettext
