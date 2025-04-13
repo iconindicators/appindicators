@@ -39,9 +39,6 @@ from indicatorbase import IndicatorBase
 from virtualmachine import Group, VirtualMachine
 
 
-#TODO There should not be autostart checkboxes for groups!
-
-
 class IndicatorVirtualBox( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
