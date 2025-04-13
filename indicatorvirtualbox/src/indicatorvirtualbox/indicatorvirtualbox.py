@@ -30,9 +30,16 @@ from gi.repository import Gdk
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from .indicatorbase import IndicatorBase
+# from .indicatorbase import IndicatorBase
+#
+# from .virtualmachine import Group, VirtualMachine
+#TODO Revert
+from indicatorbase import IndicatorBase
 
-from .virtualmachine import Group, VirtualMachine
+from virtualmachine import Group, VirtualMachine
+
+
+#TODO There should not be autostart checkboxes for groups!
 
 
 class IndicatorVirtualBox( IndicatorBase ):
