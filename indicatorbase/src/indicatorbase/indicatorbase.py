@@ -2046,9 +2046,9 @@ class IndicatorBase( ABC ):
 
 
     def create_cell_renderer_toggle_for_checkbox_within_treeview(
-            self,
-            store,
-            model_column_id ):
+        self,
+        store,
+        model_column_id ):
 
         def on_checkbox(
             cell_renderer_toggle,
