@@ -32,7 +32,11 @@ References:
 #   PyGObject and libgirepository 2.0 or equivalent.
 #
 # https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
-
+# https://pygobject.gnome.org/getting_started.html
+# https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
+#   As per above Github link, hopefully only need to worry about Debian based distros...
+#   ...but still need to check for Fedora, openSUSE and Manjaro.
+ 
 
 #TODO Check {{indicator}} and other {{ }}...are they correct/needed?
 
