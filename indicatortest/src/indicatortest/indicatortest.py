@@ -491,7 +491,7 @@ class IndicatorTest( IndicatorBase ):
                 ( ( renderer_text_for_column_dayofweek, "text", 0 ), ),
                 celldatafunctionandarguments_renderers_columnviewids = (
                     (
-                        ( self.data_function, "" ),
+                        ( self.data_function, ),
                         renderer_text_for_column_dayofweek, 0 ), ),
                 tooltip_text = _(
                     "Days of week containing an 'n' are bold." ) ) )
