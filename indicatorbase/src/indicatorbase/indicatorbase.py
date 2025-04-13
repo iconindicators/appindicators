@@ -57,7 +57,7 @@ References
 # Should the tooltip be changed to say "No script ; please add" or similar?
 # Similarly for the buttons et al?
 #
-# Similarly for fortune/ppa/onthisday/virtualbox? 
+# Similarly for fortune/ppa/onthisday/virtualbox?
 
 
 import datetime
@@ -477,7 +477,6 @@ class IndicatorBase( ABC ):
                 else:
                     output += line
 
-#TODO Make shorter
         if not autostart_enabled_present or not exec_with_sleep_present or not terminal_present:
             # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled
             # line from the original .desktop file (production or development).
@@ -1602,9 +1601,6 @@ class IndicatorBase( ABC ):
         labels,
         tooltip_texts,
         clicked_functionandarguments ):
-        '''
-        TODO Explain return values
-        '''
 
         buttons_and_expands = [ ]
         z = zip( labels, tooltip_texts, clicked_functionandarguments )
@@ -1905,7 +1901,6 @@ class IndicatorBase( ABC ):
             else:
                 # Assume a tuple of tuples of
                 #   renderer, attribute, column model id.
-#TODO Make shorter
                 for renderer, attribute, columnmodelid in renderer_attribute_columnmodelid:
                     treeviewcolumn.pack_start( renderer, False )
                     treeviewcolumn.add_attribute(
@@ -1929,7 +1924,6 @@ class IndicatorBase( ABC ):
             treeview.append_column( treeviewcolumn )
 
         if celldatafunctionandarguments_renderers_columnviewids:
-#TODO Make shorter
             for data_function_and_arguments, renderer, columnviewid in celldatafunctionandarguments_renderers_columnviewids:
                 for index, treeviewcolumn in enumerate( treeview.get_columns() ):
                     if columnviewid == index:
@@ -2013,7 +2007,6 @@ class IndicatorBase( ABC ):
                                 Gtk.SortType.ASCENDING )
 
         if clickablecolumnviewids_functionsandarguments:
-#TODO Make shorter
             for columnviewid_functionandarguments in clickablecolumnviewids_functionsandarguments:
                 for index, treeviewcolumn in enumerate( treeview.get_columns() ):
                     if columnviewid_functionandarguments[ 0 ] == index:
@@ -2812,13 +2805,11 @@ class IndicatorBase( ABC ):
         Create a filename with timestamp and extension to be used to save data
         to the cache.
         '''
-        filename = (
-            basename
-            +
+        now_as_string = (
             datetime.datetime.now().strftime(
-                IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-            +
-            extension )
+                IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) )
+
+        filename = basename + now_as_string + extension
 
         return self.get_cache_directory() / filename
 
@@ -2964,19 +2955,11 @@ class IndicatorBase( ABC ):
 
         Returns filename written on success; None otherwise.
         '''
-        filename = (
-            basename
-            +
-            datetime.datetime.now().strftime(
-                IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )  #TODO Look to see where this is used...seems to be used to create the same filename over and over...or am I dreaming?
-            +
-            extension )
-
-        cache_file = self.get_cache_directory() / filename
-        with open( cache_file, 'wb' ) as f_out:
+        file_ = self.get_cache_filename_with_timestamp( basename, extension )
+        with open( file_, 'wb' ) as f_out:
             pickle.dump( binary_data, f_out )
 
-        return cache_file
+        return file_
 
 
     def read_cache_text_without_timestamp(
@@ -3077,17 +3060,8 @@ class IndicatorBase( ABC ):
 
         Returns filename written on success; None otherwise.
         '''
-        filename = (
-            basename
-            +
-            datetime.datetime.now().strftime(
-                IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS )
-            +
-            extension )
-
-        return (
-            self._write_cache_text(
-                text, self.get_cache_directory() / filename ) )
+        file_ = self.get_cache_filename_with_timestamp( basename, extension )
+        return self._write_cache_text( text, file_ )
 
 
     def _write_cache_text(
