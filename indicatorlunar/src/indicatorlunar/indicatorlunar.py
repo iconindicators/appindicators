@@ -34,13 +34,21 @@ import requests
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from .indicatorbase import IndicatorBase
+# from .indicatorbase import IndicatorBase
+#
+# from . import eclipse
+#
+# from .dataproviderapparentmagnitude import DataProviderApparentMagnitude
+# from .dataprovidergeneralperturbation import DataProviderGeneralPerturbation
+# from .dataproviderorbitalelement import DataProviderOrbitalElement, OrbitalElement
+#TODO Revert
+from indicatorbase import IndicatorBase
 
-from . import eclipse
+import eclipse
 
-from .dataproviderapparentmagnitude import DataProviderApparentMagnitude
-from .dataprovidergeneralperturbation import DataProviderGeneralPerturbation
-from .dataproviderorbitalelement import DataProviderOrbitalElement, OrbitalElement
+from dataproviderapparentmagnitude import DataProviderApparentMagnitude
+from dataprovidergeneralperturbation import DataProviderGeneralPerturbation
+from dataproviderorbitalelement import DataProviderOrbitalElement, OrbitalElement
 
 
 class IndicatorLunar( IndicatorBase ):
@@ -54,9 +62,14 @@ class IndicatorLunar( IndicatorBase ):
     astro_backend_pyephem = "AstroPyEphem"
     astro_backend_skyfield = "AstroSkyfield"
     astro_backend_name = astro_backend_pyephem
+    # astro_backend_module = (
+    #     importlib.import_module(
+    #         '.' + astro_backend_name.lower(),
+    #         __package__ ) )
+#TODO Revert
     astro_backend_module = (
         importlib.import_module(
-            '.' + astro_backend_name.lower(),
+            astro_backend_name.lower(),
             __package__ ) )
 
     astro_backend = getattr( astro_backend_module, astro_backend_name )

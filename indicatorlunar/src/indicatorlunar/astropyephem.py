@@ -27,9 +27,13 @@ import ephem
 
 from ephem.cities import _city_data
 
-from . import eclipse
+# from . import eclipse
+#
+# from .astrobase import AstroBase
+#TODO Revert
+import eclipse
 
-from .astrobase import AstroBase
+from astrobase import AstroBase
 
 
 class AstroPyEphem( AstroBase ):
