@@ -19,7 +19,6 @@
 ''' Application indicator which displays fortunes. '''
 
 
-import codecs
 import fnmatch
 import os
 
