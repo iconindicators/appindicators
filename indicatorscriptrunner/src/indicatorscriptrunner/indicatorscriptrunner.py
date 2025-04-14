@@ -760,7 +760,40 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
-            # self.scripts = copy_of_scripts #TODO Will need to create all scripts from the treestore.
+#TODO Test saving of scripts.            
+            self.scripts = [ ] 
+            iter_group = treestore.get_iter_first()
+            while iter_group:
+                iter_scripts = treestore.iter_children( iter_group )
+                while iter_scripts:
+                    row = treestore[ iter_scripts ]
+                    background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
+                    if background == IndicatorBase.TICK_SYMBOL:
+                        script = (
+                            Background(
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ],
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_NAME ],
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ],
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_SOUND ],
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ],
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ],
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ] ) )
+
+                    else:
+                        script = (
+                            NonBackground(
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ],
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_NAME ],
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ],
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_SOUND ],
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ],
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ],
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ] ) )
+
+                    self.scripts.append( script )
+                    iter_scripts = treestore.iter_next( iter_scripts )
+                iter_group = treestore.iter_next( iter_group )
+
             self.send_command_to_log = send_command_to_log_checkbutton.get_active()
             self.show_scripts_in_submenus = radio_show_scripts_submenu.get_active()
             self.hide_groups = hide_groups_checkbutton.get_active()
