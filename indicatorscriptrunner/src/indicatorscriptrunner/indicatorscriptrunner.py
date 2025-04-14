@@ -768,6 +768,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                 while iter_scripts:
                     row = treestore[ iter_scripts ]
 
+                    group = row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
+                    name = row[ IndicatorScriptRunner.COLUMN_MODEL_NAME ]
+                    command = row[ IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ]
+
                     sound = row[ IndicatorScriptRunner.COLUMN_MODEL_SOUND ]
                     sound = True if sound == IndicatorBase.TICK_SYMBOL else False
 
@@ -781,9 +785,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                         script = (
                             Background(
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ],
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_NAME ],
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ],
+                                group,
+                                name,
+                                command,
                                 sound,
                                 notification,
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ],
@@ -798,9 +802,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                         script = (
                             NonBackground(
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ],
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_NAME ],
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ],
+                                group,
+                                name,
+                                command,
                                 sound,
                                 notification,
                                 terminal,
