@@ -437,7 +437,7 @@ class AstroPyEphem( AstroBase ):
                         observer,
                         orbital_element_data[ key ].get_data() ) )
 
-                if not AstroPyEphem._is_body_bad( body ):
+                if not AstroPyEphem._is_comet_or_minor_planet_bad( body ):
                     if is_gk:
                         apparent_magnitude = (
                             AstroBase.get_apparent_magnitude_gk(
@@ -483,7 +483,7 @@ class AstroPyEphem( AstroBase ):
                             observer,
                             orbital_element_data[ key ].get_data() ) )
 
-                    if not AstroPyEphem._is_body_bad( body ):
+                    if not AstroPyEphem._is_comet_or_minor_planet_bad( body ):
                         AstroPyEphem._calculate_common(
                             data,
                             ( AstroBase.BodyType.MINOR_PLANET, key ),
@@ -501,13 +501,17 @@ class AstroPyEphem( AstroBase ):
         return body
 
 
-    # Check computed comets and minor planets to guard against bad data.
     @staticmethod
-    def _is_body_bad(
+    def _is_comet_or_minor_planet_bad(
         body ):
+        '''
+        Although the MPC is no longer in use for a data source, some data has
+        contained *****.  Guard against this regardless of the source.
 
+        Further, near-parabolic orbits will trigger a RuntimeError in PyEphem:
+            https://github.com/brandon-rhodes/pyephem/issues/239
+        '''
         try:
-            # Have found MPC data may contain ***** in lieu of actual data!
             bad = (
                 math.isnan( body.earth_distance )
                 or
@@ -517,16 +521,7 @@ class AstroPyEphem( AstroBase ):
                 or
                 math.isnan( body.sun_distance ) )
 
-        except RunTimeError:  #TODO Need to import???
-# Check when/where this was added via repository history.
-# Don't think I need to import as it is a built-in.
-# However, this can happen when there is bad data found in ephem's calculations.
-# But surely this runtimeerror should happen during the calculation,
-# NOT here when checking for bad data.
-# Go back to the github issue below and reproduce the error...
-# surely need to catch the RuntimeError during calculation...
-            # Some comets with a near-parabolic orbit will trigger an error:
-            #   https://github.com/brandon-rhodes/pyephem/issues/239
+        except RuntimeError:
             bad = True
 
         return bad
