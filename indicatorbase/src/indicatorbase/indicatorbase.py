@@ -2654,6 +2654,8 @@ class IndicatorBase( ABC ):
             with open( config_file, 'r', encoding = "utf-8" ) as f_in:
                 config = json.load( f_in )
 
+        self.check_latest_version = False
+
         self.load_config( config ) # Call to implementation in indicator.
 
         if IndicatorBase._CONFIG_CHECK_LATEST_VERSION not in config:

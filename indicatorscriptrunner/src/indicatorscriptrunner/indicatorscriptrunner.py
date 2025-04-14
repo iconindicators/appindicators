@@ -2027,32 +2027,42 @@ class IndicatorScriptRunner( IndicatorBase ):
             config.get( self.CONFIG_SCRIPTS_NON_BACKGROUND, [ ] ) )
 
         for script in scripts_non_background:
-            skript = NonBackground(
-                script[ IndicatorScriptRunner.JSON_GROUP ],
-                script[ IndicatorScriptRunner.JSON_NAME ],
-                script[ IndicatorScriptRunner.JSON_COMMAND ],
-                bool( script[ IndicatorScriptRunner.JSON_PLAY_SOUND ] ),
-                bool( script[ IndicatorScriptRunner.JSON_SHOW_NOTIFICATION ] ),
-                bool( script[ IndicatorScriptRunner.JSON_TERMINAL_OPEN ] ),
-                bool( script[ IndicatorScriptRunner.JSON_DEFAULT ] ) )
+            skript = (
+                NonBackground(
+                    script[ IndicatorScriptRunner.JSON_GROUP ],
+                    script[ IndicatorScriptRunner.JSON_NAME ],
+                    script[ IndicatorScriptRunner.JSON_COMMAND ],
+                    bool( script[ IndicatorScriptRunner.JSON_PLAY_SOUND ] ),
+                    bool( script[ IndicatorScriptRunner.JSON_SHOW_NOTIFICATION ] ),
+                    bool( script[ IndicatorScriptRunner.JSON_TERMINAL_OPEN ] ),
+                    bool( script[ IndicatorScriptRunner.JSON_DEFAULT ] ) ) )
 
             self.scripts.append( skript )
-
 
         scripts_background = config.get( self.CONFIG_SCRIPTS_BACKGROUND, [ ] )
         for script in scripts_background:
-            skript = Background(
-                script[ IndicatorScriptRunner.JSON_GROUP ],
-                script[ IndicatorScriptRunner.JSON_NAME ],
-                script[ IndicatorScriptRunner.JSON_COMMAND ],
-                bool( script[ IndicatorScriptRunner.JSON_PLAY_SOUND ] ),
-                bool( script[ IndicatorScriptRunner.JSON_SHOW_NOTIFICATION ] ),
-                script[ IndicatorScriptRunner.JSON_INTERVAL_IN_MINUTES ],
-                bool( script[ IndicatorScriptRunner.JSON_FORCE_UPDATE ] ) )
+            skript = (
+                Background(
+                    script[ IndicatorScriptRunner.JSON_GROUP ],
+                    script[ IndicatorScriptRunner.JSON_NAME ],
+                    script[ IndicatorScriptRunner.JSON_COMMAND ],
+                    bool( script[ IndicatorScriptRunner.JSON_PLAY_SOUND ] ),
+                    bool( script[ IndicatorScriptRunner.JSON_SHOW_NOTIFICATION ] ),
+                    script[ IndicatorScriptRunner.JSON_INTERVAL_IN_MINUTES ],
+                    bool( script[ IndicatorScriptRunner.JSON_FORCE_UPDATE ] ) ) )
 
             self.scripts.append( skript )
 
+        response = Gtk.ResponseType.NO
         if len( self.scripts) == 0:
+            response = (
+                self.show_dialog_yes_no(
+                    None,
+                    _(
+                        "No scripts are present.\n\n" +
+                        "Restore the sample scripts?" ) ) )
+
+        if response == Gtk.ResponseType.YES:
             # Example non-background scripts.
             self.scripts.append(
                 NonBackground(
@@ -2126,6 +2136,8 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             self.indicator_text = (
                 " [Network::Internet Down][System::Available Memory]" )
+
+            self.request_save_config( 1 )
 
         self.initialise_background_scripts()
 

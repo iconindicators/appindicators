@@ -939,7 +939,16 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 self.ppas[ -1 ].set_filters(
                     ppa[ IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ] )
 
+        response = Gtk.ResponseType.NO
         if len( self.ppas ) == 0:
+            response = (
+                self.show_dialog_yes_no(
+                    None,
+                    _(
+                        "No PPAs are present.\n\n" +
+                        "Restore the sample PPA?" ) ) )
+
+        if response == Gtk.ResponseType.YES:
             self.ppas = [ PPA( "thebernmeister", "ppa" ) ]
             self.ppas[ 0 ].set_filters( [
                 "indicator-fortune",
@@ -951,6 +960,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 "indicator-stardate",
                 "indicator-tide",
                 "indicator-virtual-box" ] )
+
+            self.request_save_config( 1 )
 
 
     def save_config( self ):
