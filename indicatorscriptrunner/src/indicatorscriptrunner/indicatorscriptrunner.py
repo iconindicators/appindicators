@@ -760,35 +760,51 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
-#TODO Test saving of scripts.            
-            self.scripts = [ ] 
+#TODO Test saving of scripts.
+            self.scripts = [ ]
             iter_group = treestore.get_iter_first()
             while iter_group:
                 iter_scripts = treestore.iter_children( iter_group )
                 while iter_scripts:
                     row = treestore[ iter_scripts ]
+
+                    sound = row[ IndicatorScriptRunner.COLUMN_MODEL_SOUND ]
+                    sound = True if sound == IndicatorBase.TICK_SYMBOL else False
+
+                    notification = row[ IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ]
+                    notification = True if notification == IndicatorBase.TICK_SYMBOL else False
+
                     background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
                     if background == IndicatorBase.TICK_SYMBOL:
+                        force_update = row[ IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ]
+                        force_update = True if force_update == IndicatorBase.TICK_SYMBOL else False
+
                         script = (
                             Background(
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ],
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_NAME ],
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ],
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_SOUND ],
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ],
+                                sound,
+                                notification,
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ],
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ] ) )
+                                force_update ) )
 
                     else:
+                        terminal = row[ IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ]
+                        terminal = True if terminal == IndicatorBase.TICK_SYMBOL else False
+
+                        default = row[ IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ]
+                        default = True if default == "True" else False
+
                         script = (
                             NonBackground(
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ],
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_NAME ],
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ],
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_SOUND ],
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ],
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ],
-                                row[ IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ] ) )
+                                sound,
+                                notification,
+                                terminal,
+                                default ) )
 
                     self.scripts.append( script )
                     iter_scripts = treestore.iter_next( iter_scripts )
@@ -887,7 +903,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         command_text = ""
         model, iter_ = treeview.get_selection().get_selected()
-        
+
         if iter_:
             name = (
                 model.get_value( iter_, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
