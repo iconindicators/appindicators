@@ -3,7 +3,7 @@
 ## v1.0.44 (2024-09-04)
 
 - Fortunes are now defined by their .dat file, rather than an entire directory, allowing for precise control.
-- Previous change to remove characters/glyphs which appear as hexadecimal has been dropped.  Became a never ending chase to add more and more hexadecimal values as other distros/versions were tested.  Further, some hexadecimal values were fine on one distro/version yet on other required removal creating a further headache.
+- No longer remove characters/glyphs which render as hexadecimal.  Has become a never ending chase as other distros/versions were tested, where some glyphs rendered correctly on one distro/version, yet on others required removal.
 - Fixed PyGObject 3.11 deprecation warnings.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Now includes an opt-in check during start up for the latest version at PyPI.
