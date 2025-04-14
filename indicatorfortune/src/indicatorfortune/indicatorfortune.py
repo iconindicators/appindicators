@@ -152,41 +152,7 @@ class IndicatorFortune( IndicatorBase ):
                         self.read_cache_text_without_timestamp(
                             IndicatorFortune.HISTORY_FILE ) )
 
-                    # Remove characters/glyphs which appear as hexadecimal.
-                    #    https://askubuntu.com/q/827193
-                    #
-                    # Examples (On Debian 12 x0007 is x0008):
-                    #    Ask not for whom the <CONTROL-G> tolls.
-                    #        *** System shutdown message from root
-                    #    It's a very *__UN*lucky week in which to be took
-                    
-#TODO This appeared on Ubuntu 20.04:
-
-    #                 Why would you want to do this? You donât, forget I even mentioned it.
-    # -- Perl DBI documentation (v1.53)
-
-# See if it happens on say 22.04 or 24.04 or Debian 12.
-# Maybe can just forget about this...no need to try and remove,
-# particularly if it appears correctly say on 24.04 and we erroneously remove the fortune.
-
-# "We wanted to build the chat system of the future, and we
-# ended up with application-layer multicast streaming media. In 1999.
-# We were a bit ahead of our time [ââ]"
-#
-# [ââ] This is marketing-speak for âwrongâ; you can say the same thing
-# for a batterâs swing when he takes a strike.
-#
-#     -- Thomas Ptacek, http://www.matasano.com/log/914/
-                    
-                    output = ""
-                    for c in fortune_:
-                        char_as_hex = codecs.encode( str.encode( c ), "hex" )
-                        if char_as_hex == b'07' or char_as_hex == b'08':
-                            continue
-
-                        output += c
-
-                    message = output
+                    message = fortune_
                     summary = self.notification_summary
 
                     self.write_cache_text_without_timestamp(
