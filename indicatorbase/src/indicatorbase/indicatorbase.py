@@ -1237,6 +1237,21 @@ class IndicatorBase( ABC ):
                 title = title ) )
 
 
+    def show_dialog_yes_no(
+        self,
+        parent_widget,
+        message,
+        title = None ):
+
+        return (
+            self._show_dialog(
+                parent_widget,
+                message,
+                Gtk.MessageType.QUESTION,
+                Gtk.ButtonsType.YES_NO,
+                title = title ) )
+
+
     def show_dialog_ok(
         self,
         parent_widget,
