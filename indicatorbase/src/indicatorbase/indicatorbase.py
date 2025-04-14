@@ -849,7 +849,6 @@ class IndicatorBase( ABC ):
         functionandarguments ):
 
         if self.indicator.get_menu().get_children()[ 0 ].get_sensitive():
-#TODO Check this comment...correct working and placement?
             # Disabled during update/Preferences/About
             if len( functionandarguments ) == 1:
                 functionandarguments[ 0 ]( indicator, delta, scroll_direction )
