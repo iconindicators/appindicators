@@ -517,7 +517,14 @@ class AstroPyEphem( AstroBase ):
                 or
                 math.isnan( body.sun_distance ) )
 
-        except RunTimeError:  #TODO Need to import???  Check when/where this was added via repository history.
+        except RunTimeError:  #TODO Need to import???
+# Check when/where this was added via repository history.
+# Don't think I need to import as it is a built-in.
+# However, this can happen when there is bad data found in ephem's calculations.
+# But surely this runtimeerror should happen during the calculation,
+# NOT here when checking for bad data.
+# Go back to the github issue below and reproduce the error...
+# surely need to catch the RuntimeError during calculation...
             # Some comets with a near-parabolic orbit will trigger an error:
             #   https://github.com/brandon-rhodes/pyephem/issues/239
             bad = True
