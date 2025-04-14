@@ -16,127 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Check in release if there is any LICENSE file or similar.
-
-
-#TODO When building on Debian 12 getting this:
-'''
-/tmp/build-env-jpjcrpni/lib/python3.11/site-packages/setuptools/config/_apply_pyprojecttoml.py:61: SetuptoolsDeprecationWarning: License classifiers are deprecated.
-!!
-
-        ********************************************************************************
-        Please consider removing the following classifiers in favor of a SPDX license expression:
-
-        License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)
-
-        See https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license for details.
-        ********************************************************************************
-
-!!
-  dist._finalize_license_expression()
-'''
-# https://packaging.python.org/en/latest/guides/writing-pyproject-toml/#license 
-# https://packaging.python.org/en/latest/specifications/pyproject-toml/
-# https://stackoverflow.com/questions/79408101/what-is-the-correct-way-of-specifying-the-license-in-pyproject-toml-file-for-a-n
-#
-# Made changes to pyproject.toml and builds successfully on Debian 12.
-# Check on Ubuntu 20.04.
-#
-# On Ubuntu 20.04 does not work:
-'''
-configuration error: `project.license` must be valid exactly by one definition (2 matches found):
-
-    - keys:
-        'file': {type: string}
-      required: ['file']
-    - keys:
-        'text': {type: string}
-      required: ['text']
-
-DESCRIPTION:
-    `Project license <https://peps.python.org/pep-0621/#license>`_.
-
-GIVEN VALUE:
-    "GPL-3.0-or-later"
-
-OFFENDING RULE: 'oneOf'
-
-DEFINITION:
-    {
-        "oneOf": [
-            {
-                "properties": {
-                    "file": {
-                        "type": "string",
-                        "$$description": [
-                            "Relative path to the file (UTF-8) which contains the license for the",
-                            "project."
-                        ]
-                    }
-                },
-                "required": [
-                    "file"
-                ]
-            },
-            {
-                "properties": {
-                    "text": {
-                        "type": "string",
-                        "$$description": [
-                            "The license of the project whose meaning is that of the",
-                            "`License field from the core metadata",
-                            "<https://packaging.python.org/specifications/core-metadata/#license>`_."
-                        ]
-                    }
-                },
-                "required": [
-                    "text"
-                ]
-            }
-        ]
-    }
-Traceback (most recent call last):
-  File "/home/bernard/Programming/Indicators/venv_development/lib/python3.8/site-packages/pyproject_hooks/_in_process/_in_process.py", line 389, in <module>
-    main()
-  File "/home/bernard/Programming/Indicators/venv_development/lib/python3.8/site-packages/pyproject_hooks/_in_process/_in_process.py", line 373, in main
-    json_out["return_val"] = hook(**hook_input["kwargs"])
-  File "/home/bernard/Programming/Indicators/venv_development/lib/python3.8/site-packages/pyproject_hooks/_in_process/_in_process.py", line 317, in get_requires_for_build_sdist
-    return hook(config_settings)
-  File "/tmp/build-env-ruyvob75/lib/python3.8/site-packages/setuptools/build_meta.py", line 336, in get_requires_for_build_sdist
-    return self._get_build_requires(config_settings, requirements=[])
-  File "/tmp/build-env-ruyvob75/lib/python3.8/site-packages/setuptools/build_meta.py", line 303, in _get_build_requires
-    self.run_setup()
-  File "/tmp/build-env-ruyvob75/lib/python3.8/site-packages/setuptools/build_meta.py", line 319, in run_setup
-    exec(code, locals())
-  File "<string>", line 1, in <module>
-  File "/tmp/build-env-ruyvob75/lib/python3.8/site-packages/setuptools/__init__.py", line 117, in setup
-    return distutils.core.setup(**attrs)
-  File "/tmp/build-env-ruyvob75/lib/python3.8/site-packages/setuptools/_distutils/core.py", line 157, in setup
-    dist.parse_config_files()
-  File "/tmp/build-env-ruyvob75/lib/python3.8/site-packages/setuptools/dist.py", line 655, in parse_config_files
-    pyprojecttoml.apply_configuration(self, filename, ignore_option_errors)
-  File "/tmp/build-env-ruyvob75/lib/python3.8/site-packages/setuptools/config/pyprojecttoml.py", line 71, in apply_configuration
-    config = read_configuration(filepath, True, ignore_option_errors, dist)
-  File "/tmp/build-env-ruyvob75/lib/python3.8/site-packages/setuptools/config/pyprojecttoml.py", line 139, in read_configuration
-    validate(subset, filepath)
-  File "/tmp/build-env-ruyvob75/lib/python3.8/site-packages/setuptools/config/pyprojecttoml.py", line 60, in validate
-    raise ValueError(f"{error}\n{summary}") from None
-ValueError: invalid pyproject.toml config: `project.license`.
-configuration error: `project.license` must be valid exactly by one definition (2 matches found):
-
-    - keys:
-        'file': {type: string}
-      required: ['file']
-    - keys:
-        'text': {type: string}
-      required: ['text']
-
-
-ERROR Backend subprocess exited when trying to invoke get_requires_for_build_sdist
-
-'''
-
-
 '''
 Build a Python .whl and .tar.gz for one or more indicators.
 
@@ -146,10 +25,6 @@ To view the contents of a .whl:
 To view the contents of a .tar.gz:
    tar tf indicatortest-1.0.7.tar.gz
 '''
-# The issue is that setuptools needs to be version 77.0.0 which Debian 12 can use but 
-# Ubuntu 20.04 cannot as it is locked to Python 3.9 and from 75.4.0 needs Python 3.9+
-#
-# Not sure what to do...
 
 
 import configparser

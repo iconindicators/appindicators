@@ -10,7 +10,7 @@ authors = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
 maintainers = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
-license = "GPL-3.0-or-later"  #TODO See if this builds under Debian 12 and Ubunru 20.04   All good on Debian 12.  Error on Ubuntu 20.04.  See build_wheel.py for details.
+#license = "GPL-3.0-or-later"  #TODO Does not build on Ubuntu 20.04; must uncomment and build on Debian 12+ or Ubuntu 22.04+
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
@@ -19,7 +19,6 @@ classifiers = [
   "Development Status :: 6 - Mature",
   "Environment :: X11 Applications :: GTK",
   "Intended Audience :: End Users/Desktop",
-#  "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",  #TODO This is deprecated.
   "Natural Language :: English",
   "Operating System :: POSIX :: Linux",
   "Programming Language :: Python :: 3.8" ]
