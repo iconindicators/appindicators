@@ -563,6 +563,14 @@ if __name__ == "__main__":
                 "indicators" :
                     "+" } ) )
 
+    print(
+        "INFORMATION:\n" +
+        "\tPyGObject is pinned to version 3.50.0 as newer versions\n" +
+        "\trequire libgirepository-2.0 which is unavailable on Debian 11/12\n" +
+        "\tand Ubuntu 20.04/22.04.\n" +
+        "\tIf building on Ubuntu 24.04+ or Debian 13+, the most recent\n" +
+        "\tversion of PyGObject should be used.\n" )
+
     utils.initialise_virtual_environment(
         VENV_DEVELOPMENT,
         "build",
@@ -570,11 +578,6 @@ if __name__ == "__main__":
         "pip",
         "polib",
         "PyGObject\<=3.50.0", # Escape < as this will be passed to the terminal.
-#TODO Perhaps print out to the user about the PyGObject line
-# so it is clear which version is being used
-# and the user can change if needed.
-# Only needed for certain versions of Debian/Ubuntu.
-# What about building on Fedora et al?
         "readme_renderer[md]",
         "setuptools" )
 
