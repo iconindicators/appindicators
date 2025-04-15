@@ -581,8 +581,16 @@ class IndicatorScriptRunner( IndicatorBase ):
             copy_,
             indicator_text_entry )
 
+#TODO
+#    Select first script of first group and show script's command
+#    OR
+#    Disable copy and disable remove
         self._update_user_interface(
-            scripts_treeview, None, None, copy_, remove, None, None )
+            scripts_treeview,
+            treestore.get_iter_from_string( "0:0" )
+            if len( treestore ) else None,
+            button_copy = copy_,
+            button_remove = remove )
 
         box.set_margin_top( IndicatorBase.INDENT_WIDGET_TOP )
         grid.attach( box, 0, 31, 1, 1 )
@@ -980,9 +988,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                 self._on_copy_script(
                     treeview, model, iter_, group, name, groups ) )
 
-        self._update_user_interface(
-            treeview,
-            iter_select if iter_select else iter_ )
+#TODO Copy group: Select new group.
+#TODO Copy script: Select new script and show script's command.
+        if iter_select:
+            self._update_user_interface( treeview, iter_select )
 
 
     def _on_copy_group(
@@ -1192,14 +1201,37 @@ class IndicatorScriptRunner( IndicatorBase ):
                 old_tag_new_tag_pairs = (
                     ( self._create_key( group, name ), "" ), )
 
-        self._update_user_interface(
-            treeview,
-            iter_select if removed else iter_,
-            command_text_view,
-            button_copy,
-            button_remove,
-            entry_indicator_text,
-            old_tag_new_tag_pairs )
+#TODO
+# Group:
+#    Remove each script from indicator text.
+#
+#    Select last script of previous group and show script's command
+#    OR
+#    select next group 
+#    OR
+#    select nothing and disable copy and disable remove 
+#
+# Script:
+#    Remove script from indicator text.
+#
+#    Select previous script and show script's command
+#    OR
+#    select next script and show script's command
+#    OR
+#    select last script of previous group and show script's command
+#    OR
+#    select next group 
+#    OR
+#    select nothing and disable copy and disable remove and empty script's command
+        if removed:
+            self._update_user_interface(
+                treeview,
+                iter_select,
+                command_text_view = command_text_view,
+                button_copy = button_copy,
+                button_remove = button_remove,
+                entry_indicator_text = entry_indicator_text,
+                old_tag_new_tag_pairs = old_tag_new_tag_pairs )
 
 
     def _on_remove_group(
@@ -1302,15 +1334,17 @@ class IndicatorScriptRunner( IndicatorBase ):
             for row in model ]
 
         old_tag_new_tag_pairs = None
+        iter_select = None
         if name is None:
-            self._on_edit_group( treeview, model, iter_, group, groups )
-            group_ = (
-                model.get_value(
-                    iter_, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+            iter_select = (
+                self._on_edit_group( treeview, model, iter_, group, groups ) )
 
-            iter_select = iter_
-            if group != group_:
-                iter_scripts = model.iter_children( iter_ )
+            if iter_select:
+                group_ = (
+                    model.get_value(
+                        iter_, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
+                iter_scripts = model.iter_children( iter_select )
                 old_tag_new_tag_pairs = ( )
                 while iter_scripts:
                     background = (
@@ -1332,11 +1366,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                     iter_scripts = model.iter_next( iter_scripts )
 
         else:
-            background = (
-                model.get_value(
-                    iter_,
-                    IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
-
             iter_select = (
                 self._on_edit_script(
                     treeview, model, iter_, group, name, groups ) )
@@ -1352,21 +1381,26 @@ class IndicatorScriptRunner( IndicatorBase ):
                         iter_select,
                         IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
+                group_or_name_changed_or_both = group != group_ or name != name_
+
+                background = (
+                    model.get_value(
+                        iter_,
+                        IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+
+                was_background = background == IndicatorBase.TICK_SYMBOL
+
                 background_ = (
                     model.get_value(
                         iter_select,
                         IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
 
-                group_or_name_changed_or_both = group != group_ or name != name_
-                was_background = background == IndicatorBase.TICK_SYMBOL
+                is_background = background_ == IndicatorBase.TICK_SYMBOL
 
-                no_longer_background = (
-                    background == IndicatorBase.TICK_SYMBOL
-                    and
-                    background_ is None )
+                no_longer_background = was_background and not is_background
 
                 update_indicator_text = (
-                    ( group_or_name_changed_or_both and was_background )
+                    ( was_background and group_or_name_changed_or_both )
                     or
                     no_longer_background )
 
@@ -1376,14 +1410,20 @@ class IndicatorScriptRunner( IndicatorBase ):
                             self._create_key( group, name ),
                             self._create_key( group_, name_ ) ), )
 
-            else:
-                iter_select = iter_
-
-        self._update_user_interface(
-            treeview,
-            iter_select,
-            entry_indicator_text = entry_indicator_text,
-            old_tag_new_tag_pairs = old_tag_new_tag_pairs )
+#TODO
+# Group:
+#    Update each script in indicator text.
+#    Select group.
+#
+# Script:
+#    Update script in indicator text.
+#    Select script and show script's command.
+        if iter_select:
+            self._update_user_interface(
+                treeview,
+                iter_select,
+                entry_indicator_text = entry_indicator_text,
+                old_tag_new_tag_pairs = old_tag_new_tag_pairs )
 
 
     def _on_edit_group(
@@ -1412,6 +1452,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 _( "Edit Group" ),
                 content_widget = grid ) )
 
+        iter_select = None
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -1451,11 +1492,15 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                     iter_scripts = model.iter_next( iter_scripts )
 
+                iter_select = iter_group
+
             break
 
         dialog.destroy()
 
         print( self.dump_treestore( model ) ) #TODO Testing
+
+        return iter_select
 
 
 #TODO Check for adding first script (start empty).
@@ -1481,11 +1526,15 @@ class IndicatorScriptRunner( IndicatorBase ):
             self._on_edit_script(
                 treeview, treeview.get_model(), None, group, None, groups ) )
 
-        self._update_user_interface(
-            treeview,
-            iter_select if iter_select else iter_,
-            button_copy = button_copy,
-            button_remove = button_remove )
+#TODO
+# Script:
+#    Select script and show script's command.
+        if iter_select:
+            self._update_user_interface(
+                treeview,
+                iter_select,
+                button_copy = button_copy,
+                button_remove = button_remove )
 
 
     def _on_edit_script(
@@ -1984,20 +2033,25 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         model = treeview.get_model()
 
+#TODO No longer needed.
+        # if iter_:
+        #     treepath = (
+        #         Gtk.TreePath.new_from_string(
+        #             model.get_string_from_iter( iter_ ) ) )
+        #
+        # else:
+        #     treepath = Gtk.TreePath.new_from_string( "0:0" )
+
         if iter_:
             treepath = (
                 Gtk.TreePath.new_from_string(
                     model.get_string_from_iter( iter_ ) ) )
 
-        else:
-            treepath = Gtk.TreePath.new_from_string( "0:0" )
-
-        if len( model ):
             treeview.expand_all()
             treeview.get_selection().select_path( treepath )
             treeview.set_cursor( treepath, None, False )
 
-        else:
+        if command_text_view and iter_ is None :
             command_text_view.get_buffer().set_text( "" )
 
         if button_copy:
