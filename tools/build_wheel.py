@@ -270,7 +270,11 @@ def _get_name_categories_comments_from_indicator(
 
 
     indicator_source = (
-        Path( '.' ) / directory_indicator / "src" / indicator_name / ( indicator_name + ".py" ) )  #TODO Can this be split over lines?
+        Path( '.' ) /
+        directory_indicator /
+        "src" /
+        indicator_name /
+        ( indicator_name + ".py" ) )
 
     name = ""
     categories = ""
