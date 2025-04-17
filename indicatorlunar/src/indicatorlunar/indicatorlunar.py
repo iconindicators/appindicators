@@ -732,7 +732,7 @@ class IndicatorLunar( IndicatorBase ):
         # Due to a bug, the icon name must change between calls to set the icon.
         # So change the name each time incorporating the current date/time.
         #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
-        #    http://askubuntu.com/questions/490634/application-indicator-icon-not-changing-until-clicked
+        #    https://askubuntu.com/q/490634/67335
         key = (
             IndicatorLunar.astro_backend.BodyType.MOON,
             IndicatorLunar.astro_backend.NAME_TAG_MOON )
