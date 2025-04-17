@@ -757,7 +757,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         # the focus and highlight the text.
         # If the user hits the space bar (or any regular key), the text would
         # be overwritten.  Refer to:
-        #    https://stackoverflow.com/questions/68931638/remove-focus-from-textentry
+        #    https://stackoverflow.com/q/68931638/2156453
         #    https://gitlab.gnome.org/GNOME/gtk/-/issues/4249
         notebook.connect(
             "switch-page",
@@ -1205,9 +1205,9 @@ class IndicatorScriptRunner( IndicatorBase ):
 #
 #    Select last script of previous group and show script's command
 #    OR
-#    select next group 
+#    select next group
 #    OR
-#    select nothing and disable copy and disable remove 
+#    select nothing and disable copy and disable remove
 #
 # Script:
 #    Remove script from indicator text.
@@ -1218,7 +1218,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 #    OR
 #    select last script of previous group and show script's command
 #    OR
-#    select next group 
+#    select next group
 #    OR
 #    select nothing and disable copy and disable remove and empty script's command
         if iter_select:
@@ -1498,7 +1498,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         return iter_select
 
 
-#TODO Check for adding first script (start empty).
     def on_add(
         self,
         button_add,
@@ -1521,9 +1520,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             self._on_edit_script(
                 treeview, treeview.get_model(), None, group, None, groups ) )
 
-#TODO
-# Script:
-#    Select script and show script's command.
         if iter_select:
             self._update_preferences(
                 treeview,
@@ -2154,7 +2150,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.scripts.append( skript )
 
         response = Gtk.ResponseType.NO
-        if len( self.scripts) == 0:
+        if len( self.scripts ) == 0:
             response = (
                 self.show_dialog_yes_no(
                     None,
