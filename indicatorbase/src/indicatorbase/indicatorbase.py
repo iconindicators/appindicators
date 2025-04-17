@@ -3189,7 +3189,7 @@ class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
 
     References:
         https://docs.python.org/3/library/logging.handlers.html
-        https://stackoverflow.com/questions/24157278/limit-python-log-file
+        https://stackoverflow.com/q/24157278/2156453
         https://github.com/python/cpython/blob/main/Lib/logging/handlers.py
     '''
 
