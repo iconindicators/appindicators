@@ -448,26 +448,26 @@ class IndicatorScriptRunner( IndicatorBase ):
                     None,
                     script.get_name(),
                     script.get_command(),
-                    IndicatorBase.TICK_SYMBOL if script.get_play_sound()
+                    IndicatorBase.SYMBOL_TICK if script.get_play_sound()
                     else None,
-                    IndicatorBase.TICK_SYMBOL if script.get_show_notification()
+                    IndicatorBase.SYMBOL_TICK if script.get_show_notification()
                     else None,
-                    IndicatorBase.TICK_SYMBOL if isinstance( script, Background )
+                    IndicatorBase.SYMBOL_TICK if isinstance( script, Background )
                     else None,
-                    '—' if isinstance( script, Background )
+                    IndicatorBase.SYMBOL_DASH if isinstance( script, Background )
                     else (
-                        IndicatorBase.TICK_SYMBOL if script.get_terminal_open()
+                        IndicatorBase.SYMBOL_TICK if script.get_terminal_open()
                         else None
                     ),
-                    str( False ) if isinstance( script, Background )
+                    '-' if isinstance( script, Background )
                     else str( script.get_default() ),
                     str( script.get_interval_in_minutes() )
                     if isinstance( script, Background )
-                    else '—',
+                    else IndicatorBase.SYMBOL_DASH,
                     (
-                        IndicatorBase.TICK_SYMBOL if script.get_force_update()
+                        IndicatorBase.SYMBOL_TICK if script.get_force_update()
                         else None )
-                    if isinstance( script, Background ) else '—' ]
+                    if isinstance( script, Background ) else IndicatorBase.SYMBOL_DASH ]
 
                 treestore.append( parent, row )
 
@@ -781,15 +781,15 @@ class IndicatorScriptRunner( IndicatorBase ):
                     command = row[ IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ]
 
                     sound = row[ IndicatorScriptRunner.COLUMN_MODEL_SOUND ]
-                    sound = True if sound == IndicatorBase.TICK_SYMBOL else False
+                    sound = True if sound == IndicatorBase.SYMBOL_TICK else False
 
                     notification = row[ IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ]
-                    notification = True if notification == IndicatorBase.TICK_SYMBOL else False
+                    notification = True if notification == IndicatorBase.SYMBOL_TICK else False
 
                     background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
-                    if background == IndicatorBase.TICK_SYMBOL:
+                    if background == IndicatorBase.SYMBOL_TICK:
                         force_update = row[ IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ]
-                        force_update = True if force_update == IndicatorBase.TICK_SYMBOL else False
+                        force_update = True if force_update == IndicatorBase.SYMBOL_TICK else False
 
                         script = (
                             Background(
@@ -803,7 +803,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                     else:
                         terminal = row[ IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ]
-                        terminal = True if terminal == IndicatorBase.TICK_SYMBOL else False
+                        terminal = True if terminal == IndicatorBase.SYMBOL_TICK else False
 
                         default = row[ IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ]
                         default = True if default == "True" else False
@@ -850,7 +850,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         group = row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
         if group is None:
             background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
-            show = background == IndicatorBase.TICK_SYMBOL
+            show = background == IndicatorBase.SYMBOL_TICK
 
         else:
             show = False
@@ -858,7 +858,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             while iter_scripts:
                 row = model[ iter_scripts ]
                 background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
-                if background == IndicatorBase.TICK_SYMBOL:
+                if background == IndicatorBase.SYMBOL_TICK:
                     show = True
                     break
 
@@ -1259,7 +1259,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                     iter_select = model.iter_next( iter_to_group )
 
             model.remove( iter_to_group )
-            removed = True
 
         print( self.dump_treestore( model ) ) #TODO Testing
 
@@ -1347,7 +1346,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                             iter_scripts,
                             IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
 
-                    if background == IndicatorBase.TICK_SYMBOL:
+                    if background == IndicatorBase.SYMBOL_TICK:
                         script = (
                             model.get_value(
                                 iter_scripts,
@@ -1368,7 +1367,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     iter_,
                     IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
 
-            was_background = background == IndicatorBase.TICK_SYMBOL
+            was_background = background == IndicatorBase.SYMBOL_TICK
 
             iter_select = (
                 self._on_edit_script(
@@ -1392,7 +1391,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         iter_select,
                         IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
 
-                is_background = background_ == IndicatorBase.TICK_SYMBOL
+                is_background = background_ == IndicatorBase.SYMBOL_TICK
 
                 update_indicator_text = (
                     ( was_background and not is_background )
@@ -1741,7 +1740,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( Gtk.Label.new( _( "Interval" ) ), False ),
                     ( interval_spinner, False ) ),
                 sensitive = is_background,
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 1.4 ) )
+                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 2 ) )
 
         grid.attach( label_and_interval_spinner_box, 0, 19, 1, 1 )
 
@@ -1849,7 +1848,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 if not add:
                     iter_group = model.iter_parent( iter_script )
                     if model.iter_n_children( iter_group ) == 1:
-                        model.remove( iter_group ) # Remove group and last script.
+                        model.remove( iter_group )
+                        groups.remove( group )
 
                     else:
                         model.remove( iter_script )
@@ -1860,13 +1860,19 @@ class IndicatorScriptRunner( IndicatorBase ):
                     default_script_checkbutton.get_active() )
 
                 if is_non_background_and_default:
+
                     def remove_default( model, path, iter_ ):
                         name = (
                             model.get_value(
                                 iter_,
                                 IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
-                        if name:
+                        background = (
+                            model.get_value(
+                                iter_,
+                                IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+
+                        if name and background is None:
                             model.set_value(
                                 iter_,
                                 IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN,
@@ -1887,26 +1893,26 @@ class IndicatorScriptRunner( IndicatorBase ):
                     None,
                     name_,
                     self.get_textview_text( command_text_view ).strip(),
-                    IndicatorBase.TICK_SYMBOL if sound_checkbutton.get_active()
+                    IndicatorBase.SYMBOL_TICK if sound_checkbutton.get_active()
                     else None,
-                    IndicatorBase.TICK_SYMBOL if notification_checkbutton.get_active()
+                    IndicatorBase.SYMBOL_TICK if notification_checkbutton.get_active()
                     else None,
-                    IndicatorBase.TICK_SYMBOL if script_background_radio.get_active()
+                    IndicatorBase.SYMBOL_TICK if script_background_radio.get_active()
                     else None,
-                    '—' if script_background_radio.get_active()
+                    IndicatorBase.SYMBOL_DASH if script_background_radio.get_active()
                     else (
-                        IndicatorBase.TICK_SYMBOL if terminal_checkbutton.get_active()
+                        IndicatorBase.SYMBOL_TICK if terminal_checkbutton.get_active()
                         else None
                     ),
-                    str( False ) if script_background_radio.get_active()
+                    IndicatorBase.SYMBOL_DASH if script_background_radio.get_active()
                     else str( default_script_checkbutton.get_active() ),
                     str( interval_spinner.get_value_as_int() )
                     if script_background_radio.get_active()
-                    else '—',
+                    else IndicatorBase.SYMBOL_DASH,
                     (
-                        IndicatorBase.TICK_SYMBOL if force_update_checkbutton.get_active()
+                        IndicatorBase.SYMBOL_TICK if force_update_checkbutton.get_active()
                         else None )
-                    if script_background_radio.get_active() else '—' ]
+                    if script_background_radio.get_active() else IndicatorBase.SYMBOL_DASH ]
 
                 iter_select = model.append( parent, row )
 
@@ -2014,6 +2020,19 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
         dump = [ "" ]
+        dump[ 0 ] += (
+            "Group Hidden | " +
+            "Group | " +
+            "Name | " +
+            "Command Hidden | " +
+            "Sound | " +
+            "Notification | " +
+            "Background | " +
+            "Terminal | " +
+            "Default Hidden | " +
+            "Interval | " +
+            "Force Update\n" )
+        
         model.foreach( dump_treestore_, dump )
         return dump[ 0 ]+ "\n\n"
 
