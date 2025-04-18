@@ -1171,7 +1171,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             model.get_value(
                 iter_, IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
-        # old_tag_new_tag_pairs = None  #TODO Not sure if I really need to define this...only used if iter_select is not None
         iter_select = None
         if name is None:
             scripts = [ ]
@@ -1185,16 +1184,14 @@ class IndicatorScriptRunner( IndicatorBase ):
                 iter_children = model.iter_next( iter_children )
 
             iter_select = self._on_remove_group( treeview, model, iter_ )
-
-            old_tag_new_tag_pairs = ( )
             if iter_select:
+                old_tag_new_tag_pairs = ( )
                 for script in scripts:
                     old_tag_new_tag_pairs += (
                         ( self._create_key( group, script ), "" ), )
 
         else:
             iter_select = self._on_remove_script( treeview, model, iter_ )
-
             if iter_select:
                 old_tag_new_tag_pairs = (
                     ( self._create_key( group, name ), "" ), )
