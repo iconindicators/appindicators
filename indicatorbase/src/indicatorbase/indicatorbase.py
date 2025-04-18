@@ -172,7 +172,8 @@ class IndicatorBase( ABC ):
     SESSION_TYPE_WAYLAND = "wayland"
     SESSION_TYPE_X11 = "x11"
 
-    TICK_SYMBOL = '✔'
+    SYMBOL_DASH = '—'
+    SYMBOL_TICK = '✔'
 
     TIMEOUT_IN_SECONDS = 10
 
