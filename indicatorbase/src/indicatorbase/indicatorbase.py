@@ -57,7 +57,7 @@ References
 # Should the tooltip be changed to say "No script ; please add" or similar?
 # Similarly for the buttons et al?
 #
-# Similarly for fortune/ppa/onthisday/virtualbox?
+# Similarly for fortune/onthisday/ppa?
 
 
 import datetime
@@ -2218,6 +2218,7 @@ class IndicatorBase( ABC ):
                         model_column_id_for_fortune_or_calendar_enabled ) ),
                 alignments_columnviewids = (
                     ( 0.5, model_column_id_for_fortune_or_calendar_enabled ), ),
+#TODO Determine which tooltip to show based on model being empty versus non-empty.
                 tooltip_text = treeview_tool_tip,
                 rowactivatedfunctionandarguments =
                     (
@@ -2242,13 +2243,7 @@ class IndicatorBase( ABC ):
                     message_remove_fortune_or_calendar ),
                 (
                     None,
-                    (
-                        self._on_fortune_or_calendar_remove,
-                        treeview,
-                        model_column_id_for_fortune_or_calendar_file,
-                        system_fortunes_or_calendars,
-                        message_system_fortune_or_calendar_cannot_be_removed,
-                        message_confirm_removal_fortune_or_calendar ) ) ) )
+                    None ) ) )
 
         add.connect(
             "clicked",
@@ -2260,6 +2255,15 @@ class IndicatorBase( ABC ):
             model_column_id_for_fortune_or_calendar_file,
             message_fortune_or_calendar_exists,
             file_filter )
+
+        remove.connect(
+            "clicked",
+            self._on_fortune_or_calendar_remove,
+            treeview,
+            model_column_id_for_fortune_or_calendar_file,
+            system_fortunes_or_calendars,
+            message_system_fortune_or_calendar_cannot_be_removed,
+            message_confirm_removal_fortune_or_calendar )
 
         if len( store ):
             treepath = Gtk.TreePath.new_from_string( '0' )
@@ -2326,6 +2330,14 @@ class IndicatorBase( ABC ):
                     model_sort.get_model().remove(
                         model_sort.convert_iter_to_child_iter( iter_sort ) )
 
+#TODO I think need something to set revove sensitivity...
+#if there are no system fortunes/calendars, but only user fortunes/calendars,
+# it is possible for the user to remove all and so need to disable the remove
+# and change the tooltip of remove and treeview. 
+        # button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
+        # print( len( treeview.get_model() ) ) #TODO Testing
+                    
+
 
     def _on_fortune_or_calendar_add(
         self,
@@ -2343,7 +2355,6 @@ class IndicatorBase( ABC ):
 
         On success, the fortune/calendar is added and selected.
         '''
-
         self._on_fortune_or_calendar_double_click_internal(
             treeview,
             None,
@@ -2354,6 +2365,8 @@ class IndicatorBase( ABC ):
             file_filter )
 
         button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
+#TODO Change tooltip?        
+        print( len( treeview.get_model() ) ) #TODO Testing
 
 
     def _on_fortune_or_calendar_double_click(
@@ -2375,7 +2388,6 @@ class IndicatorBase( ABC ):
 
         On confirmation, the fortune/calendar is modified and selected.
         '''
-
         model_sort, iter_sort = treeview.get_selection().get_selected()
         fortune_or_calendar = (
             model_sort[
@@ -2475,7 +2487,6 @@ class IndicatorBase( ABC ):
         Estimate the number of menu items which will fit into an indicator menu
         without exceeding the screen height.
         '''
-
         screen_heights_in_pixels = [ 600, 768, 800, 900, 1024, 1050, 1080 ]
         numbers_of_menuitems = [ 15, 15, 15, 20, 20, 20, 20 ]
 
