@@ -1315,8 +1315,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                         iter_select,
                         IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
-                iter_scripts = model.iter_children( iter_select )
                 old_tag_new_tag_pairs = ( )
+                iter_scripts = model.iter_children( iter_select )
                 while iter_scripts:
                     background = (
                         model.get_value(
@@ -1337,8 +1337,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                     iter_scripts = model.iter_next( iter_scripts )
 
         else:
-            # Need to obtain the background value before edit as the edit will
-            # render the iter invalid as the edited row will be removed.
+            # Obtain the background value before edit; the edit will remove the
+            # edited row, invalidating the iter.
             background = (
                 model.get_value(
                     iter_,
@@ -1382,14 +1382,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                             self._create_key( group, name ),
                             self._create_key( group_, name_ ) ), )
 
-#TODO
-# Group:
-#    Update each script in indicator text.
-#    Select group.
-#
-# Script:
-#    Update script in indicator text.
-#    Select script and show script's command.
         if iter_select:
             self._update_preferences(
                 treeview,
@@ -1711,7 +1703,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 page_increment = 100,
                 tooltip_text = _( "Interval, in minutes, between runs." ) ) )
 
-        # Set margin left to approximately align with the checkboxes above.
         label_and_interval_spinner_box = (
             self.create_box(
                 (
