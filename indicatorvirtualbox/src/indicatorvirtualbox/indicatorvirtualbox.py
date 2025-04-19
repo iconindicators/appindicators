@@ -65,6 +65,8 @@ class IndicatorVirtualBox( IndicatorBase ):
     PREFERENCES_AUTOSTART = 0
     PREFERENCES_START_COMMAND = 1
 
+    MESSAGE_NOT_INSTALLED = _( "VirtualBox™ is not installed" )
+
 
     def __init__( self ):
         super().__init__(
@@ -131,8 +133,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         else:
             self.create_and_append_menuitem(
-                menu,
-                _( "(VirtualBox™ is not installed)" ) )
+                menu, '(' + IndicatorVirtualBox.MESSAGE_NOT_INSTALLED  + ')' )
 
 
     def _build_menu(
@@ -552,6 +553,22 @@ class IndicatorVirtualBox( IndicatorBase ):
             treestore,
             dialog )
 
+        if self.is_vboxmanage_installed():
+            if items:
+                tooltip_text = _(
+                    "Click on a virtual machine's start command to edit.\n\n" +
+                    "The start command takes the form:\n\n" +
+                    "\tVBoxManage startvm %VM%\n" +
+                    "or\n" +
+                    "\tVBoxHeadless --startvm %VM% --vrde off\n\n" +
+                    "An empty start command resets to default." )
+
+            else:
+                tooltip_text = _( "No virtual machines found." )
+
+        else:
+            tooltip_text = IndicatorVirtualBox.MESSAGE_NOT_INSTALLED + '.'
+
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 treestore,
@@ -574,13 +591,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                         IndicatorVirtualBox.COLUMN_START_COMMAND ) ),
                 alignments_columnviewids = (
                     ( 0.5, IndicatorVirtualBox.COLUMN_AUTOSTART ), ),
-                tooltip_text = _(
-                    "Click on a virtual machine's start command to edit.\n\n" +
-                    "The start command takes the form:\n\n" +
-                    "\tVBoxManage startvm %VM%\n" +
-                    "or\n" +
-                    "\tVBoxHeadless --startvm %VM% --vrde off\n\n" +
-                    "An empty start command resets to default." ),
+                tooltip_text = tooltip_text,
                 celldatafunctionandarguments_renderers_columnviewids = (
                     (
                         ( self.column_renderer_function, ),
