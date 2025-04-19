@@ -471,7 +471,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 treestore.append( parent, row )
 
-        print( self.dump_treestore( treestore ) ) #TODO Testing
+        print( self.dump_treestore( treestore ) )
 
         renderer_column_name_text = Gtk.CellRendererText()
 
@@ -581,10 +581,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             copy_,
             indicator_text_entry )
 
-#TODO
-#    Select first script of first group and show script's command
-#    OR
-#    Disable copy and disable remove
         self._update_preferences(
             scripts_treeview,
             treestore.get_iter_from_string( "0:0" )
@@ -1054,7 +1050,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dialog.destroy()
 
-        print( self.dump_treestore( model ) ) #TODO Testing
+        print( self.dump_treestore( model ) )
 
         return parent
 
@@ -1148,7 +1144,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dialog.destroy()
 
-        print( self.dump_treestore( model ) ) #TODO Testing
+        print( self.dump_treestore( model ) )
 
         return iter_select
 
@@ -1237,7 +1233,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             model.remove( iter_group )
 
-        print( self.dump_treestore( model ) ) #TODO Testing
+        print( self.dump_treestore( model ) )
 
         return iter_select
 
@@ -1281,7 +1277,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 model.remove( iter_group )
 
-        print( self.dump_treestore( model ) ) #TODO Testing
+        print( self.dump_treestore( model ) )
 
         return iter_select
 
@@ -1462,7 +1458,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dialog.destroy()
 
-        print( self.dump_treestore( model ) ) #TODO Testing
+        print( self.dump_treestore( model ) )
 
         return iter_select
 
@@ -1509,7 +1505,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         add = name is None
 
         index = -1
-        if groups: #TODO Test with no scripts (adding first script).
+        if groups:
             index = groups.index( group )
 
         group_combo = (
@@ -1847,7 +1843,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                                 IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN,
                                 "False" )
 
-
                     model.foreach( remove_default )
 
                 if group_ not in groups:
@@ -1889,7 +1884,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         dialog.destroy()
 
-        print( self.dump_treestore( model ) ) #TODO Testing
+        print( self.dump_treestore( model ) )
 
         return iter_select
 
@@ -2006,7 +2001,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         return dump[ 0 ]+ "\n\n"
 
 
-#TODO Test each call to this function.
     def _update_preferences(
         self,
         treeview,
