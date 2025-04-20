@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatortide 1.0.30\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-03-14 18:28+1100\n"
+"POT-Creation-Date: 2025-04-20 23:37+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,77 +15,77 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicatortide.py:43
+#: indicatortide.py:40
 msgid "Indicator Tide"
 msgstr ""
 
-#: indicatortide.py:54
+#: indicatortide.py:51
 msgid "Displays tidal information."
 msgstr ""
 
-#: indicatortide.py:66 indicatortide.py:67
+#: indicatortide.py:63 indicatortide.py:64
 msgid "No user script specified!"
 msgstr ""
 
-#: indicatortide.py:69
+#: indicatortide.py:66
 msgid "Please specify a user script and class name in the preferences."
 msgstr ""
 
-#: indicatortide.py:93 indicatortide.py:94
+#: indicatortide.py:90 indicatortide.py:91
 msgid "User script could not be found!"
 msgstr ""
 
-#: indicatortide.py:96
+#: indicatortide.py:93
 msgid "Please check the user script in the preferences."
 msgstr ""
 
-#: indicatortide.py:99 indicatortide.py:100
+#: indicatortide.py:96 indicatortide.py:97
 msgid "User script class name could not be found!"
 msgstr ""
 
-#: indicatortide.py:102
+#: indicatortide.py:99
 msgid "Please check the user script class name in the preferences."
 msgstr ""
 
-#: indicatortide.py:107 indicatortide.py:108
+#: indicatortide.py:104 indicatortide.py:105
 msgid "User function could not be found!"
 msgstr ""
 
-#: indicatortide.py:110
+#: indicatortide.py:107
 msgid "You must implement the function 'get_tide_data()'."
 msgstr ""
 
-#: indicatortide.py:114 indicatortide.py:115
+#: indicatortide.py:111 indicatortide.py:112
 msgid "Error running user script!"
 msgstr ""
 
-#: indicatortide.py:116
+#: indicatortide.py:113
 msgid "Check the log file in your home directory."
 msgstr ""
 
-#: indicatortide.py:176 indicatortide.py:221
+#: indicatortide.py:173 indicatortide.py:218
 msgid "HIGH"
 msgstr ""
 
-#: indicatortide.py:176 indicatortide.py:221
+#: indicatortide.py:173 indicatortide.py:218
 msgid "LOW"
 msgstr ""
 
-#: indicatortide.py:273
+#: indicatortide.py:270
 msgid "User Script"
 msgstr ""
 
-#: indicatortide.py:280
+#: indicatortide.py:277
 msgid ""
 "Full path and filename\n"
 "of user's Python3 script."
 msgstr ""
 
-#: indicatortide.py:285
+#: indicatortide.py:282
 msgid "Path and filename"
 msgstr ""
 
-#: indicatortide.py:294
+#: indicatortide.py:291
 msgid ""
 "Class name within the user script\n"
 "which must contain the function\n"
@@ -96,34 +96,34 @@ msgid ""
 "the tidal data."
 msgstr ""
 
-#: indicatortide.py:303
+#: indicatortide.py:300
 msgid "Class name"
 msgstr ""
 
-#: indicatortide.py:310
+#: indicatortide.py:307
 msgid "Show as submenus"
 msgstr ""
 
-#: indicatortide.py:311
+#: indicatortide.py:308
 msgid "Show each day's tides in a submenu."
 msgstr ""
 
-#: indicatortide.py:319
+#: indicatortide.py:316
 msgid "Except first day"
 msgstr ""
 
-#: indicatortide.py:320
+#: indicatortide.py:317
 msgid "Show the first day's tide in full."
 msgstr ""
 
-#: indicatortide.py:354
+#: indicatortide.py:350
 msgid "The user script path/filename cannot be found."
 msgstr ""
 
-#: indicatortide.py:363
+#: indicatortide.py:359
 msgid "The user script path/filename cannot be empty."
 msgstr ""
 
-#: indicatortide.py:371
+#: indicatortide.py:367
 msgid "The user script class name cannot be empty."
 msgstr ""

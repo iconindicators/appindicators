@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatoronthisday 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-03-16 14:00+1100\n"
+"POT-Creation-Date: 2025-04-20 23:37+1000\n"
 "PO-Revision-Date: 2025-03-14 16:50+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -14,110 +14,118 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: indicatoronthisday.py:69
+#: indicatoronthisday.py:71
 msgid "Indicator On This Day"
 msgstr "Индикатор событий дня"
 
-#: indicatoronthisday.py:84
+#: indicatoronthisday.py:86
 msgid "EVENT"
 msgstr "СОБЫТИЕ"
 
-#: indicatoronthisday.py:92
+#: indicatoronthisday.py:94
 #, fuzzy
 msgid ""
 "Calls the 'calendar' program and\n"
 "displays events in the menu."
 msgstr "Вызывает программу 'calendar' и показывает события в меню."
 
-#: indicatoronthisday.py:132
+#: indicatoronthisday.py:134
 msgid "On this day..."
 msgstr "В этот день..."
 
-#: indicatoronthisday.py:235 indicatoronthisday.py:240
+#: indicatoronthisday.py:237 indicatoronthisday.py:242
 msgid "Warning"
 msgstr ""
 
-#: indicatoronthisday.py:236
+#: indicatoronthisday.py:238
 msgid "No enabled calendars have a valid location!"
 msgstr ""
 
-#: indicatoronthisday.py:241
+#: indicatoronthisday.py:243
 #, fuzzy
 msgid "No calendars are enabled!"
 msgstr "Ни один календарь не выбран."
 
-#: indicatoronthisday.py:336
+#: indicatoronthisday.py:320
 msgid "Calendar"
 msgstr "Календарь"
 
-#: indicatoronthisday.py:337
-msgid "Enabled"
-msgstr "Включен"
-
-#: indicatoronthisday.py:351
+#: indicatoronthisday.py:321
 msgid "Double click to edit a calendar."
 msgstr "Щёлкните дважды, чтобы отредактировать календарь."
 
-#: indicatoronthisday.py:360
-msgid "Add"
-msgstr "Добавить"
+#: indicatoronthisday.py:322
+msgid "Choose a calendar file"
+msgstr "Выберите файл календаря"
 
-#: indicatoronthisday.py:361
-msgid "Remove"
-msgstr "Удалить"
+#: indicatoronthisday.py:323
+#, fuzzy
+msgid "This calendar already exists!"
+msgstr "Путь к календарю не существует."
 
-#: indicatoronthisday.py:363
+#: indicatoronthisday.py:324 indicatoronthisday.py:327
+#, fuzzy
+msgid "This is a system calendar and cannot be modified."
+msgstr ""
+"Этот календарь является системным\n"
+"и не может быть удалён."
+
+#: indicatoronthisday.py:325
 msgid "Add a new calendar."
 msgstr "Добавить новый календарь."
 
-#: indicatoronthisday.py:364
+#: indicatoronthisday.py:326
 msgid "Remove the selected calendar."
 msgstr "Удалить выбранный календарь."
 
-#: indicatoronthisday.py:382
+#: indicatoronthisday.py:328
+msgid "Remove the selected calendar?"
+msgstr "Удалить выбранный календарь?"
+
+#: indicatoronthisday.py:331
 msgid "Calendars"
 msgstr "Календари"
 
-#: indicatoronthisday.py:393
+#: indicatoronthisday.py:342
 msgid "The number of menu items available for display."
 msgstr "Количество строк событий, отображаемых в меню."
 
-#: indicatoronthisday.py:398
+#: indicatoronthisday.py:347
 msgid "Lines"
 msgstr "Строки"
 
-#: indicatoronthisday.py:404
+#: indicatoronthisday.py:353
 msgid "On event click"
 msgstr "При щелчке по событию"
 
-#: indicatoronthisday.py:408
+#: indicatoronthisday.py:357
 msgid "Copy the event text and date to the clipboard."
 msgstr "Скопировать событие и его дату в буфер обмена."
 
-#: indicatoronthisday.py:410
+#: indicatoronthisday.py:359
 msgid ""
 "\n"
 "\n"
 "Unsupported on Ubuntun 20.04 on Wayland."
 msgstr ""
 
-#: indicatoronthisday.py:415
+#: indicatoronthisday.py:364
 msgid "Copy event to clipboard"
 msgstr "Скопировать событие в буфер"
 
-#: indicatoronthisday.py:425
+#: indicatoronthisday.py:374
 msgid "Search event on the internet"
 msgstr "Искать событие в Интернет"
 
-#: indicatoronthisday.py:427
+#: indicatoronthisday.py:376
 #, fuzzy
 msgid "Search for the event in the default web browser."
 msgstr "Искать событие в Интернет"
 
-#: indicatoronthisday.py:437
+#: indicatoronthisday.py:386
 #, python-brace-format
 msgid ""
 "The URL to search for the event.\n"
@@ -142,15 +150,15 @@ msgstr ""
 "Если ссылка пустая, и задана опция \"Скопировать\",\n"
 "то будет восстановлена ссылка по умолчанию."
 
-#: indicatoronthisday.py:450
+#: indicatoronthisday.py:399
 msgid "URL"
 msgstr "Ссылка"
 
-#: indicatoronthisday.py:471
+#: indicatoronthisday.py:420
 msgid "Notify"
 msgstr "Уведомлять"
 
-#: indicatoronthisday.py:473
+#: indicatoronthisday.py:422
 msgid ""
 "On startup or when saving preferences,\n"
 "show a notification for each of today's events."
@@ -158,33 +166,21 @@ msgstr ""
 "При запуске или сохранении настроек показывать\n"
 "уведомление о всех событиях текущего дня."
 
-#: indicatoronthisday.py:485
+#: indicatoronthisday.py:434
 msgid "General"
 msgstr "Общие"
 
-#: indicatoronthisday.py:548
+#~ msgid "Enabled"
+#~ msgstr "Включен"
+
+#~ msgid "Add"
+#~ msgstr "Добавить"
+
+#~ msgid "Remove"
+#~ msgstr "Удалить"
+
 #, fuzzy
-msgid "This is a system calendar and cannot be removed."
-msgstr ""
-"Этот календарь является системным\n"
-"и не может быть удалён."
-
-#: indicatoronthisday.py:553
-msgid "Remove the selected calendar?"
-msgstr "Удалить выбранный календарь?"
-
-#: indicatoronthisday.py:603
-#, fuzzy
-msgid "This is a system calendar and cannot be modified."
-msgstr ""
-"Этот календарь является системным\n"
-"и не может быть удалён."
-
-#: indicatoronthisday.py:629
-msgid "Choose a calendar file"
-msgstr "Выберите файл календаря"
-
-#: indicatoronthisday.py:646
-#, fuzzy
-msgid "This calendar already exists!"
-msgstr "Путь к календарю не существует."
+#~ msgid "This is a system calendar and cannot be removed."
+#~ msgstr ""
+#~ "Этот календарь является системным\n"
+#~ "и не может быть удалён."
