@@ -568,13 +568,11 @@ if __name__ == "__main__":
                     "+" } ) )
 
     print(
-        "INFORMATION:\n" +
-        "\tPyGObject is pinned to version 3.50.0 as newer\n" +
-        "\tversions require libgirepository-2.0 which is\n" +
-        "\tunavailable on Debian 11/12 and Ubuntu 20.04/22.04.\n\n" +
-        "\tIf building on Ubuntu 24.04+ or Debian 13+,\n" +
-        "\tthe most recent version of PyGObject should be used.\n\n" +
-        "\tRemove the version requirement on PyGObject in the build script." )
+        "NOTE:\n" +
+        "\tPyGObject requires libgirepository-2.0 which is only \n" +
+        "\tavailable on Ubuntu 24.04+ or Debian 13+.\n\n" +
+        "\tThe build is set on Debian 11/12 and Ubuntu 20.04/22.04.\n" +
+        "\tconsequently, the version of PyGObject is pinned to 3.50.0.\n" )
 
     utils.initialise_virtual_environment(
         VENV_DEVELOPMENT,
