@@ -2454,11 +2454,17 @@ class IndicatorBase( ABC ):
 
                 iter_select = model_sort.get_model().append( [ filename, True ] )
 
-                iter_select = (
-                    model_sort.convert_child_iter_to_iter(
-                        model_sort.get_model().append( [ filename, True ] ) ) )
+#TODO Hopefully can go.
+                # iter_select = (
+                #     model_sort.convert_child_iter_to_iter(
+                #         model_sort.get_model().append( [ filename, True ] ) ) )
 
-                treepath = Gtk.TreePath.new_from_string( iter_select )
+                x = model_sort.convert_child_iter_to_iter( iter_select )
+                x = model_sort.get_string_from_iter( x )
+
+                treepath = (
+                    Gtk.TreePath.new_from_string( x ) )
+ 
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
 
