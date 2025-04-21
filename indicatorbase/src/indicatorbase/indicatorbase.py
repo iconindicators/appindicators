@@ -2168,7 +2168,7 @@ class IndicatorBase( ABC ):
         message_fortune_or_calendar_cannot_be_modified,
         message_add_fortune_or_calendar,
         message_remove_fortune_or_calendar,
-        message_system_fortune_or_calendar_cannot_be_removed,
+        message_system_fortune_or_calendar_cannot_be_removed,   #TODO How is this different to above "cannot be modified"?
         message_confirm_removal_fortune_or_calendar,
         file_filter = None ):
         '''
@@ -2176,10 +2176,9 @@ class IndicatorBase( ABC ):
         in a treeview the system and user-defined fortunes/calendars,
         connecting functions to handle remove, add and edit.
         '''
-
         grid = self.create_grid()
 
-        store = Gtk.ListStore( str, bool ) # Path to fortune/calendar; enabled or not.
+        store = Gtk.ListStore( str, bool ) # Fortune/calendar path; enabled.
         for location, enabled in user_fortunes_or_calendars:
             store.append( [ location, enabled ] )
 
@@ -2218,8 +2217,7 @@ class IndicatorBase( ABC ):
                         model_column_id_for_fortune_or_calendar_enabled ) ),
                 alignments_columnviewids = (
                     ( 0.5, model_column_id_for_fortune_or_calendar_enabled ), ),
-#TODO Determine which tooltip to show based on model being empty versus non-empty.
-                tooltip_text = treeview_tool_tip,
+                tooltip_text = treeview_tool_tip if len( store ) else "",
                 rowactivatedfunctionandarguments =
                     (
                         self._on_fortune_or_calendar_double_click,
@@ -2240,7 +2238,7 @@ class IndicatorBase( ABC ):
                     _( "Remove" ) ),
                 (
                     message_add_fortune_or_calendar,
-                    message_remove_fortune_or_calendar ),
+                    message_remove_fortune_or_calendar if len( store ) else "" ),
                 (
                     None,
                     None ) ) )
@@ -2250,10 +2248,12 @@ class IndicatorBase( ABC ):
             self._on_fortune_or_calendar_add,
             treeview,
             dialog,
-            remove,
             file_chooser_title,
+            remove,
             model_column_id_for_fortune_or_calendar_file,
             message_fortune_or_calendar_exists,
+            message_remove_fortune_or_calendar,
+            treeview_tool_tip,
             file_filter )
 
         remove.connect(
@@ -2284,7 +2284,7 @@ class IndicatorBase( ABC ):
         treeview,
         model_column_id_for_fortune_or_calendar,
         system_fortunes_or_calendars,
-        message_system_fortune_or_calendar_exists,
+        message_system_fortune_or_calendar_cannot_be_removed,
         message_remove_fortune_or_calendar ):
         '''
         Functionality common to both 'fortune' and 'on this day' which prompts
@@ -2294,7 +2294,6 @@ class IndicatorBase( ABC ):
         On confirmation, the fortune/calendar is removed and the
         fortune/calendar above is selected or as appropriate.
         '''
-
         model_sort, iter_sort = treeview.get_selection().get_selected()
         selected_fortune_or_calendar = (
             model_sort[
@@ -2302,7 +2301,7 @@ class IndicatorBase( ABC ):
 
         if selected_fortune_or_calendar in system_fortunes_or_calendars:
             self.show_dialog_ok(
-                treeview, message_system_fortune_or_calendar_exists )
+                treeview, message_system_fortune_or_calendar_cannot_be_removed )
 
         else:
             response = (
@@ -2315,6 +2314,8 @@ class IndicatorBase( ABC ):
                         model_sort.convert_iter_to_child_iter( iter_sort ) )
 
                     button.set_sensitive( False )
+                    button.set_sensitive( "" )
+                    treeview.set_tooltip_text( "" )
 
                 else:
                     treepath = (
@@ -2326,17 +2327,8 @@ class IndicatorBase( ABC ):
 
                     treeview.get_selection().select_path( treepath )
                     treeview.set_cursor( treepath, None, False )
-
                     model_sort.get_model().remove(
-                        model_sort.convert_iter_to_child_iter( iter_sort ) )
-
-#TODO I think need something to set revove sensitivity...
-#if there are no system fortunes/calendars, but only user fortunes/calendars,
-# it is possible for the user to remove all and so need to disable the remove
-# and change the tooltip of remove and treeview. 
-        # button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
-        # print( len( treeview.get_model() ) ) #TODO Testing
-                    
+                        model_sort.convert_iter_to_child_iter( iter_sort ) ) #TODO Does this needs to be first in this set of three?
 
 
     def _on_fortune_or_calendar_add(
@@ -2344,10 +2336,12 @@ class IndicatorBase( ABC ):
         button,
         treeview,
         preferences_dialog,
-        button_remove,
         file_chooser_title,
+        button_remove,
         model_column_id_for_fortune_or_calendar,
         message_fortune_or_calendar_exists,
+        message_remove_fortune_or_calendar,
+        treeview_tool_tip,
         file_filter = None ):
         '''
         Functionality common to both 'fortune' and 'on this day' which prompts
@@ -2364,9 +2358,10 @@ class IndicatorBase( ABC ):
             message_fortune_or_calendar_exists,
             file_filter )
 
-        button_remove.set_sensitive( len( treeview.get_model() ) > 0 )
-#TODO Change tooltip?        
-        print( len( treeview.get_model() ) ) #TODO Testing
+        if len( treeview.get_model() ):
+            treeview.set_tooltip_text( treeview_tool_tip )
+            button_remove.set_sensitive( True )
+            button_remove.set_tooltip_text( message_remove_fortune_or_calendar )
 
 
     def _on_fortune_or_calendar_double_click(
@@ -2400,13 +2395,13 @@ class IndicatorBase( ABC ):
 
         else:
             self._on_fortune_or_calendar_double_click_internal(
-            treeview,
-            path,
-            preferences_dialog,
-            file_chooser_title,
-            model_column_id_for_fortune_or_calendar,
-            message_fortune_or_calendar_exists,
-            file_filter )
+                treeview,
+                path,
+                preferences_dialog,
+                file_chooser_title,
+                model_column_id_for_fortune_or_calendar,
+                message_fortune_or_calendar_exists,
+                file_filter )
 
 
     def _on_fortune_or_calendar_double_click_internal(
@@ -2424,16 +2419,14 @@ class IndicatorBase( ABC ):
 
         Not to be called directly.
         '''
-
         model_sort, iter_sort = treeview.get_selection().get_selected()
-        adding_fortune_or_calendar = path is None
+        adding = path is None
 
         dialog = (
             self.create_filechooser_dialog(
                 file_chooser_title,
                 preferences_dialog,
-                str( Path.home() )
-                if adding_fortune_or_calendar else
+                str( Path.home() ) if adding else
                 model_sort[ path ][ model_column_id_for_fortune_or_calendar ],
                 file_filter = file_filter ) )
 
@@ -2441,6 +2434,7 @@ class IndicatorBase( ABC ):
         filename = dialog.get_filename()
         dialog.destroy()
 
+#TODO Should this be put into a loop until the user cancels or OKs successfully?
         if response == Gtk.ResponseType.OK:
             fortune_or_calendar_exists = False
             for row in model_sort:
@@ -2454,29 +2448,17 @@ class IndicatorBase( ABC ):
                     break
 
             if not fortune_or_calendar_exists:
-                if not adding_fortune_or_calendar:
+                if not adding:
                     model_sort.get_model().remove(
                         model_sort.convert_iter_to_child_iter( iter_sort ) )
 
-                model_sort.get_model().append( [ filename, True ] )
+                iter_select = model_sort.get_model().append( [ filename, True ] )
 
-#TODO What is the purpose of this code here?
-# If it is to find the added/appended item,
-# we should have an iter to that from the append above...right?
-                treepath = 0
-                for row in model_sort.get_model():
-                    fortune_or_calendar = (
-                        row[ model_column_id_for_fortune_or_calendar ] )
+                iter_select = (
+                    model_sort.convert_child_iter_to_iter(
+                        model_sort.get_model().append( [ filename, True ] ) ) )
 
-                    if fortune_or_calendar == filename:
-                        break
-
-                    treepath += 1
-
-                treepath = (
-                    model_sort.convert_child_path_to_path(
-                        Gtk.TreePath.new_from_string( str( treepath ) ) ) )
-
+                treepath = Gtk.TreePath.new_from_string( iter_select )
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
 
