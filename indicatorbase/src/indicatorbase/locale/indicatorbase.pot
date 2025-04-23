@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorbase 1.0.1\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-04-20 23:36+1000\n"
+"POT-Creation-Date: 2025-04-23 21:26+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -89,14 +89,14 @@ msgstr ""
 msgid "An update is available at <a href=\"{0}\">{1}</a>."
 msgstr ""
 
-#: indicatorbase.py:2207
+#: indicatorbase.py:2206
 msgid "Enabled"
 msgstr ""
 
-#: indicatorbase.py:2239
+#: indicatorbase.py:2237
 msgid "Add"
 msgstr ""
 
-#: indicatorbase.py:2240
+#: indicatorbase.py:2238
 msgid "Remove"
 msgstr ""

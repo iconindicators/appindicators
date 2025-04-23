@@ -41,6 +41,11 @@ References
 '''
 
 
+#TODO Should the installed locale files be somewhere like .local/share/locale
+# similarly to icons?
+# Did a quick google and could not find anything...take a better look.
+
+
 #TODO Not sure if this applies:
 #   https://setuptools.pypa.io/en/latest/userguide/datafiles.html#accessing-data-files-at-runtime
 #
