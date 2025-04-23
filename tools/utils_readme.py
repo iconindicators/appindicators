@@ -38,11 +38,6 @@ References:
 #   ...but still need to check for Fedora, openSUSE and Manjaro.
  
 
-#TODO Check the Usage section; ensure the python3 line uses
-# the environment variable for the indicator name rather than
-# specifying the indicator name in the path and .py
-
-
 import datetime
 import re
 
