@@ -25,6 +25,7 @@ import subprocess
 from pathlib import Path
 
 
+#TODO Put in a docstring!!!
 VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 
