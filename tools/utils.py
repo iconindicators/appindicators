@@ -25,7 +25,8 @@ import subprocess
 from pathlib import Path
 
 
-#TODO Put in a docstring!!!
+# The virtual environment into which indicator are installed,
+# either via PyPI or a local wheel.
 VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 

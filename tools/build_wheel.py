@@ -40,6 +40,7 @@ from . import utils_locale
 from . import utils_readme
 
 
+# The virtual environment used when building the wheel.
 VENV_DEVELOPMENT = "./venv_development"
 
 
@@ -492,6 +493,7 @@ def _package_source_for_build_wheel_process(
 
         names_from_po_files, comments_from_po_files, message = (
             utils_locale.get_names_and_comments_from_po_files(
+                VENV_DEVELOPMENT,
                 directory_indicator_locale,
                 name,
                 comments ) )

@@ -212,14 +212,17 @@ def _create_update_po(
             print( f"YOU MUST UPDATE LINES 1, 4, 11, 12." )
 
 
-def _get_msgstr_from_po( po, msgid ):
-    # The comment for indicatorfortune contains text enclosed with ' which must
-    # be escaped.
+def _get_msgstr_from_po(
+        venv_development,
+        po,
+        msgid ):
+    # The comment for indicatorfortune contains text enclosed with ' which
+    # must be escaped.
     msgid_escaped = msgid.replace( "\'", "\\\'" )
 
     result = (
         subprocess.run(
-            f". { build_wheel.VENV_DEVELOPMENT }/bin/activate && " +
+            f". { venv_development }/bin/activate && " +
             f"python3 -c \"" +
             f"import polib; " +
             f"[ print( entry.msgstr ) " +
@@ -332,6 +335,7 @@ def build_locale_for_release(
 
 
 def get_names_and_comments_from_po_files(
+    venv_development,
     directory_indicator_locale,
     name,
     comments ):
@@ -357,12 +361,12 @@ def get_names_and_comments_from_po_files(
     comments_from_po_files = { }
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         locale = po.parent.parent.stem
-        msgstr, error = _get_msgstr_from_po( po, name )
+        msgstr, error = _get_msgstr_from_po( venv_development, po, name )
         if msgstr:
             if msgstr != name:
                 names_from_po_files[ locale ] = msgstr
 
-            msgstr, error = _get_msgstr_from_po( po, comments )
+            msgstr, error = _get_msgstr_from_po( venv_development, po, comments )
             if msgstr:
                 if msgstr != comments:
                     comments_from_po_files[ locale ] = msgstr
