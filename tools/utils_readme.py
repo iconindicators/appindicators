@@ -41,6 +41,11 @@ References:
 #TODO Check {{indicator}} and other {{ }}...are they correct/needed?
 
 
+#TODO Check the Usage section; ensure the python3 line uses
+# the environment variable for the indicator name rather than
+# specifying the indicator name in the path and .py
+
+
 import datetime
 import re
 
@@ -227,12 +232,16 @@ def _get_installation_python_virtual_environment(
         f"    ```\n"
         f"    indicator={ indicator_name } && \\\n"
         f"    venv={ utils.VENV_INSTALL } && \\\n"
-        f"    if [ ! -d { utils.VENV_INSTALL } ]; "
-        f"    then python3 -m venv { utils.VENV_INSTALL }; fi && \\\n"
-        f"    . { utils.VENV_INSTALL }/bin/activate && \\\n"
+        f"    if [ ! -d ${{venv}} ]; "
+        # f"    if [ ! -d { utils.VENV_INSTALL } ]; " #TODO The above I think is correct
+        f"    then python3 -m venv ${{venv}}; fi && \\\n"
+        # f"    then python3 -m venv { utils.VENV_INSTALL }; fi && \\\n" #TODO THe above I think is corect
+        f"    . ${{venv}}/bin/activate && \\\n"
+        # f"    . { utils.VENV_INSTALL }/bin/activate && \\\n" #TODO The above i think is corect
         f"    python3 -m pip install --upgrade ${{indicator}} && \\\n"
         f"    deactivate && \\\n"
-        f"    . $(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
+        f"    . $(ls -d ${{venv}}/lib/python3.* | head -1)/"
+        # f"    . $(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/" #TODO THe above i think is corect
         f"    site-packages/${{indicator}}/platform/linux/install.sh\n"
         f"    ```\n" )
 
@@ -358,14 +367,17 @@ def _get_uninstall_for_operating_system(
             f"    ```\n"
             f"    indicator={ indicator_name } && \\\n"
             f"    venv={ utils.VENV_INSTALL } && \\\n"
-            f"    $(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
+            f"    $(ls -d ${{venv}}/lib/python3.* | head -1)/"
+            # f"    $(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"  #TODO The above I think is correct
             f"    site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n" 
-            f"    . { utils.VENV_INSTALL }/bin/activate && \\\n"
+            f"    . ${{venv}}/bin/activate && \\\n"
+            # f"    . { utils.VENV_INSTALL }/bin/activate && \\\n"  #TODO The above i think is correct
             f"    python3 -m pip uninstall --yes ${{indicator}} && \\\n"
             f"    count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && \\\n"
             f"    deactivate && \\\n"
             f"    if [ \"$count\" -eq \"0\" ]; "
-            f"    then rm -f -r { utils.VENV_INSTALL }; fi \n"
+            f"    then rm -f -r ${{venv}}; fi \n"
+            # f"    then rm -f -r { utils.VENV_INSTALL }; fi \n"  #TODO The above i think is correct
             f"    ```\n"
             f"    If no other indicators are installed, the virtual environment will be deleted.\n\n"
 
@@ -673,8 +685,10 @@ def _get_usage(
         f"```\n"
         f"indicator={ indicator_name } && \\\n"
         f"venv={ utils.VENV_INSTALL } && \\\n"
-        f". { utils.VENV_INSTALL }/bin/activate && \\\n"
-        f"python3 $(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
+        f". ${{venv}}/bin/activate && \\\n"
+        # f". { utils.VENV_INSTALL }/bin/activate && \\\n" #TODO I think the above is correct.
+        f"python3 $(ls -d {{venv}}/lib/python3.* | head -1)/"
+        # f"python3 $(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/" #TODO I think the above is correct.
         f"site-packages/${{indicator}}/${{indicator}}.py && \\\n"
         f"deactivate\n"
         f"```\n\n" )
