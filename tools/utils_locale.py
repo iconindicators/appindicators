@@ -34,8 +34,6 @@ import subprocess
 
 from pathlib import Path
 
-from . import build_wheel
-
 
 def _get_linguas_codes(
     indicator_name ):
