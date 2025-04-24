@@ -406,6 +406,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 '\n'.join( ppa.get_filters() ),
                 ppa.get_status() ] )
 
+#TODO See indicatorbase for changing tooltip to "" when no PPAs are present (similar for fortune).
+
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 store,
