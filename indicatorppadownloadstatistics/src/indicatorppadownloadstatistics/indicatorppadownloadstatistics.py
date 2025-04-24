@@ -406,7 +406,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 '\n'.join( ppa.get_filters() ),
                 ppa.get_status() ] )
 
-#TODO See indicatorbase for changing tooltip to "" when no PPAs are present (similar for fortune).
+#TODO Test add and remove...remove all, start with nothing, add from nothing.
+
+        treeview_tooltip_text = _( "Double click to edit a PPA." )
+        remove_tooltip_text = _( "Remove the selected PPA." )
 
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
@@ -429,7 +432,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         "text",
                         IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ) ),
                 default_sort_func = self._ppa_sort,
-                tooltip_text = _( "Double click to edit a PPA." ),
+                tooltip_text = treeview_tooltip_text if len( store ) else "",
                 rowactivatedfunctionandarguments = (
                     self.on_ppa_double_click, ) ) )
 
@@ -442,14 +445,20 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     _( "Remove" ) ),
                 (
                     _( "Add a new PPA." ),
-                    _( "Remove the selected PPA." ) ),
+                    remove_tooltip_text if len( store ) else "" ),
                 (
                     None,
                     ( self.on_ppa_remove, treeview ) ) ) )
 
-        grid.attach( box, 0, 1, 1, 1 )
+        add.connect(
+            "clicked",
+            self.on_ppa_add,
+            treeview,
+            treeview_tooltip_text,
+            remove,
+            remove_tooltip_text )
 
-        add.connect( "clicked", self.on_ppa_add, treeview, remove )
+        grid.attach( box, 0, 1, 1, 1 )
 
         if len( store ):
             treepath = Gtk.TreePath.new_from_string( '0' )
@@ -614,6 +623,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             if len( model ) == 1:
                 model.remove( iter_ )
                 button.set_sensitive( False )
+                button.set_tooltip_text( "" )
+                treeview.set_tooltip_text( "" )
 
             else:
                 treepath = (
@@ -633,10 +644,17 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self,
         button_add,
         treeview,
-        button_remove ):
+        treeview_tooltip_text,
+        button_remove,
+        button_remove_tooltip_text ):
 
         self.on_ppa_double_click( treeview, None, None )
-        button_remove.set_sensitive( len( treeview.get_model() ) )
+
+        if len( treeview.get_model() ):
+            treeview.set_sensitive( True )
+            treeview.set_tooltip_text( treeview_tooltip_text )
+            button_remove.set_sensitive( True )
+            button_remove.set_tooltip_text( button_remove_tooltip_text )
 
 
     def on_ppa_double_click(
