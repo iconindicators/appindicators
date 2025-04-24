@@ -579,7 +579,6 @@ if __name__ == "__main__":
     utils.initialise_virtual_environment(
         VENV_DEVELOPMENT,
         "build",
-#        "packaging",  #TODO This is used in indicatorbase, so in the main pyproject.toml dependencies.  Why is this also here?
         "pip",
         "polib",
         "PyGObject\<=3.50.0", # Escape < as this will be passed to the terminal.
