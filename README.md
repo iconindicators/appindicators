@@ -38,6 +38,8 @@ To run `indicatortest` in a terminal at development root:
     deactivate
 ```
 
+The above command is for `Debian 11/12` or `Ubuntu 20.04/22.04`, which uses `libgirepository1.0-dev` and only works with `PyGObject` version `3.50.0` or below. For `Ubuntu 24.04+` or `Debian 13+`, which use `libgirepository-2.0`, remove the version restriction on `PyGObject`.
+
 Some indicators, such as `indicatorlunar`, require additional packages specified in the `dependencies` field of the respective `pyproject.toml`.  Include additional packages `pip install` in the above command.
 
 
@@ -270,6 +272,8 @@ Assuming the project is located within the directory `Indicators`, run within th
 
 #TODO Might need to add install command via OS.  Or perhaps always install via pip...but to what venv?  venv_indicators?
 
+#TODO Check the ignore directories below: development is gone fron lunar.  Should venv be venv_development?
+
 ```
     pylint --recursive=y --ignore=development,release,venv Indicators --output=pylint.txt ; \
     sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2n pylint.txt
@@ -278,19 +282,17 @@ Assuming the project is located within the directory `Indicators`, run within th
 To disable a particular check, say `line-too-long`, include in the command:
 
 ```
-pylint --disable=line-too-long --recursive=y ...
+    pylint --disable=line-too-long --recursive=y ...
 ```
 
-To disable further checks, repeat the `--disable` option in the command: 
+To disable further checks, repeat the `--disable` option in the command:
 
 ```
-pylint --disable=line-too-long --disable=unused-argument --recursive=y ...
+    pylint --disable=line-too-long --disable=unused-argument --recursive=y ...
 ```
 
 
 ## Convert this Document from MD to HTML
-
-#TODO Check this section
 
 In a terminal at development root:
 
