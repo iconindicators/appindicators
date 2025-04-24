@@ -3,12 +3,7 @@
 which is probably
     $HOME/.localvenv_indicators 
 
-#TODO Where venv is used for building/development,
-# change to the dev directory root and venv_development.
- 
-
-#TODO Check that when running scripts in tools the command is according to new method:
-#   python3 -m tools.build_wheel release indicatortest
+in the above TODO...where should this change be done?
 
 
 #TODO Maybe (in the introduction perhaps) have a sentence or two
@@ -21,7 +16,7 @@ which is probably
 
 ## Introduction
 
-This project contains application indicators written in `Python3` for `Ubuntu 20.04` or equivalent:
+This project contains application indicators written in `Python3` for `Ubuntu 20.04` or similar:
 - `indicatorfortune` - [https://pypi.org/project/indicatorfortune](https://pypi.org/project/indicatorfortune)
 - `indicatorlunar` - [https://pypi.org/project/indicatorlunar](https://pypi.org/project/indicatorlunar)
 - `indicatoronthisday` - [https://pypi.org/project/indicatoronthisday](https://pypi.org/project/indicatoronthisday)
@@ -36,30 +31,38 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 Each indicator shares the common code `indicatorbase`.
 
 
-## Run an Indicator (from Source)
+## Run an Indicator (from source within the development environment)
+
+#TODO Make note about pygobject < 3.50.0 ???
 
 To run `indicatortest` in a terminal at the source root:
 
 ```
     indicator=indicatortest && \
-    venv=$HOME/.local/venv_indicators && \
+    venv=venv_development && \
+    indicatorbase=indicatorbase/src/indicatorbase/indicatorbase.py
+    indicatorbaselink=${indicator}/src/${indicator}/indicatorbase.py
+    if [ ! -f ${indicatorbaselink} ]; then ln -sr ${indicatorbase} ${indicatorbaselink}; fi && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install PyGObject && \
-    PYTHONPATH="indicatorbase/src/indicatorbase" python3 ${indicator}/src/${indicator}/${indicator}.py && \
+    python3 -m pip install packaging PyGObject\<=3.50.0 && \
+    python3 -m ${indicator}.src.${indicator}.${indicator} && \
+    rm ${indicatorbaselink} && \
     deactivate
 ```
 
-Some indicators, such as `indicatorlunar`, require additional packages specified in the `dependencies` field of the respective `pyproject.toml`.  Include additional packages after `PyGObject` in the above command.
+Some indicators, such as `indicatorlunar`, require additional packages specified in the `dependencies` field of the respective `pyproject.toml`.  Include additional packages `pip install` in the above command.
 
 
 ## Development Under Geany
 
+#TODO Check this section
+
+#TODO Check if Geany will accept $HOME
+
 Ensure `indicatortest` runs in a terminal from source as per the earlier section.
 
 Assuming the source code is located in `/home/bernard/Programming/Indicators`, create the project et al:
-
-#TODO Check if Geany will accept $HOME
 
 ```
     Project > New
@@ -88,12 +91,14 @@ References:
 
 ## Development Under Eclipse / PyDev
 
-Ensure `indicatortest` runs in a terminal from source as per the earlier section.
-
-Assuming the source code is located in `/home/bernard/Programming/Indicators`, create a `Python` interpreter:
+#TODO Check this section
 
 #TODO Check if Eclipse will accept $HOME
 # https://help.eclipse.org/latest/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2Fconcepts%2Fconcepts-exttools.htm
+
+Ensure `indicatortest` runs in a terminal from source as per the earlier section.
+
+Assuming the source code is located in `/home/bernard/Programming/Indicators`, create a `Python` interpreter:
 
 ```
     Window > Preferences > PyDev > Interpreters > Python Interpreter > New > Browse for python/pypy exe
@@ -156,18 +161,18 @@ References:
 To build a wheel for `indicatortest`:
 
 ```
-    python3 tools/build_wheel.py release indicatortest
+    python3 -m tools.build_wheel release indicatortest
 ```
 
 which updates locale files (`.pot` and `.po`) and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
 
 
-## Install a Wheel
+## Install a Wheel (to a virtual environment)
 
 To install the `.whl` for `indicatortest` located in `release/wheel/dist_indicatortest`:
 
 ```
-    python3 tools/install_wheel.py release indicatortest
+    python3 -m tools.install_wheel release indicatortest
 ```
 
 The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_indicators`. Additional indicators may be appended.
@@ -175,7 +180,9 @@ The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_in
 Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
 
 
-## Run an Indicator (installed to a Virtual Environment)
+## Run an Indicator (installed to a virtual environment)
+
+#TODO Check this section
 
 To run an indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
 
@@ -185,7 +192,7 @@ To run from a terminal (so that any messages/errors may be observed):
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
     . ${venv}/bin/activate && \
-    python3 $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/${indicator}.py && \
+#TODO This line should be -m without the path?    python3 $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/${indicator}.py && \
     deactivate
 ```
 
@@ -193,6 +200,8 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 
 
 ## Release to PyPI
+
+#TODO Check this section
 
 To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
 
@@ -216,6 +225,8 @@ References:
 
 
 ## Release to TestPyPI (and then Installing)
+
+#TODO Check this section
 
 For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`:
 
@@ -246,6 +257,8 @@ Additional operating system packages may be needed; refer to the installation in
 
 ## Uninstall an Indicator
 
+#TODO Check this section
+
 ```
     python3 tools/uninstall_indicator.py indicatortest
 ```
@@ -254,6 +267,8 @@ Additional indicators may be appended to the above command.
 
 
 ## Pylint
+
+#TODO Check this section
 
 Assuming the project is located within the directory `Indicators`, run within the directory one level above `Indicators`:
 
@@ -279,6 +294,8 @@ pylint --disable=line-too-long --disable=unused-argument --recursive=y ...
 
 ## Convert this Document from MD to HTML
 
+#TODO Check this section
+
 ```
     venv=$HOME/  TODO What is this part?  /venv_development && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
@@ -292,4 +309,4 @@ pylint --disable=line-too-long --disable=unused-argument --recursive=y ...
 
 This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.
 
-Copyright 2012-2024 Bernard Giannetti.
+Copyright 2012-2025 Bernard Giannetti.
