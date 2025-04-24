@@ -83,7 +83,6 @@ import webbrowser
 from abc import ABC, abstractmethod
 from bisect import bisect_right
 from importlib import metadata
-from packaging.version import Version
 from pathlib import Path, PosixPath
 from threading import Lock
 from urllib.error import HTTPError, URLError
@@ -117,6 +116,8 @@ except ValueError:
     except ValueError:
         print( "Unable to find neither AyatanaAppIndicator3 nor AppIndicator3.")
         sys.exit( 1 )
+
+from packaging.version import Version
 
 
 class IndicatorBase( ABC ):
