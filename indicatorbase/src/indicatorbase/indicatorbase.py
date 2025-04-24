@@ -2320,7 +2320,7 @@ class IndicatorBase( ABC ):
                         model_sort.convert_iter_to_child_iter( iter_sort ) )
 
                     button.set_sensitive( False )
-                    button.set_sensitive( "" )
+                    button.set_tooltip_text( "" )
                     treeview.set_tooltip_text( "" )
 
                 else:
@@ -2334,7 +2334,7 @@ class IndicatorBase( ABC ):
                     treeview.get_selection().select_path( treepath )
                     treeview.set_cursor( treepath, None, False )
                     model_sort.get_model().remove(
-                        model_sort.convert_iter_to_child_iter( iter_sort ) ) #TODO Does this needs to be first in this set of three?
+                        model_sort.convert_iter_to_child_iter( iter_sort ) )
 
 
     def _on_fortune_or_calendar_add(
@@ -2440,7 +2440,6 @@ class IndicatorBase( ABC ):
         filename = dialog.get_filename()
         dialog.destroy()
 
-#TODO Should this be put into a loop until the user cancels or OKs successfully?
         if response == Gtk.ResponseType.OK:
             fortune_or_calendar_exists = False
             for row in model_sort:
@@ -2458,18 +2457,13 @@ class IndicatorBase( ABC ):
                     model_sort.get_model().remove(
                         model_sort.convert_iter_to_child_iter( iter_sort ) )
 
-                iter_select = model_sort.get_model().append( [ filename, True ] )
-
-#TODO Hopefully can go.
-                # iter_select = (
-                #     model_sort.convert_child_iter_to_iter(
-                #         model_sort.get_model().append( [ filename, True ] ) ) )
-
-                x = model_sort.convert_child_iter_to_iter( iter_select )
-                x = model_sort.get_string_from_iter( x )
+                selected, iter_select = (
+                    model_sort.convert_child_iter_to_iter(
+                        model_sort.get_model().append( [ filename, True ] ) ) )
 
                 treepath = (
-                    Gtk.TreePath.new_from_string( x ) )
+                    Gtk.TreePath.new_from_string(
+                        model_sort.get_string_from_iter( iter_select ) ) )
  
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
