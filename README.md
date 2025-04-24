@@ -1,14 +1,7 @@
-#TODO Change venv to be 
-    Path.home() / ".local" / "venv_indicators"
-which is probably
-    $HOME/.localvenv_indicators 
-
-in the above TODO...where should this change be done?
-
-
 #TODO Maybe (in the introduction perhaps) have a sentence or two
 # explaining the layout of the project
-# (each indicator is a sub-project with specific pyproject.toml etc).
+# (each indicator is a sub-project with specific pyproject.toml etc)
+# and exceptions/deviations/additions are in each indicator's directory (such as indicatorlunar).
 
 
 # AppIndicators for Ubuntu et al...
@@ -182,21 +175,20 @@ Various operating system packages will likely need to be installed; refer to the
 
 ## Run an Indicator (installed to a virtual environment)
 
-#TODO Check this section
-
 To run an indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
 
-To run from a terminal (so that any messages/errors may be observed):
+To run from a terminal (to observe any messages/errors):
 
 ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
     . ${venv}/bin/activate && \
-#TODO This line should be -m without the path?    python3 $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/${indicator}.py && \
+    cd $(ls -d ${venv}/lib/python3.* | head -1)/site-packages && \
+    python3 -m ${indicator}.${indicator} && \
     deactivate
 ```
 
-Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and modify `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
+Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and change `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
 
 
 ## Release to PyPI
