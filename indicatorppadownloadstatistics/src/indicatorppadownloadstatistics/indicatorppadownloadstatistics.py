@@ -89,7 +89,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             for ppa in self.ppas:
                 ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
 
-        self.download_ppa_statistics()
+#TODO Uncomment
+        # self.download_ppa_statistics()
+
+        self.ppas = [ ]#TODO Testing
 
         ppas_sorted = (
             PPA.sort_ppas_by_user_then_name_then_published_binaries(
@@ -258,12 +261,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 elif ppa.has_published_binaries():
                     ppa.set_status( PPA.Status.OK )
 
-                elif ppa.has_default_filter():
-                    # No published binaries as there is no filter in place.
+                elif ppa.is_filter_empty():
                     ppa.set_status( PPA.Status.NO_PUBLISHED_BINARIES )
 
                 else:
-                    # No results passed through filtering.
                     ppa.set_status( PPA.Status.FILTERED )
 
 
@@ -405,8 +406,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 ppa.get_name(),
                 '\n'.join( ppa.get_filters() ),
                 ppa.get_status() ] )
-
-#TODO Test add and remove...remove all, start with nothing, add from nothing.
 
         treeview_tooltip = _( "Double click to edit a PPA." )
         remove_tooltip = _( "Remove the selected PPA." )
@@ -904,7 +903,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
             for ppa in self.ppas:
                 if ppa.get_name() == name and ppa.get_user() == user:
-                    if ppa.has_default_filter():
+                    if ppa.is_filter_empty():
                         ppa.set_filters( filter_text )
 
                     else:

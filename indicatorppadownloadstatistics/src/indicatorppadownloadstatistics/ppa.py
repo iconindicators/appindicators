@@ -202,8 +202,8 @@ class PPA():
         self.filters = filters
 
 
-    def has_default_filter( self ):
-        ''' Returns True if only the default filter of [ "" ] exists. '''
+    def is_filter_empty( self ):
+        ''' Returns True when the filter is set to [ "" ]. '''
         return len( self.filters ) == 1 and self.filters[ 0 ] == ''
 
 
