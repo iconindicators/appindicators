@@ -1,9 +1,3 @@
-#TODO Maybe (in the introduction perhaps) have a sentence or two
-# explaining the layout of the project
-# (each indicator is a sub-project with specific pyproject.toml etc)
-# and exceptions/deviations/additions are in each indicator's directory (such as indicatorlunar).
-
-
 # AppIndicators for Ubuntu et al...
 
 
@@ -24,11 +18,11 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 Each indicator shares the common code `indicatorbase`.
 
 
-## Run an Indicator (from source within the development environment)
+## Run an Indicator (from source)
 
 #TODO Make note about pygobject < 3.50.0 ???
 
-To run `indicatortest` in a terminal at the source root:
+To run `indicatortest` in a terminal at development root:
 
 ```
     indicator=indicatortest && \
@@ -160,9 +154,9 @@ To build a wheel for `indicatortest`:
 which updates locale files (`.pot` and `.po`) and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
 
 
-## Install a Wheel (to a virtual environment)
+## Install a Wheel
 
-To install the `.whl` for `indicatortest` located in `release/wheel/dist_indicatortest`:
+To install a `.whl` for `indicatortest` located in `release/wheel/dist_indicatortest`:
 
 ```
     python3 -m tools.install_wheel release indicatortest
@@ -173,11 +167,11 @@ The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_in
 Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
 
 
-## Run an Indicator (installed to a virtual environment)
+## Run an Indicator
 
 To run an indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
 
-To run from a terminal (to observe any messages/errors):
+To run from a terminal (observe any messages/errors) from any directory:
 
 ```
     indicator=indicatortest && \
@@ -195,11 +189,11 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 
 #TODO Check this section
 
-To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
+To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`, in a terminal at development root:
 
 ```
     indicator=indicatortest && \
-    venv=$HOME/.local/venv_indicators && \
+    venv=venv_development && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
     python3 -m pip install pip twine && \
@@ -209,28 +203,37 @@ To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
 
 which assumes the username `__token__` and prompts for the password (starts with `pypi-`) and uploads the `.whl` / `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
 
-To install the indicator from `PyPI` (to a virtual environment in `$HOME/.local/venv_indicators`), refer to the indicator's `PyPI` page listed in the *Introduction* above.
-
 References:
 - [https://twine.readthedocs.io/en/latest](https://twine.readthedocs.io/en/latest)
 - [https://packaging.python.org/en/latest/tutorials/packaging-projects](https://packaging.python.org/en/latest/tutorials/packaging-projects)
 
 
-## Release to TestPyPI (and then Installing)
+## Install from PyPI
 
 #TODO Check this section
 
-For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`:
+To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the *Introduction* above.
+
+
+## Release to TestPyPI
+
+#TODO Check this section
+
+For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`.  In a terminal at development root:
 
 ```
     indicator=indicatortest && \
-    venv=$HOME/.local/venv_indicators && \
+    venv=venv_development && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
     python3 -m pip install pip twine && \
     python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_${indicator}/* && \
     deactivate
 ```
+
+## Install from TestPyPI
+
+#TODO Check this section
 
 To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`:
 
@@ -250,6 +253,7 @@ Additional operating system packages may be needed; refer to the installation in
 ## Uninstall an Indicator
 
 #TODO Check this section
+In a terminal at development root:
 
 ```
     python3 tools/uninstall_indicator.py indicatortest
@@ -288,8 +292,10 @@ pylint --disable=line-too-long --disable=unused-argument --recursive=y ...
 
 #TODO Check this section
 
-```
-    venv=$HOME/  TODO What is this part?  /venv_development && \
+In a terminal at development root:
+
+ ```
+    venv=venv_development && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
     python3 -m pip install readme_renderer[md] && \
