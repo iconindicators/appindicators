@@ -408,8 +408,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 #TODO Test add and remove...remove all, start with nothing, add from nothing.
 
-        treeview_tooltip_text = _( "Double click to edit a PPA." )
-        remove_tooltip_text = _( "Remove the selected PPA." )
+        treeview_tooltip = _( "Double click to edit a PPA." )
+        remove_tooltip = _( "Remove the selected PPA." )
 
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
@@ -432,7 +432,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                         "text",
                         IndicatorPPADownloadStatistics.COLUMN_FILTER_TEXT ) ),
                 default_sort_func = self._ppa_sort,
-                tooltip_text = treeview_tooltip_text if len( store ) else "",
+                tooltip_text = treeview_tooltip if len( store ) else "",
                 rowactivatedfunctionandarguments = (
                     self.on_ppa_double_click, ) ) )
 
@@ -445,7 +445,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     _( "Remove" ) ),
                 (
                     _( "Add a new PPA." ),
-                    remove_tooltip_text if len( store ) else "" ),
+                    remove_tooltip if len( store ) else "" ),
                 (
                     None,
                     ( self.on_ppa_remove, treeview ) ) ) )
@@ -454,9 +454,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             "clicked",
             self.on_ppa_add,
             treeview,
-            treeview_tooltip_text,
+            treeview_tooltip,
             remove,
-            remove_tooltip_text )
+            remove_tooltip )
 
         grid.attach( box, 0, 1, 1, 1 )
 
@@ -636,7 +636,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
-
                 model.remove( iter_ )
 
 
@@ -644,17 +643,17 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self,
         button_add,
         treeview,
-        treeview_tooltip_text,
+        treeview_tooltip,
         button_remove,
-        button_remove_tooltip_text ):
+        button_remove_tooltip ):
 
         self.on_ppa_double_click( treeview, None, None )
 
         if len( treeview.get_model() ):
             treeview.set_sensitive( True )
-            treeview.set_tooltip_text( treeview_tooltip_text )
+            treeview.set_tooltip_text( treeview_tooltip )
             button_remove.set_sensitive( True )
-            button_remove.set_tooltip_text( button_remove_tooltip_text )
+            button_remove.set_tooltip_text( button_remove_tooltip )
 
 
     def on_ppa_double_click(
