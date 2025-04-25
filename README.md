@@ -40,7 +40,7 @@ To run `indicatortest` at the source tree root:
 
 The above command is for `Debian 11/12` or `Ubuntu 20.04/22.04`, which uses `libgirepository1.0-dev` and only works with `PyGObject` version `3.50.0` or below. For `Ubuntu 24.04+` or `Debian 13+`, which use `libgirepository-2.0`, remove the version restriction on `PyGObject`.
 
-Some indicators, such as `indicatorlunar`, require additional packages specified in the `dependencies` field of the respective `pyproject.toml`.  Include additional packages `pip install` in the above command.
+Some indicators, such as `indicatorlunar`, require additional packages specified in the `dependencies` field of the respective `pyproject.toml`.  Include additional packages in the `pip install` above.
 
 
 ## Development Under Geany
