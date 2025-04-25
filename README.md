@@ -40,7 +40,7 @@ To run `indicatortest` at the source tree root:
 
 The above command is for `Debian 11/12` or `Ubuntu 20.04/22.04`, which uses `libgirepository1.0-dev` and only works with `PyGObject` version `3.50.0` or below. For `Ubuntu 24.04+` or `Debian 13+`, which use `libgirepository-2.0`, remove the version restriction on `PyGObject`.
 
-Some indicators, such as `indicatorlunar`, require additional packages specified in the `dependencies` field of the respective `pyproject.toml`.  Include additional packages in the `pip install` above.
+Some indicators, such as `indicatorlunar`, require additional packages, specified in the `dependencies` field of `pyproject.toml`.  Include those additional packages in the `pip install` above.
 
 
 ## Development Under Geany
@@ -80,31 +80,26 @@ References:
 
 ## Development Under Eclipse / PyDev
 
+Ensure `indicatortest` runs in a terminal within the source tree as per the earlier section and `venv_run` exists.
 
-TODO Check if Eclipse will accept $HOME
-https://help.eclipse.org/latest/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2Fconcepts%2Fconcepts-exttools.htm
-
-
-Ensure `indicatortest` runs in a terminal within the source tree as per the earlier section and `venv_run` is created.
-
-In a terminal, from the project root, create a `symbolic link` to `indicatorbase.py`:
+In a terminal, from the project root, create a symbolic link to `indicatorbase.py`:
 
 ```
     ln -sr indicatorbase/src/indicatorbase/indicatorbase.py indicatorfortune/src/indicatorfortune/indicatorbase.py
 ```
 
-Create a `Python` interpreter which uses `venv_run`:
+In Eclipse, create a `Python` interpreter which uses `venv_run`:
 
 ```
-    Window > Preferences > PyDev > Interpreters > Python Interpreter > New > Browse for python/pypy exe
+    Window > Preferences
+        PyDev > Python Interpreter
+            New > Browse for python/pypy exe
+                Browse to venv_run/bin/python3
+                Interpreter Name: python3 venv_run
+                Check site-packages within venv_run
 
-	    Python Interpreter > New > Browse for python/pypy exe
-		Browse to venv_run/bin/python3
-		Interpreter Name: python3 venv_run
-		Check site-packages within venv_run
-
-	    Run
-		  Check Launch modules with 'python -m mod.name'
+        PyDev > Run
+            Check Launch modules with 'python -m mod.name'
 ```
 
 Create the project:
@@ -136,7 +131,7 @@ which should fail, then:
                 Interpreter: python3 venv_run
 ```
 
-Unfortunately running any `tools` such as `build_wheel` within `Eclipse` fails.  Despite `build_wheel` creating `venv_build`, dependencies are installed to the default `Python` resulting in failure.
+Unfortunately running any `tools` such as `build_wheel` within `Eclipse` fails.  Despite `build_wheel` creating and using `venv_build`, dependencies are installed to the default `Python` resulting in failure.
 
 References:
 
