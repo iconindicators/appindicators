@@ -22,7 +22,6 @@
 import concurrent.futures
 import locale
 
-from packaging.version import Version
 from threading import Lock
 
 import gi
@@ -30,14 +29,11 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
+from packaging.version import Version
 
-# from .indicatorbase import IndicatorBase
-#
-# from .ppa import PPA, PublishedBinary
-#TODO Revert
-from indicatorbase import IndicatorBase
+from .indicatorbase import IndicatorBase
 
-from ppa import PPA, PublishedBinary
+from .ppa import PPA, PublishedBinary
 
 
 class IndicatorPPADownloadStatistics( IndicatorBase ):
@@ -89,10 +85,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             for ppa in self.ppas:
                 ppa.set_status( PPA.Status.NEEDS_DOWNLOAD )
 
-#TODO Uncomment
-        # self.download_ppa_statistics()
-
-        self.ppas = [ ]#TODO Testing
+        self.download_ppa_statistics()
 
         ppas_sorted = (
             PPA.sort_ppas_by_user_then_name_then_published_binaries(

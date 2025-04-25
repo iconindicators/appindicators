@@ -44,12 +44,9 @@ from gi.repository import Gtk
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
-#from .indicatorbase import IndicatorBase
+from .indicatorbase import IndicatorBase
 
-#from .script import Background, NonBackground, Info
-from indicatorbase import IndicatorBase #TODO Restore to above.
-
-from script import Background, NonBackground, Info
+from .script import Background, NonBackground, Info
 
 
 class IndicatorScriptRunner( IndicatorBase ):

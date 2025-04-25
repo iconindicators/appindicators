@@ -28,11 +28,9 @@ from enum import auto, IntEnum
 
 import requests
 
-# from .dataprovider import DataProvider
-# from .indicatorbase import IndicatorBase
-#TODO Revert
-from dataprovider import DataProvider
-from indicatorbase import IndicatorBase
+from .dataprovider import DataProvider
+from .indicatorbase import IndicatorBase
+
 
 class DataProviderOrbitalElement( DataProvider ):
     ''' Download and persist orbital elements for comets and minor planets. '''

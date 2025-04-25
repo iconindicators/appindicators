@@ -49,7 +49,6 @@ import time
 
 from datetime import datetime, timedelta
 from itertools import chain, groupby
-from packaging.version import Version
 from pathlib import Path
 
 import gi
@@ -57,11 +56,11 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-#TODO Put . back in
-from indicatorbase import IndicatorBase
+from packaging.version import Version
 
-#TODO Put . back in
-from event import Event
+from .indicatorbase import IndicatorBase
+
+from .event import Event
 
 
 class IndicatorOnThisDay( IndicatorBase ):

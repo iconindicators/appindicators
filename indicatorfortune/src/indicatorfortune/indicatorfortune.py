@@ -22,7 +22,6 @@
 import fnmatch
 import os
 
-from packaging.version import Version
 from pathlib import Path
 
 import gi
@@ -30,11 +29,11 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-#TODO Put dot back in
-from indicatorbase import IndicatorBase
+from packaging.version import Version
 
-#TODO Put dot back in
-from fortune import Fortune
+from .indicatorbase import IndicatorBase
+
+from .fortune import Fortune
 
 
 class IndicatorFortune( IndicatorBase ):

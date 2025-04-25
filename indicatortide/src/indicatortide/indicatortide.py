@@ -19,6 +19,9 @@
 ''' Application indicator which displays tidal information. '''
 
 
+#TODO Try running via installed versus from source tree in terminal versus eclipse...do they all work?
+
+
 import datetime
 import importlib.util
 import sys
