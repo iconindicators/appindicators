@@ -60,6 +60,11 @@ class IndicatorFortune( IndicatorBase ):
 
     NOTIFICATION_SUMMARY = _( "Fortune. . ." )
 
+    SYSTEM_FORTUNE_DEBIAN = "/usr/share/games/fortunes"
+    SYSTEM_FORTUNE_FEDORA = "/usr/share/games/fortune"
+    SYSTEM_FORTUNE_MANJARO = "/usr/share/fortune"
+    SYSTEM_FORTUNE_OPENSUSE = "/usr/share/fortune"
+
 
     def __init__( self ):
         super().__init__(
@@ -421,23 +426,18 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def _get_system_fortune_path( self ):
-        SYSTEM_FORTUNE_DEBIAN = "/usr/share/games/fortunes"
-        SYSTEM_FORTUNE_FEDORA = "/usr/share/games/fortune"
-        SYSTEM_FORTUNE_MANJARO = "/usr/share/fortune"
-        SYSTEM_FORTUNE_OPENSUSE = "/usr/share/fortune"
-
         system_fortune_path = None
-        if Path( SYSTEM_FORTUNE_DEBIAN ).exists():
-            system_fortune_path = SYSTEM_FORTUNE_DEBIAN
+        if Path( IndicatorFortune.SYSTEM_FORTUNE_DEBIAN ).exists():
+            system_fortune_path = IndicatorFortune.SYSTEM_FORTUNE_DEBIAN
 
-        elif Path( SYSTEM_FORTUNE_FEDORA ).exists():
-            system_fortune_path = SYSTEM_FORTUNE_FEDORA
+        elif Path( IndicatorFortune.SYSTEM_FORTUNE_FEDORA ).exists():
+            system_fortune_path = IndicatorFortune.SYSTEM_FORTUNE_FEDORA
 
-        elif Path( SYSTEM_FORTUNE_MANJARO ).exists():
-            system_fortune_path = SYSTEM_FORTUNE_MANJARO
+        elif Path( IndicatorFortune.SYSTEM_FORTUNE_MANJARO ).exists():
+            system_fortune_path = IndicatorFortune.SYSTEM_FORTUNE_MANJARO
 
-        elif Path( SYSTEM_FORTUNE_OPENSUSE ).exists():
-            system_fortune_path = SYSTEM_FORTUNE_OPENSUSE
+        elif Path( IndicatorFortune.SYSTEM_FORTUNE_OPENSUSE ).exists():
+            system_fortune_path = IndicatorFortune.SYSTEM_FORTUNE_OPENSUSE
 
         return system_fortune_path
 

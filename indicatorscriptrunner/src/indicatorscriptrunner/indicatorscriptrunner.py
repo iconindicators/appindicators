@@ -1993,7 +1993,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             "Default Hidden | " +
             "Interval | " +
             "Force Update\n" )
-        
+
         model.foreach( dump_treestore_, dump )
         return dump[ 0 ]+ "\n\n"
 

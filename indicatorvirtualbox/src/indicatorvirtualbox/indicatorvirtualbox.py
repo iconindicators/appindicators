@@ -808,7 +808,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 row[ IndicatorVirtualBox.COLUMN_START_COMMAND ]
                 ==
                 IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT )
-            
+
             if (
                 ( is_virtual_machine and is_autostart )
                 or

@@ -21,22 +21,19 @@
 
 import datetime
 
-import stardate
+from . import stardate
 
 
-print(
-    f"Stardate API version: {stardate.get_version() }\n" )
+print( f"Stardate API version: {stardate.get_version() }\n" )
 
 utc_now = datetime.datetime.now( datetime.timezone.utc )
-print(
-    f"UTC now: { utc_now }\n" )
+print( f"UTC now: { utc_now }\n" )
 
 stardate_issue, stardate_integer, stardate_fraction = (
     stardate.get_stardate_classic( utc_now ) )
 
 print(
     f"'classic' Stardate components (issue, integer, fraction): "
-    +
     f"{ stardate_issue } { stardate_integer } { stardate_fraction }" )
 
 stardate_as_string = (
@@ -47,8 +44,7 @@ stardate_as_string = (
         True,
         False ) )
 
-print(
-    f"'classic' Stardate string: { stardate_as_string }" )
+print( f"'classic' Stardate string: { stardate_as_string }" )
 
 # Use the calculated 'classic' Stardate to get the date/time;
 # should be the same but rounding plays a part.
@@ -68,10 +64,15 @@ print(
     f"'2009 Revised' Stardate components (integer, fraction): "
     f"{ stardate_integer }, { stardate_fraction }" )
 
-print(
-    "'2009 Revised' Stardate (as string):",
+stardate_as_string = (
     stardate.to_stardate_string(
-        None, stardate_integer, stardate_fraction, None, False ) )
+        None,
+        stardate_integer,
+        stardate_fraction,
+        None,
+        False ) )
+
+print( f"'2009 Revised' Stardate (as string): { stardate_as_string }" )
 
 # Use the calculated '2009 Revised' Stardate to get the date/time;
 # should be the same but rounding plays a part.

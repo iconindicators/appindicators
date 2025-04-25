@@ -541,12 +541,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 else [ ] ) )
 
         version_from_config = Version( self.get_version_from_config( config ) )
-        upgrade = (
-            version_from_config > Version( "0.0.0" )
-            and
-            version_from_config < Version( "1.0.17" ) )
-
-        if upgrade:
+        if Version( "0.0.0" ) < version_from_config < Version( "1.0.17" ):
             self._upgrade_1_0_17()
 
         self.copy_to_clipboard = (

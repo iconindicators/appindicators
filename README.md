@@ -277,8 +277,8 @@ TODO Check the ignore directories below: development is gone fron lunar.  Need t
 
 
 ```
-    pylint --recursive=y --ignore=development,release,venv Indicators --output=pylint.txt ; \
-    sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2n pylint.txt
+    pylint --recursive=y --ignore=release,venv_build,venv_run Indicators --output=pylint.txt ; sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2n pylint.txt
+
 ```
 
 To disable a particular check, say `line-too-long`, include in the command:

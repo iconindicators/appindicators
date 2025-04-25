@@ -2464,7 +2464,7 @@ class IndicatorBase( ABC ):
                 treepath = (
                     Gtk.TreePath.new_from_string(
                         model_sort.get_string_from_iter( iter_select ) ) )
- 
+
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
 

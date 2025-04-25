@@ -243,7 +243,7 @@ def _get_msgstr_from_po(
 
     return msgstr, message
 
-    
+
 def update_locale_source(
     indicator_name,
     authors_emails,

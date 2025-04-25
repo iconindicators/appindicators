@@ -26,7 +26,7 @@ References:
 '''
 
 
-#TODO Need to work out which distros/versions must be pinned to 
+#TODO Need to work out which distros/versions must be pinned to
 #   PyGObject <= 3.50.0 and libgirepository 1.0 or equivalent
 # and which can be left as just
 #   PyGObject and libgirepository 2.0 or equivalent.
@@ -36,7 +36,7 @@ References:
 # https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
 #   As per above Github link, hopefully only need to worry about Debian based distros...
 #   ...but still need to check for Fedora, openSUSE and Manjaro.
- 
+
 
 import datetime
 import re
