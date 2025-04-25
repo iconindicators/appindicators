@@ -1973,9 +1973,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         model ):
 
 
-        def dump_treestore_( model, treepath, iter, dump ):
+        def dump_treestore_( model, treepath, iter_, dump ):
             for i in list( range( 11 ) ):
-                dump[ 0 ] += f"{ model.get_value( iter, i ) } | "
+                dump[ 0 ] += f"{ model.get_value( iter_, i ) } | "
 
             dump[ 0 ] = dump[ 0 ][ 0 : -2 ] + '\n'
 
