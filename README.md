@@ -18,15 +18,15 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 Each indicator shares the common code `indicatorbase`.
 
 
-## Run an Indicator (from source)
+## Run an Indicator (within the source tree)
 
-#TODO Make note about pygobject < 3.50.0 ???
+To run an indicator within the source tree, the indicator's `.whl` must first be built.  Refer to build a wheel in a later section.
 
-To run `indicatortest` in a terminal at development root:
+To run `indicatortest` at the source tree root:
 
 ```
     indicator=indicatortest && \
-    venv=venv_development && \
+    venv=venv_run && \
     indicatorbase=indicatorbase/src/indicatorbase/indicatorbase.py
     indicatorbaselink=${indicator}/src/${indicator}/indicatorbase.py
     if [ ! -f ${indicatorbaselink} ]; then ln -sr ${indicatorbase} ${indicatorbaselink}; fi && \
@@ -49,7 +49,7 @@ Some indicators, such as `indicatorlunar`, require additional packages specified
 
 #TODO Check if Geany will accept $HOME
 
-Ensure `indicatortest` runs in a terminal from source as per the earlier section.
+Ensure `indicatortest` runs in a terminal from source as per the earlier section and `venv_run` is created.
 
 Assuming the source code is located in `/home/bernard/Programming/Indicators`, create the project et al:
 
@@ -80,21 +80,31 @@ References:
 
 ## Development Under Eclipse / PyDev
 
-#TODO Check this section
 
-#TODO Check if Eclipse will accept $HOME
-# https://help.eclipse.org/latest/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2Fconcepts%2Fconcepts-exttools.htm
+TODO Check if Eclipse will accept $HOME
+https://help.eclipse.org/latest/index.jsp?topic=%2Forg.eclipse.platform.doc.user%2Fconcepts%2Fconcepts-exttools.htm
 
-Ensure `indicatortest` runs in a terminal from source as per the earlier section.
 
-Assuming the source code is located in `/home/bernard/Programming/Indicators`, create a `Python` interpreter:
+Ensure `indicatortest` runs in a terminal within the source tree as per the earlier section and `venv_run` is created.
+
+In a terminal, from the project root, create a `symbolic link` to `indicatorbase.py`:
+
+```
+    ln -sr indicatorbase/src/indicatorbase/indicatorbase.py indicatorfortune/src/indicatorfortune/indicatorbase.py
+```
+
+Create a `Python` interpreter which uses `venv_run`:
 
 ```
     Window > Preferences > PyDev > Interpreters > Python Interpreter > New > Browse for python/pypy exe
-        Browse to /home/bernard/.local/venv_indicators/bin/python3
-        Interpreter Name: python3 venv
-        Ensure site-packages within the venv is checked
-        Set as Default
+
+	    Python Interpreter > New > Browse for python/pypy exe
+		Browse to venv_run/bin/python3
+		Interpreter Name: python3 venv_run
+		Check site-packages within venv_run
+
+	    Run
+		  Check Launch modules with 'python -m mod.name'
 ```
 
 Create the project:
@@ -104,14 +114,8 @@ Create the project:
         Project Name: Indicators
         Use default: Uncheck
         Directory: /home/bernard/Programming/Indicators
-        Interpreter Name: python3 venv
+        Interpreter Name: python3 venv_run
         Finish
-
-    Project > Properties
-        PyDev - PYTHONPATH
-            External Libraries > Add Source Folder
-                Add...
-                    /home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase
 ```
 
 Run `indicatortest`:
@@ -121,24 +125,18 @@ Run `indicatortest`:
         Run As > Python Run
 ```
 
-Run `tools/build_wheel.py`:
+which should fail, then:
 
 ```
-    Right click on build_wheel.py
-        Run As > Python Run
+    Run > Run Configurations
+        Python Run: Indicators.indicatortest
+            Arguments
+                Working Directory: Default
+            Interpreter
+                Interpreter: python3 venv_run
 ```
 
-which should fail, then
-
-```
-    Run > Run Configurations...
-        Indicators build_wheel.py
-            Arguments: release indicatortest
-            Working directory:
-                Other: ${workspace_loc:Indicators}
-```
-
-Append other indicators to `Arguments` above as needed.  Repeat for `tools/install_wheel.py` and `tools/uninstall_indicator.py`.
+Unfortunately running any `tools` such as `build_wheel` within `Eclipse` fails.  Despite `build_wheel` creating `venv_build`, dependencies are installed to the default `Python` resulting in failure.
 
 References:
 
@@ -147,18 +145,19 @@ References:
 
 ## Build a Wheel
 
-To build a wheel for `indicatortest`:
+
+To build a wheel for `indicatortest` at the source tree root:
 
 ```
     python3 -m tools.build_wheel release indicatortest
 ```
 
-which updates locale files (`.pot` and `.po`) and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
+which creates a virtual environment `venv_build`, updates locale files `.pot` / `.po` and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
 
 
 ## Install a Wheel
 
-To install a `.whl` for `indicatortest` located in `release/wheel/dist_indicatortest`:
+To install a `.whl` for `indicatortest` located in `release/wheel/dist_indicatortest` at the source tree root:
 
 ```
     python3 -m tools.install_wheel release indicatortest
@@ -166,10 +165,10 @@ To install a `.whl` for `indicatortest` located in `release/wheel/dist_indicator
 
 The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_indicators`. Additional indicators may be appended.
 
-Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
+Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the introduction above.
 
 
-## Run an Indicator
+## Run an Installed Indicator
 
 To run an indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
 
@@ -191,11 +190,11 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 
 #TODO Check this section
 
-To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`, in a terminal at development root:
+To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`, in a terminal at the source tree root:
 
 ```
     indicator=indicatortest && \
-    venv=venv_development && \
+    venv=venv_build && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
     python3 -m pip install pip twine && \
@@ -214,18 +213,18 @@ References:
 
 #TODO Check this section
 
-To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the *Introduction* above.
+To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the introduction.
 
 
 ## Release to TestPyPI
 
 #TODO Check this section
 
-For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`.  In a terminal at development root:
+For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`.  In a terminal at the source tree root:
 
 ```
     indicator=indicatortest && \
-    venv=venv_development && \
+    venv=venv_build && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
     python3 -m pip install pip twine && \
@@ -249,16 +248,19 @@ To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.l
     $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
 ```
 
-Additional operating system packages may be needed; refer to the installation instructions at the indicator's `PyPI` page listed in the *Introduction* above.
+Additional operating system packages may be needed; refer to the installation instructions at the indicator's `PyPI` page listed in the Introduction.
 
 
 ## Uninstall an Indicator
 
-#TODO Check this section
-In a terminal at development root:
+
+TODO Check this section
+
+
+In a terminal at the source tree root:
 
 ```
-    python3 tools/uninstall_indicator.py indicatortest
+    python3 -m tools.uninstall_indicator indicatortest
 ```
 
 Additional indicators may be appended to the above command.
@@ -266,13 +268,18 @@ Additional indicators may be appended to the above command.
 
 ## Pylint
 
-#TODO Check this section
+
+TODO Check this section
+
 
 Assuming the project is located within the directory `Indicators`, run within the directory one level above `Indicators`:
 
-#TODO Might need to add install command via OS.  Or perhaps always install via pip...but to what venv?  venv_indicators?
 
-#TODO Check the ignore directories below: development is gone fron lunar.  Should venv be venv_development?
+TODO Might need to add install command via OS.  Or perhaps always install via pip...but to what venv?  venv_indicators?
+
+
+TODO Check the ignore directories below: development is gone fron lunar.  Need to ignore other venv_ dirs?
+
 
 ```
     pylint --recursive=y --ignore=development,release,venv Indicators --output=pylint.txt ; \
@@ -294,10 +301,10 @@ To disable further checks, repeat the `--disable` option in the command:
 
 ## Convert this Document from MD to HTML
 
-In a terminal at development root:
+In a terminal at the source tree root:
 
  ```
-    venv=venv_development && \
+    venv=venv_build && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
     python3 -m pip install readme_renderer[md] && \
