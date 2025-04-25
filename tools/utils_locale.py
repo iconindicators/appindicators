@@ -211,7 +211,7 @@ def _create_update_po(
 
 
 def _get_msgstr_from_po(
-        venv_development,
+        venv_build,
         po,
         msgid ):
     # The comment for indicatorfortune contains text enclosed with ' which
@@ -220,7 +220,7 @@ def _get_msgstr_from_po(
 
     result = (
         subprocess.run(
-            f". { venv_development }/bin/activate && " +
+            f". { venv_build }/bin/activate && " +
             f"python3 -c \"" +
             f"import polib; " +
             f"[ print( entry.msgstr ) " +
@@ -333,7 +333,7 @@ def build_locale_for_release(
 
 
 def get_names_and_comments_from_po_files(
-    venv_development,
+    venv_build,
     directory_indicator_locale,
     name,
     comments ):
@@ -359,12 +359,12 @@ def get_names_and_comments_from_po_files(
     comments_from_po_files = { }
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         locale = po.parent.parent.stem
-        msgstr, error = _get_msgstr_from_po( venv_development, po, name )
+        msgstr, error = _get_msgstr_from_po( venv_build, po, name )
         if msgstr:
             if msgstr != name:
                 names_from_po_files[ locale ] = msgstr
 
-            msgstr, error = _get_msgstr_from_po( venv_development, po, comments )
+            msgstr, error = _get_msgstr_from_po( venv_build, po, comments )
             if msgstr:
                 if msgstr != comments:
                     comments_from_po_files[ locale ] = msgstr

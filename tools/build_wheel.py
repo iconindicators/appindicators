@@ -41,7 +41,7 @@ from . import utils_readme
 
 
 # The virtual environment used when building the wheel.
-VENV_DEVELOPMENT = "./venv_development"
+VENV_BUILD = "./venv_build"
 
 
 def _check_for_t_o_d_o_s(
@@ -240,7 +240,7 @@ def _get_year_in_changelog_markdown(
 
     result = (
         subprocess.run(
-            f". { VENV_DEVELOPMENT }/bin/activate && " +
+            f". { VENV_BUILD }/bin/activate && " +
             f"python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " +
             f"import IndicatorBase; " +
             f"print( IndicatorBase.get_year_in_changelog_markdown( " +
@@ -482,7 +482,7 @@ def _package_source_for_build_wheel_process(
             start_year )
 
         subprocess.run(
-            f". { VENV_DEVELOPMENT }/bin/activate && " +
+            f". { VENV_BUILD }/bin/activate && " +
             f"python3 -m readme_renderer " +
             f"{ directory_dist }/{ indicator_name }/README.md " +
             f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html",
@@ -493,7 +493,7 @@ def _package_source_for_build_wheel_process(
 
         names_from_po_files, comments_from_po_files, message = (
             utils_locale.get_names_and_comments_from_po_files(
-                VENV_DEVELOPMENT,
+                VENV_BUILD,
                 directory_indicator_locale,
                 name,
                 comments ) )
@@ -543,7 +543,7 @@ def _build_wheel_for_indicator(
 
     if not message:
         subprocess.run(
-            f". { VENV_DEVELOPMENT }/bin/activate && " +
+            f". { VENV_BUILD }/bin/activate && " +
             f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }",
             shell = True )
 
@@ -577,7 +577,7 @@ if __name__ == "__main__":
         "\tconsequently, the version of PyGObject is pinned to 3.50.0.\n" )
 
     utils.initialise_virtual_environment(
-        VENV_DEVELOPMENT,
+        VENV_BUILD,
         "build",
         "pip",
         "polib",
