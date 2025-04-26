@@ -263,7 +263,7 @@ Additional indicators may be appended to the above command.
 
 ## Pylint
 
-Assuming the project is located within the directory `Indicators`, run within the directory one level above `Indicators`, which creates `pylint.txt`, sorting the results by warning/error type:
+In a terminal, one directory above source tree root (assumed to the directory `Indicators`):
 
 ```
     pylint \
@@ -299,6 +299,7 @@ As above, but with several checks disabled:
     --disable=too-few-public-methods \
     --disable=too-many-public-methods \
     --disable=unused-variable \
+    --disable=fixme \
     --recursive=y \
     --ignore=release,venv_build,venv_run \
     Indicators \
