@@ -456,7 +456,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         IndicatorBase.SYMBOL_TICK if script.get_terminal_open()
                         else None
                     ),
-                    '-' if isinstance( script, Background )
+                    IndicatorBase.SYMBOL_DASH if isinstance( script, Background )
                     else str( script.get_default() ),
                     str( script.get_interval_in_minutes() )
                     if isinstance( script, Background )
@@ -465,6 +465,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                         IndicatorBase.SYMBOL_TICK if script.get_force_update()
                         else None )
                     if isinstance( script, Background ) else IndicatorBase.SYMBOL_DASH ]
+
+# COLUMN_MODEL_BACKGROUND = 6
+# COLUMN_MODEL_TERMINAL = 7
+# COLUMN_MODEL_DEFAULT_HIDDEN = 8
+# COLUMN_MODEL_INTERVAL = 9
+# COLUMN_MODEL_FORCE_UPDATE = 10
+
 
                 treestore.append( parent, row )
 
@@ -552,6 +559,72 @@ class IndicatorScriptRunner( IndicatorBase ):
                     self._on_row_selection, command_text_view, copy_, remove ),
                 rowactivatedfunctionandarguments = (
                     self.on_edit, indicator_text_entry ), ) )
+
+
+        iter_group = treestore.get_iter_first()
+        while iter_group:
+            iter_scripts = treestore.iter_children( iter_group )
+            while iter_scripts:
+                row = treestore[ iter_scripts ]
+
+                group = row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
+                name = row[ IndicatorScriptRunner.COLUMN_MODEL_NAME ]
+                command = row[ IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ]
+
+                print( group )
+                print( name )
+
+                sound = row[ IndicatorScriptRunner.COLUMN_MODEL_SOUND ]
+                print( sound )
+                print( True if sound == IndicatorBase.SYMBOL_TICK else False )
+                print( sound == IndicatorBase.SYMBOL_TICK )
+                sound = True if sound == IndicatorBase.SYMBOL_TICK else False
+
+                notification = row[ IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ]
+                print( notification )
+                print( True if notification == IndicatorBase.SYMBOL_TICK else False )
+                print( notification == IndicatorBase.SYMBOL_TICK )
+                notification = True if notification == IndicatorBase.SYMBOL_TICK else False
+
+                # background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
+                # if background == IndicatorBase.SYMBOL_TICK:
+                #     force_update = row[ IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ]
+                #     force_update = True if force_update == IndicatorBase.SYMBOL_TICK else False
+                #
+                #     script = (
+                #         Background(
+                #             group,
+                #             name,
+                #             command,
+                #             sound,
+                #             notification,
+                #             row[ IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ],
+                #             force_update ) )
+                #
+                # else:
+                #     terminal = row[ IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ]
+                #     terminal = True if terminal == IndicatorBase.SYMBOL_TICK else False
+                #
+                #     default = row[ IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ]
+                #     default = True if default == "True" else False
+                #
+                #     script = (
+                #         NonBackground(
+                #             group,
+                #             name,
+                #             command,
+                #             sound,
+                #             notification,
+                #             terminal,
+                #             default ) )
+
+
+                print()
+                iter_scripts = treestore.iter_next( iter_scripts )
+            iter_group = treestore.iter_next( iter_group )
+
+
+
 
         grid.attach( scripts_scrolledwindow, 0, 0, 1, 20 )
 
@@ -774,16 +847,14 @@ class IndicatorScriptRunner( IndicatorBase ):
                     command = row[ IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ]
 
                     sound = row[ IndicatorScriptRunner.COLUMN_MODEL_SOUND ]
-                    sound = True if sound == IndicatorBase.SYMBOL_TICK else False
+                    sound = sound == IndicatorBase.SYMBOL_TICK
 
                     notification = row[ IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ]
-                    notification = True if notification == IndicatorBase.SYMBOL_TICK else False
+                    notification = notification == IndicatorBase.SYMBOL_TICK
 
                     background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
                     if background == IndicatorBase.SYMBOL_TICK:
                         force_update = row[ IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ]
-                        force_update = True if force_update == IndicatorBase.SYMBOL_TICK else False
-
                         script = (
                             Background(
                                 group,
@@ -792,15 +863,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                                 sound,
                                 notification,
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ],
-                                force_update ) )
+                                force_update == IndicatorBase.SYMBOL_TICK ) )
 
                     else:
                         terminal = row[ IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ]
-                        terminal = True if terminal == IndicatorBase.SYMBOL_TICK else False
-
                         default = row[ IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ]
-                        default = True if default == "True" else False
-
                         script = (
                             NonBackground(
                                 group,
@@ -808,8 +875,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                                 command,
                                 sound,
                                 notification,
-                                terminal,
-                                default ) )
+                                terminal == IndicatorBase.SYMBOL_TICK,
+                                default == "True" ) )
 
                     self.scripts.append( script )
                     iter_scripts = treestore.iter_next( iter_scripts )
