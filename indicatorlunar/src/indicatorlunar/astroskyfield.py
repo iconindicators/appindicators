@@ -644,7 +644,7 @@ class AstroSkyfield( AstroBase ):
                     row[ "magnitude_g" ], row[ "magnitude_k" ],
                     earth_body_distance.au, sun_body_distance.au ) )
 
-            if apparent_magnitude < apparent_magnitude:
+            if apparent_magnitude < apparent_magnitude_maximum:
                 AstroSkyfield._calculate_common(
                     now, now_plus_forty_eight_hours,
                     location, location_at_now,
