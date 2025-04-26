@@ -87,7 +87,8 @@ def _create_update_pot(
         f"--package-version={ version } " +
         f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' " +
         f"-o { pot_file_new }",
-        shell = True )
+        shell = True,
+        check = False )
 
     with open( pot_file_new, 'r', encoding = "utf-8" ) as r:
         text = (
@@ -147,21 +148,22 @@ def _create_update_po(
             subprocess.run(
                 f"msgmerge { po_file_original } { pot_file } " +
                 f"-o { po_file_new }",
-                shell = True )
+                shell = True,
+                check = False )
 
             with open( po_file_new, 'r', encoding = "utf-8" ) as r:
                 new = r.read()
 
                 new = (
                     re.sub(
-                        "Copyright \(C\).*",
+                        "Copyright \(C\).*",  #TODO See what happens if putting an r in front does.  pylint:  (anomalous-backslash-in-string)
                         f"Copyright (C) { copyright_ }.",
                         new ) )
 
                 new = (
                     re.sub(
                         "Project-Id-Version.*",
-                        f"Project-Id-Version: { indicator_name } { version }\\\\n\"",
+                        f"Project-Id-Version: { indicator_name } { version }\\\\n\"",  #TODO See what happens if putting an r in front does.  pylint:  (anomalous-backslash-in-string)
                         new ) )
 
                 with open( po_file_new, 'w', encoding = "utf-8" ) as w:
@@ -186,7 +188,8 @@ def _create_update_po(
                 f"-o { po_file_original } " +
                 f"-l { lingua_code } " +
                 f"--no-translator",
-                shell = True )
+                shell = True,
+                check = False )
 
             with open( po_file_original, 'r', encoding = "utf-8" ) as r:
                 text = (
@@ -312,7 +315,8 @@ def build_locale_for_release(
         f"{ str( directory_indicator_locale / ( indicator_name + '.pot' ) ) } " +
         f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } " +
         f"-o { str( directory_indicator_locale / ( indicator_name + '.pot' ) ) }",
-        shell = True )
+        shell = True,
+        check = False )
 
     # For each locale, merge indicatorbase PO with indicator PO.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
@@ -322,14 +326,16 @@ def build_locale_for_release(
             f"{ str( po ) } " +
             f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } " +
             f"-o { str( po ) } ",
-            shell = True )
+            shell = True,
+            check = False )
 
     # Create .mo files.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         subprocess.run(
             f"msgfmt { str( po ) } " +
             f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }",
-            shell = True )
+            shell = True,
+            check = False )
 
 
 def get_names_and_comments_from_po_files(

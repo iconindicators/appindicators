@@ -644,7 +644,7 @@ class IndicatorBase( ABC ):
             If there is a pending (future) update and a request for an update
             comes along, need to remove the "old" pending update.
         '''
-        if self.lock_update.acquire( blocking = False ):
+        if self.lock_update.acquire( blocking = False ):    #TODO  R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
             if self.id_update > 0:
                 GLib.source_remove( self.id_update )
 
@@ -2713,7 +2713,7 @@ class IndicatorBase( ABC ):
         self,
         delay = 0 ):
 
-        if self.lock_save_config.acquire( blocking = False ):
+        if self.lock_save_config.acquire( blocking = False ):  #TODO  R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
             if self.id_save_config > 0:
                 GLib.source_remove( self.id_save_config )
 

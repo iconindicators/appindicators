@@ -261,7 +261,7 @@ class DataProviderOrbitalElement( DataProvider ):
 
             downloaded = True
 
-        except Exception as e:
+        except Exception as e:    #TODO W0718: Catching too general exception Exception (broad-exception-caught)
             downloaded = False
             logging.error( "Error retrieving orbital element data from " + str( url ) )
             logging.exception( e )

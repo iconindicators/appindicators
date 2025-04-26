@@ -58,10 +58,10 @@ def initialise_virtual_environment(
 
     if not Path( venv_directory ).is_dir():
         command = f"python3 -m venv { venv_directory }"
-        subprocess.run( command, shell = True )
+        subprocess.run( command, shell = True, check = False )
 
     command = (
         f". { venv_directory }/bin/activate && " + \
         f"python3 -m pip install --upgrade --force-reinstall { ' '.join( modules_to_install ) }" )
 
-    subprocess.run( command, shell = True )
+    subprocess.run( command, shell = True, check = False )

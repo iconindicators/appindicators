@@ -486,7 +486,8 @@ def _package_source_for_build_wheel_process(
             f"python3 -m readme_renderer " +
             f"{ directory_dist }/{ indicator_name }/README.md " +
             f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html",
-            shell = True )
+            shell = True,
+            check = False ) )
 
         directory_indicator_locale = (
             Path( '.' ) / directory_indicator / "src" / indicator_name / "locale" )
@@ -545,7 +546,8 @@ def _build_wheel_for_indicator(
         subprocess.run(
             f". { VENV_BUILD }/bin/activate && " +
             f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }",
-            shell = True )
+            shell = True,
+            check = False ) )
 
 # TODO Uncomment
 #         shutil.rmtree( directory_dist / indicator_name )
@@ -581,7 +583,7 @@ if __name__ == "__main__":
         "build",
         "pip",
         "polib",
-        "PyGObject\<=3.50.0", # Escape < as this will be passed to the terminal.
+        "PyGObject\<=3.50.0", # Escape < as this will be passed to the terminal.   #TODO See what happens if putting an r in front does.  pylint:  (anomalous-backslash-in-string)
         "readme_renderer[md]",
         "setuptools" )
 

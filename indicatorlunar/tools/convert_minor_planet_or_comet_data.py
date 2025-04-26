@@ -384,9 +384,9 @@ def convert(
         f_in = gzip.open( in_file, 'rt' )
 
     else:
-        f_in = open( in_file, 'r', encoding = "utf-8" )
+        f_in = open( in_file, 'r', encoding = "utf-8" )  #TODO  R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
 
-    f_out = open( out_file, 'w', encoding = "utf-8" )
+    f_out = open( out_file, 'w', encoding = "utf-8" )  #TODO  R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
 
     if option == 1:
         for line in f_in:

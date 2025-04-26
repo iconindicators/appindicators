@@ -188,8 +188,7 @@ class IndicatorPunycode( IndicatorBase ):
 
             self.request_update()
 
-#TODO Can the exception be more specific?
-        except Exception as e:
+        except Exception as e:  #TODO W0718: Catching too general exception Exception (broad-exception-caught)
             print( "EXCEPTION" )
             print( e )
             print()

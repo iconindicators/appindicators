@@ -564,7 +564,7 @@ class IndicatorLunar( IndicatorBase ):
         # Handle free text enclosed by { }.
         i = 0
         last_separator_index = -1 # Allows the last separator to be removed.
-        tag_regular_expression = "\[[^\[\]]*\]"
+        tag_regular_expression = "\[[^\[\]]*\]"   #TODO See what happens if putting an r in front does.  pylint:  (anomalous-backslash-in-string)
         while i < len( processed_text ):
             if processed_text[ i ] == '{':
                 j = i + 1
@@ -2914,7 +2914,7 @@ class IndicatorLunar( IndicatorBase ):
             j = 0
 
         translated_text = text
-        tags = re.findall( "\[([^\[^\]]+)\]", translated_text )
+        tags = re.findall( "\[([^\[^\]]+)\]", translated_text )  #TODO See what happens if putting an r in front does.  pylint:  (anomalous-backslash-in-string)
         for tag in tags:
             iterator = tags_list_store.get_iter_first()
             while iterator:
