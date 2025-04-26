@@ -263,34 +263,47 @@ Additional indicators may be appended to the above command.
 
 ## Pylint
 
-
-TODO Check this section
-
-
-Assuming the project is located within the directory `Indicators`, run within the directory one level above `Indicators`:
-
-
-TODO Might need to add install command via OS.  Or perhaps always install via pip...but to what venv?  venv_indicators?
-
-
-TODO Check the ignore directories below: development is gone fron lunar.  Need to ignore other venv_ dirs?
-
+Assuming the project is located within the directory `Indicators`, run within the directory one level above `Indicators`, which creates `pylint.txt`, sorting the results by warning/error type:
 
 ```
-    pylint --recursive=y --ignore=release,venv_build,venv_run Indicators --output=pylint.txt ; sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2n pylint.txt
-
+    pylint \
+    --recursive=y \
+    --ignore=release,venv_build,venv_run \
+    Indicators \
+    --output=pylint.txt ; \
+    sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2n pylint.txt
 ```
 
-To disable a particular check, say `line-too-long`, include in the command:
+As above, but with several checks disabled:
 
 ```
-    pylint --disable=line-too-long --recursive=y ...
-```
-
-To disable further checks, repeat the `--disable` option in the command:
-
-```
-    pylint --disable=line-too-long --disable=unused-argument --recursive=y ...
+    pylint \
+    --disable=line-too-long \
+    --disable=missing-function-docstring \
+    --disable=too-many-lines \
+    --disable=wrong-import-position \
+    --disable=import-error \
+    --disable=undefined-variable \
+    --disable=no-name-in-module \
+    --disable=no-member \
+    --disable=too-many-instance-attributes \
+    --disable=too-many-branches \
+    --disable=too-many-arguments \
+    --disable=too-many-locals \
+    --disable=too-many-statements \
+    --disable=too-many-boolean-expressions \
+    --disable=too-many-nested-blocks \
+    --disable=attribute-defined-outside-init \
+    --disable=unused-argument \
+    --disable=f-string-without-interpolation \
+    --disable=too-few-public-methods \
+    --disable=too-many-public-methods \
+    --disable=unused-variable \
+    --recursive=y \
+    --ignore=release,venv_build,venv_run \
+    Indicators \
+    --output=pylint.txt ; \
+    sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2n pylint.txt
 ```
 
 
