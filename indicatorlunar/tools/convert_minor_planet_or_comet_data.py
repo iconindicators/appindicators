@@ -40,12 +40,15 @@ import gzip
 import textwrap
 
 
-def get_unpacked_date( packed_date ):
+def get_unpacked_date(
+    packed_date ):
     '''
     https://www.minorplanetcenter.net/iau/info/PackedDates.html
     '''
 
-    def get_month_or_day_from_packed( packed_month_or_day ):
+    def get_month_or_day_from_packed(
+            packed_month_or_day ):
+
         if packed_month_or_day.isdigit():
             month_or_day = str( packed_month_or_day )
 
@@ -105,7 +108,7 @@ def get_packed_date(
     return packed_year + packed_month + packed_day
 
 
-def process_and_write_one_line_lowell_minorplanet(
+def process_line_and_write_lowell_minorplanet(
     line,
     output_file,
     to_skyfield ):
@@ -223,7 +226,7 @@ def process_and_write_one_line_lowell_minorplanet(
         output_file.write( separator.join( components ) + '\n' )
 
 
-def process_and_write_one_line_minorplanetcenter_minorplanet_to_xephem(
+def process_line_and_write_minorplanetcenter_minorplanet_to_xephem(
     line,
     output_file ):
     '''
@@ -282,7 +285,7 @@ def process_and_write_one_line_minorplanetcenter_minorplanet_to_xephem(
         output_file.write( ','.join( components ) + '\n' )
 
 
-def process_and_write_one_line_minorplanetcenter_comet_to_xephem(
+def process_line_and_write_minorplanetcenter_comet_to_xephem(
     line,
     output_file ):
     '''
@@ -380,36 +383,74 @@ def convert(
     in_file,
     out_file ):
 
-    if in_file.endswith( ".gz" ):
-        f_in = gzip.open( in_file, 'rt' )
+    # if in_file.endswith( ".gz" ):
+    #     f_in = gzip.open( in_file, 'rt' )
+    #
+    # else:
+    #     f_in = open( in_file, 'r', encoding = "utf-8" )  #TODO  R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
+    #
+    # f_out = open( out_file, 'w', encoding = "utf-8" )  #TODO  R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
+    #
+    # if option == 1:
+    #     for line in f_in:
+    #         if len( line.strip() ) > 0:
+    #             process_line_and_write_lowell_minorplanet( line, f_out, True )
+    #
+    # elif option == 2:
+    #     for line in f_in:
+    #         if len( line.strip() ) > 0:
+    #             process_line_and_write_lowell_minorplanet( line, f_out, False )
+    #
+    # elif option == 3:
+    #     for line in f_in:
+    #         if len( line.strip() ) > 0:
+    #             process_line_and_write_minorplanetcenter_minorplanet_to_xephem( line, f_out )
+    #
+    # elif option == 4:
+    #     for line in f_in:
+    #         if len( line.strip() ) > 0:
+    #             process_line_and_write_minorplanetcenter_comet_to_xephem( line, f_out )
+    #
+    # f_in.close()
+    # f_out.close()
+#TODO Check the new code below does what the above does.
 
-    else:
-        f_in = open( in_file, 'r', encoding = "utf-8" )  #TODO  R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
 
-    f_out = open( out_file, 'w', encoding = "utf-8" )  #TODO  R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
+    def process(
+        f_in,
+        f_out ):
 
-    if option == 1:
+        functions = { }
+        parameters = { }
+
+
         for line in f_in:
             if len( line.strip() ) > 0:
-                process_and_write_one_line_lowell_minorplanet( line, f_out, True )
+                if option == 1:
+                    process_line_and_write_lowell_minorplanet(
+                        line, f_out, True )
+        
+                elif option == 2:
+                    process_line_and_write_lowell_minorplanet(
+                        line, f_out, False )
+        
+                elif option == 3:
+                    process_line_and_write_minorplanetcenter_minorplanet_to_xephem(
+                        line, f_out )
+        
+                elif option == 4:
+                    process_line_and_write_minorplanetcenter_comet_to_xephem(
+                        line, f_out )
 
-    elif option == 2:
-        for line in f_in:
-            if len( line.strip() ) > 0:
-                process_and_write_one_line_lowell_minorplanet( line, f_out, False )
 
-    elif option == 3:
-        for line in f_in:
-            if len( line.strip() ) > 0:
-                process_and_write_one_line_minorplanetcenter_minorplanet_to_xephem( line, f_out )
+    with open( out_file, 'w', encoding = "utf-8" ) as f_out:
+        if in_file.endswith( ".gz" ):
+            with gzip.open( in_file, 'rt' ) as f_in:
+                process( f_in, f_out )
 
-    elif option == 4:
-        for line in f_in:
-            if len( line.strip() ) > 0:
-                process_and_write_one_line_minorplanetcenter_comet_to_xephem( line, f_out )
-
-    f_in.close()
-    f_out.close()
+        else:
+            with open( in_file, 'r', encoding = "utf-8" ) as f_in:
+                process( f_in, f_out )
 
 
 if __name__ == "__main__":
