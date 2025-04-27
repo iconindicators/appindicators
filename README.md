@@ -81,12 +81,6 @@ References:
 
 Ensure `indicatortest` runs in a terminal within the source tree as per the earlier section and `venv_run` exists.
 
-In a terminal, from the project root, create a symbolic link to `indicatorbase.py`:
-
-```
-    ln -sr indicatorbase/src/indicatorbase/indicatorbase.py indicatorfortune/src/indicatorfortune/indicatorbase.py
-```
-
 In Eclipse, create a `Python` interpreter which uses `venv_run`:
 
 ```
@@ -112,6 +106,14 @@ Create the project:
         Finish
 ```
 
+Before `indicatortest` can be run, need to create a symbolic link to `indicatorbase.py`.  In a terminal, from the project root, create a symbolic link:
+
+```
+    ln -sr indicatorbase/src/indicatorbase/indicatorbase.py indicatortest/src/indicatortest/indicatorbase.py
+```
+
+Repeat for each indicator, or as each indicator is run.
+
 Run `indicatortest`:
 
 ```
@@ -129,6 +131,8 @@ which should fail, then:
             Interpreter
                 Interpreter: python3 venv_run
 ```
+
+Repeat for each indicator, or as each indicator is run.
 
 Unfortunately running any `tools` such as `build_wheel` within `Eclipse` fails.  Despite `build_wheel` creating and using `venv_build`, dependencies are installed to the default `Python` resulting in failure.
 
