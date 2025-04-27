@@ -51,7 +51,7 @@ Some indicators, such as `indicatorlunar`, require additional packages, specifie
 
 TODO Check this section
 
-#TODO Check if Geany will accept $HOME
+TODO Check if Geany will accept $HOME
 
 Ensure `indicatortest` runs in a terminal from source as per the earlier section and `venv_run` is created.
 
