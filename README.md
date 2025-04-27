@@ -34,7 +34,6 @@ To run `indicatortest` at the source tree root:
     . ${venv}/bin/activate && \
     python3 -m pip install packaging PyGObject\<=3.50.0 && \
     python3 -m ${indicator}.src.${indicator}.${indicator} && \
-    rm ${indicatorbaselink} && \
     deactivate
 ```
 
