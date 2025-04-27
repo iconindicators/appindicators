@@ -22,14 +22,19 @@ Each indicator shares the common code `indicatorbase`.
 
 To run an indicator within the source tree, the indicator's `.whl` must first be built.  Refer to build a wheel in a later section.
 
-To run `indicatortest` at the source tree root:
+Next, create a symbolic link to `indicatorbase.py` via the terminal, from the source tree root:
+
+```
+    for dirs in indicator*; do if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py $dirs/src/$dirs/indicatorbase.py; fi ; done;
+```
+
+which will create a symbolic link to `indicatorbase.py` for all the indicators.
+
+To run `indicatortest` from the source tree root:
 
 ```
     indicator=indicatortest && \
     venv=venv_run && \
-    indicatorbase=indicatorbase/src/indicatorbase/indicatorbase.py
-    indicatorbaselink=${indicator}/src/${indicator}/indicatorbase.py
-    if [ ! -f ${indicatorbaselink} ]; then ln -sr ${indicatorbase} ${indicatorbaselink}; fi && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
     python3 -m pip install packaging PyGObject\<=3.50.0 && \
@@ -44,7 +49,7 @@ Some indicators, such as `indicatorlunar`, require additional packages, specifie
 
 ## Development Under Geany
 
-#TODO Check this section
+TODO Check this section
 
 #TODO Check if Geany will accept $HOME
 
@@ -77,7 +82,9 @@ References:
 - [https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide](https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide)
 
 
-## Development Under Eclipse / PyDev
+## Development Under Eclipse / Liclipse (PyDev)
+
+Install Eclipse; install Liclipse (via update site).
 
 Ensure `indicatortest` runs in a terminal within the source tree as per the earlier section and `venv_run` exists.
 
@@ -105,14 +112,6 @@ Create the project:
         Interpreter Name: python3 venv_run
         Finish
 ```
-
-Before `indicatortest` can be run, need to create a symbolic link to `indicatorbase.py`.  In a terminal, from the project root, create a symbolic link:
-
-```
-    ln -sr indicatorbase/src/indicatorbase/indicatorbase.py indicatortest/src/indicatortest/indicatorbase.py
-```
-
-Repeat for each indicator, or as each indicator is run.
 
 Run `indicatortest`:
 
@@ -142,7 +141,6 @@ References:
 
 
 ## Build a Wheel
-
 
 To build a wheel for `indicatortest` at the source tree root:
 
@@ -186,7 +184,7 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 
 ## Release to PyPI
 
-#TODO Check this section
+TODO Check this section
 
 To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`, in a terminal at the source tree root:
 
@@ -209,14 +207,14 @@ References:
 
 ## Install from PyPI
 
-#TODO Check this section
+TODO Check this section
 
 To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the introduction.
 
 
 ## Release to TestPyPI
 
-#TODO Check this section
+TODO Check this section
 
 For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`.  In a terminal at the source tree root:
 
@@ -230,9 +228,10 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
     deactivate
 ```
 
+
 ## Install from TestPyPI
 
-#TODO Check this section
+TODO Check this section
 
 To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`:
 
@@ -251,9 +250,7 @@ Additional operating system packages may be needed; refer to the installation in
 
 ## Uninstall an Indicator
 
-
 TODO Check this section
-
 
 In a terminal at the source tree root:
 
@@ -262,6 +259,15 @@ In a terminal at the source tree root:
 ```
 
 Additional indicators may be appended to the above command.
+
+
+## Remove all Symbolic Links to indicatorbase.py
+
+In a terminal from the source tree root:
+
+```
+    for dirs in indicator*; do if [ -L $dirs/src/$dirs/indicatorbase.py ]; then rm $dirs/src/$dirs/indicatorbase.py; fi ; done;
+```
 
 
 ## Pylint
@@ -323,6 +329,7 @@ In a terminal at the source tree root:
     python3 -m readme_renderer README.md -o README.html && \
     deactivate
 ```
+
 
 ## License
 
