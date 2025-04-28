@@ -38,9 +38,13 @@ To run `indicatortest` from the source tree root:
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
     python3 -m pip install packaging PyGObject\<=3.50.0 && \
-    python3 -m ${indicator}.src.${indicator}.${indicator} && \
-    deactivate
+    cd ${indicator}/src && \
+    python3 -m ${indicator}.${indicator} && \
+    deactivate && \
+    cd ../..
 ```
+
+Running the indicator from source is done in the same way when run from installed to reproduce the same conditions/environment.
 
 The above command is for `Debian 11/12` or `Ubuntu 20.04/22.04`, which uses `libgirepository1.0-dev` and only works with `PyGObject` version `3.50.0` or below. For `Ubuntu 24.04+` or `Debian 13+`, which use `libgirepository-2.0`, remove the version restriction on `PyGObject`.
 
@@ -53,7 +57,7 @@ TODO Check this section
 
 TODO Check if Geany will accept $HOME
 
-Ensure `indicatortest` runs in a terminal from source as per the earlier section and `venv_run` is created.
+Ensure `indicatortest` runs in a terminal within the source tree as per the earlier section and `venv_run` exists.
 
 Assuming the source code is located in `/home/bernard/Programming/Indicators`, create the project et al:
 
@@ -64,9 +68,13 @@ Assuming the source code is located in `/home/bernard/Programming/Indicators`, c
         Basepath: /home/bernard/Programming/Indicators
 
     Build > Set Build Commands > Execute Commands
-        Execute: /home/bernard/.local/venv_indicators/bin/python3 "%f"
+        Execute: /home/bernard/Programming/Indicators/venv_run/bin/python3 "%f"
+I think the new command should be
+       cd /home/bernard/Programming/Indicators/%e/src ; /home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.%f"
+/home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.src%e.%f"
+indicator name is not set properly...uses -m as indicator name taken from argv[ 0 ]
 
-    Edit > Preferences > Tools > Tool Paths > Terminal
+    Edit > Preferences > Tools > Tool Paths > Terminal      TODO Now that the indicatorbase symbolic link is used.
         x-terminal-emulator -e "env PYTHONPATH=/home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase /bin/sh %c"
 ```
 
@@ -84,7 +92,7 @@ References:
 
 ## Development Under Eclipse / Liclipse (PyDev)
 
-Install Eclipse; install Liclipse (via update site).
+Run Eclipse and install Liclipse (via update site).
 
 Ensure `indicatortest` runs in a terminal within the source tree as per the earlier section and `venv_run` exists.
 
@@ -133,9 +141,8 @@ which should fail, then:
 
 Repeat for each indicator, or as each indicator is run.
 
-TODO For tools, need to comment out the call to utils.initialise_virtual_environment but ensure that venv_build exists.
-Also need to set run config to run from project folder.
-
+To run any of the `tools` under `Eclipse`, first ensure that venv_build exists.  Then if `utils.initialise_virtual_environment` will be called, comment this out.  Finally, under the `Run Configuration`, ensure that `Working Directory` is set to `Default`.
+TODO What interpreter to use?  Default Python or python3 venv_run?
 
 References:
 
