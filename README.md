@@ -133,7 +133,9 @@ which should fail, then:
 
 Repeat for each indicator, or as each indicator is run.
 
-Unfortunately running any `tools` such as `build_wheel` within `Eclipse` fails.  Despite `build_wheel` creating and using `venv_build`, dependencies are installed to the default `Python` resulting in failure.
+TODO For tools, need to comment out the call to utils.initialise_virtual_environment but ensure that venv_build exists.
+Also need to set run config to run from project folder.
+
 
 References:
 
