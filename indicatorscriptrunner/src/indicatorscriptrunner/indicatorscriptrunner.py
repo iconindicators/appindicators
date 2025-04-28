@@ -436,10 +436,10 @@ class IndicatorScriptRunner( IndicatorBase ):
         # script default, which are not displayed, but used programmatically.
         treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str, str )
         scripts_by_group = self.get_scripts_by_group( self.scripts )
-        for group in scripts_by_group:
+        for group, scripts in scripts_by_group.items():
             row = [ group, group, None, None, None, None, None, None, None, None, None ]
             parent = treestore.append( None, row )
-            for script in scripts_by_group[ group ]:
+            for script in scripts:
                 row = [
                     group,
                     None,
