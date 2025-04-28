@@ -21,15 +21,6 @@ Application indicator to run a terminal command/script from the indicator menu.
 '''
 
 
-#TODO
-# When add/edit a script, see fortune/onthisday...maybe there is a simpler
-# way to select the script (similarly for remove).
-#
-# Not sure if the above still is valid...
-# but there is a TODO in the indicatorbase code for fortune/onthisday.
-# Address that first then come back here.
-
-
 import concurrent.futures
 import datetime
 import math
