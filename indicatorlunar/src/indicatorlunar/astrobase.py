@@ -268,7 +268,7 @@ class AstroBase( ABC ):
     # Ultimately, start with PyEphem's list of stars and drop those which are
     # not listed in the IAU CSN Catalog.
     #
-    # DO NOT EDIT: Content must be created using 'create_ephemeris_stars.py'.
+    # The list of stars below MUST be created using create_ephemeris_stars.py.
     STARS = [
         [ "ACAMAR",            13847,  _( "Acamar" ),            _( "ACAMAR" ) ],
         [ "ACHERNAR",          7588,   _( "Achernar" ),          _( "ACHERNAR" ) ],
