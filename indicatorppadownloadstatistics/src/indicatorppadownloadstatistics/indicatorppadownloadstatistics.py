@@ -243,6 +243,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         '''
         for ppa in self.ppas:
             if ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD:
+                ppa.set_status( PPA.Status.OK )
+                continue #TODO Remove this line and above line.
                 for filter_text in ppa.get_filters():
                     self._process_ppa_with_filter( ppa, filter_text )
                     if ppa.has_status_error():
@@ -784,7 +786,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     ppa_name.grab_focus()
                     continue
 
-#TODO Check from here down.
                 user_and_name_in_use = (
                     any(
                         row[ IndicatorPPADownloadStatistics.COLUMN_USER ] == user
@@ -817,8 +818,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     # However, assume the user made a mistake and allow the
                     # user to correct...
                     self.show_dialog_ok(
-                        dialog,
-                        _( "Filter text may not contain duplicates." ) )
+                        dialog, _( "Filter text may not contain duplicates." ) )
 
                     continue
 
@@ -830,32 +830,24 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                 if filter_text_contains_a_space:
                     self.show_dialog_ok(
-                        dialog,
-                        _( "Filter text may not contain spaces." ) )
+                        dialog, _( "Filter text may not contain spaces." ) )
 
                     continue
 
                 if not adding_ppa:
                     model.remove( iter_ )
 
-                model.append( [
-                    user,
-                    name,
-                    '\n'.join( filter_text ),
-                    PPA.Status.NEEDS_DOWNLOAD ] )
+                iter_select = (
+                    model.append( [
+                        user,
+                        name,
+                        '\n'.join( filter_text ),
+                        PPA.Status.NEEDS_DOWNLOAD ] ) )
 
-#TODO Does the code below simply find the added/appended item?
-# If so, the append above should return an iter to the added/appended item...right?
-                treepath = 0
-                for row in model:
-                    user_original = row[ IndicatorPPADownloadStatistics.COLUMN_USER ]
-                    name_original = row[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
-                    if user == user_original and name == name_original:
-                        break
+                treepath = (
+                    Gtk.TreePath.new_from_string(
+                        model.get_string_from_iter( iter_select ) ) )
 
-                    treepath += 1
-
-                treepath = Gtk.TreePath.new_from_string( str( treepath ) )
                 treeview.get_selection().select_path( treepath )
                 treeview.set_cursor( treepath, None, False )
 
