@@ -23,7 +23,7 @@ Convert:
     Comets file from Minor Planet Center to XEphem format.
 
 Formats:
-    https://asteroid.lowell.edu/main/astorb/
+    https://asteroid.lowell.edu/astorb/
     https://www.minorplanetcenter.net/iau/info/CometOrbitFormat.html
     https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
     https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
@@ -420,27 +420,44 @@ def convert(
         f_in,
         f_out ):
 
-        functions = { }
-        parameters = { }
+        functions = {
+            1 : process_line_and_write_lowell_minorplanet,
+            2 : process_line_and_write_lowell_minorplanet,
+            3 : process_line_and_write_minorplanetcenter_minorplanet_to_xephem,
+            4 : process_line_and_write_minorplanetcenter_comet_to_xephem }
 
+        parameters = {
+            1 : ( f_out, True ),
+            2 : ( f_out, False ),
+            3 : ( f_out, ),
+            4 : ( f_out, ) }
 
         for line in f_in:
             if len( line.strip() ) > 0:
-                if option == 1:
-                    process_line_and_write_lowell_minorplanet(
-                        line, f_out, True )
-        
-                elif option == 2:
-                    process_line_and_write_lowell_minorplanet(
-                        line, f_out, False )
-        
-                elif option == 3:
-                    process_line_and_write_minorplanetcenter_minorplanet_to_xephem(
-                        line, f_out )
-        
-                elif option == 4:
-                    process_line_and_write_minorplanetcenter_comet_to_xephem(
-                        line, f_out )
+                # print( option )
+                # print( functions[ option ] )
+                # print( parameters[ option ] )
+                # print( *parameters[ option ] )
+                # print()
+                functions[ option ]( line, *parameters[ option ] )
+
+        # for line in f_in:
+        #     if len( line.strip() ) > 0:
+        #         if option == 1:
+        #             process_line_and_write_lowell_minorplanet(
+        #                 line, f_out, True )
+        #
+        #         elif option == 2:
+        #             process_line_and_write_lowell_minorplanet(
+        #                 line, f_out, False )
+        #
+        #         elif option == 3:
+        #             process_line_and_write_minorplanetcenter_minorplanet_to_xephem(
+        #                 line, f_out )
+        #
+        #         elif option == 4:
+        #             process_line_and_write_minorplanetcenter_comet_to_xephem(
+        #                 line, f_out )
 
 
     with open( out_file, 'w', encoding = "utf-8" ) as f_out:
