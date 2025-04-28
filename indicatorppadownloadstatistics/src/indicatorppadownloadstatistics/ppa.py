@@ -37,7 +37,6 @@ class PublishedBinary():
         name,
         version,
         architecture ):
-
         '''
         Name (string)
         Version (string)
@@ -106,7 +105,6 @@ class PublishedBinary():
         Compare two Published Binaries by download count.
         If the download count is the same, sort by name then by version.
         '''
-
         if published_binary1.get_download_count() < published_binary2.get_download_count():
             sort_value = 1
 
@@ -151,7 +149,6 @@ class PPA():
         self,
         user,
         name ):
-
         '''
         Creates a PPA with a default single filter [ "" ].
 
@@ -194,7 +191,6 @@ class PPA():
     def set_filters(
         self,
         filters ):
-
         '''
         Set a list of one or more filter strings.
         Each filter string must be plain text without whitespace.
@@ -233,7 +229,6 @@ class PPA():
     def has_status_error(
         self,
         ignore_other = False ):
-
         '''
         Returns True if the PPA has any of the error statuses.
         If ignore_other is set to True, the status of ERROR_OTHER is ignored.
@@ -326,7 +321,6 @@ class PPA():
         ppa1,
         ppa2 ):
         ''' Compare two PPAs by user, then by name. '''
-
         return (
             PPA.compare_by_user_and_name(
                 ppa1.get_user(), ppa1.get_name(),
@@ -340,7 +334,6 @@ class PPA():
         user2,
         name2 ):
         ''' Compare two PPA users/names, by user, then by name. '''
-
         user1_ = locale.strxfrm( user1 )
         user2_ = locale.strxfrm( user2 )
         if user1_ < user2_:
@@ -372,7 +365,6 @@ class PPA():
         Returns True if both PPAs have the user, name and filters,
         otherwise returns False.
         '''
-
         return (
             PPA.compare_by_ppa( ppa1, ppa2 ) == 0
             and

@@ -19,6 +19,9 @@
 ''' Application indicator which displays PPA download statistics. '''
 
 
+#TODO Add / edit / remove some PPAs to test saving and restoring.
+
+
 import concurrent.futures
 import locale
 
@@ -543,7 +546,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.sort_by_download = sort_by_download_checkbutton.get_active()
             self.sort_by_download_amount = spinner.get_value_as_int()
 
-#TODO Check logic from here down...
             ppas_original = self.ppas
             self.ppas = [ ]
             iter_ = store.get_iter_first()
