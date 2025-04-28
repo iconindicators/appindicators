@@ -17,11 +17,11 @@
 
 
 '''
-Create a planet ephemeris for use in Skyfield which commences from
-today's date to end at the specified number of years from today.
+Create a planet ephemeris for use in Skyfield which commences from today's date
+and ends at a specified number of years from today.
 
-The start date is wound back one month to take into account a quirk
-in the Skyfield lunar eclipse algorithm.
+The start date is wound back one month to take into account a quirk in the
+Skyfield lunar eclipse algorithm.
 
 This script essentially wraps up the following command:
 
@@ -65,10 +65,14 @@ def create_ephemeris_planets(
     date_format = "%Y/%m/%d"
 
     command = (
-        "python3 -m jplephem excerpt " + \
-        start_date.strftime( date_format ) + " " + \
-        end_date.strftime( date_format ) + " " + \
-        in_bsp + " " + out_bsp )
+        "python3 -m jplephem excerpt " +
+        start_date.strftime( date_format ) +
+        " " +
+        end_date.strftime( date_format ) +
+        " " +
+        in_bsp +
+        " " +
+        out_bsp )
 
     print( "Processing...\n\t", command )
     subprocess.run( command, shell = True, check = False )
@@ -96,13 +100,10 @@ if __name__ == "__main__":
             formatter_class = argparse.RawDescriptionHelpFormatter,
             description = description ) )
 
-    parser.add_argument(
-        "in_bsp",
-        help = "The input .bsp file." )
+    parser.add_argument( "in_bsp", help = "The input .bsp file." )
 
     parser.add_argument(
-        "out_bsp",
-        help = "The output .bsp file with reduced date range." )
+        "out_bsp", help = "The output .bsp file with reduced date range." )
 
     parser.add_argument(
         "years",
@@ -110,7 +111,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    create_ephemeris_planets(
-        args.in_bsp,
-        args.out_bsp,
-        int( args.years ) )
+    create_ephemeris_planets( args.in_bsp, args.out_bsp, int( args.years ) )
