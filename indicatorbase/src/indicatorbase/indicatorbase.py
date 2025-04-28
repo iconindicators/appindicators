@@ -41,6 +41,15 @@ References
 '''
 
 
+#TODO In Geany the indicatorname is incorrect and is -m.
+# Is this because of Geany?
+# Check what happens:
+#	Running under Eclipse
+#	In the terminal from source
+#	In the terminal running the run script in .local/bin
+#	Running from super key
+
+
 #TODO Should the installed locale files be somewhere like .local/share/locale
 # similarly to icons?
 # Did a quick google and could not find anything...take a better look.
