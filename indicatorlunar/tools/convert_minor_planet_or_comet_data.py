@@ -47,7 +47,7 @@ def get_unpacked_date(
     '''
 
     def get_month_or_day_from_packed(
-            packed_month_or_day ):
+        packed_month_or_day ):
 
         if packed_month_or_day.isdigit():
             month_or_day = str( packed_month_or_day )
@@ -93,7 +93,9 @@ def get_packed_date(
         packed_year = 'K' + packed_year
 
 
-    def get_packed_day_month( day_or_month ):
+    def get_packed_day_month(
+        day_or_month ):
+
         if int( day_or_month ) < 10:
             packed_day_month = str( int( day_or_month ) )
 
@@ -383,39 +385,6 @@ def convert(
     in_file,
     out_file ):
 
-    # if in_file.endswith( ".gz" ):
-    #     f_in = gzip.open( in_file, 'rt' )
-    #
-    # else:
-    #     f_in = open( in_file, 'r', encoding = "utf-8" )  #TODO  R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
-    #
-    # f_out = open( out_file, 'w', encoding = "utf-8" )  #TODO  R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
-    #
-    # if option == 1:
-    #     for line in f_in:
-    #         if len( line.strip() ) > 0:
-    #             process_line_and_write_lowell_minorplanet( line, f_out, True )
-    #
-    # elif option == 2:
-    #     for line in f_in:
-    #         if len( line.strip() ) > 0:
-    #             process_line_and_write_lowell_minorplanet( line, f_out, False )
-    #
-    # elif option == 3:
-    #     for line in f_in:
-    #         if len( line.strip() ) > 0:
-    #             process_line_and_write_minorplanetcenter_minorplanet_to_xephem( line, f_out )
-    #
-    # elif option == 4:
-    #     for line in f_in:
-    #         if len( line.strip() ) > 0:
-    #             process_line_and_write_minorplanetcenter_comet_to_xephem( line, f_out )
-    #
-    # f_in.close()
-    # f_out.close()
-#TODO Check the new code below does what the above does.
-
-
     def process(
         f_in,
         f_out ):
@@ -434,30 +403,7 @@ def convert(
 
         for line in f_in:
             if len( line.strip() ) > 0:
-                # print( option )
-                # print( functions[ option ] )
-                # print( parameters[ option ] )
-                # print( *parameters[ option ] )
-                # print()
                 functions[ option ]( line, *parameters[ option ] )
-
-        # for line in f_in:
-        #     if len( line.strip() ) > 0:
-        #         if option == 1:
-        #             process_line_and_write_lowell_minorplanet(
-        #                 line, f_out, True )
-        #
-        #         elif option == 2:
-        #             process_line_and_write_lowell_minorplanet(
-        #                 line, f_out, False )
-        #
-        #         elif option == 3:
-        #             process_line_and_write_minorplanetcenter_minorplanet_to_xephem(
-        #                 line, f_out )
-        #
-        #         elif option == 4:
-        #             process_line_and_write_minorplanetcenter_comet_to_xephem(
-        #                 line, f_out )
 
 
     with open( out_file, 'w', encoding = "utf-8" ) as f_out:
