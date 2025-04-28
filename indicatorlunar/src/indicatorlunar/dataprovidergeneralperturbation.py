@@ -78,15 +78,14 @@ class GeneralPerturbation():
         has an upper limit of 339,999 for the NORAD catalog number:
             https://github.com/brandon-rhodes/pyephem/discussions/243
 
-        Use a sleight of hand to ensure propagation occurs
-        when the NORAD catalog number exceeds 339,999:
+        Ensure propagation occurs when the NORAD catalog number exceeds 339,999:
             Swap out the NORAD catalog number with '0'
             (NORAD catalog numbers start from '1'),
             perform the propagation, then swap back in.
 
         Although the resultant satellite record will contain a value of '0'
-        for the NORAD catalog number, the actual NORAD catalog number
-        is still available via get_number().
+        for the NORAD catalog number, the actual NORAD catalog number is still
+        available via get_number().
         '''
 
         self.satellite_record = Satrec()
@@ -149,6 +148,7 @@ class GeneralPerturbation():
                 self.satellite_record.satnum_str = "00000"
                 self.tle_line_one, self.tle_line_two = (
                     exporter.export_tle( self.satellite_record ) )
+
                 self.satellite_record.satnum_str = (
                     alpha5.to_alpha5( int( self.get_number() ) ) )
 

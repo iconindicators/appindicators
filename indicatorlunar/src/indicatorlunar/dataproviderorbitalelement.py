@@ -71,7 +71,7 @@ class DataProviderOrbitalElement( DataProvider ):
 
         else:
             logging.error(
-                "Unknown data type: " + str( orbital_element_data_type ) )
+                f"Unknown data type: { str( orbital_element_data_type ) }" )
 
             downloaded = False
 
@@ -143,25 +143,23 @@ class DataProviderOrbitalElement( DataProvider ):
 
             with open( filename, 'w', encoding = "utf-8" ) as f:
                 for minor_planet in minor_planets:
-                    asteroid_number = (
-                        minor_planet[ "minorplanet" ][ "ast_number" ] )
+                    minor_planet_ = minor_planet[ "minorplanet" ]
 
+                    asteroid_number = minor_planet_[ "ast_number" ]
                     if asteroid_number is None:
-                        # Not all asteroids / minor planets have a number.
                         continue
 
-                    if minor_planet[ "minorplanet" ][ "designameByIdDesignationName" ] is None:
-                        # Not all asteroids / minor planets have a number.
+                    if minor_planet_[ "designameByIdDesignationName" ] is None:
                         continue
 
                     designation_name = (
-                        minor_planet[ "minorplanet" ][ "designameByIdDesignationName" ][ "str_designame" ] )
+                        minor_planet_[ "designameByIdDesignationName" ][ "str_designame" ] )
 
                     designation = (
                         str( asteroid_number ) + ' ' + designation_name )
 
                     absolute_magnitude = (
-                        str( minor_planet[ "minorplanet" ][ 'h' ] ) )
+                        str( minor_planet_[ 'h' ] ) )
 
                     # The slope parameter is hard coded; typically does not vary
                     # that much and is not used to calculate apparent magnitude.
@@ -186,10 +184,8 @@ class DataProviderOrbitalElement( DataProvider ):
                     # Therefore this should not be a problem of concern;
                     # however, filter out such bodies just to be safe!
                     if float( orbital_eccentricity ) >= 1.0:
-                        logging.error(
-                            "Found a body with eccentricity >= 1.0:" )
-
-                        logging.error( "\t" + str( minor_planet ) )
+                        logging.error( "Body with eccentricity >= 1.0:" )
+                        logging.error( f"\t { str( minor_planet ) }" )
                         continue
 
                     if orbital_element_data_type == OrbitalElement.DataType.XEPHEM_MINOR_PLANET:
@@ -402,12 +398,10 @@ class DataProviderOrbitalElement( DataProvider ):
 
         else:
             oe_data = { }
-            message = (
+            logging.error(
                 "Unknown data type encountered when loading orbital elements " +
                 "from file: " +
                 f"'{ str( orbital_element_data_type ) }', '{ filename }'" )
-
-            logging.error( message )
 
         return oe_data
 
