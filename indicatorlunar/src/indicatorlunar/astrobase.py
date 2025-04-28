@@ -473,7 +473,6 @@ class AstroBase( ABC ):
 
         NOTE: Any error when computing a body no result is added for that body.
         '''
-
         return { }
 
 
@@ -483,7 +482,6 @@ class AstroBase( ABC ):
         '''
         Return a list of cities, sorted alphabetically, sensitive to locale.
         '''
-
         return [ ]
 
 
@@ -520,7 +518,9 @@ class AstroBase( ABC ):
     @staticmethod
     def _get_star_row(
         star ):
-        return next( i for i in AstroBase.STARS if i[ AstroBase._STARS_INDEX_NAME ] == star )
+        return next(
+            i for i in AstroBase.STARS
+            if i[ AstroBase._STARS_INDEX_NAME ] == star )
 
 
     @staticmethod
@@ -532,13 +532,15 @@ class AstroBase( ABC ):
     @staticmethod
     def get_star_name_translation(
         star ):
-        return AstroBase._get_star_row( star )[ AstroBase._STARS_INDEX_NAME_TRANSLATION ]
+        row = AstroBase._get_star_row( star )
+        return row[ AstroBase._STARS_INDEX_NAME_TRANSLATION ]
 
 
     @staticmethod
     def get_star_tag_translation(
         star ):
-        return AstroBase._get_star_row( star )[ AstroBase._STARS_INDEX_TAG_TRANSLATION ]
+        row = AstroBase._get_star_row( star )
+        return row[ AstroBase._STARS_INDEX_TAG_TRANSLATION ]
 
 
     @staticmethod
@@ -553,7 +555,9 @@ class AstroBase( ABC ):
 
     @staticmethod
     def get_star_tag_translations():
-        return [ i[ AstroBase._STARS_INDEX_TAG_TRANSLATION ] for i in AstroBase.STARS ]
+        return [
+            i[ AstroBase._STARS_INDEX_TAG_TRANSLATION ]
+            for i in AstroBase.STARS ]
 
 
     @staticmethod
@@ -568,7 +572,6 @@ class AstroBase( ABC ):
 
         https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId564354
         '''
-
         return (
             g_absolute_magnitude
             +
@@ -682,7 +685,7 @@ class AstroBase( ABC ):
         Reference
             Practical Astronomy with Your Calculator by Peter Duffett-Smith.
         '''
-        # Find the Julian date.  Section 4 of the reference.
+        # Find the Julian date; section 4 of the reference.
         # Assume the date is always later than 15th October, 1582.
         y = utc_now.year
         m = utc_now.month
@@ -704,13 +707,12 @@ class AstroBase( ABC ):
         a = int( y_prime / 100 )
         b = 2 - a + int( a / 4 )
         c = int( 365.25 * y_prime )
-        d = int( 30.6001 * ( m_prime + 1 ) )
-        julian_date = b + c + d + d + 1720994.5
+        d_ = int( 30.6001 * ( m_prime + 1 ) )
+        julian_date = b + c + d_ + d + 1720994.5
 
-        # Find universal time.  Section 12 of the reference.
+        # Find universal time; section 12 of the reference.
         s = julian_date - 2451545.0
         t = s / 36525.0
-
         t0 = ( 6.697374558 + ( 2400.051336 * t ) + ( 0.000025862 * t * t ) ) % 24
         universal_time_decimal = (
             ( ( ( utc_now.second / 60 ) + utc_now.minute ) / 60 )
@@ -720,7 +722,7 @@ class AstroBase( ABC ):
         a = universal_time_decimal * 1.002737909
         greenwich_sidereal_time_decimal = ( a + t0 ) % 24
 
-        # Find local sidereal time.  Section 14 of the reference.
+        # Find local sidereal time; section 14 of the reference.
         longitude_in_hours = math.degrees( longitude ) / 15
 
         # Local sidereal time as a decimal time.
