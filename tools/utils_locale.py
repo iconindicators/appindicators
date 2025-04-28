@@ -156,14 +156,14 @@ def _create_update_po(
 
                 new = (
                     re.sub(
-                        "Copyright \(C\).*",  #TODO See what happens if putting an r in front does.  pylint:  (anomalous-backslash-in-string)
+                        r"Copyright \(C\).*",
                         f"Copyright (C) { copyright_ }.",
                         new ) )
 
                 new = (
                     re.sub(
                         "Project-Id-Version.*",
-                        f"Project-Id-Version: { indicator_name } { version }\\\\n\"",  #TODO See what happens if putting an r in front does.  pylint:  (anomalous-backslash-in-string)
+                        f"Project-Id-Version: { indicator_name } { version }\\\\n\"",
                         new ) )
 
                 with open( po_file_new, 'w', encoding = "utf-8" ) as w:
