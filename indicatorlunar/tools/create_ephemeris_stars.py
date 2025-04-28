@@ -46,22 +46,20 @@ def get_stars_and_hips( iau_catalog_file ):
     stars_and_hips_from_iau = [ ]
     with open( iau_catalog_file, 'r', encoding = "utf-8" ) as f_in:
         for line in f_in:
-            if line.startswith( '#' ) or line.startswith( '$' ):
-                continue
+            if not ( line.startswith( '#' ) or line.startswith( '$' ) ):
+                try:
+                    start = IAUCSN_NAME_START - 1
+                    end = IAUCSN_NAME_END - 1 + 1
+                    name_utf8 = line[ start : end ].strip()
+                    if name_utf8 in stars_from_pyephem:
+                        start = IAUCSN_HIP_START - 1
+                        end = IAUCSN_HIP_END - 1 + 1
+                        hip = int( line[ start : end ] )
 
-            try:
-                start = IAUCSN_NAME_START - 1
-                end = IAUCSN_NAME_END - 1 + 1
-                name_utf8 = line[ start : end ].strip()
-                if name_utf8 in stars_from_pyephem:
-                    start = IAUCSN_HIP_START - 1
-                    end = IAUCSN_HIP_END - 1 + 1
-                    hip = int( line[ start : end ] )
+                        stars_and_hips_from_iau.append( [ name_utf8, hip ] )
 
-                    stars_and_hips_from_iau.append( [ name_utf8, hip ] )
-
-            except ValueError:
-                pass
+                except ValueError:
+                    pass
 
     return stars_and_hips_from_iau
 
@@ -74,13 +72,13 @@ def print_formatted_stars(
     for name, hip in stars_and_hips_:
         print(
             "        [ " +
-            "\"" + name.upper() + "\"," +
+            f"\"{ name.upper() }\"," +
             ( ' ' * ( IAUCSN_NAME_END - IAUCSN_NAME_START - len( name ) + 1 ) ) +
-            str( hip ) + ", " +
+            f"{ str( hip ) }, " +
             ( ' ' * ( IAUCSN_HIP_END - IAUCSN_HIP_START - len( str( hip ) ) + 1 ) ) +
-            "_( \"" + name.title() + "\" )," +
+            f"_( \"{ name.title() }\" )," +
             ( ' ' * ( IAUCSN_NAME_END - IAUCSN_NAME_START - len( name ) + 1 ) ) +
-            "_( \"" + name.upper() + "\" ) ]," )
+            f"_( \"{ name.upper() }\" ) ]," )
 
     print( "Done" )
 
