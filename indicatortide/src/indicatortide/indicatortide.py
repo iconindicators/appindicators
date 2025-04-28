@@ -54,6 +54,10 @@
 # For Eclipse, test to see if need to add a cd first ... if possible.
 # For Eclipse, open RUn configs, arguments, working directory, other:  ${workspace_loc:Indicators/indicatortide/src}
 # and that works.  So test that for all other indicators too...then update readme.md too.
+#
+# Not sure that changing to ${workspace_loc:Indicators/indicatortide/src} (which is fine)
+# can then run ${indicator}.${indicator}
+# Check...
 
 
 import datetime

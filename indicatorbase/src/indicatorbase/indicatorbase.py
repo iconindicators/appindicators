@@ -192,6 +192,14 @@ class IndicatorBase( ABC ):
 
     TIMEOUT_IN_SECONDS = 10
 
+#TODO Test
+    print( sys.modules[ __name__ ] )            
+    print( sys.modules[ "__main__" ] )            #TODO SHould I use this?  Original method works in Geany 
+    print( type( sys.modules[ "__main__" ] ) )            
+
+    x = sys.modules[ "__main__" ]            
+    print( sys.argv )
+
     INDICATOR_NAME = Path( sys.argv[ 0 ] ).stem
 
     gettext.install(
