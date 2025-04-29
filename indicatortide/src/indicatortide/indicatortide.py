@@ -19,47 +19,6 @@
 ''' Application indicator which displays tidal information. '''
 
 
-#TODO Try running via installed versus from source tree in terminal versus eclipse...do they all work?
-# Copied source files to installed venv and ran from terminal...worked.
-# After that, ran from super key and selected tide...worked.
-#
-# Running from terminal in source:
-#
-#     2025-04-27 11:04:56,520 - root - ERROR - cannot import name 'tide' from 'indicatortide' (unknown location)
-#     Traceback (most recent call last):
-#       File "/home/bernard/Programming/Indicators/indicatortide/src/indicatortide/indicatortide.py", line 85, in update
-#         spec.loader.exec_module( module )
-#       File "<frozen importlib._bootstrap_external>", line 848, in exec_module
-#       File "<frozen importlib._bootstrap>", line 219, in _call_with_frames_removed
-#       File "/home/bernard/Programming/getTideDataFromBOM.py", line 14, in <module>
-#         from indicatortide import tide
-#     ImportError: cannot import name 'tide' from 'indicatortide' (unknown location)
-#     2025-04-27 11:04:56,540 - root - ERROR - Error running user script: /home/bernard/Programming/getTideDataFromBOM.py | GetTideDataFromBOM
-#
-#
-# Running in eclipse, same error as per terminal in source.
-#
-#
-# For running in a terminal from source, need to change to indicatortide/src directory first,
-# so this looks the same as the installed version (start from site-packages)
-# and then run as python3 -m indicatortide.indicatortide
-# so it seems this is a path issue as such.
-#
-# cd indicatortide/src && python3 -m ${indicator}.${indicator}
-#
-# Not sure what to do about running in eclipse.
-# Maybe check this change works for running in source for say fortune, lunar and script runner...
-# ALL indicators...and then update readme.md
-#
-# For Eclipse, test to see if need to add a cd first ... if possible.
-# For Eclipse, open RUn configs, arguments, working directory, other:  ${workspace_loc:Indicators/indicatortide/src}
-# and that works.  So test that for all other indicators too...then update readme.md too.
-#
-# Not sure that changing to ${workspace_loc:Indicators/indicatortide/src} (which is fine)
-# can then run ${indicator}.${indicator}
-# Check...
-
-
 import datetime
 import importlib.util
 import sys
