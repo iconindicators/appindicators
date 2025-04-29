@@ -51,46 +51,33 @@ The above command is for `Debian 11/12` or `Ubuntu 20.04/22.04`, which uses `lib
 Some indicators, such as `indicatorlunar`, require additional packages, specified in the `dependencies` field of `pyproject.toml`.  Include those additional packages in the `pip install` above.
 
 
-## Development Under Geany
+## Development under Geany
 
-TODO Check this section
-
-TODO Check if Geany will accept $HOME
+#### Geany Setup
 
 Ensure `indicatortest` runs in a terminal within the source tree as per the earlier section and `venv_run` exists.
 
-Ensure a `.whl` for `indicatortest` is built as per the earlier section on building a wheel and `venv_build` exists.
+Run `Geany`:
 
-Assuming the source code is located in `/home/bernard/Programming/Indicators`, run `Geany` and create the project et al:
+```
+    Build > Set Build Commands > Execute Commands
+        Execute: cd /home/bernard/Programming/Indicators/%e/src ; /home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.%e"
+```
+
+#### Project Setup
 
 ```
     Project > New
         Name: Indicators
         Filename: /home/bernard/Programming/Indicators/project.geany
         Basepath: /home/bernard/Programming/Indicators
-
-    Build > Set Build Commands > Execute Commands
-        Execute: /home/bernard/Programming/Indicators/venv_run/bin/python3 "%f"
-I think the new command should be
-       cd /home/bernard/Programming/Indicators/%e/src ; /home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.%f"
-/home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.src%e.%f"
-indicator name is not set properly...uses -m as indicator name taken from argv[ 0 ]
-
-    Edit > Preferences > Tools > Tool Paths > Terminal      TODO Now that the indicatorbase symbolic link is used.
-        x-terminal-emulator -e "env PYTHONPATH=/home/bernard/Programming/Indicators/indicatorbase/src/indicatorbase /bin/sh %c"
-        
-FROM project.geany:
-
-EX_00_CM=cd /home/bernard/Programming/Indicators/%e/src ; /home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.%e"
-
-        
 ```
 
-`indicatortest` should now run under `Geany`.
+The indicator should now run via `Build > Execute` or `F5`.
 
 NOTE: If editing `README.md` or any `markdown` document under `Geany`, using two spaces to insert an empty line may not work as `Geany` removes trailing spaces by default.
 
-NOTE: Appears to be no way to execute any of the `tools` scripts within `Geany`.
+NOTE: May be possible to run the `tools` scripts within `Geany`; however this has not been investigated.
 
 References:
 
@@ -98,7 +85,7 @@ References:
 - [https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide](https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide)
 
 
-## Development Under Eclipse
+## Development under Eclipse
 
 #### Eclipse Setup
 
@@ -145,7 +132,7 @@ which should fail, then:
         Python Run: Indicators.indicatortest
             Arguments
                 Working Directory:
-                	Other: ${workspace_loc:Indicators/indicatortest/src}
+                    Other: ${workspace_loc:Indicators/indicatortest/src}
             Interpreter
                 Interpreter: python3 venv_run
 ```
