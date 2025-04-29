@@ -59,7 +59,9 @@ TODO Check if Geany will accept $HOME
 
 Ensure `indicatortest` runs in a terminal within the source tree as per the earlier section and `venv_run` exists.
 
-Assuming the source code is located in `/home/bernard/Programming/Indicators`, create the project et al:
+Ensure a `.whl` for `indicatortest` is built as per the earlier section on building a wheel and `venv_build` exists.
+
+Assuming the source code is located in `/home/bernard/Programming/Indicators`, run `Geany` and create the project et al:
 
 ```
     Project > New
@@ -96,13 +98,15 @@ References:
 - [https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide](https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide)
 
 
-## Development Under Eclipse / Liclipse (PyDev)
+## Development Under Eclipse
 
-Run Eclipse and install Liclipse (via update site).
+#### Eclipse Setup
 
 Ensure `indicatortest` runs in a terminal within the source tree as per the earlier section and `venv_run` exists.
 
-In Eclipse, create a `Python` interpreter which uses `venv_run`:
+Run `Eclipse` and install [Liclipse](https://www.liclipse.com/) via the update site.
+
+Create a `Python` interpreter which uses `venv_run`:
 
 ```
     Window > Preferences
@@ -116,7 +120,7 @@ In Eclipse, create a `Python` interpreter which uses `venv_run`:
             Check Launch modules with 'python -m mod.name'
 ```
 
-Create the project:
+#### Project Setup
 
 ```
     File > New > PyDev Project
@@ -127,7 +131,7 @@ Create the project:
         Finish
 ```
 
-Run `indicatortest`:
+#### Run Indicator
 
 ```
     Right click on indicatortest.py
@@ -140,15 +144,23 @@ which should fail, then:
     Run > Run Configurations
         Python Run: Indicators.indicatortest
             Arguments
-                Working Directory: Default
+                Working Directory:
+                	Other: ${workspace_loc:Indicators/indicatortest/src}
             Interpreter
                 Interpreter: python3 venv_run
 ```
 
 Repeat for each indicator, or as each indicator is run.
 
-To run any of the `tools` under `Eclipse`, first ensure that venv_build exists.  Then if `utils.initialise_virtual_environment` will be called, comment this out.  Finally, under the `Run Configuration`, ensure that `Working Directory` is set to `Default`.
-TODO What interpreter to use?  Default Python or python3 venv_run?
+#### Run Tool
+
+Ensure a `.whl` for `indicatortest` is built as per the earlier section on building a wheel and `venv_build` exists.
+
+Create a `Python` interpreter similarly to above which uses `venv_build`:
+
+If `utils.initialise_virtual_environment` will be called by the tool, temporarily comment out the call.
+
+Under `Run Configuration` for the tool, ensure that `Working Directory` is set to `Default` and the `Python` interpreter is set to `venv_build`.
 
 References:
 
