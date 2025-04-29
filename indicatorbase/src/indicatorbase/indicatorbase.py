@@ -41,20 +41,6 @@ References
 '''
 
 
-#TODO In Geany the indicatorname is incorrect and is -m.
-# Is this because of Geany?
-# Check what happens:
-#	Running under Eclipse
-#	In the terminal from source
-#	In the terminal running the run script in .local/bin
-#	Running from super key
-
-
-#TODO Should the installed locale files be somewhere like .local/share/locale
-# similarly to icons?
-# Did a quick google and could not find anything...take a better look.
-
-
 #TODO Not sure if this applies:
 #   https://setuptools.pypa.io/en/latest/userguide/datafiles.html#accessing-data-files-at-runtime
 #
@@ -64,14 +50,10 @@ References
 # ephemerides
 # tides
 # fortune history
-
-
-#TODO When removing last script from scriptrunner, so the treeview is now empty,
-# the tooltip on the treeview and buttons et al say "double click to edit".
-# Should the tooltip be changed to say "No script ; please add" or similar?
-# Similarly for the buttons et al?
 #
-# Similarly for fortune/onthisday/ppa?
+#
+#   from importlib_resources import files
+#   data_text = files('mypkg.data').joinpath('data1.txt').read_text()
 
 
 import datetime
@@ -1035,9 +1017,7 @@ class IndicatorBase( ABC ):
 
 
     def is_calendar_supported( self ):
-        '''
-        The calendar package is unavailable on some distributions.
-        '''
+        ''' The calendar package is unavailable on some distributions. '''
         etc_os_release = self.process_get( "cat /etc/os-release" )
 
         is_manjaro = "NAME=\"Manjaro Linux\"" in etc_os_release
@@ -1105,9 +1085,7 @@ class IndicatorBase( ABC ):
         self,
         text,
         is_primary = False ):
-        '''
-        Send text to the clipboard or primary.
-        '''
+        ''' Send text to the clipboard or primary. '''
         if self.is_clipboard_supported():
             if self.is_session_type_wayland():
                 with tempfile.NamedTemporaryFile( mode = 'w', delete = False ) as temporary_named_file:
@@ -1429,7 +1407,6 @@ class IndicatorBase( ABC ):
             First element: indent level when adding to a non-detachable menu.
             Second element: equivalent for a detachable menu.
         '''
-
         indent_amount = self._get_menu_indent_amount( indent )
         menuitem = Gtk.MenuItem.new_with_label( indent_amount + label )
 
@@ -1460,7 +1437,6 @@ class IndicatorBase( ABC ):
             First element: indent level when adding to a non-detachable menu.
             Second element: equivalent for a detachable menu.
         '''
-
         menuitem = (
             self.create_and_append_menuitem(
                 menu,
@@ -1488,7 +1464,6 @@ class IndicatorBase( ABC ):
             First element: indent level when adding to a non-detachable menu.
             Second element: equivalent for a detachable menu.
         '''
-
         indent_amount = self._get_menu_indent_amount( indent )
         menuitem = (
             Gtk.RadioMenuItem.new_with_label( [ ], indent_amount + label ) )
@@ -1518,7 +1493,6 @@ class IndicatorBase( ABC ):
         The second value of the indent argument refers to the indent for
         a submenu's menuitems under Kubuntu and similar layouts.
         '''
-
         indent_amount = "      "
         indent_small = (
             self.get_current_desktop() == IndicatorBase._DESKTOP_KDE )
@@ -1733,7 +1707,6 @@ class IndicatorBase( ABC ):
             Must be passed as a tuple.
             https://stackoverflow.com/a/6289656/2156453
        '''
-
         button = Gtk.Button.new_with_label( label )
         self._set_widget_common_attributes(
             button,
@@ -1845,9 +1818,6 @@ class IndicatorBase( ABC ):
         alignments_columnviewids = None,
         celldatafunctionandarguments_renderers_columnviewids = None,
         default_sort_func = None,
-#TODO Maybe rename the sort parameters...
-# sortcolumnviewids_columnmodelids => usersort_columnviewids_columnmodelids
-# clickablecolumnviewids_functionsandarguments => userclickable_columnviewids_functionsandarguments
         sortcolumnviewids_columnmodelids = None,
         clickablecolumnviewids_functionsandarguments = None,
         tooltip_text = "",
@@ -1903,7 +1873,7 @@ class IndicatorBase( ABC ):
         treeview = Gtk.TreeView.new_with_model( treemodel )
 
         z = zip( titles, renderers_attributes_columnmodelids )
-        for index, ( title, renderer_attribute_columnmodelid ) in enumerate( z ):
+        for i, ( title, renderer_attribute_columnmodelid ) in enumerate( z ):
             treeviewcolumn = Gtk.TreeViewColumn( title )
 
             # Expand the column unless the column contains a single checkbox
@@ -1925,8 +1895,7 @@ class IndicatorBase( ABC ):
                 treeviewcolumn.pack_start(
                     renderer_attribute_columnmodelid[ 0 ], False )
 
-                treeviewcolumn.add_attribute(
-                    *renderer_attribute_columnmodelid )
+                treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
 
             else:
                 # Assume a tuple of tuples of
@@ -1940,7 +1909,7 @@ class IndicatorBase( ABC ):
                 alignment = [
                     alignment_columnviewid[ 0 ]
                     for alignment_columnviewid in alignments_columnviewids
-                    if alignment_columnviewid[ 1 ] == index ]
+                    if alignment_columnviewid[ 1 ] == i ]
 
                 if alignment:
                     treeviewcolumn.set_alignment( alignment[ 0 ] )
@@ -1955,11 +1924,10 @@ class IndicatorBase( ABC ):
 
         if celldatafunctionandarguments_renderers_columnviewids:
             for data_function_and_arguments, renderer, columnviewid in celldatafunctionandarguments_renderers_columnviewids:
-                for index, treeviewcolumn in enumerate( treeview.get_columns() ):
-                    if columnviewid == index:
+                for i, treeviewcolumn in enumerate( treeview.get_columns() ):
+                    if columnviewid == i:
                         treeviewcolumn.set_cell_data_func(
-                            renderer,
-                            *data_function_and_arguments )
+                            renderer, *data_function_and_arguments )
 
         if default_sort_func:
             treemodel.set_default_sort_func( default_sort_func, None )
@@ -1967,64 +1935,6 @@ class IndicatorBase( ABC ):
                 Gtk.TREE_SORTABLE_DEFAULT_SORT_COLUMN_ID,
                 Gtk.SortType.ASCENDING )
 
-#TODO May or may not need this links (either here or anywhere)...
-# https://gist.github.com/Cilyan/41b3e44b0e3fa4623386
-# https://pygtk.daa.com.narkive.com/3AbQPAK1/formatting-floats-in-treeview
-# https://stackoverflow.com/questions/18063907/how-to-use-the-set-cell-data-func-function-in-vala-to-change-the-layout-of-my-ce
-# https://stackoverflow.com/questions/55540542/how-to-customize-text-rendered-in-a-gtk-treeviewcolumn
-# https://stackoverflow.com/questions/52798356/python-gtk-treeview-column-data-display
-# https://stackoverflow.com/questions/14149324/how-do-i-create-a-gtk-iconview-with-a-custom-cellrenderertext
-# https://stackoverflow.com/questions/10907828/rather-than-model-get-value-of-cellrenderer-in-a-gtktreeview
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/Entry.html#Gtk.Entry.set_text
-# https://stackoverflow.com/questions/6146509/how-do-i-make-a-proper-read-only-pygtk-text-entry
-# https://stackoverflow.com/questions/37450757/python-gtk-treeview-enter-key
-# https://stackoverflow.com/questions/57136209/python-autocomplete-in-an-editable-gtk-treeview-cell
-# https://stackoverflow.com/questions/13756787/gtk-entry-in-gtk-treeview-cellrenderer
-# https://web.archive.org/web/20170613091956/http://faq.pygtk.org/index.py?req=show&file=faq13.055.htp
-# https://stackoverflow.com/questions/57136209/python-autocomplete-in-an-editable-gtk-treeview-cell
-# https://en.wikibooks.org/wiki/GTK+_By_Example/Tree_View/Editable_Cells#Editable_Text_Cells
-# https://discourse.gnome.org/t/displaying-multiple-cellrenderers-in-a-treeviewcolumn/1229/2
-# https://stackoverflow.com/questions/77774517/how-to-create-a-python-gtk3-treeview-column-which-contains-both-text-and-images
-# https://stackoverflow.com/questions/22744506/how-to-write-a-gtk-treeselection-set-select-function
-# https://stackoverflow.com/questions/3534127/gtk-detect-click-on-a-cell-in-a-treeview
-# https://stackoverflow.com/questions/26605909/gtk-focus-out-event
-#
-# https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeView.html#Gtk.TreeView
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeSelection.html#Gtk.TreeSelection
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeViewColumn.html#Gtk.TreeViewColumn
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/CellRenderer.html#Gtk.CellRenderer
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/CellRendererText.html#Gtk.CellRendererText
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeModel.html#Gtk.TreeModel.get_n_columns
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeIter.html#Gtk.TreeIter
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeStore.html#Gtk.TreeStore
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeModelFilter.html#Gtk.TreeModelFilter
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreePath.html
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeModelSort.html#Gtk.TreeModelSort
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeSortable.html#gtk-treesortable-methods
-
-
-#TODO Need to look at sorting again...
-# Not sure what the difference is between
-#    treeviewcolumn.set_sort_column_id
-# and
-#    treemodel.set_sort_column_id
-#...and how does it relate or not to clickable column view ids below?
-# https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeSortable.html#Gtk.TreeSortable.set_sort_column_id
-# https://lazka.github.io/pgi-docs/Gtk-3.0/classes/TreeViewColumn.html#Gtk.TreeViewColumn.set_sort_column_id
-# https://stackoverflow.com/questions/18954160/sort-a-column-in-a-treeview-by-default-or-programmatically
-# https://stackoverflow.com/questions/55167884/python-gtk-3-sorting-a-treeview-by-clicking-on-column
-# https://stackoverflow.com/questions/53158803/gtk-tree-view-with-filter-and-sorting
-# https://stackoverflow.com/questions/18234513/python-sort-a-gtk-treeview
-# https://stackoverflow.com/questions/55167884/python-gtk-3-sorting-a-treeview-by-clicking-on-column/70108852
-# https://stackoverflow.com/questions/12368059/a-sorted-and-filtered-treemodel-in-python-gtk3
-# https://stackoverflow.com/questions/9194588/how-to-programmatically-sort-treeview
-# https://python-gtk-3-tutorial.readthedocs.io/en/latest/treeview.html
-#
-# I think this is now okay...better check with ALL tables in all indicators.
-#
-# TODO I think this is only used in lunar for the icon text values and satellites.
         if sortcolumnviewids_columnmodelids:
             for columnviewid, columnmodelid in sortcolumnviewids_columnmodelids:
                 for indexcolumn, treeviewcolumn in enumerate( treeview.get_columns() ):
@@ -2033,17 +1943,15 @@ class IndicatorBase( ABC ):
                         if sortcolumnviewids_columnmodelids.index( ( columnviewid, columnmodelid ) ) == 0:
                             # Set first sorted column as default ascending.
                             treemodel.set_sort_column_id(
-                                columnmodelid,
-                                Gtk.SortType.ASCENDING )
+                                columnmodelid, Gtk.SortType.ASCENDING )
 
         if clickablecolumnviewids_functionsandarguments:
             for columnviewid_functionandarguments in clickablecolumnviewids_functionsandarguments:
-                for index, treeviewcolumn in enumerate( treeview.get_columns() ):
-                    if columnviewid_functionandarguments[ 0 ] == index:
+                for i, treeviewcolumn in enumerate( treeview.get_columns() ):
+                    if columnviewid_functionandarguments[ 0 ] == i:
                         treeviewcolumn.set_clickable( True )
                         treeviewcolumn.connect(
-                            "clicked",
-                            *columnviewid_functionandarguments[ 1 ] )
+                            "clicked", *columnviewid_functionandarguments[ 1 ] )
 
         treeview.set_tooltip_text( tooltip_text )
         treeview.get_selection().set_mode( Gtk.SelectionMode.BROWSE )
@@ -2174,17 +2082,17 @@ class IndicatorBase( ABC ):
         dialog,
         user_fortunes_or_calendars,
         system_fortunes_or_calendars,
-        model_column_id_for_fortune_or_calendar_file,
-        model_column_id_for_fortune_or_calendar_enabled,
-        treeview_column_fortunes_or_calendars_title,
+        column_id_fortune_or_calendar_file,
+        column_id_fortune_or_calendar_enabled,
+        column_title_fortunes_or_calendars,
         treeview_tool_tip,
         file_chooser_title,
         message_fortune_or_calendar_exists,
         message_fortune_or_calendar_cannot_be_modified,
-        message_add_fortune_or_calendar,
-        message_remove_fortune_or_calendar,
-        message_system_fortune_or_calendar_cannot_be_removed,   #TODO How is this different to above "cannot be modified"?
-        message_confirm_removal_fortune_or_calendar,
+        message_fortune_or_calendar_add,
+        message_fortune_or_calendar_remove,
+        message_fortune_or_calendar_cannot_be_removed,
+        message_fortune_or_calendar_confirm_removal,
         file_filter = None ):
         '''
         Create a Preferences panel for 'fortune' and 'on this day' to display
@@ -2210,35 +2118,35 @@ class IndicatorBase( ABC ):
 
         store = Gtk.TreeModelSort.new_with_model( store )
         store.set_sort_column_id(
-            model_column_id_for_fortune_or_calendar_file,
+            column_id_fortune_or_calendar_file,
             Gtk.SortType.ASCENDING )
 
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 store,
                 (
-                    treeview_column_fortunes_or_calendars_title,
+                    column_title_fortunes_or_calendars,
                     _( "Enabled" ) ),
                 (
                     (
                         Gtk.CellRendererText(),
                         "text",
-                        model_column_id_for_fortune_or_calendar_file ),
+                        column_id_fortune_or_calendar_file ),
                     (
                         self.create_cell_renderer_toggle_for_checkbox_within_treeview(
                             store,
-                            model_column_id_for_fortune_or_calendar_enabled ),
+                            column_id_fortune_or_calendar_enabled ),
                         "active",
-                        model_column_id_for_fortune_or_calendar_enabled ) ),
+                        column_id_fortune_or_calendar_enabled ) ),
                 alignments_columnviewids = (
-                    ( 0.5, model_column_id_for_fortune_or_calendar_enabled ), ),
+                    ( 0.5, column_id_fortune_or_calendar_enabled ), ),
                 tooltip_text = treeview_tool_tip if len( store ) else "",
                 rowactivatedfunctionandarguments =
                     (
                         self._on_fortune_or_calendar_double_click,
                         dialog,
                         file_chooser_title,
-                        model_column_id_for_fortune_or_calendar_file,
+                        column_id_fortune_or_calendar_file,
                         system_fortunes_or_calendars,
                         message_fortune_or_calendar_exists,
                         message_fortune_or_calendar_cannot_be_modified,
@@ -2252,8 +2160,8 @@ class IndicatorBase( ABC ):
                     _( "Add" ),
                     _( "Remove" ) ),
                 (
-                    message_add_fortune_or_calendar,
-                    message_remove_fortune_or_calendar if len( store ) else "" ),
+                    message_fortune_or_calendar_add,
+                    message_fortune_or_calendar_remove if len( store ) else "" ),
                 (
                     None,
                     None ) ) )
@@ -2265,9 +2173,9 @@ class IndicatorBase( ABC ):
             dialog,
             file_chooser_title,
             remove,
-            model_column_id_for_fortune_or_calendar_file,
+            column_id_fortune_or_calendar_file,
             message_fortune_or_calendar_exists,
-            message_remove_fortune_or_calendar,
+            message_fortune_or_calendar_remove,
             treeview_tool_tip,
             file_filter )
 
@@ -2275,10 +2183,10 @@ class IndicatorBase( ABC ):
             "clicked",
             self._on_fortune_or_calendar_remove,
             treeview,
-            model_column_id_for_fortune_or_calendar_file,
+            column_id_fortune_or_calendar_file,
             system_fortunes_or_calendars,
-            message_system_fortune_or_calendar_cannot_be_removed,
-            message_confirm_removal_fortune_or_calendar )
+            message_fortune_or_calendar_cannot_be_removed,
+            message_fortune_or_calendar_confirm_removal )
 
         if len( store ):
             treepath = Gtk.TreePath.new_from_string( '0' )
@@ -2297,10 +2205,10 @@ class IndicatorBase( ABC ):
         self,
         button,
         treeview,
-        model_column_id_for_fortune_or_calendar,
+        column_id_fortune_or_calendar_file,
         system_fortunes_or_calendars,
-        message_system_fortune_or_calendar_cannot_be_removed,
-        message_remove_fortune_or_calendar ):
+        message_fortune_or_calendar_cannot_be_removed,
+        message_fortune_or_calendar_remove ):
         '''
         Functionality common to both 'fortune' and 'on this day' which prompts
         a user to remove the selected fortune/calendar, checking if the
@@ -2312,16 +2220,16 @@ class IndicatorBase( ABC ):
         model_sort, iter_sort = treeview.get_selection().get_selected()
         selected_fortune_or_calendar = (
             model_sort[
-                iter_sort ][ model_column_id_for_fortune_or_calendar ] )
+                iter_sort ][ column_id_fortune_or_calendar_file ] )
 
         if selected_fortune_or_calendar in system_fortunes_or_calendars:
             self.show_dialog_ok(
-                treeview, message_system_fortune_or_calendar_cannot_be_removed )
+                treeview, message_fortune_or_calendar_cannot_be_removed )
 
         else:
             response = (
                 self.show_dialog_ok_cancel(
-                    treeview, message_remove_fortune_or_calendar ) )
+                    treeview, message_fortune_or_calendar_remove ) )
 
             if response == Gtk.ResponseType.OK:
                 if len( model_sort ) == 1:
@@ -2353,9 +2261,9 @@ class IndicatorBase( ABC ):
         preferences_dialog,
         file_chooser_title,
         button_remove,
-        model_column_id_for_fortune_or_calendar,
+        column_id_fortune_or_calendar_file,
         message_fortune_or_calendar_exists,
-        message_remove_fortune_or_calendar,
+        message_fortune_or_calendar_remove,
         treeview_tool_tip,
         file_filter = None ):
         '''
@@ -2369,14 +2277,14 @@ class IndicatorBase( ABC ):
             None,
             preferences_dialog,
             file_chooser_title,
-            model_column_id_for_fortune_or_calendar,
+            column_id_fortune_or_calendar_file,
             message_fortune_or_calendar_exists,
             file_filter )
 
         if len( treeview.get_model() ):
             treeview.set_tooltip_text( treeview_tool_tip )
             button_remove.set_sensitive( True )
-            button_remove.set_tooltip_text( message_remove_fortune_or_calendar )
+            button_remove.set_tooltip_text( message_fortune_or_calendar_remove )
 
 
     def _on_fortune_or_calendar_double_click(
@@ -2386,7 +2294,7 @@ class IndicatorBase( ABC ):
         treeviewcolumn,
         preferences_dialog,
         file_chooser_title,
-        model_column_id_for_fortune_or_calendar,
+        column_id_fortune_or_calendar_file,
         system_fortunes_or_calendars,
         message_fortune_or_calendar_exists,
         message_fortune_or_calendar_cannot_be_modified,
@@ -2401,7 +2309,7 @@ class IndicatorBase( ABC ):
         model_sort, iter_sort = treeview.get_selection().get_selected()
         fortune_or_calendar = (
             model_sort[
-                iter_sort ][ model_column_id_for_fortune_or_calendar ] )
+                iter_sort ][ column_id_fortune_or_calendar_file ] )
 
         if fortune_or_calendar in system_fortunes_or_calendars:
             self.show_dialog_ok(
@@ -2414,7 +2322,7 @@ class IndicatorBase( ABC ):
                 path,
                 preferences_dialog,
                 file_chooser_title,
-                model_column_id_for_fortune_or_calendar,
+                column_id_fortune_or_calendar_file,
                 message_fortune_or_calendar_exists,
                 file_filter )
 
@@ -2425,7 +2333,7 @@ class IndicatorBase( ABC ):
         path,
         preferences_dialog,
         file_chooser_title,
-        model_column_id_for_fortune_or_calendar,
+        column_id_fortune_or_calendar_file,
         message_fortune_or_calendar_exists,
         file_filter = None ):
         '''
@@ -2442,7 +2350,7 @@ class IndicatorBase( ABC ):
                 file_chooser_title,
                 preferences_dialog,
                 str( Path.home() ) if adding else
-                model_sort[ path ][ model_column_id_for_fortune_or_calendar ],
+                model_sort[ path ][ column_id_fortune_or_calendar_file ],
                 file_filter = file_filter ) )
 
         response = dialog.run()
@@ -2452,7 +2360,7 @@ class IndicatorBase( ABC ):
         if response == Gtk.ResponseType.OK:
             fortune_or_calendar_exists = False
             for row in model_sort:
-                fortune_or_calendar = row[ model_column_id_for_fortune_or_calendar ]
+                fortune_or_calendar = row[ column_id_fortune_or_calendar_file ]
                 if fortune_or_calendar == filename:
                     self.show_dialog_ok(
                         preferences_dialog,
@@ -2519,9 +2427,7 @@ class IndicatorBase( ABC ):
         x_values,
         y_values,
         x ):
-        '''
-        Reference: https://stackoverflow.com/a/56233642/2156453
-        '''
+        ''' Reference: https://stackoverflow.com/a/56233642/2156453 '''
         if not x_values[ 0 ] <= x <= x_values[ -1 ]:
             raise ValueError( "x out of bounds!" )
 
