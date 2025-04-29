@@ -192,7 +192,7 @@ class IndicatorBase( ABC ):
 
     TIMEOUT_IN_SECONDS = 10
 
-    INDICATOR_NAME = sys.modules[ "__main__" ].__spec__.name.split( '.' )[ -1 ]
+    INDICATOR_NAME = Path( sys.argv[ 0 ] ).stem
 
     gettext.install(
         INDICATOR_NAME,
