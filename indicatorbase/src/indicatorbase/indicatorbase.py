@@ -198,9 +198,35 @@ class IndicatorBase( ABC ):
     print( type( sys.modules[ "__main__" ] ) )            
 
     x = sys.modules[ "__main__" ]            
-    print( sys.argv )
+    print()
+    print( dir( x ) )
 
-    INDICATOR_NAME = Path( sys.argv[ 0 ] ).stem
+    print( x.__file__ )
+    print( x.__loader__ )
+    print( x.__name__ )
+    print( x.__package__ )
+    print( x.__spec__ )
+    print( x.__package__.split( '.' )[ -1 ] )
+    print( dir( x.__spec__))
+    print( x.__spec__.name.split( '.' )[ -1 ] )  #TODO THIS IS WHAR I WANT 
+
+# <module 'indicatortest.src.indicatortest.indicatorbase' from '/home/bernard/Programming/Indicators/indicatortest/src/indicatortest/indicatorbase.py'>
+# <module 'indicatortest.src.indicatortest.indicatortest' from '/home/bernard/Programming/Indicators/indicatortest/src/indicatortest/indicatortest.py'>
+# <class 'module'>
+#
+# ['Gtk', 'Pango', 'Thread', '__annotations__', '__builtins__', '__cached__', '__doc__', '__file__', '__loader__', '__name__', '__package__', '__spec__', 'datetime', 'gi', 'os', 'platform', 'random']
+# /home/bernard/Programming/Indicators/indicatortest/src/indicatortest/indicatortest.py
+# <_frozen_importlib_external.SourceFileLoader object at 0x7fe6fe8e1c10>
+# __main__
+# indicatortest.src.indicatortest
+# ModuleSpec(name='indicatortest.src.indicatortest.indicatortest', loader=<_frozen_importlib_external.SourceFileLoader object at 0x7fe6fe8e1c10>, origin='/home/bernard/Programming/Indicators/indicatortest/src/indicatortest/indicatortest.py')
+# indicatortest
+# ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_cached', '_set_fileattr', 'cached', 'has_location', 'loader', 'loader_state', 'name', 'origin', 'parent', 'submodule_search_locations']
+
+
+#TODO New and hopefully correct/robust method...
+    # INDICATOR_NAME = Path( sys.argv[ 0 ] ).stem
+    INDICATOR_NAME = sys.modules[ "__main__" ].__spec__.name.split( '.' )[ -1 ]
 
     gettext.install(
         INDICATOR_NAME,
