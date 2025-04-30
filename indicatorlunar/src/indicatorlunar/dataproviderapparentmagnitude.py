@@ -43,7 +43,6 @@ class DataProviderApparentMagnitude( DataProvider ):
         Download apparent magnitude data for comets and minor planets and save
         to the given filename.
         '''
-
         if is_comet:
             # COBS does not provide apparent magnitude data.
             # Instead, when downloading orbital element data,
@@ -68,48 +67,48 @@ class DataProviderApparentMagnitude( DataProvider ):
         Download apparent magnitude data for minor planets from Lowell Minor
         Planet Services and saves to the given filename.
         '''
-        try:
-            variables = {
-                "date": datetime.date.today().isoformat(),
-                "apparentMagnitude": apparent_magnitude_maximum }
+        variables = {
+            "date": datetime.date.today().isoformat(),
+            "apparentMagnitude": apparent_magnitude_maximum }
 
-            query = '''
-                query AsteroidsToday( $date: date!, $apparentMagnitude: float8! )
+        query = '''
+            query AsteroidsToday( $date: date!, $apparentMagnitude: float8! )
+            {
+                minorplanet
+                (
+                    where:
+                    {
+                        ephemeris:
+                        {
+                            _and:
+                            {
+                                eph_date: { _eq: $date },
+                                v_mag: { _lte: $apparentMagnitude }
+                            }
+                        }
+                    }
+                )
                 {
-                    minorplanet
+                    ast_number
+                    designameByIdDesignationPrimary { str_designame }
+                    designameByIdDesignationName { str_designame }
+                    ephemeris
                     (
                         where:
                         {
-                            ephemeris:
-                            {
-                                _and:
-                                {
-                                    eph_date: { _eq: $date },
-                                    v_mag: { _lte: $apparentMagnitude }
-                                }
-                            }
+                            _and: { eph_date: { _eq: $date } }
                         }
                     )
                     {
-                        ast_number
-                        designameByIdDesignationPrimary { str_designame }
-                        designameByIdDesignationName { str_designame }
-                        ephemeris
-                        (
-                            where:
-                            {
-                                _and: { eph_date: { _eq: $date } }
-                            }
-                        )
-                        {
-                          v_mag
-                        }
+                      v_mag
                     }
                 }
-                '''
+            }
+            '''
 
-            url = "https://astorbdb.lowell.edu/v1/graphql"
-            json = { "query": query, "variables": variables }
+        url = "https://astorbdb.lowell.edu/v1/graphql"
+        json = { "query": query, "variables": variables }
+        try:
             response = requests.post( url, None, json, timeout = 5 )
             data = response.json()
             minor_planets = data[ "data" ][ "minorplanet" ]
@@ -147,7 +146,7 @@ class DataProviderApparentMagnitude( DataProvider ):
         except Exception as e:    #TODO W0718: Catching too general exception Exception (broad-exception-caught)
             downloaded = False
             logging.error(
-                "Error retrieving apparent magnitude data from " + str( url ) )
+                f"Error retrieving apparent magnitude data from { str( url ) }" )
 
             logging.exception( e )
 
