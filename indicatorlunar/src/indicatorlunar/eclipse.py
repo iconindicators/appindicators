@@ -56,8 +56,7 @@ _months = {
 # https://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
 # https://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
 _ECLIPSES_LUNAR = (
-''' 09706   2025 Mar 14  06:59:56     75    311  123   T   -p   0.3484  2.2595  1.1784  362.6  218.3   65.4    3N  102W
-    09707   2025 Sep 07  18:12:58     75    317  128   T   -p  -0.2752  2.3440  1.3619  326.7  209.4   82.1    6S   87E
+''' 09707   2025 Sep 07  18:12:58     75    317  128   T   -p  -0.2752  2.3440  1.3619  326.7  209.4   82.1    6S   87E
     09708   2026 Mar 03  11:34:52     75    323  133   T   a-  -0.3765  2.1838  1.1507  338.6  207.2   58.3    6N  171W
     09709   2026 Aug 28  04:14:04     75    329  138   P   t-   0.4964  1.9645  0.9299  337.8  198.1    -      9S   63W
     09710   2027 Feb 20  23:14:06     76    335  143   N   a-  -1.0480  0.9266 -0.0569  241.0    -      -     10N   15E
@@ -98,8 +97,7 @@ _ECLIPSES_LUNAR = (
 # https://eclipse.gsfc.nasa.gov/5MCSE/5MKSEcatalog.txt
 # https://eclipse.gsfc.nasa.gov/SEcat5/catkey.html
 _ECLIPSES_SOLAR = (
-'''  9563  479   2025 Mar 29  10:48:36     75    312  149   P   t-   1.0405  0.9376  61.1N  77.1W   0   83
-     9564  479   2025 Sep 21  19:43:04     75    318  154   P   t-  -1.0651  0.8550  60.9S 153.5E   0   89
+'''  9564  479   2025 Sep 21  19:43:04     75    318  154   P   t-  -1.0651  0.8550  60.9S 153.5E   0   89
      9565  479   2026 Feb 17  12:13:06     75    323  121   A   -t  -0.9743  0.9630  64.7S  86.8E  12  268  616  02m20s
      9566  479   2026 Aug 12  17:47:06     75    329  126   T   -p   0.8977  1.0386  65.2N  25.2W  26  248  294  02m18s
      9567  479   2027 Feb 06  16:00:48     76    335  131   A   -n  -0.2952  0.9281  31.3S  48.5W  73  334  282  07m51s
@@ -147,7 +145,9 @@ def get_eclipse_lunar(
         latitude (south is negative)
         longitude (east is negative)
     '''
-    return _get_eclipse( utc_now, _ECLIPSES_LUNAR, 1, 2, 3, 4, 5, 8, 16, 17 )
+    return _get_eclipse(
+        utc_now,
+        _ECLIPSES_LUNAR, 1, 2, 3, 4, 5, 8, 16, 17 )
 
 
 def get_eclipse_solar(
@@ -161,7 +161,9 @@ def get_eclipse_solar(
         latitude (south is negative)
         longitude (east is negative)
     '''
-    return _get_eclipse( utc_now, _ECLIPSES_SOLAR, 2, 3, 4, 5, 6, 9, 13, 14 )
+    return _get_eclipse(
+        utc_now,
+        _ECLIPSES_SOLAR, 2, 3, 4, 5, 6, 9, 13, 14 )
 
 
 def _get_eclipse(
@@ -191,8 +193,10 @@ def _get_eclipse(
             year + ", " + _months[ month ] + ", " + day + ", " + time_utc )
 
         date_time = (
-            datetime.datetime.strptime( date_string, "%Y, %m, %d, %H:%M:%S" ).replace( tzinfo = datetime.timezone.utc ) -
-            datetime.timedelta( seconds = int( delta_t ) ) )
+            datetime.datetime.strptime( date_string, "%Y, %m, %d, %H:%M:%S" ) )
+
+        date_time = date_time.replace( tzinfo = datetime.timezone.utc )
+        date_time = date_time - datetime.timedelta( seconds = int( delta_t ) )
 
         if utc_now <= date_time:
             eclipse_type = fields[ field_type ][ 0 ]
@@ -233,7 +237,7 @@ def get_eclipse_type_as_text(
     elif eclipse_type == EclipseType.PENUMBRAL:
         eclipse_type_text = _( "Penumbral" )
 
-    else: # EclipseType.TOTAL:
+    else:
         eclipse_type_text = _( "Total" )
 
     return eclipse_type_text
