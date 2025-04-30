@@ -82,9 +82,7 @@ class AstroBase( ABC ):
     DATA_TAG_SOLSTICE = "SOLSTICE"
     DATA_TAG_THIRD_QUARTER = "THIRD QUARTER"
 
-
-    # Corresponding tags reflecting each data tag made visible to the user
-    # in the Preferences.
+    # Corresponding data tags translations.
     DATA_TAGS_TRANSLATIONS = {
         DATA_TAG_ALTITUDE           : _( "ALTITUDE" ),
         DATA_TAG_AZIMUTH            : _( "AZIMUTH" ),
@@ -166,13 +164,11 @@ class AstroBase( ABC ):
         DATA_TAG_SET_DATE_TIME,
         DATA_TAG_SOLSTICE ]
 
-
     # Tags used to uniquely name particular objects/items.
     NAME_TAG_MOON = "MOON"
     NAME_TAG_SUN = "SUN"
 
-    # Corresponding tags reflecting each data tag made visible to the user
-    # in the Preferences.
+    # Corresponding tags translations.
     NAME_TAG_MOON_TRANSLATION = { NAME_TAG_MOON : _( "MOON" ) }
     NAME_TAG_SUN_TRANSLATION = { NAME_TAG_SUN : _( "SUN" ) }
 
@@ -203,8 +199,7 @@ class AstroBase( ABC ):
         PLANET_URANUS   : _( "Uranus" ),
         PLANET_NEPTUNE  : _( "Neptune" ) }
 
-    # Corresponding tags reflecting each data tag made visible to the user
-    # in the Preferences.
+    # Corresponding tags translations.
     PLANET_TAGS_TRANSLATIONS = {
         PLANET_MERCURY  : _( "MERCURY" ),
         PLANET_VENUS    : _( "VENUS" ),
@@ -213,7 +208,6 @@ class AstroBase( ABC ):
         PLANET_SATURN   : _( "SATURN" ),
         PLANET_URANUS   : _( "URANUS" ),
         PLANET_NEPTUNE  : _( "NEPTUNE" ) }
-
 
     # Lunar phases.
     LUNAR_PHASE_FULL_MOON = "FULL_MOON"
@@ -225,8 +219,7 @@ class AstroBase( ABC ):
     LUNAR_PHASE_FIRST_QUARTER = "FIRST_QUARTER"
     LUNAR_PHASE_WAXING_GIBBOUS = "WAXING_GIBBOUS"
 
-    # Corresponding tags reflecting each data tag made visible to the user
-    # in the Preferences.
+    # Corresponding tags translations.
     LUNAR_PHASE_NAMES_TRANSLATIONS = {
         LUNAR_PHASE_FULL_MOON       : _( "Full Moon" ),
         LUNAR_PHASE_WANING_GIBBOUS  : _( "Waning Gibbous" ),
@@ -236,7 +229,6 @@ class AstroBase( ABC ):
         LUNAR_PHASE_WAXING_CRESCENT : _( "Waxing Crescent" ),
         LUNAR_PHASE_FIRST_QUARTER   : _( "First Quarter" ),
         LUNAR_PHASE_WAXING_GIBBOUS  : _( "Waxing Gibbous" ) }
-
 
     _STARS_INDEX_NAME = 0
     _STARS_INDEX_HIP = 1
@@ -397,35 +389,29 @@ class AstroBase( ABC ):
     SATELLITE_TAG_SET_AZIMUTH_TRANSLATION = "[" + _( "SET AZIMUTH" ) + "]"
     SATELLITE_TAG_SET_TIME_TRANSLATION = "[" + _( "SET TIME" ) + "]"
 
-    SATELLITE_TAG_TRANSLATIONS = [ ] # List of [ tag, translated tag ] pairs.
-    SATELLITE_TAG_TRANSLATIONS.append(
+    # List of [ tag, translated tag ] pairs.
+    SATELLITE_TAG_TRANSLATIONS = [
         [
             SATELLITE_TAG_NAME.strip( "[]" ),
-            SATELLITE_TAG_NAME_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append(
+            SATELLITE_TAG_NAME_TRANSLATION.strip( "[]" ) ],
         [
             SATELLITE_TAG_NUMBER.strip( "[]" ),
-            SATELLITE_TAG_NUMBER_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append(
+            SATELLITE_TAG_NUMBER_TRANSLATION.strip( "[]" ) ],
         [
             SATELLITE_TAG_INTERNATIONAL_DESIGNATOR.strip( "[]" ),
-            SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append(
+            SATELLITE_TAG_INTERNATIONAL_DESIGNATOR_TRANSLATION.strip( "[]" ) ],
         [
             SATELLITE_TAG_RISE_AZIMUTH.strip( "[]" ),
-            SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append(
+            SATELLITE_TAG_RISE_AZIMUTH_TRANSLATION.strip( "[]" ) ],
         [
             SATELLITE_TAG_RISE_TIME.strip( "[]" ),
-            SATELLITE_TAG_RISE_TIME_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append(
+            SATELLITE_TAG_RISE_TIME_TRANSLATION.strip( "[]" ) ],
         [
             SATELLITE_TAG_SET_AZIMUTH.strip( "[]" ),
-            SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ] )
-    SATELLITE_TAG_TRANSLATIONS.append(
+            SATELLITE_TAG_SET_AZIMUTH_TRANSLATION.strip( "[]" ) ],
         [
             SATELLITE_TAG_SET_TIME.strip( "[]" ),
-            SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] )
+            SATELLITE_TAG_SET_TIME_TRANSLATION.strip( "[]" ) ] ]
 
     MAGNITUDE_MAXIMUM = 15.0 # More than adequate for the home astronomer.
 
@@ -500,8 +486,8 @@ class AstroBase( ABC ):
     def get_latitude_longitude_elevation(
         city ):
         '''
-        Returns a tuple of floats of the latitude, longitude and elevation for
-        the city.
+        Returns the latitude, longitude and elevation for the city
+        as a tuple of floats.
         '''
         return 0.0, 0.0, 0.0
 
@@ -685,6 +671,7 @@ class AstroBase( ABC ):
         Reference
             Practical Astronomy with Your Calculator by Peter Duffett-Smith.
         '''
+
         # Find the Julian date; section 4 of the reference.
         # Assume the date is always later than 15th October, 1582.
         y = utc_now.year
@@ -763,6 +750,7 @@ class AstroBase( ABC ):
             https://stackoverflow.com/a/13425515/2156453
             http://astro.ukho.gov.uk/data/tn/naotn74.pdf
         '''
+
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
         y = math.cos( sun_dec ) * math.sin( sun_ra - body_ra )
         x = (
