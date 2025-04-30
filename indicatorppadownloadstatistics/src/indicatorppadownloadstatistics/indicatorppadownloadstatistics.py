@@ -246,8 +246,6 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         '''
         for ppa in self.ppas:
             if ppa.get_status() == PPA.Status.NEEDS_DOWNLOAD:
-                ppa.set_status( PPA.Status.OK )
-                continue #TODO Remove this line and above line.
                 for filter_text in ppa.get_filters():
                     self._process_ppa_with_filter( ppa, filter_text )
                     if ppa.has_status_error():
