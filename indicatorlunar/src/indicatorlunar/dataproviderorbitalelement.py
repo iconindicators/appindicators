@@ -42,7 +42,6 @@ class DataProviderOrbitalElement( DataProvider ):
         orbital_element_data_type,
         apparent_magnitude_maximum ):
         ''' Download orbital element data and save to the given filename. '''
-
         is_comet = (
             orbital_element_data_type in {
                 OrbitalElement.DataType.SKYFIELD_COMET,
@@ -53,17 +52,17 @@ class DataProviderOrbitalElement( DataProvider ):
                 OrbitalElement.DataType.SKYFIELD_MINOR_PLANET,
                 OrbitalElement.DataType.XEPHEM_MINOR_PLANET } )
 
+        download_function = None
         if is_comet:
-            downloaded = (
-                DataProviderOrbitalElement._download_from_comet_observation_database(
-                    filename,
-                    logging,
-                    orbital_element_data_type,
-                    apparent_magnitude_maximum ) )
+            download_function = "_download_from_comet_observation_database"
 
         elif is_minor_planet:
+            download_function = "_download_from_lowell_minor_planet_services"
+
+        if download_function:
+            print( download_function )
             downloaded = (
-                DataProviderOrbitalElement._download_from_lowell_minor_planet_services(
+                getattr( DataProviderOrbitalElement, download_function )(
                     filename,
                     logging,
                     orbital_element_data_type,
@@ -85,58 +84,57 @@ class DataProviderOrbitalElement( DataProvider ):
         orbital_element_data_type,
         apparent_magnitude_maximum ):
         '''
-        Download orbital element data for minor planets from Lowell Minor
-        Planet Services and save to the given filename.
+        Download orbital element data for minor planets from
+        Lowell Minor Planet Services and save to the given filename.
         '''
+        variables = {
+            "date": datetime.date.today().isoformat(),
+            "apparentMagnitude": apparent_magnitude_maximum }
 
-        try:
-            variables = {
-                "date": datetime.date.today().isoformat(),
-                "apparentMagnitude": apparent_magnitude_maximum }
-
-            query = '''
-                query AsteroidsToday( $date: date!, $apparentMagnitude: float8! )
-                {
-                    query_closest_orbelements
-                    (
-                        args: { query_date: $date },
-                        where:
+        query = '''
+            query AsteroidsToday( $date: date!, $apparentMagnitude: float8! )
+            {
+                query_closest_orbelements
+                (
+                    args: { query_date: $date },
+                    where:
+                    {
+                        minorplanet:
                         {
-                            minorplanet:
+                            ephemeris:
                             {
-                                ephemeris:
+                                _and:
                                 {
-                                    _and:
-                                    {
-                                        eph_date: { _eq: $date },
-                                        v_mag: { _lte: $apparentMagnitude }
-                                    }
+                                    eph_date: { _eq: $date },
+                                    v_mag: { _lte: $apparentMagnitude }
                                 }
                             }
                         }
-                    )
-                    {
-                        minorplanet
-                        {
-                            ast_number
-                            designameByIdDesignationPrimary { str_designame }
-                            designameByIdDesignationName { str_designame }
-                            h # Absolute magnitude
-                            ephemeris( where: { eph_date: { _eq: $date } } ) { v_mag }
-                        }
-                        epoch # Epoch date
-                        m # Mean anomaly epoch
-                        peri # Argument of perhilion
-                        node # Longitude of ascending node
-                        i # Inclination to ecliptic
-                        e # Orbital eccentricity
-                        a # Semi-major axis
                     }
+                )
+                {
+                    minorplanet
+                    {
+                        ast_number
+                        designameByIdDesignationPrimary { str_designame }
+                        designameByIdDesignationName { str_designame }
+                        h # Absolute magnitude
+                        ephemeris( where: { eph_date: { _eq: $date } } ) { v_mag }
+                    }
+                    epoch # Epoch date
+                    m # Mean anomaly epoch
+                    peri # Argument of perhilion
+                    node # Longitude of ascending node
+                    i # Inclination to ecliptic
+                    e # Orbital eccentricity
+                    a # Semi-major axis
                 }
-                '''
+            }
+            '''
 
-            url = "https://astorbdb.lowell.edu/v1/graphql"
-            json = { "query": query, "variables": variables }
+        url = "https://astorbdb.lowell.edu/v1/graphql"
+        json = { "query": query, "variables": variables }
+        try:
             response = requests.post( url, None, json, timeout = 5 )
             data = response.json()
             minor_planets = data[ "data" ][ "query_closest_orbelements" ]
@@ -155,14 +153,12 @@ class DataProviderOrbitalElement( DataProvider ):
                     designation_name = (
                         minor_planet_[ "designameByIdDesignationName" ][ "str_designame" ] )
 
-                    designation = (
-                        str( asteroid_number ) + ' ' + designation_name )
+                    designation = str( asteroid_number ) + ' ' + designation_name
 
-                    absolute_magnitude = (
-                        str( minor_planet_[ 'h' ] ) )
+                    absolute_magnitude = str( minor_planet_[ 'h' ] )
 
                     # The slope parameter is hard coded; typically does not vary
-                    # that much and is not used to calculate apparent magnitude.
+                    # much and is not used to calculate apparent magnitude.
                     slope_parameter = "0.15"
 
                     mean_anomaly_epoch = str( minor_planet[ 'm' ] )
@@ -179,8 +175,8 @@ class DataProviderOrbitalElement( DataProvider ):
                     # requires date of epoch of perihelion, which does not
                     # appear to be present in the Lowell data.
                     # After checking both the Minor Planet Center's MPCORB.DAT
-                    # and Lowell's astorb.dat, there are no bodies for which the
-                    # eccentricity is >= 1.0
+                    # and Lowell's astorb.dat, there are no bodies for which
+                    # the eccentricity is >= 1.0
                     # Therefore this should not be a problem of concern;
                     # however, filter out such bodies just to be safe!
                     if float( orbital_eccentricity ) >= 1.0:
@@ -188,7 +184,12 @@ class DataProviderOrbitalElement( DataProvider ):
                         logging.error( f"\t { str( minor_planet ) }" )
                         continue
 
-                    if orbital_element_data_type == OrbitalElement.DataType.XEPHEM_MINOR_PLANET:
+                    xephem_minor_planet = (
+                        orbital_element_data_type
+                        ==
+                        OrbitalElement.DataType.XEPHEM_MINOR_PLANET )
+
+                    if xephem_minor_planet:
                         components = [
                             designation,
                             'e',
@@ -199,7 +200,15 @@ class DataProviderOrbitalElement( DataProvider ):
                             '0',
                             orbital_eccentricity,
                             mean_anomaly_epoch,
-                            minor_planet[ "epoch" ][ 5 : 7 ] + '/' + minor_planet[ "epoch" ][ 8 : 10 ] + '/' + minor_planet[ "epoch" ][ 0 : 4 ],
+                            minor_planet[ "epoch" ][ 5 : 7 ]
+                            +
+                            '/'
+                            +
+                            minor_planet[ "epoch" ][ 8 : 10 ]
+                            +
+                            '/'
+                            +
+                            minor_planet[ "epoch" ][ 0 : 4 ],
                             "2000.0",
                             absolute_magnitude,
                             slope_parameter ]
@@ -259,7 +268,9 @@ class DataProviderOrbitalElement( DataProvider ):
 
         except Exception as e:    #TODO W0718: Catching too general exception Exception (broad-exception-caught)
             downloaded = False
-            logging.error( "Error retrieving orbital element data from " + str( url ) )
+            logging.error(
+                f"Error retrieving orbital element data from { str( url ) }" )
+
             logging.exception( e )
 
         return downloaded
@@ -273,7 +284,6 @@ class DataProviderOrbitalElement( DataProvider ):
         '''
         https://www.minorplanetcenter.net/iau/info/PackedDates.html
         '''
-
         def get_packed_day_month( day_or_month ):
             if int( day_or_month ) < 10:
                 packed_day_month = str( int( day_or_month ) )
@@ -310,7 +320,6 @@ class DataProviderOrbitalElement( DataProvider ):
         Download orbital element data for comets from Comet Observation
         Database and save to the given filename.
         '''
-
         url = "https://cobs.si/api/elements.api"
         url += "?mag=obs"
         url += "&is-active=true"
@@ -399,9 +408,8 @@ class DataProviderOrbitalElement( DataProvider ):
         else:
             oe_data = { }
             logging.error(
-                "Unknown data type encountered when loading orbital elements " +
-                "from file: " +
-                f"'{ str( orbital_element_data_type ) }', '{ filename }'" )
+                f"Unknown data type '{ str( orbital_element_data_type ) }' " +
+                f"when loading orbital elements from '{ filename }'" )
 
         return oe_data
 
