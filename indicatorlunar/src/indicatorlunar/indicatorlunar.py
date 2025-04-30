@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Run and check all values against current/installed.
+
+
 ''' Application indicator for the home astronomer. '''
 
 

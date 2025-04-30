@@ -290,20 +290,33 @@ class AstroPyEphem( AstroBase ):
         # Needed for icon.
         data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( bright_limb )
 
-#TODO Too long
-        if not AstroPyEphem._calculate_common( data, ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ), observer, moon ):
-            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = (
-                ephem.next_first_quarter_moon(
-                    ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc ) )
+        calculated = (
+            AstroPyEphem._calculate_common(
+                data,
+                ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ),
+                observer,
+                moon ) )
 
+        if not calculated:
+            next_first_quarter = (
+                ephem.next_first_quarter_moon( ephem_now ).datetime() )
+
+            data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = (
+                next_first_quarter.replace( tzinfo = datetime.timezone.utc ) )
+
+            next_full = ephem.next_full_moon( ephem_now ).datetime()
             data[ key + ( AstroBase.DATA_TAG_FULL, ) ] = (
-                ephem.next_full_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc ) )
+                next_full.replace( tzinfo = datetime.timezone.utc ) )
+
+            next_last_quarter = (
+                ephem.next_last_quarter_moon( ephem_now ).datetime() )
 
             data[ key + ( AstroBase.DATA_TAG_THIRD_QUARTER, ) ] = (
-                ephem.next_last_quarter_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc ) )
+                next_last_quarter.replace( tzinfo = datetime.timezone.utc ) )
 
+            next_new = ephem.next_new_moon( ephem_now ).datetime()
             data[ key + ( AstroBase.DATA_TAG_NEW, ) ] = (
-                ephem.next_new_moon( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc ))
+                next_new.replace( tzinfo = datetime.timezone.utc ) )
 
             AstroPyEphem._calculate_eclipse( ephem_now, data, key, False )
 
@@ -316,15 +329,24 @@ class AstroPyEphem( AstroBase ):
 
         sun = ephem.Sun()
         sun.compute( observer )
-#TODO Too long
-        if not AstroPyEphem._calculate_common( data, ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ), observer, sun ):
+
+        calculated = (
+            AstroPyEphem._calculate_common(
+                data,
+                ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ),
+                observer,
+                sun ) )
+
+        if not calculated:
             key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
 
+            next_equinox = ephem.next_equinox( ephem_now ).datetime()
             data[ key + ( AstroBase.DATA_TAG_EQUINOX, ) ] = (
-                ephem.next_equinox( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc ) )
+                next_equinox.replace( tzinfo = datetime.timezone.utc ) )
 
+            next_solstice = ephem.next_solstice( ephem_now ).datetime()
             data[ key + ( AstroBase.DATA_TAG_SOLSTICE, ) ] = (
-                ephem.next_solstice( ephem_now ).datetime().replace( tzinfo = datetime.timezone.utc ) )
+                next_solstice.replace( tzinfo = datetime.timezone.utc ) )
 
             AstroPyEphem._calculate_eclipse( ephem_now, data, key, True )
 
@@ -337,12 +359,14 @@ class AstroPyEphem( AstroBase ):
         is_solar ):
 
         if is_solar:
-            date_time, eclipse_type, latitude, longitude = (
-                eclipse.get_eclipse_solar( ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ) ) )
+            eclipse_function = "get_eclipse_solar"
 
         else:
-            date_time, eclipse_type, latitude, longitude = (
-                eclipse.get_eclipse_lunar( ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ) ) )
+            eclipse_function = "get_eclipse_lunar"
+
+        date_time, eclipse_type, latitude, longitude = (
+            getattr( eclipse, eclipse_function )(
+                ephem_now.datetime().replace( tzinfo = datetime.timezone.utc ) ) )
 
         data[ key + ( AstroBase.DATA_TAG_ECLIPSE_DATE_TIME, ) ] = (
             date_time.replace( tzinfo = datetime.timezone.utc ) )
@@ -552,11 +576,17 @@ class AstroPyEphem( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_AZIMUTH, ) ] = repr( body.az )
             data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = repr( body.alt )
 
+            next_rise = (
+                observer.next_rising( body ).datetime() )
+
             data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = (
-                observer.next_rising( body ).datetime().replace( tzinfo = datetime.timezone.utc ) )
+                next_rise.replace( tzinfo = datetime.timezone.utc ) )
+
+            next_set = (
+                observer.next_setting( body ).datetime() )
 
             data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = (
-                observer.next_setting( body ).datetime().replace( tzinfo = datetime.timezone.utc ) )
+                next_set.replace( tzinfo = datetime.timezone.utc ) )
 
         except ephem.AlwaysUpError:
             pass
@@ -580,10 +610,16 @@ class AstroPyEphem( AstroBase ):
         end_hour_as_date_time_in_utc ):
 
         utc_now = ephem_now.datetime().replace( tzinfo = datetime.timezone.utc )
+
+        utc_now_plus_search_duration = (
+            utc_now
+            +
+            datetime.timedelta( hours = AstroBase.SATELLITE_SEARCH_DURATION_HOURS ) )
+
         windows = (
             AstroBase.get_start_end_windows(
                 utc_now,
-                utc_now + datetime.timedelta( hours = AstroBase.SATELLITE_SEARCH_DURATION_HOURS ),
+                utc_now_plus_search_duration,
                 start_hour_as_date_time_in_utc,
                 end_hour_as_date_time_in_utc ) )
 
@@ -634,13 +670,14 @@ class AstroPyEphem( AstroBase ):
             observer.date = current_date_time
             earth_satellite.compute( observer )
             try:
-                # Must set 'singlepass = False' as it is possible a pass is too
-                # quick/low and an exception is thrown.
+                # Must set 'singlepass = False' as it is possible a pass
+                # is too quick/low and an exception is thrown.
                 # https://github.com/brandon-rhodes/pyephem/issues/164
                 # https://github.com/brandon-rhodes/pyephem/pull/85/files
                 next_pass = (
                     observer.next_pass( earth_satellite, singlepass = False ) )
 
+#TODO Tidy up code below...
                 if AstroPyEphem._is_satellite_pass_valid( next_pass ):
                     pass_before_end_date_time = (
                         next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ] < end_date_time )

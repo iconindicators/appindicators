@@ -60,7 +60,6 @@ class DataProviderOrbitalElement( DataProvider ):
             download_function = "_download_from_lowell_minor_planet_services"
 
         if download_function:
-            print( download_function )
             downloaded = (
                 getattr( DataProviderOrbitalElement, download_function )(
                     filename,
