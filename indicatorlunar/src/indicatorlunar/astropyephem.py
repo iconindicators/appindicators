@@ -146,9 +146,9 @@ class AstroPyEphem( AstroBase ):
 
 
     # Internally used to reference PyEphem objects.
-    _PYEPHEM_CITY_LATITUDE = 0
-    _PYEPHEM_CITY_LONGITUDE = 1
-    _PYEPHEM_CITY_ELEVATION = 2
+    _CITY_LATITUDE = 0
+    _CITY_LONGITUDE = 1
+    _CITY_ELEVATION = 2
 
     _PYEPHEM_DATE_TUPLE_YEAR = 0
     _PYEPHEM_DATE_TUPLE_MONTH = 1
@@ -168,7 +168,9 @@ class AstroPyEphem( AstroBase ):
     @staticmethod
     def calculate(
         utc_now,
-        latitude, longitude, elevation,
+        latitude,
+        longitude,
+        elevation,
         planets,
         stars,
         satellites,
@@ -244,10 +246,11 @@ class AstroPyEphem( AstroBase ):
         city ):
 
         city_ = _city_data.get( city )
+
         return (
-            float( city_[ AstroPyEphem._PYEPHEM_CITY_LATITUDE ] ),
-            float( city_[ AstroPyEphem._PYEPHEM_CITY_LONGITUDE ] ),
-            city_[ AstroPyEphem._PYEPHEM_CITY_ELEVATION ] )
+            float( city_[ AstroPyEphem._CITY_LATITUDE ] ),
+            float( city_[ AstroPyEphem._CITY_LONGITUDE ] ),
+            city_[ AstroPyEphem._CITY_ELEVATION ] )
 
 
     @staticmethod
@@ -287,6 +290,7 @@ class AstroPyEphem( AstroBase ):
         # Needed for icon.
         data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( bright_limb )
 
+#TODO Too long
         if not AstroPyEphem._calculate_common( data, ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ), observer, moon ):
             data[ key + ( AstroBase.DATA_TAG_FIRST_QUARTER, ) ] = (
                 ephem.next_first_quarter_moon(
@@ -312,6 +316,7 @@ class AstroPyEphem( AstroBase ):
 
         sun = ephem.Sun()
         sun.compute( observer )
+#TODO Too long
         if not AstroPyEphem._calculate_common( data, ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ), observer, sun ):
             key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
 
@@ -391,7 +396,8 @@ class AstroPyEphem( AstroBase ):
     def _calculate_comets(
         observer,
         data,
-        comets, orbital_element_data,
+        comets,
+        orbital_element_data,
         apparent_magnitude_maximum,
         logging ):
 
