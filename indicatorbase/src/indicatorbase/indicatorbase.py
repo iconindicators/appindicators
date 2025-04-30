@@ -194,7 +194,6 @@ class IndicatorBase( ABC ):
             2) The first letter of the comments is capitalised and
                incorporated into the Project Description on the PyPI page.
         '''
-
         if IndicatorBase.INDICATOR_NAME is None:
             self.show_dialog_ok(
                 None,
