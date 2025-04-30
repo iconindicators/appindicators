@@ -139,7 +139,7 @@ class GeneralPerturbation():
         '''
         if self.tle_line_one is None:
             if float( self.get_number() ) > float( "339999" ):
-                # The satnum was set to '0' in the init, so safe to do an export.
+                # The satnum was set to '0' in the init, so safe to export.
                 self.tle_line_one, self.tle_line_two = (
                     exporter.export_tle( self.satellite_record ) )
 
