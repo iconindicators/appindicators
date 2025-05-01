@@ -736,7 +736,8 @@ class AstroBase( ABC ):
         References
             Astronomical Algorithms Second Edition by Jean Meeus (chapters 14 and 48).
             Practical Astronomy with Your Calculator by Peter Duffett-Smith.
-            http://www.geoastro.de/moonlibration/ (pictures of moon are wrong but the data is correct).
+            http://www.geoastro.de/moonlibration/
+              (pictures of moon are wrong but the data is correct)
             http://www.geoastro.de/SME/
             http://futureboy.us/fsp/moon.fsp
             http://www.timeanddate.com/moon/australia/sydney
@@ -753,14 +754,17 @@ class AstroBase( ABC ):
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 48.5
         y = math.cos( sun_dec ) * math.sin( sun_ra - body_ra )
-        x = (
-            math.sin( sun_dec ) * math.cos( body_dec )
-            -
-            math.cos( sun_dec ) * math.sin( body_dec ) * math.cos( sun_ra - body_ra ) )
-
+        x1 = math.sin( sun_dec ) * math.cos( body_dec )
+        x2 = (
+                math.cos( sun_dec )
+                *
+                math.sin( body_dec )
+                *
+                math.cos( sun_ra - body_ra ) )
+        x = x1 - x2
         position_angle_of_bright_limb = math.atan2( y, x )
 
-        # Multiply by 15 to convert from decimal time to decimal degrees;
+        # Convert from decimal time to decimal degrees;
         # section 22 of Practical Astronomy with Your Calculator.
         local_sidereal_time = (
             math.radians(
@@ -774,11 +778,9 @@ class AstroBase( ABC ):
 
         # Astronomical Algorithms by Jean Meeus, Second Edition, Equation 14.1
         y = math.sin( hour_angle )
-        x = (
-            math.tan( observer_lat ) * math.cos( body_dec )
-            -
-            math.sin( body_dec ) * math.cos( hour_angle ) )
-
+        x1 = math.tan( observer_lat ) * math.cos( body_dec )
+        x2 = math.sin( body_dec ) * math.cos( hour_angle )
+        x = x1 - x2
         parallactic_angle = math.atan2( y, x )
 
         return (
@@ -803,6 +805,8 @@ class AstroBase( ABC ):
         The start hour (as date/time in UTC) < end hour (as date/time UTC).
         '''
 
+        # Scenarios:
+        #
         #  SH           EH
         #               SH           EH
         #                            SH           EH

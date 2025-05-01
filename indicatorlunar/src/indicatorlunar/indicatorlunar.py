@@ -215,13 +215,14 @@ class IndicatorLunar( IndicatorBase ):
             comments = _( "Displays lunar, solar, planetary, minor planet,\ncomet, star and satellite information." ),
             creditz = IndicatorLunar.CREDIT )
 
-        # Dictionary to hold currently calculated (and previously calculated)
-        # astronomical data.
+        # Dictionary for currently calculated astronomical data.
         # Key: combination of three tags: body type, body name and data name.
         # Value: a string for all data types, EXCEPT for date/time which is a
         # Python datetime in UTC with timezone.
-        # Previous data is used for satellite transits.
         self.data = None
+
+        # Dictionary for previously calculated astronomical data, used for
+        # satellite transits.
         self.data_previous = None
 
         # Key: comet designation; Value: OE object.
@@ -543,10 +544,11 @@ class IndicatorLunar( IndicatorBase ):
         The 'process tags' function is passed the text along with optional
         arguments and must then return the processed text.
         '''
+
         # Handle [ ].
         # There may still be tags left in as a result of say a satellite
         # or comet dropping out.
-        # Remaining tags are mopped up at the end.
+        # Remaining tags are dealt with at the end.
         processed_text = self.indicator_text
         for key in self.data.keys():
             tag = (
@@ -660,8 +662,13 @@ class IndicatorLunar( IndicatorBase ):
                     date_times.append( self.data[ key ] )
 
         utc_now = datetime.datetime.now( datetime.timezone.utc )
-        utc_now_plus_one_minute = utc_now + datetime.timedelta( minutes = 1 ) # Ensure updates don't happen more frequently than every minute.
-        next_update_time = utc_now + datetime.timedelta( minutes = 20 ) # Do an update at most twenty minutes from now (keeps the moon icon and data fresh).
+
+        # Ensure updates don't happen more frequently than every minute.
+        utc_now_plus_one_minute = utc_now + datetime.timedelta( minutes = 1 )
+
+        # Do an update at most twenty minutes from now; keeps the moon icon
+        # and data fresh.
+        next_update_time = utc_now + datetime.timedelta( minutes = 20 )
         next_update_in_seconds = (
             int( math.ceil( ( next_update_time - utc_now ).total_seconds() ) ) )
 
@@ -784,7 +791,8 @@ class IndicatorLunar( IndicatorBase ):
         if show_notification:
             summary = self.werewolf_warning_summary
             if self.werewolf_warning_summary == "":
-                summary = " " # The notification summary text cannot be empty (at least on Unity).
+                # The summary text cannot be empty (at least on Unity).
+                summary = " "
 
             self.show_notification(
                 summary,
@@ -983,7 +991,11 @@ class IndicatorLunar( IndicatorBase ):
             key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_THIRD_QUARTER, )
             next_phases.append( [ self.data[ key_ ], _( "Third Quarter: " ), key_ ] )
 
-            for date_time, display_text, key in sorted( next_phases, key = lambda pair: pair[ 0 ] ): # Sort by date of each phase.
+            # Sort phases by date.
+            phases_sorted_by_date = (
+                sorted( next_phases, key = lambda pair: pair[ 0 ] ) )
+            
+            for date_time, display_text, key in phases_sorted_by_date:
                 formatted_data = (
                     self.format_data(
                         key[ IndicatorLunar.DATA_INDEX_DATA_NAME ],
@@ -995,7 +1007,8 @@ class IndicatorLunar( IndicatorBase ):
                     submenu,
                     label,
                     name = IndicatorLunar.SEARCH_URL_MOON,
-                    activate_functionandarguments = ( self.get_on_click_menuitem_open_browser_function(), ),
+                    activate_functionandarguments = (
+                        self.get_on_click_menuitem_open_browser_function(), ),
                 indent = ( 2, 1 ) )
 
             self._update_menu_eclipse(
@@ -1041,7 +1054,12 @@ class IndicatorLunar( IndicatorBase ):
                     self.data[
                         key + ( IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE, ) ] ) )
 
-            if self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_EQUINOX, ) ] < self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE, ) ]:
+            equinox_before_solsitce = (
+                self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_EQUINOX, ) ]
+                <
+                self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE, ) ] )
+
+            if equinox_before_solsitce:
                 self.create_and_append_menuitem(
                     submenu,
                     equinox_label,
@@ -1106,7 +1124,7 @@ class IndicatorLunar( IndicatorBase ):
             self.format_data(
                 IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME,
                 self.data[
-                    key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
+                    key +( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
             name = url,
             activate_functionandarguments = (
                 self.get_on_click_menuitem_open_browser_function(), ),
@@ -1124,7 +1142,9 @@ class IndicatorLunar( IndicatorBase ):
                 self.get_on_click_menuitem_open_browser_function(), ),
                 indent = ( 2, 1 ) )
 
-        if key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE, ) in self.data: # PyEphem uses the NASA Eclipse data which contains latitude/longitude; Skyfield does not.
+        if key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE, ) in self.data:
+            # PyEphem uses the NASA Eclipse data which contains latitude/longitude; Skyfield does not.
+#TODO Check this...skyfield does put in lat/long for solar eclipse.
             latitude = (
                 self.format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE,
@@ -1374,11 +1394,15 @@ class IndicatorLunar( IndicatorBase ):
         For the given body, creates the menu items relating to
         rise/set/azimuth/altitude.
         '''
-
         key = ( body_type, name_tag )
         appended = False
-        if key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # This body rises/sets.
-            if self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] < self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ]: # Body will rise.
+        if key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) in self.data:
+            body_will_rise = (
+                self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ]
+                <
+                self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] )
+
+            if body_will_rise:
                 if not self.hide_bodies_below_horizon:
                     self._update_menuitems_rise_azimuth_altitude_set(
                         menu,
@@ -1416,7 +1440,6 @@ class IndicatorLunar( IndicatorBase ):
                             key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] )
 
                     if target_body_type and body_set_date_time < sun_set < sun_rise:
-
                         if not self.hide_bodies_below_horizon:
                             self._update_menuitems_rise_azimuth_altitude_set(
                                 menu,
@@ -1450,7 +1473,8 @@ class IndicatorLunar( IndicatorBase ):
 
                     appended = True
 
-        elif key + ( IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH, ) in self.data: # Body is 'always up'.
+        elif key + ( IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH, ) in self.data:
+            # Body is 'always up'.
             self._update_menuitems_rise_azimuth_altitude_set(
                 menu,
                 key,
@@ -1567,8 +1591,13 @@ class IndicatorLunar( IndicatorBase ):
 
         for number in self.satellites:
             key = ( IndicatorLunar.astro_backend.BodyType.SATELLITE, number )
-            if key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) in self.data: # Satellite rises/sets.
-                if self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] < utc_now_plus_five_minutes: # Satellite will rise within the next five minutes.
+            if key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) in self.data:
+                satellite_will_rise_within_next_five_minutes = (
+                    self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ]
+                    <
+                    utc_now_plus_five_minutes )
+
+                if satellite_will_rise_within_next_five_minutes:
                     satellites.append( [
                         number,
                         self.satellite_general_perturbation_data[ number ].get_name(),
@@ -1577,7 +1606,10 @@ class IndicatorLunar( IndicatorBase ):
                         self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ],
                         self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_AZIMUTH, ) ] ] )
 
-                else: # Satellite will rise more than five minutes from now; look at previous transit.
+                else:
+                    # Satellite will rise more than five minutes from now;
+                    # look at previous transit.
+#TODO Too long
                     if key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) in self.data_previous:
                         in_transit = (
                             self.data_previous[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] < utc_now_plus_five_minutes and \
@@ -1604,7 +1636,8 @@ class IndicatorLunar( IndicatorBase ):
                             self.satellite_general_perturbation_data[ number ].get_name(),
                             self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] ] )
 
-            elif key + ( IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH, ) in self.data: # Satellite is polar (always up).
+            elif key + ( IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH, ) in self.data:
+                # Satellite is polar (always up).
                 satellites_polar.append( [
                     number,
                     self.satellite_general_perturbation_data[ number ].get_name(),
@@ -1632,12 +1665,13 @@ class IndicatorLunar( IndicatorBase ):
             self._update_menu_satellites( menu, _( "Satellites" ), satellites )
 
         if satellites_polar:
+            # Sort by name then number.
             satellites_polar = (
                 sorted(
                     satellites_polar,
                     key = lambda x: (
                         x[ IndicatorLunar.SATELLITE_MENU_NAME ],
-                        x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) ) # Sort by name then number.
+                        x[ IndicatorLunar.SATELLITE_MENU_NUMBER ] ) ) )
 
             self._update_menu_satellites(
                 menu, _( "Satellites (Polar)" ), satellites_polar )
@@ -1883,11 +1917,13 @@ class IndicatorLunar( IndicatorBase ):
         https://stackoverflow.com/a/64097432/2156453
         https://medium.com/@eleroy/10-things-you-need-to-know-about-date-and-time-in-python-with-datetime-pytz-dateutil-timedelta-309bfbafb3f7
         '''
+        now = datetime.datetime.now().astimezone()
+
         start_hour_as_datetime_in_utc = (
-            datetime.datetime.now().astimezone().replace( hour = start_hour ).astimezone( datetime.timezone.utc ) )
+            now.replace( hour = start_hour ).astimezone( datetime.timezone.utc ) )
 
         end_hour_as_datetime_in_utc = (
-            datetime.datetime.now().astimezone().replace( hour = end_hour ).astimezone( datetime.timezone.utc ) )
+            now.replace( hour = end_hour ).astimezone( datetime.timezone.utc ) )
 
         return start_hour_as_datetime_in_utc, end_hour_as_datetime_in_utc
 
@@ -1921,17 +1957,25 @@ class IndicatorLunar( IndicatorBase ):
                 IndicatorLunar.astro_backend.LUNAR_PHASE_NEW_MOON } )
 
         if is_full_or_new:
-            body = '<circle cx="' + str( width / 2 ) + '" cy="' + str( height / 2 ) + '" r="' + str( radius )
+            body = (
+                '<circle cx="' +
+                str( width / 2 ) +
+                '" cy="' + str( height / 2 ) +
+                '" r="' + str( radius ) )
+
             if phase == IndicatorLunar.astro_backend.LUNAR_PHASE_NEW_MOON:
                 body += '" fill="#' + colour + '" fill-opacity="0.0" />'
 
             else: # Full
                 body += '" fill="#' + colour + '" />'
 
-        else: # First/Third Quarter or Waning/Waxing Crescent or Waning/Waxing Gibbous
+        else:
+            # First/Third Quarter or
+            # Waning/Waxing Crescent or
+            # Waning/Waxing Gibbous
             body = (
-                '<path d="M ' + str( width / 2 - radius ) + ' ' + str( height / 2 ) + ' ' +
-                'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' +
+                '<path d="M ' + str( width / 2 - radius ) + ' ' + str( height / 2 )
+                + ' ' + 'A ' + str( radius ) + ' ' + str( radius ) + ' 0 0 1 ' +
                 str( width / 2 + radius ) + ' ' + str( height / 2 ) )
 
             is_first_quarter_or_third_quarter = (
@@ -1949,22 +1993,29 @@ class IndicatorLunar( IndicatorBase ):
 
             elif is_waning_crescent_or_waxing_crescent:
                 body += (
-                    ' A ' + str( radius ) + ' ' + str( radius * ( 50 - illumination_percentage ) / 50 ) + ' 0 0 0 ' +
-                    str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"' )
+                    ' A ' + str( radius ) + ' ' +
+                    str( radius * ( 50 - illumination_percentage ) / 50 ) +
+                    ' 0 0 0 ' + str( width / 2 - radius ) + ' ' + str( height / 2 )
+                    + '"' )
 
             else: # Waning/Waxing Gibbous
                 body += (
-                    ' A ' + str( radius ) + ' ' + str( radius * ( illumination_percentage - 50 ) / 50 ) + ' 0 0 1 ' +
-                    str( width / 2 - radius ) + ' ' + str( height / 2 ) + '"' )
+                    ' A ' + str( radius ) + ' ' +
+                    str( radius * ( illumination_percentage - 50 ) / 50 ) +
+                    ' 0 0 1 ' + str( width / 2 - radius ) + ' ' + str( height / 2 )
+                    + '"' )
 
             body += (
                 ' transform="rotate(' + str( -bright_limb_angle_in_degrees ) + ' ' +
                 str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />' )
 
+#TODO Check this comes out correctly.
         return (
             '<?xml version="1.0" standalone="no"?>'
-            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
-            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>' )
+            '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ' +
+            '"https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
+            '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" ' +
+            'viewBox="0 0 100 100" width="22" height="22">' + body + '</svg>' )
 
 
     def on_preferences(
@@ -2453,7 +2504,7 @@ class IndicatorLunar( IndicatorBase ):
             "Available tags:\n\t" +
             tooltip_common )
 
-        show_satellite_notification_checkbox, satellite_notification_summary_text, satellite_notification_messaget_ext = (
+        show_satellite_notification_checkbox, satellite_notification_summary_text, satellite_notification_message_text = (
             self.create_notification_panel(
                 grid,
                 0,
@@ -2647,7 +2698,12 @@ class IndicatorLunar( IndicatorBase ):
                 elevation.grab_focus()
                 continue
 
-            if spinner_satellite_limit_start.get_value_as_int() >= spinner_satellite_limit_end.get_value_as_int():
+            satellite_limit_start_greater_than_or_equal_to_end = (
+                spinner_satellite_limit_start.get_value_as_int()
+                >=
+                spinner_satellite_limit_end.get_value_as_int() )
+
+            if satellite_limit_start_greater_than_or_equal_to_end:
                 notebook.set_current_page( page_menu )
                 self.show_dialog_ok(
                     dialog,
@@ -2681,6 +2737,7 @@ class IndicatorLunar( IndicatorBase ):
             # the previous set of transits may no longer match the new window.
             # One solution is to filter out those transits which do not match.
             # A simpler solution is to erase the previous transits.
+#TODO Too long
             if self.satellite_limit_start != spinner_satellite_limit_start.get_value_as_int() or \
                self.satellite_limit_end != spinner_satellite_limit_end.get_value_as_int():
                 self.data_previous = None
@@ -2743,7 +2800,7 @@ class IndicatorLunar( IndicatorBase ):
                     satellite_tag_translations,
                     False,
                     self.get_textview_text(
-                        satellite_notification_messaget_ext ) ) )
+                        satellite_notification_message_text ) ) )
 
             self.show_werewolf_warning = (
                 show_werewolf_warning_checkbox.get_active() )
@@ -2787,6 +2844,7 @@ class IndicatorLunar( IndicatorBase ):
             body_type = item[ IndicatorLunar.DATA_INDEX_BODY_TYPE ]
             body_tag = item[ IndicatorLunar.DATA_INDEX_BODY_NAME ]
             data_tags = item[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
+#TODO Too long
             if ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
                 for data_tag in data_tags:
                     translated_tag = (
@@ -2816,6 +2874,7 @@ class IndicatorLunar( IndicatorBase ):
             body_tags = item[ IndicatorLunar.DATA_INDEX_BODY_NAME ]
             data_tags = item[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
             for body_tag in body_tags:
+#TODO Too long
                 if ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
                     for data_tag in data_tags:
                         translated_tag = (
@@ -2846,6 +2905,7 @@ class IndicatorLunar( IndicatorBase ):
             body_tags = item[ IndicatorLunar.DATA_INDEX_BODY_NAME ]
             data_tags = item[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
             for body_tag in body_tags:
+#TODO Too long
                 if ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
                     for data_tag in data_tags:
                         translated_tag = (
@@ -2864,6 +2924,7 @@ class IndicatorLunar( IndicatorBase ):
         body_type = IndicatorLunar.astro_backend.BodyType.SATELLITE
         for body_tag in self.satellite_general_perturbation_data:
             # Add this body's attributes ONLY if data is present.
+#TODO Too long
             rise_is_present = (
                 ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_RISE_AZIMUTH ) in self.data or
                 ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH ) in self.data )
@@ -3148,6 +3209,7 @@ class IndicatorLunar( IndicatorBase ):
                     utc_now + datetime.timedelta( minutes = 10 ),
                     IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
 
+#TODO Too long
             summary = replace_tags( summary, now_plus_one_minute, now_plus_ten_minutes ) + " " # The notification summary text must not be empty (at least on Unity).
             message = replace_tags( message, now_plus_one_minute, now_plus_ten_minutes )
             icon = self.icon_satellite

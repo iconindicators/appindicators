@@ -290,14 +290,14 @@ class AstroPyEphem( AstroBase ):
         # Needed for icon.
         data[ key + ( AstroBase.DATA_TAG_BRIGHT_LIMB, ) ] = str( bright_limb )
 
-        calculated = (
+        never_up = (
             AstroPyEphem._calculate_common(
                 data,
                 ( AstroBase.BodyType.MOON, AstroBase.NAME_TAG_MOON ),
                 observer,
                 moon ) )
 
-        if not calculated:
+        if not never_up:
             next_first_quarter = (
                 ephem.next_first_quarter_moon( ephem_now ).datetime() )
 
@@ -330,14 +330,14 @@ class AstroPyEphem( AstroBase ):
         sun = ephem.Sun()
         sun.compute( observer )
 
-        calculated = (
+        never_up = (
             AstroPyEphem._calculate_common(
                 data,
                 ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN ),
                 observer,
                 sun ) )
 
-        if not calculated:
+        if not never_up:
             key = ( AstroBase.BodyType.SUN, AstroBase.NAME_TAG_SUN )
 
             next_equinox = ephem.next_equinox( ephem_now ).datetime()
@@ -677,11 +677,12 @@ class AstroPyEphem( AstroBase ):
                 next_pass = (
                     observer.next_pass( earth_satellite, singlepass = False ) )
 
-#TODO Tidy up code below...
                 if AstroPyEphem._is_satellite_pass_valid( next_pass ):
                     pass_before_end_date_time = (
-                        next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ] < end_date_time )
-
+                        next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ]
+                        <
+                        end_date_time )
+                    
                     pass_is_visible = (
                         AstroPyEphem._is_satellite_pass_visible(
                             observer_visible_passes,
@@ -689,17 +690,21 @@ class AstroPyEphem( AstroBase ):
                             next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_CULMINATION_DATE ] ) )
 
                     if pass_before_end_date_time and pass_is_visible:
+                        next_rise = next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_DATE ]
+                        next_rise = next_rise.datetime().replace( tzinfo = datetime.timezone.utc )
                         data[ key + ( AstroBase.DATA_TAG_RISE_DATE_TIME, ) ] = (
-                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc ) )
+                            next_rise )
 
                         data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = (
                             repr( next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_RISING_ANGLE ] ) )
 
+                        next_set = next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ]
+                        next_set = next_set.datetime().replace( tzinfo = datetime.timezone.utc )
                         data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = (
-                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ].datetime().replace( tzinfo = datetime.timezone.utc ) )
+                            next_set )
 
                         data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = (
-                            repr( next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_ANGLE ] ))
+                            repr( next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_ANGLE ] ) )
 
                         found_pass = True
                         break
@@ -707,7 +712,9 @@ class AstroPyEphem( AstroBase ):
                     # Look for the next pass starting shortly after current set.
                     current_date_time = (
                         ephem.Date(
-                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ] + ephem.minute * 15 ) )
+                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ]
+                            +
+                            ephem.minute * 15 ) )
 
                 else:
                     # Bad pass data, so look shortly after the current time.
