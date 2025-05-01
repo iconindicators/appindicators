@@ -1142,9 +1142,12 @@ class IndicatorLunar( IndicatorBase ):
                 self.get_on_click_menuitem_open_browser_function(), ),
                 indent = ( 2, 1 ) )
 
+        # PyEphem uses the NASA Eclipse data which contains latitude/longitude.
+        #
+        # For lunar eclipses, Skyfield implements its own function,
+        # which does not provide latitude/longitude.
+        # For solar eclipses, Skyfield uses the same NASA Eclipse data.
         if key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE, ) in self.data:
-            # PyEphem uses the NASA Eclipse data which contains latitude/longitude; Skyfield does not.
-#TODO Check this...skyfield does put in lat/long for solar eclipse.
             latitude = (
                 self.format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE,
