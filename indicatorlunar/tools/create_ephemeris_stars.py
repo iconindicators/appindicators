@@ -68,16 +68,15 @@ def print_formatted_stars(
     stars_and_hips_,
     star_information_url ):
 
-    print( "Printing formatted stars from", star_information_url )
+    print( f"Printing formatted stars for AstroBase from { star_information_url }" )
     for name, hip in stars_and_hips_:
+        spacing_name = ' ' * ( IAUCSN_NAME_END - IAUCSN_NAME_START - len( name ) - 1 )
+        spacing_hip = ' ' * ( IAUCSN_HIP_END - IAUCSN_HIP_START - len( str( hip ) ) + 1 )
         print(
             "        [ " +
-            f"\"{ name.upper() }\"," +
-            ( ' ' * ( IAUCSN_NAME_END - IAUCSN_NAME_START - len( name ) + 1 ) ) +
-            f"{ str( hip ) }, " +
-            ( ' ' * ( IAUCSN_HIP_END - IAUCSN_HIP_START - len( str( hip ) ) + 1 ) ) +
-            f"_( \"{ name.title() }\" )," +
-            ( ' ' * ( IAUCSN_NAME_END - IAUCSN_NAME_START - len( name ) + 1 ) ) +
+            f"\"{ name.upper() }\",{ spacing_name }" +
+            f"{ str( hip ) }, { spacing_hip }" +
+            f"_( \"{ name.title() }\" ),{ spacing_name }" +
             f"_( \"{ name.upper() }\" ) ]," )
 
     print( "Done" )
@@ -88,7 +87,7 @@ def create_ephemeris_skyfield(
     star_ephemeris,
     stars_and_hips_ ):
 
-    print( "Creating", out_file, "for Skyfield..." )
+    print( f"Creating { out_file } for Skyfield..." )
     hipparcos_identifiers = (
         [ star_and_hip[ 1 ] for star_and_hip in stars_and_hips_ ] )
 
@@ -148,8 +147,8 @@ def print_ephemeris_pyephem(
         ]
 
         line = ','.join( str( item ) for item in components )
-        padding = ' ' * ( IAUCSN_NAME_END - IAUCSN_NAME_START - len( name ) + 1 )
-        print( "        \"" + name.upper() + "\"" + padding + ": \"" + line + "\"," )
+        print( f"        \"{ name.upper() }\" :" )
+        print( f"            \"{ line }\"," )
 
     print( "Done" )
 
