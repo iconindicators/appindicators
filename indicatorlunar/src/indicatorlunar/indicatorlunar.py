@@ -625,8 +625,13 @@ class IndicatorLunar( IndicatorBase ):
         date_times = [ ]
         for key in self.data:
             data_name = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
-#TODO Too long
-            if key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] == IndicatorLunar.astro_backend.BodyType.SATELLITE:
+
+            is_satellite = (
+                key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ]
+                ==
+                IndicatorLunar.astro_backend.BodyType.SATELLITE )
+
+            if is_satellite:
                 if data_name == IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME:
                     date_time = self.data[ key ]
 
@@ -1607,8 +1612,12 @@ class IndicatorLunar( IndicatorBase ):
                 else:
                     # Satellite will rise more than five minutes from now;
                     # look at previous transit.
-#TODO Too long
-                    if key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) in self.data_previous:
+                    rise_date_time_in_previous_data = (
+                        key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, )
+                        in
+                        self.data_previous )
+
+                    if rise_date_time_in_previous_data:
                         in_transit = (
                             self.data_previous[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] < utc_now_plus_five_minutes and \
                             self.data_previous[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] > utc_now )
@@ -2734,9 +2743,17 @@ class IndicatorLunar( IndicatorBase ):
             # the previous set of transits may no longer match the new window.
             # One solution is to filter out those transits which do not match.
             # A simpler solution is to erase the previous transits.
-#TODO Too long
-            if self.satellite_limit_start != spinner_satellite_limit_start.get_value_as_int() or \
-               self.satellite_limit_end != spinner_satellite_limit_end.get_value_as_int():
+            satellite_start_limit_changed = (
+                self.satellite_limit_start
+                !=
+                spinner_satellite_limit_start.get_value_as_int() )
+
+            satellite_end_limit_changed = (
+                self.satellite_limit_end
+                !=
+                spinner_satellite_limit_end.get_value_as_int() )
+
+            if satellite_start_limit_changed or satellite_end_limit_changed:
                 self.data_previous = None
 
             self.satellite_limit_start = (
@@ -2841,8 +2858,14 @@ class IndicatorLunar( IndicatorBase ):
             body_type = item[ IndicatorLunar.DATA_INDEX_BODY_TYPE ]
             body_tag = item[ IndicatorLunar.DATA_INDEX_BODY_NAME ]
             data_tags = item[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
-#TODO Too long
-            if ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
+
+            azimuth_in_data = (
+                ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH )
+                in
+                self.data )
+            
+            if azimuth_in_data:
+                # Only add this body's attributes if there is data present.
                 for data_tag in data_tags:
                     translated_tag = (
                         IndicatorLunar.BODY_TAGS_TRANSLATIONS[ body_tag ] +
@@ -2871,8 +2894,13 @@ class IndicatorLunar( IndicatorBase ):
             body_tags = item[ IndicatorLunar.DATA_INDEX_BODY_NAME ]
             data_tags = item[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
             for body_tag in body_tags:
-#TODO Too long
-                if ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
+                azimuth_in_data = (
+                    ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH )
+                    in
+                    self.data )
+                if azimuth_in_data:
+                    # Only add this body's attributes if there is data present.
+
                     for data_tag in data_tags:
                         translated_tag = (
                             IndicatorLunar.BODY_TAGS_TRANSLATIONS[ body_tag ] +
@@ -2902,8 +2930,13 @@ class IndicatorLunar( IndicatorBase ):
             body_tags = item[ IndicatorLunar.DATA_INDEX_BODY_NAME ]
             data_tags = item[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
             for body_tag in body_tags:
-#TODO Too long
-                if ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH ) in self.data: # Only add this body's attributes if there is data present.
+                azimuth_in_data = (
+                    ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH )
+                    in
+                    self.data )
+
+                if azimuth_in_data:
+                    # Only add this body's attributes if there is data present.
                     for data_tag in data_tags:
                         translated_tag = (
                             body_tag +
@@ -2920,13 +2953,18 @@ class IndicatorLunar( IndicatorBase ):
 
         body_type = IndicatorLunar.astro_backend.BodyType.SATELLITE
         for body_tag in self.satellite_general_perturbation_data:
-            # Add this body's attributes ONLY if data is present.
-#TODO Too long
-            rise_is_present = (
-                ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_RISE_AZIMUTH ) in self.data or
-                ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH ) in self.data )
-
-            if rise_is_present:
+            azimuth_in_data = (
+                ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH )
+                in
+                self.data )
+            
+            rise_azimuth_in_data = (
+                ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH )
+                in
+                self.data )
+            
+            if azimuth_in_data or rise_azimuth_in_data:
+                # Add this body's attributes ONLY if data is present.
                 for data_tag in IndicatorLunar.astro_backend.DATA_TAGS_SATELLITE:
                     value = ""
                     name = (
