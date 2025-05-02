@@ -609,6 +609,7 @@ class IndicatorLunar( IndicatorBase ):
 
         # Remove the last separator if present.
         if last_separator_index > -1:
+#TODO Why is this repeated???
             processed_text = (
                 processed_text[ 0 : last_separator_index ]
                 +
@@ -631,6 +632,7 @@ class IndicatorLunar( IndicatorBase ):
         date_times = [ ]
         for key in self.data:
             data_name = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
+#TODO Too long
             if key[ IndicatorLunar.DATA_INDEX_BODY_TYPE ] == IndicatorLunar.astro_backend.BodyType.SATELLITE:
                 if data_name == IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME:
                     date_time = self.data[ key ]
