@@ -609,13 +609,6 @@ class IndicatorLunar( IndicatorBase ):
 
         # Remove the last separator if present.
         if last_separator_index > -1:
-#TODO Why is this repeated???
-            processed_text = (
-                processed_text[ 0 : last_separator_index ]
-                +
-                processed_text[
-                    last_separator_index + len( self.indicator_text_separator ) : ] )
-
             processed_text = (
                 processed_text[ 0 : last_separator_index ]
                 +
@@ -2014,9 +2007,8 @@ class IndicatorLunar( IndicatorBase ):
                 ' transform="rotate(' + str( -bright_limb_angle_in_degrees ) + ' ' +
                 str( width / 2 ) + ' ' + str( height / 2 ) + ')" fill="#' + colour + '" />' )
 
-#TODO Check this comes out correctly.
         return (
-            '<?xml version="1.0" standalone="no"?>'
+            '<?xml version="1.0" standalone="no"?>' +
             '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ' +
             '"https://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">'
             '<svg xmlns="http://www.w3.org/2000/svg" version="1.1" ' +
@@ -3214,9 +3206,19 @@ class IndicatorLunar( IndicatorBase ):
                     utc_now + datetime.timedelta( minutes = 10 ),
                     IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
 
-#TODO Too long
-            summary = replace_tags( summary, now_plus_one_minute, now_plus_ten_minutes ) + " " # The notification summary text must not be empty (at least on Unity).
-            message = replace_tags( message, now_plus_one_minute, now_plus_ten_minutes )
+            # The notification summary must not be empty (at least on Unity).
+            summary = (
+                replace_tags(
+                    summary,
+                    now_plus_one_minute,
+                    now_plus_ten_minutes ) + " " )
+
+            message = (
+                replace_tags(
+                    message,
+                    now_plus_one_minute,
+                    now_plus_ten_minutes ) )
+
             icon = self.icon_satellite
 
         self.show_notification( summary, message, icon = icon )
