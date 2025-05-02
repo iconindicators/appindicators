@@ -106,6 +106,8 @@ class IndicatorTide( IndicatorBase ):
                 message = _(
                     "You must implement the function 'get_tide_data()'." )
 
+#TODO Maybe drop this catch and instead try to
+# trigger other exceptions with the user class and catch those.
             except Exception as e:  #TODO  W0718: Catching too general exception Exception (broad-exception-caught)
                 self.get_logging().exception( e )
                 label = _( "Error running user script!" )
