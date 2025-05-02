@@ -165,22 +165,22 @@ def _get_introduction(
 
     introduction = (
         f"`{ indicator_name }` { comments } on "
-        f"`Debian`, `Ubuntu`, `Fedora`" )
+        "`Debian`, `Ubuntu`, `Fedora`" )
 
     # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
     # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
     # Want to still have indicatortest for openSUSE/Manjaro!
     if not _is_indicator( indicator_name, IndicatorName.INDICATORONTHISDAY ):
-        introduction += f", `openSUSE`, `Manjaro`"
+        introduction += ", `openSUSE`, `Manjaro`"
 
 #TODO Somewhere/somehow, mention ONLY for indicatoronthisday
 # that indicatoronthisday is unavailable on Manjaro/openSUSE
 # because the calendar package is unavailable.
 
-    introduction += f" and theoretically, any platform which supports the "
-    introduction += f"`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n"
+    introduction += " and theoretically, any platform which supports the "
+    introduction += "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n"
 
-    introduction += f"Other indicators in this series are:\n"
+    introduction += "Other indicators in this series are:\n"
     for indicator in _get_indicator_names_sans_current( indicator_name ):
         introduction += f"- [{ indicator }](https://pypi.org/project/{ indicator })\n"
 
@@ -195,22 +195,22 @@ def _get_installation_additional_python_modules(
     message = ''
 
     common = (
-        f"For example, to install the `requests` module:\n"
-        f"    ```\n"
+        "For example, to install the `requests` module:\n"
+        "    ```\n"
         f"    . { utils.VENV_INSTALL }/bin/activate && \\\n"
-        f"    python3 -m pip install --upgrade requests && \\\n"
-        f"    deactivate\n"
-        f"    ```\n" )
+        "    python3 -m pip install --upgrade requests && \\\n"
+        "    deactivate\n"
+        "    ```\n" )
 
     if indicator_name.upper() == IndicatorName.INDICATORSCRIPTRUNNER.name:
         message += (
             f"If you have added any `Python` scripts to `{ indicator_name }`, "
-            f"you may need to install additional `Python` modules. "
+            "you may need to install additional `Python` modules. "
             f"{ common }" )
 
     if indicator_name.upper() == IndicatorName.INDICATORTIDE.name:
         message += (
-            f"Your `Python` script which retrieves your tidal data may need additional `Python` modules. "
+            "Your `Python` script which retrieves your tidal data may need additional `Python` modules. "
             f"{ common }" )
 
     return message
@@ -220,17 +220,17 @@ def _get_installation_python_virtual_environment(
     indicator_name ):
 
     message = (
-        f"Install the indicator to a `Python` virtual environment:\n"
-        f"    ```\n"
+        "Install the indicator to a `Python` virtual environment:\n"
+        "    ```\n"
         f"    indicator={ indicator_name } && \\\n"
         f"    venv={ utils.VENV_INSTALL } && \\\n"
-        f"    if [ ! -d ${{venv}} ]; then python3 -m venv ${{venv}}; fi && \\\n"
-        f"    . ${{venv}}/bin/activate && \\\n"
-        f"    python3 -m pip install --upgrade ${{indicator}} && \\\n"
-        f"    deactivate && \\\n"
-        f"    . $(ls -d ${{venv}}/lib/python3.* | head -1)/"
-        f"site-packages/${{indicator}}/platform/linux/install.sh\n"
-        f"    ```\n" )
+        "    if [ ! -d ${{venv}} ]; then python3 -m venv ${{venv}}; fi && \\\n"
+        "    . ${{venv}}/bin/activate && \\\n"
+        "    python3 -m pip install --upgrade ${{indicator}} && \\\n"
+        "    deactivate && \\\n"
+        "    . $(ls -d ${{venv}}/lib/python3.* | head -1)/"
+        "site-packages/${{indicator}}/platform/linux/install.sh\n"
+        "    ```\n" )
 
     return message
 
@@ -246,11 +246,11 @@ def _get_extension(
 
     if operating_system.issubset( applicable_operating_systems ):
         extension = (
-            f"For the `appindicator` extension to take effect, log out / in "
-            f"(or restart) and in a terminal run:\n"
-            f"    ```\n"
-            f"    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
-            f"    ```\n" )
+            "For the `appindicator` extension to take effect, log out / in "
+            "(or restart) and in a terminal run:\n"
+            "    ```\n"
+            "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
+            "    ```\n" )
 
     applicable_operating_systems = {
         OperatingSystem.FEDORA_38,
@@ -261,8 +261,8 @@ def _get_extension(
 
     if operating_system.issubset( applicable_operating_systems ):
         extension = (
-            f"Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
-            f"[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
+            "Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
+            "[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
 
     return extension
 
@@ -298,13 +298,13 @@ def _get_installation_for_operating_system(
         #   https://stackoverflow.com/a/61164149/2156453
         #   https://pygobject.gnome.org/getting_started.html
         installation = (
-            f"<details>"
+            "<details>"
             f"<summary><b>{ _get_summary( operating_system ) }</b></summary>\n\n"
 
-            f"1. Install operating system packages:\n\n"
-            f"    ```\n"
+            "1. Install operating system packages:\n\n"
+            "    ```\n"
             f"    { install_command } { operating_system_packages }\n"
-            f"    ```\n"
+            "    ```\n"
             f"    { _get_extension( operating_system ) }\n\n" )
 
         installation += f"2. { _get_installation_python_virtual_environment( indicator_name ) }"
@@ -313,7 +313,7 @@ def _get_installation_for_operating_system(
         if additional_python_modules:
             installation += f"3. { additional_python_modules }"
 
-        installation += f"</details>\n\n"
+        installation += "</details>\n\n"
 
     return installation
 
@@ -341,30 +341,30 @@ def _get_uninstall_for_operating_system(
 
     else:
         uninstall = (
-            f"<details>"
+            "<details>"
             f"<summary><b>{ _get_summary( operating_system ) }</b></summary>\n\n"
 
-            f"1. Uninstall operating system packages:\n\n"
-            f"    ```\n"
+            "1. Uninstall operating system packages:\n\n"
+            "    ```\n"
             f"    { uninstall_command } "
             f"{ _get_operating_system_dependencies_function_name( operating_system, IndicatorName[ indicator_name.upper() ] ) }\n"
-            f"    ```\n\n"
+            "    ```\n\n"
 
-            f"2. Uninstall the indicator from virtual environment:\n"
-            f"    ```\n"
+            "2. Uninstall the indicator from virtual environment:\n"
+            "    ```\n"
             f"    indicator={ indicator_name } && \\\n"
             f"    venv={ utils.VENV_INSTALL } && \\\n"
-            f"    $(ls -d ${{venv}}/lib/python3.* | head -1)/"
-            f"site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n" 
-            f"    . ${{venv}}/bin/activate && \\\n"
-            f"    python3 -m pip uninstall --yes ${{indicator}} && \\\n"
-            f"    count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && \\\n"
-            f"    deactivate && \\\n"
-            f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
-            f"    ```\n"
-            f"    If no other indicators are installed, the virtual environment will be deleted.\n\n"
+            "    $(ls -d ${{venv}}/lib/python3.* | head -1)/"
+            "site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n" 
+            "    . ${{venv}}/bin/activate && \\\n"
+            "    python3 -m pip uninstall --yes ${{indicator}} && \\\n"
+            "    count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && \\\n"
+            "    deactivate && \\\n"
+            "    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
+            "    ```\n"
+            "    If no other indicators are installed, the virtual environment will be deleted.\n\n"
 
-            f"</details>\n\n" )
+            "</details>\n\n" )
 
     return uninstall
 
@@ -571,13 +571,13 @@ def _get_install_uninstall(
 
         if _is_indicator( indicator_name, IndicatorName.INDICATORTIDE ):
             additional_text = (
-                f"3. You will need to write a `Python` script to retrieve your tidal data.\n" )
+                "3. You will need to write a `Python` script to retrieve your tidal data.\n" )
 
         title = (
-            f"Installation / Updating\n"
-            f"-----------------------\n\n"
-            f"Installation and updating follow the same process:\n"
-            f"1. Install operating system packages.\n"
+            "Installation / Updating\n"
+            "-----------------------\n\n"
+            "Installation and updating follow the same process:\n"
+            "1. Install operating system packages.\n"
             f"2. Install `{ indicator_name }` via `pip` into a `Python3` "
             f"virtual environment at `{ utils.VENV_INSTALL }`.\n"
             f"{ additional_text }\n\n" )
@@ -657,22 +657,22 @@ def _get_usage(
     indicator_name_human_readable ):
 
     return (
-        f"Usage\n"
-        f"-----\n\n"
+        "Usage\n"
+        "-----\n\n"
 
         f"To run `{ indicator_name }`, press the `Super` key to show the applications overlay or similar "
         f"and type `{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Remove the ™ from VirtualBox™.
-        f"into the search bar and the icon should be present for you to select.  "
-        f"If the icon does not appear, or appears as generic, you may have to log out / in (or restart).\n\n"
-        f"Alternatively, to run from the terminal:\n\n"
-        f"```\n"
+        "into the search bar and the icon should be present for you to select.  "
+        "If the icon does not appear, or appears as generic, you may have to log out / in (or restart).\n\n"
+        "Alternatively, to run from the terminal:\n\n"
+        "```\n"
         f"indicator={ indicator_name } && \\\n"
         f"venv={ utils.VENV_INSTALL } && \\\n"
-        f". ${{venv}}/bin/activate && \\\n"
-        f"python3 $(ls -d ${{venv}}/lib/python3.* | head -1)/"
-        f"site-packages/${{indicator}}/${{indicator}}.py && \\\n"
-        f"deactivate\n"
-        f"```\n\n" )
+        ". ${{venv}}/bin/activate && \\\n"
+        "python3 $(ls -d ${{venv}}/lib/python3.* | head -1)/"
+        "site-packages/${{indicator}}/${{indicator}}.py && \\\n"
+        "deactivate\n"
+        "```\n\n" )
 
 
 def _get_limitations(
@@ -684,7 +684,7 @@ def _get_limitations(
         indicator_name,
         IndicatorName.INDICATORPUNYCODE ):
         messages.append(
-            f"- `Wayland`: Clipboard/Primary input and output function intermittently at best; effectively unsupported.\n" )
+            "- `Wayland`: Clipboard/Primary input and output function intermittently at best; effectively unsupported.\n" )
 
     if _is_indicator(
         indicator_name,
@@ -692,14 +692,14 @@ def _get_limitations(
         IndicatorName.INDICATORONTHISDAY,
         IndicatorName.INDICATORTEST ):
         messages.append(
-            f"- `Wayland`: Clipboard copy/paste is unsupported.\n" )
+            "- `Wayland`: Clipboard copy/paste is unsupported.\n" )
 
     if _is_indicator(
         indicator_name,
         IndicatorName.INDICATORTEST,
         IndicatorName.INDICATORVIRTUALBOX ):
         messages.append(
-            f"- `Wayland`: The command `wmctrl` is unsupported.\n" )
+            "- `Wayland`: The command `wmctrl` is unsupported.\n" )
 
     # Kubuntu 22.04     KDE     No mouse wheel scroll.
     # Kubuntu 24.04     KDE     No mouse wheel scroll.
@@ -710,7 +710,7 @@ def _get_limitations(
         IndicatorName.INDICATORTEST,
         IndicatorName.INDICATORVIRTUALBOX ):
         messages.append(
-            f"- `KDE`: Mouse wheel scroll over icon is unsupported.\n" )
+            "- `KDE`: Mouse wheel scroll over icon is unsupported.\n" )
 
     # Kubuntu 22.04         KDE         Tooltip in lieu of label.
     # Kubuntu 24.04         KDE         Tooltip in lieu of label.
@@ -727,15 +727,15 @@ def _get_limitations(
         IndicatorName.INDICATORSTARDATE,
         IndicatorName.INDICATORTEST ):
         messages.append(
-            f"- `KDE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
+            "- `KDE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
         messages.append(
-            f"- `X-Cinnamon`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
+            "- `X-Cinnamon`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
         messages.append(
-            f"- `XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
+            "- `XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
         messages.append(
-            f"- `LXQt`: The icon label is unsupported; icon tooltip shows the indicator filename (effectively unsupported).\n" )
+            "- `LXQt`: The icon label is unsupported; icon tooltip shows the indicator filename (effectively unsupported).\n" )
         messages.append(
-            f"- `ICEWM`: The icon label and icon tooltip are unsupported.\n" )
+            "- `ICEWM`: The icon label and icon tooltip are unsupported.\n" )
 
     # Linux Mint 22     X-Cinnamon  When icon is changed, it disappears.
     # Lubuntu 22.04     LXQt        Cannot change the icon once initially set.
@@ -745,9 +745,9 @@ def _get_limitations(
         IndicatorName.INDICATORLUNAR,
         IndicatorName.INDICATORTEST ):
         messages.append(
-            f"- `LXQt`: The icon cannot be changed once set.\n" )
+            "- `LXQt`: The icon cannot be changed once set.\n" )
         messages.append(
-            f"- `X-Cinnamon`: The icon disappears when changed from that originally set, leaving a blank space.\n" )
+            "- `X-Cinnamon`: The icon disappears when changed from that originally set, leaving a blank space.\n" )
 
     # Lubuntu 22.04     LXQt    Default terminal (qterminal) does not work.
     # Lubuntu 24.04     LXQt    Default terminal (qterminal) all good.
@@ -756,16 +756,16 @@ def _get_limitations(
         IndicatorName.INDICATORSCRIPTRUNNER,
         IndicatorName.INDICATORTEST ):
         messages.append(
-            f"- `LXQt`: Commands cannot be sent to `qterminal` with version < `1.2.0` as the "
-            f"arguments are not [preserved](https://github.com/lxqt/qterminal/issues/335). "
-            f"Install `gnome-terminal` as a workaround.\n" )
+            "- `LXQt`: Commands cannot be sent to `qterminal` with version < `1.2.0` as the "
+            "arguments are not [preserved](https://github.com/lxqt/qterminal/issues/335). "
+            "Install `gnome-terminal` as a workaround.\n" )
 
     # openSUSE Tumbleweed   No `calendar` command.
     if _is_indicator(
         indicator_name,
         IndicatorName.INDICATORTEST ):
         messages.append(
-            f"- `openSUSE Tumbleweed`: Does not contain the `calendar` command.\n" )
+            "- `openSUSE Tumbleweed`: Does not contain the `calendar` command.\n" )
 
     # openSUSE Tumbleweed    ICEWM      No notifications.
     if _is_indicator(
@@ -779,7 +779,7 @@ def _get_limitations(
         IndicatorName.INDICATORTIDE,
         IndicatorName.INDICATORVIRTUALBOX ):
         messages.append(
-            f"- `ICEWM`: Notifications are unsupported.\n" )
+            "- `ICEWM`: Notifications are unsupported.\n" )
 
     # Kubuntu 24.04     No autostart.
     # Manjaro 24.04.7   No autostart.
@@ -797,9 +797,9 @@ def _get_limitations(
         IndicatorName.INDICATORTIDE,
         IndicatorName.INDICATORVIRTUALBOX ):
         messages.append(
-            f"- `Kubuntu 24.04`: No autostart.\n" )
+            "- `Kubuntu 24.04`: No autostart.\n" )
         messages.append(
-            f"- `Manjaro 24`: No autostart.\n" )
+            "- `Manjaro 24`: No autostart.\n" )
 
 #TODO For indicatoronthisday and wayland and ubuntu 20.04
 # need to mention that clicking on an event will not copy to clipboard.
@@ -807,9 +807,8 @@ def _get_limitations(
     message = ""
     if messages:
         message = (
-            f"Limitations\n"
-            f"-----------\n\n"
-            f"{ ''.join( sorted( messages, key = str.casefold ) ) }\n\n" )
+            "Limitations\n"
+            "-----------\n\n"
 
     return message
 
@@ -824,9 +823,9 @@ def _get_license(
     authors = ', '.join( authors )
 
     return (
-        f"License\n"
-        f"-------\n\n"
-        f"This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.\n\n"
+        "License\n"
+        "-------\n\n"
+        "This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.\n\n"
         f"Copyright { start_year }-{ end_year } { authors }.\n" )
 
 

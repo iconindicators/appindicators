@@ -790,7 +790,7 @@ class AstroPyEphem( AstroBase ):
                         next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ]
                         <
                         end_date_time )
-                    
+
                     pass_is_visible = (
                         AstroPyEphem._is_satellite_pass_visible(
                             observer_visible_passes,

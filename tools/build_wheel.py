@@ -241,9 +241,9 @@ def _get_year_in_changelog_markdown(
     result = (
         subprocess.run(
             f". { VENV_BUILD }/bin/activate && " +
-            f"python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " +
-            f"import IndicatorBase; " +
-            f"print( IndicatorBase.get_year_in_changelog_markdown( " +
+            "python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " +
+            "import IndicatorBase; " +
+            "print( IndicatorBase.get_year_in_changelog_markdown( " +
             f"'{ Path( indicator_name ) }/src/{ indicator_name }/CHANGELOG.md' ) )\"",
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE,
@@ -314,7 +314,13 @@ def _create_dot_desktop(
     categories ):
 
     indicatorbase_dot_desktop_path = (
-        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" / "indicatorbase.py.desktop" )
+        Path( '.' ) /
+        "indicatorbase" /
+        "src" /
+        "indicatorbase" /
+        "platform" /
+        "linux" /
+        "indicatorbase.py.desktop" )
 
     dot_desktop_text = ""
     with open( indicatorbase_dot_desktop_path, 'r', encoding = "utf-8" ) as f:
@@ -359,7 +365,13 @@ def _create_scripts_for_linux(
     indicator_name ):
 
     indicatorbase_platform_linux_path = (
-        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "platform" / "linux" )
+        Path( '.' ) /
+        "indicatorbase" /
+        "src"
+        /
+        "indicatorbase" /
+        "platform" /
+        "linux" )
 
     def process(
         source_script_name,
@@ -396,7 +408,13 @@ def _create_symbolic_icons(
     directory_wheel,
     indicator_name ):
 
-    directory_icons = directory_wheel / indicator_name / "src" / indicator_name / "icons"
+    directory_icons = (
+        directory_wheel /
+        indicator_name /
+        "src" /
+        indicator_name /
+        "icons" )
+
     for hicolor_icon in list( ( Path( '.' ) / directory_icons ).glob( "*.svg" ) ):
         symbolic_icon = directory_icons / ( str( hicolor_icon.name )[ 0 : -4 ] + "-symbolic.svg" )
         shutil.copy( hicolor_icon, symbolic_icon )
@@ -444,13 +462,17 @@ def _package_source_for_build_wheel_process(
 
     version_from_changelog_markdown = (
         _get_version_in_changelog_markdown(
-            Path( '.' ) / indicator_name / "src" / indicator_name / "CHANGELOG.md" ) )
+            Path( '.' ) /
+            indicator_name /
+            "src" /
+            indicator_name /
+            "CHANGELOG.md" ) )
 
     message = ""
     if version_from_pyproject_toml != version_from_changelog_markdown:
         message = (
             f"{ indicator_name }: The most recent version in " +
-            f"CHANGELOG.md does not match that in pyprojectspecific.toml\n" )
+            "CHANGELOG.md does not match that in pyprojectspecific.toml\n" )
 
     if not message:
         authors = _get_pyproject_toml_authors( config )
@@ -483,7 +505,7 @@ def _package_source_for_build_wheel_process(
 
         subprocess.run(
             f". { VENV_BUILD }/bin/activate && " +
-            f"python3 -m readme_renderer " +
+            "python3 -m readme_renderer " +
             f"{ directory_dist }/{ indicator_name }/README.md " +
             f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html",
             shell = True,
@@ -501,7 +523,12 @@ def _package_source_for_build_wheel_process(
 
     if not message:
         directory_platform_linux = (
-            directory_dist / indicator_name / "src" / indicator_name / "platform" / "linux" )
+            directory_dist /
+            indicator_name /
+            "src" /
+            indicator_name /
+            "platform" /
+            "linux" )
 
         directory_platform_linux.mkdir( parents = True )
 

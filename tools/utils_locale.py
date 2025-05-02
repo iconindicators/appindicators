@@ -79,7 +79,7 @@ def _create_update_pot(
     # Create a POT based on current source:
     #   http://www.gnu.org/software/gettext/manual/gettext.html
     subprocess.run(
-        f"xgettext " +
+        "xgettext " +
         f"-f { locale_directory / 'POTFILES.in' } " +
         f"-D { str( Path( indicator_name ) / 'src' / indicator_name ) } " +
         f"--copyright-holder='{ authors_emails[ 0 ][ 0 ] }.' " +
@@ -183,11 +183,11 @@ def _create_update_po(
                 exist_ok = True )
 
             subprocess.run(
-                f"msginit " +
+                "msginit " +
                 f"-i { pot_file } " +
                 f"-o { po_file_original } " +
                 f"-l { lingua_code } " +
-                f"--no-translator",
+                "--no-translator",
                 shell = True,
                 check = False )
 
@@ -201,16 +201,16 @@ def _create_update_po(
                         f"Automatically generated, { _get_current_year() }",
                         f"<author name> <<author email>>, { _get_current_year() }" ).
                     replace(
-                        f"Last-Translator: Automatically generated",
-                        f"Last-Translator: <author name> <<author email>>" ).
+                        "Last-Translator: Automatically generated",
+                        "Last-Translator: <author name> <<author email>>" ).
                     replace(
-                        f"Language-Team: none",
+                        "Language-Team: none",
                         f"Language-Team: <English language name for { lingua_code }>" ) )
 
             with open( po_file_original, 'w', encoding = "utf-8" ) as w:
                 w.write( text )
 
-            print( f"YOU MUST UPDATE LINES 1, 4, 11, 12." )
+            print( "YOU MUST UPDATE LINES 1, 4, 11, 12." )
 
 
 def _get_msgstr_from_po(
@@ -224,12 +224,12 @@ def _get_msgstr_from_po(
     result = (
         subprocess.run(
             f". { venv_build }/bin/activate && " +
-            f"python3 -c \"" +
-            f"import polib; " +
-            f"[ print( entry.msgstr ) " +
+            "python3 -c \"" +
+            "import polib; " +
+            "[ print( entry.msgstr ) " +
             f"for entry in polib.pofile( \'{ po }\' ) " +
             f"if entry.msgid == \'{ msgid_escaped }\' ]" +
-            f"\"",
+            "\"",
             stdout = subprocess.PIPE,
             stderr = subprocess.PIPE,
             shell = True,
@@ -322,7 +322,7 @@ def build_locale_for_release(
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         language_code = po.parent.parts[ -2 ]
         subprocess.run(
-            f"msgcat --use-first " +
+            "msgcat --use-first " +
             f"{ str( po ) } " +
             f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } " +
             f"-o { str( po ) } ",

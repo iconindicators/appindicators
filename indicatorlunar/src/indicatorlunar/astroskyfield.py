@@ -810,7 +810,7 @@ class AstroSkyfield( AstroBase ):
             data[ key + ( AstroBase.DATA_TAG_ALTITUDE, ) ] = str( alt.radians )
 
         else: # not rises.item( 0 )
-            # Never rises (never up). 
+            # Never rises (never up).
             # It is impossible to be never up AND always up.
             never_up = True
 
@@ -926,14 +926,14 @@ class AstroSkyfield( AstroBase ):
 
                         data[ key + ( AstroBase.DATA_TAG_RISE_AZIMUTH, ) ] = (
                             str( az.radians ) )
-    
+
                         data[ key + ( AstroBase.DATA_TAG_SET_DATE_TIME, ) ] = (
                             date_time.utc_datetime() )
 
                         alt, az, earth_satellite_distance = ( earth_satellite - latitude_longitude_elevation ).at( date_time ).altaz()  #TODO Too long
                         data[ key + ( AstroBase.DATA_TAG_SET_AZIMUTH, ) ] = (
                             str( az.radians ) )
-    
+
                         found_pass = True
                         break
 
@@ -958,6 +958,7 @@ class AstroSkyfield( AstroBase ):
                 start_date_time.utc.second + seconds_from_rise_to_set ) )
 
         # Set a step interval of 60 seconds.
+#TODO R1731: Consider using 'range_step = max(range_step, 1.0)' instead of unnecessary if block (consider-using-max-builtin)
         range_step = math.ceil( seconds_from_rise_to_set / 60.0 )
         if range_step < 1.0:
             range_step = 1.0

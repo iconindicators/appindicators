@@ -994,7 +994,7 @@ class IndicatorLunar( IndicatorBase ):
             # Sort phases by date.
             phases_sorted_by_date = (
                 sorted( next_phases, key = lambda pair: pair[ 0 ] ) )
-            
+
             for date_time, display_text, key in phases_sorted_by_date:
                 formatted_data = (
                     self.format_data(
@@ -2863,7 +2863,7 @@ class IndicatorLunar( IndicatorBase ):
                 ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH )
                 in
                 self.data )
-            
+
             if azimuth_in_data:
                 # Only add this body's attributes if there is data present.
                 for data_tag in data_tags:
@@ -2957,12 +2957,12 @@ class IndicatorLunar( IndicatorBase ):
                 ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH )
                 in
                 self.data )
-            
+
             rise_azimuth_in_data = (
                 ( body_type, body_tag, IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH )
                 in
                 self.data )
-            
+
             if azimuth_in_data or rise_azimuth_in_data:
                 # Add this body's attributes ONLY if data is present.
                 for data_tag in IndicatorLunar.astro_backend.DATA_TAGS_SATELLITE:

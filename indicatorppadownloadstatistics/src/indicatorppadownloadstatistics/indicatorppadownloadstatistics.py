@@ -289,10 +289,10 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         url = (
             f"https://api.launchpad.net/1.0/~{ ppa.get_user() }" +
             f"/+archive/ubuntu/{ ppa.get_name() }" +
-            f"?ws.op=getPublishedBinaries" +
-            f"&status=Published" +
-            f"&exact_match=false" +
-            f"&ordered=false" +
+            "?ws.op=getPublishedBinaries" +
+            "&status=Published" +
+            "&exact_match=false" +
+            "&ordered=false" +
             f"&binary_name={ filter_text }" )
 
         published_binaries = [ ]

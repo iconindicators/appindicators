@@ -366,8 +366,8 @@ class IndicatorBase( ABC ):
                 if first_metadata is None:
                     project_metadata = None
                     error_message = (
-                        f"No metadata was found in " +
-                        "{ wheel_in_release.absolute() }!" )
+                        "No metadata was found in " +
+                        f"{ wheel_in_release.absolute() }" )
 
                 else:
                     project_metadata = first_metadata.metadata
@@ -482,7 +482,10 @@ class IndicatorBase( ABC ):
 
             else:
                 desktop_file_original = (
-                    Path( __file__ ).parent / "platform" / "linux" / "indicatorbase.py.desktop" )
+                    Path( __file__ ).parent /
+                    "platform" /
+                    "linux" /
+                    "indicatorbase.py.desktop" )
 
             with open( desktop_file_original, 'r', encoding = "utf-8" ) as f:
                 for line in f:
@@ -599,7 +602,13 @@ class IndicatorBase( ABC ):
 
     @staticmethod
     def get_changelog_markdown_path():
-        # Path under virtual environment.
+        '''
+        Return the path to CHANGELOG.md.
+        
+        First attempt to locate within the installed virtual environment.
+        On failure, resort to the development environment.
+        '''
+
         changelog = Path( __file__ ).parent / "CHANGELOG.md"
 
         if not Path( changelog ).exists():
@@ -610,6 +619,7 @@ class IndicatorBase( ABC ):
 
 
     def main( self ):
+        ''' Entry point to the indicator. '''
         self.request_update()
         Gtk.main()
 
@@ -650,6 +660,7 @@ class IndicatorBase( ABC ):
     def update(
         self,
         menu ):
+        ''' Main update loop to be implemented by indicator. '''
         raise NotImplementedError()
 
 
@@ -791,6 +802,7 @@ class IndicatorBase( ABC ):
 
 
     def is_debug( self ):
+        ''' Return true if debug mode is enabled.  False otherwise. '''
         return self.debug
 
 

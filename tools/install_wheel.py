@@ -30,9 +30,9 @@ from . import utils
 if __name__ == "__main__":
     args = (
         utils.initialiase_parser_and_get_arguments(
-            f"Install a Python wheel package for one or more indicators to "
+            "Install a Python wheel package for one or more indicators to "
             f"a virtual environment within { utils.VENV_INSTALL } "
-            f"and copy across the .desktop, run script and icons.",
+            "and copy across the .desktop, run script and icons.",
             ( "directory_release", "indicators" ),
             {
                 "directory_release" :
@@ -48,12 +48,12 @@ if __name__ == "__main__":
     for indicator_name in args.indicators:
         utils.initialise_virtual_environment(
             utils.VENV_INSTALL,
-            f"pip",
+            "pip",
             f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)" )
 
         command = (
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | " +
             f" head -1)/site-packages/{indicator_name}/platform/" +
-            f"linux/install.sh" )
+            "linux/install.sh" )
 
         subprocess.run( command, shell = True, check = False )
