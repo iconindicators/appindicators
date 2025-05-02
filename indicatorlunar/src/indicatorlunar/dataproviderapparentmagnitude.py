@@ -143,6 +143,8 @@ class DataProviderApparentMagnitude( DataProvider ):
 
             downloaded = True
 
+#TODO Try to figure out what errors will happen;
+# no internet connection, timeout, bad data result...and catch those errors.
         except Exception as e:    #TODO W0718: Catching too general exception Exception (broad-exception-caught)
             downloaded = False
             logging.error(
