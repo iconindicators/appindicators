@@ -641,8 +641,10 @@ class AstroPyEphem( AstroBase ):
     def _is_comet_or_minor_planet_bad(
         body ):
         '''
-        Although the MPC is no longer in use for a data source, some data has
-        contained *****.  Guard against this regardless of the source.
+        Data from Minor Planet Center at times contains ***** so guard against.
+
+        MPC data is no longer used; regardless, continue to guard,
+        regardless of the source.
 
         Further, near-parabolic orbits will trigger a RuntimeError in PyEphem:
             https://github.com/brandon-rhodes/pyephem/issues/239
