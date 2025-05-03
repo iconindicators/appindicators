@@ -10,12 +10,13 @@ Otherwise just leave as is...and keep the entry in the changelog.
 What to do?
 
 
-## Update date CHANGELOG.md
+## Update date in CHANGELOG.md
 For each indicator's CHANGELOG.md, at release time, update the release date in
 the latest entry to the date of release.
 
 
-## When finally released, or at least indicatortest is released, post a note to
+## When indicatortest is released
+Post a note to
   https://github.com/AyatanaIndicators/libayatana-appindicator/issues/76
 to help the guy out.
 
@@ -49,7 +50,6 @@ update the URL at the top with the relevant URL at PyPI.
 
 Also update the indicator name (remove the hyphen from the name).
 
-
   https://pypi.org/project/indicatorfortune/
   https://pypi.org/project/indicatorlunar/
   https://pypi.org/project/indicatoronthisday/
@@ -64,7 +64,6 @@ Also update the indicator name (remove the hyphen from the name).
 When indicators released to pypi, update description at
   https://sourceforge.net/p/appindicators/admin/overview
 to read:
-
 
 Source code repository for:
  - indicatorfortune
@@ -94,13 +93,17 @@ Releases:
 - https://pypi.org/project/indicatorvirtualbox
 
 
-
 # Long Term
 
 ## Create non-symbolic icons
 Some distros/desktops do not utilise the GNOME symbolic icon mechanism.
 Determine which distros/desktops these are and if anything can be done.
 
+
+## Replacement for wmctrl for indicatorvirtualbox
+Consider https://git.sr.ht/~brocellous/wlrctl which may be a suitable
+and eventual replacement for wmctrl.
+ 
 
 ## Migrate to GTK4
 May need to continue to run as GTK3 simulataneously.
@@ -118,13 +121,20 @@ An end-user installs an indicator by:
 - copy icons/desktop/locale
 - some distros require setting an extension
 
-Whilsts installing via .deb/.rpm is easier for the end-user,
-it would be even easier (for the end-user) if each indicator was present in
-a distro's package repository (Debian, Fedora, openSUSE).
+Consider either building a .deb/.rpm or even adding to each major distro's
+package repository.
 
-May need to change the venv location to /opt rather than the user $HOME,
-particulary given icons/locale/.desktop will then be installed under /usr/share.
+I read on Debian's documentation for getting a package into the repository 
+requires that there must be a "need" for the package.
+So it is possible some but not all indicators are accepted.
+No point in that; all or nothing.
+
+If installing via a .deb/.rpm (or repository package), will likely need to
+change the venv location to /opt rather than the user $HOME, particulary given
+icons/locale/.desktop will then be installed under /usr/share.
 
 https://github.com/jordansissel/fpm
 Takes a Python project and converts to .deb/.rpm
 Does not yet support pyproject.toml
+
+Where to distribute the .deb/.rpm?  Does Sourceforge or Github allow this?
