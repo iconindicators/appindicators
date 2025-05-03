@@ -19,6 +19,12 @@
 ''' Application indicator for VirtualBox™ virtual machines. '''
 
 
+#TODO If running under wayland (that is no wmctrl)
+# when wmctrl is needed (bring a window to front)
+# instead show a notification to the user.
+# Be careful about the mouse wheel scroll event and showing lots of notifications!
+
+
 import datetime
 import time
 
