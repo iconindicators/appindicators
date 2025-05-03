@@ -63,9 +63,9 @@ class IndicatorTide( IndicatorBase ):
             label = _( "No user script specified!" )
             summary = _( "No user script specified!" )
             message = _(
-                "Please specify a user script and class name in "
-                +
+                "Please specify a user script and class name in " +
                 "the preferences." )
+
             menu.append( Gtk.MenuItem.new_with_label( label ) )
             self.show_notification( summary, message )
 
@@ -96,8 +96,7 @@ class IndicatorTide( IndicatorBase ):
                 label = _( "User script class name could not be found!" )
                 summary = _( "User script class name could not be found!" )
                 message = _(
-                    "Please check the user script class name in "
-                    +
+                    "Please check the user script class name in " +
                     "the preferences." )
 
             except NotImplementedError:
@@ -105,18 +104,6 @@ class IndicatorTide( IndicatorBase ):
                 summary = _( "User function could not be found!" )
                 message = _(
                     "You must implement the function 'get_tide_data()'." )
-
-#TODO Maybe drop this catch and instead try to
-# trigger other exceptions with the user class and catch those.
-            except Exception as e:  #TODO  W0718: Catching too general exception Exception (broad-exception-caught)
-                self.get_logging().exception( e )
-                label = _( "Error running user script!" )
-                summary = _( "Error running user script!" )
-                message = _( "Check the log file in your home directory." )
-                self.get_logging().error(
-                    "Error running user script: " +
-                    self.user_script_path_and_filename + " | " +
-                    self.user_script_class_name )
 
             if not tidal_readings:
                 menu.append( Gtk.MenuItem.new_with_label( label ) )
@@ -172,10 +159,8 @@ class IndicatorTide( IndicatorBase ):
                 shown_today = False
 
             menu_text = (
-                ( _( "HIGH" ) if tidal_reading.is_high() else _( "LOW" ) )
-                +
-                "  "
-                +
+                ( _( "HIGH" ) if tidal_reading.is_high() else _( "LOW" ) ) +
+                "  " +
                 tidal_reading.get_time() + "  " + tidal_reading.get_level() )
 
             if shown_today:
@@ -217,10 +202,8 @@ class IndicatorTide( IndicatorBase ):
                 shown_today = False
 
             menu_text = (
-                ( _( "HIGH" ) if tidal_reading.is_high() else _( "LOW" ) )
-                +
-                "  "
-                +
+                ( _( "HIGH" ) if tidal_reading.is_high() else _( "LOW" ) ) +
+                "  " +
                 tidal_reading.get_time() + "  " + tidal_reading.get_level() )
 
             if shown_today:
@@ -346,8 +329,10 @@ class IndicatorTide( IndicatorBase ):
                 self.show_as_submenus_except_first_day = (
                     show_as_submenus_except_first_day_checkbutton.get_active() )
 
-                if user_script_path_and_filename.get_text() and user_script_class_name.get_text():
-                    if not Path( user_script_path_and_filename.get_text().strip() ).is_file():
+                path_and_filename = user_script_path_and_filename.get_text()
+                classname = user_script_class_name.get_text()
+                if path_and_filename and classname:
+                    if not Path( path_and_filename.strip() ).is_file():
                         message = _(
                             "The user script path/filename cannot be found." )
 
@@ -355,8 +340,9 @@ class IndicatorTide( IndicatorBase ):
                         user_script_path_and_filename.grab_focus()
                         continue
 
-                elif user_script_path_and_filename.get_text() or user_script_class_name.get_text(): # Cannot have one empty and the other not.
-                    if not user_script_path_and_filename.get_text():
+                elif path_and_filename or classname:
+                    # Cannot have one empty and the other not.
+                    if not path_and_filename:
                         message = _(
                             "The user script path/filename cannot be empty." )
 
@@ -372,10 +358,10 @@ class IndicatorTide( IndicatorBase ):
                     continue
 
                 self.user_script_path_and_filename = (
-                    user_script_path_and_filename.get_text().strip() )
+                    path_and_filename.strip() )
 
                 self.user_script_class_name = (
-                    user_script_class_name.get_text().strip() )
+                    classname.strip() )
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),
