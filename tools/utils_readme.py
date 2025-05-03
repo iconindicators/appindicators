@@ -36,6 +36,18 @@ References:
 # https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
 #   As per above Github link, hopefully only need to worry about Debian based distros...
 #   ...but still need to check for Fedora, openSUSE and Manjaro.
+#
+#
+# https://packages.debian.org/search?keywords=girepository&searchon=names&suite=all&section=all
+#
+# https://packages.ubuntu.com/search?keywords=libgirepository&searchon=names&suite=all&section=all
+#
+# https://packages.fedoraproject.org/pkgs/gobject-introspection/gobject-introspection-devel/
+#
+# https://software.opensuse.org/package/gobject-introspection-devel?search_term=gobject-introspection-devel
+#
+# Is it safe to NOT pin Ubuntu 24.04 say (et al) to PyGObject 35.x.y and
+# just let it work with latest PyGObject and also with libgirepository2.0?
 
 
 import datetime
