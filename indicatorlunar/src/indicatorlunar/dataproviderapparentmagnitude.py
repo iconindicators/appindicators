@@ -25,6 +25,8 @@ apparent magnitude for comets and minor planets.
 import datetime
 import requests
 
+from requests.exceptions import RequestException
+
 from .dataprovider import DataProvider
 
 
@@ -143,9 +145,7 @@ class DataProviderApparentMagnitude( DataProvider ):
 
             downloaded = True
 
-#TODO Try to figure out what errors will happen;
-# no internet connection, timeout, bad data result...and catch those errors.
-        except Exception as e:    #TODO W0718: Catching too general exception Exception (broad-exception-caught)
+        except RequestException as e:
             downloaded = False
             logging.error(
                 f"Error retrieving apparent magnitude data from { str( url ) }" )
