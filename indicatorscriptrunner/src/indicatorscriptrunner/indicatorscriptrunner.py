@@ -764,11 +764,15 @@ class IndicatorScriptRunner( IndicatorBase ):
                     name = row[ IndicatorScriptRunner.COLUMN_MODEL_NAME ]
                     command = row[ IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ]
 
-                    sound = row[ IndicatorScriptRunner.COLUMN_MODEL_SOUND ]
-                    sound = sound == IndicatorBase.SYMBOL_TICK
+                    sound = (
+                        row[ IndicatorScriptRunner.COLUMN_MODEL_SOUND ]
+                        ==
+                        IndicatorBase.SYMBOL_TICK )
 
-                    notification = row[ IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ]
-                    notification = notification == IndicatorBase.SYMBOL_TICK
+                    notification = (
+                        row[ IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ]
+                        ==
+                        IndicatorBase.SYMBOL_TICK )
 
                     background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
                     if background == IndicatorBase.SYMBOL_TICK:
@@ -798,6 +802,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                     self.scripts.append( script )
                     iter_scripts = treestore.iter_next( iter_scripts )
+
                 iter_group = treestore.iter_next( iter_group )
 
             self.send_command_to_log = send_command_to_log_checkbutton.get_active()
