@@ -19,6 +19,9 @@
 ''' Application indicator for VirtualBox™ virtual machines. '''
 
 
+#TODO See if wlrctl is available on 24.04
+
+
 import datetime
 import time
 
