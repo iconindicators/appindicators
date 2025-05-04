@@ -106,6 +106,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         super().__init__(
             comments = _( "Runs a terminal command or script;\noptionally display results in the icon label." ) )
 
+#TODO Look at all of this...why use notify-send?
+# indicatorbase has a function to show notifications; why not use that?
+# Why is the command to for background different to non-background?
         command_notify_common = (
             "notify-send -i " +
             self.get_icon_name() +
@@ -332,8 +335,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.get_logging().debug(
                 script.get_group() + " | " + script.get_name() + ": " + script.get_command() )
 
-        # When calling a user script, always log any errors from non-zero
-        # return codes.
         command_result = (
             self.process_get(
                 script.get_command(), log_non_zero_error_code = True ) )

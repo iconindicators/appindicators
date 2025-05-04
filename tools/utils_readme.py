@@ -367,7 +367,7 @@ def _get_uninstall_for_operating_system(
             f"    indicator={ indicator_name } && \\\n"
             f"    venv={ utils.VENV_INSTALL } && \\\n"
             "    $(ls -d ${{venv}}/lib/python3.* | head -1)/"
-            "site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n" 
+            "site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n"
             "    . ${{venv}}/bin/activate && \\\n"
             "    python3 -m pip uninstall --yes ${{indicator}} && \\\n"
             "    count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && \\\n"
@@ -820,7 +820,9 @@ def _get_limitations(
     if messages:
         message = (
             "Limitations\n"
-            "-----------\n\n"
+            "-----------\n\n" )
+#TODO The ) on the line above was missing.
+# Check repository history; anything else missing?
 
     return message
 

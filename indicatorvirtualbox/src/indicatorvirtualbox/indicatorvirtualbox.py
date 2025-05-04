@@ -22,8 +22,14 @@
 #TODO If running under wayland (that is no wmctrl)
 # when wmctrl is needed (bring a window to front)
 # instead show a notification to the user.
-# Be careful about the mouse wheel scroll event and showing lots of notifications!
-
+# Be careful about the mouse wheel scroll event and
+# showing lots of notifications!
+#
+# No need for the above.
+# If under wayland, mouse wheel scroll events are not listened.
+# Need to make a note in the changelog.md about this (wmctrl does not work under wayland).
+# Also check if the mouse middle button click does what it should under wayland
+# and note if it does not in changelog.md
 
 import datetime
 import time
@@ -146,7 +152,9 @@ class IndicatorVirtualBox( IndicatorBase ):
         running_uuids ):
 
         sorted_items = (
-            Group.sort( items, self.sort_groups_and_virtual_machines_equally ) )
+            Group.sort(
+                items,
+                self.sort_groups_and_virtual_machines_equally ) )
 
         for item in sorted_items:
             if isinstance( item, Group ):
@@ -294,6 +302,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         virtual_machine_name,
         delay_in_seconds = 0 ):
 
+#TODO Handle the case for wayland.
+# Show a notification saying because running wayland cannot use wmctrl?
         if not self.is_session_type_wayland():
             number_of_windows_with_the_same_name = (
                 self.process_get(
@@ -395,6 +405,10 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
         if self.is_session_type_wayland():
+#TODO Maybe have a preference to let the user specify the process name?
+# Then if we find it via 'which <process name>' notify the user
+# it is already running but cannot bring to front under wayland,
+# otherwise run it.
             # Wayland does not support wmctrl.
             # If the VirtualBox manager is already running,
             # there is no ability to bring to the front.
@@ -402,8 +416,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             start_virtualbox_manager()
 
         else:
-            # Only want one instance of VirtualBox manager to be running
-            # (as a convenience to the user to avoidable multiple versions).
+            # Only want one instance of VirtualBox manager to be running.
             #
             # The executable for VirtualBox manager does not necessarily appear
             # in the process list because the executable might be a script which
@@ -449,6 +462,20 @@ class IndicatorVirtualBox( IndicatorBase ):
         uuid ):
 
         command = "VBoxManage list runningvms | grep " + uuid
+#TODO I think casting to bool is dangerous...
+# best to check the return value against what is expected.
+#
+# On Debian 12 where virtualbox is NOT installed got the following:
+#    list runningvms | grep 123
+#    bash: list: command not found
+#
+# But this function should only be called if vboxmanage is installed...right?
+# Should there be protection put in place (check vboxmanage is installed first)?
+#
+# What if a user copies the .config to a new machine and install indicatorvirtualbox
+# but vboxmanage is not yet installed?  Will this crash?
+#
+# Test on Ubuntu 20.04 but maybe switch the sense of is_vboxmanage_installed.
         return bool( self.process_get( command ) )
 
 
@@ -507,10 +534,13 @@ class IndicatorVirtualBox( IndicatorBase ):
         self,
         uuid ):
 
-        start_command = IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT
+        start_command = (
+            IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT )
+
         if uuid in self.virtual_machine_preferences:
             preferences = self.virtual_machine_preferences[ uuid ]
-            start_command = preferences[ IndicatorVirtualBox.PREFERENCES_START_COMMAND ]
+            start_command = (
+                preferences[ IndicatorVirtualBox.PREFERENCES_START_COMMAND ] )
 
         return start_command
 
@@ -519,10 +549,13 @@ class IndicatorVirtualBox( IndicatorBase ):
         self,
         uuid ):
 
-        return (
-            uuid in self.virtual_machine_preferences
-            and
-            self.virtual_machine_preferences[ uuid ][ IndicatorVirtualBox.PREFERENCES_AUTOSTART ] )
+        autostart = False
+        if uuid in self.virtual_machine_preferences:
+            preferences = self.virtual_machine_preferences[ uuid ]
+            autostart = (
+                preferences[ IndicatorVirtualBox.PREFERENCES_AUTOSTART ] )
+
+        return autostart
 
 
     def on_preferences(
@@ -610,23 +643,27 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         # General settings.
         grid = self.create_grid()
+        row = 0
 
-        window_name = (
-            self.create_entry(
-                self.virtualbox_manager_window_name,
-                tooltip_text = _(
-                    "The window title of VirtualBox™ Manager.\n" +
-                    "You may have to adjust for your local language.\n\n" +
-                    "This is used to bring the VirtualBox™ Manager\n" +
-                    "window to the front if already running.\n\n" +
-                    "This is unsupported under Wayland." ) ) )
+        if self.is_session_type_wayland():
+            window_name = (
+                self.create_entry(
+                    self.virtualbox_manager_window_name,
+                    tooltip_text = _(
+                        "The window title of VirtualBox™ Manager.\n" +
+                        "You may have to adjust for your local language.\n\n" +
+                        "This is used to bring the VirtualBox™ Manager\n" +
+                        "window to the front if already running.\n\n" +
+                        "This is unsupported under Wayland." ) ) )
 
-        grid.attach(
-            self.create_box(
-                (
-                    ( Gtk.Label.new( _( "VirtualBox™ Manager" ) ), False ),
-                    ( window_name, True ) ) ),
-            0, 0, 1, 1 )
+            grid.attach(
+                self.create_box(
+                    (
+                        ( Gtk.Label.new( _( "VirtualBox™ Manager" ) ), False ),
+                        ( window_name, True ) ) ),
+                0, row, 1, 1 )
+
+            row += 1
 
         sort_groups_and_virtual_machines_equally_checkbox = (
             self.create_checkbutton(
@@ -639,7 +676,9 @@ class IndicatorVirtualBox( IndicatorBase ):
                 active = self.sort_groups_and_virtual_machines_equally ) )
 
         grid.attach(
-            sort_groups_and_virtual_machines_equally_checkbox, 0, 1, 1, 1 )
+            sort_groups_and_virtual_machines_equally_checkbox, 0, row, 1, 1 )
+
+        row += 1
 
         show_as_submenus_checkbox = (
             self.create_checkbutton(
@@ -649,7 +688,6 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "Otherwise, groups are shown as an indented list." ),
                 active = self.show_submenu ) )
 
-        row = 2
         if groups_exist:
             grid.attach( show_as_submenus_checkbox, 0, row, 1, 1 )
             row += 1
@@ -671,6 +709,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     ( spinner_refresh_interval, False ) ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, row, 1, 1 )
+
         row += 1
 
         spinner_delay = (
@@ -690,6 +729,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     ( spinner_delay, False ) ),
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
             0, row, 1, 1 )
+
         row += 1
 
         autostart_checkbox, delay_spinner, latest_version_checkbox, box = (

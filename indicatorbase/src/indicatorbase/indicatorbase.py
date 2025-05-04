@@ -604,7 +604,7 @@ class IndicatorBase( ABC ):
     def get_changelog_markdown_path():
         '''
         Return the path to CHANGELOG.md.
-        
+
         First attempt to locate within the installed virtual environment.
         On failure, resort to the development environment.
         '''
@@ -644,7 +644,7 @@ class IndicatorBase( ABC ):
             If there is a pending (future) update and a request for an update
             comes along, need to remove the "old" pending update.
         '''
-        if self.lock_update.acquire( blocking = False ):    #TODO  R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
+        if self.lock_update.acquire( blocking = False ):
             if self.id_update > 0:
                 GLib.source_remove( self.id_update )
 
@@ -1027,12 +1027,14 @@ class IndicatorBase( ABC ):
                 menuitem.set_sensitive( toggle )
 
 
+    def get_os_release( self ):
+        return self.process_get( "cat /etc/os-release" )
+
+
     def is_calendar_supported( self ):
         ''' The calendar package is unavailable on some distributions. '''
-        etc_os_release = self.process_get( "cat /etc/os-release" )
-
+        etc_os_release = self.get_os_release()
         is_manjaro = "NAME=\"Manjaro Linux\"" in etc_os_release
-
         is_opensuse_tumbleweed = (
             "NAME=\"openSUSE Tumbleweed\"" in etc_os_release )
 
@@ -1083,7 +1085,7 @@ class IndicatorBase( ABC ):
         '''
         clipboard_supported = True
         if self.is_session_type_wayland():
-            etc_os_release = self.process_get( "cat /etc/os-release" )
+            etc_os_release = self.get_os_release()
             clipboard_supported = (
                 "ID=ubuntu" in etc_os_release
                 and
@@ -2639,7 +2641,7 @@ class IndicatorBase( ABC ):
         self,
         delay = 0 ):
 
-        if self.lock_save_config.acquire( blocking = False ):  #TODO  R1732: Consider using 'with' for resource-allocating operations (consider-using-with)
+        if self.lock_save_config.acquire( blocking = False ):
             if self.id_save_config > 0:
                 GLib.source_remove( self.id_save_config )
 
@@ -3047,25 +3049,16 @@ class IndicatorBase( ABC ):
         return directory
 
 
-#TODO Check every call to this to ensure things still work.
     def process_call(
         self,
         command ):
         '''
         Executes the command in a new process.
-        On exception, logs to file.
+        On failure/exception, logs to file.
         '''
-        try:
-            subprocess.call( command, shell = True ) #TODO Replace with .run (but can we use the process_get function)?
-
-        except subprocess.CalledProcessError as e:
-            logging.error( e )
-            if e.stderr:
-                logging.error( e.stderr )
+        self.process_get( command )
 
 
-#TODO Check every function which calls this...the function no longer returns None but rather "".
-# Do we need to return the result and stderr?
     def process_get(
         self,
         command,

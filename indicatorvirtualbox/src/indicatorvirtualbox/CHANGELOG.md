@@ -4,6 +4,12 @@
 
 - Can now edit in place in the Preferences a virtual machine's autostart and start command.
 - Preference to show groups in submenus defaults to True.
+
+TODO Finish this ...
+- Under Wayland, as wmctrl is not implemented, it is not possible to use the mouse wheel scroll
+- On selecting a VM which is already running, the VM window is brought to the front (using wmctrl).
+
+
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhauled to adhere to the pyproject.toml standard.
