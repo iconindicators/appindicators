@@ -290,9 +290,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         virtual_machine_name,
         delay_in_seconds = 0 ):
 
-#TODO Handle the case for wayland.
-# Show a notification saying because running wayland cannot use wmctrl?
-        if not self.is_session_type_wayland():
+        if self.is_session_type_x11():
             number_of_windows_with_the_same_name = (
                 self.process_get(
                     'wmctrl -l | grep "' +
