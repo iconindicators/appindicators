@@ -462,21 +462,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         uuid ):
 
         command = "VBoxManage list runningvms | grep " + uuid
-#TODO I think casting to bool is dangerous...
-# best to check the return value against what is expected.
-#
-# On Debian 12 where virtualbox is NOT installed got the following:
-#    list runningvms | grep 123
-#    bash: list: command not found
-#
-# But this function should only be called if vboxmanage is installed...right?
-# Should there be protection put in place (check vboxmanage is installed first)?
-#
-# What if a user copies the .config to a new machine and install indicatorvirtualbox
-# but vboxmanage is not yet installed?  Will this crash?
-#
-# Test on Ubuntu 20.04 but maybe switch the sense of is_vboxmanage_installed.
-        return bool( self.process_get( command ) )
+        return uuid in self.process_get( command )
 
 
     def get_virtual_machines( self ):
