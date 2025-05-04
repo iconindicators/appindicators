@@ -19,18 +19,6 @@
 ''' Application indicator for VirtualBox™ virtual machines. '''
 
 
-#TODO If running under wayland (that is no wmctrl)
-# when wmctrl is needed (bring a window to front)
-# instead show a notification to the user.
-# Be careful about the mouse wheel scroll event and
-# showing lots of notifications!
-#
-# No need for the above.
-# If under wayland, mouse wheel scroll events are not listened.
-# Need to make a note in the changelog.md about this (wmctrl does not work under wayland).
-# Also check if the mouse middle button click does what it should under wayland
-# and note if it does not in changelog.md
-
 import datetime
 import time
 
