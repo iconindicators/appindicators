@@ -820,9 +820,8 @@ def _get_limitations(
     if messages:
         message = (
             "Limitations\n"
-            "-----------\n\n" )
-#TODO The ) on the line above was missing.
-# Check repository history; anything else missing?
+            "-----------\n\n"
+            f"{ ''.join( sorted( messages, key = str.casefold ) ) }\n\n" )
 
     return message
 
