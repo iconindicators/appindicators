@@ -85,11 +85,9 @@ class IndicatorVirtualBox( IndicatorBase ):
         self.scroll_direction_is_up = True
         self.scroll_uuid = None
 
-        # A mouse wheel scroll event will use wmctrl to cycle through running
-        # virtual machines and attempt to bring each to the front.
-        # Under Wayland, wmctrl is not implemented and so it is pointless
-        # listening for events which will result in nothing.
-        if not self.is_session_type_wayland():
+        # Mouse wheel scroll events use wmctrl to cycle through running
+        # virtual machines to bring each to the front (only work on X11).
+        if self.is_session_type_x11():
             self.request_mouse_wheel_scroll_events(
                 ( self.on_mouse_wheel_scroll, ) )
 
@@ -103,8 +101,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         if vboxmanage_installed:
             virtual_machines = self.get_virtual_machines()
 
-            # Autostart VMs here rather than in __init__ ensures the indicator
-            # icon/menu is displayed without delay.
+            # Autostart viritual machines here rather than in __init__ ensures
+            # the indicator icon/menu is displayed without delay.
             if self.auto_start_required:
                 self.auto_start_required = False
                 self.auto_start_virtual_machines( virtual_machines )
@@ -225,8 +223,9 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         else:
             self.start_virtual_machine( virtual_machine.get_uuid() )
-            # Delay the refresh as the VM will have been started in the
-            # background and VBoxManage will not have had time to update.
+
+            # Delay the refresh as the virtual machine will have been started
+            # in the background and VBoxManage will not have had time to update.
             self.request_update( delay = 10 )
 
 
@@ -255,6 +254,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 need_one_last_sleep = True
 
         if need_one_last_sleep:
+
             # Delay ensuring the running status of the last virtual machine
             # starts up and is captured in the immediate update.
             time.sleep( 10 )
@@ -404,19 +404,8 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.process_call( self.process_get( "which VirtualBox" ) + " &" )
 
 
-        if self.is_session_type_wayland():
-#TODO Maybe have a preference to let the user specify the process name?
-# Then if we find it via 'which <process name>' notify the user
-# it is already running but cannot bring to front under wayland,
-# otherwise run it.
-            # Wayland does not support wmctrl.
-            # If the VirtualBox manager is already running,
-            # there is no ability to bring to the front.
-            # Can only run VirtualBox manager again and again...
-            start_virtualbox_manager()
-
-        else:
-            # Only want one instance of VirtualBox manager to be running.
+        if self.is_session_type_x11():
+            # Only want one instance of VirtualBox manager.
             #
             # The executable for VirtualBox manager does not necessarily appear
             # in the process list because the executable might be a script which
@@ -437,19 +426,24 @@ class IndicatorVirtualBox( IndicatorBase ):
             else:
                 start_virtualbox_manager()
 
+        elif self.is_session_type_wayland():
+            # Wayland does not support wmctrl.
+            # Can only run VirtualBox manager again and again...
+            start_virtualbox_manager()
+
 
     def get_running_virtual_machines( self ):
         '''
-        Returns a list of running VM names and list of corresponding
-        running VM UUIDs.
+        Returns a list of running virtual machine names and list of
+        corresponding running virtual machine UUIDs.
         '''
         names = [ ]
         uuids = [ ]
         result = self.process_get( "VBoxManage list runningvms" )
         for line in result.splitlines():
             if line.startswith( '\"' ) and line.endswith( '}' ):
-                # VBoxManage may emit a warning message along with the VM
-                # information, so check each line as best as possible.
+                # VBoxManage may emit a warning message along with the virtual
+                # machine information, so check each line as best as possible.
                 info = line[ 1 : -1 ].split( "\" {" )
                 names.append( info[ 0 ] )
                 uuids.append( info[ 1 ] )
@@ -631,17 +625,17 @@ class IndicatorVirtualBox( IndicatorBase ):
         grid = self.create_grid()
         row = 0
 
-        if self.is_session_type_wayland():
-            window_name = (
-                self.create_entry(
-                    self.virtualbox_manager_window_name,
-                    tooltip_text = _(
-                        "The window title of VirtualBox™ Manager.\n" +
-                        "You may have to adjust for your local language.\n\n" +
-                        "This is used to bring the VirtualBox™ Manager\n" +
-                        "window to the front if already running.\n\n" +
-                        "This is unsupported under Wayland." ) ) )
+        window_name = (
+            self.create_entry(
+                self.virtualbox_manager_window_name,
+                tooltip_text = _(
+                    "The window title of VirtualBox™ Manager.\n" +
+                    "You may have to adjust for your local language.\n\n" +
+                    "This is used to bring the VirtualBox™ Manager\n" +
+                    "window to the front if already running.\n\n" +
+                    "Only supported under X11." ) ) )
 
+        if self.is_session_type_x11():
             grid.attach(
                 self.create_box(
                     (
@@ -661,10 +655,11 @@ class IndicatorVirtualBox( IndicatorBase ):
                     "followed by virtual machines." ),
                 active = self.sort_groups_and_virtual_machines_equally ) )
 
-        grid.attach(
-            sort_groups_and_virtual_machines_equally_checkbox, 0, row, 1, 1 )
+        if groups_exist:
+            grid.attach(
+                sort_groups_and_virtual_machines_equally_checkbox, 0, row, 1, 1 )
 
-        row += 1
+            row += 1
 
         show_as_submenus_checkbox = (
             self.create_checkbutton(
@@ -846,7 +841,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 or
                 ( is_virtual_machine and not is_default_start_command ) ):
 
-                # Only record VMs with different settings to default.
+                # Record virtual machines with settings other than default.
                 key = row[ IndicatorVirtualBox.COLUMN_UUID ]
                 value = [ is_autostart, row[ IndicatorVirtualBox.COLUMN_START_COMMAND ] ]
                 self.virtual_machine_preferences[ key ] = value
@@ -882,8 +877,8 @@ class IndicatorVirtualBox( IndicatorBase ):
                 IndicatorVirtualBox.CONFIG_SORT_GROUPS_AND_VIRTUAL_MACHINES_EQUALLY,
                 True ) )
 
-        # Store information about VMs.
-        #   Key is VM UUID
+        # Store information about virtual machines.
+        #   Key is virtual machine UUID
         #   Value is [ autostart (bool), start command (str) ]
         self.virtual_machine_preferences = (
             config.get(
