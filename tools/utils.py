@@ -25,8 +25,8 @@ import subprocess
 from pathlib import Path
 
 
-# The virtual environment into which indicator are installed,
-# either via PyPI or a local wheel.
+# The virtual environment into which indicators are installed,
+# via PyPI or a local wheel.
 VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 
@@ -62,7 +62,7 @@ def initialise_virtual_environment(
         subprocess.run( command, shell = True, check = False )
 
     command = (
-        f". { venv_directory }/bin/activate && " + \
+        f". { venv_directory }/bin/activate && "
         f"python3 -m pip install --upgrade { '--force-reinstall' if force_reinstall else '' } { ' '.join( modules_to_install ) }" )
 
     subprocess.run( command, shell = True, check = False )

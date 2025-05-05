@@ -18,7 +18,7 @@
 
 '''
 Install a wheel for one or more indicators to a virtual environment at
-$HOME/.local and then run install.sh.
+$HOME/.local/venv_indicators and then run install.sh.
 '''
 
 
@@ -54,7 +54,7 @@ if __name__ == "__main__":
 
         command = (
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | " +
-            f" head -1)/site-packages/{indicator_name}/platform/" +
+            f" head -1)/site-packages/{ indicator_name }/platform/" +
             "linux/install.sh" )
 
         subprocess.run( command, shell = True, check = False )
