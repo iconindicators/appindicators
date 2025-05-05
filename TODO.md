@@ -100,10 +100,12 @@ Some distros/desktops do not utilise the GNOME symbolic icon mechanism.
 Determine which distros/desktops these are and if anything can be done.
 
 
-## Replacement for wmctrl for indicatorvirtualbox
-Consider https://git.sr.ht/~brocellous/wlrctl which may be a suitable
-and eventual replacement for wmctrl.
- 
+## Replacement for wmctrl for indicatorvirtualbox on Wayland
+https://git.sr.ht/~brocellous/wlrctl is a work-in-progress wmctrl replacement.
+Tested wlrctl on Ubuntu 24.04 but does not work when attempting to access
+window information:
+  error message: Foreign Toplevel Management interface not found!
+
 
 ## Migrate to GTK4
 May need to continue to run as GTK3 simulataneously.
