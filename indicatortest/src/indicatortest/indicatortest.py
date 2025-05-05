@@ -40,9 +40,11 @@ from .indicatorbase import IndicatorBase
 class IndicatorTest( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Used when building the wheel to create the .desktop file.
-    indicator_name_for_desktop_file = _( "Indicator Test" )
-    indicator_categories = "Categories=Utility"
+    # Used in the About dialog and the .desktop file.
+    INDICATOR_NAME_HUMAN_READABLE = _( "Indicator Test" )
+
+    # Used in the .desktop file.
+    INDICATOR_CATEGORIES = "Categories=Utility"
 
     CACHE_ICON_BASENAME = "icon-"
     CACHE_ICON_MAXIMUM_AGE_HOURS = 0

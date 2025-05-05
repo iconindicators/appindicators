@@ -43,9 +43,11 @@ from .script import Background, NonBackground, Info
 class IndicatorScriptRunner( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Used when building the wheel to create the .desktop file.
-    indicator_name_for_desktop_file = _( "Indicator Script Runner" )
-    indicator_categories = "Categories=Utility"
+    # Used in the About dialog and the .desktop file.
+    INDICATOR_NAME_HUMAN_READABLE = _( "Indicator Script Runner" )
+
+    # Used in the .desktop file.
+    INDICATOR_CATEGORIES = "Categories=Utility"
 
     CONFIG_HIDE_GROUPS = "hideGroups"
     CONFIG_INDICATOR_TEXT = "indicatorText"
@@ -104,6 +106,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
+            IndicatorScriptRunner.INDICATOR_NAME_HUMAN_READABLE,
             comments = _( "Runs a terminal command or script;\noptionally display results in the icon label." ) )
 
 #TODO Look at all of this...why use notify-send?

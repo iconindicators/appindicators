@@ -39,9 +39,11 @@ from .fortune import Fortune
 class IndicatorFortune( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Used when building the wheel to create the .desktop file.
-    indicator_name_for_desktop_file = _( "Indicator Fortune" )
-    indicator_categories = "Categories=Utility;Amusement"
+    # Used in the About dialog and the .desktop file.
+    INDICATOR_NAME_HUMAN_READABLE = _( "Indicator Fortune" )
+
+    # Used in the .desktop file.
+    INDICATOR_CATEGORIES = "Categories=Utility;Amusement"
 
     # Fortune treeview columns; model and view have same columns.
     COLUMN_FORTUNE_FILE = 0 # Path to fortune .dat file.

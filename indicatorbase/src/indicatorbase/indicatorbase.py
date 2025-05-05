@@ -183,25 +183,30 @@ class IndicatorBase( ABC ):
 
     def __init__(
         self,
+        indicator_name_human_readable,
         comments,
         artwork = None,
         creditz = None,
         debug = False ):
         '''
-        The comments argument is used in two places:
-            1) The comments are passed directly to the About dialog.
+        indicator_name_human_readable
+            Must be a translated string.
+            Used in the About dialog and the .desktop file.
 
-            2) The first letter of the comments is capitalised and
-               incorporated into the Project Description on the PyPI page.
+        comments
+            Must be a translated string.
+            Used in the About dialog and incorporated into the Project
+            Description on the PyPI page.
+
+        artwork, creditz
+            A list of strings or string/URL pairs where the string is the name
+            of credit.
+
+        debug
+            If True, shows update time and similar information in the menu.
         '''
         if IndicatorBase.INDICATOR_NAME is None:
-            self.show_dialog_ok(
-                None,
-                "Unable to determine indicator name!",
-                title = "ERROR",
-                message_type = Gtk.MessageType.ERROR )
-
-            sys.exit( 1 )
+            self._show_message_and_exit( "Unable to determine indicator name!" )
 
         self.indicator_name = IndicatorBase.INDICATOR_NAME
 
@@ -209,24 +214,13 @@ class IndicatorBase( ABC ):
             IndicatorBase.get_project_metadata( self.indicator_name ) )
 
         if error_message:
-            self.show_dialog_ok(
-                None,
-                error_message,
-                title = self.indicator_name,
-                message_type = Gtk.MessageType.ERROR )
-
-            sys.exit( 1 )
+            self._show_message_and_exit( error_message )
 
         error_message = self._initialise_desktop_file_in_user_home()
         if error_message:
-            self.show_dialog_ok(
-                None,
-                error_message,
-                title = self.indicator_name,
-                message_type = Gtk.MessageType.ERROR )
+            self._show_message_and_exit( error_message )
 
-            sys.exit( 1 )
-
+        self.indicator_name_human_readable = indicator_name_human_readable
         self.comments = comments
         self.artwork = artwork
         self.creditz = creditz
@@ -275,6 +269,20 @@ class IndicatorBase( ABC ):
         self.new_version_available = False
         if self.check_latest_version:
             threading.Thread( target = self._check_for_newer_version ).start()
+
+
+    def _show_message_and_exit(
+        self,
+        message ):
+
+        self.show_dialog_ok(
+            None,
+            message,
+            "ERROR" if IndicatorBase.INDICATOR_NAME is None
+            else IndicatorBase.INDICATOR_NAME,
+            message_type = Gtk.MessageType.ERROR )
+
+        sys.exit( 1 )
 
 
     def _check_for_newer_version( self ):
@@ -925,7 +933,7 @@ class IndicatorBase( ABC ):
 
         about_dialog.set_license_type( Gtk.License.GPL_3_0 )
         about_dialog.set_logo_icon_name( self.get_icon_name() )
-        about_dialog.set_program_name( self.indicator_name )
+        about_dialog.set_program_name( self.indicator_name_human_readable )
         about_dialog.set_translator_credits( _( "translator-credits" ) )
         about_dialog.set_version( self.version )
         about_dialog.set_website( self.website )

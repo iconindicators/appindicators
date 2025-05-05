@@ -36,9 +36,11 @@ from .indicatorbase import IndicatorBase
 class IndicatorTide( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Used when building the wheel to create the .desktop file.
-    indicator_name_for_desktop_file = _( "Indicator Tide" )
-    indicator_categories = "Categories=Utility"
+    # Used in the About dialog and the .desktop file.
+    INDICATOR_NAME_HUMAN_READABLE = _( "Indicator Tide" )
+
+    # Used in the .desktop file.
+    INDICATOR_CATEGORIES = "Categories=Utility"
 
     CONFIG_SHOW_AS_SUBMENUS = "showAsSubmenus"
     CONFIG_SHOW_AS_SUBMENUS_EXCEPT_FIRST_DAY = "showAsSubmenusExceptFirstDay"

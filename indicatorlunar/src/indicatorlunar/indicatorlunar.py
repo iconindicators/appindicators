@@ -49,9 +49,11 @@ from .dataproviderorbitalelement import DataProviderOrbitalElement, OrbitalEleme
 class IndicatorLunar( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
 
-    # Used when building the wheel to create the .desktop file.
-    indicator_name_for_desktop_file = _( "Indicator Lunar" )
-    indicator_categories = "Categories=Science;Astronomy"
+    # Used in the About dialog and the .desktop file.
+    INDICATOR_NAME_HUMAN_READABLE = _( "Indicator Lunar" )
+
+    # Used in the .desktop file.
+    INDICATOR_CATEGORIES = "Categories=Science;Astronomy"
 
     # Allow switching between backends.
     astro_backend_pyephem = "AstroPyEphem"
