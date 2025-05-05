@@ -54,7 +54,8 @@ def initialiase_parser_and_get_arguments(
 
 def initialise_virtual_environment(
     venv_directory,
-    *modules_to_install ):
+    *modules_to_install,
+    force_reinstall = False ):
 
     if not Path( venv_directory ).is_dir():
         command = f"python3 -m venv { venv_directory }"
@@ -62,6 +63,6 @@ def initialise_virtual_environment(
 
     command = (
         f". { venv_directory }/bin/activate && " + \
-        f"python3 -m pip install --upgrade { ' '.join( modules_to_install ) }" )
+        f"python3 -m pip install --upgrade { '--force-reinstall' if force_reinstall else '' } { ' '.join( modules_to_install ) }" )
 
     subprocess.run( command, shell = True, check = False )

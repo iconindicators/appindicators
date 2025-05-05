@@ -49,7 +49,8 @@ if __name__ == "__main__":
         utils.initialise_virtual_environment(
             utils.VENV_INSTALL,
             "pip",
-            f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)" )
+            f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)",
+            force_reinstall = True )
 
         command = (
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | " +
