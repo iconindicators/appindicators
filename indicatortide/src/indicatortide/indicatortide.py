@@ -50,6 +50,7 @@ class IndicatorTide( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
+            IndicatorTide.INDICATOR_NAME_HUMAN_READABLE,
             comments = _( "Displays tidal information." ) )
 
 

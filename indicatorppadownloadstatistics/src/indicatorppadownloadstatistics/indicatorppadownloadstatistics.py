@@ -71,6 +71,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
+            IndicatorPPADownloadStatistics.INDICATOR_NAME_HUMAN_READABLE,
             comments = _( "Displays the total downloads of PPAs." ) )
 
         self.preferences_changed = False

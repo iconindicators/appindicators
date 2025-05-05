@@ -46,6 +46,7 @@ class IndicatorStardate( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
+            IndicatorStardate.INDICATOR_NAME_HUMAN_READABLE,
             comments = _( "Shows the current Star Trek™ stardate." ),
             creditz = [
                 "STARDATES IN STAR TREK FAQ by Andrew Main. " +

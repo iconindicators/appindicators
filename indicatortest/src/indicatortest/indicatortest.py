@@ -56,6 +56,7 @@ class IndicatorTest( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
+            IndicatorTest.INDICATOR_NAME_HUMAN_READABLE,
             comments = _( "Exercises a range of indicator functionality." ),
             debug = True )
 

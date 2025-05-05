@@ -68,6 +68,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
+            IndicatorVirtualBox.INDICATOR_NAME_HUMAN_READABLE,
             comments = _( "Shows VirtualBox™ virtual machines and\nallows them to be started." ) )
 
         self.auto_start_required = True

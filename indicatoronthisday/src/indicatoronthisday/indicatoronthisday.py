@@ -92,6 +92,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
+            IndicatorOnThisDay.INDICATOR_NAME_HUMAN_READABLE,
             comments = _( "Calls the 'calendar' program and\ndisplays events in the menu." ) )
 
 

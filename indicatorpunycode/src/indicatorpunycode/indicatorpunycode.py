@@ -53,6 +53,7 @@ class IndicatorPunycode( IndicatorBase ):
 
     def __init__( self ):
         super().__init__(
+            IndicatorPunycode.INDICATOR_NAME_HUMAN_READABLE,
             comments = _( "Converts domain names between Unicode and ASCII." ),
             artwork = [ "Oleg Moiseichuk" ] )
 
