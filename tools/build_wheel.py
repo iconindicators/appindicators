@@ -283,23 +283,23 @@ def _get_name_categories_comments_from_indicator(
     message = ""
     with open( indicator_source, 'r', encoding = "utf-8" ) as f:
         for line in f:
-            if re.search( r"indicator_name_for_desktop_file = _\( ", line ):
+            if re.search( r"INDICATOR_NAME_HUMAN_READABLE = _\( ", line ):
                 name = parse( line )
 
-            if re.search( r"indicator_categories = ", line ):
+            if re.search( r"INDICATOR_CATEGORIES = ", line ):
                 categories = parse( line )
 
             if re.search( r"comments = _\(", line ):
                 comments = parse( line )
 
     if name == "":
-        message += f"ERROR: Unable to obtain 'indicator_name' from \n\t{ indicator_source }"
+        message += f"ERROR: Unable to obtain 'indicator_name' from \n\t{ indicator_source }\n"
 
     if categories == "":
-        message += f"ERROR: Unable to obtain 'categories' from \n\t{ indicator_source }"
+        message += f"ERROR: Unable to obtain 'categories' from \n\t{ indicator_source }\n"
 
     if comments == "":
-        message += f"ERROR: Unable to obtain 'comments' from the constructor of\n\t{ indicator_source }"
+        message += f"ERROR: Unable to obtain 'comments' from the constructor of\n\t{ indicator_source }\n"
 
     return name, categories, comments, message
 
@@ -599,11 +599,12 @@ if __name__ == "__main__":
                     "+" } ) )
 
     print(
-        "NOTE:\n" +
-        "\tPyGObject requires libgirepository-2.0 which is only \n" +
-        "\tavailable on Ubuntu 24.04+ or Debian 13+.\n\n" +
-        "\tThe build is set on Debian 11/12 and Ubuntu 20.04/22.04.\n" +
-        "\tconsequently, the version of PyGObject is pinned to 3.50.0.\n" )
+        "NOTE:\n"
+        "\tBuilding requires several Python libraries installed via PIP.\n" 
+        "\tThe most recent version of PyGObject requires libgirepository-2.0\n"
+        "\twhich is only available on Ubuntu 24.04+ or Debian 13+.\n\n"
+        "\tTo enabling building on Debian 11/12 and Ubuntu 20.04/22.04,\n"
+        "\tthe version of PyGObject has been pinned to 3.50.0.\n\n" )
 
     utils.initialise_virtual_environment(
         VENV_BUILD,
