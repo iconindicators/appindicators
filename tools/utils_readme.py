@@ -48,6 +48,8 @@ References:
 #
 # Is it safe to NOT pin Ubuntu 24.04 say (et al) to PyGObject 35.x.y and
 # just let it work with latest PyGObject and also with libgirepository2.0?
+#
+# https://github.com/beeware/toga/issues/3143#issuecomment-2853410292
 
 
 import datetime
