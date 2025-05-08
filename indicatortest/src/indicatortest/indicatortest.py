@@ -293,18 +293,12 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
+
     def _build_menu_clipboard(
         self,
         menu ):
 
         submenu = Gtk.Menu()
-
-        message_clipboard_unsupported = (
-            f"notify-send -i { self.get_icon_name() } "
-            +
-            "\"Unsupported\" "
-            +
-            "\"Clipboard unsupported.\"" )
 
         self.create_and_append_menuitem(
             submenu,
@@ -313,9 +307,9 @@ class IndicatorTest( IndicatorBase ):
                 lambda menuitem: (
                     self.copy_to_selection(
                         self._get_current_time() )
-                    if self.is_clipboard_supported()
-                    else
-                    self._execute_command( message_clipboard_unsupported ) ), ),
+                    if self.is_clipboard_supported() else
+                    self.show_notification(
+                        "Unsupported", "Clipboard unsupported." ) ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -325,9 +319,9 @@ class IndicatorTest( IndicatorBase ):
                 lambda menuitem: (
                     self.copy_to_selection(
                         self._get_current_time(), is_primary = True )
-                    if self.is_clipboard_supported()
-                    else
-                    self._execute_command( message_clipboard_unsupported ) ), ),
+                    if self.is_clipboard_supported() else
+                    self.show_notification(
+                        "Unsupported", "Clipboard unsupported." ) ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -342,35 +336,30 @@ class IndicatorTest( IndicatorBase ):
 
         submenu = Gtk.Menu()
 
-        labels = (
-            "calendar",
+        labels = [
             "fortune",
             "ls",
-            "notify-send",
-            "paplay",
-            "wmctrl" )
+            "notify-send", #TODO Need this?  For scriptrunner?
+            "paplay" ]
 
+#TODO Delete this if above TODO removes that line.
         notify_send = f"notify-send -i { self.get_icon_name() }"
         notify_send_unsupported = f"{ notify_send } \"Unsupported\" "
 
-        commands = (
-            "calendar -f /usr/share/calendar/calendar.all -A 3"
-            if self.is_calendar_supported()
-            else
-            f"{ notify_send_unsupported } \"Calendar package is unavailable.\"",
-
+        commands = [
             "fortune",
-
             "ls -la",
+            f"{ notify_send } \"summary 1 2 3\" \"body 4 5 6\"", #TODO Hopefully delete.
+            self.get_play_sound_complete_command() ]
 
-            f"{ notify_send } \"summary 1 2 3\" \"body 4 5 6\"",
+        if self.is_calendar_supported():
+            labels.insert( 0, "calendar" )
+            commands.insert(
+                0, "calendar -f /usr/share/calendar/calendar.all -A 3" )
 
-            self.get_play_sound_complete_command(),
-
-            f"{ notify_send_unsupported } \"Wayland does not support wmctrl.\""
-            if self.is_session_type_wayland()
-            else
-            "wmctrl -l" )
+        if self.is_session_type_x11():
+            labels.append( "wmctrl" )
+            commands.append( "wmctrl -l" )
 
         for label, command in zip( labels, commands ):
             self.create_and_append_menuitem(
