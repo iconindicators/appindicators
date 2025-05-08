@@ -22,9 +22,6 @@
 #TODO Add / edit / remove some PPAs to test saving and restoring.
 
 
-#TODO Run from installed version...just hangs.
-
-
 import concurrent.futures
 import locale
 
