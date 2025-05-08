@@ -101,7 +101,9 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem( menu, _( "Functionality" ) )
         self._build_menu_icon( menu )
         self._build_menu_label_tooltip_osd( menu )
-        self._build_menu_clipboard( menu )
+        if self.is_clipboard_supported():
+            self._build_menu_clipboard( menu )
+
         self._build_menu_execute_command( menu )
 
 
@@ -293,7 +295,6 @@ class IndicatorTest( IndicatorBase ):
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 
-
     def _build_menu_clipboard(
         self,
         menu ):
@@ -305,11 +306,7 @@ class IndicatorTest( IndicatorBase ):
             _( "Copy current time to clipboard" ),
             activate_functionandarguments = (
                 lambda menuitem: (
-                    self.copy_to_selection(
-                        self._get_current_time() )
-                    if self.is_clipboard_supported() else
-                    self.show_notification(
-                        "Unsupported", "Clipboard unsupported." ) ), ),
+                    self.copy_to_selection( self._get_current_time() ) ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -318,10 +315,7 @@ class IndicatorTest( IndicatorBase ):
             activate_functionandarguments = (
                 lambda menuitem: (
                     self.copy_to_selection(
-                        self._get_current_time(), is_primary = True )
-                    if self.is_clipboard_supported() else
-                    self.show_notification(
-                        "Unsupported", "Clipboard unsupported." ) ), ),
+                        self._get_current_time(), is_primary = True ) ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
