@@ -89,7 +89,7 @@ class AstroSkyfield( AstroBase ):
 
     # Stars ephemeris must be created using create_ephemeris_stars.py.
     ephemeris_stars_path = Path( __file__ ).parent / "data" / "stars.dat"
-    with load.open( str( ephemeris_stars_path ) as f:
+    with load.open( str( ephemeris_stars_path ) ) as f:
         _EPHEMERIS_STARS = hipparcos.load_dataframe( f )
 
     # Name tags for bodies.
@@ -623,13 +623,13 @@ class AstroSkyfield( AstroBase ):
         earth_at_now = earth.at( now )
         for planet_name in planets:
             index_planet = AstroSkyfield._PLANET_MAPPINGS[ planet_name ]
-            planet = AstroSkyfield._EPHEMERIS_PLANETS[ index_planet ] )
+            planet = AstroSkyfield._EPHEMERIS_PLANETS[ index_planet ]
             apparent_magnitude = planetary_magnitude( earth_at_now.observe( planet ) )
 
             is_saturn_bad_apparent_magnitude = (
                 planet_name == AstroBase.PLANET_SATURN
                 and
-                math.isnan( apparent_magnitude )
+                math.isnan( apparent_magnitude ) )
 
             if is_saturn_bad_apparent_magnitude:
                 # Saturn can return NaN; set the mean apparent magnitude.
@@ -658,7 +658,7 @@ class AstroSkyfield( AstroBase ):
 
         for star in stars:
             hip = AstroBase.get_star_hip( star )
-            star_ = AstroSkyfield._EPHEMERIS_STARS.loc[ hip ] )
+            star_ = AstroSkyfield._EPHEMERIS_STARS.loc[ hip ]
             if star_.magnitude <= apparent_magnitude_maximum:
                 AstroSkyfield._calculate_common(
                     now,
