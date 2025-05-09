@@ -116,7 +116,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         today = datetime.datetime.now()
         self.update_menu( menu )
-        # self.update_background_scripts( today )#TODO Uncomment
+        self.update_background_scripts( today )
         self.set_label_or_tooltip( self.process_tags() )
 
         # Calculate next update; default to well into the future.
@@ -124,7 +124,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         for script in self.scripts:
             key = self._create_key( script.get_group(), script.get_name() )
 
-#TODO Check this...
             is_background_and_update_due_and_in_indicator_text = (
                 isinstance( script, Background )
                 and
@@ -263,17 +262,29 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         background_scripts_to_execute = [ ]
         for script in self.scripts:
-#TODO Check logic of this loop and all if tests.
             script_is_background_and_in_indicator_text = (
                 isinstance( script, Background )
                 and
                 self.is_background_script_in_indicator_text( script ) )
 
-            key = self._create_key( script.get_group(), script.get_name() )
             if script_is_background_and_in_indicator_text:
+                key = self._create_key( script.get_group(), script.get_name() )
+
                 update_required = (
                     self.background_script_next_update_time[ key ] < now )
 
+#TODO This is odd...
+# Why does force update require that the script ALSO has results?
+# Why not always just force update?
+# Reading the tooltip for force update...
+#
+# Bitcoin returns either a profit/breakeven message or a failure message.
+# Impossible to distinguish success from failure as both are non-zero strings.
+#
+# CheckStackExchange returns None on no messages/notifications at StackExchange;
+# returns a message when a message/notification exists.
+# On error (failure to connect) an error message is returned.
+# Success/failure does not make sense for this script.
                 force_update_and_has_results = (
                     script.get_force_update()
                     and
@@ -382,12 +393,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "The text shown next to the indicator icon,\n" +
                     "or tooltip where applicable.\n\n" +
                     "A background script must:\n" +
-                    "\tAlways return non-empty text; or\n" +
+                    "\tAlways return non-empty text,\n\n" +
+                    "or,\n\n" +
                     "\tReturn non-empty text on success\n" +
                     "\tand empty text otherwise.\n\n" +
                     "Only background scripts added to the\n" +
-                    "icon text will be run.\n\n" +
-                    "Not supported on all desktops." ) ) )
+                    "icon text will be run." ) ) )
 
         command_text_view = (
             self.create_textview(
@@ -1643,13 +1654,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                 script_non_background_radio,
                 _( "Background" ),
                 tooltip_text = _(
-                    "Background scripts automatically run\n" +
-                    "at the interval specified, but only if\n" +
-                    "added to the icon text.\n\n" +
-                    "Any exception which occurs during script\n" +
-                    "execution will be logged to a file in the\n" +
-                    "user's home directory and the script tag\n" +
-                    "will remain in the icon text." ),
+                    "A background script added to the icon\n" +
+                    "text will run at the interval specified.\n\n" +
+                    "Any exception will be logged to a file in\n" +
+                    "the user's home directory and the script's\n" +
+                    "tag will remain in the icon text." ),
                 active = is_background ) )
 
         grid.attach( script_background_radio, 0, 18, 1, 1 )
