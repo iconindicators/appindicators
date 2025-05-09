@@ -112,17 +112,34 @@ class IndicatorScriptRunner( IndicatorBase ):
 #TODO Look at all of this...why use notify-send?
 # indicatorbase has a function to show notifications; why not use that?
 # Why is the command to for background different to non-background?
+#
+# Seems that to notify a non background script, need to add a call to notify-send
+# within the call for running the user script (so need libnotify-bin or whatever)
+# and cannot do via a Python call.
+#
+# For background, possibly can just make a Python call.
+#
+# Regardless of the above, why need to initial this stuff here?
+# Put the background call right next to where the background script is called.
+# Similarly for non-background?
         command_notify_common = (
             "notify-send -i " +
             self.get_icon_name() +
-            " \"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME + "\" " )
+            " \"" +
+            IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME +
+            "\" " )
 
         self.command_notify_background = (
             command_notify_common +
-            "\"" + IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT + "\"" )
+            "\"" +
+            IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT +
+            "\"" )
 
         self.command_notify_nonbackground = (
-            command_notify_common + "\"" + _( "...has completed." ) + "\"" )
+            command_notify_common +
+            "\"" +
+            _( "...has completed." ) +
+            "\"" )
 
 
     def update(
@@ -249,6 +266,33 @@ class IndicatorScriptRunner( IndicatorBase ):
             command += script.get_command()
 
             if script.get_show_notification():
+
+#TODO See if the code below can be made simpler and defined here as 
+# it was done for background script notification.
+                '''
+                command_notify_common = (
+                    "notify-send -i " +
+                    self.get_icon_name() +
+                    " \"" +
+                    IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME +
+                    "\" " )
+        
+                self.command_notify_background = (
+                    command_notify_common +
+                    "\"" +
+                    IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT +
+                    "\"" )
+        
+                self.command_notify_nonbackground = (
+                    command_notify_common +
+                    "\"" +
+                    _( "...has completed." ) +
+                    "\"" )
+                '''
+                
+                
+                
+                
                 notification = (
                     self.command_notify_nonbackground.replace(
                         IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME,
@@ -315,18 +359,29 @@ class IndicatorScriptRunner( IndicatorBase ):
                         IndicatorBase.get_play_sound_complete_command() )
 
                 if script.get_show_notification() and command_result:
-                    notification_command = self.command_notify_background
-                    notification_command = (
-                        notification_command.replace(
-                            IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME,
-                            script.get_name().replace( '-', '\\-' ) ) )
+                    self.process_call(
+                        "notify-send -i "
+                        +
+                        self.get_icon_name()
+                        +
+                        " \"" + script.get_name().replace( '-', '\\-' ) + "\" "
+                        +
+                        "\"" + command_result.replace( '-', '\\-' ) + "\"" )
 
-                    notification_command = (
-                        notification_command.replace(
-                            IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT,
-                            command_result.replace( '-', '\\-' ) ) )
-
-                    self.process_call( notification_command )
+#TODO Test the above...
+# Need to have a test background script which produces a result/output.
+                    # notification_command = self.command_notify_background
+                    # notification_command = (
+                    #     notification_command.replace(
+                    #         IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME,
+                    #         script.get_name().replace( '-', '\\-' ) ) )
+                    #
+                    # notification_command = (
+                    #     notification_command.replace(
+                    #         IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT,
+                    #         command_result.replace( '-', '\\-' ) ) )
+                    #
+                    # self.process_call( notification_command )
 
 
     def _update_background_script(
