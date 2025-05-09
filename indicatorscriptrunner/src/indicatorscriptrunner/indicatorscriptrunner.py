@@ -307,21 +307,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                         " \"" + script.get_name().replace( '-', '\\-' ) + "\"" +
                         " \"" + command_result.replace( '-', '\\-' ) + "\"" )
 
-#TODO Test the above...
-# Need to have a test background script which produces a result/output.
-                    # notification_command = self.command_notify_background
-                    # notification_command = (
-                    #     notification_command.replace(
-                    #         IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME,
-                    #         script.get_name().replace( '-', '\\-' ) ) )
-                    #
-                    # notification_command = (
-                    #     notification_command.replace(
-                    #         IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT,
-                    #         command_result.replace( '-', '\\-' ) ) )
-                    #
-                    # self.process_call( notification_command )
-
 
     def _update_background_script(
         self,
