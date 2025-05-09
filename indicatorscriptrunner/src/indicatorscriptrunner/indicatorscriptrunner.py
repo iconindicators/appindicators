@@ -109,38 +109,6 @@ class IndicatorScriptRunner( IndicatorBase ):
             IndicatorScriptRunner.INDICATOR_NAME_HUMAN_READABLE,
             comments = _( "Runs a terminal command or script;\noptionally display results in the icon label." ) )
 
-#TODO Look at all of this...why use notify-send?
-# indicatorbase has a function to show notifications; why not use that?
-# Why is the command to for background different to non-background?
-#
-# Seems that to notify a non background script, need to add a call to notify-send
-# within the call for running the user script (so need libnotify-bin or whatever)
-# and cannot do via a Python call.
-#
-# For background, possibly can just make a Python call.
-#
-# Regardless of the above, why need to initial this stuff here?
-# Put the background call right next to where the background script is called.
-# Similarly for non-background?
-        command_notify_common = (
-            "notify-send -i " +
-            self.get_icon_name() +
-            " \"" +
-            IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME +
-            "\" " )
-
-        self.command_notify_background = (
-            command_notify_common +
-            "\"" +
-            IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT +
-            "\"" )
-
-        self.command_notify_nonbackground = (
-            command_notify_common +
-            "\"" +
-            _( "...has completed." ) +
-            "\"" )
-
 
     def update(
         self,
@@ -266,37 +234,11 @@ class IndicatorScriptRunner( IndicatorBase ):
             command += script.get_command()
 
             if script.get_show_notification():
-
-#TODO See if the code below can be made simpler and defined here as 
-# it was done for background script notification.
-                '''
-                command_notify_common = (
+                notification = (
                     "notify-send -i " +
                     self.get_icon_name() +
-                    " \"" +
-                    IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME +
-                    "\" " )
-        
-                self.command_notify_background = (
-                    command_notify_common +
-                    "\"" +
-                    IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_RESULT +
-                    "\"" )
-        
-                self.command_notify_nonbackground = (
-                    command_notify_common +
-                    "\"" +
-                    _( "...has completed." ) +
-                    "\"" )
-                '''
-                
-                
-                
-                
-                notification = (
-                    self.command_notify_nonbackground.replace(
-                        IndicatorScriptRunner.COMMAND_NOTIFY_TAG_SCRIPT_NAME,
-                        script.get_name() ) )
+                    " \"" + script.get_name() + "\"" +
+                    " \"" + _( "...has completed." ) + "\"" )
 
                 command += "; " + notification
 
@@ -360,13 +302,10 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 if script.get_show_notification() and command_result:
                     self.process_call(
-                        "notify-send -i "
-                        +
-                        self.get_icon_name()
-                        +
-                        " \"" + script.get_name().replace( '-', '\\-' ) + "\" "
-                        +
-                        "\"" + command_result.replace( '-', '\\-' ) + "\"" )
+                        "notify-send -i " +
+                        self.get_icon_name() +
+                        " \"" + script.get_name().replace( '-', '\\-' ) + "\"" +
+                        " \"" + command_result.replace( '-', '\\-' ) + "\"" )
 
 #TODO Test the above...
 # Need to have a test background script which produces a result/output.
