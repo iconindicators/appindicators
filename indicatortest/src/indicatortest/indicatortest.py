@@ -333,17 +333,13 @@ class IndicatorTest( IndicatorBase ):
         labels = [
             "fortune",
             "ls",
-            "notify-send", #TODO Need this?  For scriptrunner?
+            "notify-send",
             "paplay" ]
-
-#TODO Delete this if above TODO removes that line.
-        notify_send = f"notify-send -i { self.get_icon_name() }"
-        notify_send_unsupported = f"{ notify_send } \"Unsupported\" "
 
         commands = [
             "fortune",
             "ls -la",
-            f"{ notify_send } \"summary 1 2 3\" \"body 4 5 6\"", #TODO Hopefully delete.
+            f"notify-send -i { self.get_icon_name() } 'summary...' 'body...'",
             self.get_play_sound_complete_command() ]
 
         if self.is_calendar_supported():
@@ -376,7 +372,7 @@ class IndicatorTest( IndicatorBase ):
 
 
     def _get_third_quarter_svg_icon_text( self ):
-        ''' Inspired from indicatorlunar to create third quarter. '''
+        ''' Ripped from indicatorlunar to create third quarter. '''
         width = 100
         height = width
         radius = float( width / 2 )
