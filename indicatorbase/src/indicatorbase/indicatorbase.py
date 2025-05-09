@@ -3125,10 +3125,7 @@ class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
         filename,
         maxBytes = 10000 ):
 
-        super().__init__(
-            filename,
-            maxBytes = maxBytes,
-            delay = True )
+        super().__init__( filename, maxBytes = maxBytes, delay = True )
 
 
     def doRollover( self ):
