@@ -19,9 +19,6 @@
 ''' Application indicator which displays PPA download statistics. '''
 
 
-#TODO Add / edit / remove some PPAs to test saving and restoring.
-
-
 import concurrent.futures
 import locale
 
