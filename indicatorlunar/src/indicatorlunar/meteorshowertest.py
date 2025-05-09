@@ -42,8 +42,6 @@
 # Likely need e, h or p.
 
 
-
-
 '''
 :====================================================
 : All records on J2000, velocities are VG    =
@@ -155,8 +153,6 @@
 "00009"|"00001"|"008"|"CAP"|" 1"|"2015-08-23"|"alpha-Capricornids                      "|"2010/13 "|"101    "|"138    "|"127    "|"306.5  "|"-9.2   "|"0.97   "|"0.24   "|"23.0   "|"306.57 "|"179.57 "|"  9.73 "|" 89.57 "|"260.27 "|"  M   1"|"2.54   "|"0.578  "|"0.774  "|"268.9  "|"125.4  "|"7.5    "|"00646"|"00000"|"00"|"169P/NEAT                               "|"                                                                                                                                                      "|"T   "|"LookUp table file name"|"9] <A href='http://adsabs.harvard.edu/abs/2016Icar..266..331J' target=_blank>Jenniskens et al., 2016</A>"
 "00010"|"00002"|"000"|"STA"|" 1"|"2002-mm-dd"|"Southern Taurids                        "|" annual "|"       "|"       "|"217.3  "|"48.7   "|"13     "|"0.73   "|"0.18   "|"28     "|" 49.80 "|"192.50 "|" -4.86 "|"102.46 "|"274.98 "|"       "|"2.07   "|"0.352  "|"0.825  "|"115.4  "|"37.3   "|"5.4    "|" 0097"|"00247"|"02"|"2P/Encke                                "|"member of Taurid Complex (247)                                                                                                                        "|"P   "|"LookUp table file name"|"1] <A href='http://adsabs.harvard.edu/abs/2002ESASP.500..177P' target=_blank>Porubcan & Kornos, 2002</A>"
 '''
-
-
 
 #TODO Random links that might help...
 # https://github.com/drguthals/learnwithdrg/tree/main/OverTheMoon/meteor-showers

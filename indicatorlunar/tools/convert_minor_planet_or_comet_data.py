@@ -74,7 +74,6 @@ def get_unpacked_date(
     return month + '/' + day + '/' + str( year )
 
 
-
 def get_packed_date(
     year,
     month,
