@@ -116,7 +116,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         today = datetime.datetime.now()
         self.update_menu( menu )
-        self.update_background_scripts( today )
+        # self.update_background_scripts( today )#TODO Uncomment
         self.set_label_or_tooltip( self.process_tags() )
 
         # Calculate next update; default to well into the future.
@@ -206,13 +206,14 @@ class IndicatorScriptRunner( IndicatorBase ):
         terminal, terminal_execution_flag = (
             self.get_terminal_and_execution_flag() )
 
+        summary_cannot_run_script = _( "Cannot run script" )
         if terminal is None:
             message = _(
-                "Cannot run script as no terminal and/or terminal execution " +
-                "flag found; please install gnome-terminal." )
+                "Cannot run script as no terminal and/or terminal" +
+                " execution flag found; please install gnome-terminal." )
 
             self.get_logging().error( message )
-            self.show_notification( "Cannot run script", message )
+            self.show_notification( summary_cannot_run_script, message )
 
         elif self.is_qterminal_and_broken( terminal ):
             # As a result of
@@ -226,7 +227,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 " install gnome-terminal instead." )
 
             self.get_logging().error( message )
-            self.show_notification( "Cannot run script", message )
+            self.show_notification( summary_cannot_run_script, message )
 
         else:
             command = terminal + " " + terminal_execution_flag + " ${SHELL} -c '"
@@ -389,6 +390,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         indicator_text_entry = (
             self.create_entry(
                 self.indicator_text,
+#TODO Needs rewording.
                 tooltip_text = _(
                     "The text shown next to the indicator icon,\n" +
                     "or tooltip where applicable.\n\n" +
@@ -1653,6 +1655,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_radiobutton(
                 script_non_background_radio,
                 _( "Background" ),
+#TODO Needs rewording.
                 tooltip_text = _(
                     "A background script added to the icon\n" +
                     "text will run at the interval specified.\n\n" +
@@ -1698,6 +1701,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         force_update_checkbutton = (
             self.create_checkbutton(
                 _( "Force update" ),
+#TODO Needs rewording.
                 tooltip_text = _(
                     "If the script returns non-empty text\n" +
                     "on its update, the script will run\n" +
