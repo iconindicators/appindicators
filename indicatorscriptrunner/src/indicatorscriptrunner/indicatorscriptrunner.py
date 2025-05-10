@@ -274,18 +274,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 update_required = (
                     self.background_script_next_update_time[ key ] < now )
 
-#TODO This is odd...
-# Why does force update require that the script ALSO has results?
-# Why not always just force update?
-# Reading the tooltip for force update...
-#
-# Bitcoin returns either a profit/breakeven message or a failure message.
-# Impossible to distinguish success from failure as both are non-zero strings.
-#
-# CheckStackExchange returns None on no messages/notifications at StackExchange;
-# returns a message when a message/notification exists.
-# On error (failure to connect) an error message is returned.
-# Success/failure does not make sense for this script.
+#TODO Check this logic below.
                 force_update_and_has_results = (
                     script.get_force_update()
                     and
@@ -390,17 +379,13 @@ class IndicatorScriptRunner( IndicatorBase ):
         indicator_text_entry = (
             self.create_entry(
                 self.indicator_text,
-#TODO Needs rewording.
                 tooltip_text = _(
                     "The text shown next to the indicator icon,\n" +
-                    "or tooltip where applicable.\n\n" +
-                    "A background script must:\n" +
-                    "\tAlways return non-empty text,\n\n" +
-                    "or,\n\n" +
-                    "\tReturn non-empty text on success\n" +
-                    "\tand empty text otherwise.\n\n" +
-                    "Only background scripts added to the\n" +
-                    "icon text will be run." ) ) )
+                    "or tooltip, where applicable.\n\n" +
+                    "A background script will only be run\n" +
+                    "if added to the icon text.\n" +
+                    "The result of running a background script\n" +
+                    "will be added to the icon text." ) ) )
 
         command_text_view = (
             self.create_textview(
@@ -1655,10 +1640,11 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_radiobutton(
                 script_non_background_radio,
                 _( "Background" ),
-#TODO Needs rewording.
                 tooltip_text = _(
-                    "A background script added to the icon\n" +
-                    "text will run at the interval specified.\n\n" +
+                    "A background script, added to the icon text,\n" +
+                    "will be run at the interval specified.\n\n" +
+                    "A background script must return a string,\n" +
+                    "which may be empty.\n\n" +
                     "Any exception will be logged to a file in\n" +
                     "the user's home directory and the script's\n" +
                     "tag will remain in the icon text." ),
@@ -1701,11 +1687,14 @@ class IndicatorScriptRunner( IndicatorBase ):
         force_update_checkbutton = (
             self.create_checkbutton(
                 _( "Force update" ),
-#TODO Needs rewording.
                 tooltip_text = _(
-                    "If the script returns non-empty text\n" +
-                    "on its update, the script will run\n" +
-                    "on the next update of ANY script." ),
+                    "Useful for a script which generally returns\n" +
+                    "an empty string, but on occasion returns\n" +
+                    "a message, say, when new mail has arrived,\n" +
+                    "or a log file is present.\n\n" +
+                    "When force update is enabled, the script will\n" +
+                    "be run on the next update of ANY script,\n" +
+                    "if the script returned a non-empty message." ),
                 sensitive = is_background,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = active ) )
