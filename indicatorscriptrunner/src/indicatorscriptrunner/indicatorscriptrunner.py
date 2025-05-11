@@ -559,6 +559,14 @@ class IndicatorScriptRunner( IndicatorBase ):
             button_copy = copy_,
             button_remove = remove )
 
+        if len( treestore ):
+            self._select_iter(
+                scripts_treeview, 
+                treestore.get_iter_from_string( "0:0" ) )
+
+        copy_.set_sensitive( len( treestore ) )
+        remove.set_sensitive( len( treestore ) )
+
         box.set_margin_top( IndicatorBase.INDENT_WIDGET_TOP )
         grid.attach( box, 0, 31, 1, 1 )
 
@@ -961,6 +969,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         if iter_select:
             self._update_preferences( treeview, iter_select )
+            self._select_iter( treeview, iter_select )
 
 
     def _on_copy_group(
@@ -1124,6 +1133,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         return iter_select
 
 
+#TODO Check each function below...
     def on_remove(
         self,
         button_remove,
@@ -1155,6 +1165,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 iter_children = model.iter_next( iter_children )
 
             iter_select = self._on_remove_group( treeview, model, iter_ )
+#TODO If we delete the last group, iter_select will be None and
+# we won't clear out the last of the tags...right?
             if iter_select:
                 old_tag_new_tag_pairs = ( )
                 for script in scripts:
@@ -1163,10 +1175,18 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         else:
             iter_select = self._on_remove_script( treeview, model, iter_ )
+#TODO If this was the last script, iter_select is None and
+# we won't clear out last of the tags.
             if iter_select:
                 old_tag_new_tag_pairs = (
                     ( self._create_key( group, name ), "" ), )
 
+#TODO If iter_select is not None, it means there is a valid group/script to select
+# (after the successful deletion of group/script).
+# This means the events will trigger correctly to set buttons/commandtextview/etc.
+# If iter_select is None, the deletion may still have occurred,
+# but that was the last group/script.
+# So still need to reset buttons/commandtextview and tags too?
         if iter_select:
             self._update_preferences(
                 treeview,
@@ -1176,6 +1196,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                 button_remove = button_remove,
                 entry_indicator_text = entry_indicator_text,
                 old_tag_new_tag_pairs = old_tag_new_tag_pairs )
+
+            # self._select_iter( treeview, iter_select )
+            # command_text_view.get_buffer().set_text( "" )
 
 
     def _on_remove_group(
@@ -1977,6 +2000,57 @@ class IndicatorScriptRunner( IndicatorBase ):
         return dump[ 0 ]+ "\n\n"
 
 
+#TODO See if it makes sense to use the functions below to replace the lump function.
+    def _select_iter(
+        self,
+        treeview,
+        iter_ ):
+
+        model = treeview.get_model()
+
+        if iter_: #TODO Need this?
+            treepath = (
+                Gtk.TreePath.new_from_string(
+                    model.get_string_from_iter( iter_ ) ) )
+
+            treeview.expand_all()
+            treeview.get_selection().select_path( treepath )
+            treeview.set_cursor( treepath, None, False )
+
+
+#TODO Need a function just to do this?
+    def _clear_command_text_view(
+        self,
+        command_text_view ):
+
+        command_text_view.get_buffer().set_text( "" )
+
+
+#TODO Need a function just to do this?
+    def _set_sensitive_copy_remove(
+        self,
+        treeview,
+        button_copy,
+        button_remove ):
+
+        model = treeview.get_model()
+        button_copy.set_sensitive( len( model ) )
+        button_remove.set_sensitive( len( model ) )
+
+
+    def _update_entry_indicator_text(
+        self,
+        entry_indicator_text,
+        old_tag_new_tag_pairs ):
+
+        for old_tag, new_tag in old_tag_new_tag_pairs:
+            entry_indicator_text.set_text(
+                entry_indicator_text.get_text().replace(
+                    "[" + old_tag + "]",
+                    "[" + new_tag + "]" if new_tag else "" ) )
+
+
+#TODO ORIGINAL Delete
     def _update_preferences(
         self,
         treeview,
