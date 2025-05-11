@@ -643,14 +643,18 @@ class IndicatorBase( ABC ):
                 The indicator returning the amount of seconds from now until
                 the next update needs to occur.
 
+                or
+
                 The user clicks OK in the Preferences.
+
+                or
 
                 An indicator experiences and event and requests an update.
                 For example, starting a virtual machine will request an update
                 to refresh the menu.
 
-            If there is a pending (future) update and a request for an update
-            comes along, need to remove the "old" pending update.
+            If there is a pending (future) update and a new request for an
+            update comes along, remove the previously pending update.
         '''
         if self.lock_update.acquire( blocking = False ):
             if self.id_update > 0:
