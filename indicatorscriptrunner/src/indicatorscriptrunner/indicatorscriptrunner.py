@@ -403,8 +403,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         # or a
         #   script, displaying the script name and attributes.
         #
-        # Each row contains columns containing group, script command and
-        # script default, which are not displayed, but used programmatically.
+        # In addition, each row contains a column for
+        #   group
+        #   script command
+        #   script default
+        # which are not displayed, but used programmatically.
         treestore = Gtk.TreeStore( str, str, str, str, str, str, str, str, str, str, str )
         scripts_by_group = self.get_scripts_by_group( self.scripts )
         for group, scripts in scripts_by_group.items():
@@ -427,7 +430,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         IndicatorBase.SYMBOL_TICK if script.get_terminal_open()
                         else None
                     ),
-                    IndicatorBase.SYMBOL_DASH if isinstance( script, Background )
+                    IndicatorBase.SYMBOL_DASH if isinstance( script, Background )  #TODO Set to None or false not DASH?
                     else str( script.get_default() ),
                     str( script.get_interval_in_minutes() )
                     if isinstance( script, Background )
@@ -732,7 +735,6 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
-#TODO Test saving of scripts.
             self.scripts = [ ]
             iter_group = treestore.get_iter_first()
             while iter_group:
@@ -756,7 +758,6 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                     background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
                     if background == IndicatorBase.SYMBOL_TICK:
-                        force_update = row[ IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ]
                         script = (
                             Background(
                                 group,
@@ -765,11 +766,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                                 sound,
                                 notification,
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ],
-                                force_update == IndicatorBase.SYMBOL_TICK ) )
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ]
+                                ==
+                                IndicatorBase.SYMBOL_TICK ) )
 
                     else:
-                        terminal = row[ IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ]
-                        default = row[ IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ]
                         script = (
                             NonBackground(
                                 group,
@@ -777,8 +778,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                                 command,
                                 sound,
                                 notification,
-                                terminal == IndicatorBase.SYMBOL_TICK,
-                                default == "True" ) )
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ]
+                                ==
+                                IndicatorBase.SYMBOL_TICK,
+                                row[ IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ]
+                                ==
+                                "True" ) )
 
                     self.scripts.append( script )
                     iter_scripts = treestore.iter_next( iter_scripts )
@@ -790,12 +795,15 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.hide_groups = hide_groups_checkbutton.get_active()
             self.indicator_text = indicator_text_entry.get_text()
             self.indicator_text_separator = indicator_text_separator_entry.get_text()
-            self.initialise_background_scripts()
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),
                 delay_spinner.get_value_as_int(),
                 latest_version_checkbox.get_active() )
+
+            # Reset all background scripts; could/should try and determine which
+            # script changed and only reset those...just brute force reset all!
+            self.initialise_background_scripts()
 
         return response_type
 
@@ -806,8 +814,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         iter_,
         data ):
         '''
-        Show a row for a group if any script within the group is background.
         Show a row for a script if the script is background.
+        Show a row for a group if any script within the group is background.
         '''
         row = model[ iter_ ]
         group = row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
@@ -897,7 +905,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "and all scripts within the group." ) )
 
                 remove.set_tooltip_text( _(
-                    "Remove the selected script and\n." +
+                    "Remove the selected group and\n." +
                     "all scripts within the group." ) )
 
             textview.get_buffer().set_text( command_text )
@@ -2011,8 +2019,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         '''
         Each time a background script is run, cache the result.
 
-        If for example, one script has an interval of five minutes and another
-        script is hourly, the hourly script should only be run hourly, so use a
+        If one script's interval is five minutes and another's hourly,
+        the hourly script should only be run hourly, so use a
         cached result when the shorter interval script is run.
 
         Initialise the cache results and set a next update time in the past to
@@ -2020,12 +2028,12 @@ class IndicatorScriptRunner( IndicatorBase ):
         '''
         self.background_script_results = { }
         self.background_script_next_update_time = { }
-        today = datetime.datetime.now()
+        now = datetime.datetime.now()
         for script in self.scripts:
             if isinstance( script, Background ):
                 key = self._create_key( script.get_group(), script.get_name() )
                 self.background_script_results[ key ] = None
-                self.background_script_next_update_time[ key ] = today
+                self.background_script_next_update_time[ key ] = now
 
 
     def _create_key(
