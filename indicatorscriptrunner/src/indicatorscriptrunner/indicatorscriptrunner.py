@@ -274,7 +274,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 update_required = (
                     self.background_script_next_update_time[ key ] < now )
 
-#TODO Check this logic below.
                 force_update_and_has_results = (
                     script.get_force_update()
                     and
