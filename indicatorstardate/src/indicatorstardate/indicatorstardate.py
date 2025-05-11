@@ -149,8 +149,7 @@ class IndicatorStardate( IndicatorBase ):
 
         self.request_update( delay = 0 )
 
-        # Defer the save; avoids multiple saves when scrolling the mouse wheel
-        # like crazy!
+        # Defer the save; avoids multiple saves when manic scrolling!
         self.request_save_config( delay = 10 )
 
 
