@@ -299,23 +299,49 @@ class IndicatorTest( IndicatorBase ):
         self,
         menu ):
 
+        def primary_received_callback_function( text ):
+            if text is None:
+                print( "No text is highlighted/selected." )
+
+            else:
+                print( f"From primary: { text }" )
+
+
         submenu = Gtk.Menu()
+
+        self.create_and_append_menuitem(
+            submenu,
+            _( "Copy from clipboard" ),
+            activate_functionandarguments = (
+                lambda menuitem:
+                    print(
+                        f"From clipboard: { self.copy_from_selection_clipboard() }"), ),
+            indent = ( 2, 0 ) )
+
+        self.create_and_append_menuitem(
+            submenu,
+            _( "Copy from primary" ),
+            activate_functionandarguments = (
+                lambda menuitem:
+                    self. copy_from_selection_primary(
+                        primary_received_callback_function ), ),
+            indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
             submenu,
             _( "Copy current time to clipboard" ),
             activate_functionandarguments = (
-                lambda menuitem: (
-                    self.copy_to_selection( self._get_current_time() ) ), ),
+                lambda menuitem:
+                    self.copy_to_selection( self._get_current_time() ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
             submenu,
             _( "Copy current time to primary" ),
             activate_functionandarguments = (
-                lambda menuitem: (
+                lambda menuitem:
                     self.copy_to_selection(
-                        self._get_current_time(), is_primary = True ) ), ),
+                        self._get_current_time(), is_primary = True ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
