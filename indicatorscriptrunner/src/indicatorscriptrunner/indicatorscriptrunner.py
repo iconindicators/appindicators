@@ -1140,39 +1140,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                 iter_,
                 IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
-        group = (
-            model.get_value(
-                iter_,
-                IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
-
         if name is None:
-            # scripts = [ ]
-            # iter_children = model.iter_children( iter_ )
-            # while iter_children:
-            #     scripts.append(
-            #         model.get_value(
-            #             iter_children,
-            #             IndicatorScriptRunner.COLUMN_MODEL_NAME )  )
-            #
-            #     iter_children = model.iter_next( iter_children )
-
             iter_select, old_tag_new_tag_pairs = (
                 self._on_remove_group( treeview, model, iter_ ) )
-
-            # old_tag_new_tag_pairs = ( )
-            # if iter_select or len( model ) == 0:
-            #     for script in scripts:
-            #         old_tag_new_tag_pairs += (
-            #             ( self._create_key( group, script ), "" ), )
 
         else:
             iter_select, old_tag_new_tag_pairs = (
                 self._on_remove_script( treeview, model, iter_ ) )
-
-            # old_tag_new_tag_pairs = ( )
-            # if iter_select or len( model ) == 0:
-            #     old_tag_new_tag_pairs = (
-            #         ( self._create_key( group, name ), "" ), )
 
         if iter_select:
             self._select_row( treeview, iter_select )
