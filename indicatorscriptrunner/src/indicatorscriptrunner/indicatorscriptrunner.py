@@ -1125,7 +1125,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         return iter_select
 
 
-#TODO Check each function below...
     def on_remove(
         self,
         button_remove,
@@ -1201,8 +1200,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 if iter_previous:
                     iter_select = (
                         model.iter_nth_child(
-                        iter_previous,
-                        model.iter_n_children( iter_previous ) - 1 ) )
+                            iter_previous,
+                            model.iter_n_children( iter_previous ) - 1 ) )
 
                 else:
                     iter_select = (
@@ -1274,6 +1273,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         return iter_select, old_tag_new_tag_pairs
 
 
+#TODO Check each function below...
     def on_edit(
         self,
         treeview,
