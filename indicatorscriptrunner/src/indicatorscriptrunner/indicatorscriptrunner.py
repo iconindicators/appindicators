@@ -1146,29 +1146,33 @@ class IndicatorScriptRunner( IndicatorBase ):
                 IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
 
         if name is None:
-            scripts = [ ]
-            iter_children = model.iter_children( iter_ )
-            while iter_children:
-                scripts.append(
-                    model.get_value(
-                        iter_children,
-                        IndicatorScriptRunner.COLUMN_MODEL_NAME )  )
+            # scripts = [ ]
+            # iter_children = model.iter_children( iter_ )
+            # while iter_children:
+            #     scripts.append(
+            #         model.get_value(
+            #             iter_children,
+            #             IndicatorScriptRunner.COLUMN_MODEL_NAME )  )
+            #
+            #     iter_children = model.iter_next( iter_children )
 
-                iter_children = model.iter_next( iter_children )
+            iter_select, old_tag_new_tag_pairs = (
+                self._on_remove_group( treeview, model, iter_ ) )
 
-            iter_select = self._on_remove_group( treeview, model, iter_ )
-            old_tag_new_tag_pairs = ( )
-            if iter_select or len( model ) == 0:
-                for script in scripts:
-                    old_tag_new_tag_pairs += (
-                        ( self._create_key( group, script ), "" ), )
+            # old_tag_new_tag_pairs = ( )
+            # if iter_select or len( model ) == 0:
+            #     for script in scripts:
+            #         old_tag_new_tag_pairs += (
+            #             ( self._create_key( group, script ), "" ), )
 
         else:
-            iter_select = self._on_remove_script( treeview, model, iter_ )
-            old_tag_new_tag_pairs = ( )
-            if iter_select or len( model ) == 0:
-                old_tag_new_tag_pairs = (
-                    ( self._create_key( group, name ), "" ), )
+            iter_select, old_tag_new_tag_pairs = (
+                self._on_remove_script( treeview, model, iter_ ) )
+
+            # old_tag_new_tag_pairs = ( )
+            # if iter_select or len( model ) == 0:
+            #     old_tag_new_tag_pairs = (
+            #         ( self._create_key( group, name ), "" ), )
 
         if iter_select:
             self._select_row( treeview, iter_select )
@@ -1189,6 +1193,16 @@ class IndicatorScriptRunner( IndicatorBase ):
         model,
         iter_group ):
 
+        scripts = [ ]
+        iter_children = model.iter_children( iter_group )
+        while iter_children:
+            scripts.append(
+                model.get_value(
+                    iter_children,
+                    IndicatorScriptRunner.COLUMN_MODEL_NAME )  )
+
+            iter_children = model.iter_next( iter_children )
+
         response = (
             self.show_dialog_ok_cancel(
                 treeview,
@@ -1197,7 +1211,17 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "all scripts within the group?" ) ) )
 
         iter_select = None
+        old_tag_new_tag_pairs = ( )
         if response == Gtk.ResponseType.OK:
+            group = (
+                model.get_value(
+                    iter_group,
+                    IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
+            for script in scripts:
+                old_tag_new_tag_pairs += (
+                    ( self._create_key( group, script ), "" ), )
+
             if len( model ) > 1:
                 iter_previous = model.iter_previous( iter_group )
                 if iter_previous:
@@ -1215,7 +1239,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         print( self.dump_treestore( model ) )
 
-        return iter_select
+        return iter_select, old_tag_new_tag_pairs
 
 
     def _on_remove_script(
@@ -1229,7 +1253,21 @@ class IndicatorScriptRunner( IndicatorBase ):
                 treeview, _( "Remove the selected script?" ) ) )
 
         iter_select = None
+        old_tag_new_tag_pairs = ( )
         if response == Gtk.ResponseType.OK:
+            name = (
+                model.get_value(
+                    iter_script,
+                    IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+
+            group = (
+                model.get_value(
+                    iter_script,
+                    IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+
+            old_tag_new_tag_pairs = (
+                ( self._create_key( group, name ), "" ), )
+
             iter_group = model.iter_parent( iter_script )
             if model.iter_n_children( iter_group ) > 1:
                 iter_previous = model.iter_previous( iter_script )
@@ -1259,7 +1297,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         print( self.dump_treestore( model ) )
 
-        return iter_select
+        return iter_select, old_tag_new_tag_pairs
 
 
     def on_edit(
