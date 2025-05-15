@@ -1273,7 +1273,6 @@ class IndicatorScriptRunner( IndicatorBase ):
         return iter_select, old_tag_new_tag_pairs
 
 
-#TODO Check each function below...
     def on_edit(
         self,
         treeview,
@@ -1297,78 +1296,10 @@ class IndicatorScriptRunner( IndicatorBase ):
             iter_select, old_tag_new_tag_pairs = (
                 self._on_edit_group( treeview, model, iter_, group, groups ) )
 
-            # if iter_select:
-            #     group_ = (
-            #         model.get_value(
-            #             iter_select,
-            #             IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
-            #
-            #     old_tag_new_tag_pairs = ( )
-            #     iter_scripts = model.iter_children( iter_select )
-            #     while iter_scripts:
-            #         background = (
-            #             model.get_value(
-            #                 iter_scripts,
-            #                 IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
-            #
-            #         if background == IndicatorBase.SYMBOL_TICK:
-            #             script = (
-            #                 model.get_value(
-            #                     iter_scripts,
-            #                     IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
-            #
-            #             old_tag_new_tag_pairs += (
-            #                 (
-            #                     self._create_key( group, script ),
-            #                     self._create_key( group_, script ) ), )
-            #
-            #         iter_scripts = model.iter_next( iter_scripts )
-
         else:
-            # Obtain the background value before edit; the edit will remove the
-            # edited row, invalidating the iter.
-            # background = (
-            #     model.get_value(
-            #         iter_,
-            #         IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
-            #
-            # was_background = background == IndicatorBase.SYMBOL_TICK
-            #
             iter_select, old_tag_new_tag_pairs = (
                 self._on_edit_script(
                     treeview, model, iter_, group, name, groups ) )
-            #
-            # if iter_select:
-            #     group_ = (
-            #         model.get_value(
-            #             iter_select,
-            #             IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
-            #
-            #     name_ = (
-            #         model.get_value(
-            #             iter_select,
-            #             IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
-            #
-            #     group_or_name_changed_or_both = group != group_ or name != name_
-            #
-            #     background_ = (
-            #         model.get_value(
-            #             iter_select,
-            #             IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
-            #
-            #     is_background = background_ == IndicatorBase.SYMBOL_TICK
-            #
-            #     update_indicator_text = (
-            #         ( was_background and not is_background )
-            #         or
-            #         ( was_background and group_or_name_changed_or_both ) )
-            #
-            #     old_tag_new_tag_pairs = ( )
-            #     if update_indicator_text:
-            #         old_tag_new_tag_pairs = (
-            #             (
-            #                 self._create_key( group, name ),
-            #                 self._create_key( group_, name_ ) ), )
 
         if iter_select:
             self._select_row( treeview, iter_select )
@@ -1557,7 +1488,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                     model.get_value(
                         iter_script,
                         IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
-                tooltip_text = _( "The terminal script/command, along with any arguments." ) ) )
+                tooltip_text = _(
+                    "The terminal script/command, along with any arguments." ) ) )
 
         grid.attach(
             self.create_box(
@@ -1639,7 +1571,8 @@ class IndicatorScriptRunner( IndicatorBase ):
         terminal_checkbutton = (
             self.create_checkbutton(
                 _( "Leave terminal open" ),
-                tooltip_text = _( "Leave the terminal open on script completion." ),
+                tooltip_text = _(
+                    "Leave the terminal open on script completion." ),
                 sensitive = not is_background,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = active ) )
