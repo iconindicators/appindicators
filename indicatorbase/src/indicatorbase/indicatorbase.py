@@ -1164,11 +1164,12 @@ class IndicatorBase( ABC ):
         On success, the text parameter to the callback function
         will contain the primary text; otherwise None.
         '''
+        print( "copy_from_selection_primary" ) #TODO Remove
         if self.is_clipboard_supported():
             if self.is_session_type_wayland():
                 # GTK interacts with the X11 clipboard mechanism via a user
-                # callback function to receive the selection, whereas under
-                # Wayland, this is not the case.
+                # callback function to receive the selection.
+                # Under Wayland, this is not the case.
                 #
                 # There is presently no GTK method for accessing the clipboard
                 # under Wayland.  Instead, the package wl-clipboard is used
