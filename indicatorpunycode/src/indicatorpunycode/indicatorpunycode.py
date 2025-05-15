@@ -133,9 +133,14 @@ class IndicatorPunycode( IndicatorBase ):
         else:
             self.show_notification(
                 _( "Unsupported" ),
-                _( "Under Wayland, the clipboard is unsupported." ) )
+                _( "Under Wayland, the clipboard is unsupported." ) )  #TODO THis is incorrect...
+            # clipboard is unsupported on wayland and ubuntu 20.04 (and similar versions...where else)?
+            # Maybe just say clipboard is unsupported.
 
 
+#TODO Can/should this just return a result and deal with the result in the caller?
+# The caller should determine how to obtain the text input and where to send the result/output.
+# This function should JUST CONVERT ... right?
     def _do_conversion(
         self,
         text ):
