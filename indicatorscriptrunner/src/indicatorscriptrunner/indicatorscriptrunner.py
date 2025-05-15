@@ -1294,35 +1294,35 @@ class IndicatorScriptRunner( IndicatorBase ):
             for row in model ]
 
         if name is None:
-            iter_select = (
+            iter_select, old_tag_new_tag_pairs = (
                 self._on_edit_group( treeview, model, iter_, group, groups ) )
 
-            if iter_select:
-                group_ = (
-                    model.get_value(
-                        iter_select,
-                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
-
-                old_tag_new_tag_pairs = ( )
-                iter_scripts = model.iter_children( iter_select )
-                while iter_scripts:
-                    background = (
-                        model.get_value(
-                            iter_scripts,
-                            IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
-
-                    if background == IndicatorBase.SYMBOL_TICK:
-                        script = (
-                            model.get_value(
-                                iter_scripts,
-                                IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
-
-                        old_tag_new_tag_pairs += (
-                            (
-                                self._create_key( group, script ),
-                                self._create_key( group_, script ) ), )
-
-                    iter_scripts = model.iter_next( iter_scripts )
+            # if iter_select:
+            #     group_ = (
+            #         model.get_value(
+            #             iter_select,
+            #             IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+            #
+            #     old_tag_new_tag_pairs = ( )
+            #     iter_scripts = model.iter_children( iter_select )
+            #     while iter_scripts:
+            #         background = (
+            #             model.get_value(
+            #                 iter_scripts,
+            #                 IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+            #
+            #         if background == IndicatorBase.SYMBOL_TICK:
+            #             script = (
+            #                 model.get_value(
+            #                     iter_scripts,
+            #                     IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+            #
+            #             old_tag_new_tag_pairs += (
+            #                 (
+            #                     self._create_key( group, script ),
+            #                     self._create_key( group_, script ) ), )
+            #
+            #         iter_scripts = model.iter_next( iter_scripts )
 
         else:
             # Obtain the background value before edit; the edit will remove the
@@ -1403,6 +1403,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 content_widget = grid ) )
 
         iter_select = None
+        old_tag_new_tag_pairs = ( )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -1440,6 +1441,22 @@ class IndicatorScriptRunner( IndicatorBase ):
                         IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN,
                         group_ )
 
+                    background = (
+                        model.get_value(
+                            iter_scripts,
+                            IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+
+                    if background == IndicatorBase.SYMBOL_TICK:
+                        script = (
+                            model.get_value(
+                                iter_scripts,
+                                IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+
+                        old_tag_new_tag_pairs += (
+                            (
+                                self._create_key( group, script ),
+                                self._create_key( group_, script ) ), )
+
                     iter_scripts = model.iter_next( iter_scripts )
 
                 iter_select = iter_group
@@ -1450,7 +1467,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         print( self.dump_treestore( model ) )
 
-        return iter_select
+        return iter_select, old_tag_new_tag_pairs
 
 
     def on_add(
