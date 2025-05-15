@@ -1327,48 +1327,48 @@ class IndicatorScriptRunner( IndicatorBase ):
         else:
             # Obtain the background value before edit; the edit will remove the
             # edited row, invalidating the iter.
-            background = (
-                model.get_value(
-                    iter_,
-                    IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
-
-            was_background = background == IndicatorBase.SYMBOL_TICK
-
-            iter_select = (
+            # background = (
+            #     model.get_value(
+            #         iter_,
+            #         IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+            #
+            # was_background = background == IndicatorBase.SYMBOL_TICK
+            #
+            iter_select, old_tag_new_tag_pairs = (
                 self._on_edit_script(
                     treeview, model, iter_, group, name, groups ) )
-
-            if iter_select:
-                group_ = (
-                    model.get_value(
-                        iter_select,
-                        IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
-
-                name_ = (
-                    model.get_value(
-                        iter_select,
-                        IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
-
-                group_or_name_changed_or_both = group != group_ or name != name_
-
-                background_ = (
-                    model.get_value(
-                        iter_select,
-                        IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
-
-                is_background = background_ == IndicatorBase.SYMBOL_TICK
-
-                update_indicator_text = (
-                    ( was_background and not is_background )
-                    or
-                    ( was_background and group_or_name_changed_or_both ) )
-
-                old_tag_new_tag_pairs = ( )
-                if update_indicator_text:
-                    old_tag_new_tag_pairs = (
-                        (
-                            self._create_key( group, name ),
-                            self._create_key( group_, name_ ) ), )
+            #
+            # if iter_select:
+            #     group_ = (
+            #         model.get_value(
+            #             iter_select,
+            #             IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ) )
+            #
+            #     name_ = (
+            #         model.get_value(
+            #             iter_select,
+            #             IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+            #
+            #     group_or_name_changed_or_both = group != group_ or name != name_
+            #
+            #     background_ = (
+            #         model.get_value(
+            #             iter_select,
+            #             IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+            #
+            #     is_background = background_ == IndicatorBase.SYMBOL_TICK
+            #
+            #     update_indicator_text = (
+            #         ( was_background and not is_background )
+            #         or
+            #         ( was_background and group_or_name_changed_or_both ) )
+            #
+            #     old_tag_new_tag_pairs = ( )
+            #     if update_indicator_text:
+            #         old_tag_new_tag_pairs = (
+            #             (
+            #                 self._create_key( group, name ),
+            #                 self._create_key( group_, name_ ) ), )
 
         if iter_select:
             self._select_row( treeview, iter_select )
@@ -1488,7 +1488,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP_HIDDEN ]
             for row in model ]
 
-        iter_select = (
+        iter_select, old_tag_new_tag_pairs = (
             self._on_edit_script(
                 treeview, treeview.get_model(), None, group, None, groups ) )
 
@@ -1773,6 +1773,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 content_widget = grid ) )
 
         iter_select = None
+        old_tag_new_tag_pairs = ( )
         while True:
             dialog.show_all()
             if dialog.run() == Gtk.ResponseType.OK:
@@ -1817,6 +1818,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                         continue
 
                 if not add:
+                    was_background = (
+                        model.get_value(
+                            iter_script,
+                            IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND )
+                        ==
+                        IndicatorBase.SYMBOL_TICK )
+
                     iter_group = model.iter_parent( iter_script )
                     if model.iter_n_children( iter_group ) == 1:
                         model.remove( iter_group )
@@ -1824,6 +1832,18 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                     else:
                         model.remove( iter_script )
+
+                    if was_background:
+                        update_indicator_text = (
+                            not script_background_radio.get_active()
+                            or
+                            ( group != group_ or name != name_ ) )
+
+                        if update_indicator_text:
+                            old_tag_new_tag_pairs = (
+                                (
+                                    self._create_key( group, name ),
+                                    self._create_key( group_, name_ ) ), )
 
                 is_non_background_and_default = (
                     script_non_background_radio.get_active()
@@ -1892,7 +1912,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         print( self.dump_treestore( model ) )
 
-        return iter_select
+        return iter_select, old_tag_new_tag_pairs
 
 
     def _get_iter_to_group(
