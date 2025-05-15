@@ -116,7 +116,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         today = datetime.datetime.now()
         self.update_menu( menu )
-        # self.update_background_scripts( today )#TODO Uncomment
+        self.update_background_scripts( today )
         self.set_label_or_tooltip( self.process_tags() )
 
         # Calculate next update; default to well into the future.
@@ -430,7 +430,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         IndicatorBase.SYMBOL_TICK if script.get_terminal_open()
                         else None
                     ),
-                    IndicatorBase.SYMBOL_DASH if isinstance( script, Background )  #TODO Set to None or false not DASH?
+                    None if isinstance( script, Background )
                     else str( script.get_default() ),
                     str( script.get_interval_in_minutes() )
                     if isinstance( script, Background )
@@ -890,12 +890,14 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         if iter_:
             name = (
-                model.get_value( iter_, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+                model.get_value(
+                    iter_, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
 
             if name:
                 command_text = (
                     model.get_value(
-                        iter_, IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ) )
+                        iter_,
+                        IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ) )
 
                 copy.set_tooltip_text( _( "Duplicate the selected script." ) )
                 remove.set_tooltip_text( _( "Remove the selected script." ) )
@@ -1981,45 +1983,6 @@ class IndicatorScriptRunner( IndicatorBase ):
                 entry_indicator_text.get_text().replace(
                     "[" + old_tag + "]",
                     "[" + new_tag + "]" if new_tag else "" ) )
-
-
-#TODO ORIGINAL Delete
-    # def _update_preferences(
-    #     self,
-    #     treeview,
-    #     iter_,
-    #     command_text_view = None,
-    #     button_copy = None,
-    #     button_remove = None,
-    #     entry_indicator_text = None,
-    #     old_tag_new_tag_pairs = None ):
-    #
-    #     model = treeview.get_model()
-    #
-    #     if iter_:
-    #         treepath = (
-    #             Gtk.TreePath.new_from_string(
-    #                 model.get_string_from_iter( iter_ ) ) )
-    #
-    #         treeview.expand_all()
-    #         treeview.get_selection().select_path( treepath )
-    #         treeview.set_cursor( treepath, None, False )
-    #
-    #     if command_text_view:
-    #         command_text_view.get_buffer().set_text( "" )
-    #
-    #     if button_copy:
-    #         button_copy.set_sensitive( len( model ) )
-    #
-    #     if button_remove:
-    #         button_remove.set_sensitive( len( model ) )
-    #
-    #     if entry_indicator_text and old_tag_new_tag_pairs:
-    #         for old_tag, new_tag in old_tag_new_tag_pairs:
-    #             entry_indicator_text.set_text(
-    #                 entry_indicator_text.get_text().replace(
-    #                     "[" + old_tag + "]",
-    #                     "[" + new_tag + "]" if new_tag else "" ) )
 
 
     def initialise_background_scripts( self ):
