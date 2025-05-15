@@ -65,9 +65,8 @@ class IndicatorPunycode( IndicatorBase ):
         self,
         menu ):
 
-        # The mouse middle button click kicks off a convert, but to do so must
-        # be bound to a menu item (which in reality kicks off the convert).
-        # Therefore this menu item, seemingly redundant, must be present.
+        # A conversion is kicked off by a mouse middle button click,
+        # which must be bound to a menu item.
         self.create_and_append_menuitem(
             menu,
             _( "Convert" ),
@@ -83,7 +82,7 @@ class IndicatorPunycode( IndicatorBase ):
                 _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
                 activate_functionandarguments = (
                     lambda menuitem, result = result: # Lambda late binding.
-                        self.send_results_to_output(
+                        self._send_to_output(
                             result[ IndicatorPunycode.RESULTS_UNICODE ] ), ),
                 indent = ( 1, 1 ) )
 
@@ -92,7 +91,7 @@ class IndicatorPunycode( IndicatorBase ):
                 _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
                 activate_functionandarguments = (
                     lambda menuitem, result = result:
-                        self.send_results_to_output(
+                        self._send_to_output(
                             result[ IndicatorPunycode.RESULTS_ASCII ] ), ),
                 indent = ( 1, 1 ) )
 
@@ -102,7 +101,8 @@ class IndicatorPunycode( IndicatorBase ):
 # Seems to not work on Ubuntu 20.04 on wayland either.
 # So how to capture this?
     def on_convert( self ):
-        if self.is_clipboard_supported():
+        print( "\n\n--------------" ) #TODO Testing
+        if self.is_clipboard_supported():  #TODO Does this also cover primary as opposed to clipboard?
             summary =_( "Nothing to convert..." )
             if self.input_clipboard:
                 print( "clipboard input" ) #TODO Remove
@@ -113,7 +113,7 @@ class IndicatorPunycode( IndicatorBase ):
 
                 else:
                     self._do_conversion( text )
-                    print( text ) #TODO Remove
+                    print( f"Converting: { text }" ) #TODO Remove
 
             else:
                 print( "primary input" ) #TODO Remove
@@ -125,7 +125,7 @@ class IndicatorPunycode( IndicatorBase ):
 
                     else:
                         self._do_conversion( text )
-                        print( text ) #TODO Remove
+                        print( f"Converting: { text }" ) #TODO Remove
 
                 self. copy_from_selection_primary(
                     primary_received_callback_function )
@@ -133,15 +133,76 @@ class IndicatorPunycode( IndicatorBase ):
         else:
             self.show_notification(
                 _( "Unsupported" ),
-                _( "Under Wayland, the clipboard is unsupported." ) )  #TODO THis is incorrect...
-            # clipboard is unsupported on wayland and ubuntu 20.04 (and similar versions...where else)?
-            # Maybe just say clipboard is unsupported.
+                _( "The clipboard is unsupported." ) )
 
 
-#TODO Can/should this just return a result and deal with the result in the caller?
-# The caller should determine how to obtain the text input and where to send the result/output.
-# This function should JUST CONVERT ... right?
     def _do_conversion(
+        self,
+        text ):
+
+        protocol = ""
+        result = re.split( r"(^.*//)", text )
+        if len( result ) == 3:
+            protocol = result[ 1 ]
+            text = result[ 2 ]
+
+        path_query = ""
+        result = re.split( r"(/.*$)", text )
+        if len( result ) == 3:
+            text = result[ 0 ]
+            if not self.drop_path_query:
+                path_query = result[ 1 ]
+
+        converted_text = ""
+        if text.find( "xn--" ) == -1:
+            labels = [ ]
+            for label in text.split( "." ):
+                labels.append(
+                    (
+                        encodings.idna.ToASCII(
+                            encodings.idna.nameprep( label ) ) ) )
+
+            converted_text = str( b'.'.join( labels ), "utf-8" )
+            result = [
+                protocol + text + path_query,
+                protocol + converted_text + path_query ]
+
+        else:
+            for label in text.split( "." ):
+                converted_text += (
+                    encodings.idna.ToUnicode(
+                        encodings.idna.nameprep( label ) ) + "." )
+
+            converted_text = converted_text[ : -1 ]
+            result = [
+                protocol + converted_text + path_query,
+                protocol + text + path_query ]
+
+        if result in self.results:
+            self.results.remove( result )
+
+        self.results.insert( 0, result )
+        self._cull_results()
+        self._send_to_output(
+            self.results[ 0 ][ IndicatorPunycode.RESULTS_UNICODE ] )
+
+        self.request_update()
+
+#TODO Hopefully not needed...do testing on wayland distros.
+        # except Exception as e:  #TODO W0718: Catching too general exception Exception (broad-exception-caught)
+        #     print( "EXCEPTION" )
+        #     print( e )
+        #     print()
+        #     self.get_logging().exception( e )
+        #     self.get_logging().error(
+        #         "Error converting '" + protocol + text + path_query + "'." )
+        #
+        #     self.show_notification(
+        #         _( "Error converting..." ), _( "See log for more details." ) )
+
+
+#TODO Remove
+    def _do_conversionORIGINAL(
         self,
         text ):
 
@@ -189,7 +250,7 @@ class IndicatorPunycode( IndicatorBase ):
 
             self.results.insert( 0, result )
 
-            self.cull_results()
+            self._cull_results()
 
             self.send_results_to_output(
                 protocol + converted_text + path_query )
@@ -208,12 +269,31 @@ class IndicatorPunycode( IndicatorBase ):
                 _( "Error converting..." ), _( "See log for more details." ) )
 
 
-    def cull_results( self ):
+    def _cull_results( self ):
         if len( self.results ) > self.result_history_length:
             self.results = self.results[ : self.result_history_length ]
 
 
-    def send_results_to_output(
+    def _send_to_output(
+        self,
+        text ):
+
+        if self.output_both:
+            print( f"Output to clipboard and primary: { text }" ) #TODO Remove
+            self.copy_to_selection( text )
+            self.copy_to_selection( text, is_primary = True )
+
+        elif self.input_clipboard:
+            print( f"Output to clipboard: { text }" ) #TODO Remove
+            self.copy_to_selection( text )
+
+        else:
+            print( f"Output to primary: { text }" ) #TODO Remove
+            self.copy_to_selection( text, is_primary = True )
+
+
+#TODO Delete
+    def send_results_to_outputORIG(
         self,
         text ):
 
@@ -327,7 +407,7 @@ class IndicatorPunycode( IndicatorBase ):
                 delay_spinner.get_value_as_int(),
                 latest_version_checkbox.get_active() )
 
-            self.cull_results()
+            self._cull_results()
 
         return response_type
 
