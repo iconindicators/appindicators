@@ -96,10 +96,9 @@ class IndicatorPunycode( IndicatorBase ):
                 indent = ( 1, 1 ) )
 
 
-#TODO On Debian 12 laptop under wayland,
-# cannot do a conversion...why?
-# Seems to not work on Ubuntu 20.04 on wayland either.
-# So how to capture this?
+#TODO Test Debian 12 laptop x11.
+#TODO Test Debian 12 laptop wayland.
+#TODO Test Ubuntu 20.04 wayland.
     def on_convert( self ):
         print( "\n\n--------------" ) #TODO Testing
         if self.is_clipboard_supported():  #TODO Does this also cover primary as opposed to clipboard?
@@ -201,74 +200,6 @@ class IndicatorPunycode( IndicatorBase ):
         #         _( "Error converting..." ), _( "See log for more details." ) )
 
 
-#TODO Remove
-    def _do_conversionORIGINAL(
-        self,
-        text ):
-
-        protocol = ""
-        result = re.split( r"(^.*//)", text )
-        if len( result ) == 3:
-            protocol = result[ 1 ]
-            text = result[ 2 ]
-
-        path_query = ""
-        result = re.split( r"(/.*$)", text )
-        if len( result ) == 3:
-            text = result[ 0 ]
-            if not self.drop_path_query:
-                path_query = result[ 1 ]
-
-        try:
-            converted_text = ""
-            if text.find( "xn--" ) == -1:
-                labels = [ ]
-                for label in text.split( "." ):
-                    labels.append(
-                        (
-                            encodings.idna.ToASCII(
-                                encodings.idna.nameprep( label ) ) ) )
-
-                converted_text = str( b'.'.join( labels ), "utf-8" )
-                result = [
-                    protocol + text + path_query,
-                    protocol + converted_text + path_query ]
-
-            else:
-                for label in text.split( "." ):
-                    converted_text += (
-                        encodings.idna.ToUnicode(
-                            encodings.idna.nameprep( label ) ) + "." )
-
-                converted_text = converted_text[ : -1 ]
-                result = [
-                    protocol + converted_text + path_query,
-                    protocol + text + path_query ]
-
-            if result in self.results:
-                self.results.remove( result )
-
-            self.results.insert( 0, result )
-
-            self._cull_results()
-
-            self.send_results_to_output(
-                protocol + converted_text + path_query )
-
-            self.request_update()
-
-        except Exception as e:  #TODO W0718: Catching too general exception Exception (broad-exception-caught)
-            print( "EXCEPTION" )
-            print( e )
-            print()
-            self.get_logging().exception( e )
-            self.get_logging().error(
-                "Error converting '" + protocol + text + path_query + "'." )
-
-            self.show_notification(
-                _( "Error converting..." ), _( "See log for more details." ) )
-
-
     def _cull_results( self ):
         if len( self.results ) > self.result_history_length:
             self.results = self.results[ : self.result_history_length ]
@@ -290,23 +221,6 @@ class IndicatorPunycode( IndicatorBase ):
         else:
             print( f"Output to primary: { text }" ) #TODO Remove
             self.copy_to_selection( text, is_primary = True )
-
-
-#TODO Delete
-    def send_results_to_outputORIG(
-        self,
-        text ):
-
-        if self.output_both:
-            self.copy_to_selection( text )
-            self.copy_to_selection( text, is_primary = True )
-
-        else:
-            if self.input_clipboard:
-                self.copy_to_selection( text )
-
-            else:
-                self.copy_to_selection( text, is_primary = True )
 
 
     def on_preferences(
