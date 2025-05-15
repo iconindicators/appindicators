@@ -815,9 +815,10 @@ def _get_limitations(
         messages.append(
             "- `Manjaro 24`: No autostart.\n" )
 
-#TODO For indicatoronthisday and wayland and ubuntu 20.04
-# need to mention that clicking on an event will not copy to clipboard.
+#TODO Is wl-clipboard needed for openSUSE?
 
+#TODO For fotune/onthisday/punycode/test and wayland and ubuntu 20.04
+# need to mention that clicking on an event will not copy to clipboard.
     message = ""
     if messages:
         message = (
