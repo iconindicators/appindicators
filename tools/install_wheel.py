@@ -45,6 +45,27 @@ if __name__ == "__main__":
                 "indicators" :
                     "+" } ) )
 
+
+#TODO Tried to install indicatortest on Ubuntu 24.04 
+#into a new .loca/venv_indicators and gi and other packages are not installed...why?
+# Need to add PyGObject and packaging to pip below...
+# But got some error during install...
+#... is that because the pyproject.toml build is locked to an older version of PyGObject?
+# Got the error because libgirepository-2.0-dev was not installed.
+#
+# Another thought; need to change
+#
+#   "pip",
+#
+# to
+#
+#   "pip",
+#   "packaging",
+#   "PyGObject",
+#
+# but PyGObject may need to be pinned depending on the version of Ubuntu.
+# How to make this script do that automatically...or at least check
+# and abort if wrong version?
     for indicator_name in args.indicators:
         utils.initialise_virtual_environment(
             utils.VENV_INSTALL,
