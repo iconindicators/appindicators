@@ -50,6 +50,10 @@ References:
 # just let it work with latest PyGObject and also with libgirepository2.0?
 #
 # https://github.com/beeware/toga/issues/3143#issuecomment-2853410292
+#
+# On Ubuntu 24.04 need to install libgirepository-2.0-dev
+#
+
 
 
 import datetime
