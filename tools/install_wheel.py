@@ -66,6 +66,10 @@ if __name__ == "__main__":
 # but PyGObject may need to be pinned depending on the version of Ubuntu.
 # How to make this script do that automatically...or at least check
 # and abort if wrong version?
+#
+# BIGGER QUESTION: Need a big print at the start of this script (and others???)
+# stating that the build/install will only work on Ubuntu?
+# That is bad...!
     for indicator_name in args.indicators:
         utils.initialise_virtual_environment(
             utils.VENV_INSTALL,
