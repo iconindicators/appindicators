@@ -1093,32 +1093,9 @@ class IndicatorBase( ABC ):
         '''
         clipboard_supported = True
         if self.is_session_type_wayland():
+            clipboard_supported = (
+                "UBUNTU_CODENAME=focal" not in self.get_os_release() )
 
-            clipboard_supported = "UBUNTU_CODENAME=focal" not in self.get_os_release()
-            
-            
-            # etc_os_release = self.get_os_release()
-            # clipboard_supported = (
-            # 	not (
-            #         "ID=ubuntu" in etc_os_release
-            #         and
-            #         "VERSION_ID=\"20.04\"" in etc_os_release ) )
-#TODO Check with Kubuntu/Lubuntu 20.04 and 22.04 and 24.04 that ID=ubuntu is always true/present.
-# Also Linux Mint, Ubuntu Budgie and ubuntu Mate.
-#
-# I think cannot rely on ID=ubuntu and instead use
-#  UBUNTU_CODENAME=focal
-# Check above distros/variants first...
-#
-# Lubuntu 22.04 has ID=ubuntu and VERSION_ID="22.04"
-# Linux Mint Cinnamon 22 has ID=linutmint and VERSION_ID="22"
-# Kubuntu 22.04 has ID=ubuntu and VERSION_ID="22.04"
-# Kubuntu 24.04 has ID=ubuntu and VERSION_ID="24.04"
-# Lubuntu 24.04 has ID=ubuntu and VERSION_ID="24.04"
-# Xubuntu 24.04 has ID=ubuntu and VERSION_ID="24.04"
-#
-# CANNOT USE VERSION_ID nor ID
-# Instead use UBUNTU_CODENAME=focal
         return clipboard_supported
 
 
