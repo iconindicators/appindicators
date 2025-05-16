@@ -67,7 +67,6 @@ import signal
 import socket
 import subprocess
 import sys
-import tempfile
 import threading
 import webbrowser
 
@@ -1082,13 +1081,11 @@ class IndicatorBase( ABC ):
 #
 #   Ubuntu 20.04  Works on X11 but logs out on Wayland.
 #
-#
 # Seems to also be an issue on Debian 12 32 bit wayland.
-
     def is_clipboard_supported( self ):
         '''
-        On Ubuntu 20.04 when calling wl-copy/wl-paste under Wayland, due to a
-        bug in GNOME, the destkop session crashes:
+        On Ubuntu 20.04 calling wl-copy/wl-paste under Wayland,
+        the destkop session crashes:
 
             https://gitlab.gnome.org/GNOME/mutter/-/issues/1690
 
@@ -1096,13 +1093,32 @@ class IndicatorBase( ABC ):
         '''
         clipboard_supported = True
         if self.is_session_type_wayland():
-            etc_os_release = self.get_os_release()
-#TODO Check on say Kubuntu/Lubuntu 20.04 and 22.04 and 24.04 that ID=ubuntu is always true/present.
-            clipboard_supported = (
-                "ID=ubuntu" in etc_os_release
-                and
-                "VERSION_ID=\"20.04\"" not in etc_os_release )
 
+            clipboard_supported = "UBUNTU_CODENAME=focal" not in self.get_os_release()
+            
+            
+            # etc_os_release = self.get_os_release()
+            # clipboard_supported = (
+            # 	not (
+            #         "ID=ubuntu" in etc_os_release
+            #         and
+            #         "VERSION_ID=\"20.04\"" in etc_os_release ) )
+#TODO Check with Kubuntu/Lubuntu 20.04 and 22.04 and 24.04 that ID=ubuntu is always true/present.
+# Also Linux Mint, Ubuntu Budgie and ubuntu Mate.
+#
+# I think cannot rely on ID=ubuntu and instead use
+#  UBUNTU_CODENAME=focal
+# Check above distros/variants first...
+#
+# Lubuntu 22.04 has ID=ubuntu and VERSION_ID="22.04"
+# Linux Mint Cinnamon 22 has ID=linutmint and VERSION_ID="22"
+# Kubuntu 22.04 has ID=ubuntu and VERSION_ID="22.04"
+# Kubuntu 24.04 has ID=ubuntu and VERSION_ID="24.04"
+# Lubuntu 24.04 has ID=ubuntu and VERSION_ID="24.04"
+# Xubuntu 24.04 has ID=ubuntu and VERSION_ID="24.04"
+#
+# CANNOT USE VERSION_ID nor ID
+# Instead use UBUNTU_CODENAME=focal
         return clipboard_supported
 
 
@@ -1117,15 +1133,15 @@ class IndicatorBase( ABC ):
                 if is_primary:
                     command += "--primary "
 
-		#TODO Add links about why need to drop stderr
-		'''
-		https://bbs.archlinux.org/viewtopic.php?id=291927
-		https://github.com/bugaevc/wl-clipboard/pull/154
-		https://github.com/bugaevc/wl-clipboard/issues/212
-		https://github.com/bugaevc/wl-clipboard/pull/110
-		https://github.com/bugaevc/wl-clipboard/pull/154
-		'''
-
+                # The call to wl-copy was not closing stderr and so was
+                # effectively not returning and execution would hang.
+                # Need to pipe stderr to null.
+                #
+                # References:
+                #   https://bbs.archlinux.org/viewtopic.php?id=291927
+                #   https://github.com/bugaevc/wl-clipboard/issues/212
+                #   https://github.com/bugaevc/wl-clipboard/pull/110
+                #   https://github.com/bugaevc/wl-clipboard/pull/154
                 command += "2>/dev/null"
                 self.process_call( command )
 
@@ -1211,6 +1227,11 @@ class IndicatorBase( ABC ):
         primary_received_callback_function( text )
 
 
+#TODO Should there be a check for the presence of paplay AND the .oga which is played?
+# Maybe check if paplay is always present in each distro's packages.
+# paplay is part of pulseaudio...
+# but it seems pipewire is soon to be the default.
+# pipewire apparently uses pw-cat
     def get_play_sound_complete_command( self ):
         return "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 
