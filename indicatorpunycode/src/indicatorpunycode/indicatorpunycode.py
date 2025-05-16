@@ -65,8 +65,6 @@ class IndicatorPunycode( IndicatorBase ):
         self,
         menu ):
 
-        # A conversion is kicked off by a mouse middle button click,
-        # which must be bound to a menu item.
         self.create_and_append_menuitem(
             menu,
             _( "Convert" ),
