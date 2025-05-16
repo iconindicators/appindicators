@@ -1092,16 +1092,16 @@ class IndicatorBase( ABC ):
 
             https://gitlab.gnome.org/GNOME/mutter/-/issues/1690
 
-        Unfortunately this issue never got fixed for the version of GNOME used
-        in Ubuntu 20.04.
+        This issue was not fixed for the version of GNOME used in Ubuntu 20.04.
         '''
         clipboard_supported = True
         if self.is_session_type_wayland():
             etc_os_release = self.get_os_release()
+#TODO Check on say Kubuntu/Lubuntu 20.04 and 22.04 and 24.04 that ID=ubuntu is always true/present.
             clipboard_supported = (
                 "ID=ubuntu" in etc_os_release
                 and
-                "VERSION_ID=\"20.04\"" in etc_os_release )
+                "VERSION_ID=\"20.04\"" not in etc_os_release )
 
         return clipboard_supported
 
@@ -1113,17 +1113,21 @@ class IndicatorBase( ABC ):
         ''' Send text to the clipboard or primary. '''
         if self.is_clipboard_supported():
             if self.is_session_type_wayland():
-                with tempfile.NamedTemporaryFile( mode = 'w', delete = False ) as temporary_named_file:
-                    temporary_named_file.write( text )
-
-                command = "wl-copy "
+                command = f"echo \"{ text }\" | wl-copy "
                 if is_primary:
                     command += "--primary "
 
-                command += "< "
+		#TODO Add links about why need to drop stderr
+		'''
+		https://bbs.archlinux.org/viewtopic.php?id=291927
+		https://github.com/bugaevc/wl-clipboard/pull/154
+		https://github.com/bugaevc/wl-clipboard/issues/212
+		https://github.com/bugaevc/wl-clipboard/pull/110
+		https://github.com/bugaevc/wl-clipboard/pull/154
+		'''
 
-                self.process_call( command + temporary_named_file.name )
-                Path( temporary_named_file.name ).unlink( missing_ok = True )
+                command += "2>/dev/null"
+                self.process_call( command )
 
             else:
                 selection = Gdk.SELECTION_CLIPBOARD
