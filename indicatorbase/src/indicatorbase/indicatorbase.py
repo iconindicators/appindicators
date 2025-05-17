@@ -226,6 +226,7 @@ class IndicatorBase( ABC ):
         self.debug = debug
 
         self.current_desktop = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
+        self.session_type = self.process_get( "echo $XDG_SESSION_TYPE" )
 
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
@@ -882,15 +883,15 @@ class IndicatorBase( ABC ):
 
 
     def get_session_type( self ):
-        return self.process_get( "echo $XDG_SESSION_TYPE" )
+        return self.session_type
 
 
     def is_session_type_wayland( self ):
-        return self.get_session_type() == IndicatorBase.SESSION_TYPE_WAYLAND
+        return self.session_type == IndicatorBase.SESSION_TYPE_WAYLAND
 
 
     def is_session_type_x11( self ):
-        return self.get_session_type() == IndicatorBase.SESSION_TYPE_X11
+        return self.session_type == IndicatorBase.SESSION_TYPE_X11
 
 
     def _on_about(
@@ -1103,47 +1104,52 @@ class IndicatorBase( ABC ):
         self,
         text,
         is_primary = False ):
-        ''' Send text to the clipboard or primary. '''
-        if self.is_clipboard_supported():
-            if self.is_session_type_wayland():
-                command = f"echo \"{ text }\" | wl-copy "
-                if is_primary:
-                    command += "--primary "
+        '''
+        Send text to the clipboard or primary.
 
-                # The call to wl-copy was not closing stderr and so was
-                # effectively not returning and execution would hang.
-                # Need to pipe stderr to null.
-                #
-                # References:
-                #   https://bbs.archlinux.org/viewtopic.php?id=291927
-                #   https://github.com/bugaevc/wl-clipboard/issues/212
-                #   https://github.com/bugaevc/wl-clipboard/pull/110
-                #   https://github.com/bugaevc/wl-clipboard/pull/154
-                command += "2>/dev/null"
-                self.process_call( command )
+        Assumes clipboard support previously verified by the caller!
+        '''
+        if self.is_session_type_wayland():
+            command = f"echo \"{ text }\" | wl-copy "
+            if is_primary:
+                command += "--primary "
 
-            else:
-                selection = Gdk.SELECTION_CLIPBOARD
-                if is_primary:
-                    selection = Gdk.SELECTION_PRIMARY
+            # The call to wl-copy does not close stderr,
+            # effectively not returning and so execution hangs.
+            #
+            # Workaround: pipe stderr to null.
+            #
+            # References:
+            #   https://bbs.archlinux.org/viewtopic.php?id=291927
+            #   https://github.com/bugaevc/wl-clipboard/issues/212
+            #   https://github.com/bugaevc/wl-clipboard/pull/110
+            #   https://github.com/bugaevc/wl-clipboard/pull/154
+            command += "2>/dev/null"
+            self.process_call( command )
 
-                Gtk.Clipboard.get( selection ).set_text( text, -1 )
+        else:
+            selection = Gdk.SELECTION_CLIPBOARD
+            if is_primary:
+                selection = Gdk.SELECTION_PRIMARY
+
+            Gtk.Clipboard.get( selection ).set_text( text, -1 )
 
 
     def copy_from_selection_clipboard( self ):
         '''
         Obtain text from the clipboard.
         If there was no text copied or an error occurred, None is returned.
+
+        Assumes clipboard support previously verified by the caller!
         '''
         text_in_clipboard = None
-        if self.is_clipboard_supported():
-            if self.is_session_type_wayland():
-                text_in_clipboard = self.process_get( "wl-paste" )
+        if self.is_session_type_wayland():
+            text_in_clipboard = self.process_get( "wl-paste" )
 
-            else:
-                text_in_clipboard = (
-                    Gtk.Clipboard.get(
-                        Gdk.SELECTION_CLIPBOARD ).wait_for_text() )
+        else:
+            text_in_clipboard = (
+                Gtk.Clipboard.get(
+                    Gdk.SELECTION_CLIPBOARD ).wait_for_text() )
 
         return text_in_clipboard
 
@@ -1160,24 +1166,25 @@ class IndicatorBase( ABC ):
 
         On success, the text parameter to the callback function
         will contain the primary text; otherwise None.
-        '''
-        if self.is_clipboard_supported():
-            if self.is_session_type_wayland():
-                # GTK interacts with the X11 clipboard via a user callback
-                # function to receive the selection.
-                #
-                # Under Wayland, there is presently no GTK equivalent.
-                # Instead, the package wl-clipboard is called via a terminal.
-                #
-                # Shield the user from having to know about Wayland or X11 by
-                # wrapping wl-clipboard within a callback function.
-                primary_received_callback_function(
-                    self.process_get( "wl-paste --primary" ) )
 
-            else:
-                Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
-                    self._clipboard_primary_text_received_function,
-                    primary_received_callback_function )
+        Assumes clipboard support previously verified by the caller!
+        '''
+        if self.is_session_type_wayland():
+            # GTK interacts with the X11 clipboard via a user callback
+            # function to receive the selection.
+            #
+            # Under Wayland, there is presently no GTK equivalent.
+            # Instead, the package wl-clipboard is called via a terminal.
+            #
+            # Shield the user from having to know about Wayland or X11 by
+            # wrapping wl-clipboard within a callback function.
+            primary_received_callback_function(
+                self.process_get( "wl-paste --primary" ) )
+
+        else:
+            Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
+                self._clipboard_primary_text_received_function,
+                primary_received_callback_function )
 
 
     def _clipboard_primary_text_received_function(
