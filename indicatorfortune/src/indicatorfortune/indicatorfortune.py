@@ -19,6 +19,11 @@
 ''' Application indicator which displays fortunes. '''
 
 
+#TODO Test with/without clipboard supported 
+# AND
+# with/without preference set to copy last.
+
+
 import fnmatch
 import os
 
@@ -100,17 +105,17 @@ class IndicatorFortune( IndicatorBase ):
                 ==
                 IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
-#TODO Only put this in if the clipboard is supported.
-        self.create_and_append_menuitem(
-            menu,
-            _( "Copy Last Fortune" ),
-            activate_functionandarguments = (
-                lambda menuitem:
-                    self.copy_to_selection( self.fortune.get_message() ), ),
-            is_secondary_activate_target = (
-                self.middle_mouse_click_on_icon
-                ==
-                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
+        if self.is_clipboard_supported():
+            self.create_and_append_menuitem(
+                menu,
+                _( "Copy Last Fortune" ),
+                activate_functionandarguments = (
+                    lambda menuitem:
+                        self.copy_to_selection( self.fortune.get_message() ), ),
+                is_secondary_activate_target = (
+                    self.middle_mouse_click_on_icon
+                    ==
+                    IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST ) )
 
         self.create_and_append_menuitem(
             menu,
@@ -343,24 +348,7 @@ class IndicatorFortune( IndicatorBase ):
 
         grid.attach( radio_middle_mouse_click_new_fortune, 0, 4, 1, 1 )
 
-#TODO Hide this part if clipboard is not supported.
-# Need to consider if a user switched from a desktop session which supports
-# clipboard to a session which does not support...so default to show new fortune
-# maybe down in the properties?
-#
-# Otherwise, this is only for Ubuntu 20.04 and Wayland
-# so maybe the tooltip is fine?
-#
-# But how to prevent calling clipboard stuff when clipboard is not supported
-# and the check for clipboard support is removed from within each clipboard 
-# function?
-# Need to check out here (in menu building).
-# See also onthisday.
-
-        tooltip_text = ""
-        if not self.is_clipboard_supported():
-            tooltip_text += _( "Unsupported on Ubuntun 20.04 on Wayland." )
-
+        row = 5
         active_ = (
             self.middle_mouse_click_on_icon
             ==
@@ -370,11 +358,12 @@ class IndicatorFortune( IndicatorBase ):
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,
                 _( "Copy current fortune to clipboard" ),
-                tooltip_text = tooltip_text,
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = active_ ) )
 
-        grid.attach( radio_middle_mouse_click_copy_last_fortune, 0, 5, 1, 1 )
+        if self.is_clipboard_supported():
+            grid.attach( radio_middle_mouse_click_copy_last_fortune, 0, row, 1, 1 )
+            row += 1
 
         active_ = (
             self.middle_mouse_click_on_icon
@@ -388,12 +377,13 @@ class IndicatorFortune( IndicatorBase ):
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = active_ ) )
 
-        grid.attach( radio_middle_mouse_click_show_last_fortune, 0, 6, 1, 1 )
+        grid.attach( radio_middle_mouse_click_show_last_fortune, 0, row, 1, 1 )
+        row += 1
 
         autostart_checkbox, delay_spinner, latest_version_checkbox, box = (
             self.create_preferences_common_widgets() )
 
-        grid.attach( box, 0, 7, 1, 1 )
+        grid.attach( box, 0, row, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
@@ -563,7 +553,16 @@ class IndicatorFortune( IndicatorBase ):
         self.middle_mouse_click_on_icon = (
             config.get(
                 IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON,
-                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_SHOW_LAST ) )
+                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
+
+        mouse_middle_click_copy_last = (
+            self.middle_mouse_click_on_icon
+            ==
+            IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_COPY_LAST )
+
+        if mouse_middle_click_copy_last and not self.is_clipboard_supported():
+            self.middle_mouse_click_on_icon = (
+                IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW )
 
         self.refresh_interval_in_minutes = (
             config.get(
