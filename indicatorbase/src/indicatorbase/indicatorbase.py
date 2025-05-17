@@ -1107,11 +1107,7 @@ class IndicatorBase( ABC ):
         self,
         text,
         is_primary = False ):
-        '''
-        Send text to the clipboard or primary.
-
-        Assumes clipboard support previously verified by the caller!
-        '''
+        ''' Send text to the clipboard or primary. '''
         if self.is_session_type_wayland():
             command = f"echo \"{ text }\" | wl-copy "
             if is_primary:
@@ -1142,8 +1138,6 @@ class IndicatorBase( ABC ):
         '''
         Obtain text from the clipboard.
         If there was no text copied or an error occurred, None is returned.
-
-        Assumes clipboard support previously verified by the caller!
         '''
         text_in_clipboard = None
         if self.is_session_type_wayland():
@@ -1169,8 +1163,6 @@ class IndicatorBase( ABC ):
 
         On success, the text parameter to the callback function
         will contain the primary text; otherwise None.
-
-        Assumes clipboard support previously verified by the caller!
         '''
         if self.is_session_type_wayland():
             # GTK interacts with the X11 clipboard via a user callback
