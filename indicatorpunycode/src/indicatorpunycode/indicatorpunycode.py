@@ -21,6 +21,9 @@ Application indicator which converts domain names between Unicode and ASCII.
 '''
 
 
+#TODO Test with/without clipboard supported.
+
+
 import encodings.idna
 import re
 
@@ -234,16 +237,14 @@ class IndicatorPunycode( IndicatorBase ):
 
         grid = self.create_grid()
 
-#TODO If the clipboard is unsupported...show all of this stuff?
-# Perhaps see what happens after testing on ALL distros to see where support is
-# and is not.
-# If only for Ubuntu 20.04 and wayland, leave as is.
-# Maybe set insensitive (set to disabled or whatever the term is)
-# if clipboard unsupported.
-        grid.attach(
-            self.create_box(
-                ( ( Gtk.Label.new( _( "Input source" ) ), False ), ) ),
-            0, 0, 1, 1 )
+        row = 0
+        if self.is_clipboard_supported():
+            grid.attach(
+                self.create_box(
+                    ( ( Gtk.Label.new( _( "Input source" ) ), False ), ) ),
+                0, row, 1, 1 )
+
+            row += 1
 
         input_clipboard_radio = (
             self.create_radiobutton(
@@ -254,7 +255,9 @@ class IndicatorPunycode( IndicatorBase ):
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = self.input_clipboard ) )
 
-        grid.attach( input_clipboard_radio, 0, 1, 1, 1 )
+        if self.is_clipboard_supported():
+            grid.attach( input_clipboard_radio, 0, row, 1, 1 )
+            row += 1
 
         input_primary_radio = (
             self.create_radiobutton(
@@ -265,7 +268,9 @@ class IndicatorPunycode( IndicatorBase ):
                 margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
                 active = not self.input_clipboard ) )
 
-        grid.attach( input_primary_radio, 0, 2, 1, 1 )
+        if self.is_clipboard_supported():
+            grid.attach( input_primary_radio, 0, row, 1, 1 )
+            row += 1
 
         output_both_checkbutton = (
             self.create_checkbutton(
@@ -278,7 +283,9 @@ class IndicatorPunycode( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.output_both ) )
 
-        grid.attach( output_both_checkbutton, 0, 3, 1, 1 )
+        if self.is_clipboard_supported():
+            grid.attach( output_both_checkbutton, 0, row, 1, 1 )
+            row += 1
 
         drop_path_query_checkbutton = (
             self.create_checkbutton(
@@ -289,7 +296,9 @@ class IndicatorPunycode( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.drop_path_query ) )
 
-        grid.attach( drop_path_query_checkbutton, 0, 4, 1, 1 )
+        if self.is_clipboard_supported():
+            grid.attach( drop_path_query_checkbutton, 0, row, 1, 1 )
+            row += 1
 
         results_amount_spinner = (
             self.create_spinbutton(
@@ -303,18 +312,21 @@ class IndicatorPunycode( IndicatorBase ):
                     "contains a result will copy\n"
                     "the result to the output." ) ) )
 
-        grid.attach(
-            self.create_box(
-                (
-                    ( Gtk.Label.new( _( "Maximum results" ) ), False ),
-                    ( results_amount_spinner, False ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
-            0, 5, 1, 1 )
+        if self.is_clipboard_supported():
+            grid.attach(
+                self.create_box(
+                    (
+                        ( Gtk.Label.new( _( "Maximum results" ) ), False ),
+                        ( results_amount_spinner, False ) ),
+                    margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                0, row, 1, 1 )
+
+            row += 1
 
         autostart_checkbox, delay_spinner, latest_version_checkbox, box = (
             self.create_preferences_common_widgets() )
 
-        grid.attach( box, 0, 6, 1, 1 )
+        grid.attach( box, 0, row, 1, 1 )
 
         dialog.get_content_area().pack_start( grid, True, True, 0 )
         dialog.show_all()
