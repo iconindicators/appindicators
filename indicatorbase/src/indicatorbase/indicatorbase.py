@@ -1085,6 +1085,9 @@ class IndicatorBase( ABC ):
 # Seems to also be an issue on Debian 12 32 bit wayland.
     def is_clipboard_supported( self ):
         '''
+        Returns true if clipboard/primary copy/paste is supported;
+        false otherwise.
+
         On Ubuntu 20.04 calling wl-copy/wl-paste under Wayland,
         the desktop session crashes:
 
