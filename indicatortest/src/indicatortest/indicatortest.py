@@ -101,10 +101,10 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem( menu, _( "Functionality" ) )
         self._build_menu_icon( menu )
         self._build_menu_label_tooltip_osd( menu )
+        self._build_menu_execute_command( menu )
+
         if self.is_clipboard_supported():
             self._build_menu_clipboard( menu )
-
-        self._build_menu_execute_command( menu )
 
 
     def _build_menu_platform_uname(
