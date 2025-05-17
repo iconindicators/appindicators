@@ -16,6 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Test with/without clipboard supported
+# AND
+# preference copy_to_clipboard set to True/False.
+
+
 '''
 Application indicator which displays calendar events.
 
@@ -164,8 +169,6 @@ class IndicatorOnThisDay( IndicatorBase ):
                 last_date = event.get_date()
                 menu_item_count += 1
 
-#TODO Need a different layout perhaps for when clipboard is not supported?
-# Hopefully this is only for Ubuntu 20.04 and Wayland.
             if self.copy_to_clipboard:
                 name = event_date
                 activate_functionandarguments = None
@@ -352,40 +355,11 @@ class IndicatorOnThisDay( IndicatorBase ):
                     ( spinner, False ) ) ),
             0, 0, 1, 1 )
 
-        grid.attach(
-            self.create_box(
-                ( ( Gtk.Label.new( _( "On event click" ) ), False ), ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
-            0, 1, 1, 1 )
-
-        tooltip_text = _( "Copy the event text and date to the clipboard." )
         if self.is_clipboard_supported():
-            tooltip_text += _( "\n\nUnsupported on Ubuntun 20.04 on Wayland." )
+            sensitive = not self.copy_to_clipboard
 
-#TODO Show the radio if clipboard unsupported?
-# What about a preference set in a desktop which supports clipboard but 
-# now runs a desktop without clipboard?
-# See fortune too.
-        radio_copy_to_clipboard = (
-            self.create_radiobutton(
-                None,
-                _( "Copy event to clipboard" ),
-                tooltip_text = tooltip_text,
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = self.copy_to_clipboard ) )
-
-        grid.attach( radio_copy_to_clipboard, 0, 2, 1, 1 )
-
-        radio_internet_search = (
-            self.create_radiobutton(
-                radio_copy_to_clipboard,
-                _( "Search event on the internet" ),
-                tooltip_text =
-                    _( "Search for the event in the default web browser." ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
-                active = not self.copy_to_clipboard ) )
-
-        grid.attach( radio_internet_search, 0, 3, 1, 1 )
+        else:
+            sensitive = True
 
         search_engine_entry = (
             self.create_entry(
@@ -399,29 +373,78 @@ class IndicatorOnThisDay( IndicatorBase ):
                     "If the URL is empty and 'copy' is selected,\n" +
                     "the URL is reset back to factory default." ).format(
                         IndicatorOnThisDay.TAG_EVENT ),
-                sensitive = not self.copy_to_clipboard ) )
+                sensitive = sensitive ) )
 
-        grid.attach(
-            self.create_box(
-                (
-                    ( Gtk.Label.new( _( "URL" ) ), False ),
-                    ( search_engine_entry, True ) ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 2 ),
-            0, 4, 1, 1 )
+        row = 1
 
-        radio_copy_to_clipboard.connect(
-            "toggled",
-            self.on_event_click_radio,
-            radio_copy_to_clipboard,
-            radio_internet_search,
-            search_engine_entry )
+        if self.is_clipboard_supported():
+            grid.attach(
+                self.create_box(
+                    ( ( Gtk.Label.new( _( "On event click" ) ), False ), ),
+                    margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                0, row, 1, 1 )
 
-        radio_internet_search.connect(
-            "toggled",
-            self.on_event_click_radio,
-            radio_copy_to_clipboard,
-            radio_internet_search,
-            search_engine_entry )
+            row += 1
+
+            radio_copy_to_clipboard = (
+                self.create_radiobutton(
+                    None,
+                    _( "Copy event to clipboard" ),
+                    margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                    active = self.copy_to_clipboard ) )
+
+            grid.attach( radio_copy_to_clipboard, 0, row, 1, 1 )
+            row += 1
+
+            radio_internet_search = (
+                self.create_radiobutton(
+                    radio_copy_to_clipboard,
+                    _( "Search using URL" ),
+                    margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                    active = not self.copy_to_clipboard ) )
+
+            grid.attach( radio_internet_search, 0, row, 1, 1 )
+            row += 1
+
+            grid.attach( search_engine_entry, 0, row, 1, 1 )
+            search_engine_entry.set_hexpand( True )
+            search_engine_entry.set_margin_left(
+                IndicatorBase.INDENT_WIDGET_LEFT * 2 ),
+
+            row += 1
+
+            radio_copy_to_clipboard.connect(
+                "toggled",
+                self.on_event_click_radio,
+                radio_copy_to_clipboard,
+                radio_internet_search,
+                search_engine_entry )
+
+            radio_internet_search.connect(
+                "toggled",
+                self.on_event_click_radio,
+                radio_copy_to_clipboard,
+                radio_internet_search,
+                search_engine_entry )
+
+        else:
+            label = (
+                Gtk.Label.new( _( "On event click, search using URL" ) ) )
+
+            grid.attach(
+                self.create_box(
+                    ( ( label, False ), ),
+                    margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                0, row, 1, 1 )
+
+            row += 1
+
+            grid.attach( search_engine_entry, 0, row, 1, 1 )
+            search_engine_entry.set_hexpand( True )
+            search_engine_entry.set_margin_left(
+                IndicatorBase.INDENT_WIDGET_LEFT )
+
+            row += 1
 
         notify_checkbutton = (
             self.create_checkbutton(
@@ -432,12 +455,13 @@ class IndicatorOnThisDay( IndicatorBase ):
                 margin_top = IndicatorBase.INDENT_WIDGET_TOP,
                 active = self.notify ) )
 
-        grid.attach( notify_checkbutton, 0, 5, 1, 1 )
+        grid.attach( notify_checkbutton, 0, row, 1, 1 )
+        row += 1
 
         autostart_checkbox, delay_spinner, latest_version_checkbox, box = (
             self.create_preferences_common_widgets() )
 
-        grid.attach( box, 0, 6, 1, 1 )
+        grid.attach( box, 0, row, 1, 1 )
 
         notebook.append_page( grid, Gtk.Label.new( _( "General" ) ) )
 
@@ -458,9 +482,11 @@ class IndicatorOnThisDay( IndicatorBase ):
                 iter_ = store.iter_next( iter_ )
 
             self.lines = spinner.get_value_as_int()
-            self.copy_to_clipboard = radio_copy_to_clipboard.get_active()
             self.search_url = search_engine_entry.get_text().strip()
             self.notify = notify_checkbutton.get_active()
+
+            if self.is_clipboard_supported():
+                self.copy_to_clipboard = radio_copy_to_clipboard.get_active()
 
             self.set_preferences_common_attributes(
                 autostart_checkbox.get_active(),
@@ -557,6 +583,9 @@ class IndicatorOnThisDay( IndicatorBase ):
             config.get(
                 IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD,
                 True ) )
+
+        if copy_to_clipboard and not self.is_clipboard_supported():
+            self.copy_to_clipboard = False
 
         self.lines = (
             config.get(
