@@ -65,37 +65,46 @@ class IndicatorPunycode( IndicatorBase ):
         self,
         menu ):
 
-#TODO Perhaps test if the clipboard is supported.
-# If not, show a single menu item stating this...and a notification
-# and don't build the rest of the menu.
-# This ensures we don't need to check if clipboard is supported each time a conversion is done. 
-        self.create_and_append_menuitem(
-            menu,
-            _( "Convert" ),
-            activate_functionandarguments = (
-                lambda menuitem: self.on_convert(), ),
-            is_secondary_activate_target = True )
-
-        for result in self.results:
-            menu.append( Gtk.SeparatorMenuItem() )
-
+        if self.is_clipboard_supported():
             self.create_and_append_menuitem(
                 menu,
-                _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
+                _( "Convert" ),
                 activate_functionandarguments = (
-                    lambda menuitem, result = result: # Lambda late binding.
-                        self._send_to_output(
-                            result[ IndicatorPunycode.RESULTS_UNICODE ] ), ),
-                indent = ( 1, 1 ) )
+                    lambda menuitem: self.on_convert(), ),
+                is_secondary_activate_target = True )
 
+            for result in self.results:
+                menu.append( Gtk.SeparatorMenuItem() )
+
+                self.create_and_append_menuitem(
+                    menu,
+                    _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
+                    activate_functionandarguments = (
+                        lambda menuitem, result = result: # Lambda late binding.
+                            self._send_to_output(
+                                result[ IndicatorPunycode.RESULTS_UNICODE ] ), ),
+                    indent = ( 1, 1 ) )
+
+                self.create_and_append_menuitem(
+                    menu,
+                    _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
+                    activate_functionandarguments = (
+                        lambda menuitem, result = result:
+                            self._send_to_output(
+                                result[ IndicatorPunycode.RESULTS_ASCII ] ), ),
+                    indent = ( 1, 1 ) )
+
+        else:
             self.create_and_append_menuitem(
-                menu,
-                _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
-                activate_functionandarguments = (
-                    lambda menuitem, result = result:
-                        self._send_to_output(
-                            result[ IndicatorPunycode.RESULTS_ASCII ] ), ),
-                indent = ( 1, 1 ) )
+                menu, _( "Unsupported session type and clipboard." ) )
+
+            summary = _(
+                "{0} is inoperative" ).format(
+                    IndicatorPunycode.INDICATOR_NAME_HUMAN_READABLE )
+
+            self.show_notification(
+                summary,
+                _( "The clipboard is unsupported for your session type." ) )
 
 
 #TODO Test Debian 12 laptop x11.
@@ -103,38 +112,32 @@ class IndicatorPunycode( IndicatorBase ):
 #TODO Test Ubuntu 20.04 wayland.
     def on_convert( self ):
         print( "\n\n--------------" ) #TODO Testing
-        if self.is_clipboard_supported():  #TODO Does this also cover primary as opposed to clipboard?
-            summary =_( "Nothing to convert..." )
-            if self.input_clipboard:
-                print( "clipboard input" ) #TODO Remove
-                text = self.copy_from_selection_clipboard()
+        summary =_( "Nothing to convert..." )
+        if self.input_clipboard:
+            print( "clipboard input" ) #TODO Remove
+            text = self.copy_from_selection_clipboard()
+            if text is None:
+                self.show_notification(
+                    summary, _( "No text is in the clipboard." ) )
+
+            else:
+                self._do_conversion( text )
+                print( f"Converting: { text }" ) #TODO Remove
+
+        else:
+            print( "primary input" ) #TODO Remove
+            def primary_received_callback_function( text ):
+                print( text )#TODO Test
                 if text is None:
                     self.show_notification(
-                        summary, _( "No text is in the clipboard." ) )
+                        summary, _( "No text is highlighted/selected." ) )
 
                 else:
                     self._do_conversion( text )
                     print( f"Converting: { text }" ) #TODO Remove
 
-            else:
-                print( "primary input" ) #TODO Remove
-                def primary_received_callback_function( text ):
-                    print( text )#TODO Test
-                    if text is None:
-                        self.show_notification(
-                            summary, _( "No text is highlighted/selected." ) )
-
-                    else:
-                        self._do_conversion( text )
-                        print( f"Converting: { text }" ) #TODO Remove
-
-                self. copy_from_selection_primary(
-                    primary_received_callback_function )
-
-        else:
-            self.show_notification(
-                _( "Unsupported" ),
-                _( "The clipboard is unsupported." ) )
+            self. copy_from_selection_primary(
+                primary_received_callback_function )
 
 
     def _do_conversion(
@@ -231,6 +234,10 @@ class IndicatorPunycode( IndicatorBase ):
 
         grid = self.create_grid()
 
+#TODO If the clipboard is unsupported...show all of this stuff?
+# Perhaps see what happens after testing on ALL distros to see where support is
+# and is not.
+# If only for Ubuntu 20.04 and wayland, leave as is.
         grid.attach(
             self.create_box(
                 ( ( Gtk.Label.new( _( "Input source" ) ), False ), ) ),
