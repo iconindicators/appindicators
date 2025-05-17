@@ -164,6 +164,8 @@ class IndicatorOnThisDay( IndicatorBase ):
                 last_date = event.get_date()
                 menu_item_count += 1
 
+#TODO Need a different layout perhaps for when clipboard is not supported?
+# Hopefully this is only for Ubuntu 20.04 and Wayland.
             if self.copy_to_clipboard:
                 name = event_date
                 activate_functionandarguments = None
@@ -360,6 +362,10 @@ class IndicatorOnThisDay( IndicatorBase ):
         if self.is_clipboard_supported():
             tooltip_text += _( "\n\nUnsupported on Ubuntun 20.04 on Wayland." )
 
+#TODO Show the radio if clipboard unsupported?
+# What about a preference set in a desktop which supports clipboard but 
+# now runs a desktop without clipboard?
+# See fortune too.
         radio_copy_to_clipboard = (
             self.create_radiobutton(
                 None,

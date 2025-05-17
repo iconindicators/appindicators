@@ -100,6 +100,7 @@ class IndicatorFortune( IndicatorBase ):
                 ==
                 IndicatorFortune.CONFIG_MIDDLE_MOUSE_CLICK_ON_ICON_NEW ) )
 
+#TODO Only put this in if the clipboard is supported.
         self.create_and_append_menuitem(
             menu,
             _( "Copy Last Fortune" ),
@@ -341,6 +342,20 @@ class IndicatorFortune( IndicatorBase ):
                 active = active_ ) )
 
         grid.attach( radio_middle_mouse_click_new_fortune, 0, 4, 1, 1 )
+
+#TODO Hide this part if clipboard is not supported.
+# Need to consider if a user switched from a desktop session which supports
+# clipboard to a session which does not support...so default to show new fortune
+# maybe down in the properties?
+#
+# Otherwise, this is only for Ubuntu 20.04 and Wayland
+# so maybe the tooltip is fine?
+#
+# But how to prevent calling clipboard stuff when clipboard is not supported
+# and the check for clipboard support is removed from within each clipboard 
+# function?
+# Need to check out here (in menu building).
+# See also onthisday.
 
         tooltip_text = ""
         if not self.is_clipboard_supported():

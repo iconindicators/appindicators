@@ -65,6 +65,10 @@ class IndicatorPunycode( IndicatorBase ):
         self,
         menu ):
 
+#TODO Perhaps test if the clipboard is supported.
+# If not, show a single menu item stating this...and a notification
+# and don't build the rest of the menu.
+# This ensures we don't need to check if clipboard is supported each time a conversion is done. 
         self.create_and_append_menuitem(
             menu,
             _( "Convert" ),
