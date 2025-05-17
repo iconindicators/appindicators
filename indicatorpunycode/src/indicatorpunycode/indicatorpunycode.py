@@ -99,7 +99,7 @@ class IndicatorPunycode( IndicatorBase ):
                 menu, _( "Unsupported session type and clipboard." ) )
 
             summary = _(
-                "{0} is inoperative" ).format(
+                "{0} is inoperative..." ).format(
                     IndicatorPunycode.INDICATOR_NAME_HUMAN_READABLE )
 
             self.show_notification(
@@ -238,6 +238,8 @@ class IndicatorPunycode( IndicatorBase ):
 # Perhaps see what happens after testing on ALL distros to see where support is
 # and is not.
 # If only for Ubuntu 20.04 and wayland, leave as is.
+# Maybe set insensitive (set to disabled or whatever the term is)
+# if clipboard unsupported.
         grid.attach(
             self.create_box(
                 ( ( Gtk.Label.new( _( "Input source" ) ), False ), ) ),
