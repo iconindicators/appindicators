@@ -1092,12 +1092,12 @@ class IndicatorBase( ABC ):
 
         This was not fixed for the version of GNOME used in Ubuntu 20.04.
         '''
-        clipboard_supported = True
-        if self.is_session_type_wayland():
-            clipboard_supported = (
-                "UBUNTU_CODENAME=focal" not in self.get_os_release() )
-
-        return clipboard_supported
+        return (
+            self.is_session_type_x11()
+            or (
+                self.is_session_type_wayland()
+                and
+                "UBUNTU_CODENAME=focal" not in self.get_os_release() ) )
 
 
     def copy_to_selection(
