@@ -192,6 +192,9 @@ class IndicatorPunycode( IndicatorBase ):
         self._cull_results()
         self._send_to_output(
             self.results[ 0 ][ IndicatorPunycode.RESULTS_UNICODE ] )
+#TODO I think this should not ALWAYS be UNICODE...means it always emits
+# to the clipboard/primary output the unicode.
+# Maybe the original result is put in the wrong way around in one case above.
 
         self.request_update()
 
