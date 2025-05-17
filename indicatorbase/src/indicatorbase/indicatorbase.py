@@ -1132,7 +1132,7 @@ class IndicatorBase( ABC ):
 
     def copy_from_selection_clipboard( self ):
         '''
-        Obtains text from the clipboard.
+        Obtain text from the clipboard.
         If there was no text copied or an error occurred, None is returned.
         '''
         text_in_clipboard = None
@@ -1163,27 +1163,24 @@ class IndicatorBase( ABC ):
         '''
         if self.is_clipboard_supported():
             if self.is_session_type_wayland():
-                # GTK interacts with the X11 clipboard mechanism via a user
-                # callback function to receive the selection.
-                # Under Wayland, this is not the case.
+                # GTK interacts with the X11 clipboard via a user callback
+                # function to receive the selection.
                 #
-                # There is presently no GTK method for accessing the clipboard
-                # under Wayland.  Instead, the package wl-clipboard is used
-                # directly via a terminal, requiring no callback function.
+                # Under Wayland, there is presently no GTK equivalent.
+                # Instead, the package wl-clipboard is called via a terminal.
                 #
-                # To shield the user from having to know whether Wayland or X11
-                # is in use, access to the primary is wrapped within a callback
-                # function.
+                # Shield the user from having to know about Wayland or X11 by
+                # wrapping wl-clipboard within a callback function.
                 primary_received_callback_function(
                     self.process_get( "wl-paste --primary" ) )
 
             else:
                 Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
-                    self._clipboard_text_received_function,
+                    self._clipboard_primary_text_received_function,
                     primary_received_callback_function )
 
 
-    def _clipboard_text_received_function(
+    def _clipboard_primary_text_received_function(
         self,
         clipboard,
         text,
