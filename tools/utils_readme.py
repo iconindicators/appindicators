@@ -394,9 +394,37 @@ def _get_operating_system_dependencies_debian(
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
         "libcairo2-dev",
-        "libgirepository1.0-dev",
         "python3-pip",
         "python3-venv" ]
+
+    applicable_operating_systems = {
+        OperatingSystem.DEBIAN_11,
+        OperatingSystem.DEBIAN_12,
+        OperatingSystem.KUBUNTU_2204,
+        OperatingSystem.LUBUNTU_2204,
+        OperatingSystem.UBUNTU_2004,
+        OperatingSystem.UBUNTU_2204,
+        OperatingSystem.UBUNTU_UNITY_2204 }
+
+    if operating_system.issubset( applicable_operating_systems ):
+        dependencies.append( "libgirepository1.0-dev" )
+
+#TODO Check this..apparently based on Ubuntu 24.04 so why didn't I install libgirepdev 2.0?
+# Maybe it is because libgirepdev1.0 is installed using the older PyGObject...?
+# But the latest PyGObject requires 2.0
+# So test this now any of the OS below which already has indicators already installed.
+    applicable_operating_systems = {
+        OperatingSystem.KUBUNTU_2404,
+        OperatingSystem.LINUX_MINT_CINNAMON_22,
+        OperatingSystem.LUBUNTU_2404,
+        OperatingSystem.UBUNTU_2404,
+        OperatingSystem.UBUNTU_BUDGIE_2404,
+        OperatingSystem.UBUNTU_MATE_2404,
+        OperatingSystem.UBUNTU_UNITY_2404,
+        OperatingSystem.XUBUNTU_2404 }
+
+    if operating_system.issubset( applicable_operating_systems ):
+        dependencies.append( "libgirepository-2.0-dev" )
 
     applicable_operating_systems = {
         OperatingSystem.DEBIAN_11,
@@ -408,7 +436,7 @@ def _get_operating_system_dependencies_debian(
     if indicator_name == IndicatorName.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
-        dependencies.append( "wl-clipboard" )
+        dependencies.append( "wl-clipboard" )  #TODO Is wl-clipboard available on Ubuntu 20.04?
 
     if indicator_name == IndicatorName.INDICATORONTHISDAY:
         dependencies.append( "wl-clipboard" )

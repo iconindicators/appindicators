@@ -702,9 +702,8 @@ class IndicatorBase( ABC ):
             menu.prepend( Gtk.SeparatorMenuItem() )
 
             if next_update_in_seconds:
-                next_update_date_time = (
-                    datetime.datetime.now() + datetime.timedelta( seconds = next_update_in_seconds ) )
-
+                delta = datetime.timedelta( seconds = next_update_in_seconds )
+                next_update_date_time = datetime.datetime.now() + delta
                 label = (
                     "Next update: " +
                     str( next_update_date_time ).split( '.', maxsplit = 1 )[ 0 ] )
@@ -918,21 +917,16 @@ class IndicatorBase( ABC ):
         changelog_markdown_path = IndicatorBase.get_changelog_markdown_path()
 
         authors = [
-                author_and_email[ 0 ]
-                for author_and_email in self.authors_and_emails ]
+            author_and_email[ 0 ]
+            for author_and_email in self.authors_and_emails ]
 
         about_dialog.set_copyright(
-            "Copyright \xa9 "
-            +
+            "Copyright \xa9 " +
             IndicatorBase.get_year_in_changelog_markdown(
-                changelog_markdown_path )
-            +
-            '-'
-            +
-            str( datetime.datetime.now().year )
-            +
-            " "
-            +
+                changelog_markdown_path ) +
+            '-' +
+            str( datetime.datetime.now().year ) +
+            " " +
             ' '.join( authors ) )
 
         about_dialog.set_license_type( Gtk.License.GPL_3_0 )
@@ -1053,36 +1047,6 @@ class IndicatorBase( ABC ):
         return not is_manjaro and not is_opensuse_tumbleweed
 
 
-#TODO Where is clipboard used?
-# indicatorfortune
-# indicatoronthisday
-# indicatorpunycode
-# indicatortest
-#
-# Clipboard should now work on X11 and Wayland, so no issue here.
-#
-# EXCEPT: Under Ubuntu 20.04 Wayland, clipboard causes a logout.
-# So test clipboard on Wayland for all other distros.
-# Note in readme the bad distros.
-# What else to do?  Block the call to clipboard for these distros?
-# Tell the user in a tooltip?
-# Show a notification?
-# Hide the option/functionality from the user?
-#
-# Works on both X11 and Wayland for distro...
-#   Debian 11
-#   Debian 12
-#   Fedora 38
-#   Fedora 39
-#   Fedora 40
-#   Manjaro KDE
-#   openSUSE
-#   Ubuntu 22.04
-#   Ubuntu 24.04
-#
-#   Ubuntu 20.04  Works on X11 but logs out on Wayland.
-#
-# Seems to also be an issue on Debian 12 32 bit wayland.
     def is_clipboard_supported( self ):
         '''
         Returns true if clipboard/primary copy/paste is supported;
@@ -1208,6 +1172,10 @@ class IndicatorBase( ABC ):
 # paplay is part of pulseaudio...
 # but it seems pipewire is soon to be the default.
 # pipewire apparently uses pw-cat
+#
+# Maybe instead, this function can figure out what application is available
+# for plaing a sound file and what sound file is available to be played,
+# hiding this from the caller.
     def get_play_sound_complete_command( self ):
         return "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
 

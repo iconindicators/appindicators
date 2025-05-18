@@ -46,7 +46,7 @@ if __name__ == "__main__":
                     "+" } ) )
 
 
-#TODO Tried to install indicatortest on Ubuntu 24.04 
+#TODO Tried to install indicatortest on Ubuntu 24.04
 #into a new .loca/venv_indicators and gi and other packages are not installed...why?
 # Need to add PyGObject and packaging to pip below...
 # But got some error during install...
@@ -62,6 +62,13 @@ if __name__ == "__main__":
 #   "pip",
 #   "packaging",
 #   "PyGObject",
+#
+# Was the fix for above only needing to install libgirepository-2.0-dev
+# or ALSO needed PyGObject added to the pip line?
+# If also needed PyGObject, that is a problem right...?
+# That means PyGObject needs to be added to the dependencies in the wheel build...
+# ...but the previous installs should have failed by now if that was the case.
+# I suspect that only needed to install libgirepository-2.0-dev on Ubuntu 24.04.
 #
 # but PyGObject may need to be pinned depending on the version of Ubuntu.
 # How to make this script do that automatically...or at least check
