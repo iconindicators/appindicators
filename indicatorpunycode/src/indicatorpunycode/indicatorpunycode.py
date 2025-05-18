@@ -174,7 +174,7 @@ class IndicatorPunycode( IndicatorBase ):
                     if not self.drop_path_query:
                         path_query = '?' + result[ 1 ]
 
-        error_message = None
+        exception = None
         if text_to_convert.find( "xn--" ) == -1:
             try:
                 parts = [ ]
@@ -191,7 +191,7 @@ class IndicatorPunycode( IndicatorBase ):
                 output = unicode_ascii_pair.get_ascii()
 
             except UnicodeError as e:
-                error_message = str( e )
+                exception = e
 
         else:
             try:
@@ -209,12 +209,15 @@ class IndicatorPunycode( IndicatorBase ):
                 output = unicode_ascii_pair.get_unicode()
 
             except UnicodeError as e:
-                error_message = str( e )
+                exception = e
 
-        if error_message:
-            print( "1111" )
-            print( error_message )
-            print( "2222" )
+        if exception:
+            self.show_notification(
+                _( "Unable to convert..." ), str( exception ) )
+
+            self.get_logging().exception( exception )
+            self.get_logging().error(
+                f"UnicodeError - error converting:\n{ text }" )
 
         else:
             if unicode_ascii_pair in self.unicode_ascii_pairs:
