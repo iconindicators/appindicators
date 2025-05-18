@@ -106,10 +106,8 @@ class IndicatorPunycode( IndicatorBase ):
 
 
     def on_convert( self ):
-        print( "\n\n--------------" ) #TODO Testing
         summary =_( "Nothing to convert..." )
         if self.input_clipboard:
-            print( "clipboard input" ) #TODO Remove
             text = self.copy_from_selection_clipboard()
             if text is None:
                 self.show_notification(
@@ -117,10 +115,8 @@ class IndicatorPunycode( IndicatorBase ):
 
             else:
                 self._do_conversion( text )
-                print( f"Converting: { text }" ) #TODO Remove
 
         else:
-            print( "primary input" ) #TODO Remove
             def primary_received_callback_function( text ):
                 if text is None:
                     self.show_notification(
@@ -128,7 +124,6 @@ class IndicatorPunycode( IndicatorBase ):
 
                 else:
                     self._do_conversion( text )
-                    print( f"Converting: { text }" ) #TODO Remove
 
             self. copy_from_selection_primary(
                 primary_received_callback_function )
@@ -138,78 +133,17 @@ class IndicatorPunycode( IndicatorBase ):
         self,
         text ):
 
-        text_to_convert = text
-
-        protocol = ""
-        path_query = ""
-        result = re.split( r"(^.*//)", text_to_convert )
-        if len( result ) == 3:
-#TODO Test this clause...maybe write a comment with example            
-# #TODO Testing
-#         self._do_conversion( "http://www.url.com" )
-#         self._do_conversion( "http://www.url.com" )
-#         self._do_conversion( "http://www.url.com/a/path" )
-#         self._do_conversion( "http://www.url.com/a/path?query=string" )
-#         self._do_conversion( "http://www.url.com?query=string" )
-#
-# #TODO Test these also in a format of a URL?
-#         self._do_conversion( "abæcdöef" )
-#         self._do_conversion( "xn--abcdef-qua4k" )
-#         self._do_conversion( "правда" )
-#         self._do_conversion( "xn--80aafi6cg" )
-            protocol = result[ 1 ]
-            text_to_convert = result[ 2 ]
-            result = re.split( r"(/.*$)", text_to_convert )
-            if len( result ) == 3:
-#TODO Test this clause...maybe write a comment with example            
-                text_to_convert = result[ 0 ]
-                if not self.drop_path_query:
-                    path_query = result[ 1 ]
-
-            else:
-                result = re.split( r"\?", text_to_convert )
-                if len( result ) == 2:
-#TODO Test this clause...maybe write a comment with example            
-                    text_to_convert = result[ 0 ]
-                    if not self.drop_path_query:
-                        path_query = '?' + result[ 1 ]
+        protocol, path_query, text_to_convert = (
+            self._get_protocol_path_query_text_to_convert( text ) )
 
         exception = None
         if text_to_convert.find( "xn--" ) == -1:
-            try:
-                parts = [ ]
-                for part in text_to_convert.split( "." ):
-                    parts.append( (
-                        encodings.idna.ToASCII(
-                            encodings.idna.nameprep( part ) ) ) )
-
-                unicode_ascii_pair = (
-                    UnicodeAsciiPair(
-                        protocol + text + path_query,
-                        protocol + str( b'.'.join( parts ), "utf-8" ) + path_query ) )
-
-                output = unicode_ascii_pair.get_ascii()
-
-            except UnicodeError as e:
-                exception = e
+            unicode_ascii_pair, output, exception = (
+                self._to_ascii( protocol, path_query, text_to_convert ) )
 
         else:
-            try:
-                parts = [ ]
-                for part in text_to_convert.split( "." ):
-                    parts.append( (
-                        encodings.idna.ToUnicode(
-                            encodings.idna.nameprep( part ) ) ) )
-
-                unicode_ascii_pair = (
-                    UnicodeAsciiPair(
-                        protocol + '.'.join( parts ) + path_query,
-                        protocol + text + path_query ) )
-
-                output = unicode_ascii_pair.get_unicode()
-
-            except UnicodeError as e:
-                exception = e
+            unicode_ascii_pair, output, exception = (
+                self._to_unicode( protocol, path_query, text_to_convert ) )
 
         if exception:
             self.show_notification(
@@ -228,34 +162,89 @@ class IndicatorPunycode( IndicatorBase ):
             self._send_to_output( output )
             self.request_update()
 
-        
+
+    def _get_protocol_path_query_text_to_convert(
+        self,
+        text ):
+
+        text_to_convert = text
+        protocol = ""
+        path_query = ""
+        result = re.split( r"(^.*//)", text_to_convert )
+        if len( result ) == 3:
+            # Text is a URL.
+            protocol = result[ 1 ]
+            text_to_convert = result[ 2 ]
+            result = re.split( r"(/.*$)", text_to_convert )
+            if len( result ) == 3:
+                # URL has a path (which may or may contain a query string).
+                text_to_convert = result[ 0 ]
+                if not self.drop_path_query:
+                    path_query = result[ 1 ]
+
+            else:
+                result = re.split( r"\?", text_to_convert )
+                if len( result ) == 2:
+                # URL contains a query string but no path.
+                    text_to_convert = result[ 0 ]
+                    if not self.drop_path_query:
+                        path_query = '?' + result[ 1 ]
+
+        return protocol, path_query, text_to_convert
 
 
-# --------------
-# clipboard input
-# Traceback (most recent call last):
-#   File "/home/bernard/Programming/Indicators/indicatorpunycode/src/indicatorpunycode/indicatorpunycode.py", line 76, in <lambda>
-#     lambda menuitem: self.on_convert(), ),
-#   File "/home/bernard/Programming/Indicators/indicatorpunycode/src/indicatorpunycode/indicatorpunycode.py", line 119, in on_convert
-#     self._do_conversion( text )
-#   File "/home/bernard/Programming/Indicators/indicatorpunycode/src/indicatorpunycode/indicatorpunycode.py", line 184, in _do_conversion
-#     encodings.idna.ToASCII(
-#   File "/usr/lib/python3.8/encodings/idna.py", line 71, in ToASCII
-#     raise UnicodeError("label empty or too long")
-# UnicodeError: label empty or too long
+    def _to_ascii(
+        self,
+        protocol,
+        path_query,
+        text ):
+
+        exception = None
+        try:
+            parts = [ ]
+            for part in text.split( "." ):
+                parts.append( (
+                    encodings.idna.ToASCII(
+                        encodings.idna.nameprep( part ) ) ) )
+
+            unicode_ascii_pair = (
+                UnicodeAsciiPair(
+                    protocol + text + path_query,
+                    protocol + str( b'.'.join( parts ), "utf-8" ) + path_query ) )
+
+            output = unicode_ascii_pair.get_ascii()
+
+        except UnicodeError as e:
+            exception = e
+
+        return unicode_ascii_pair, output, exception
 
 
-#TODO Hopefully not needed...do testing on wayland distros.
-        # except Exception as e:  #TODO W0718: Catching too general exception Exception (broad-exception-caught)
-        #     print( "EXCEPTION" )
-        #     print( e )
-        #     print()
-        #     self.get_logging().exception( e )
-        #     self.get_logging().error(
-        #         "Error converting '" + protocol + text + path_query + "'." )
-        #
-        #     self.show_notification(
-        #         _( "Error converting..." ), _( "See log for more details." ) )
+    def _to_unicode(
+        self,
+        protocol,
+        path_query,
+        text ):
+
+        exception = None
+        try:
+            parts = [ ]
+            for part in text.split( "." ):
+                parts.append( (
+                    encodings.idna.ToUnicode(
+                        encodings.idna.nameprep( part ) ) ) )
+
+            unicode_ascii_pair = (
+                UnicodeAsciiPair(
+                    protocol + '.'.join( parts ) + path_query,
+                    protocol + text + path_query ) )
+
+            output = unicode_ascii_pair.get_unicode()
+
+        except UnicodeError as e:
+            exception = e
+
+        return unicode_ascii_pair, output, exception
 
 
     def _cull_results( self ):
@@ -268,16 +257,13 @@ class IndicatorPunycode( IndicatorBase ):
         text ):
 
         if self.output_both:
-            print( f"Output to clipboard and primary: { text }" ) #TODO Remove
             self.copy_to_selection( text )
             self.copy_to_selection( text, is_primary = True )
 
         elif self.input_clipboard:
-            print( f"Output to clipboard: { text }" ) #TODO Remove
             self.copy_to_selection( text )
 
         else:
-            print( f"Output to primary: { text }" ) #TODO Remove
             self.copy_to_selection( text, is_primary = True )
 
 
