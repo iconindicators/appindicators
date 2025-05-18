@@ -34,6 +34,8 @@ from gi.repository import Gtk
 
 from .indicatorbase import IndicatorBase
 
+from .unicodeasciipair import UnicodeAsciiPair
+
 
 class IndicatorPunycode( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
@@ -61,7 +63,20 @@ class IndicatorPunycode( IndicatorBase ):
             artwork = [ "Oleg Moiseichuk" ] )
 
         # List of lists, each sublist contains [ unicode, ascii ].
-        self.results =  [ ]
+        self.unicode_ascii_pairs =  [ ]
+
+#TODO Testing
+        self._do_conversion( "http://www.url.com" )
+        self._do_conversion( "http://www.url.com" )
+        self._do_conversion( "http://www.url.com/a/path" )
+        self._do_conversion( "http://www.url.com/a/path?query=string" )
+        self._do_conversion( "http://www.url.com?query=string" )
+
+#TODO Test these also in a format of a URL?
+        self._do_conversion( "abæcdöef" )
+        self._do_conversion( "xn--abcdef-qua4k" )
+        self._do_conversion( "правда" )
+        self._do_conversion( "xn--80aafi6cg" )
 
 
     def update(
@@ -76,25 +91,23 @@ class IndicatorPunycode( IndicatorBase ):
                     lambda menuitem: self.on_convert(), ),
                 is_secondary_activate_target = True )
 
-            for result in self.results:
+            for pairs in self.unicode_ascii_pairs:
                 menu.append( Gtk.SeparatorMenuItem() )
 
                 self.create_and_append_menuitem(
                     menu,
-                    _( "Unicode:  " ) + result[ IndicatorPunycode.RESULTS_UNICODE ],
+                    _( "Unicode:  " ) + pairs.get_unicode(),
                     activate_functionandarguments = (
-                        lambda menuitem, result = result: # Lambda late binding.
-                            self._send_to_output(
-                                result[ IndicatorPunycode.RESULTS_UNICODE ] ), ),
+                        lambda menuitem, text = pairs.get_unicode(): # Lambda late binding.
+                            self._send_to_output( text ), ),
                     indent = ( 1, 1 ) )
 
                 self.create_and_append_menuitem(
                     menu,
-                    _( "ASCII:  " ) + result[ IndicatorPunycode.RESULTS_ASCII ],
+                    _( "ASCII:  " ) + pairs.get_ascii(),
                     activate_functionandarguments = (
-                        lambda menuitem, result = result:
-                            self._send_to_output(
-                                result[ IndicatorPunycode.RESULTS_ASCII ] ), ),
+                        lambda menuitem, text = pairs.get_ascii():
+                            self._send_to_output( text ), ),
                     indent = ( 1, 1 ) )
 
         else:
@@ -147,55 +160,64 @@ class IndicatorPunycode( IndicatorBase ):
         self,
         text ):
 
+        text_to_convert = text
+
         protocol = ""
-        result = re.split( r"(^.*//)", text )
-        if len( result ) == 3:
-            protocol = result[ 1 ]
-            text = result[ 2 ]
-
         path_query = ""
-        result = re.split( r"(/.*$)", text )
+        result = re.split( r"(^.*//)", text_to_convert )
         if len( result ) == 3:
-            text = result[ 0 ]
-            if not self.drop_path_query:
-                path_query = result[ 1 ]
+#TODO Test this clause...maybe write a comment with example            
+            protocol = result[ 1 ]
+            text_to_convert = result[ 2 ]
+            result = re.split( r"(/.*$)", text_to_convert )
+            if len( result ) == 3:
+#TODO Test this clause...maybe write a comment with example            
+                text_to_convert = result[ 0 ]
+                if not self.drop_path_query:
+                    path_query = result[ 1 ]
 
-        converted_text = ""
-        if text.find( "xn--" ) == -1:
-            labels = [ ]
-            for label in text.split( "." ):
-                labels.append(
-                    (
-                        encodings.idna.ToASCII(
-                            encodings.idna.nameprep( label ) ) ) )
+            else:
+                result = re.split( r"\?", text_to_convert )
+                if len( result ) == 2:
+#TODO Test this clause...maybe write a comment with example            
+                    text_to_convert = result[ 0 ]
+                    if not self.drop_path_query:
+                        path_query = '?' + result[ 1 ]
 
-            converted_text = str( b'.'.join( labels ), "utf-8" )
-            result = [
-                protocol + text + path_query,
-                protocol + converted_text + path_query ]
+        if text_to_convert.find( "xn--" ) == -1:
+            parts = [ ]
+            for part in text_to_convert.split( "." ):
+                parts.append( (
+                    encodings.idna.ToASCII(
+                        encodings.idna.nameprep( part ) ) ) )
+
+            unicode_ascii_pair = (
+                UnicodeAsciiPair(
+                    protocol + text + path_query,
+                    protocol + str( b'.'.join( parts ), "utf-8" ) + path_query ) )  #TODO Why need tot utf-9 and 'b'?
+
+            output = unicode_ascii_pair.get_ascii()
 
         else:
-            for label in text.split( "." ):
-                converted_text += (
+            parts = [ ]
+            for part in text_to_convert.split( "." ):
+                parts.append( (
                     encodings.idna.ToUnicode(
-                        encodings.idna.nameprep( label ) ) + "." )
+                        encodings.idna.nameprep( part ) ) ) )
 
-            converted_text = converted_text[ : -1 ]
-            result = [
-                protocol + converted_text + path_query,
-                protocol + text + path_query ]
+            unicode_ascii_pair = (
+                UnicodeAsciiPair(
+                    protocol + '.'.join( parts ) + path_query,
+                    protocol + text + path_query ) )
 
-        if result in self.results:
-            self.results.remove( result )
+            output = unicode_ascii_pair.get_unicode()
 
-        self.results.insert( 0, result )
+        if unicode_ascii_pair in self.unicode_ascii_pairs:
+            self.unicode_ascii_pairs.remove( unicode_ascii_pair )
+
+        self.unicode_ascii_pairs.insert( 0, unicode_ascii_pair )
         self._cull_results()
-        self._send_to_output(
-            self.results[ 0 ][ IndicatorPunycode.RESULTS_UNICODE ] )
-#TODO I think this should not ALWAYS be UNICODE...means it always emits
-# to the clipboard/primary output the unicode.
-# Maybe the original result is put in the wrong way around in one case above.
-
+        self._send_to_output( output )
         self.request_update()
 
 #TODO Hopefully not needed...do testing on wayland distros.
@@ -212,8 +234,8 @@ class IndicatorPunycode( IndicatorBase ):
 
 
     def _cull_results( self ):
-        if len( self.results ) > self.result_history_length:
-            self.results = self.results[ : self.result_history_length ]
+        if len( self.unicode_ascii_pairs ) > self.result_history_length:
+            self.unicode_ascii_pairs = self.unicode_ascii_pairs[ : self.result_history_length ]
 
 
     def _send_to_output(
