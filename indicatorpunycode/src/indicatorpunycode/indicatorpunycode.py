@@ -22,6 +22,9 @@ Application indicator which converts domain names between Unicode and ASCII.
 
 
 #TODO Test with/without clipboard supported.
+#TODO Test Debian 12 laptop x11.
+#TODO Test Debian 12 laptop wayland.
+#TODO Test Ubuntu 20.04 wayland.
 
 
 import encodings.idna
@@ -51,10 +54,6 @@ class IndicatorPunycode( IndicatorBase ):
     CONFIG_OUTPUT_BOTH = "outputBoth"
     CONFIG_RESULT_HISTORY_LENGTH = "resultHistoryLength"
 
-    # Results are stored in two element sublists.
-    RESULTS_UNICODE = 0
-    RESULTS_ASCII = 1
-
 
     def __init__( self ):
         super().__init__(
@@ -62,21 +61,7 @@ class IndicatorPunycode( IndicatorBase ):
             comments = _( "Converts domain names between Unicode and ASCII." ),
             artwork = [ "Oleg Moiseichuk" ] )
 
-        # List of lists, each sublist contains [ unicode, ascii ].
         self.unicode_ascii_pairs =  [ ]
-
-#TODO Testing
-        self._do_conversion( "http://www.url.com" )
-        self._do_conversion( "http://www.url.com" )
-        self._do_conversion( "http://www.url.com/a/path" )
-        self._do_conversion( "http://www.url.com/a/path?query=string" )
-        self._do_conversion( "http://www.url.com?query=string" )
-
-#TODO Test these also in a format of a URL?
-        self._do_conversion( "abæcdöef" )
-        self._do_conversion( "xn--abcdef-qua4k" )
-        self._do_conversion( "правда" )
-        self._do_conversion( "xn--80aafi6cg" )
 
 
     def update(
@@ -98,7 +83,7 @@ class IndicatorPunycode( IndicatorBase ):
                     menu,
                     _( "Unicode:  " ) + pairs.get_unicode(),
                     activate_functionandarguments = (
-                        lambda menuitem, text = pairs.get_unicode(): # Lambda late binding.
+                        lambda menuitem, text = pairs.get_unicode():
                             self._send_to_output( text ), ),
                     indent = ( 1, 1 ) )
 
@@ -111,21 +96,15 @@ class IndicatorPunycode( IndicatorBase ):
                     indent = ( 1, 1 ) )
 
         else:
-            self.create_and_append_menuitem(
-                menu, _( "Unsupported session type and clipboard." ) )
-
+            message = _( "Clipboard is unsupported for your session type." )
+            self.create_and_append_menuitem( menu, message )
             summary = _(
                 "{0} is inoperative..." ).format(
                     IndicatorPunycode.INDICATOR_NAME_HUMAN_READABLE )
 
-            self.show_notification(
-                summary,
-                _( "The clipboard is unsupported for your session type." ) )
+            self.show_notification( summary, message )
 
 
-#TODO Test Debian 12 laptop x11.
-#TODO Test Debian 12 laptop wayland.
-#TODO Test Ubuntu 20.04 wayland.
     def on_convert( self ):
         print( "\n\n--------------" ) #TODO Testing
         summary =_( "Nothing to convert..." )
@@ -143,7 +122,6 @@ class IndicatorPunycode( IndicatorBase ):
         else:
             print( "primary input" ) #TODO Remove
             def primary_received_callback_function( text ):
-                print( text )#TODO Test
                 if text is None:
                     self.show_notification(
                         summary, _( "No text is highlighted/selected." ) )
@@ -167,6 +145,18 @@ class IndicatorPunycode( IndicatorBase ):
         result = re.split( r"(^.*//)", text_to_convert )
         if len( result ) == 3:
 #TODO Test this clause...maybe write a comment with example            
+# #TODO Testing
+#         self._do_conversion( "http://www.url.com" )
+#         self._do_conversion( "http://www.url.com" )
+#         self._do_conversion( "http://www.url.com/a/path" )
+#         self._do_conversion( "http://www.url.com/a/path?query=string" )
+#         self._do_conversion( "http://www.url.com?query=string" )
+#
+# #TODO Test these also in a format of a URL?
+#         self._do_conversion( "abæcdöef" )
+#         self._do_conversion( "xn--abcdef-qua4k" )
+#         self._do_conversion( "правда" )
+#         self._do_conversion( "xn--80aafi6cg" )
             protocol = result[ 1 ]
             text_to_convert = result[ 2 ]
             result = re.split( r"(/.*$)", text_to_convert )
@@ -184,41 +174,73 @@ class IndicatorPunycode( IndicatorBase ):
                     if not self.drop_path_query:
                         path_query = '?' + result[ 1 ]
 
+        error_message = None
         if text_to_convert.find( "xn--" ) == -1:
-            parts = [ ]
-            for part in text_to_convert.split( "." ):
-                parts.append( (
-                    encodings.idna.ToASCII(
-                        encodings.idna.nameprep( part ) ) ) )
+            try:
+                parts = [ ]
+                for part in text_to_convert.split( "." ):
+                    parts.append( (
+                        encodings.idna.ToASCII(
+                            encodings.idna.nameprep( part ) ) ) )
 
-            unicode_ascii_pair = (
-                UnicodeAsciiPair(
-                    protocol + text + path_query,
-                    protocol + str( b'.'.join( parts ), "utf-8" ) + path_query ) )  #TODO Why need tot utf-9 and 'b'?
+                unicode_ascii_pair = (
+                    UnicodeAsciiPair(
+                        protocol + text + path_query,
+                        protocol + str( b'.'.join( parts ), "utf-8" ) + path_query ) )
 
-            output = unicode_ascii_pair.get_ascii()
+                output = unicode_ascii_pair.get_ascii()
+
+            except UnicodeError as e:
+                error_message = str( e )
 
         else:
-            parts = [ ]
-            for part in text_to_convert.split( "." ):
-                parts.append( (
-                    encodings.idna.ToUnicode(
-                        encodings.idna.nameprep( part ) ) ) )
+            try:
+                parts = [ ]
+                for part in text_to_convert.split( "." ):
+                    parts.append( (
+                        encodings.idna.ToUnicode(
+                            encodings.idna.nameprep( part ) ) ) )
 
-            unicode_ascii_pair = (
-                UnicodeAsciiPair(
-                    protocol + '.'.join( parts ) + path_query,
-                    protocol + text + path_query ) )
+                unicode_ascii_pair = (
+                    UnicodeAsciiPair(
+                        protocol + '.'.join( parts ) + path_query,
+                        protocol + text + path_query ) )
 
-            output = unicode_ascii_pair.get_unicode()
+                output = unicode_ascii_pair.get_unicode()
 
-        if unicode_ascii_pair in self.unicode_ascii_pairs:
-            self.unicode_ascii_pairs.remove( unicode_ascii_pair )
+            except UnicodeError as e:
+                error_message = str( e )
 
-        self.unicode_ascii_pairs.insert( 0, unicode_ascii_pair )
-        self._cull_results()
-        self._send_to_output( output )
-        self.request_update()
+        if error_message:
+            print( "1111" )
+            print( error_message )
+            print( "2222" )
+
+        else:
+            if unicode_ascii_pair in self.unicode_ascii_pairs:
+                self.unicode_ascii_pairs.remove( unicode_ascii_pair )
+
+            self.unicode_ascii_pairs.insert( 0, unicode_ascii_pair )
+            self._cull_results()
+            self._send_to_output( output )
+            self.request_update()
+
+        
+
+
+# --------------
+# clipboard input
+# Traceback (most recent call last):
+#   File "/home/bernard/Programming/Indicators/indicatorpunycode/src/indicatorpunycode/indicatorpunycode.py", line 76, in <lambda>
+#     lambda menuitem: self.on_convert(), ),
+#   File "/home/bernard/Programming/Indicators/indicatorpunycode/src/indicatorpunycode/indicatorpunycode.py", line 119, in on_convert
+#     self._do_conversion( text )
+#   File "/home/bernard/Programming/Indicators/indicatorpunycode/src/indicatorpunycode/indicatorpunycode.py", line 184, in _do_conversion
+#     encodings.idna.ToASCII(
+#   File "/usr/lib/python3.8/encodings/idna.py", line 71, in ToASCII
+#     raise UnicodeError("label empty or too long")
+# UnicodeError: label empty or too long
+
 
 #TODO Hopefully not needed...do testing on wayland distros.
         # except Exception as e:  #TODO W0718: Catching too general exception Exception (broad-exception-caught)
