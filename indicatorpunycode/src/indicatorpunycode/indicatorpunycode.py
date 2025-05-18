@@ -136,7 +136,6 @@ class IndicatorPunycode( IndicatorBase ):
         protocol, path_query, text_to_convert = (
             self._get_protocol_path_query_text_to_convert( text ) )
 
-        exception = None
         if text_to_convert.find( "xn--" ) == -1:
             unicode_ascii_pair, output, exception = (
                 self._to_ascii( protocol, path_query, text_to_convert ) )
