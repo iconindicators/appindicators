@@ -44,7 +44,9 @@ def get_etc_os_release():
 def is_debian_12():
     etc_os_release = get_etc_os_release()
     return (
-        'ID=debian' in etc_os_release and 'VERSION_ID="12"' in etc_os_release )
+        'ID=debian' in etc_os_release
+        and
+        'VERSION_ID="12"' in etc_os_release )
 
 
 def initialiase_parser_and_get_arguments(
