@@ -56,6 +56,29 @@ To run `indicatortest` from the source tree root:
     cd ../..
 ```
 
+1111111111
+
+indicator=indicatortest && \
+venv=venv_run && \
+if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+. ${venv}/bin/activate && \
+pygobject="PyGObject" && \
+etc_os_release="$(cat /etc/os-release)" && \
+if [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"12\"')" == "VERSION_ID=\"12\"" ]; then pygobject="PyGObject\<=3.50.0"; fi && \
+python3 -m pip install packaging $pygobject && \
+cd ${indicator}/src && \
+python3 -m ${indicator}.${indicator} && \
+deactivate && \
+cd ../..
+
+1111111111111111
+
+
+echo $pygobject
+
+
+
+
 THIS assumes that the indicator is already installed in .local because the icons/locale/etc will be present.
 
 
