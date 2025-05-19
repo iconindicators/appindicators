@@ -94,20 +94,55 @@ echo $pygobject
 
 
 
-
-
-pygobject="abc"
+pygobject="PyGObject"
 etc_os_release="$(cat /etc/os-release)"
-if echo "$etc_os_release" | grep -q 'ID=ubuntu'; then
-  echo "matched ID=ubuntu"
-  
-  if echo "$etc_os_release" | grep -q 'VERSION_ID=\"20.04\"'; then
-    echo "matched VERSION_ID=\"20.04\""
-    pygobject="def"
+if echo "$etc_os_release" | grep -q 'ID=debian'; then
+  if echo "$etc_os_release" | grep -q 'VERSION_ID=\"12\"'; then
+    pygobject="PyGObject\<=3.50.0"
   fi
-else
-  echo "no match"
 fi
+echo $pygobject
+
+
+
+
+
+pygobject="PyGObject" && \
+etc_os_release="$(cat /etc/os-release)" && \
+if [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ] && [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ]; then pygobject="debian"; fi && \
+echo $pygobject
+
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+pygobject="PyGObject" && \
+etc_os_release="$(cat /etc/os-release)" && \
+if [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"12\"')" == "VERSION_ID=\"12\"" ]; then pygobject="debian"; fi && \
+echo $pygobject
+
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+
+pygobject="PyGObject" && \
+etc_os_release="$(cat /etc/os-release)" && \
+if [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ]; then pygobject="debian"; fi && \
+echo $pygobject
+
+
+
+
+
+
+
+pygobject="abc" && \
+etc_os_release="$(cat /etc/os-release)" && \
+if echo "$etc_os_release" | grep -q 'ID=ubuntu'; then && \
+  if echo "$etc_os_release" | grep -q 'VERSION_ID=\"20.04\"'; then && \
+    pygobject="def" && \
+  fi && \
+fi && \
 echo $pygobject
 
 
