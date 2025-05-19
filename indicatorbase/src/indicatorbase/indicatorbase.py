@@ -1033,13 +1033,13 @@ class IndicatorBase( ABC ):
                 menuitem.set_sensitive( toggle )
 
 
-    def get_os_release( self ):
+    def get_etc_os_release( self ):
         return self.process_get( "cat /etc/os-release" )
 
 
     def is_calendar_supported( self ):
         ''' The calendar package is unavailable on some distributions. '''
-        etc_os_release = self.get_os_release()
+        etc_os_release = self.get_etc_os_release()
         is_manjaro = "NAME=\"Manjaro Linux\"" in etc_os_release
         is_opensuse_tumbleweed = (
             "NAME=\"openSUSE Tumbleweed\"" in etc_os_release )
@@ -1064,7 +1064,7 @@ class IndicatorBase( ABC ):
             or (
                 self.is_session_type_wayland()
                 and
-                "UBUNTU_CODENAME=focal" not in self.get_os_release() ) )
+                "UBUNTU_CODENAME=focal" not in self.get_etc_os_release() ) )
 
 
     def copy_to_selection(
