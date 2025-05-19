@@ -26,33 +26,9 @@ References:
 '''
 
 
-#TODO Need to work out which distros/versions must be pinned to
-#   PyGObject <= 3.50.0 and libgirepository 1.0 or equivalent
-# and which can be left as just
-#   PyGObject and libgirepository 2.0 or equivalent.
-#
-# https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
-# https://pygobject.gnome.org/getting_started.html
-# https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
-#   As per above Github link, hopefully only need to worry about Debian based distros...
-#   ...but still need to check for Fedora, openSUSE and Manjaro.
-#
-#
-# https://packages.debian.org/search?keywords=girepository&searchon=names&suite=all&section=all
-#
-# https://packages.ubuntu.com/search?keywords=libgirepository&searchon=names&suite=all&section=all
-#
-# https://packages.fedoraproject.org/pkgs/gobject-introspection/gobject-introspection-devel/
-#
-# https://software.opensuse.org/package/gobject-introspection-devel?search_term=gobject-introspection-devel
-#
-# Is it safe to NOT pin Ubuntu 24.04 say (et al) to PyGObject 35.x.y and
-# just let it work with latest PyGObject and also with libgirepository2.0?
-#
-# https://github.com/beeware/toga/issues/3143#issuecomment-2853410292
-#
-# On Ubuntu 24.04 need to install libgirepository-2.0-dev
-#
+#TODO On Ubuntu 24.04 see if can swith to use libgirepository-2.0-dev
+# and if so, remove libgirepository1.0-dev from install instructions
+# and need to make a separate section (and for any distro based on Ubuntu 24.04).
 
 
 import datetime
@@ -237,6 +213,17 @@ def _get_installation_python_virtual_environment(
     indicator_name,
     operating_system):
 
+    # The latest version of PyGObject requires libgirepository-2.0-dev
+    # which is not available on Debian 11/12.
+    # Therefore PyGObject needs to be pinned to 3.50.0 which is compatible
+    # with libgirepository1.0-dev.
+    # This issue does not seem to affect Ubuntu 20.04/22.04/24.04 nor
+    # Fedora, Manjaro, openSUSE.
+    #
+    # References:
+    #   https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
+    #   https://pygobject.gnome.org/getting_started.html
+    #   https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
     applicable_operating_systems = {
         OperatingSystem.DEBIAN_11,
         OperatingSystem.DEBIAN_12 }
