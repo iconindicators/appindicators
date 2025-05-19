@@ -49,6 +49,14 @@ def is_debian_12():
         'VERSION_ID="12"' in etc_os_release )
 
 
+def get_pygobject():
+    pygobject = "PyGObject"
+    if is_debian_12():
+        pygobject = r"PyGObject\<=3.50.0"
+
+    return pygobject
+
+
 def initialiase_parser_and_get_arguments(
     description,
     argument_names,

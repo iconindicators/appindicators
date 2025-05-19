@@ -606,17 +606,13 @@ if __name__ == "__main__":
         "\tTo build on Debian 12, PyGObject must be pinned to version 3.50.0.\n\n"
         "\tUbuntu 20.04/22.04/24.04 requires no change (for now).\n\n" )
 
-    pygobject = "PyGObject"
-    if utils.is_debian_12():
-        pygobject = r"PyGObject\<=3.50.0"
-
     utils.initialise_virtual_environment(
         VENV_BUILD,
         "build",
         "packaging",
         "pip",
         "polib",
-        pygobject,
+        utils.get_pygobject(),
         "readme_renderer[md]" )
 
     for indicator in args.indicators:

@@ -56,6 +56,9 @@ References:
 
 
 
+#TODO Does packaging need to be put into the pip install line?
+
+
 import datetime
 import re
 
