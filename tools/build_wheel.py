@@ -603,8 +603,8 @@ if __name__ == "__main__":
         "\tBuilding requires several Python libraries installed via PIP.\n"
         "\tThe most recent version of PyGObject requires libgirepository-2.0\n"
         "\twhich is only available on Ubuntu 24.04+ or Debian 13+.\n\n"
-        "\tTo build on Debian 12, PyGObject is pinned to version 3.50.0.\n\n"
-        "\tDebian 11 and Ubuntu 20.04/22.04/24.04 require no change (for now).\n\n" )
+        "\tTo build on Debian 12, PyGObject must be pinned to version 3.50.0.\n\n"
+        "\tUbuntu 20.04/22.04/24.04 requires no change (for now).\n\n" )
 
     pygobject = "PyGObject"
     if utils.is_debian_12():
