@@ -83,7 +83,7 @@ if __name__ == "__main__":
             "pip",
 
 #TODO Need to put in packagng, and PyGObject (with/without pinning)?
-            
+#TODO Do a test install without packaging/pygojbect to venv_test say.            
             f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)",
             force_reinstall = True )
 
