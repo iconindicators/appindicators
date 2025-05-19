@@ -603,17 +603,19 @@ if __name__ == "__main__":
         "\tBuilding requires several Python libraries installed via PIP.\n" 
         "\tThe most recent version of PyGObject requires libgirepository-2.0\n"
         "\twhich is only available on Ubuntu 24.04+ or Debian 13+.\n\n"
-        "\tTo enabling building on Debian 11/12 and Ubuntu 20.04/22.04,\n"
-        "\tthe version of PyGObject has been pinned to 3.50.0.\n\n" )
+        "\tTo build on Debian 11/12 and Ubuntu 20.04/22.04,\n"
+        "\tPyGObject has been pinned to version 3.50.0.\n\n" )
 
     utils.initialise_virtual_environment(
         VENV_BUILD,
         "build",
+        "packaging",
         "pip",
         "polib",
-        r"PyGObject\<=3.50.0",
-        "readme_renderer[md]",
-        "setuptools" )
+        "PyGObject",
+        # r"PyGObject\<=3.50.0",  #TODO Tried a build on Ubuntu 20.04 without pinning and the build worked!
+        "readme_renderer[md]" )
+        # "setuptools" )  #TODO Seems to build without this...!
 
     for indicator in args.indicators:
         error_message = _build_wheel_for_indicator( args.directory_release, indicator )
