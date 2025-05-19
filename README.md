@@ -71,6 +71,21 @@ python3 -m ${indicator}.${indicator} && \
 deactivate && \
 cd ../..
 
+
+
+indicator=indicatortest && \
+pygobject_debian_12="PyGObject<=3.50.0" && \
+pygobject="PyGObject" && \
+venv=venv_run && \
+if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+. ${venv}/bin/activate && \
+etc_os_release="$(cat /etc/os-release)" && \
+if [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"12\"')" == "VERSION_ID=\"12\"" ]; then pygobject=$pygobject_debian_12; fi && \
+python3 -m pip install packaging $pygobject && \
+cd ${indicator}/src && \
+python3 -m ${indicator}.${indicator} && \
+deactivate && \
+cd ../..
 1111111111111111
 
 
@@ -93,7 +108,7 @@ pygobject="PyGObject"
 etc_os_release="$(cat /etc/os-release)"
 if echo "$etc_os_release" | grep -q 'ID=ubuntu'; then
   echo "matched ID=ubuntu"
-  
+
   if echo "$etc_os_release" | grep -q 'VERSION_ID=\"20.04\"'; then
     echo "matched VERSION_ID=\"20.04\""
     pygobject="PyGObject\<=3.50.0"
