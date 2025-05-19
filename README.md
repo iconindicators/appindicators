@@ -18,9 +18,20 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 Each indicator shares the common code `indicatorbase`.
 
 
+## Build a Wheel
+
+To build a wheel for `indicatortest` in the root of the source tree:
+
+```
+    python3 -m tools.build_wheel release indicatortest
+```
+
+which creates a virtual environment `venv_build`, updates locale files `.pot` / `.po` and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
+
+
 ## Run an Indicator (within the source tree)
 
-To run an indicator within the source tree, the indicator's `.whl` must first be built.  Refer to build a wheel in a later section.
+To run an indicator within the source tree, the indicator's `.whl` must first be built as above.
 
 Next, create a symbolic link to `indicatorbase.py` via the terminal, from the source tree root:
 
@@ -37,12 +48,121 @@ To run `indicatortest` from the source tree root:
     venv=venv_run && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
+#TODO Why is PyGObject here?
     python3 -m pip install packaging PyGObject\<=3.50.0 && \
     cd ${indicator}/src && \
     python3 -m ${indicator}.${indicator} && \
     deactivate && \
     cd ../..
 ```
+
+THIS assumes that the indicator is already installed in .local because the icons/locale/etc will be present.
+
+
+if cat /etc/os-release | grep -q 'ID=ubuntu'; then
+  echo "matched"
+fi
+
+
+
+
+pygobject="PyGObject"
+etc_os_release="$(cat /etc/os-release)"
+if echo "$etc_os_release" | grep -q 'ID=ubuntu'; then
+  echo "matched ID=ubuntu"
+  
+  if echo "$etc_os_release" | grep -q 'VERSION_ID=\"20.04\"'; then
+    echo "matched VERSION_ID=\"20.04\""
+    pygobject="PyGObject\<=3.50.0"
+  fi
+else
+  echo "no match"
+fi
+echo $pygobject
+
+
+
+
+pygobject="PyGObject"
+etc_os_release="$(cat /etc/os-release)"
+if echo "$etc_os_release" | grep -q 'ID=debian'; then
+  if echo "$etc_os_release" | grep -q 'VERSION_ID=\"12\"'; then
+    pygobject="PyGObject\<=3.50.0"
+  fi
+fi
+echo $pygobject
+
+
+
+
+
+pygobject="abc"
+etc_os_release="$(cat /etc/os-release)"
+if echo "$etc_os_release" | grep -q 'ID=ubuntu'; then
+  echo "matched ID=ubuntu"
+  
+  if echo "$etc_os_release" | grep -q 'VERSION_ID=\"20.04\"'; then
+    echo "matched VERSION_ID=\"20.04\""
+    pygobject="def"
+  fi
+else
+  echo "no match"
+fi
+echo $pygobject
+
+
+
+
+
+VERSION_ID="20.04"
+
+
+etc_os_release="$(cat /etc/os-release)"
+if [ echo "$etc_os_release" | grep -q 'ID=ubuntu' ] && [ echo "$etc_os_release" | grep -q 'ID_LIKE=debian' ]; then
+  echo "matched"
+else
+  echo "no match"
+fi
+
+
+
+
+if [ $STATUS -ne 200 ] -a [[ "$STRING" != "$VALUE" ]];
+
+
+etc_os_release="$(cat /etc/os-release)"
+
+result="$($etc_os_release | grep -q 'ID=ubuntu')"
+
+
+echo $etc_os_release
+
+echo result
+
+OUTPUT="$(ls -1)"
+
+ | grep -q 'ID=ubuntu' ] && [ cat /etc/os-release | grep -q 'ID=ubuntu' ]; then
+  echo "matched"
+fi
+
+if [ cat /etc/os-release | grep -q 'ID=ubuntu' ] && [ cat /etc/os-release | grep -q 'ID=ubuntu' ]; then
+  echo "matched"
+fi
+
+
+indicator=indicatortest && \
+venv=venv_run && \
+if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+. ${venv}/bin/activate && \
+python3 -m pip install packaging PyGObject && \
+cd ${indicator}/src && \
+python3 -m ${indicator}.${indicator} && \
+deactivate && \
+cd ../..
+
+
+TODO Check below
+TODO Also mention the icon will not display unless installed in .local
 
 Running the indicator from source is done in the same way when run from installed to reproduce the same conditions/environment.
 
@@ -152,17 +272,6 @@ Under `Run Configuration` for the tool, ensure that `Working Directory` is set t
 References:
 
 - [https://www.pydev.org/manual_101_interpreter.html](https://www.pydev.org/manual_101_interpreter.html)
-
-
-## Build a Wheel
-
-To build a wheel for `indicatortest` at the source tree root:
-
-```
-    python3 -m tools.build_wheel release indicatortest
-```
-
-which creates a virtual environment `venv_build`, updates locale files `.pot` / `.po` and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
 
 
 ## Install a Wheel
