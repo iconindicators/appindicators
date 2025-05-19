@@ -45,45 +45,11 @@ if __name__ == "__main__":
                 "indicators" :
                     "+" } ) )
 
-
-#TODO Tried to install indicatortest on Ubuntu 24.04
-#into a new .loca/venv_indicators and gi and other packages are not installed...why?
-# Need to add PyGObject and packaging to pip below...
-# But got some error during install...
-#... is that because the pyproject.toml build is locked to an older version of PyGObject?
-# Got the error because libgirepository-2.0-dev was not installed.
-#
-# Another thought; need to change
-#
-#   "pip",
-#
-# to
-#
-#   "pip",
-#   "packaging",
-#   "PyGObject",
-#
-# Was the fix for above only needing to install libgirepository-2.0-dev
-# or ALSO needed PyGObject added to the pip line?
-# If also needed PyGObject, that is a problem right...?
-# That means PyGObject needs to be added to the dependencies in the wheel build...
-# ...but the previous installs should have failed by now if that was the case.
-# I suspect that only needed to install libgirepository-2.0-dev on Ubuntu 24.04.
-#
-# but PyGObject may need to be pinned depending on the version of Ubuntu.
-# How to make this script do that automatically...or at least check
-# and abort if wrong version?
-#
-# BIGGER QUESTION: Need a big print at the start of this script (and others???)
-# stating that the build/install will only work on Ubuntu?
-# That is bad...!
     for indicator_name in args.indicators:
         utils.initialise_virtual_environment(
             utils.VENV_INSTALL,
             "pip",
-
-#TODO Need to put in packagng, and PyGObject (with/without pinning)?
-#TODO Do a test install without packaging/pygojbect to venv_test say.            
+            utils.get_pygobject(),
             f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)",
             force_reinstall = True )
 
