@@ -55,10 +55,6 @@ References:
 #
 
 
-
-#TODO Does packaging need to be put into the pip install line?
-
-
 import datetime
 import re
 
@@ -238,7 +234,16 @@ def _get_installation_additional_python_modules(
 
 
 def _get_installation_python_virtual_environment(
-    indicator_name ):
+    indicator_name,
+    operating_system):
+
+    applicable_operating_systems = {
+        OperatingSystem.DEBIAN_11,
+        OperatingSystem.DEBIAN_12 }
+
+    pygobject = "PyGObject"
+    if operating_system.issubset( applicable_operating_systems ):
+        pygobject = "PyGObject<=3.50.0"  #TODO Not sure if needs to be \< so do a test install.
 
     message = (
         "Install the indicator to a `Python` virtual environment:\n"
@@ -247,7 +252,7 @@ def _get_installation_python_virtual_environment(
         f"    venv={ utils.VENV_INSTALL } && \\\n"
         "    if [ ! -d ${{venv}} ]; then python3 -m venv ${{venv}}; fi && \\\n"
         "    . ${{venv}}/bin/activate && \\\n"
-        "    python3 -m pip install --upgrade ${{indicator}} && \\\n"
+        f"    python3 -m pip install --upgrade { pygobject } ${{indicator}} && \\\n"
         "    deactivate && \\\n"
         "    . $(ls -d ${{venv}}/lib/python3.* | head -1)/"
         "site-packages/${{indicator}}/platform/linux/install.sh\n"
@@ -328,7 +333,7 @@ def _get_installation_for_operating_system(
             "    ```\n"
             f"    { _get_extension( operating_system ) }\n\n" )
 
-        installation += f"2. { _get_installation_python_virtual_environment( indicator_name ) }"
+        installation += f"2. { _get_installation_python_virtual_environment( indicator_name, operating_system ) }"
 
         additional_python_modules = _get_installation_additional_python_modules( indicator_name )
         if additional_python_modules:
@@ -412,10 +417,7 @@ def _get_operating_system_dependencies_debian(
     if operating_system.issubset( applicable_operating_systems ):
         dependencies.append( "libgirepository1.0-dev" )
 
-#TODO Check this..apparently based on Ubuntu 24.04 so why didn't I install libgirepdev 2.0?
-# Maybe it is because libgirepdev1.0 is installed using the older PyGObject...?
-# But the latest PyGObject requires 2.0
-# So test this now any of the OS below which already has indicators already installed.
+#TODO Verify these all can use libgirep2 (rather than libgirep1)
     applicable_operating_systems = {
         OperatingSystem.KUBUNTU_2404,
         OperatingSystem.LINUX_MINT_CINNAMON_22,
@@ -439,7 +441,7 @@ def _get_operating_system_dependencies_debian(
     if indicator_name == IndicatorName.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
-        dependencies.append( "wl-clipboard" )  #TODO Is wl-clipboard available on Ubuntu 20.04?
+        dependencies.append( "wl-clipboard" )
 
     if indicator_name == IndicatorName.INDICATORONTHISDAY:
         dependencies.append( "wl-clipboard" )
