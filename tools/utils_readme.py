@@ -233,7 +233,7 @@ def _get_installation_python_virtual_environment(
         pygobject = "PyGObject<=3.50.0"  #TODO Not sure if needs to be \< so do a test install.
 
     message = (
-        "Install the indicator to a `Python` virtual environment:\n"
+        "Install the indicator to a `Python` virtual environment and install icons, .desktop and run script:\n"
         "    ```\n"
         f"    indicator={ indicator_name } && \\\n"
         f"    venv={ utils.VENV_INSTALL } && \\\n"
