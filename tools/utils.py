@@ -45,8 +45,10 @@ def is_debian_11_or_debian_12():
     etc_os_release = get_etc_os_release()
     return (
         'ID=debian' in etc_os_release
-        and
-        'VERSION_ID="12"' in etc_os_release )
+        and (
+            'VERSION_ID="11"' in etc_os_release
+            or
+            'VERSION_ID="12"' in etc_os_release ) )
 
 
 def get_pygobject():
