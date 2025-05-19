@@ -41,7 +41,7 @@ def get_etc_os_release():
     return result
 
 
-def is_debian_12():
+def is_debian_11_or_debian_12():
     etc_os_release = get_etc_os_release()
     return (
         'ID=debian' in etc_os_release
@@ -51,7 +51,7 @@ def is_debian_12():
 
 def get_pygobject():
     pygobject = "PyGObject"
-    if is_debian_12():
+    if is_debian_11_or_debian_12():
         pygobject = r"PyGObject\<=3.50.0"
 
     return pygobject
