@@ -30,6 +30,23 @@ from pathlib import Path
 VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 
+def get_etc_os_release():
+    result = (
+        subprocess.run(
+            "cat /etc/os-release",
+            stdout = subprocess.PIPE,
+            shell = True,
+            check = False ).stdout.decode().strip() )
+
+    return result
+
+
+def is_debian_12():
+    etc_os_release = get_etc_os_release()
+    return (
+        'ID=debian' in etc_os_release and 'VERSION_ID="12"' in etc_os_release )
+
+
 def initialiase_parser_and_get_arguments(
     description,
     argument_names,
