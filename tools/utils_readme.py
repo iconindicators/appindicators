@@ -160,18 +160,20 @@ def _get_introduction(
         f"`{ indicator_name }` { comments } on "
         "`Debian`, `Ubuntu`, `Fedora`" )
 
-    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
-    # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
+    # openSUSE Tumbleweed and Manjaro do not contain the 'calendar' package or
+    # an equivalent.  When creating the README.md for indicatoronthisday,
+    # drop references to openSUSE/Manjaro.
     # Want to still have indicatortest for openSUSE/Manjaro!
     if not _is_indicator( indicator_name, IndicatorName.INDICATORONTHISDAY ):
         introduction += ", `openSUSE`, `Manjaro`"
 
-#TODO Somewhere/somehow, mention ONLY for indicatoronthisday
-# that indicatoronthisday is unavailable on Manjaro/openSUSE
-# because the calendar package is unavailable.
-
     introduction += " and theoretically, any platform which supports the "
     introduction += "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n"
+
+    if _is_indicator( indicator_name, IndicatorName.INDICATORONTHISDAY ):
+        introduction += f"Note that `{ indicator_name }` requires the `calendar` "
+        introduction += f"package which is unavailable on `openSUSE Tumbleweed` "
+        introduction += f"and `Manjaro`; therefore `{ indicator_name }` is unsupported.\n\n"
 
     introduction += "Other indicators in this series are:\n"
     for indicator in _get_indicator_names_sans_current( indicator_name ):
@@ -215,8 +217,10 @@ def _get_installation_python_virtual_environment(
 
     # The latest version of PyGObject requires libgirepository-2.0-dev
     # which is not available on Debian 11/12.
+    #
     # Therefore PyGObject needs to be pinned to 3.50.0 which is compatible
     # with libgirepository1.0-dev.
+    #
     # This issue does not seem to affect Ubuntu 20.04/22.04/24.04 nor
     # Fedora, Manjaro, openSUSE.
     #
@@ -286,8 +290,7 @@ def _get_installation_for_operating_system(
     install_command,
     _get_operating_system_dependencies_function_name ):
 
-    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
-    # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
+    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar'.
     os_has_no_calendar = (
         operating_system.issubset( {
             OperatingSystem.MANJARO_240X,
@@ -337,8 +340,7 @@ def _get_uninstall_for_operating_system(
     uninstall_command,
     _get_operating_system_dependencies_function_name ):
 
-    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar' or equivalent.
-    # When creating the README.md for indicatoronthisday, drop references to openSUSE/Manjaro.
+    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar'.
     os_has_no_calendar = (
         operating_system.issubset( {
             OperatingSystem.MANJARO_240X,
@@ -840,9 +842,9 @@ def _get_limitations(
             "- `Manjaro 24`: No autostart.\n" )
 
 #TODO Is wl-clipboard needed for openSUSE?
+#
+# Not sure why I wrote the above...I guess check all distros under Wayland!
 
-#TODO For fotune/onthisday/punycode/test and wayland and ubuntu 20.04
-# need to mention that clicking on an event will not copy to clipboard.
     message = ""
     if messages:
         message = (

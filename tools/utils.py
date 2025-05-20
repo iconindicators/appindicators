@@ -52,6 +52,16 @@ def is_debian_11_or_debian_12():
 
 
 def get_pygobject():
+    '''
+    PyGObject is required for building a wheel and running an indicator.
+
+    On Debian based distributions, the most recent version of PyGObject requires
+    libgirepository-2.0, which is only available on Ubuntu 24.04+ or Debian 13+.
+
+    On Debian 11/12, PyGObject must be pinned to version 3.50.0.
+
+    Ubuntu 20.04/22.04/24.04 requires no change (for now).
+    '''
     pygobject = "PyGObject"
     if is_debian_11_or_debian_12():
         pygobject = r"PyGObject\<=3.50.0"
