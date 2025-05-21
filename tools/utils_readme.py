@@ -26,11 +26,6 @@ References:
 '''
 
 
-#TODO On Ubuntu 24.04 see if can swith to use libgirepository-2.0-dev
-# and if so, remove libgirepository1.0-dev from install instructions
-# and need to make a separate section (and for any distro based on Ubuntu 24.04).
-
-
 import datetime
 import re
 
