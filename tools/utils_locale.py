@@ -228,7 +228,8 @@ def _get_msgstr_from_po(
         "import polib; "
         "[ print( entry.msgstr ) "
         f"for entry in polib.pofile( \'{ po }\' ) "
-        f"if entry.msgid == \'{ msgid_escaped }\' ]" )
+        f"if entry.msgid == \'{ msgid_escaped }\' ]"
+        "\"" )
 
     result = utils.process_get( command )
     stderr_ = result.stderr.decode()
