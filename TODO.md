@@ -107,6 +107,15 @@ window information:
   error message: Foreign Toplevel Management interface not found!
 
 
+## Access Data at Runtime
+Reading
+    https://setuptools.pypa.io/en/latest/userguide/datafiles.html#accessing-data-files-at-runtime
+it appears that data files which are part of the installation should be accessed
+via importlib.resources which is available since Python 3.10.
+Would only apply to locale and stars.dat / planets.bsp (for astroskyfield).
+Consider this once Ubuntu 20.04 / Debian 11 (et al) are no longer supported.
+
+
 ## Migrate to GTK4
 May need to continue to run as GTK3 simulataneously.
 - https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159

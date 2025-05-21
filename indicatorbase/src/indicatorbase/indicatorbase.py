@@ -41,21 +41,6 @@ References
 '''
 
 
-#TODO Not sure if this applies:
-#   https://setuptools.pypa.io/en/latest/userguide/datafiles.html#accessing-data-files-at-runtime
-#
-# When/how do I access data files at runtime?
-# Icons
-# Locale
-# ephemerides
-# tides
-# fortune history
-#
-#
-#   from importlib_resources import files
-#   data_text = files('mypkg.data').joinpath('data1.txt').read_text()
-
-
 import datetime
 import email.policy
 import gettext
