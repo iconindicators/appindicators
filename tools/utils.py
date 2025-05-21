@@ -30,15 +30,26 @@ from pathlib import Path
 VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 
-def get_etc_os_release():
-    result = (
-        subprocess.run(
-            "cat /etc/os-release",
-            stdout = subprocess.PIPE,
-            shell = True,
-            check = False ).stdout.decode().strip() )
+def process_call(
+    command ):
 
-    return result
+    subprocess.run( command, shell = True, check = False )
+
+
+def process_get(
+    command ):
+
+    return (
+        subprocess.run(
+            command,
+            stdout = subprocess.PIPE,
+            stderr = subprocess.PIPE,
+            shell = True,
+            check = False ) )
+
+
+def get_etc_os_release():
+    return process_get( "cat /etc/os-release" ).stdout.decode().strip()
 
 
 def is_debian_11_or_debian_12():
@@ -97,11 +108,10 @@ def initialise_virtual_environment(
     force_reinstall = False ):
 
     if not Path( venv_directory ).is_dir():
-        command = f"python3 -m venv { venv_directory }"
-        subprocess.run( command, shell = True, check = False )
+        process_call( f"python3 -m venv { venv_directory }"  )
 
     command = (
         f". { venv_directory }/bin/activate && "
         f"python3 -m pip install --upgrade { '--force-reinstall' if force_reinstall else '' } { ' '.join( modules_to_install ) }" )
 
-    subprocess.run( command, shell = True, check = False )
+    process_call( command )

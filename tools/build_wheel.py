@@ -31,7 +31,6 @@ import configparser
 import re
 import shutil
 import stat
-import subprocess
 
 from pathlib import Path
 
@@ -237,19 +236,14 @@ def _get_year_in_changelog_markdown(
     Returns the most recent year from the CHANGELOG.md and an empty message.
     On error, returns -1 for the year and an non-empty message.
     '''
+    command = (
+        f". { VENV_BUILD }/bin/activate && "
+        "python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " 
+        "import IndicatorBase; " 
+        "print( IndicatorBase.get_year_in_changelog_markdown( " 
+        f"'{ Path( indicator_name ) }/src/{ indicator_name }/CHANGELOG.md' ) )\"" )
 
-    result = (
-        subprocess.run(
-            f". { VENV_BUILD }/bin/activate && " +
-            "python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " +
-            "import IndicatorBase; " +
-            "print( IndicatorBase.get_year_in_changelog_markdown( " +
-            f"'{ Path( indicator_name ) }/src/{ indicator_name }/CHANGELOG.md' ) )\"",
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE,
-            shell = True,
-            check = False ) )
-
+    result = utils.process_get( command )
     stderr_ = result.stderr.decode()
     if stderr_:
         message = f"Unable to obtain year from CHANGELOG.md: { stderr_ }"
@@ -503,13 +497,13 @@ def _package_source_for_build_wheel_process(
             authors,
             start_year )
 
-        subprocess.run(
-            f". { VENV_BUILD }/bin/activate && " +
-            "python3 -m readme_renderer " +
-            f"{ directory_dist }/{ indicator_name }/README.md " +
-            f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html",
-            shell = True,
-            check = False )
+        command = (
+            f". { VENV_BUILD }/bin/activate && "
+            "python3 -m readme_renderer "
+            f"{ directory_dist }/{ indicator_name }/README.md "
+            f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html" )
+
+        utils.process_call( command )
 
         directory_indicator_locale = (
             Path( '.' ) / directory_indicator / "src" / indicator_name / "locale" )
@@ -570,11 +564,11 @@ def _build_wheel_for_indicator(
                 directory_dist, indicator_name ) )
 
     if not message:
-        subprocess.run(
-            f". { VENV_BUILD }/bin/activate && " +
-            f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }",
-            shell = True,
-            check = False )
+        command = (
+            f". { VENV_BUILD }/bin/activate && "
+            f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }" )
+
+        utils.process_call( command )
 
 # TODO Uncomment
 #         shutil.rmtree( directory_dist / indicator_name )

@@ -22,8 +22,6 @@ $HOME/.local/venv_indicators and then run install.sh.
 '''
 
 
-import subprocess
-
 from . import utils
 
 
@@ -58,4 +56,4 @@ if __name__ == "__main__":
             f" head -1)/site-packages/{ indicator_name }/platform/" +
             "linux/install.sh" )
 
-        subprocess.run( command, shell = True, check = False )
+        utils.process_call( command )

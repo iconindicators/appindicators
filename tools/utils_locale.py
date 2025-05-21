@@ -30,9 +30,10 @@ import datetime
 import filecmp
 import os
 import re
-import subprocess
 
 from pathlib import Path
+
+from . import utils
 
 
 def _get_linguas_codes(
@@ -78,17 +79,17 @@ def _create_update_pot(
 
     # Create a POT based on current source:
     #   http://www.gnu.org/software/gettext/manual/gettext.html
-    subprocess.run(
-        "xgettext " +
-        f"-f { locale_directory / 'POTFILES.in' } " +
-        f"-D { str( Path( indicator_name ) / 'src' / indicator_name ) } " +
-        f"--copyright-holder='{ authors_emails[ 0 ][ 0 ] }.' " +
-        f"--package-name={ indicator_name } " +
-        f"--package-version={ version } " +
-        f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' " +
-        f"-o { pot_file_new }",
-        shell = True,
-        check = False )
+    command = (
+        "xgettext "
+        f"-f { locale_directory / 'POTFILES.in' } "
+        f"-D { str( Path( indicator_name ) / 'src' / indicator_name ) } "
+        f"--copyright-holder='{ authors_emails[ 0 ][ 0 ] }.' "
+        f"--package-name={ indicator_name } "
+        f"--package-version={ version } "
+        f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' "
+        f"-o { pot_file_new }" )
+    
+    utils.process_call( command )
 
     with open( pot_file_new, 'r', encoding = "utf-8" ) as r:
         text = (
@@ -145,11 +146,11 @@ def _create_update_po(
         if po_file_original.exists():
             po_file_new = str( po_file_original ).replace( '.po', '.new.po' )
 
-            subprocess.run(
-                f"msgmerge { po_file_original } { pot_file } " +
-                f"-o { po_file_new }",
-                shell = True,
-                check = False )
+            command = (
+                f"msgmerge { po_file_original } { pot_file } "
+                f"-o { po_file_new }" )
+
+            utils.process_call( command )
 
             with open( po_file_new, 'r', encoding = "utf-8" ) as r:
                 new = r.read()
@@ -182,14 +183,14 @@ def _create_update_po(
                 parents = True,
                 exist_ok = True )
 
-            subprocess.run(
-                "msginit " +
-                f"-i { pot_file } " +
-                f"-o { po_file_original } " +
-                f"-l { lingua_code } " +
-                "--no-translator",
-                shell = True,
-                check = False )
+            command = (
+                "msginit "
+                f"-i { pot_file } "
+                f"-o { po_file_original } "
+                f"-l { lingua_code } "
+                "--no-translator" )
+
+            utils.process_call( command )
 
             with open( po_file_original, 'r', encoding = "utf-8" ) as r:
                 text = (
@@ -221,20 +222,15 @@ def _get_msgstr_from_po(
     # must be escaped.
     msgid_escaped = msgid.replace( "\'", "\\\'" )
 
-    result = (
-        subprocess.run(
-            f". { venv_build }/bin/activate && " +
-            "python3 -c \"" +
-            "import polib; " +
-            "[ print( entry.msgstr ) " +
-            f"for entry in polib.pofile( \'{ po }\' ) " +
-            f"if entry.msgid == \'{ msgid_escaped }\' ]" +
-            "\"",
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE,
-            shell = True,
-            check = False ) )
+    command = (
+        f". { venv_build }/bin/activate && "
+        "python3 -c \""
+        "import polib; "
+        "[ print( entry.msgstr ) "
+        f"for entry in polib.pofile( \'{ po }\' ) "
+        f"if entry.msgid == \'{ msgid_escaped }\' ]" )
 
+    result = utils.process_get( command )
     stderr_ = result.stderr.decode()
     if stderr_:
         message = f"Error retrieving\n\t{ msgid }\nfrom\n\t{ po }\n\n{ stderr_ }"
@@ -310,32 +306,30 @@ def build_locale_for_release(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" )
 
     # Merge indicatorbase POT with indicator POT.
-    subprocess.run(
-        "msgcat --use-first " +
-        f"{ str( directory_indicator_locale / ( indicator_name + '.pot' ) ) } " +
-        f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } " +
-        f"-o { str( directory_indicator_locale / ( indicator_name + '.pot' ) ) }",
-        shell = True,
-        check = False )
+    command = (
+        "msgcat --use-first "
+        f"{ str( directory_indicator_locale / ( indicator_name + '.pot' ) ) } "
+        f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } "
+        f"-o { str( directory_indicator_locale / ( indicator_name + '.pot' ) ) }" )
+
+    utils.process_call( command )
 
     # For each locale, merge indicatorbase PO with indicator PO.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         language_code = po.parent.parts[ -2 ]
-        subprocess.run(
-            "msgcat --use-first " +
-            f"{ str( po ) } " +
-            f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } " +
-            f"-o { str( po ) } ",
-            shell = True,
-            check = False )
+        command = (
+            "msgcat --use-first "
+            f"{ str( po ) } "
+            f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } "
+            f"-o { str( po ) } " )
+
+    utils.process_call( command )
 
     # Create .mo files.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
-        subprocess.run(
-            f"msgfmt { str( po ) } " +
-            f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }",
-            shell = True,
-            check = False )
+        command = (
+            f"msgfmt { str( po ) } "
+            f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }" )
 
 
 def get_names_and_comments_from_po_files(

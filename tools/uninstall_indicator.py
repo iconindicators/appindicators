@@ -23,8 +23,6 @@ if no more indicators are installed.
 '''
 
 
-import subprocess
-
 from . import utils
 
 
@@ -55,4 +53,4 @@ if __name__ == "__main__":
             f"if [ \"$count\" -eq \"0\" ]; "
             f"then rm -f -r { utils.VENV_INSTALL }; fi" )
 
-        subprocess.run( command, shell = True, check = False )
+        utils.process_call( command )
