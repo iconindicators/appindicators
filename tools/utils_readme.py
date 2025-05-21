@@ -162,13 +162,15 @@ def _get_introduction(
     if not _is_indicator( indicator_name, IndicatorName.INDICATORONTHISDAY ):
         introduction += ", `openSUSE`, `Manjaro`"
 
-    introduction += " and theoretically, any platform which supports the "
-    introduction += "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n"
+    introduction += (
+        " and theoretically, any platform which supports the "
+        "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n" )
 
     if _is_indicator( indicator_name, IndicatorName.INDICATORONTHISDAY ):
-        introduction += f"Note that `{ indicator_name }` requires the `calendar` "
-        introduction += f"package which is unavailable on `openSUSE Tumbleweed` "
-        introduction += f"and `Manjaro`; therefore `{ indicator_name }` is unsupported.\n\n"
+        introduction += (
+            f"Note that `{ indicator_name }` requires the `calendar` "
+            f"package which is unavailable on `openSUSE Tumbleweed` "
+            f"and `Manjaro`; therefore `{ indicator_name }` is unsupported.\n\n" )
 
     introduction += "Other indicators in this series are:\n"
     for indicator in _get_indicator_names_sans_current( indicator_name ):
@@ -386,34 +388,9 @@ def _get_operating_system_dependencies_debian(
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
         "libcairo2-dev",
+        "libgirepository1.0-dev",
         "python3-pip",
         "python3-venv" ]
-
-    applicable_operating_systems = {
-        OperatingSystem.DEBIAN_11,
-        OperatingSystem.DEBIAN_12,
-        OperatingSystem.KUBUNTU_2204,
-        OperatingSystem.LUBUNTU_2204,
-        OperatingSystem.UBUNTU_2004,
-        OperatingSystem.UBUNTU_2204,
-        OperatingSystem.UBUNTU_UNITY_2204 }
-
-    if operating_system.issubset( applicable_operating_systems ):
-        dependencies.append( "libgirepository1.0-dev" )
-
-#TODO Verify these all can use libgirep2 (rather than libgirep1)
-    applicable_operating_systems = {
-        OperatingSystem.KUBUNTU_2404,
-        OperatingSystem.LINUX_MINT_CINNAMON_22,
-        OperatingSystem.LUBUNTU_2404,
-        OperatingSystem.UBUNTU_2404,
-        OperatingSystem.UBUNTU_BUDGIE_2404,
-        OperatingSystem.UBUNTU_MATE_2404,
-        OperatingSystem.UBUNTU_UNITY_2404,
-        OperatingSystem.XUBUNTU_2404 }
-
-    if operating_system.issubset( applicable_operating_systems ):
-        dependencies.append( "libgirepository-2.0-dev" )
 
     applicable_operating_systems = {
         OperatingSystem.DEBIAN_11,
