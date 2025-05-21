@@ -85,14 +85,16 @@ def _get_summary(
                     human_readable_operating_system += ' ' + part
 
                 elif len( part ) == 4:
-                    human_readable_operating_system += ' ' + part[ 0 : 2 ] + '.' + part[ 2 : ]
+                    human_readable_operating_system += (
+                        ' ' + part[ 0 : 2 ] + '.' + part[ 2 : ] )
 
                 else:
                     print( f"UNHANDLED PART '{ part }' for OPERATING SYSTEM '{ operating_system_ }'" )
 
             else:
                 if human_readable_operating_system.endswith( "Manjaro" ):
-                    human_readable_operating_system += ' ' + part[ 0 : 2 ] + '.' + part[ 2 : 3 ] + '.' + part[ 3 ].lower()
+                    human_readable_operating_system += (
+                        ' ' + part[ 0 : 2 ] + '.' + part[ 2 : 3 ] + '.' + part[ 3 ].lower() )
 
                 elif "MATE" == part:
                     human_readable_operating_system += ' ' + part # Keep capitalised.
@@ -202,7 +204,8 @@ def _get_installation_additional_python_modules(
 
     if indicator_name.upper() == IndicatorName.INDICATORTIDE.name:
         message += (
-            "Your `Python` script which retrieves your tidal data may need additional `Python` modules. "
+            "Your `Python` script which retrieves your tidal data may need "
+            "additional `Python` modules. "
             f"{ common }" )
 
     return message
@@ -234,7 +237,8 @@ def _get_installation_python_virtual_environment(
         pygobject = "PyGObject<=3.50.0"  #TODO Not sure if needs to be \< so do a test install.
 
     message = (
-        "Install the indicator to a `Python` virtual environment and install icons, .desktop and run script:\n"
+        "Install the indicator to a `Python` virtual environment and install "
+        "icons, .desktop and run script:\n"
         "    ```\n"
         f"    indicator={ indicator_name } && \\\n"
         f"    venv={ utils.VENV_INSTALL } && \\\n"
@@ -374,7 +378,8 @@ def _get_uninstall_for_operating_system(
             "    deactivate && \\\n"
             "    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
             "    ```\n"
-            "    If no other indicators are installed, the virtual environment will be deleted.\n\n"
+            "    If no other indicators are installed, the virtual "
+            "environment will be deleted.\n\n"
 
             "</details>\n\n" )
 
@@ -579,11 +584,13 @@ def _get_install_uninstall(
         additional_text = ""
         if _is_indicator( indicator_name, IndicatorName.INDICATORSCRIPTRUNNER ):
             additional_text = (
-                f"3. Any `Python` scripts you add to `{ indicator_name }` may require additional modules.\n" )
+                f"3. Any `Python` scripts you add to `{ indicator_name }` may "
+                "require additional modules.\n" )
 
         if _is_indicator( indicator_name, IndicatorName.INDICATORTIDE ):
             additional_text = (
-                "3. You will need to write a `Python` script to retrieve your tidal data.\n" )
+                "3. You will need to write a `Python` script to retrieve "
+                "your tidal data.\n" )
 
         title = (
             "Installation / Updating\n"
@@ -672,10 +679,12 @@ def _get_usage(
         "Usage\n"
         "-----\n\n"
 
-        f"To run `{ indicator_name }`, press the `Super` key to show the applications overlay or similar "
-        f"and type `{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Remove the ™ from VirtualBox™.
+        f"To run `{ indicator_name }`, press the `Super` key to show the "
+        "applications overlay or similar and type "
+        "`{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Removes the ™ from VirtualBox™.
         "into the search bar and the icon should be present for you to select.  "
-        "If the icon does not appear, or appears as generic, you may have to log out / in (or restart).\n\n"
+        "If the icon does not appear, or appears as generic, you may have to "
+        "log out / in (or restart).\n\n"
         "Alternatively, to run from the terminal:\n\n"
         "```\n"
         f"indicator={ indicator_name } && \\\n"
@@ -696,7 +705,8 @@ def _get_limitations(
         indicator_name,
         IndicatorName.INDICATORPUNYCODE ):
         messages.append(
-            "- `Wayland`: Clipboard/Primary input and output function intermittently at best; effectively unsupported.\n" )
+            "- `Wayland`: Clipboard/Primary input and output function "
+            "intermittently at best; effectively unsupported.\n" )
 
     if _is_indicator(
         indicator_name,
@@ -739,13 +749,17 @@ def _get_limitations(
         IndicatorName.INDICATORSTARDATE,
         IndicatorName.INDICATORTEST ):
         messages.append(
-            "- `KDE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
+            "- `KDE`: The icon label is unsupported; "
+            "the icon tooltip is used in lieu.\n" )
         messages.append(
-            "- `X-Cinnamon`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
+            "- `X-Cinnamon`: The icon label is unsupported; "
+            "the icon tooltip is used in lieu.\n" )
         messages.append(
-            "- `XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.\n" )
+            "- `XFCE`: The icon label is unsupported; "
+            "the icon tooltip is used in lieu.\n" )
         messages.append(
-            "- `LXQt`: The icon label is unsupported; icon tooltip shows the indicator filename (effectively unsupported).\n" )
+            "- `LXQt`: The icon label is unsupported; icon tooltip shows the "
+            "indicator filename (effectively unsupported).\n" )
         messages.append(
             "- `ICEWM`: The icon label and icon tooltip are unsupported.\n" )
 
@@ -759,7 +773,8 @@ def _get_limitations(
         messages.append(
             "- `LXQt`: The icon cannot be changed once set.\n" )
         messages.append(
-            "- `X-Cinnamon`: The icon disappears when changed from that originally set, leaving a blank space.\n" )
+            "- `X-Cinnamon`: The icon disappears when changed from that "
+            "originally set, leaving a blank space.\n" )
 
     # Lubuntu 22.04     LXQt    Default terminal (qterminal) does not work.
     # Lubuntu 24.04     LXQt    Default terminal (qterminal) all good.
@@ -768,8 +783,9 @@ def _get_limitations(
         IndicatorName.INDICATORSCRIPTRUNNER,
         IndicatorName.INDICATORTEST ):
         messages.append(
-            "- `LXQt`: Commands cannot be sent to `qterminal` with version < `1.2.0` as the "
-            "arguments are not [preserved](https://github.com/lxqt/qterminal/issues/335). "
+            "- `LXQt`: Commands cannot be sent to `qterminal` with version < `1.2.0`"
+            " as the arguments are not "
+            "[preserved](https://github.com/lxqt/qterminal/issues/335). "
             "Install `gnome-terminal` as a workaround.\n" )
 
     # openSUSE Tumbleweed   No `calendar` command.
@@ -839,7 +855,8 @@ def _get_license(
     return (
         "License\n"
         "-------\n\n"
-        "This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.\n\n"
+        "This project in its entirety is licensed under the terms of the "
+        "GNU General Public License v3.0 license.\n\n"
         f"Copyright { start_year }-{ end_year } { authors }.\n" )
 
 
