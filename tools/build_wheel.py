@@ -250,7 +250,35 @@ def _get_year_in_changelog_markdown(
         year = -1
 
     else:
+        # from .indicatorbase import IndicatorBase
+        # changelog_markdown = (
+        #     Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
+        #
+        # year = IndicatorBase.get_year_in_changelog_markdown( changelog_markdown )
+        # print( f"YEAR { year }") #TODO Testing
+        #
+        # year = IndicatorBase.get_year_in_changelog_markdown( changelog_markdown, first_year = False )
+        # print( f"YEAR { year }") #TODO Testing
+
+        print( "*****************" )
+        import sys
+        # sys.path.insert( 0, '/home/bernard/Programming/Indicators' )
+        sys.path.insert( 0, '../' )
+        from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
+        changelog_markdown = (
+            Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
+        
+        year = IndicatorBase.get_year_in_changelog_markdown( changelog_markdown )
+        print( f"YEAR { year }") #TODO Testing
+        
+        year = IndicatorBase.get_year_in_changelog_markdown( changelog_markdown, first_year = False )
+        print( f"YEAR { year }") #TODO Testing
+        
+        
+
         year = result.stdout.decode().strip()
+        print( f"YEAR { year }") #TODO Testing
+        print( "*****************" )
         message = ""
 
     return year, message
