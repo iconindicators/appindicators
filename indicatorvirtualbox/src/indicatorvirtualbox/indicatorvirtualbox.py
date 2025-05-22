@@ -390,7 +390,8 @@ class IndicatorVirtualBox( IndicatorBase ):
     def on_launch_virtual_box_manager( self ):
 
         def start_virtualbox_manager():
-            self.process_call( self.process_get( "which VirtualBox" ) + " &" )
+            self.process_call(
+                self.process_get( "which VirtualBox" ).strip() + ' &' )
 
 
         if self.is_session_type_x11():
@@ -540,7 +541,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         treestore = Gtk.TreeStore( str, bool, str, str )
 
         items = [ ]
-        if self.is_vboxmanage_installed():
+        if self.is_vboxmanage_installed():  #TODO This is called again below...only do this once!
             items = self.get_virtual_machines()
 
         groups_exist = self._add_items_to_store( treestore, None, items )

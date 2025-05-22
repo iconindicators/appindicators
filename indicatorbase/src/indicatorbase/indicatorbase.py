@@ -3019,50 +3019,96 @@ class IndicatorBase( ABC ):
         self,
         command ):
         '''
-        Executes the command in a new process.
+        Executes the command in the shell.
         On failure/exception, logs to file.
         '''
-        self.process_get( command )
+#TODO Should this return a flag on error/exception?
+# Who calls this function? Would an error flag help?
+        try:
+            subprocess.run(
+                command,
+                shell = True,
+                capture_output = False,
+                check = True )
+
+        except subprocess.CalledProcessError as e:
+            if e.stderr:
+                logging.error( e.stderr.decode() )
+
+            if e.stdout:
+                logging.error( e.stdout.decode() )
 
 
-    def process_get(
-        self,
-        command,
-        log_non_zero_error_code = False ):
-        '''
-        Executes the command and returns the result.
-        The result of executing the command may indeed be "" which does not
-        necessarily indicate an error condition.
+    # def process_get(
+    #     self,
+    #     command,
+    #     log_non_zero_error_code = False ):
+    #     '''
+    #     Executes the command and returns the result.
+    #     The result of executing the command may indeed be "" which does not
+    #     necessarily indicate an error condition.
+    #
+    #     logNonZeroErrorCode:
+    #         If True, will log any exception arising from a non-zero return code;
+    #         otherwise will ignore.
+    #
+    #     On failure/exception, logs to file and returns "".
+    #     '''
+    #     try:
+    #         result = (
+    #             subprocess.run(
+    #                 command,
+    #                 stdout = subprocess.PIPE,
+    #                 stderr = subprocess.PIPE,
+    #                 shell = True,
+    #                 check = log_non_zero_error_code ) )
+    #
+    #         stderr_ = result.stderr.decode()
+    #         if stderr_:
+    #             result = ""
+    #             logging.error( stderr_ )
+    #
+    #         else:
+    #             result = result.stdout.decode().strip()
+    #
+    #     except subprocess.CalledProcessError as e:
+    #         logging.error( e )
+    #         if e.stderr:
+    #             logging.error( e.stderr )
+    #
+    #         result = ""
+    #
+    #     return result
 
-        logNonZeroErrorCode:
-            If True, will log any exception arising from a non-zero return code;
-            otherwise will ignore.
 
-        On failure/exception, logs to file and returns "".
-        '''
+#TODO Original code above.
+# The only caller of this where check = True was in scriptrunner when calling a user script.
+# All other callers set check = False.
+# Does setting check = True always affect the other callers?
+    def process_get( self, command ):
         try:
             result = (
                 subprocess.run(
                     command,
-                    stdout = subprocess.PIPE,
-                    stderr = subprocess.PIPE,
                     shell = True,
-                    check = log_non_zero_error_code ) )
+                    capture_output = True,
+                    check = True ) )
 
             stderr_ = result.stderr.decode()
             if stderr_:
                 result = ""
                 logging.error( stderr_ )
-
+    
             else:
                 result = result.stdout.decode().strip()
 
         except subprocess.CalledProcessError as e:
-            logging.error( e )
-            if e.stderr:
-                logging.error( e.stderr )
-
             result = ""
+            if e.stderr:
+                logging.error( e.stderr.decode() )
+
+            if e.stdout:
+                logging.error( e.stdout.decode() )
 
         return result
 
