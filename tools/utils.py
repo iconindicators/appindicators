@@ -36,6 +36,7 @@ def process_call(
     subprocess.run( command, shell = True, check = False )
 
 
+#TODO Compare this against that in indicatorbase.
 def process_get(
     command ):
 
