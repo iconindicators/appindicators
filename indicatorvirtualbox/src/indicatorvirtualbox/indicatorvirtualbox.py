@@ -541,7 +541,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         treestore = Gtk.TreeStore( str, bool, str, str )
 
         items = [ ]
-        if self.is_vboxmanage_installed():  #TODO This is called again below...only do this once!
+        if self.is_vboxmanage_installed():
             items = self.get_virtual_machines()
 
         groups_exist = self._add_items_to_store( treestore, None, items )
