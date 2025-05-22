@@ -317,10 +317,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.get_logging().debug(
                 script.get_group() + " | " + script.get_name() + ": " + script.get_command() )
 
-        command_result = (
-            self.process_get(
-                script.get_command(), log_non_zero_error_code = True ) )
-
+        command_result = self.process_get( script.get_command() )
         key = self._create_key( script.get_group(), script.get_name() )
         self.background_script_results[ key ] = command_result
         self.background_script_next_update_time[ key ] = (

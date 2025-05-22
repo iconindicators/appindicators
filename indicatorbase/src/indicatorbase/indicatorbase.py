@@ -3039,52 +3039,6 @@ class IndicatorBase( ABC ):
                 logging.error( e.stdout.decode() )
 
 
-    # def process_get(
-    #     self,
-    #     command,
-    #     log_non_zero_error_code = False ):
-    #     '''
-    #     Executes the command and returns the result.
-    #     The result of executing the command may indeed be "" which does not
-    #     necessarily indicate an error condition.
-    #
-    #     logNonZeroErrorCode:
-    #         If True, will log any exception arising from a non-zero return code;
-    #         otherwise will ignore.
-    #
-    #     On failure/exception, logs to file and returns "".
-    #     '''
-    #     try:
-    #         result = (
-    #             subprocess.run(
-    #                 command,
-    #                 stdout = subprocess.PIPE,
-    #                 stderr = subprocess.PIPE,
-    #                 shell = True,
-    #                 check = log_non_zero_error_code ) )
-    #
-    #         stderr_ = result.stderr.decode()
-    #         if stderr_:
-    #             result = ""
-    #             logging.error( stderr_ )
-    #
-    #         else:
-    #             result = result.stdout.decode().strip()
-    #
-    #     except subprocess.CalledProcessError as e:
-    #         logging.error( e )
-    #         if e.stderr:
-    #             logging.error( e.stderr )
-    #
-    #         result = ""
-    #
-    #     return result
-
-
-#TODO Original code above.
-# The only caller of this where check = True was in scriptrunner when calling a user script.
-# All other callers set check = False.
-# Does setting check = True always affect the other callers?
     def process_get( self, command ):
         try:
             result = (
