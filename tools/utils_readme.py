@@ -30,6 +30,20 @@ References:
 # 21 is NOT backed up.
 
 
+
+
+#TODO Candidates for removal of VM from backup after testing...
+# Fedora 38 2024 05
+# Debian 11 2024 08
+# Fedora 39 2024 11
+# Kubuntu 22.04 2025 04
+# Linux Mint 20 2025 04
+# Lubuntu 22.04 2025 04
+# Fedora 40 2025 05
+# Ubuntu Unity 22.04 2025 04
+# Manjaro 24 now replaced by 25
+
+
 import datetime
 import re
 
