@@ -31,8 +31,12 @@ import configparser
 import re
 import shutil
 import stat
+import sys
 
 from pathlib import Path
+
+sys.path.insert( 0, '../' )
+from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 
 from . import utils
 from . import utils_locale
@@ -224,64 +228,11 @@ def _get_pyproject_toml_authors(
 
 def _get_year_in_changelog_markdown(
     indicator_name ):
-    '''
-    Obtains the (most recent) year from the CHANGELOG.md.
+    ''' Obtains the (most recent) year from the CHANGELOG.md. '''
+    changelog_markdown = (
+        Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
 
-    Typically achieved by calling a function in indicatorbase.
-    Unfortunately, seems next to impossible to do so because the import of
-    indicatorbase fails.
-
-    Next best thing: call the function through the Python console.
-
-    Returns the most recent year from the CHANGELOG.md and an empty message.
-    On error, returns -1 for the year and an non-empty message.
-    '''
-    command = (
-        f". { VENV_BUILD }/bin/activate && "
-        "python3 -c \"from indicatorbase.src.indicatorbase.indicatorbase " 
-        "import IndicatorBase; " 
-        "print( IndicatorBase.get_year_in_changelog_markdown( " 
-        f"'{ Path( indicator_name ) }/src/{ indicator_name }/CHANGELOG.md' ) )\"" )
-
-    result = utils.process_get( command )
-    stderr_ = result.stderr.decode()
-    if stderr_:
-        message = f"Unable to obtain year from CHANGELOG.md: { stderr_ }"
-        year = -1
-
-    else:
-        # from .indicatorbase import IndicatorBase
-        # changelog_markdown = (
-        #     Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
-        #
-        # year = IndicatorBase.get_year_in_changelog_markdown( changelog_markdown )
-        # print( f"YEAR { year }") #TODO Testing
-        #
-        # year = IndicatorBase.get_year_in_changelog_markdown( changelog_markdown, first_year = False )
-        # print( f"YEAR { year }") #TODO Testing
-
-        print( "*****************" )
-        import sys
-        # sys.path.insert( 0, '/home/bernard/Programming/Indicators' )
-        sys.path.insert( 0, '../' )
-        from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
-        changelog_markdown = (
-            Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
-        
-        year = IndicatorBase.get_year_in_changelog_markdown( changelog_markdown )
-        print( f"YEAR { year }") #TODO Testing
-        
-        year = IndicatorBase.get_year_in_changelog_markdown( changelog_markdown, first_year = False )
-        print( f"YEAR { year }") #TODO Testing
-        
-        
-
-        year = result.stdout.decode().strip()
-        print( f"YEAR { year }") #TODO Testing
-        print( "*****************" )
-        message = ""
-
-    return year, message
+    return IndicatorBase.get_year_in_changelog_markdown( changelog_markdown )
 
 
 def _get_name_categories_comments_from_indicator(
@@ -498,9 +449,8 @@ def _package_source_for_build_wheel_process(
 
     if not message:
         authors = _get_pyproject_toml_authors( config )
-        start_year, message = _get_year_in_changelog_markdown( indicator_name )
+        start_year = _get_year_in_changelog_markdown( indicator_name )
 
-    if not message:
         utils_locale.update_locale_source(
             indicator_name,
             authors,
