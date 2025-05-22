@@ -56,15 +56,20 @@ which will create a symbolic link to `indicatorbase.py` for all the indicators.
 
 To run `indicatortest`:
 
+TODO Add Linux Mint
 ```
 	indicator=indicatortest && \
-	pygobject_debian_12="PyGObject<=3.50.0" && \
 	pygobject="PyGObject" && \
+	pygobject_3_50_0="PyGObject<=3.50.0" && \
 	venv=venv_run && \
 	if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
 	. ${venv}/bin/activate && \
 	etc_os_release="$(cat /etc/os-release)" && \
-	if [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"12\"')" == "VERSION_ID=\"12\"" ]; then pygobject=$pygobject_debian_12; fi && \
+	if [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"12\"')" == "VERSION_ID=\"12\"" ]; then pygobject=$pygobject_3_50_0; fi && \
+	if [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"11\"')" == "VERSION_ID=\"11\"" ]; then pygobject=$pygobject_3_50_0; fi && \
+	if [ "$(echo "$etc_os_release" | grep 'ID=ubuntu')" == "ID=ubuntu" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"20.04\"')" == "VERSION_ID=\"20.04\"" ]; then pygobject=$pygobject_3_50_0; fi && \
+	if [ "$(echo "$etc_os_release" | grep 'ID=ubuntu')" == "ID=ubuntu" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"22.04\"')" == "VERSION_ID=\"22.04\"" ]; then pygobject=$pygobject_3_50_0; fi && \
+	if [ "$(echo "$etc_os_release" | grep 'ID=ubuntu')" == "ID=ubuntu" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"24.04\"')" == "VERSION_ID=\"24.04\"" ]; then pygobject=$pygobject_3_50_0; fi && \
 	python3 -m pip install packaging $pygobject && \
 	cd ${indicator}/src && \
 	python3 -m ${indicator}.${indicator} && \

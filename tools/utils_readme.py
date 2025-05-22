@@ -26,6 +26,10 @@ References:
 '''
 
 
+#TODO Test on Linux Mint 20 first, then delete, then 21.
+# 21 is NOT backed up.
+
+
 import datetime
 import re
 
@@ -215,14 +219,17 @@ def _get_installation_python_virtual_environment(
     indicator_name,
     operating_system):
 
-    # The latest version of PyGObject requires libgirepository-2.0-dev
-    # which is not available on Debian 11/12.
+    # On Debian based distributions, the latest version of PyGObject requires
+    # libgirepository-2.0-dev which is only available on Debian 13+ and
+    # Ubuntu 24.04+.
     #
-    # Therefore PyGObject needs to be pinned to 3.50.0 which is compatible
-    # with libgirepository1.0-dev.
+    # Ubuntu 24.04 has both libgirepository-2.0-dev and libgirepository1.0-dev
+    # and things seem to work just fine with libgirepository1.0-dev.
     #
-    # This issue does not seem to affect Ubuntu 20.04/22.04/24.04 nor
-    # Fedora, Manjaro, openSUSE.
+    # Consequently, For Debian 11/12 and Ubuntu 20.04/22.04/24.04 PyGObject is
+    # pinned to 3.50.0 which is compatible with libgirepository1.0-dev.
+    #
+    # This issue does not seem to affect Fedora, Manjaro nor openSUSE.
     #
     # References:
     #   https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
@@ -230,11 +237,24 @@ def _get_installation_python_virtual_environment(
     #   https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
     applicable_operating_systems = {
         OperatingSystem.DEBIAN_11,
-        OperatingSystem.DEBIAN_12 }
+        OperatingSystem.DEBIAN_12,
+        OperatingSystem.KUBUNTU_2204,
+        OperatingSystem.KUBUNTU_2404,
+        OperatingSystem.LINUX_MINT_CINNAMON_22,
+        OperatingSystem.LUBUNTU_2204,
+        OperatingSystem.LUBUNTU_2404,
+        OperatingSystem.UBUNTU_2004,
+        OperatingSystem.UBUNTU_2204,
+        OperatingSystem.UBUNTU_2404,
+        OperatingSystem.UBUNTU_BUDGIE_2404,
+        OperatingSystem.UBUNTU_MATE_2404,
+        OperatingSystem.UBUNTU_UNITY_2204,
+        OperatingSystem.UBUNTU_UNITY_2404,
+        OperatingSystem.XUBUNTU_2404 }
 
     pygobject = "PyGObject"
     if operating_system.issubset( applicable_operating_systems ):
-        pygobject = "PyGObject<=3.50.0"  #TODO Not sure if needs to be \< so do a test install.
+        pygobject = "PyGObject\<=3.50.0"  #TODO Check that the \ on the < is actually needed by doing an install.
 
     message = (
         "Install the indicator to a `Python` virtual environment and install "
