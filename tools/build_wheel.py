@@ -226,15 +226,6 @@ def _get_pyproject_toml_authors(
     return tuple( names_emails )
 
 
-def _get_year_in_changelog_markdown(
-    indicator_name ):
-    ''' Obtains the (most recent) year from the CHANGELOG.md. '''
-    changelog_markdown = (
-        Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
-
-    return IndicatorBase.get_year_in_changelog_markdown( changelog_markdown )
-
-
 def _get_name_categories_comments_from_indicator(
     indicator_name,
     directory_indicator ):
@@ -433,13 +424,11 @@ def _package_source_for_build_wheel_process(
     version_from_pyproject_toml = (
         config.get( "project", "version" ).replace( "\"", '' ).strip() )
 
+    changelog_markdown = (
+        Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
+
     version_from_changelog_markdown = (
-        _get_version_in_changelog_markdown(
-            Path( '.' ) /
-            indicator_name /
-            "src" /
-            indicator_name /
-            "CHANGELOG.md" ) )
+        _get_version_in_changelog_markdown( changelog_markdown ) )
 
     message = ""
     if version_from_pyproject_toml != version_from_changelog_markdown:
@@ -449,7 +438,8 @@ def _package_source_for_build_wheel_process(
 
     if not message:
         authors = _get_pyproject_toml_authors( config )
-        start_year = _get_year_in_changelog_markdown( indicator_name )
+        start_year = (
+            IndicatorBase.get_year_in_changelog_markdown( changelog_markdown ) )
 
         utils_locale.update_locale_source(
             indicator_name,
