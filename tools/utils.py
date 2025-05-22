@@ -30,6 +30,7 @@ from pathlib import Path
 VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 
+#TODO Compare this against that in indicatorbase.
 def process_call(
     command ):
 
