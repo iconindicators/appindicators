@@ -3040,6 +3040,13 @@ class IndicatorBase( ABC ):
 
 
     def process_get( self, command ):
+        '''
+        Executes the command and returns the result.
+        The result of executing the command may indeed be "" which does not
+        necessarily indicate an error condition.
+    
+        On failure/exception, logs to file and returns "".
+        '''
         try:
             result = (
                 subprocess.run(
