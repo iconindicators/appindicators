@@ -93,43 +93,6 @@ class IndicatorName( Enum ):
     INDICATORVIRTUALBOX = auto()
 
 
-def _get_summary(
-    operating_system ):
-
-    summary = [ ]
-    for operating_system_ in operating_system:
-        human_readable_operating_system = ""
-        for part in operating_system_.name.split( '_' ):
-            if part.isnumeric():
-                if len( part ) == 2:
-                    human_readable_operating_system += ' ' + part
-
-                elif len( part ) == 4:
-                    human_readable_operating_system += (
-                        ' ' + part[ 0 : 2 ] + '.' + part[ 2 : ] )
-
-                else:
-                    print( f"UNHANDLED PART '{ part }' for OPERATING SYSTEM '{ operating_system_ }'" )
-
-            else:
-                if human_readable_operating_system.endswith( "Manjaro" ):
-                    human_readable_operating_system += (
-                        ' ' + part[ 0 : 2 ] + '.' + part[ 2 : 3 ] + '.' + part[ 3 ].lower() )
-
-                elif "MATE" == part:
-                    human_readable_operating_system += ' ' + part # Keep capitalised.
-
-                elif "OPENSUSE" == part:
-                    human_readable_operating_system += ' ' + "openSUSE" # Keep partially capitalised.
-
-                else:
-                    human_readable_operating_system += ' ' + part.title()
-
-        summary.append( human_readable_operating_system.strip() )
-
-    return " | ".join( sorted( summary ) )
-
-
 def _is_indicator(
     indicator_name,
     *indicator_names ):
@@ -146,7 +109,11 @@ def _is_indicator(
 def _get_indicator_names_sans_current(
     indicator_name ):
 
-    indicators = [ str( x ) for x in Path( '.' ).iterdir() if x.is_dir() and str( x ).startswith( "indicator" ) ]
+    indicators = [
+        str( x )
+        for x in Path( '.' ).iterdir()
+        if x.is_dir() and str( x ).startswith( "indicator" ) ]
+
     indicators.remove( indicator_name )
     indicators.remove( "indicatorbase" )
     indicators.sort()
@@ -177,10 +144,9 @@ def _get_introduction(
         f"`{ indicator_name }` { comments } on "
         "`Debian`, `Ubuntu`, `Fedora`" )
 
-    # openSUSE Tumbleweed and Manjaro do not contain the 'calendar' package or
-    # an equivalent.  When creating the README.md for indicatoronthisday,
-    # drop references to openSUSE/Manjaro.
-    # Want to still have indicatortest for openSUSE/Manjaro!
+    # openSUSE Tumbleweed and Manjaro do not contain the 'calendar' package.
+    # For indicatoronthisday, drop references to openSUSE/Manjaro.
+    # Still keep indicatortest for openSUSE/Manjaro!
     if not _is_indicator( indicator_name, IndicatorName.INDICATORONTHISDAY ):
         introduction += ", `openSUSE`, `Manjaro`"
 
@@ -190,9 +156,15 @@ def _get_introduction(
 
     if _is_indicator( indicator_name, IndicatorName.INDICATORONTHISDAY ):
         introduction += (
-            f"Note that `{ indicator_name }` requires the `calendar` "
-            f"package which is unavailable on `openSUSE Tumbleweed` "
-            f"and `Manjaro`; therefore `{ indicator_name }` is unsupported.\n\n" )
+            f"Note that `{ indicator_name }` requires the `calendar` package "
+            "which is unavailable on `openSUSE Tumbleweed` and `Manjaro` and "
+            f"therefore `{ indicator_name }` is unsupported.\n\n" )
+
+    if _is_indicator( indicator_name, IndicatorName.INDICATORTEST ):
+        introduction += (
+            f"Note that `{ indicator_name }` uses the `calendar` package which "
+            "is unavailable on `openSUSE Tumbleweed` and `Manjaro` and so the "
+            "`calendar` functionality is unavailable.\m\m" )
 
     introduction += "Other indicators in this series are:\n"
     for indicator in _get_indicator_names_sans_current( indicator_name ):
@@ -201,34 +173,6 @@ def _get_introduction(
     introduction += '\n'
 
     return introduction
-
-
-def _get_installation_additional_python_modules(
-    indicator_name ):
-
-    message = ''
-
-    common = (
-        "For example, to install the `requests` module:\n"
-        "    ```\n"
-        f"    . { utils.VENV_INSTALL }/bin/activate && \\\n"
-        "    python3 -m pip install --upgrade requests && \\\n"
-        "    deactivate\n"
-        "    ```\n" )
-
-    if indicator_name.upper() == IndicatorName.INDICATORSCRIPTRUNNER.name:
-        message += (
-            f"If you have added any `Python` scripts to `{ indicator_name }`, "
-            "you may need to install additional `Python` modules. "
-            f"{ common }" )
-
-    if indicator_name.upper() == IndicatorName.INDICATORTIDE.name:
-        message += (
-            "Your `Python` script which retrieves your tidal data may need "
-            "additional `Python` modules. "
-            f"{ common }" )
-
-    return message
 
 
 def _get_installation_python_virtual_environment(
@@ -291,6 +235,71 @@ def _get_installation_python_virtual_environment(
     return message
 
 
+def _get_installation_additional_python_modules(
+    indicator_name ):
+
+    message = ''
+
+    common = (
+        "For example, to install the `requests` module:\n"
+        "    ```\n"
+        f"    . { utils.VENV_INSTALL }/bin/activate && \\\n"
+        "    python3 -m pip install --upgrade requests && \\\n"
+        "    deactivate\n"
+        "    ```\n" )
+
+    if indicator_name.upper() == IndicatorName.INDICATORSCRIPTRUNNER.name:
+        message += (
+            f"If you have added any `Python` scripts to `{ indicator_name }`, "
+            "you may need to install additional `Python` modules. "
+            f"{ common }" )
+
+    if indicator_name.upper() == IndicatorName.INDICATORTIDE.name:
+        message += (
+            "Your `Python` script which retrieves your tidal data may need "
+            "additional `Python` modules. "
+            f"{ common }" )
+
+    return message
+
+
+def _get_summary(
+    operating_system ):
+
+    summary = [ ]
+    for operating_system_ in operating_system:
+        human_readable_operating_system = ""
+        for part in operating_system_.name.split( '_' ):
+            if part.isnumeric():
+                if len( part ) == 2:
+                    human_readable_operating_system += ' ' + part
+
+                elif len( part ) == 4:
+                    human_readable_operating_system += (
+                        ' ' + part[ 0 : 2 ] + '.' + part[ 2 : ] )
+
+                else:
+                    print( f"UNHANDLED PART '{ part }' for OPERATING SYSTEM '{ operating_system_ }'" )
+
+            else:
+                if human_readable_operating_system.endswith( "Manjaro" ):
+                    human_readable_operating_system += (
+                        ' ' + part[ 0 : 2 ] + '.' + part[ 2 : 3 ] + '.' + part[ 3 ].lower() )
+
+                elif "MATE" == part:
+                    human_readable_operating_system += ' ' + part # Keep capitalised.
+
+                elif "OPENSUSE" == part:
+                    human_readable_operating_system += ' ' + "openSUSE" # Keep partially capitalised.
+
+                else:
+                    human_readable_operating_system += ' ' + part.title()
+
+        summary.append( human_readable_operating_system.strip() )
+
+    return " | ".join( sorted( summary ) )
+
+
 def _get_extension(
     operating_system ):
 
@@ -324,7 +333,7 @@ def _get_extension(
 
 
 def _get_installation_for_operating_system(
-    operating_system,
+    operating_system,  #TODO This can be a tuple of more than one OS...so add an 's'?
     indicator_name,
     install_command,
     _get_operating_system_dependencies_function_name ):
@@ -335,12 +344,12 @@ def _get_installation_for_operating_system(
             OperatingSystem.MANJARO_240X,
             OperatingSystem.OPENSUSE_TUMBLEWEED } ) )
 
-    indicator_uses_calendar = (
+    indicator_relies_upon_calendar = (
         _is_indicator(
             indicator_name,
             IndicatorName.INDICATORONTHISDAY ) )
 
-    if indicator_uses_calendar and os_has_no_calendar:
+    if indicator_relies_upon_calendar and os_has_no_calendar:
         installation = ''
 
     else:
@@ -349,13 +358,12 @@ def _get_installation_for_operating_system(
                 operating_system,
                 IndicatorName[ indicator_name.upper() ] ) )
 
-        # Reference on installing some of the operating system packages:
+        # Installing operating system packages:
         #   https://stackoverflow.com/a/61164149/2156453
         #   https://pygobject.gnome.org/getting_started.html
         installation = (
             "<details>"
             f"<summary><b>{ _get_summary( operating_system ) }</b></summary>\n\n"
-
             "1. Install operating system packages:\n\n"
             "    ```\n"
             f"    { install_command } { operating_system_packages }\n"
@@ -455,7 +463,7 @@ def _get_operating_system_dependencies_debian(
             OperatingSystem.DEBIAN_12,
             OperatingSystem.KUBUNTU_2204,
             OperatingSystem.KUBUNTU_2404,
-            OperatingSystem.LINUX_MINT_CINNAMON_21,  #TODO Check
+            OperatingSystem.LINUX_MINT_CINNAMON_21,
             OperatingSystem.LINUX_MINT_CINNAMON_22,
             OperatingSystem.LUBUNTU_2204,
             OperatingSystem.LUBUNTU_2404,
@@ -490,7 +498,7 @@ def _get_operating_system_dependencies_debian(
             OperatingSystem.DEBIAN_12,
             OperatingSystem.KUBUNTU_2204,
             OperatingSystem.KUBUNTU_2404,
-            OperatingSystem.LINUX_MINT_CINNAMON_21,  #TODO Check
+            OperatingSystem.LINUX_MINT_CINNAMON_21,
             OperatingSystem.LINUX_MINT_CINNAMON_22,
             OperatingSystem.LUBUNTU_2204,
             OperatingSystem.LUBUNTU_2404,
@@ -629,8 +637,8 @@ def _get_install_uninstall(
 
         if _is_indicator( indicator_name, IndicatorName.INDICATORTIDE ):
             additional_text = (
-                "3. You will need to write a `Python` script to retrieve "
-                "your tidal data.\n" )
+                "3. You will need to write a `Python` script to retrieve your "
+                "tidal data.\n" )
 
         title = (
             "Installation / Updating\n"
@@ -646,7 +654,7 @@ def _get_install_uninstall(
         command_debian = "sudo apt-get -y remove"
         command_fedora = "sudo dnf -y remove"
         title = (
-            "Uninstall\n" + \
+            "Uninstall\n"
             "---------\n\n" )
 
     return (
@@ -744,6 +752,7 @@ def _get_limitations(
 
     messages = [ ]
 
+#TODO I think this is no longer the case but test on all distros...
     if _is_indicator(
         indicator_name,
         IndicatorName.INDICATORPUNYCODE ):
@@ -751,6 +760,7 @@ def _get_limitations(
             "- `Wayland`: Clipboard/Primary input and output function "
             "intermittently at best; effectively unsupported.\n" )
 
+#TODO I think this is no longer the case but test on all distros...
     if _is_indicator(
         indicator_name,
         IndicatorName.INDICATORFORTUNE,
@@ -835,10 +845,13 @@ def _get_limitations(
             "[preserved](https://github.com/lxqt/qterminal/issues/335). "
             "Install `gnome-terminal` as a workaround.\n" )
 
+    # Manjaro 24            No `calendar` command.
     # openSUSE Tumbleweed   No `calendar` command.
     if _is_indicator(
         indicator_name,
         IndicatorName.INDICATORTEST ):
+        messages.append(
+            "- `Manjaro 24`: Does not contain the `calendar` command.\n" )
         messages.append(
             "- `openSUSE Tumbleweed`: Does not contain the `calendar` command.\n" )
 
@@ -923,3 +936,36 @@ def create_readme(
         f.write( _get_limitations( indicator_name ) )
         f.write( _get_install_uninstall( indicator_name, install = False ) )
         f.write( _get_license( authors_emails, start_year ) )
+
+
+#TODO I think using issubset is unsafe...
+operating_system = {
+    OperatingSystem.DEBIAN_11,
+    OperatingSystem.DEBIAN_12 }
+
+
+print(
+    operating_system.issubset( {
+        OperatingSystem.MANJARO_240X,
+        OperatingSystem.OPENSUSE_TUMBLEWEED } ) )
+
+print(
+    operating_system.issubset( {
+        OperatingSystem.DEBIAN_11,
+        OperatingSystem.DEBIAN_12 } ) )
+
+print(
+    operating_system.issubset( {
+        OperatingSystem.FEDORA_38,
+        OperatingSystem.DEBIAN_11,
+        OperatingSystem.DEBIAN_12 } ) )
+
+print(
+    operating_system.issubset( {
+        OperatingSystem.DEBIAN_11,
+        OperatingSystem.DEBIAN_12 } ) )
+
+print(
+    operating_system.issubset( {
+        OperatingSystem.DEBIAN_11,
+        OperatingSystem.OPENSUSE_TUMBLEWEED } ) )
