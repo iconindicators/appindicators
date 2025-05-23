@@ -467,7 +467,14 @@ class IndicatorBase( ABC ):
                 else:
                     output += line
 
-        if not autostart_enabled_present or not exec_with_sleep_present or not terminal_present:
+        tags_missing = (
+            not autostart_enabled_present
+            pr
+            not exec_with_sleep_present
+            or
+            not terminal_present )
+
+        if tags_missing:
             # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled
             # line from the original .desktop file (production or development).
             if desktop_file_virtual_environment.exists():
@@ -482,22 +489,25 @@ class IndicatorBase( ABC ):
 
             with open( desktop_file_original, 'r', encoding = "utf-8" ) as f:
                 for line in f:
-                    if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ) and not autostart_enabled_present:
-                        output += line
+                    if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
+                        if not autostart_enabled_present:
+                            output += line
+                            made_a_change = True
+
+                    elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
+                        if not exec_with_sleep_present:
+                            if delay:
+                                output += line.replace( "{indicator_name}", self.indicator_name ).replace( '0', delay )
+
+                            else:
+                                output += line.replace( "{indicator_name}", self.indicator_name )
+
                         made_a_change = True
 
-                    elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) and not exec_with_sleep_present:
-                        if delay:
-                            output += line.replace( "{indicator_name}", self.indicator_name ).replace( '0', delay )
-
-                        else:
-                            output += line.replace( "{indicator_name}", self.indicator_name )
-
-                        made_a_change = True
-
-                    elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL ) and not terminal_present:
-                        output += line
-                        made_a_change = True
+                    elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL ):
+                        if not terminal_present:
+                            output += line
+                            made_a_change = True
 
         if made_a_change:
             with open( self.desktop_file_user_home, 'w', encoding = "utf-8" ) as f:
@@ -2316,8 +2326,8 @@ class IndicatorBase( ABC ):
         message_fortune_or_calendar_exists,
         file_filter = None ):
         '''
-        Functionality common to both 'fortune' and 'on this day' to handle
-        both the add and edit of a fortune/calendar.
+        Functionality common to both 'fortune' and 'on this day' to handle both
+        the add and edit of a fortune/calendar.
 
         Not to be called directly.
         '''
@@ -2539,7 +2549,8 @@ class IndicatorBase( ABC ):
     def _load_config( self ):
         ''' Read a dictionary of configuration from a JSON text file. '''
         config_file = (
-            self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON ) )
+            self._get_config_directory() /
+            ( self.indicator_name + IndicatorBase._EXTENSION_JSON ) )
 
         self._copy_config_to_new_directory( config_file )
 
@@ -2634,7 +2645,8 @@ class IndicatorBase( ABC ):
             self.check_latest_version )
 
         config_file = (
-            self._get_config_directory() / ( self.indicator_name + IndicatorBase._EXTENSION_JSON ) )
+            self._get_config_directory() /
+            ( self.indicator_name + IndicatorBase._EXTENSION_JSON ) )
 
         with open( config_file, 'w', encoding = "utf-8" ) as f_out:
             f_out.write( json.dumps( config ) )
@@ -3044,7 +3056,7 @@ class IndicatorBase( ABC ):
         Executes the command and returns the result.
         The result of executing the command may indeed be "" which does not
         necessarily indicate an error condition.
-    
+
         On failure/exception, logs to file and returns "".
         '''
         try:
@@ -3059,7 +3071,7 @@ class IndicatorBase( ABC ):
             if stderr_:
                 result = ""
                 logging.error( stderr_ )
-    
+
             else:
                 result = result.stdout.decode().strip()
 
