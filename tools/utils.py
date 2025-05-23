@@ -74,7 +74,7 @@ def is_ubuntu2004_or_is_ubuntu2204_or_ubuntu2404():
             or
             'VERSION_ID="24.04"' in etc_os_release ) )
         or (
-        'ID=linutmint' in etc_os_release and (
+        'ID=linuxmint' in etc_os_release and (
             'UBUNTU_CODENAME=focal' in etc_os_release
             or
             'UBUNTU_CODENAME=jammy' in etc_os_release

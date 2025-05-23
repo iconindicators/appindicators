@@ -62,6 +62,8 @@ class OperatingSystem( Enum ):
     FEDORA_40 = auto()
     KUBUNTU_2204 = auto()
     KUBUNTU_2404 = auto()
+    LINUX_MINT_CINNAMON_20 = auto()
+    LINUX_MINT_CINNAMON_21 = auto()
     LINUX_MINT_CINNAMON_22 = auto()
     LUBUNTU_2204 = auto()
     LUBUNTU_2404 = auto()
@@ -254,6 +256,8 @@ def _get_installation_python_virtual_environment(
         OperatingSystem.DEBIAN_12,
         OperatingSystem.KUBUNTU_2204,
         OperatingSystem.KUBUNTU_2404,
+        OperatingSystem.LINUX_MINT_CINNAMON_20,
+        OperatingSystem.LINUX_MINT_CINNAMON_21,
         OperatingSystem.LINUX_MINT_CINNAMON_22,
         OperatingSystem.LUBUNTU_2204,
         OperatingSystem.LUBUNTU_2404,
@@ -268,7 +272,7 @@ def _get_installation_python_virtual_environment(
 
     pygobject = "PyGObject"
     if operating_system.issubset( applicable_operating_systems ):
-        pygobject = "PyGObject\<=3.50.0"  #TODO Check that the \ on the < is actually needed by doing an install.
+        pygobject = "PyGObject\<=3.50.0"
 
     message = (
         "Install the indicator to a `Python` virtual environment and install "
@@ -276,12 +280,12 @@ def _get_installation_python_virtual_environment(
         "    ```\n"
         f"    indicator={ indicator_name } && \\\n"
         f"    venv={ utils.VENV_INSTALL } && \\\n"
-        "    if [ ! -d ${{venv}} ]; then python3 -m venv ${{venv}}; fi && \\\n"
-        "    . ${{venv}}/bin/activate && \\\n"
+        f"    if [ ! -d ${{venv}} ]; then python3 -m venv ${{venv}}; fi && \\\n"
+        f"    . ${{venv}}/bin/activate && \\\n"
         f"    python3 -m pip install --upgrade { pygobject } ${{indicator}} && \\\n"
         "    deactivate && \\\n"
-        "    . $(ls -d ${{venv}}/lib/python3.* | head -1)/"
-        "site-packages/${{indicator}}/platform/linux/install.sh\n"
+        f"    . $(ls -d ${{venv}}/lib/python3.* | head -1)/"
+        f"site-packages/${{indicator}}/platform/linux/install.sh\n"
         "    ```\n" )
 
     return message
@@ -404,13 +408,13 @@ def _get_uninstall_for_operating_system(
             "    ```\n"
             f"    indicator={ indicator_name } && \\\n"
             f"    venv={ utils.VENV_INSTALL } && \\\n"
-            "    $(ls -d ${{venv}}/lib/python3.* | head -1)/"
-            "site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n"
-            "    . ${{venv}}/bin/activate && \\\n"
-            "    python3 -m pip uninstall --yes ${{indicator}} && \\\n"
+            f"    $(ls -d ${{venv}}/lib/python3.* | head -1)/"
+            f"site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n"
+            f"    . ${{venv}}/bin/activate && \\\n"
+            f"    python3 -m pip uninstall --yes ${{indicator}} && \\\n"
             "    count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && \\\n"
             "    deactivate && \\\n"
-            "    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
+            f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
             "    ```\n"
             "    If no other indicators are installed, the virtual "
             "environment will be deleted.\n\n"
@@ -451,6 +455,7 @@ def _get_operating_system_dependencies_debian(
             OperatingSystem.DEBIAN_12,
             OperatingSystem.KUBUNTU_2204,
             OperatingSystem.KUBUNTU_2404,
+            OperatingSystem.LINUX_MINT_CINNAMON_21,  #TODO Check
             OperatingSystem.LINUX_MINT_CINNAMON_22,
             OperatingSystem.LUBUNTU_2204,
             OperatingSystem.LUBUNTU_2404,
@@ -485,6 +490,7 @@ def _get_operating_system_dependencies_debian(
             OperatingSystem.DEBIAN_12,
             OperatingSystem.KUBUNTU_2204,
             OperatingSystem.KUBUNTU_2404,
+            OperatingSystem.LINUX_MINT_CINNAMON_21,  #TODO Check
             OperatingSystem.LINUX_MINT_CINNAMON_22,
             OperatingSystem.LUBUNTU_2204,
             OperatingSystem.LUBUNTU_2404,
@@ -681,7 +687,9 @@ def _get_install_uninstall(
             _get_operating_system_dependencies_opensuse ) +
 
         function(
-            { OperatingSystem.UBUNTU_2004 },
+            {
+                OperatingSystem.LINUX_MINT_CINNAMON_20,
+                OperatingSystem.UBUNTU_2004 },
             indicator_name,
             command_debian,
             _get_operating_system_dependencies_debian ) +
@@ -690,6 +698,7 @@ def _get_install_uninstall(
             {
                 OperatingSystem.KUBUNTU_2204,
                 OperatingSystem.KUBUNTU_2404,
+                OperatingSystem.LINUX_MINT_CINNAMON_21,
                 OperatingSystem.LINUX_MINT_CINNAMON_22,
                 OperatingSystem.LUBUNTU_2204,
                 OperatingSystem.LUBUNTU_2404,
@@ -715,7 +724,7 @@ def _get_usage(
 
         f"To run `{ indicator_name }`, press the `Super` key to show the "
         "applications overlay or similar and type "
-        "`{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Removes the ™ from VirtualBox™.
+        f"`{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Removes the ™ from VirtualBox™.
         "into the search bar and the icon should be present for you to select.  "
         "If the icon does not appear, or appears as generic, you may have to "
         "log out / in (or restart).\n\n"
@@ -723,9 +732,9 @@ def _get_usage(
         "```\n"
         f"indicator={ indicator_name } && \\\n"
         f"venv={ utils.VENV_INSTALL } && \\\n"
-        ". ${{venv}}/bin/activate && \\\n"
-        "python3 $(ls -d ${{venv}}/lib/python3.* | head -1)/"
-        "site-packages/${{indicator}}/${{indicator}}.py && \\\n"
+        f". ${{venv}}/bin/activate && \\\n"
+        f"cd $(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages && \\\n"
+        f"python3 -m ${{indicator}}.${{indicator}} && \\\n"
         "deactivate\n"
         "```\n\n" )
 
@@ -770,6 +779,8 @@ def _get_limitations(
 
     # Kubuntu 22.04         KDE         Tooltip in lieu of label.
     # Kubuntu 24.04         KDE         Tooltip in lieu of label.
+    # Linux Mint 20         X-Cinnamon  Tooltip in lieu of label.
+    # Linux Mint 21         X-Cinnamon  Tooltip in lieu of label.
     # Linux Mint 22         X-Cinnamon  Tooltip in lieu of label.
     # Lubuntu 22.04         LXQt        No label; tooltip is indicator filename.
     # Lubuntu 24.04         LXQt        No label; tooltip is indicator filename.
@@ -797,6 +808,8 @@ def _get_limitations(
         messages.append(
             "- `ICEWM`: The icon label and icon tooltip are unsupported.\n" )
 
+    # Linux Mint 20     X-Cinnamon  When icon is changed, it disappears.
+    # Linux Mint 21     X-Cinnamon  When icon is changed, it disappears.
     # Linux Mint 22     X-Cinnamon  When icon is changed, it disappears.
     # Lubuntu 22.04     LXQt        Cannot change the icon once initially set.
     # Lubuntu 24.04     LXQt        Cannot change the icon once initially set.
