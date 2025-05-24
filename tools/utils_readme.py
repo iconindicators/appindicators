@@ -151,7 +151,7 @@ def _get_introduction(
         introduction += (
             f"Note that `{ indicator_name }` uses the `calendar` package which "
             "is unavailable on `openSUSE Tumbleweed` and `Manjaro` and so the "
-            "`calendar` functionality is unavailable.\m\m" )
+            "`calendar` functionality is unavailable.\n\n" )
 
     introduction += "Other indicators in this series are:\n"
     for indicator in _get_indicator_names_sans_current( indicator_name ):
