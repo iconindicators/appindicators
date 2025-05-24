@@ -469,7 +469,7 @@ class IndicatorBase( ABC ):
 
         tags_missing = (
             not autostart_enabled_present
-            pr
+            or
             not exec_with_sleep_present
             or
             not terminal_present )
