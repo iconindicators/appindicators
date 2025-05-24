@@ -282,7 +282,9 @@ def _get_install_uninstall(
 
 
 def _os_has_no_calendar( operating_systems ):
-    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar'.
+    '''
+    openSUSE Tumbleweed and Manjaro do not contain the package 'calendar'.
+    '''
     return (
         { OperatingSystem.MANJARO_240X }.issubset( operating_systems ) or
         { OperatingSystem.OPENSUSE_TUMBLEWEED }.issubset( operating_systems ) )
@@ -338,11 +340,11 @@ def _get_extension(
 
     extension = ''
 
-    os_needs_extension = (
+    needs_extension = (
         { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
         { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) )
 
-    if os_needs_extension:
+    if needs_extension:
         extension = (
             "For the `appindicator` extension to take effect, log out / in "
             "(or restart) and in a terminal run:\n"
@@ -350,14 +352,14 @@ def _get_extension(
             "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
             "    ```\n" )
 
-    os_needs_extension = (
+    needs_extension = (
         { OperatingSystem.FEDORA_38 }.issubset( operating_systems ) or
         { OperatingSystem.FEDORA_39 }.issubset( operating_systems ) or
         { OperatingSystem.FEDORA_40 }.issubset( operating_systems ) or
         { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
         { OperatingSystem.OPENSUSE_TUMBLEWEED }.issubset( operating_systems ) )
 
-    if os_needs_extension:
+    if needs_extension:
         extension = (
             "Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
             "[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
@@ -385,7 +387,7 @@ def _get_installation_python_virtual_environment(
     #   https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
     #   https://pygobject.gnome.org/getting_started.html
     #   https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
-    pygojbect_needs_to_be_pinned = (
+    pygobject_needs_to_be_pinned = (
         { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
         { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) or
         { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
@@ -405,7 +407,7 @@ def _get_installation_python_virtual_environment(
         { OperatingSystem.XUBUNTU_2404 }.issubset( operating_systems ) )
 
     pygobject = "PyGObject"
-    if pygojbect_needs_to_be_pinned:
+    if pygobject_needs_to_be_pinned:
         pygobject = "PyGObject\<=3.50.0"
 
     message = (
@@ -536,7 +538,7 @@ def _get_summary(
 
 
 def _get_operating_system_dependencies_debian(
-    operating_system,
+    operating_systems,
     indicator_name ):
 
     dependencies = [
@@ -546,13 +548,11 @@ def _get_operating_system_dependencies_debian(
         "python3-pip",
         "python3-venv" ]
 
-#TODO Check issubset everything after this line.
+    needs_gnome_shell_extension_appindicator = (
+        { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
+        { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) )
 
-    applicable_operating_systems = {
-        OperatingSystem.DEBIAN_11,
-        OperatingSystem.DEBIAN_12 }
-
-    if operating_system.issubset( applicable_operating_systems ):
+    if needs_gnome_shell_extension_appindicator:
         dependencies.append( "gnome-shell-extension-appindicator" )
 
     if indicator_name == IndicatorName.INDICATORFORTUNE:
@@ -560,27 +560,27 @@ def _get_operating_system_dependencies_debian(
         dependencies.append( "fortunes" )
         dependencies.append( "wl-clipboard" )
 
+    needs_calendar = (
+        { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
+        { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) or
+        { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.KUBUNTU_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.LINUX_MINT_CINNAMON_21 }.issubset( operating_systems ) or
+        { OperatingSystem.LINUX_MINT_CINNAMON_22 }.issubset( operating_systems ) or
+        { OperatingSystem.LUBUNTU_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.LUBUNTU_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_BUDGIE_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_MATE_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_UNITY_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_UNITY_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.XUBUNTU_2404 }.issubset( operating_systems ) )
+
     if indicator_name == IndicatorName.INDICATORONTHISDAY:
         dependencies.append( "wl-clipboard" )
 
-        applicable_operating_systems = {
-            OperatingSystem.DEBIAN_11,
-            OperatingSystem.DEBIAN_12,
-            OperatingSystem.KUBUNTU_2204,
-            OperatingSystem.KUBUNTU_2404,
-            OperatingSystem.LINUX_MINT_CINNAMON_21,
-            OperatingSystem.LINUX_MINT_CINNAMON_22,
-            OperatingSystem.LUBUNTU_2204,
-            OperatingSystem.LUBUNTU_2404,
-            OperatingSystem.UBUNTU_2204,
-            OperatingSystem.UBUNTU_2404,
-            OperatingSystem.UBUNTU_BUDGIE_2404,
-            OperatingSystem.UBUNTU_MATE_2404,
-            OperatingSystem.UBUNTU_UNITY_2204,
-            OperatingSystem.UBUNTU_UNITY_2404,
-            OperatingSystem.XUBUNTU_2404 }
-
-        if operating_system.issubset( applicable_operating_systems ):
+        if needs_calendar:
             dependencies.append( "calendar" )
 
     if indicator_name == IndicatorName.INDICATORPUNYCODE:
@@ -598,24 +598,7 @@ def _get_operating_system_dependencies_debian(
         dependencies.append( "wl-clipboard" )
         dependencies.append( "wmctrl" )
 
-        applicable_operating_systems = {
-            OperatingSystem.DEBIAN_11,
-            OperatingSystem.DEBIAN_12,
-            OperatingSystem.KUBUNTU_2204,
-            OperatingSystem.KUBUNTU_2404,
-            OperatingSystem.LINUX_MINT_CINNAMON_21,
-            OperatingSystem.LINUX_MINT_CINNAMON_22,
-            OperatingSystem.LUBUNTU_2204,
-            OperatingSystem.LUBUNTU_2404,
-            OperatingSystem.UBUNTU_2204,
-            OperatingSystem.UBUNTU_2404,
-            OperatingSystem.UBUNTU_BUDGIE_2404,
-            OperatingSystem.UBUNTU_MATE_2404,
-            OperatingSystem.UBUNTU_UNITY_2204,
-            OperatingSystem.UBUNTU_UNITY_2404,
-            OperatingSystem.XUBUNTU_2404 }
-
-        if operating_system.issubset( applicable_operating_systems ):
+        if needs_calendar:
             dependencies.append( "calendar" )
 
     if indicator_name == IndicatorName.INDICATORVIRTUALBOX:
@@ -625,7 +608,7 @@ def _get_operating_system_dependencies_debian(
 
 
 def _get_operating_system_dependencies_fedora(
-    operating_system,
+    operating_systems,
     indicator_name ):
 
     dependencies = [
@@ -647,12 +630,12 @@ def _get_operating_system_dependencies_fedora(
     if indicator_name == IndicatorName.INDICATORPUNYCODE:
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == IndicatorName.INDICATORSCRIPTRUNNER:
-        applicable_operating_systems = {
-            OperatingSystem.FEDORA_39,
-            OperatingSystem.FEDORA_40 }
+    needs_pulseaudio = (
+        { OperatingSystem.FEDORA_39 }.issubset( operating_systems ) or
+        { OperatingSystem.FEDORA_40 }.issubset( operating_systems ) )
 
-        if operating_system.issubset( applicable_operating_systems ):
+    if indicator_name == IndicatorName.INDICATORSCRIPTRUNNER:
+        if needs_pulseaudio:
             dependencies.append( "pulseaudio-utils" )
 
     if indicator_name == IndicatorName.INDICATORTEST:
@@ -661,11 +644,7 @@ def _get_operating_system_dependencies_fedora(
         dependencies.append( "wl-clipboard" )
         dependencies.append( "wmctrl" )
 
-        applicable_operating_systems = {
-            OperatingSystem.FEDORA_39,
-            OperatingSystem.FEDORA_40 }
-
-        if operating_system.issubset( applicable_operating_systems ):
+        if needs_pulseaudio:
             dependencies.append( "pulseaudio-utils" )
 
     if indicator_name == IndicatorName.INDICATORVIRTUALBOX:
@@ -675,7 +654,7 @@ def _get_operating_system_dependencies_fedora(
 
 
 def _get_operating_system_dependencies_manjaro(
-    operating_system,
+    operating_systems,
     indicator_name ):
 
     dependencies = [
@@ -706,7 +685,7 @@ def _get_operating_system_dependencies_manjaro(
 
 
 def _get_operating_system_dependencies_opensuse(
-    operating_system,
+    operating_systems,
     indicator_name ):
 
     dependencies = [
