@@ -106,20 +106,6 @@ def _is_indicator(
     return is_indicator
 
 
-def _get_indicator_names_sans_current(
-    indicator_name ):
-
-    indicators = [
-        str( x )
-        for x in Path( '.' ).iterdir()
-        if x.is_dir() and str( x ).startswith( "indicator" ) ]
-
-    indicators.remove( indicator_name )
-    indicators.remove( "indicatorbase" )
-    indicators.sort()
-    return indicators
-
-
 def _get_introduction(
     indicator_name ):
 
@@ -146,7 +132,8 @@ def _get_introduction(
 
     # openSUSE Tumbleweed and Manjaro do not contain the 'calendar' package.
     # For indicatoronthisday, drop references to openSUSE/Manjaro.
-    # Still keep indicatortest for openSUSE/Manjaro!
+    #
+    # Keep indicatortest other functionality still applies.
     if not _is_indicator( indicator_name, IndicatorName.INDICATORONTHISDAY ):
         introduction += ", `openSUSE`, `Manjaro`"
 
@@ -173,6 +160,208 @@ def _get_introduction(
     introduction += '\n'
 
     return introduction
+
+
+def _get_indicator_names_sans_current(
+    indicator_name ):
+
+    indicators = [
+        str( x )
+        for x in Path( '.' ).iterdir()
+        if x.is_dir() and str( x ).startswith( "indicator" ) ]
+
+    indicators.remove( indicator_name )
+    indicators.remove( "indicatorbase" )
+    indicators.sort()
+    return indicators
+
+
+def _get_install_uninstall(
+    indicator_name,
+    install = True ):
+
+    if install:
+        function = _get_install_for_operating_system
+        command_debian = "sudo apt-get -y install"
+        command_fedora = "sudo dnf -y install"
+
+        additional_text = ""
+        if _is_indicator( indicator_name, IndicatorName.INDICATORSCRIPTRUNNER ):
+            additional_text = (
+                f"3. Any `Python` scripts you add to `{ indicator_name }` may "
+                "require additional modules installed to the virtual "
+                f"environment at `{ utils.VENV_INSTALL }`.\n" )
+
+        if _is_indicator( indicator_name, IndicatorName.INDICATORTIDE ):
+            additional_text = (
+                "3. You will need to write a `Python` script to retrieve your "
+                "tidal data.  In addition, your `Python` script may require "
+                "additional modules installed to the virtual environment at "
+                f"`{ utils.VENV_INSTALL }`.\n" )
+
+        title = (
+            "Installation / Updating\n"
+            "-----------------------\n\n"
+            "Installation and updating follow the same process:\n"
+            "1. Install operating system packages.\n"
+            f"2. Install `{ indicator_name }` via `pip` into a `Python3` "
+            f"virtual environment at `{ utils.VENV_INSTALL }`.\n"
+            f"{ additional_text }\n\n" )
+
+    else:
+        function = _get_uninstall_for_operating_system
+        command_debian = "sudo apt-get -y remove"
+        command_fedora = "sudo dnf -y remove"
+        title = (
+            "Uninstall\n"
+            "---------\n\n" )
+
+    return (
+        title +
+
+        function(
+            {
+                OperatingSystem.DEBIAN_11,
+                OperatingSystem.DEBIAN_12 },
+            indicator_name,
+            command_debian,
+            _get_operating_system_dependencies_debian ) +
+
+        function(
+            { OperatingSystem.FEDORA_38 },
+            indicator_name,
+            command_fedora,
+            _get_operating_system_dependencies_fedora ) +
+
+        function(
+            {
+                OperatingSystem.FEDORA_39,
+                OperatingSystem.FEDORA_40 },
+            indicator_name,
+            command_fedora,
+            _get_operating_system_dependencies_fedora ) +
+
+        function(
+            { OperatingSystem.MANJARO_240X },
+            indicator_name,
+            "sudo pacman -S --noconfirm" if install else "sudo pacman -R --noconfirm",
+            _get_operating_system_dependencies_manjaro ) +
+
+        function(
+            { OperatingSystem.OPENSUSE_TUMBLEWEED },
+            indicator_name,
+            "sudo zypper install -y" if install else "sudo zypper remove -y",
+            _get_operating_system_dependencies_opensuse ) +
+
+        function(
+            {
+                OperatingSystem.LINUX_MINT_CINNAMON_20,
+                OperatingSystem.UBUNTU_2004 },
+            indicator_name,
+            command_debian,
+            _get_operating_system_dependencies_debian ) +
+
+        function(
+            {
+                OperatingSystem.KUBUNTU_2204,
+                OperatingSystem.KUBUNTU_2404,
+                OperatingSystem.LINUX_MINT_CINNAMON_21,
+                OperatingSystem.LINUX_MINT_CINNAMON_22,
+                OperatingSystem.LUBUNTU_2204,
+                OperatingSystem.LUBUNTU_2404,
+                OperatingSystem.UBUNTU_2204,
+                OperatingSystem.UBUNTU_2404,
+                OperatingSystem.UBUNTU_BUDGIE_2404,
+                OperatingSystem.UBUNTU_MATE_2404,
+                OperatingSystem.UBUNTU_UNITY_2204,
+                OperatingSystem.UBUNTU_UNITY_2404,
+                OperatingSystem.XUBUNTU_2404 },
+            indicator_name,
+            command_debian,
+            _get_operating_system_dependencies_debian ) )
+
+
+def _get_install_for_operating_system(
+    operating_system,  #TODO This can be a tuple of more than one OS...so add an 's'?
+    indicator_name,
+    install_command,
+    _get_operating_system_dependencies_function_name ):
+
+    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar'.
+    os_has_no_calendar = (
+        operating_system.issubset( {
+            OperatingSystem.MANJARO_240X,
+            OperatingSystem.OPENSUSE_TUMBLEWEED } ) )
+
+    indicator_relies_upon_calendar = (
+        _is_indicator(
+            indicator_name,
+            IndicatorName.INDICATORONTHISDAY ) )
+
+    if indicator_relies_upon_calendar and os_has_no_calendar:
+        installation = ''
+
+    else:
+        operating_system_packages = (
+            _get_operating_system_dependencies_function_name(
+                operating_system,
+                IndicatorName[ indicator_name.upper() ] ) )
+
+        # Installing operating system packages:
+        #   https://stackoverflow.com/a/61164149/2156453
+        #   https://pygobject.gnome.org/getting_started.html
+        installation = (
+            "<details>"
+            f"<summary><b>{ _get_summary( operating_system ) }</b></summary>\n\n"
+            "1. Install operating system packages:\n\n"
+            "    ```\n"
+            f"    { install_command } { operating_system_packages }\n"
+            "    ```\n"
+            f"    { _get_extension( operating_system ) }\n\n" )
+
+        installation += f"2. { _get_installation_python_virtual_environment( indicator_name, operating_system ) }"
+
+        additional_python_modules = (
+            _get_installation_additional_python_modules( indicator_name ) )
+
+        if additional_python_modules:
+            installation += f"3. { additional_python_modules }"
+
+        installation += "</details>\n\n"
+
+    return installation
+
+
+def _get_extension(
+    operating_system ):
+
+    extension = ''
+
+    applicable_operating_systems = {
+        OperatingSystem.DEBIAN_11,
+        OperatingSystem.DEBIAN_12 }
+
+    if operating_system.issubset( applicable_operating_systems ):
+        extension = (
+            "For the `appindicator` extension to take effect, log out / in "
+            "(or restart) and in a terminal run:\n"
+            "    ```\n"
+            "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
+            "    ```\n" )
+
+    applicable_operating_systems = {
+        OperatingSystem.FEDORA_38,
+        OperatingSystem.FEDORA_39,
+        OperatingSystem.KUBUNTU_2204,
+        OperatingSystem.FEDORA_40,
+        OperatingSystem.OPENSUSE_TUMBLEWEED }
+
+    if operating_system.issubset( applicable_operating_systems ):
+        extension = (
+            "Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
+            "[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
+
+    return extension
 
 
 def _get_installation_python_virtual_environment(
@@ -263,124 +452,6 @@ def _get_installation_additional_python_modules(
     return message
 
 
-def _get_summary(
-    operating_system ):
-
-    summary = [ ]
-    for operating_system_ in operating_system:
-        human_readable_operating_system = ""
-        for part in operating_system_.name.split( '_' ):
-            if part.isnumeric():
-                if len( part ) == 2:
-                    human_readable_operating_system += ' ' + part
-
-                elif len( part ) == 4:
-                    human_readable_operating_system += (
-                        ' ' + part[ 0 : 2 ] + '.' + part[ 2 : ] )
-
-                else:
-                    print( f"UNHANDLED PART '{ part }' for OPERATING SYSTEM '{ operating_system_ }'" )
-
-            else:
-                if human_readable_operating_system.endswith( "Manjaro" ):
-                    human_readable_operating_system += (
-                        ' ' + part[ 0 : 2 ] + '.' + part[ 2 : 3 ] + '.' + part[ 3 ].lower() )
-
-                elif "MATE" == part:
-                    human_readable_operating_system += ' ' + part # Keep capitalised.
-
-                elif "OPENSUSE" == part:
-                    human_readable_operating_system += ' ' + "openSUSE" # Keep partially capitalised.
-
-                else:
-                    human_readable_operating_system += ' ' + part.title()
-
-        summary.append( human_readable_operating_system.strip() )
-
-    return " | ".join( sorted( summary ) )
-
-
-def _get_extension(
-    operating_system ):
-
-    extension = ''
-
-    applicable_operating_systems = {
-        OperatingSystem.DEBIAN_11,
-        OperatingSystem.DEBIAN_12 }
-
-    if operating_system.issubset( applicable_operating_systems ):
-        extension = (
-            "For the `appindicator` extension to take effect, log out / in "
-            "(or restart) and in a terminal run:\n"
-            "    ```\n"
-            "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
-            "    ```\n" )
-
-    applicable_operating_systems = {
-        OperatingSystem.FEDORA_38,
-        OperatingSystem.FEDORA_39,
-        OperatingSystem.KUBUNTU_2204,
-        OperatingSystem.FEDORA_40,
-        OperatingSystem.OPENSUSE_TUMBLEWEED }
-
-    if operating_system.issubset( applicable_operating_systems ):
-        extension = (
-            "Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
-            "[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
-
-    return extension
-
-
-def _get_installation_for_operating_system(
-    operating_system,  #TODO This can be a tuple of more than one OS...so add an 's'?
-    indicator_name,
-    install_command,
-    _get_operating_system_dependencies_function_name ):
-
-    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar'.
-    os_has_no_calendar = (
-        operating_system.issubset( {
-            OperatingSystem.MANJARO_240X,
-            OperatingSystem.OPENSUSE_TUMBLEWEED } ) )
-
-    indicator_relies_upon_calendar = (
-        _is_indicator(
-            indicator_name,
-            IndicatorName.INDICATORONTHISDAY ) )
-
-    if indicator_relies_upon_calendar and os_has_no_calendar:
-        installation = ''
-
-    else:
-        operating_system_packages = (
-            _get_operating_system_dependencies_function_name(
-                operating_system,
-                IndicatorName[ indicator_name.upper() ] ) )
-
-        # Installing operating system packages:
-        #   https://stackoverflow.com/a/61164149/2156453
-        #   https://pygobject.gnome.org/getting_started.html
-        installation = (
-            "<details>"
-            f"<summary><b>{ _get_summary( operating_system ) }</b></summary>\n\n"
-            "1. Install operating system packages:\n\n"
-            "    ```\n"
-            f"    { install_command } { operating_system_packages }\n"
-            "    ```\n"
-            f"    { _get_extension( operating_system ) }\n\n" )
-
-        installation += f"2. { _get_installation_python_virtual_environment( indicator_name, operating_system ) }"
-
-        additional_python_modules = _get_installation_additional_python_modules( indicator_name )
-        if additional_python_modules:
-            installation += f"3. { additional_python_modules }"
-
-        installation += "</details>\n\n"
-
-    return installation
-
-
 def _get_uninstall_for_operating_system(
     operating_system,
     indicator_name,
@@ -430,6 +501,43 @@ def _get_uninstall_for_operating_system(
             "</details>\n\n" )
 
     return uninstall
+
+
+def _get_summary(
+    operating_system ):
+
+    summary = [ ]
+    for operating_system_ in operating_system:
+        human_readable_operating_system = ""
+        for part in operating_system_.name.split( '_' ):
+            if part.isnumeric():
+                if len( part ) == 2:
+                    human_readable_operating_system += ' ' + part
+
+                elif len( part ) == 4:
+                    human_readable_operating_system += (
+                        ' ' + part[ 0 : 2 ] + '.' + part[ 2 : ] )
+
+                else:
+                    print( f"UNHANDLED PART '{ part }' for OPERATING SYSTEM '{ operating_system_ }'" )
+
+            else:
+                if human_readable_operating_system.endswith( "Manjaro" ):
+                    human_readable_operating_system += (
+                        ' ' + part[ 0 : 2 ] + '.' + part[ 2 : 3 ] + '.' + part[ 3 ].lower() )
+
+                elif "MATE" == part:
+                    human_readable_operating_system += ' ' + part # Keep capitalised.
+
+                elif "OPENSUSE" == part:
+                    human_readable_operating_system += ' ' + "openSUSE" # Keep partially capitalised.
+
+                else:
+                    human_readable_operating_system += ' ' + part.title()
+
+        summary.append( human_readable_operating_system.strip() )
+
+    return " | ".join( sorted( summary ) )
 
 
 def _get_operating_system_dependencies_debian(
@@ -618,108 +726,6 @@ def _get_operating_system_dependencies_opensuse(
         dependencies.append( "fortune" )
 
     return ' '.join( sorted( dependencies ) )
-
-
-def _get_install_uninstall(
-    indicator_name,
-    install = True ):
-
-    if install:
-        function = _get_installation_for_operating_system
-        command_debian = "sudo apt-get -y install"
-        command_fedora = "sudo dnf -y install"
-
-        additional_text = ""
-        if _is_indicator( indicator_name, IndicatorName.INDICATORSCRIPTRUNNER ):
-            additional_text = (
-                f"3. Any `Python` scripts you add to `{ indicator_name }` may "
-                "require additional modules.\n" )
-
-        if _is_indicator( indicator_name, IndicatorName.INDICATORTIDE ):
-            additional_text = (
-                "3. You will need to write a `Python` script to retrieve your "
-                "tidal data.\n" )
-
-        title = (
-            "Installation / Updating\n"
-            "-----------------------\n\n"
-            "Installation and updating follow the same process:\n"
-            "1. Install operating system packages.\n"
-            f"2. Install `{ indicator_name }` via `pip` into a `Python3` "
-            f"virtual environment at `{ utils.VENV_INSTALL }`.\n"
-            f"{ additional_text }\n\n" )
-
-    else:
-        function = _get_uninstall_for_operating_system
-        command_debian = "sudo apt-get -y remove"
-        command_fedora = "sudo dnf -y remove"
-        title = (
-            "Uninstall\n"
-            "---------\n\n" )
-
-    return (
-        title +
-
-        function(
-            {
-                OperatingSystem.DEBIAN_11,
-                OperatingSystem.DEBIAN_12 },
-            indicator_name,
-            command_debian,
-            _get_operating_system_dependencies_debian ) +
-
-        function(
-            { OperatingSystem.FEDORA_38 },
-            indicator_name,
-            command_fedora,
-            _get_operating_system_dependencies_fedora ) +
-
-        function(
-            {
-                OperatingSystem.FEDORA_39,
-                OperatingSystem.FEDORA_40 },
-            indicator_name,
-            command_fedora,
-            _get_operating_system_dependencies_fedora ) +
-
-        function(
-            { OperatingSystem.MANJARO_240X },
-            indicator_name,
-            "sudo pacman -S --noconfirm" if install else "sudo pacman -R --noconfirm",
-            _get_operating_system_dependencies_manjaro ) +
-
-        function(
-            { OperatingSystem.OPENSUSE_TUMBLEWEED },
-            indicator_name,
-            "sudo zypper install -y" if install else "sudo zypper remove -y",
-            _get_operating_system_dependencies_opensuse ) +
-
-        function(
-            {
-                OperatingSystem.LINUX_MINT_CINNAMON_20,
-                OperatingSystem.UBUNTU_2004 },
-            indicator_name,
-            command_debian,
-            _get_operating_system_dependencies_debian ) +
-
-        function(
-            {
-                OperatingSystem.KUBUNTU_2204,
-                OperatingSystem.KUBUNTU_2404,
-                OperatingSystem.LINUX_MINT_CINNAMON_21,
-                OperatingSystem.LINUX_MINT_CINNAMON_22,
-                OperatingSystem.LUBUNTU_2204,
-                OperatingSystem.LUBUNTU_2404,
-                OperatingSystem.UBUNTU_2204,
-                OperatingSystem.UBUNTU_2404,
-                OperatingSystem.UBUNTU_BUDGIE_2404,
-                OperatingSystem.UBUNTU_MATE_2404,
-                OperatingSystem.UBUNTU_UNITY_2204,
-                OperatingSystem.UBUNTU_UNITY_2404,
-                OperatingSystem.XUBUNTU_2404 },
-            indicator_name,
-            command_debian,
-            _get_operating_system_dependencies_debian ) )
 
 
 def _get_usage(
