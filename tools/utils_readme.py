@@ -281,30 +281,31 @@ def _get_install_uninstall(
             _get_operating_system_dependencies_debian ) )
 
 
+def _os_has_no_calendar( operating_systems ):
+    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar'.
+    return (
+        { OperatingSystem.MANJARO_240X }.issubset( operating_systems ) or
+        { OperatingSystem.OPENSUSE_TUMBLEWEED }.issubset( operating_systems ) )
+
+
 def _get_install_for_operating_system(
-    operating_system,  #TODO This can be a tuple of more than one OS...so add an 's'?
+    operating_systems,
     indicator_name,
     install_command,
     _get_operating_system_dependencies_function_name ):
 
-    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar'.
-    os_has_no_calendar = (
-        operating_system.issubset( {
-            OperatingSystem.MANJARO_240X,
-            OperatingSystem.OPENSUSE_TUMBLEWEED } ) )
-
-    indicator_relies_upon_calendar = (
+    calendar_vital_to_indicator = (
         _is_indicator(
             indicator_name,
             IndicatorName.INDICATORONTHISDAY ) )
 
-    if indicator_relies_upon_calendar and os_has_no_calendar:
+    if calendar_vital_to_indicator and _os_has_no_calendar( operating_systems ):
         installation = ''
 
     else:
         operating_system_packages = (
             _get_operating_system_dependencies_function_name(
-                operating_system,
+                operating_systems,
                 IndicatorName[ indicator_name.upper() ] ) )
 
         # Installing operating system packages:
@@ -312,14 +313,14 @@ def _get_install_for_operating_system(
         #   https://pygobject.gnome.org/getting_started.html
         installation = (
             "<details>"
-            f"<summary><b>{ _get_summary( operating_system ) }</b></summary>\n\n"
+            f"<summary><b>{ _get_summary( operating_systems ) }</b></summary>\n\n"
             "1. Install operating system packages:\n\n"
             "    ```\n"
             f"    { install_command } { operating_system_packages }\n"
             "    ```\n"
-            f"    { _get_extension( operating_system ) }\n\n" )
+            f"    { _get_extension( operating_systems ) }\n\n" )
 
-        installation += f"2. { _get_installation_python_virtual_environment( indicator_name, operating_system ) }"
+        installation += f"2. { _get_installation_python_virtual_environment( indicator_name, operating_systems ) }"
 
         additional_python_modules = (
             _get_installation_additional_python_modules( indicator_name ) )
@@ -333,15 +334,15 @@ def _get_install_for_operating_system(
 
 
 def _get_extension(
-    operating_system ):
+    operating_systems ):
 
     extension = ''
 
-    applicable_operating_systems = {
-        OperatingSystem.DEBIAN_11,
-        OperatingSystem.DEBIAN_12 }
+    os_needs_extension = (
+        { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
+        { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) )
 
-    if operating_system.issubset( applicable_operating_systems ):
+    if os_needs_extension:
         extension = (
             "For the `appindicator` extension to take effect, log out / in "
             "(or restart) and in a terminal run:\n"
@@ -349,14 +350,14 @@ def _get_extension(
             "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
             "    ```\n" )
 
-    applicable_operating_systems = {
-        OperatingSystem.FEDORA_38,
-        OperatingSystem.FEDORA_39,
-        OperatingSystem.KUBUNTU_2204,
-        OperatingSystem.FEDORA_40,
-        OperatingSystem.OPENSUSE_TUMBLEWEED }
+    os_needs_extension = (
+        { OperatingSystem.FEDORA_38 }.issubset( operating_systems ) or
+        { OperatingSystem.FEDORA_39 }.issubset( operating_systems ) or
+        { OperatingSystem.FEDORA_40 }.issubset( operating_systems ) or
+        { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.OPENSUSE_TUMBLEWEED }.issubset( operating_systems ) )
 
-    if operating_system.issubset( applicable_operating_systems ):
+    if os_needs_extension:
         extension = (
             "Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
             "[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
@@ -366,7 +367,7 @@ def _get_extension(
 
 def _get_installation_python_virtual_environment(
     indicator_name,
-    operating_system):
+    operating_systems ):
 
     # On Debian based distributions, the latest version of PyGObject requires
     # libgirepository-2.0-dev which is only available on Debian 13+ and
@@ -384,27 +385,27 @@ def _get_installation_python_virtual_environment(
     #   https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
     #   https://pygobject.gnome.org/getting_started.html
     #   https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
-    applicable_operating_systems = {
-        OperatingSystem.DEBIAN_11,
-        OperatingSystem.DEBIAN_12,
-        OperatingSystem.KUBUNTU_2204,
-        OperatingSystem.KUBUNTU_2404,
-        OperatingSystem.LINUX_MINT_CINNAMON_20,
-        OperatingSystem.LINUX_MINT_CINNAMON_21,
-        OperatingSystem.LINUX_MINT_CINNAMON_22,
-        OperatingSystem.LUBUNTU_2204,
-        OperatingSystem.LUBUNTU_2404,
-        OperatingSystem.UBUNTU_2004,
-        OperatingSystem.UBUNTU_2204,
-        OperatingSystem.UBUNTU_2404,
-        OperatingSystem.UBUNTU_BUDGIE_2404,
-        OperatingSystem.UBUNTU_MATE_2404,
-        OperatingSystem.UBUNTU_UNITY_2204,
-        OperatingSystem.UBUNTU_UNITY_2404,
-        OperatingSystem.XUBUNTU_2404 }
+    pygojbect_needs_to_be_pinned = (
+        { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
+        { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) or
+        { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.KUBUNTU_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.LINUX_MINT_CINNAMON_20 }.issubset( operating_systems ) or
+        { OperatingSystem.LINUX_MINT_CINNAMON_21 }.issubset( operating_systems ) or
+        { OperatingSystem.LINUX_MINT_CINNAMON_22 }.issubset( operating_systems ) or
+        { OperatingSystem.LUBUNTU_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.LUBUNTU_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_2004 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_BUDGIE_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_MATE_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_UNITY_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_UNITY_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.XUBUNTU_2404 }.issubset( operating_systems ) )
 
     pygobject = "PyGObject"
-    if operating_system.issubset( applicable_operating_systems ):
+    if pygojbect_needs_to_be_pinned:
         pygobject = "PyGObject\<=3.50.0"
 
     message = (
@@ -453,34 +454,28 @@ def _get_installation_additional_python_modules(
 
 
 def _get_uninstall_for_operating_system(
-    operating_system,
+    operating_systems,
     indicator_name,
     uninstall_command,
     _get_operating_system_dependencies_function_name ):
 
-    # openSUSE Tumbleweed and Manjaro do not contain the package 'calendar'.
-    os_has_no_calendar = (
-        operating_system.issubset( {
-            OperatingSystem.MANJARO_240X,
-            OperatingSystem.OPENSUSE_TUMBLEWEED } ) )
-
-    indicator_uses_calendar = (
+    calendar_vital_to_indicator = (
         _is_indicator(
             indicator_name,
             IndicatorName.INDICATORONTHISDAY ) )
 
-    if indicator_uses_calendar and os_has_no_calendar:
+    if calendar_vital_to_indicator and _os_has_no_calendar( operating_systems ):
         uninstall = ''
 
     else:
         uninstall = (
             "<details>"
-            f"<summary><b>{ _get_summary( operating_system ) }</b></summary>\n\n"
+            f"<summary><b>{ _get_summary( operating_systems ) }</b></summary>\n\n"
 
             "1. Uninstall operating system packages:\n\n"
             "    ```\n"
             f"    { uninstall_command } "
-            f"{ _get_operating_system_dependencies_function_name( operating_system, IndicatorName[ indicator_name.upper() ] ) }\n"
+            f"{ _get_operating_system_dependencies_function_name( operating_systems, IndicatorName[ indicator_name.upper() ] ) }\n"
             "    ```\n\n"
 
             "2. Uninstall the indicator from virtual environment:\n"
@@ -504,12 +499,12 @@ def _get_uninstall_for_operating_system(
 
 
 def _get_summary(
-    operating_system ):
+    operating_systems ):
 
     summary = [ ]
-    for operating_system_ in operating_system:
+    for operating_system in operating_systems:
         human_readable_operating_system = ""
-        for part in operating_system_.name.split( '_' ):
+        for part in operating_system.name.split( '_' ):
             if part.isnumeric():
                 if len( part ) == 2:
                     human_readable_operating_system += ' ' + part
@@ -519,7 +514,7 @@ def _get_summary(
                         ' ' + part[ 0 : 2 ] + '.' + part[ 2 : ] )
 
                 else:
-                    print( f"UNHANDLED PART '{ part }' for OPERATING SYSTEM '{ operating_system_ }'" )
+                    print( f"UNHANDLED PART '{ part }' for OPERATING SYSTEM '{ operating_system }'" )
 
             else:
                 if human_readable_operating_system.endswith( "Manjaro" ):
@@ -550,6 +545,8 @@ def _get_operating_system_dependencies_debian(
         "libgirepository1.0-dev",
         "python3-pip",
         "python3-venv" ]
+
+#TODO Check issubset everything after this line.
 
     applicable_operating_systems = {
         OperatingSystem.DEBIAN_11,
@@ -942,36 +939,3 @@ def create_readme(
         f.write( _get_limitations( indicator_name ) )
         f.write( _get_install_uninstall( indicator_name, install = False ) )
         f.write( _get_license( authors_emails, start_year ) )
-
-
-#TODO I think using issubset is unsafe...
-operating_system = {
-    OperatingSystem.DEBIAN_11,
-    OperatingSystem.DEBIAN_12 }
-
-
-print(
-    operating_system.issubset( {
-        OperatingSystem.MANJARO_240X,
-        OperatingSystem.OPENSUSE_TUMBLEWEED } ) )
-
-print(
-    operating_system.issubset( {
-        OperatingSystem.DEBIAN_11,
-        OperatingSystem.DEBIAN_12 } ) )
-
-print(
-    operating_system.issubset( {
-        OperatingSystem.FEDORA_38,
-        OperatingSystem.DEBIAN_11,
-        OperatingSystem.DEBIAN_12 } ) )
-
-print(
-    operating_system.issubset( {
-        OperatingSystem.DEBIAN_11,
-        OperatingSystem.DEBIAN_12 } ) )
-
-print(
-    operating_system.issubset( {
-        OperatingSystem.DEBIAN_11,
-        OperatingSystem.OPENSUSE_TUMBLEWEED } ) )
