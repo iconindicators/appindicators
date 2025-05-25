@@ -1,7 +1,7 @@
 # AppIndicators for Ubuntu et al...
 
 
-## Introduction
+### Introduction
 
 This project contains application indicators written in `Python3` for `Ubuntu 20.04` or similar:
 - `indicatorfortune` - [https://pypi.org/project/indicatorfortune](https://pypi.org/project/indicatorfortune)
@@ -18,7 +18,7 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 Each indicator shares the common code `indicatorbase`.
 
 
-## Build a Wheel
+### Build a Wheel
 
 To build a wheel for `indicatortest` from the root of the source tree:
 
@@ -29,7 +29,7 @@ To build a wheel for `indicatortest` from the root of the source tree:
 which creates a virtual environment `venv_build`, updates locale files `.pot` / `.po` and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
 
 
-## Install a Wheel
+### Install a Wheel
 
 To install a `.whl` for `indicatortest` located in `release/wheel/dist_indicatortest`:
 
@@ -42,7 +42,7 @@ The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_in
 Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the introduction above.
 
 
-## Run an Indicator (within the source tree)
+### Run an Indicator (within the source tree)
 
 To run an indicator within the source tree, the indicator's `.whl` must first be built as above.
 
@@ -84,7 +84,7 @@ If the indicator has not previously been installed to `$HOME/.local/venv_indicat
 Some indicators, such as `indicatorlunar`, require additional packages, specified in the `dependencies` field of `pyproject.toml`.  Include those additional packages in the `pip install` above.
 
 
-## Development under Geany
+### Development under Geany
 
 #### Geany Setup
 
@@ -118,7 +118,7 @@ References:
 - [https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide](https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide)
 
 
-## Development under Eclipse
+### Development under Eclipse
 
 #### Eclipse Setup
 
@@ -187,7 +187,7 @@ References:
 - [https://www.pydev.org/manual_101_interpreter.html](https://www.pydev.org/manual_101_interpreter.html)
 
 
-## Run an Installed Indicator
+### Run an Installed Indicator
 
 To run an indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
 
@@ -205,7 +205,7 @@ To run from a terminal (observe any messages/errors) from any directory:
 Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and change `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
 
 
-## Release to PyPI
+### Release to PyPI
 
 TODO Check this section
 
@@ -228,14 +228,14 @@ References:
 - [https://packaging.python.org/en/latest/tutorials/packaging-projects](https://packaging.python.org/en/latest/tutorials/packaging-projects)
 
 
-## Install from PyPI
+### Install from PyPI
 
 TODO Check this section
 
 To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the introduction.
 
 
-## Release to TestPyPI
+### Release to TestPyPI
 
 TODO Check this section
 
@@ -252,7 +252,7 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
 ```
 
 
-## Install from TestPyPI
+### Install from TestPyPI
 
 TODO Check this section
 
@@ -271,7 +271,7 @@ To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.l
 Additional operating system packages may be needed; refer to the installation instructions at the indicator's `PyPI` page listed in the Introduction.
 
 
-## Uninstall an Indicator
+### Uninstall an Indicator
 
 TODO Check this section
 
@@ -282,14 +282,14 @@ TODO Check this section
 Additional indicators may be appended to the above command.
 
 
-## Remove all Symbolic Links to indicatorbase.py
+### Remove all Symbolic Links to indicatorbase.py
 
 ```
     for dirs in indicator*; do if [ -L $dirs/src/$dirs/indicatorbase.py ]; then rm $dirs/src/$dirs/indicatorbase.py; fi ; done;
 ```
 
 
-## Pylint
+### Pylint
 
 In a terminal, one directory **above** the source tree root (assumed to the directory `Indicators`):
 
@@ -336,7 +336,7 @@ As above, but with several checks disabled:
 ```
 
 
-## Convert this Document from MD to HTML
+### Convert this Document from MD to HTML
 
  ```
 	venv=venv_build && \
@@ -348,7 +348,7 @@ As above, but with several checks disabled:
 ```
 
 
-## License
+### License
 
 This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.
 
