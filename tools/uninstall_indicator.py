@@ -42,7 +42,7 @@ if __name__ == "__main__":
                     "+" } ) )
 
     for indicator_name in args.indicators:
-        command = (
+        utils.process_call(
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
             f"site-packages/{indicator_name}/platform/linux/uninstall.sh && "
             f". { utils.VENV_INSTALL }/bin/activate && "
@@ -52,5 +52,3 @@ if __name__ == "__main__":
             f"deactivate && "
             f"if [ \"$count\" -eq \"0\" ]; "
             f"then rm -f -r { utils.VENV_INSTALL }; fi" )
-
-        utils.process_call( command )

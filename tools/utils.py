@@ -30,14 +30,18 @@ from pathlib import Path
 VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 
-#TODO Compare this against that in indicatorbase.
 def process_call(
     command ):
 
-    subprocess.run( command, shell = True, check = False )
+    subprocess.run(
+        command,
+        shell = True,
+        capture_output = False,
+        check = True )
 
 
 #TODO Compare this against that in indicatorbase.
+# Much better to call process_run from indicatorbase rather than duplicate code here!
 def process_get(
     command ):
 
@@ -129,8 +133,8 @@ def initialise_virtual_environment(
     if not Path( venv_directory ).is_dir():
         process_call( f"python3 -m venv { venv_directory }"  )
 
-    command = (
+    process_call(
         f". { venv_directory }/bin/activate && "
-        f"python3 -m pip install --upgrade { '--force-reinstall' if force_reinstall else '' } { ' '.join( modules_to_install ) }" )
-
-    process_call( command )
+        "python3 -m pip install --upgrade "
+        f"{ '--force-reinstall' if force_reinstall else '' } "
+        f"{ ' '.join( modules_to_install ) }" )

@@ -79,7 +79,7 @@ def _create_update_pot(
 
     # Create a POT based on current source:
     #   http://www.gnu.org/software/gettext/manual/gettext.html
-    command = (
+    utils.process_call(
         "xgettext "
         f"-f { locale_directory / 'POTFILES.in' } "
         f"-D { str( Path( indicator_name ) / 'src' / indicator_name ) } "
@@ -88,8 +88,6 @@ def _create_update_pot(
         f"--package-version={ version } "
         f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' "
         f"-o { pot_file_new }" )
-    
-    utils.process_call( command )
 
     with open( pot_file_new, 'r', encoding = "utf-8" ) as r:
         text = (
@@ -145,12 +143,9 @@ def _create_update_po(
 
         if po_file_original.exists():
             po_file_new = str( po_file_original ).replace( '.po', '.new.po' )
-
-            command = (
+            utils.process_call(
                 f"msgmerge { po_file_original } { pot_file } "
                 f"-o { po_file_new }" )
-
-            utils.process_call( command )
 
             with open( po_file_new, 'r', encoding = "utf-8" ) as r:
                 new = r.read()
@@ -183,14 +178,12 @@ def _create_update_po(
                 parents = True,
                 exist_ok = True )
 
-            command = (
+            utils.process_call(
                 "msginit "
                 f"-i { pot_file } "
                 f"-o { po_file_original } "
                 f"-l { lingua_code } "
                 "--no-translator" )
-
-            utils.process_call( command )
 
             with open( po_file_original, 'r', encoding = "utf-8" ) as r:
                 text = (
@@ -307,28 +300,24 @@ def build_locale_for_release(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" )
 
     # Merge indicatorbase POT with indicator POT.
-    command = (
+    utils.process_call(
         "msgcat --use-first "
         f"{ str( directory_indicator_locale / ( indicator_name + '.pot' ) ) } "
         f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } "
         f"-o { str( directory_indicator_locale / ( indicator_name + '.pot' ) ) }" )
 
-    utils.process_call( command )
-
     # For each locale, merge indicatorbase PO with indicator PO.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         language_code = po.parent.parts[ -2 ]
-        command = (
+        utils.process_call(
             "msgcat --use-first "
             f"{ str( po ) } "
             f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } "
             f"-o { str( po ) } " )
 
-    utils.process_call( command )
-
     # Create .mo files.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
-        command = (
+        utils.process_call(
             f"msgfmt { str( po ) } "
             f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }" )
 

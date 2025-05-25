@@ -51,9 +51,7 @@ if __name__ == "__main__":
             f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)",
             force_reinstall = True )
 
-        command = (
+        utils.process_call(
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | " +
             f" head -1)/site-packages/{ indicator_name }/platform/" +
             "linux/install.sh" )
-
-        utils.process_call( command )
