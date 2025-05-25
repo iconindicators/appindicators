@@ -26,10 +26,12 @@ References:
 '''
 
 
+
+#TODO Consider testing on newest Manjaro.
+
+
 #TODO Test on Linux Mint 20 first, then delete, then 21.
 # 21 is NOT backed up.
-
-
 
 
 #TODO Candidates for removal of VM from backup after testing...
@@ -131,27 +133,17 @@ def _get_introduction(
         "`Debian`, `Ubuntu`, `Fedora`" )
 
     # openSUSE Tumbleweed and Manjaro do not contain the 'calendar' package.
+    #
     # For indicatoronthisday, drop references to openSUSE/Manjaro.
     #
-    # Keep indicatortest other functionality still applies.
+    # Keep indicatortest as `calendar` is only a small part of the overall
+    # functionality.
     if not _is_indicator( indicator_name, IndicatorName.INDICATORONTHISDAY ):
         introduction += ", `openSUSE`, `Manjaro`"
 
     introduction += (
         " and theoretically, any platform which supports the "
         "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n" )
-
-    if _is_indicator( indicator_name, IndicatorName.INDICATORONTHISDAY ):
-        introduction += (
-            f"Note that `{ indicator_name }` requires the `calendar` package "
-            "which is unavailable on `openSUSE Tumbleweed` and `Manjaro` and "
-            f"therefore `{ indicator_name }` is unsupported.\n\n" )
-
-    if _is_indicator( indicator_name, IndicatorName.INDICATORTEST ):
-        introduction += (
-            f"Note that `{ indicator_name }` uses the `calendar` package which "
-            "is unavailable on `openSUSE Tumbleweed` and `Manjaro` and so the "
-            "`calendar` functionality is unavailable.\n\n" )
 
     introduction += "Other indicators in this series are:\n"
     for indicator in _get_indicator_names_sans_current( indicator_name ):
@@ -713,20 +705,13 @@ def _get_usage(
         "-----\n\n"
 
         f"To run `{ indicator_name }`, press the `Super` key to show the "
-        "applications overlay or similar and type "
+        "applications overlay (or similar), type "
         f"`{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Removes the ™ from VirtualBox™.
         "into the search bar and the icon should be present for you to select.  "
-        "If the icon does not appear, or appears as generic, you may have to "
+        "If the icon does not appear, or appears as generic or broken, you may have to "
         "log out / in (or restart).\n\n"
         "Alternatively, to run from the terminal:\n\n"
-        "```\n"
-        f"indicator={ indicator_name } && \\\n"
-        f"venv={ utils.VENV_INSTALL } && \\\n"
-        f". ${{venv}}/bin/activate && \\\n"
-        f"cd $(ls -d ${{venv}}/lib/python3.* | head -1)/site-packages && \\\n"
-        f"python3 -m ${{indicator}}.${{indicator}} && \\\n"
-        "deactivate\n"
-        "```\n\n" )
+        f"```. $HOME/.local/bin/{ indicator_name }.sh```\n\n" )
 
 
 def _get_limitations(
