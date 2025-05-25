@@ -26,8 +26,22 @@ References:
 '''
 
 
+#TODO Will wmctrl be dropped for Wayland only distros?
+
+
+#TODO I think pulseaudio is no longer available on Manjaro 24...
+# try to confirm and if so, what is the new way to play a sound for scriptrunner?
+
+
+#TODO Consider testing on Fedora 42.
+
 
 #TODO Consider testing on newest Manjaro.
+#    MANJARO_25 = auto()
+# Check that calendar still does not exist.
+# Check that autostart still does not function.
+# In messages to user about Manjaro, maybe change "Manjaro 24" to just
+# "Manjaro" or "Manjaro 24/25". 
 
 
 #TODO Test on Linux Mint 20 first, then delete, then 21.
@@ -69,7 +83,7 @@ class OperatingSystem( Enum ):
     LINUX_MINT_CINNAMON_22 = auto()
     LUBUNTU_2204 = auto()
     LUBUNTU_2404 = auto()
-    MANJARO_240X = auto()
+    MANJARO_24 = auto()
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2004 = auto()
     UBUNTU_2204 = auto()
@@ -196,8 +210,8 @@ def _get_install_uninstall(
             "-----------------------\n\n"
             "Installation and updating follow the same process:\n"
             "1. Install operating system packages.\n"
-            f"2. Install `{ indicator_name }` via `pip` into a `Python3` "
-            f"virtual environment at `{ utils.VENV_INSTALL }`.\n"
+            f"2. Install `{ indicator_name }` to a `Python3` virtual "
+            f"environment at `{ utils.VENV_INSTALL }`.\n"
             f"{ additional_text }\n\n" )
 
     else:
@@ -234,15 +248,19 @@ def _get_install_uninstall(
             _get_operating_system_dependencies_fedora ) +
 
         function(
-            { OperatingSystem.MANJARO_240X },
+            { OperatingSystem.MANJARO_24 },
             indicator_name,
-            "sudo pacman -S --noconfirm" if install else "sudo pacman -R --noconfirm",
+            "sudo pacman -S --noconfirm"
+            if install else
+            "sudo pacman -R --noconfirm",
             _get_operating_system_dependencies_manjaro ) +
 
         function(
             { OperatingSystem.OPENSUSE_TUMBLEWEED },
             indicator_name,
-            "sudo zypper install -y" if install else "sudo zypper remove -y",
+            "sudo zypper install -y"
+            if install else
+            "sudo zypper remove -y",
             _get_operating_system_dependencies_opensuse ) +
 
         function(
@@ -278,7 +296,7 @@ def _os_has_no_calendar( operating_systems ):
     openSUSE Tumbleweed and Manjaro do not contain the package 'calendar'.
     '''
     return (
-        { OperatingSystem.MANJARO_240X }.issubset( operating_systems ) or
+        { OperatingSystem.MANJARO_24 }.issubset( operating_systems ) or
         { OperatingSystem.OPENSUSE_TUMBLEWEED }.issubset( operating_systems ) )
 
 
@@ -286,7 +304,7 @@ def _get_install_for_operating_system(
     operating_systems,
     indicator_name,
     install_command,
-    _get_operating_system_dependencies_function_name ):
+    _get_operating_system_dependencies_function ):
 
     calendar_vital_to_indicator = (
         _is_indicator(
@@ -297,24 +315,31 @@ def _get_install_for_operating_system(
         installation = ''
 
     else:
-        operating_system_packages = (
-            _get_operating_system_dependencies_function_name(
-                operating_systems,
-                IndicatorName[ indicator_name.upper() ] ) )
+        summary = _get_summary( operating_systems )
 
         # Installing operating system packages:
         #   https://stackoverflow.com/a/61164149/2156453
         #   https://pygobject.gnome.org/getting_started.html
+        operating_system_dependencies = (
+            _get_operating_system_dependencies_function(
+                operating_systems,
+                IndicatorName[ indicator_name.upper() ] ) )
+
         installation = (
             "<details>"
-            f"<summary><b>{ _get_summary( operating_systems ) }</b></summary>\n\n"
+            f"<summary><b>{ summary }</b></summary>\n\n"
+
             "1. Install operating system packages:\n\n"
             "    ```\n"
-            f"    { install_command } { operating_system_packages }\n"
+            f"    { install_command } { operating_system_dependencies }\n"
             "    ```\n"
             f"    { _get_extension( operating_systems ) }\n\n" )
 
-        installation += f"2. { _get_installation_python_virtual_environment( indicator_name, operating_systems ) }"
+        python_virtual_environment = (
+            _get_installation_python_virtual_environment(
+                indicator_name, operating_systems ) )
+
+        installation += f"2. { python_virtual_environment }"
 
         additional_python_modules = (
             _get_installation_additional_python_modules( indicator_name ) )
@@ -352,9 +377,11 @@ def _get_extension(
         { OperatingSystem.OPENSUSE_TUMBLEWEED }.issubset( operating_systems ) )
 
     if needs_extension:
+        url = "https://extensions.gnome.org/extension/615/appindicator-support"
         extension = (
-            "Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
-            "[extension](https://extensions.gnome.org/extension/615/appindicator-support).\n\n" )
+            "Install the `GNOME Shell` "
+            "`AppIndicator and KStatusNotifierItem Support` "
+            f"[extension]({ url }).\n\n" )
 
     return extension
 
@@ -403,8 +430,8 @@ def _get_installation_python_virtual_environment(
         pygobject = "PyGObject\<=3.50.0"
 
     message = (
-        "Install the indicator to a `Python` virtual environment and install "
-        "icons, .desktop and run script:\n"
+        f"Install `{ indicator_name }`, including icons, .desktop and run "
+        "script, to the `Python3` virtual environment:\n"
         "    ```\n"
         f"    indicator={ indicator_name } && \\\n"
         f"    venv={ utils.VENV_INSTALL } && \\\n"
@@ -432,17 +459,15 @@ def _get_installation_additional_python_modules(
         "    deactivate\n"
         "    ```\n" )
 
-    if indicator_name.upper() == IndicatorName.INDICATORSCRIPTRUNNER.name:
+    if _is_indicator( indicator_name, IndicatorName.INDICATORSCRIPTRUNNER ):
         message += (
             f"If you have added any `Python` scripts to `{ indicator_name }`, "
-            "you may need to install additional `Python` modules. "
-            f"{ common }" )
+            f"you may need to install additional `Python` modules. { common }" )
 
-    if indicator_name.upper() == IndicatorName.INDICATORTIDE.name:
+    if _is_indicator( indicator_name, IndicatorName.INDICATORTIDE ):
         message += (
-            "Your `Python` script which retrieves your tidal data may need "
-            "additional `Python` modules. "
-            f"{ common }" )
+            "Your `Python` script which retrieves tidal data may require "
+            f"additional `Python` modules. { common }" )
 
     return message
 
@@ -451,7 +476,7 @@ def _get_uninstall_for_operating_system(
     operating_systems,
     indicator_name,
     uninstall_command,
-    _get_operating_system_dependencies_function_name ):
+    _get_operating_system_dependencies_function ):
 
     calendar_vital_to_indicator = (
         _is_indicator(
@@ -462,14 +487,24 @@ def _get_uninstall_for_operating_system(
         uninstall = ''
 
     else:
+        summary = _get_summary( operating_systems )
+
+        operating_system_dependencies = (
+            _get_operating_system_dependencies_function( 
+                operating_systems, IndicatorName[ indicator_name.upper() ] ) )
+
+        # Ideally, an extension which was installed should be uninstalled.
+        #
+        # In reality, perhaps unwise to try to specify how to do this as it
+        # depends on the distribution and version of the distribution.
+        # Leave the extension in place; should not present a major drama!
         uninstall = (
             "<details>"
-            f"<summary><b>{ _get_summary( operating_systems ) }</b></summary>\n\n"
+            f"<summary><b>{ summary }</b></summary>\n\n"
 
             "1. Uninstall operating system packages:\n\n"
             "    ```\n"
-            f"    { uninstall_command } "
-            f"{ _get_operating_system_dependencies_function_name( operating_systems, IndicatorName[ indicator_name.upper() ] ) }\n"
+            f"    { uninstall_command } { operating_system_dependencies }\n"
             "    ```\n\n"
 
             "2. Uninstall the indicator from virtual environment:\n"
@@ -571,7 +606,6 @@ def _get_operating_system_dependencies_debian(
 
     if indicator_name == IndicatorName.INDICATORONTHISDAY:
         dependencies.append( "wl-clipboard" )
-
         if needs_calendar:
             dependencies.append( "calendar" )
 
@@ -589,7 +623,6 @@ def _get_operating_system_dependencies_debian(
         dependencies.append( "pulseaudio-utils" )
         dependencies.append( "wl-clipboard" )
         dependencies.append( "wmctrl" )
-
         if needs_calendar:
             dependencies.append( "calendar" )
 
@@ -837,28 +870,24 @@ def _get_limitations(
             "- `ICEWM`: Notifications are unsupported.\n" )
 
     # Kubuntu 24.04     No autostart.
+    messages.append(
+        "- `Kubuntu 24.04`: No autostart.\n" )
+
     # Manjaro 24.04.7   No autostart.
-#TODO Need to change this...does not apply for manjaro and indicatoronthisday.
-    if _is_indicator(
+    # As indicatoronthisday is unsupported on Manjaro (and openSUSE) as there
+    # is no calendar package, only flag that that autostart does not work for
+    # all the indicators other than indicatoronthisday.
+    if not _is_indicator(
         indicator_name,
-        IndicatorName.INDICATORFORTUNE,
-        IndicatorName.INDICATORLUNAR,
-        IndicatorName.INDICATORONTHISDAY,
-        IndicatorName.INDICATORPPADOWNLOADSTATISTICS,
-        IndicatorName.INDICATORPUNYCODE,
-        IndicatorName.INDICATORSCRIPTRUNNER,
-        IndicatorName.INDICATORSTARDATE,
-        IndicatorName.INDICATORTEST,
-        IndicatorName.INDICATORTIDE,
-        IndicatorName.INDICATORVIRTUALBOX ):
-        messages.append(
-            "- `Kubuntu 24.04`: No autostart.\n" )
+        IndicatorName.INDICATORONTHISDAY ):
         messages.append(
             "- `Manjaro 24`: No autostart.\n" )
 
+
 #TODO Is wl-clipboard needed for openSUSE?
 #
-# Not sure why I wrote the above...I guess check all distros under Wayland!
+# Not sure why I wrote the TODO above...I guess check all distros under Wayland!
+
 
     message = ""
     if messages:
