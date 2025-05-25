@@ -1083,7 +1083,7 @@ class IndicatorBase( ABC ):
             #   https://github.com/bugaevc/wl-clipboard/pull/110
             #   https://github.com/bugaevc/wl-clipboard/pull/154
             command += "2>/dev/null"
-            self.process_call( command )
+            self.process_call( command )  #TODO If this uses new process_run, check the pipe to stderr still works!
 
         else:
             selection = Gdk.SELECTION_CLIPBOARD
@@ -3084,6 +3084,39 @@ class IndicatorBase( ABC ):
                 self.get_logging().error( e.stdout.decode() )
 
         return result
+
+
+    def process_run(
+        self,
+        command ):
+        '''
+        Executes the command, returning a tuple comprising stdout (the result),
+        stderr and the return code.
+
+        On stderr or exception, logs to file.
+        '''
+        try:
+            result = (
+                subprocess.run(
+                    command,
+                    shell = True,
+                    capture_output = True,
+                    check = True ) )
+
+            stdout_ = result.stdout.decode().strip()
+            stderr_ = result.stderr.decode()
+            if stderr_:
+                self.get_logging().error( stderr_ )
+
+            return_code = result.returncode
+
+        except subprocess.CalledProcessError as e:
+            self.get_logging().error( e.stderr.decode() )
+            stdout_ = e.stdout.decode()
+            stderr_ = e.stderr.decode()
+            return_code = e.returncode
+
+        return stdout_, stderr_, return_code
 
 
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
