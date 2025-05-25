@@ -875,16 +875,14 @@ def _get_license(
     start_year ):
 
     end_year = datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
-
     authors = [ author_email[ 0 ] for author_email in authors_emails ]
-    authors = ', '.join( authors )
 
     return (
         "License\n"
         "-------\n\n"
         "This project in its entirety is licensed under the terms of the "
         "GNU General Public License v3.0 license.\n\n"
-        f"Copyright { start_year }-{ end_year } { authors }.\n" )
+        f"Copyright { start_year }-{ end_year } { ', '.join( authors ) }.\n" )
 
 
 def create_readme(
