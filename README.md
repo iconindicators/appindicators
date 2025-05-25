@@ -56,7 +56,7 @@ which will create a symbolic link to `indicatorbase.py` for all the indicators.
 
 To run `indicatortest`:
 
-TODO Add Linux Mint
+TODO Test on Linux Mint.
 ```
 	indicator=indicatortest && \
 	pygobject="PyGObject" && \
@@ -70,6 +70,9 @@ TODO Add Linux Mint
 	if [ "$(echo "$etc_os_release" | grep 'ID=ubuntu')" == "ID=ubuntu" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"20.04\"')" == "VERSION_ID=\"20.04\"" ]; then pygobject=$pygobject_3_50_0; fi && \
 	if [ "$(echo "$etc_os_release" | grep 'ID=ubuntu')" == "ID=ubuntu" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"22.04\"')" == "VERSION_ID=\"22.04\"" ]; then pygobject=$pygobject_3_50_0; fi && \
 	if [ "$(echo "$etc_os_release" | grep 'ID=ubuntu')" == "ID=ubuntu" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"24.04\"')" == "VERSION_ID=\"24.04\"" ]; then pygobject=$pygobject_3_50_0; fi && \
+	if [ "$(echo "$etc_os_release" | grep 'ID=linuxmint')" == "ID=linuxmint" ] && [ "$(echo "$etc_os_release" | grep 'UBUNTU_CODENAME=focal')" == "UBUNTU_CODENAME=focal" ]; then pygobject=$pygobject_3_50_0; fi && \
+	if [ "$(echo "$etc_os_release" | grep 'ID=linuxmint')" == "ID=linuxmint" ] && [ "$(echo "$etc_os_release" | grep 'UBUNTU_CODENAME=jammy')" == "UBUNTU_CODENAME=jammy" ]; then pygobject=$pygobject_3_50_0; fi && \
+	if [ "$(echo "$etc_os_release" | grep 'ID=linuxmint')" == "ID=linuxmint" ] && [ "$(echo "$etc_os_release" | grep 'UBUNTU_CODENAME=noble')" == "UBUNTU_CODENAME=noble" ]; then pygobject=$pygobject_3_50_0; fi && \
 	python3 -m pip install packaging $pygobject && \
 	cd ${indicator}/src && \
 	python3 -m ${indicator}.${indicator} && \
@@ -77,7 +80,7 @@ TODO Add Linux Mint
 	cd ../..
 ```
 
-Note for `Debian 12` the version of `PyGObject` is pinned. Subsequent distributions/versions may require similar treatment.
+Note for `Debian 12`, `Ubuntu 20.04` et al, the version of `PyGObject` is pinned. Subsequent distributions/versions may require similar treatment depending on whether `libgirepository-2.0-dev` becomes the default/standard.
 
 If the indicator has not previously been installed to `$HOME/.local/venv_indicators`, the icon and locale will be absent.
 
