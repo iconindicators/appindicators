@@ -35,7 +35,9 @@ import sys
 
 from pathlib import Path
 
-sys.path.insert( 0, '../' )
+if '../' not in sys.path:
+    sys.path.insert( 0, '../' ) # Allows calls to IndicatorBase.
+
 from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 
 from . import utils
@@ -465,11 +467,12 @@ def _package_source_for_build_wheel_process(
             authors,
             start_year )
 
-        utils.process_call(
+        IndicatorBase.process_run(
             f". { VENV_BUILD }/bin/activate && "
             "python3 -m readme_renderer "
             f"{ directory_dist }/{ indicator_name }/README.md "
-            f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html" )
+            f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html",
+            print_ = True )
 
         directory_indicator_locale = (
             Path( '.' ) / directory_indicator / "src" / indicator_name / "locale" )
@@ -530,9 +533,10 @@ def _build_wheel_for_indicator(
                 directory_dist, indicator_name ) )
 
     if not message:
-        utils.process_call(
+        IndicatorBase.process_run(
             f". { VENV_BUILD }/bin/activate && "
-            f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }" )
+            f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }",
+            print_ = True )
 
 # TODO Uncomment
 #         shutil.rmtree( directory_dist / indicator_name )

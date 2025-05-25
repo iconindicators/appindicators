@@ -20,9 +20,14 @@
 
 
 import argparse
-import subprocess
+import sys
 
 from pathlib import Path
+
+if '../' not in sys.path:
+    sys.path.insert( 0, '../' ) # Allows calls to IndicatorBase.
+
+from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 
 
 # The virtual environment into which indicators are installed,
@@ -30,32 +35,8 @@ from pathlib import Path
 VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 
-def process_call(
-    command ):
-
-    subprocess.run(
-        command,
-        shell = True,
-        capture_output = False,
-        check = True )
-
-
-#TODO Compare this against that in indicatorbase.
-# Much better to call process_run from indicatorbase rather than duplicate code here!
-def process_get(
-    command ):
-
-    return (
-        subprocess.run(
-            command,
-            stdout = subprocess.PIPE,
-            stderr = subprocess.PIPE,
-            shell = True,
-            check = False ) )
-
-
 def get_etc_os_release():
-    return process_get( "cat /etc/os-release" ).stdout.decode().strip()
+    return IndicatorBase.process_run( "cat /etc/os-release", print_ = True )
 
 
 def is_debian11_or_debian12():
@@ -131,10 +112,12 @@ def initialise_virtual_environment(
     force_reinstall = False ):
 
     if not Path( venv_directory ).is_dir():
-        process_call( f"python3 -m venv { venv_directory }"  )
+        IndicatorBase.process_run(
+            f"python3 -m venv { venv_directory }", print_ = True )
 
-    process_call(
+    IndicatorBase.process_run(
         f". { venv_directory }/bin/activate && "
         "python3 -m pip install --upgrade "
         f"{ '--force-reinstall' if force_reinstall else '' } "
-        f"{ ' '.join( modules_to_install ) }" )
+        f"{ ' '.join( modules_to_install ) }",
+        print_ = True )

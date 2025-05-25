@@ -3086,7 +3086,7 @@ class IndicatorBase( ABC ):
         return result
 
 
-    def process_run(
+    def process_runORIG(
         self,
         command ):
         '''
@@ -3116,6 +3116,71 @@ class IndicatorBase( ABC ):
             stderr_ = e.stderr.decode()
             return_code = e.returncode
 
+        return stdout_, stderr_, return_code
+
+
+    @staticmethod
+    def process_run(
+        command,
+        print_ = False,
+        logging = None ):
+        '''
+        Executes the command, returning stdout (the result).
+
+        If print_ is True, prints stdout and stderr to the console.
+
+        On stderr or exception, logs to file (for a valid logger).
+
+        To obtain stderr and the return code, call process_run_full().
+        '''
+        return IndicatorBase.process_run_full( command, logging, print_ )[ 0 ]
+
+
+    @staticmethod
+    def process_run_full(
+        command,
+        print_ = False,
+        logging = None ):
+        '''
+        Executes the command, returning a tuple of:
+            stdout (the result)
+            stderr
+            return code
+
+        If print_ is True, prints stdout and stderr to the console.
+
+        On stderr or exception, logs to file (for a valid logger).
+        '''
+        try:
+            result = (
+                subprocess.run(
+                    command,
+                    shell = True,
+                    capture_output = True,
+                    check = True ) )
+
+            stdout_ = result.stdout.decode().strip()
+            stderr_ = result.stderr.decode()
+            if logging and stderr_:
+                logging.error( stderr_ )
+
+            return_code = result.returncode
+
+        except subprocess.CalledProcessError as e:
+            if logging:
+                logging.error( e.stderr.decode() )
+
+            stdout_ = e.stdout.decode()
+            stderr_ = e.stderr.decode()
+            return_code = e.returncode
+
+        if print_:
+            if stdout_:
+                print( stdout_ )
+
+            elif stderr_:
+                print( stderr_ )
+        
         return stdout_, stderr_, return_code
 
 

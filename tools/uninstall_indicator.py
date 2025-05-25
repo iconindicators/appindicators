@@ -22,6 +22,12 @@ and icons and .config/.cache.  Finally, remove the virtual environment
 if no more indicators are installed.
 '''
 
+import sys
+
+if '../' not in sys.path:
+    sys.path.insert( 0, '../' ) # Allows calls to IndicatorBase.
+
+from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 
 from . import utils
 
@@ -42,7 +48,7 @@ if __name__ == "__main__":
                     "+" } ) )
 
     for indicator_name in args.indicators:
-        utils.process_call(
+        IndicatorBase.process_run(
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
             f"site-packages/{indicator_name}/platform/linux/uninstall.sh && "
             f". { utils.VENV_INSTALL }/bin/activate && "
@@ -51,4 +57,5 @@ if __name__ == "__main__":
             f"grep -o \"indicator\" | wc -l) && "
             f"deactivate && "
             f"if [ \"$count\" -eq \"0\" ]; "
-            f"then rm -f -r { utils.VENV_INSTALL }; fi" )
+            f"then rm -f -r { utils.VENV_INSTALL }; fi",
+            print_ = True )

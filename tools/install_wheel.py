@@ -22,6 +22,13 @@ $HOME/.local/venv_indicators and then run install.sh.
 '''
 
 
+import sys
+
+if '../' not in sys.path:
+    sys.path.insert( 0, '../' ) # Allows calls to IndicatorBase.
+
+from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
+
 from . import utils
 
 
@@ -51,7 +58,8 @@ if __name__ == "__main__":
             f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)",
             force_reinstall = True )
 
-        utils.process_call(
+        IndicatorBase.process_run(
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | " +
             f" head -1)/site-packages/{ indicator_name }/platform/" +
-            "linux/install.sh" )
+            "linux/install.sh",
+            print_ = True )
