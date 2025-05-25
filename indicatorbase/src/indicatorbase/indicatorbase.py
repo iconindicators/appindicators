@@ -3045,10 +3045,10 @@ class IndicatorBase( ABC ):
 
         except subprocess.CalledProcessError as e:
             if e.stderr:
-                logging.error( e.stderr.decode() )
+                self.get_logging().error( e.stderr.decode() )
 
             if e.stdout:
-                logging.error( e.stdout.decode() )
+                self.get_logging().error( e.stdout.decode() )
 
 
     def process_get( self, command ):
@@ -3070,7 +3070,7 @@ class IndicatorBase( ABC ):
             stderr_ = result.stderr.decode()
             if stderr_:
                 result = ""
-                logging.error( stderr_ )
+                self.get_logging().error( stderr_ )
 
             else:
                 result = result.stdout.decode().strip()
@@ -3078,10 +3078,10 @@ class IndicatorBase( ABC ):
         except subprocess.CalledProcessError as e:
             result = ""
             if e.stderr:
-                logging.error( e.stderr.decode() )
+                self.get_logging().error( e.stderr.decode() )
 
             if e.stdout:
-                logging.error( e.stdout.decode() )
+                self.get_logging().error( e.stdout.decode() )
 
         return result
 
