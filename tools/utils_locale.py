@@ -92,6 +92,7 @@ def _create_update_pot(
         f"--package-version={ version } "
         f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' "
         f"-o { pot_file_new }",
+        capture_output = False,
         print_ = True )
 
     with open( pot_file_new, 'r', encoding = "utf-8" ) as r:
@@ -151,6 +152,7 @@ def _create_update_po(
             IndicatorBase.process_run(
                 f"msgmerge { po_file_original } { pot_file } "
                 f"-o { po_file_new }",
+                capture_output = False,
                 print_ = True )
 
             with open( po_file_new, 'r', encoding = "utf-8" ) as r:
@@ -190,6 +192,7 @@ def _create_update_po(
                 f"-o { po_file_original } "
                 f"-l { lingua_code } "
                 "--no-translator",
+                capture_output = False,
                 print_ = True )
 
             with open( po_file_original, 'r', encoding = "utf-8" ) as r:
@@ -224,14 +227,15 @@ def _get_msgstr_from_po(
     msgid_escaped = msgid.replace( "\'", "\\\'" )
 
     stdout_, stderr_, return_code = (
-        IndicatorBase.process_run_full(
+        IndicatorBase.process_run(
             f". { venv_build }/bin/activate && "
             "python3 -c \""
             "import polib; "
             "[ print( entry.msgstr ) "
             f"for entry in polib.pofile( \'{ po }\' ) "
             f"if entry.msgid == \'{ msgid_escaped }\' ]"
-            "\"" ) )
+            "\"",
+            print_ = True ) )
 
     if stdout_:
         message = ""
@@ -312,6 +316,7 @@ def build_locale_for_release(
         f"{ str( directory_indicator_locale / ( indicator_name + '.pot' ) ) } "
         f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } "
         f"-o { str( directory_indicator_locale / ( indicator_name + '.pot' ) ) }",
+        capture_output = False,
         print_ = True )
 
     # For each locale, merge indicatorbase PO with indicator PO.
@@ -322,6 +327,7 @@ def build_locale_for_release(
             f"{ str( po ) } "
             f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } "
             f"-o { str( po ) } ",
+            capture_output = False,
             print_ = True )
 
     # Create .mo files.
@@ -329,6 +335,7 @@ def build_locale_for_release(
         IndicatorBase.process_run(
             f"msgfmt { str( po ) } "
             f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }",
+            capture_output = False,
             print_ = True )
 
 

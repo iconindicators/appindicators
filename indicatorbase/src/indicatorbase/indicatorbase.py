@@ -222,10 +222,10 @@ class IndicatorBase( ABC ):
         IndicatorBase._LOGGING_INITIALISED = True #TODO Stays?
 
         self.current_desktop = (
-            IndicatorBase.process_run( "echo $XDG_CURRENT_DESKTOP" ) )
+            IndicatorBase.process_run( "echo $XDG_CURRENT_DESKTOP" )[ 0 ] )
 
         self.session_type = (
-            IndicatorBase.process_run( "echo $XDG_SESSION_TYPE" ) )
+            IndicatorBase.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )
 
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
@@ -1044,10 +1044,11 @@ class IndicatorBase( ABC ):
         '''
         TODO Add docstring
         '''
+#TODO Check...need print parameter (and to be passed into process_run)?
+# Also use [ 0 ]
         return (
-            IndicatorBase.process_run(  #TODO Check...need print?
-                "cat /etc/os-release",
-                print_ = print_ ) ) 
+            IndicatorBase.process_run(
+                "cat /etc/os-release", print_ = print_ ) ) 
 
 
     def is_calendar_supported( self ):
@@ -1102,7 +1103,7 @@ class IndicatorBase( ABC ):
             #   https://github.com/bugaevc/wl-clipboard/pull/154
             command += "2>/dev/null"
             self.process_call( command )  #TODO If this uses new process_run, check the pipe to stderr still works!
-
+                                                # Also, set capture_output = False?
         else:
             selection = Gdk.SELECTION_CLIPBOARD
             if is_primary:
@@ -1118,7 +1119,7 @@ class IndicatorBase( ABC ):
         '''
         text_in_clipboard = None
         if self.is_session_type_wayland():
-            text_in_clipboard = IndicatorBase.process_run( "wl-paste" )
+            text_in_clipboard = IndicatorBase.process_run( "wl-paste" )[ 0 ]
 
         else:
             text_in_clipboard = (
@@ -1151,7 +1152,7 @@ class IndicatorBase( ABC ):
             # Shield the user from having to know about Wayland or X11 by
             # wrapping wl-clipboard within a callback function.
             primary_received_callback_function(
-                IndicatorBase.process_run( "wl-paste --primary" ) )
+                IndicatorBase.process_run( "wl-paste --primary" )[ 0 ] )
 
         else:
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
@@ -2524,7 +2525,7 @@ class IndicatorBase( ABC ):
         is_qterminal_and_broken_ = False
         if "qterminal" in terminal:
             qterminal_version = (
-                IndicatorBase.process_run( "qterminal --version" ) )
+                IndicatorBase.process_run( "qterminal --version" )[ 0 ] )
 
             is_qterminal_and_broken_ = qterminal_version < "1.2.0"
 
@@ -2539,7 +2540,7 @@ class IndicatorBase( ABC ):
         terminal = None
         execution_flag = None
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
-            terminal = IndicatorBase.process_run( "which " + _terminal )
+            terminal = IndicatorBase.process_run( "which " + _terminal )[ 0 ]
             if terminal:
                 execution_flag = _execution_flag
                 break
@@ -3118,47 +3119,37 @@ class IndicatorBase( ABC ):
         return result
 
 
+#TODO Search for process_run and ensure use IndicatorBase not self.
+
+
     @staticmethod
     def process_run(
-        command,
-        print_ = False ):
-        '''
-        Executes the command, returning stdout (the result).
-
-        If print_ is True, prints stdout and stderr to the console.
-
-        On stderr or exception, logs to file (for a valid logger).  #TODO Update
-
-        To obtain stderr and the return code, call process_run_full().
-        '''
-        return IndicatorBase.process_run_full( command, print_ = print_ )[ 0 ]
-
-
-#TODO Search for process_run and ensure they are IndicatorBase not self.
-
-
-    @staticmethod
-    def process_run_full(
         command,
         capture_output = True,
         print_ = False ):
         '''
-        Executes the command, returning a tuple of:
-            stdout (the result)
+        Executes the command, returning the tuple:
+            stdout
             stderr
             return code
 
+        If capture_output is True, stdout and stderr are captured;
+        otherwise, stdout and stderr are None.
+
         If print_ is True, prints stdout and stderr to the console.
 
-        On stderr or exception, logs to file (for a valid logger).  #TODO Update
+        On stderr or exception, logs to a file, if logging was previously
+        initialised.
         '''
         try:
             result = (
                 subprocess.run(
                     command,
                     shell = True,
-                    capture_output = capture_output,
-                    check = True ) )
+                    capture_output = capture_output ) )
+#TODO Used to have check = True, but that throws an exception for grep when grep
+# finds no result but returns a 1 (which is not 0 and thus an exception is thrown).
+# Who/when might need check = True?
 
             if capture_output:
                 stdout_ = result.stdout.decode().strip()
@@ -3175,12 +3166,20 @@ class IndicatorBase( ABC ):
         except subprocess.CalledProcessError as e:
             print( "EXCEPTION" ) #TODO Testing
             if IndicatorBase._LOGGING_INITIALISED:
+                print("----") #TODO Testing
+                print( e.stdout )
+                print("----")
+                print( e.stderr )
+                print("----")
+                print( e.returncode )
+                print("----")
                 IndicatorBase.get_logging().error( e.stderr.decode() )
 
 #TODO Find a way to trigger this exception and determine what happens when
 # capture_output is True (stdout/stderr should be defined so decode is okay) and
 # when capture_output is False (stdout/stderr should be not be defined so decode is unsafe).
-            stdout_ = e.stdout.decode()
+# Can trigger the exception on grep but no result but get a return code of 1
+# but need to set check = True in the call to subprocess.run().            stdout_ = e.stdout.decode()
             stderr_ = e.stderr.decode()
             return_code = e.returncode
 

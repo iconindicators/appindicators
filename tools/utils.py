@@ -109,11 +109,14 @@ def initialise_virtual_environment(
 
     if not Path( venv_directory ).is_dir():
         IndicatorBase.process_run(
-            f"python3 -m venv { venv_directory }", print_ = True )
+            f"python3 -m venv { venv_directory }", 
+            capture_output = False,
+            print_ = True )
 
     IndicatorBase.process_run(
         f". { venv_directory }/bin/activate && "
         "python3 -m pip install --upgrade "
         f"{ '--force-reinstall' if force_reinstall else '' } "
         f"{ ' '.join( modules_to_install ) }",
+        capture_output = False,
         print_ = True )

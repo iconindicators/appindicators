@@ -58,4 +58,5 @@ if __name__ == "__main__":
             f"deactivate && "
             f"if [ \"$count\" -eq \"0\" ]; "
             f"then rm -f -r { utils.VENV_INSTALL }; fi",
+            capture_output = False,
             print_ = True )

@@ -62,4 +62,5 @@ if __name__ == "__main__":
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | " +
             f" head -1)/site-packages/{ indicator_name }/platform/" +
             "linux/install.sh",
+            capture_output = False,
             print_ = True )

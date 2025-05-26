@@ -933,27 +933,51 @@ def create_readme(
 
 
 
-import sys
+# import sys
+#
+# if '../' not in sys.path:
+#     sys.path.insert( 0, '../' ) # Allows calls to IndicatorBase.
+#
+# from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
+#
+# command = "ls"
+# command = "which VirtualBox"
+# command = "/usr/bin/VirtualBoxx &"
+# stdout_, stderr_, return_code = (
+#     IndicatorBase.process_run_full(
+#         command, capture_output = True, print_ = False ) )
+#
+# print( f"stdout: { stdout_ }" )
+# print()
+#
+#
+# print( f"stderr: { stderr_ }" )
+# print()
+#
+#
+# print( f"return_code: { return_code }" )
+# print()
 
-if '../' not in sys.path:
-    sys.path.insert( 0, '../' ) # Allows calls to IndicatorBase.
 
-from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
-
-command = "ls"
-command = "which VirtualBox"
-command = "/usr/bin/VirtualBoxx &"
-stdout_, stderr_, return_code = (
-    IndicatorBase.process_run_full(
-        command, capture_output = True, print_ = False ) )
-
-print( f"stdout: { stdout_ }" )
-print()
-
-
-print( f"stderr: { stderr_ }" )
-print()
-
-
-print( f"return_code: { return_code }" )
-print()
+# import subprocess
+# try:
+#     result = (
+#         subprocess.run(
+#             f"wmctrl -l | grep \"Oracle VM VirtualBox Manager\"",
+#             shell = True,
+#             capture_output = True,
+#             check = False ) )
+#
+#     stdout_ = result.stdout.decode().strip()
+#     stderr_ = result.stderr.decode()
+#     return_code = result.returncode
+#
+# except subprocess.CalledProcessError as e:
+#     print( "EXCEPTION" ) #TODO Testing
+#     print("----")
+#     print( e.stdout )
+#     print("----")
+#     print( e.stderr )
+#     print("----")
+#     print( e.returncode )
+#     print("----")

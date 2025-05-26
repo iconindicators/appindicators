@@ -27,6 +27,12 @@ To view the contents of a .tar.gz:
 '''
 
 
+#TODO Had a dream/thought...
+# check all usages of PyGObject...
+# For running indicator...
+# For building indicator...
+
+
 import configparser
 import re
 import shutil
@@ -472,6 +478,7 @@ def _package_source_for_build_wheel_process(
             "python3 -m readme_renderer "
             f"{ directory_dist }/{ indicator_name }/README.md "
             f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html",
+            capture_output = False,
             print_ = True )
 
         directory_indicator_locale = (
@@ -536,6 +543,7 @@ def _build_wheel_for_indicator(
         IndicatorBase.process_run(
             f". { VENV_BUILD }/bin/activate && "
             f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }",
+            capture_output = False,
             print_ = True )
 
 # TODO Uncomment
