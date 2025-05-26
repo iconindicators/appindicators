@@ -19,6 +19,9 @@
 ''' Application indicator for VirtualBox™ virtual machines. '''
 
 
+#TODO Check that running vboxmanage via the indicator does not block about/preferences.
+
+
 import datetime
 import time
 
@@ -273,7 +276,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         self,
         uuid ):
 
-        result = self.process_get( "VBoxManage list vms | grep " + uuid )
+        result = IndicatorBase.process_run( "VBoxManage list vms | grep " + uuid )
         if uuid not in result:
             message = _(
                 "The virtual machine could not be found - " +
@@ -284,7 +287,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.show_notification( _( "Error" ), message )
 
         else:
-            self.process_call(
+            IndicatorBase.process_run(
                 self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &" )
 
 
@@ -295,7 +298,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         if self.is_session_type_x11():
             number_of_windows_with_the_same_name = (
-                self.process_get(
+                IndicatorBase.process_run(
                     'wmctrl -l | grep "' +
                     virtual_machine_name + '" | wc -l' ) )
 
@@ -312,10 +315,10 @@ class IndicatorVirtualBox( IndicatorBase ):
                     delay_in_seconds = delay_in_seconds )
 
             elif number_of_windows_with_the_same_name == "1":
-                for line in self.process_get( "wmctrl -l" ).splitlines():
+                for line in IndicatorBase.process_run( "wmctrl -l" ).splitlines():
                     if virtual_machine_name in line:
                         window_id = line[ 0 : line.find( " " ) ]
-                        self.process_call( "wmctrl -i -a " + window_id )
+                        IndicatorBase.process_run( "wmctrl -i -a " + window_id )
                         break
 
             else:
@@ -390,8 +393,8 @@ class IndicatorVirtualBox( IndicatorBase ):
     def on_launch_virtual_box_manager( self ):
 
         def start_virtualbox_manager():
-            self.process_call(
-                self.process_get( "which VirtualBox" ).strip() + ' &' )
+            IndicatorBase.process_run(
+                IndicatorBase.process_run( "which VirtualBox" ) + ' &' )
 
 
         if self.is_session_type_x11():
@@ -408,10 +411,10 @@ class IndicatorVirtualBox( IndicatorBase ):
             command = (
                 f"wmctrl -l | grep \"{ self.virtualbox_manager_window_name }\"" )
 
-            result = self.process_get( command )
+            result = IndicatorBase.process_run( command )
             if result:
                 window_id = result.split()[ 0 ]
-                self.process_call( f"wmctrl -ia { window_id }" )
+                IndicatorBase.process_run( f"wmctrl -ia { window_id }" )
 
             else:
                 start_virtualbox_manager()
@@ -429,7 +432,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         '''
         names = [ ]
         uuids = [ ]
-        result = self.process_get( "VBoxManage list runningvms" )
+        result = IndicatorBase.process_run( "VBoxManage list runningvms" )
         for line in result.splitlines():
             if line.startswith( '\"' ) and line.endswith( '}' ):
                 # VBoxManage may emit a warning message along with the virtual
@@ -446,7 +449,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         uuid ):
 
         command = "VBoxManage list runningvms | grep " + uuid
-        return uuid in self.process_get( command )
+        return uuid in IndicatorBase.process_run( command )
 
 
     def get_virtual_machines( self ):
@@ -480,7 +483,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         top_group = Group( "" )
         command = "VBoxManage list vms --long"
-        for line in self.process_get( command ).splitlines():
+        for line in IndicatorBase.process_run( command ).splitlines():
             if line.startswith( "Name:" ):
                 name = line.split( "Name:" )[ 1 ].strip()
 
@@ -497,7 +500,8 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def is_vboxmanage_installed( self ):
-        return self.process_get( "which VBoxManage" ).find( "VBoxManage" ) > -1
+        which_vboxmanage = IndicatorBase.process_run( "which VBoxManage" )
+        return which_vboxmanage.find( "VBoxManage" ) > -1
 
 
     def get_start_command(

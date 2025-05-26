@@ -222,14 +222,10 @@ class IndicatorBase( ABC ):
         IndicatorBase._LOGGING_INITIALISED = True #TODO Stays?
 
         self.current_desktop = (
-            IndicatorBase.process_run(
-                "echo $XDG_CURRENT_DESKTOP",
-                logging = self.get_logging() ) )
+            IndicatorBase.process_run( "echo $XDG_CURRENT_DESKTOP" ) )
 
         self.session_type = (
-            IndicatorBase.process_run(
-                "echo $XDG_SESSION_TYPE",
-                logging = self.get_logging() ) )
+            IndicatorBase.process_run( "echo $XDG_SESSION_TYPE" ) )
 
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
@@ -1049,10 +1045,9 @@ class IndicatorBase( ABC ):
         TODO Add docstring
         '''
         return (
-            IndicatorBase.process_run(
+            IndicatorBase.process_run(  #TODO Check...need print?
                 "cat /etc/os-release",
-                print_ = print_,
-                logging = logging ) ) 
+                print_ = print_ ) ) 
 
 
     def is_calendar_supported( self ):
@@ -1123,10 +1118,7 @@ class IndicatorBase( ABC ):
         '''
         text_in_clipboard = None
         if self.is_session_type_wayland():
-            text_in_clipboard = (
-                IndicatorBase.process_run(
-                    "wl-paste",
-                    logging = self.get_logging() ) )
+            text_in_clipboard = IndicatorBase.process_run( "wl-paste" )
 
         else:
             text_in_clipboard = (
@@ -1159,8 +1151,7 @@ class IndicatorBase( ABC ):
             # Shield the user from having to know about Wayland or X11 by
             # wrapping wl-clipboard within a callback function.
             primary_received_callback_function(
-                IndicatorBase.process_run(
-                    "wl-paste --primary", logging = self.get_logging() ) )
+                IndicatorBase.process_run( "wl-paste --primary" ) )
 
         else:
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
@@ -2533,9 +2524,7 @@ class IndicatorBase( ABC ):
         is_qterminal_and_broken_ = False
         if "qterminal" in terminal:
             qterminal_version = (
-                IndicatorBase.process_run(
-                    "qterminal --version",
-                    logging = self.get_logging() ) )
+                IndicatorBase.process_run( "qterminal --version" ) )
 
             is_qterminal_and_broken_ = qterminal_version < "1.2.0"
 
@@ -2550,10 +2539,7 @@ class IndicatorBase( ABC ):
         terminal = None
         execution_flag = None
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
-            terminal = (
-                IndicatorBase.process_run(
-                    "which " + _terminal, logging = self.get_logging() ) )
-
+            terminal = IndicatorBase.process_run( "which " + _terminal )
             if terminal:
                 execution_flag = _execution_flag
                 break
@@ -3135,24 +3121,17 @@ class IndicatorBase( ABC ):
     @staticmethod
     def process_run(
         command,
-        print_ = False,
-        logging = None ):
+        print_ = False ):
         '''
         Executes the command, returning stdout (the result).
 
         If print_ is True, prints stdout and stderr to the console.
 
-        On stderr or exception, logs to file (for a valid logger).
+        On stderr or exception, logs to file (for a valid logger).  #TODO Update
 
         To obtain stderr and the return code, call process_run_full().
         '''
-        result = (
-            IndicatorBase.process_run_full(
-                command,
-                print_ = print_,
-                logging = logging ) )
-
-        return result[ 0 ]
+        return IndicatorBase.process_run_full( command, print_ = print_ )[ 0 ]
 
 
 #TODO Search for process_run and ensure they are IndicatorBase not self.
@@ -3161,8 +3140,8 @@ class IndicatorBase( ABC ):
     @staticmethod
     def process_run_full(
         command,
-        print_ = False,
-        logging = None ):
+        capture_output = True,
+        print_ = False ):
         '''
         Executes the command, returning a tuple of:
             stdout (the result)
@@ -3171,27 +3150,36 @@ class IndicatorBase( ABC ):
 
         If print_ is True, prints stdout and stderr to the console.
 
-        On stderr or exception, logs to file (for a valid logger).
+        On stderr or exception, logs to file (for a valid logger).  #TODO Update
         '''
         try:
             result = (
                 subprocess.run(
                     command,
                     shell = True,
-                    capture_output = True,
+                    capture_output = capture_output,
                     check = True ) )
 
-            stdout_ = result.stdout.decode().strip()
-            stderr_ = result.stderr.decode()
-            if logging and stderr_:
-                logging.error( stderr_ )
+            if capture_output:
+                stdout_ = result.stdout.decode().strip()
+                stderr_ = result.stderr.decode()
+                if stderr_ and IndicatorBase._LOGGING_INITIALISED:
+                    IndicatorBase.get_logging().error( stderr_ )
+
+            else:
+                stdout_ = None
+                stderr_ = None
 
             return_code = result.returncode
 
         except subprocess.CalledProcessError as e:
-            if logging:
-                logging.error( e.stderr.decode() )
+            print( "EXCEPTION" ) #TODO Testing
+            if IndicatorBase._LOGGING_INITIALISED:
+                IndicatorBase.get_logging().error( e.stderr.decode() )
 
+#TODO Find a way to trigger this exception and determine what happens when
+# capture_output is True (stdout/stderr should be defined so decode is okay) and
+# when capture_output is False (stdout/stderr should be not be defined so decode is unsafe).
             stdout_ = e.stdout.decode()
             stderr_ = e.stderr.decode()
             return_code = e.returncode
@@ -3202,7 +3190,7 @@ class IndicatorBase( ABC ):
 
             elif stderr_:
                 print( stderr_ )
-        
+
         return stdout_, stderr_, return_code
 
 

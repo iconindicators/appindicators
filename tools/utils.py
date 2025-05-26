@@ -35,12 +35,8 @@ from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 
-def get_etc_os_release():
-    return IndicatorBase.process_run( "cat /etc/os-release", print_ = True )
-
-
 def is_debian11_or_debian12():
-    etc_os_release = get_etc_os_release()
+    etc_os_release = IndicatorBase.get_etc_os_release( print_ = True )
     return (
         'ID=debian' in etc_os_release
         and (
@@ -50,7 +46,7 @@ def is_debian11_or_debian12():
 
 
 def is_ubuntu2004_or_is_ubuntu2204_or_ubuntu2404():
-    etc_os_release = get_etc_os_release()
+    etc_os_release = IndicatorBase.get_etc_os_release( print_ = True )
     return ( (
         'ID=ubuntu' in etc_os_release and (
             'VERSION_ID="20.04"' in etc_os_release
