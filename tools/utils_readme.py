@@ -41,7 +41,7 @@ References:
 # Check that calendar still does not exist.
 # Check that autostart still does not function.
 # In messages to user about Manjaro, maybe change "Manjaro 24" to just
-# "Manjaro" or "Manjaro 24/25". 
+# "Manjaro" or "Manjaro 24/25".
 
 
 #TODO Test on Linux Mint 20 first, then delete, then 21.
@@ -490,7 +490,7 @@ def _get_uninstall_for_operating_system(
         summary = _get_summary( operating_systems )
 
         operating_system_dependencies = (
-            _get_operating_system_dependencies_function( 
+            _get_operating_system_dependencies_function(
                 operating_systems, IndicatorName[ indicator_name.upper() ] ) )
 
         # Ideally, an extension which was installed should be uninstalled.
@@ -930,54 +930,3 @@ def create_readme(
         f.write( _get_limitations( indicator_name ) )
         f.write( _get_install_uninstall( indicator_name, install = False ) )
         f.write( _get_license( authors_emails, start_year ) )
-
-
-
-# import sys
-#
-# if '../' not in sys.path:
-#     sys.path.insert( 0, '../' ) # Allows calls to IndicatorBase.
-#
-# from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
-#
-# command = "ls"
-# command = "which VirtualBox"
-# command = "/usr/bin/VirtualBoxx &"
-# stdout_, stderr_, return_code = (
-#     IndicatorBase.process_run_full(
-#         command, capture_output = True, print_ = False ) )
-#
-# print( f"stdout: { stdout_ }" )
-# print()
-#
-#
-# print( f"stderr: { stderr_ }" )
-# print()
-#
-#
-# print( f"return_code: { return_code }" )
-# print()
-
-
-# import subprocess
-# try:
-#     result = (
-#         subprocess.run(
-#             f"wmctrl -l | grep \"Oracle VM VirtualBox Manager\"",
-#             shell = True,
-#             capture_output = True,
-#             check = False ) )
-#
-#     stdout_ = result.stdout.decode().strip()
-#     stderr_ = result.stderr.decode()
-#     return_code = result.returncode
-#
-# except subprocess.CalledProcessError as e:
-#     print( "EXCEPTION" ) #TODO Testing
-#     print("----")
-#     print( e.stdout )
-#     print("----")
-#     print( e.stderr )
-#     print("----")
-#     print( e.returncode )
-#     print("----")

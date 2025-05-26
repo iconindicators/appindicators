@@ -571,7 +571,6 @@ if __name__ == "__main__":
     utils.initialise_virtual_environment(
         VENV_BUILD,
         "build",
-        "packaging",
         "pip",
         "polib",
         utils.get_pygobject(),

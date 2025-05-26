@@ -226,6 +226,7 @@ def _get_msgstr_from_po(
     # must be escaped.
     msgid_escaped = msgid.replace( "\'", "\\\'" )
 
+    print( msgid_escaped)#TODO Testing
     stdout_, stderr_, return_code = (
         IndicatorBase.process_run(
             f". { venv_build }/bin/activate && "
@@ -236,6 +237,15 @@ def _get_msgstr_from_po(
             f"if entry.msgid == \'{ msgid_escaped }\' ]"
             "\"",
             print_ = True ) )
+
+#TODO Testing
+    print('----')
+    print( stdout_ )
+    print('----')
+    print( stderr_)
+    print('----')
+    print( return_code)
+    print('----')
 
     if stdout_:
         message = ""
@@ -361,7 +371,6 @@ def get_names_and_comments_from_po_files(
 
     Instead, use polib to read the translations from the .po files.
     '''
-
     names_from_po_files = { }
     comments_from_po_files = { }
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
@@ -371,6 +380,8 @@ def get_names_and_comments_from_po_files(
             if msgstr != name:
                 names_from_po_files[ locale ] = msgstr
 
+#TODO Should this be outdented?
+# Why only get the comments if there is a message string for the name?
             msgstr, error = _get_msgstr_from_po( venv_build, po, comments )
             if msgstr:
                 if msgstr != comments:

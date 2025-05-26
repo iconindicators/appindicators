@@ -14,7 +14,10 @@ maintainers = [
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
-  "packaging" ]
+  "pip" ]
+  #TODO Need to remove the dependencies tag completely,
+  # but ensure build wheel works with all indicators including indicatorlunar.
+  # Also, work out why packaging is included in the venv_build.
 classifiers = [
   "Development Status :: 6 - Mature",
   "Environment :: X11 Applications :: GTK",

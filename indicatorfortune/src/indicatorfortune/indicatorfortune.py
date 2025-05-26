@@ -19,7 +19,7 @@
 ''' Application indicator which displays fortunes. '''
 
 
-#TODO Test with/without clipboard supported 
+#TODO Test with/without clipboard supported
 # AND
 # with/without preference set to copy last.
 
@@ -33,8 +33,6 @@ import gi
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
-
-from packaging.version import Version
 
 from .indicatorbase import IndicatorBase
 
@@ -538,8 +536,10 @@ class IndicatorFortune( IndicatorBase ):
                 IndicatorFortune.CONFIG_NOTIFICATION_SUMMARY,
                 IndicatorFortune.NOTIFICATION_SUMMARY ) )
 
-        version_from_config = Version( self.get_version_from_config( config ) )
-        if version_from_config < Version( "1.0.44" ):
+        version_from_config = (
+            IndicatorBase.versiontuple( self.get_version_from_config( config ) ) )
+
+        if version_from_config < IndicatorBase.versiontuple( "1.0.44" ):
             self._upgrade_1_0_44()
 
         if len( self.fortunes ) == 0:

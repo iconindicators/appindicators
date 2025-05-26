@@ -92,8 +92,6 @@ except ValueError:
         print( "Unable to find neither AyatanaAppIndicator3 nor AppIndicator3.")
         sys.exit( 1 )
 
-from packaging.version import Version
-
 
 class IndicatorBase( ABC ):
     ''' Base class for all indicators. '''
@@ -278,6 +276,24 @@ class IndicatorBase( ABC ):
         sys.exit( 1 )
 
 
+    @staticmethod
+    def versiontuple( v ):
+        # Ideally would use PyPI packaging.version requiring installation
+        # via pip
+        #
+        # However, some tools call IndicatorBase functions which requires
+        # importing IndicatorBase, which pulls in packaging.version.
+        #
+        # Unfortunately this requires packaging.version to be already
+        # present in the tools venv_build virtual environment,
+        # but the virtual environment will not exist on the first call to
+        # any tool.
+        #
+        # Instead, use the function below, taken from
+        #   https://stackoverflow.com/a/11887825/2156453
+        return tuple( map( int, ( v.split( '.' ) ) ) )
+
+
     def _check_for_newer_version( self ):
         url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
         message = _( "Refer to the Preferences for details." )
@@ -286,8 +302,10 @@ class IndicatorBase( ABC ):
 
         data_json, error_network, error_timeout = self.get_json( url )
         if data_json:
-            version_pypi = Version( data_json[ "info" ][ "version" ] )
-            if Version( self.version ) < version_pypi:
+            version_pypi = (
+                IndicatorBase.versiontuple( data_json[ "info" ][ "version" ] ) )
+
+            if IndicatorBase.versiontuple( self.version ) < version_pypi:
                 self.new_version_available = True
                 self.show_notification( summary, message )
 
@@ -1036,24 +1054,20 @@ class IndicatorBase( ABC ):
                 menuitem.set_sensitive( toggle )
 
 
-#TODO Who calls this in the indicators?  Replace with a static call and pass in logging. 
     @staticmethod
     def get_etc_os_release(
-        print_ = False,
-        logging = None ):
+        print_ = False ):
         '''
         TODO Add docstring
         '''
-#TODO Check...need print parameter (and to be passed into process_run)?
-# Also use [ 0 ]
         return (
             IndicatorBase.process_run(
-                "cat /etc/os-release", print_ = print_ ) ) 
+                "cat /etc/os-release", print_ = print_ )[ 0 ] )
 
 
     def is_calendar_supported( self ):
         ''' The calendar package is unavailable on some distributions. '''
-        etc_os_release = self.get_etc_os_release()
+        etc_os_release = IndicatorBase.get_etc_os_release()
         is_manjaro = "NAME=\"Manjaro Linux\"" in etc_os_release
         is_opensuse_tumbleweed = (
             "NAME=\"openSUSE Tumbleweed\"" in etc_os_release )
@@ -1078,7 +1092,7 @@ class IndicatorBase( ABC ):
             or (
                 self.is_session_type_wayland()
                 and
-                "UBUNTU_CODENAME=focal" not in self.get_etc_os_release() ) )
+                "UBUNTU_CODENAME=focal" not in IndicatorBase.get_etc_os_release() ) )
 
 
     def copy_to_selection(
@@ -3152,6 +3166,7 @@ class IndicatorBase( ABC ):
 # Who/when might need check = True?
 
             if capture_output:
+                print("here")#TODO
                 stdout_ = result.stdout.decode().strip()
                 stderr_ = result.stderr.decode()
                 if stderr_ and IndicatorBase._LOGGING_INITIALISED:
@@ -3190,6 +3205,10 @@ class IndicatorBase( ABC ):
             elif stderr_:
                 print( stderr_ )
 
+        print( command )
+        print( capture_output )
+        print( print_ )
+        print()
         return stdout_, stderr_, return_code
 
 

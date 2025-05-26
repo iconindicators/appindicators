@@ -29,8 +29,6 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from packaging.version import Version
-
 from .indicatorbase import IndicatorBase
 
 from .ppa import PPA, PublishedBinary
@@ -928,8 +926,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
         self.ppas = [ ]
-        version_from_config = Version( self.get_version_from_config( config ) )
-        if version_from_config < Version( "1.0.81" ):
+
+        version_from_config = (
+            IndicatorBase.versiontuple( self.get_version_from_config( config ) ) )
+
+        if version_from_config < IndicatorBase.versiontuple( "1.0.81" ):
             self._upgrade_1_0_81( ppas, config.get( "filters", [ ] ) )
 
         else:

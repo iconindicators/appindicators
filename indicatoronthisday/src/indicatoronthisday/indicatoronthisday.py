@@ -61,8 +61,6 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from packaging.version import Version
-
 from .indicatorbase import IndicatorBase
 
 from .event import Event
@@ -575,8 +573,12 @@ class IndicatorOnThisDay( IndicatorBase ):
                 [ [ system_calendar_default, True ] ] if system_calendar_default
                 else [ ] ) )
 
-        version_from_config = Version( self.get_version_from_config( config ) )
-        if Version( "0.0.0" ) < version_from_config < Version( "1.0.17" ):
+        version_0_0_0 = IndicatorBase.versiontuple( "0.0.0" )
+        version_1_0_17 = IndicatorBase.versiontuple( "1.0.17" )
+        version_from_config = (
+            IndicatorBase.versiontuple( self.get_version_from_config( config ) ) )
+
+        if version_0_0_0 < version_from_config < version_1_0_17:
             self._upgrade_1_0_17()
 
         self.copy_to_clipboard = (
