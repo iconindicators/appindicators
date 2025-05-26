@@ -125,6 +125,8 @@ class IndicatorBase( ABC ):
 
     _EXTENSION_JSON = ".json"
 
+    _LOGGING_INITIALISED = False #TODO Not sure if this stays.
+
     _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ]
     _TERMINALS_AND_EXECUTION_FLAGS.extend( [
         [ "konsole", "-e" ],
@@ -210,20 +212,30 @@ class IndicatorBase( ABC ):
         self.creditz = creditz
         self.debug = debug
 
-        self.current_desktop = self.process_get( "echo $XDG_CURRENT_DESKTOP" )
-        self.session_type = self.process_get( "echo $XDG_SESSION_TYPE" )
+        logging.basicConfig(
+            format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+            level = logging.DEBUG,
+            handlers = [
+                TruncatedFileHandler(
+                    Path.home() / ( self.indicator_name + ".log" ) ) ] )
+
+        IndicatorBase._LOGGING_INITIALISED = True #TODO Stays?
+
+        self.current_desktop = (
+            IndicatorBase.process_run(
+                "echo $XDG_CURRENT_DESKTOP",
+                logging = self.get_logging() ) )
+
+        self.session_type = (
+            IndicatorBase.process_run(
+                "echo $XDG_SESSION_TYPE",
+                logging = self.get_logging() ) )
 
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
 
         project_url = project_metadata.get_all( "Project-URL" )[ 0 ]
         self.website = project_url.split( ',' )[ 1 ].strip()
-
-        self.log = Path.home() / ( self.indicator_name + ".log" )
-        logging.basicConfig(
-            format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-            level = logging.DEBUG,
-            handlers = [ TruncatedFileHandler( self.log ) ] )
 
         self.lock_update = Lock()
         self.id_update = 0 # ID returned when scheduling an update.
@@ -1028,8 +1040,19 @@ class IndicatorBase( ABC ):
                 menuitem.set_sensitive( toggle )
 
 
-    def get_etc_os_release( self ):
-        return self.process_get( "cat /etc/os-release" )
+#TODO Who calls this in the indicators?  Replace with a static call and pass in logging. 
+    @staticmethod
+    def get_etc_os_release(
+        print_ = False,
+        logging = None ):
+        '''
+        TODO Add docstring
+        '''
+        return (
+            IndicatorBase.process_run(
+                "cat /etc/os-release",
+                print_ = print_,
+                logging = logging ) ) 
 
 
     def is_calendar_supported( self ):
@@ -1100,7 +1123,10 @@ class IndicatorBase( ABC ):
         '''
         text_in_clipboard = None
         if self.is_session_type_wayland():
-            text_in_clipboard = self.process_get( "wl-paste" )
+            text_in_clipboard = (
+                IndicatorBase.process_run(
+                    "wl-paste",
+                    logging = self.get_logging() ) )
 
         else:
             text_in_clipboard = (
@@ -1133,7 +1159,8 @@ class IndicatorBase( ABC ):
             # Shield the user from having to know about Wayland or X11 by
             # wrapping wl-clipboard within a callback function.
             primary_received_callback_function(
-                self.process_get( "wl-paste --primary" ) )
+                IndicatorBase.process_run(
+                    "wl-paste --primary", logging = self.get_logging() ) )
 
         else:
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
@@ -2436,8 +2463,18 @@ class IndicatorBase( ABC ):
         return y
 
 
-    def get_logging( self ):
-        return logging
+    @staticmethod
+    def get_logging():
+        logging_ = None
+        if IndicatorBase._LOGGING_INITIALISED:
+            logging_ = logging
+
+        return logging_
+
+#TODO If the above stays, need to find all calls to self.get_logging()
+# and replace with IndicatorBase.get_logging()
+    # def get_logging( self ):
+    #     return logging
 
 
     def is_number(
@@ -2495,8 +2532,12 @@ class IndicatorBase( ABC ):
         '''
         is_qterminal_and_broken_ = False
         if "qterminal" in terminal:
-            is_qterminal_and_broken_ = (
-                self.process_get( "qterminal --version" ) < "1.2.0" )
+            qterminal_version = (
+                IndicatorBase.process_run(
+                    "qterminal --version",
+                    logging = self.get_logging() ) )
+
+            is_qterminal_and_broken_ = qterminal_version < "1.2.0"
 
         return is_qterminal_and_broken_
 
@@ -2509,7 +2550,10 @@ class IndicatorBase( ABC ):
         terminal = None
         execution_flag = None
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
-            terminal = self.process_get( "which " + _terminal )
+            terminal = (
+                IndicatorBase.process_run(
+                    "which " + _terminal, logging = self.get_logging() ) )
+
             if terminal:
                 execution_flag = _execution_flag
                 break
@@ -3027,6 +3071,7 @@ class IndicatorBase( ABC ):
         return directory
 
 
+#TODO Replace with process_run
     def process_call(
         self,
         command ):
@@ -3051,6 +3096,7 @@ class IndicatorBase( ABC ):
                 self.get_logging().error( e.stdout.decode() )
 
 
+#TODO Replace with process_run
     def process_get( self, command ):
         '''
         Executes the command and returns the result.
@@ -3086,39 +3132,6 @@ class IndicatorBase( ABC ):
         return result
 
 
-    def process_runORIG(
-        self,
-        command ):
-        '''
-        Executes the command, returning a tuple comprising stdout (the result),
-        stderr and the return code.
-
-        On stderr or exception, logs to file.
-        '''
-        try:
-            result = (
-                subprocess.run(
-                    command,
-                    shell = True,
-                    capture_output = True,
-                    check = True ) )
-
-            stdout_ = result.stdout.decode().strip()
-            stderr_ = result.stderr.decode()
-            if stderr_:
-                self.get_logging().error( stderr_ )
-
-            return_code = result.returncode
-
-        except subprocess.CalledProcessError as e:
-            self.get_logging().error( e.stderr.decode() )
-            stdout_ = e.stdout.decode()
-            stderr_ = e.stderr.decode()
-            return_code = e.returncode
-
-        return stdout_, stderr_, return_code
-
-
     @staticmethod
     def process_run(
         command,
@@ -3133,7 +3146,16 @@ class IndicatorBase( ABC ):
 
         To obtain stderr and the return code, call process_run_full().
         '''
-        return IndicatorBase.process_run_full( command, logging, print_ )[ 0 ]
+        result = (
+            IndicatorBase.process_run_full(
+                command,
+                print_ = print_,
+                logging = logging ) )
+
+        return result[ 0 ]
+
+
+#TODO Search for process_run and ensure they are IndicatorBase not self.
 
 
     @staticmethod
