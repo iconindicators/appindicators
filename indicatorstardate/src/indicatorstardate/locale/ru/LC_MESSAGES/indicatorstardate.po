@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorstardate 1.0.45\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-03-14 18:23+1100\n"
+"POT-Creation-Date: 2025-05-27 12:19+1000\n"
 "PO-Revision-Date: 2025-03-14 18:23+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -14,22 +14,22 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: indicatorstardate.py:37
 msgid "Indicator Stardate"
 msgstr "Индикатор звёздной даты"
 
-#: indicatorstardate.py:47
+#: indicatorstardate.py:50
 msgid "Shows the current Star Trek™ stardate."
 msgstr "Показывает текущую звёздную дату \"Звёздного пути\"."
 
-#: indicatorstardate.py:162
+#: indicatorstardate.py:164
 msgid "Show stardate 'classic'"
 msgstr "Показывать \"классическую\" звёздную дату"
 
-#: indicatorstardate.py:164
+#: indicatorstardate.py:166
 #, fuzzy
 msgid ""
 "If checked, show stardate 'classic' based on\n"
@@ -47,18 +47,18 @@ msgstr ""
 "Иначе показываются звёздные даты \"ревизии 2009 года\"\n"
 "https://en.wikipedia.org/wiki/Stardate"
 
-#: indicatorstardate.py:174
+#: indicatorstardate.py:176
 msgid "Show ISSUE"
 msgstr "Показывать ВЫПУСК"
 
-#: indicatorstardate.py:175
+#: indicatorstardate.py:177
 msgid "Show the ISSUE of the stardate 'classic'."
 msgstr "Показывать ВЫПУСК \"классической\" звёздной даты."
 
-#: indicatorstardate.py:184
+#: indicatorstardate.py:186
 msgid "Pad INTEGER"
 msgstr "Выравнивать целую часть"
 
-#: indicatorstardate.py:186
+#: indicatorstardate.py:188
 msgid "Pad the INTEGER part of the stardate 'classic' with leading zeros."
 msgstr "Дополнять нулями целую часть \"классической\" звёздной даты."

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatortide 1.0.30\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-04-20 23:37+1000\n"
+"POT-Creation-Date: 2025-05-27 12:19+1000\n"
 "PO-Revision-Date: 2025-03-14 18:28+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -14,86 +14,77 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: indicatortide.py:40
 msgid "Indicator Tide"
 msgstr "Индикатор приливов"
 
-#: indicatortide.py:51
+#: indicatortide.py:54
 msgid "Displays tidal information."
 msgstr "Показывает сведения о приливах."
 
-#: indicatortide.py:63 indicatortide.py:64
+#: indicatortide.py:66 indicatortide.py:67
 msgid "No user script specified!"
 msgstr ""
 
-#: indicatortide.py:66
+#: indicatortide.py:69
 msgid "Please specify a user script and class name in the preferences."
 msgstr ""
 
-#: indicatortide.py:90 indicatortide.py:91
+#: indicatortide.py:93 indicatortide.py:94
 #, fuzzy
 msgid "User script could not be found!"
 msgstr "Пользовательский сценарий с заданным именем не найден."
 
-#: indicatortide.py:93
+#: indicatortide.py:96
 msgid "Please check the user script in the preferences."
 msgstr ""
 
-#: indicatortide.py:96 indicatortide.py:97
+#: indicatortide.py:99 indicatortide.py:100
 #, fuzzy
 msgid "User script class name could not be found!"
 msgstr "Имя класса в пользовательском сценарии не может быть пустым."
 
-#: indicatortide.py:99
+#: indicatortide.py:102
 #, fuzzy
 msgid "Please check the user script class name in the preferences."
 msgstr "Имя класса в пользовательском сценарии не может быть пустым."
 
-#: indicatortide.py:104 indicatortide.py:105
+#: indicatortide.py:106 indicatortide.py:107
 msgid "User function could not be found!"
 msgstr ""
 
-#: indicatortide.py:107
+#: indicatortide.py:109
 msgid "You must implement the function 'get_tide_data()'."
 msgstr ""
 
-#: indicatortide.py:111 indicatortide.py:112
-msgid "Error running user script!"
-msgstr ""
-
-#: indicatortide.py:113
-#, fuzzy
-msgid "Check the log file in your home directory."
-msgstr "Проверьте журнал в домашней папке."
-
-#: indicatortide.py:173 indicatortide.py:218
+#: indicatortide.py:165 indicatortide.py:208
 msgid "HIGH"
 msgstr "ПРИЛИВ"
 
-#: indicatortide.py:173 indicatortide.py:218
+#: indicatortide.py:165 indicatortide.py:208
 msgid "LOW"
 msgstr "ОТЛИВ"
 
-#: indicatortide.py:270
+#: indicatortide.py:258
 #, fuzzy
 msgid "User Script"
 msgstr "Пользовательский сценарий"
 
-#: indicatortide.py:277
+#: indicatortide.py:265
 #, fuzzy
 msgid ""
 "Full path and filename\n"
 "of user's Python3 script."
 msgstr "Полный путь и имя файла пользовательского сценария Python3."
 
-#: indicatortide.py:282
+#: indicatortide.py:270
 msgid "Path and filename"
 msgstr ""
 
-#: indicatortide.py:291
+#: indicatortide.py:279
 #, fuzzy
 msgid ""
 "Class name within the user script\n"
@@ -111,34 +102,38 @@ msgstr ""
 "\n"
 "разработанную пользователем, для полученияданных о приливах."
 
-#: indicatortide.py:300
+#: indicatortide.py:288
 msgid "Class name"
 msgstr ""
 
-#: indicatortide.py:307
+#: indicatortide.py:295
 msgid "Show as submenus"
 msgstr "Отображать подменю"
 
-#: indicatortide.py:308
+#: indicatortide.py:296
 msgid "Show each day's tides in a submenu."
 msgstr "Отображать приливы каждого дня в виде подменю."
 
-#: indicatortide.py:316
+#: indicatortide.py:304
 msgid "Except first day"
 msgstr "Кроме первого дня"
 
-#: indicatortide.py:317
+#: indicatortide.py:305
 msgid "Show the first day's tide in full."
 msgstr "Отображать приливы первого дня полностью."
 
-#: indicatortide.py:350
+#: indicatortide.py:340
 msgid "The user script path/filename cannot be found."
 msgstr "Пользовательский сценарий с заданным именем не найден."
 
-#: indicatortide.py:359
+#: indicatortide.py:350
 msgid "The user script path/filename cannot be empty."
 msgstr "Имя пользовательского сценария не может быть пустым."
 
-#: indicatortide.py:367
+#: indicatortide.py:358
 msgid "The user script class name cannot be empty."
 msgstr "Имя класса в пользовательском сценарии не может быть пустым."
+
+#, fuzzy
+#~ msgid "Check the log file in your home directory."
+#~ msgstr "Проверьте журнал в домашней папке."

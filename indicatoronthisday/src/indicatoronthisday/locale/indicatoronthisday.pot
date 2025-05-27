@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatoronthisday 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-04-20 23:37+1000\n"
+"POT-Creation-Date: 2025-05-27 12:19+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,108 +15,81 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicatoronthisday.py:71
+#: indicatoronthisday.py:73
 msgid "Indicator On This Day"
 msgstr ""
 
-#: indicatoronthisday.py:86
+#: indicatoronthisday.py:90
 msgid "EVENT"
 msgstr ""
 
-#: indicatoronthisday.py:94
+#: indicatoronthisday.py:99
 msgid ""
 "Calls the 'calendar' program and\n"
 "displays events in the menu."
 msgstr ""
 
-#: indicatoronthisday.py:134
+#: indicatoronthisday.py:139
 msgid "On this day..."
 msgstr ""
 
-#: indicatoronthisday.py:237 indicatoronthisday.py:242
+#: indicatoronthisday.py:242 indicatoronthisday.py:247
 msgid "Warning"
 msgstr ""
 
-#: indicatoronthisday.py:238
+#: indicatoronthisday.py:243
 msgid "No enabled calendars have a valid location!"
 msgstr ""
 
-#: indicatoronthisday.py:243
+#: indicatoronthisday.py:248
 msgid "No calendars are enabled!"
 msgstr ""
 
-#: indicatoronthisday.py:320
+#: indicatoronthisday.py:325
 msgid "Calendar"
 msgstr ""
 
-#: indicatoronthisday.py:321
+#: indicatoronthisday.py:326
 msgid "Double click to edit a calendar."
 msgstr ""
 
-#: indicatoronthisday.py:322
+#: indicatoronthisday.py:327
 msgid "Choose a calendar file"
 msgstr ""
 
-#: indicatoronthisday.py:323
+#: indicatoronthisday.py:328
 msgid "This calendar already exists!"
 msgstr ""
 
-#: indicatoronthisday.py:324 indicatoronthisday.py:327
+#: indicatoronthisday.py:329 indicatoronthisday.py:332
 msgid "This is a system calendar and cannot be modified."
 msgstr ""
 
-#: indicatoronthisday.py:325
+#: indicatoronthisday.py:330
 msgid "Add a new calendar."
 msgstr ""
 
-#: indicatoronthisday.py:326
+#: indicatoronthisday.py:331
 msgid "Remove the selected calendar."
 msgstr ""
 
-#: indicatoronthisday.py:328
+#: indicatoronthisday.py:333
 msgid "Remove the selected calendar?"
 msgstr ""
 
-#: indicatoronthisday.py:331
+#: indicatoronthisday.py:336
 msgid "Calendars"
 msgstr ""
 
-#: indicatoronthisday.py:342
+#: indicatoronthisday.py:347
 msgid "The number of menu items available for display."
 msgstr ""
 
-#: indicatoronthisday.py:347
+#: indicatoronthisday.py:352
 msgid "Lines"
 msgstr ""
 
-#: indicatoronthisday.py:353
-msgid "On event click"
-msgstr ""
-
-#: indicatoronthisday.py:357
-msgid "Copy the event text and date to the clipboard."
-msgstr ""
-
-#: indicatoronthisday.py:359
-msgid ""
-"\n"
-"\n"
-"Unsupported on Ubuntun 20.04 on Wayland."
-msgstr ""
-
-#: indicatoronthisday.py:364
-msgid "Copy event to clipboard"
-msgstr ""
-
-#: indicatoronthisday.py:374
-msgid "Search event on the internet"
-msgstr ""
-
-#: indicatoronthisday.py:376
-msgid "Search for the event in the default web browser."
-msgstr ""
-
-#: indicatoronthisday.py:386
+#: indicatoronthisday.py:366
 #, python-brace-format
 msgid ""
 "The URL to search for the event.\n"
@@ -131,20 +104,32 @@ msgid ""
 "the URL is reset back to factory default."
 msgstr ""
 
-#: indicatoronthisday.py:399
-msgid "URL"
+#: indicatoronthisday.py:381
+msgid "On event click"
 msgstr ""
 
-#: indicatoronthisday.py:420
+#: indicatoronthisday.py:390
+msgid "Copy event to clipboard"
+msgstr ""
+
+#: indicatoronthisday.py:400
+msgid "Search using URL"
+msgstr ""
+
+#: indicatoronthisday.py:430
+msgid "On event click, search using URL"
+msgstr ""
+
+#: indicatoronthisday.py:449
 msgid "Notify"
 msgstr ""
 
-#: indicatoronthisday.py:422
+#: indicatoronthisday.py:451
 msgid ""
 "On startup or when saving preferences,\n"
 "show a notification for each of today's events."
 msgstr ""
 
-#: indicatoronthisday.py:434
+#: indicatoronthisday.py:464
 msgid "General"
 msgstr ""

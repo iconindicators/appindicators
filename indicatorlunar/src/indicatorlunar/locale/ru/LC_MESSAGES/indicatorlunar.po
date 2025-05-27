@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorlunar 1.0.101\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-04-20 23:38+1000\n"
+"POT-Creation-Date: 2025-05-27 12:18+1000\n"
 "PO-Revision-Date: 2025-03-14 16:45+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -14,1103 +14,1103 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: astrobase.py:89
+#: astrobase.py:87
 msgid "ALTITUDE"
 msgstr "ВЫСОТА"
 
-#: astrobase.py:90
+#: astrobase.py:88
 msgid "AZIMUTH"
 msgstr "АЗИМУТ"
 
-#: astrobase.py:91
+#: astrobase.py:89
 msgid "BRIGHT LIMB"
 msgstr "УГОЛ ЭКВАТОРА ИНТЕНСИВНОСТИ"
 
-#: astrobase.py:92
+#: astrobase.py:90
 msgid "ECLIPSE DATE TIME"
 msgstr "ЗАТМЕНИЕ ДАТА ВРЕМЯ"
 
-#: astrobase.py:93
+#: astrobase.py:91
 msgid "ECLIPSE LATITUDE"
 msgstr "ЗАТМЕНИЕ ШИРОТА"
 
-#: astrobase.py:94
+#: astrobase.py:92
 msgid "ECLIPSE LONGITUDE"
 msgstr "ЗАТМЕНИЕ ДОЛГОТА"
 
-#: astrobase.py:95
+#: astrobase.py:93
 msgid "ECLIPSE TYPE"
 msgstr "ЗАТМЕНИЕ ТИП"
 
-#: astrobase.py:96
+#: astrobase.py:94
 msgid "EQUINOX"
 msgstr "РАВНОДЕНСТВИЕ"
 
-#: astrobase.py:97
+#: astrobase.py:95
 msgid "FIRST QUARTER"
 msgstr "ПЕРВАЯ ЧЕТВЕРТЬ"
 
-#: astrobase.py:98
+#: astrobase.py:96
 msgid "ILLUMINATION"
 msgstr "ОСВЕЩЁННОСТЬ ДИСКА"
 
-#: astrobase.py:99
+#: astrobase.py:97
 msgid "FULL"
 msgstr "ПОЛНОЛУНИЕ"
 
-#: astrobase.py:100
+#: astrobase.py:98
 msgid "NEW"
 msgstr "НОВОЛУНИЕ"
 
-#: astrobase.py:101
+#: astrobase.py:99
 msgid "PHASE"
 msgstr "ФАЗА"
 
-#: astrobase.py:102 astrobase.py:395
+#: astrobase.py:100 astrobase.py:387
 msgid "RISE AZIMUTH"
 msgstr "АЗИМУТ ВОСХОДА"
 
-#: astrobase.py:103
+#: astrobase.py:101
 msgid "RISE DATE TIME"
 msgstr "ВОСХОД ДАТА ВРЕМЯ"
 
-#: astrobase.py:104 astrobase.py:397
+#: astrobase.py:102 astrobase.py:389
 msgid "SET AZIMUTH"
 msgstr "АЗИМУТ ЗАХОДА"
 
-#: astrobase.py:105
+#: astrobase.py:103
 msgid "SET DATE TIME"
 msgstr "ЗАХОД ДАТА ВРЕМЯ"
 
-#: astrobase.py:106
+#: astrobase.py:104
 msgid "SOLSTICE"
 msgstr "СОЛНЦЕСТОЯНИЕ"
 
-#: astrobase.py:107
+#: astrobase.py:105
 msgid "THIRD QUARTER"
 msgstr "ПОСЛЕДНЯЯ ЧЕТВЕРТЬ"
 
-#: astrobase.py:176
+#: astrobase.py:172
 msgid "MOON"
 msgstr "ЛУНА"
 
-#: astrobase.py:177
+#: astrobase.py:173
 msgid "SUN"
 msgstr "СОЛНЦЕ"
 
-#: astrobase.py:198
+#: astrobase.py:194
 msgid "Mercury"
 msgstr "Меркурий"
 
-#: astrobase.py:199
+#: astrobase.py:195
 msgid "Venus"
 msgstr "Венера"
 
-#: astrobase.py:200
+#: astrobase.py:196
 msgid "Mars"
 msgstr "Марс"
 
-#: astrobase.py:201
+#: astrobase.py:197
 msgid "Jupiter"
 msgstr "Юпитер"
 
-#: astrobase.py:202
+#: astrobase.py:198
 msgid "Saturn"
 msgstr "Сатурн"
 
-#: astrobase.py:203
+#: astrobase.py:199
 msgid "Uranus"
 msgstr "Уран"
 
-#: astrobase.py:204
+#: astrobase.py:200
 msgid "Neptune"
 msgstr "Нептун"
 
-#: astrobase.py:209
+#: astrobase.py:204
 msgid "MERCURY"
 msgstr "МЕРКУРИЙ"
 
-#: astrobase.py:210
+#: astrobase.py:205
 msgid "VENUS"
 msgstr "ВЕНЕРА"
 
-#: astrobase.py:211
+#: astrobase.py:206
 msgid "MARS"
 msgstr "МАРС"
 
-#: astrobase.py:212
+#: astrobase.py:207
 msgid "JUPITER"
 msgstr "ЮПИТЕР"
 
-#: astrobase.py:213
+#: astrobase.py:208
 msgid "SATURN"
 msgstr "САТУРН"
 
-#: astrobase.py:214
+#: astrobase.py:209
 msgid "URANUS"
 msgstr "УРАН"
 
-#: astrobase.py:215
+#: astrobase.py:210
 msgid "NEPTUNE"
 msgstr "НЕПТУН"
 
-#: astrobase.py:231
+#: astrobase.py:224
 msgid "Full Moon"
 msgstr "Полнолуние"
 
-#: astrobase.py:232
+#: astrobase.py:225
 msgid "Waning Gibbous"
 msgstr "Убывающая луна"
 
-#: astrobase.py:233
+#: astrobase.py:226
 msgid "Third Quarter"
 msgstr "Последняя четверть"
 
-#: astrobase.py:234
+#: astrobase.py:227
 msgid "Waning Crescent"
 msgstr "Убывающий полумесяц"
 
-#: astrobase.py:235
+#: astrobase.py:228
 msgid "New Moon"
 msgstr "Новолуние"
 
-#: astrobase.py:236
+#: astrobase.py:229
 msgid "Waxing Crescent"
 msgstr "Растущий полумесяц"
 
-#: astrobase.py:237
+#: astrobase.py:230
 msgid "First Quarter"
 msgstr "Первая четверть"
 
-#: astrobase.py:238
+#: astrobase.py:231
 msgid "Waxing Gibbous"
 msgstr "Растущая луна"
 
-#: astrobase.py:273
+#: astrobase.py:265
 msgid "Acamar"
 msgstr "Акамар"
 
-#: astrobase.py:273
+#: astrobase.py:265
 msgid "ACAMAR"
 msgstr "АКАМАР"
 
-#: astrobase.py:274
+#: astrobase.py:266
 msgid "Achernar"
 msgstr "Ахернар"
 
-#: astrobase.py:274
+#: astrobase.py:266
 msgid "ACHERNAR"
 msgstr "АХЕРНАР"
 
-#: astrobase.py:275
+#: astrobase.py:267
 msgid "Acrux"
 msgstr "Акрукс"
 
-#: astrobase.py:275
+#: astrobase.py:267
 msgid "ACRUX"
 msgstr "АКРУКС"
 
-#: astrobase.py:276
+#: astrobase.py:268
 msgid "Adhara"
 msgstr "Адара"
 
-#: astrobase.py:276
+#: astrobase.py:268
 msgid "ADHARA"
 msgstr "АДАРА"
 
-#: astrobase.py:277
+#: astrobase.py:269
 msgid "Alcor"
 msgstr "Алькор"
 
-#: astrobase.py:277
+#: astrobase.py:269
 msgid "ALCOR"
 msgstr "АЛЬКОР"
 
-#: astrobase.py:278
+#: astrobase.py:270
 msgid "Alcyone"
 msgstr "Альциона"
 
-#: astrobase.py:278
+#: astrobase.py:270
 msgid "ALCYONE"
 msgstr "АЛЬЦИОНА"
 
-#: astrobase.py:279
+#: astrobase.py:271
 msgid "Aldebaran"
 msgstr "Альдебаран"
 
-#: astrobase.py:279
+#: astrobase.py:271
 msgid "ALDEBARAN"
 msgstr "АЛЬДЕБАРАН"
 
-#: astrobase.py:280
+#: astrobase.py:272
 msgid "Alderamin"
 msgstr "Альдерамин"
 
-#: astrobase.py:280
+#: astrobase.py:272
 msgid "ALDERAMIN"
 msgstr "АЛЬДЕРАМИН"
 
-#: astrobase.py:281
+#: astrobase.py:273
 msgid "Alfirk"
 msgstr "Альфирк"
 
-#: astrobase.py:281
+#: astrobase.py:273
 msgid "ALFIRK"
 msgstr "АЛЬФИРК"
 
-#: astrobase.py:282
+#: astrobase.py:274
 msgid "Algenib"
 msgstr "Альгениб"
 
-#: astrobase.py:282
+#: astrobase.py:274
 msgid "ALGENIB"
 msgstr "АЛЬГЕНИБ"
 
-#: astrobase.py:283
+#: astrobase.py:275
 msgid "Algieba"
 msgstr "Альгиеба"
 
-#: astrobase.py:283
+#: astrobase.py:275
 msgid "ALGIEBA"
 msgstr "АЛЬГИЕБА"
 
-#: astrobase.py:284
+#: astrobase.py:276
 msgid "Algol"
 msgstr "Алголь"
 
-#: astrobase.py:284
+#: astrobase.py:276
 msgid "ALGOL"
 msgstr "АЛГОЛЬ"
 
-#: astrobase.py:285
+#: astrobase.py:277
 msgid "Alhena"
 msgstr "Альхена"
 
-#: astrobase.py:285
+#: astrobase.py:277
 msgid "ALHENA"
 msgstr "АЛЬХЕНА"
 
-#: astrobase.py:286
+#: astrobase.py:278
 msgid "Alioth"
 msgstr "Алиот"
 
-#: astrobase.py:286
+#: astrobase.py:278
 msgid "ALIOTH"
 msgstr "АЛИОТ"
 
-#: astrobase.py:287
+#: astrobase.py:279
 msgid "Alkaid"
 msgstr "Алькаид"
 
-#: astrobase.py:287
+#: astrobase.py:279
 msgid "ALKAID"
 msgstr "АЛЬКАИД"
 
-#: astrobase.py:288
+#: astrobase.py:280
 msgid "Almach"
 msgstr "Аламак"
 
-#: astrobase.py:288
+#: astrobase.py:280
 msgid "ALMACH"
 msgstr "АЛАМАК"
 
-#: astrobase.py:289
+#: astrobase.py:281
 msgid "Alnair"
 msgstr "Альнаир"
 
-#: astrobase.py:289
+#: astrobase.py:281
 msgid "ALNAIR"
 msgstr "АЛЬНАИР"
 
-#: astrobase.py:290
+#: astrobase.py:282
 msgid "Alnilam"
 msgstr "Альнилам"
 
-#: astrobase.py:290
+#: astrobase.py:282
 msgid "ALNILAM"
 msgstr "АЛЬНИЛАМ"
 
-#: astrobase.py:291
+#: astrobase.py:283
 msgid "Alnitak"
 msgstr "Альнитак"
 
-#: astrobase.py:291
+#: astrobase.py:283
 msgid "ALNITAK"
 msgstr "АЛЬНИТАК"
 
-#: astrobase.py:292
+#: astrobase.py:284
 msgid "Alphard"
 msgstr "Альфард"
 
-#: astrobase.py:292
+#: astrobase.py:284
 msgid "ALPHARD"
 msgstr "АЛЬФАРД"
 
-#: astrobase.py:293
+#: astrobase.py:285
 msgid "Alphecca"
 msgstr "Альфекка"
 
-#: astrobase.py:293
+#: astrobase.py:285
 msgid "ALPHECCA"
 msgstr "АЛЬФЕККА"
 
-#: astrobase.py:294
+#: astrobase.py:286
 msgid "Alpheratz"
 msgstr "Альферац"
 
-#: astrobase.py:294
+#: astrobase.py:286
 msgid "ALPHERATZ"
 msgstr "АЛЬФЕРАЦ"
 
-#: astrobase.py:295
+#: astrobase.py:287
 msgid "Alshain"
 msgstr "Альшаин"
 
-#: astrobase.py:295
+#: astrobase.py:287
 msgid "ALSHAIN"
 msgstr "АЛЬШАИН"
 
-#: astrobase.py:296
+#: astrobase.py:288
 msgid "Altair"
 msgstr "Альтаир"
 
-#: astrobase.py:296
+#: astrobase.py:288
 msgid "ALTAIR"
 msgstr "АЛЬТАИР"
 
-#: astrobase.py:297
+#: astrobase.py:289
 msgid "Ankaa"
 msgstr "Анкаа"
 
-#: astrobase.py:297
+#: astrobase.py:289
 msgid "ANKAA"
 msgstr "АНКАА"
 
-#: astrobase.py:298
+#: astrobase.py:290
 msgid "Antares"
 msgstr "Антарес"
 
-#: astrobase.py:298
+#: astrobase.py:290
 msgid "ANTARES"
 msgstr "АНТАРЕС"
 
-#: astrobase.py:299
+#: astrobase.py:291
 msgid "Arcturus"
 msgstr "Арктур"
 
-#: astrobase.py:299
+#: astrobase.py:291
 msgid "ARCTURUS"
 msgstr "АРКТУР"
 
-#: astrobase.py:300
+#: astrobase.py:292
 msgid "Arkab Posterior"
 msgstr "Аркаб Постериор"
 
-#: astrobase.py:300
+#: astrobase.py:292
 msgid "ARKAB POSTERIOR"
 msgstr "АРКАБ ПОСТЕРИОР"
 
-#: astrobase.py:301
+#: astrobase.py:293
 msgid "Arkab Prior"
 msgstr "Аркаб Приор"
 
-#: astrobase.py:301
+#: astrobase.py:293
 msgid "ARKAB PRIOR"
 msgstr "АРКАБ ПРИОР"
 
-#: astrobase.py:302
+#: astrobase.py:294
 msgid "Arneb"
 msgstr "Арнеб"
 
-#: astrobase.py:302
+#: astrobase.py:294
 msgid "ARNEB"
 msgstr "АРНЕБ"
 
-#: astrobase.py:303
+#: astrobase.py:295
 msgid "Atlas"
 msgstr "Атлас"
 
-#: astrobase.py:303
+#: astrobase.py:295
 msgid "ATLAS"
 msgstr "АТЛАС"
 
-#: astrobase.py:304
+#: astrobase.py:296
 msgid "Atria"
 msgstr "Атрия"
 
-#: astrobase.py:304
+#: astrobase.py:296
 msgid "ATRIA"
 msgstr "АТРИЯ"
 
-#: astrobase.py:305
+#: astrobase.py:297
 msgid "Avior"
 msgstr "Авиор"
 
-#: astrobase.py:305
+#: astrobase.py:297
 msgid "AVIOR"
 msgstr "АВИОР"
 
-#: astrobase.py:306
+#: astrobase.py:298
 msgid "Bellatrix"
 msgstr "Беллатрикс"
 
-#: astrobase.py:306
+#: astrobase.py:298
 msgid "BELLATRIX"
 msgstr "БЕЛЛАТРИКС"
 
-#: astrobase.py:307
+#: astrobase.py:299
 msgid "Betelgeuse"
 msgstr "Бетельгейзе"
 
-#: astrobase.py:307
+#: astrobase.py:299
 msgid "BETELGEUSE"
 msgstr "БЕТЕЛЬГЕЙЗЕ"
 
-#: astrobase.py:308
+#: astrobase.py:300
 msgid "Canopus"
 msgstr "Канопус"
 
-#: astrobase.py:308
+#: astrobase.py:300
 msgid "CANOPUS"
 msgstr "КАНОПУС"
 
-#: astrobase.py:309
+#: astrobase.py:301
 msgid "Capella"
 msgstr "Капелла"
 
-#: astrobase.py:309
+#: astrobase.py:301
 msgid "CAPELLA"
 msgstr "КАПЕЛЛА"
 
-#: astrobase.py:310
+#: astrobase.py:302
 msgid "Caph"
 msgstr "Каф"
 
-#: astrobase.py:310
+#: astrobase.py:302
 msgid "CAPH"
 msgstr "КАФ"
 
-#: astrobase.py:311
+#: astrobase.py:303
 msgid "Castor"
 msgstr "Кастор"
 
-#: astrobase.py:311
+#: astrobase.py:303
 msgid "CASTOR"
 msgstr "КАСТОР"
 
-#: astrobase.py:312
+#: astrobase.py:304
 msgid "Cebalrai"
 msgstr "Цельбальрай"
 
-#: astrobase.py:312
+#: astrobase.py:304
 msgid "CEBALRAI"
 msgstr "ЦЕЛЬБАЛЬРАЙ"
 
-#: astrobase.py:313
+#: astrobase.py:305
 msgid "Deneb"
 msgstr "Денеб"
 
-#: astrobase.py:313
+#: astrobase.py:305
 msgid "DENEB"
 msgstr "ДЕНЕБ"
 
-#: astrobase.py:314
+#: astrobase.py:306
 msgid "Denebola"
 msgstr "Денебола"
 
-#: astrobase.py:314
+#: astrobase.py:306
 msgid "DENEBOLA"
 msgstr "ДЕНЕБОЛА"
 
-#: astrobase.py:315
+#: astrobase.py:307
 msgid "Diphda"
 msgstr "Дифда"
 
-#: astrobase.py:315
+#: astrobase.py:307
 msgid "DIPHDA"
 msgstr "ДИФДА"
 
-#: astrobase.py:316
+#: astrobase.py:308
 msgid "Dubhe"
 msgstr "Дубхе"
 
-#: astrobase.py:316
+#: astrobase.py:308
 msgid "DUBHE"
 msgstr "ДУБХЕ"
 
-#: astrobase.py:317
+#: astrobase.py:309
 msgid "Electra"
 msgstr "Электра"
 
-#: astrobase.py:317
+#: astrobase.py:309
 msgid "ELECTRA"
 msgstr "ЭЛЕКТРА"
 
-#: astrobase.py:318
+#: astrobase.py:310
 msgid "Elnath"
 msgstr "Нат"
 
-#: astrobase.py:318
+#: astrobase.py:310
 msgid "ELNATH"
 msgstr "НАТ"
 
-#: astrobase.py:319
+#: astrobase.py:311
 msgid "Eltanin"
 msgstr "Этамин"
 
-#: astrobase.py:319
+#: astrobase.py:311
 msgid "ELTANIN"
 msgstr "ЭТАМИН"
 
-#: astrobase.py:320
+#: astrobase.py:312
 msgid "Enif"
 msgstr "Эниф"
 
-#: astrobase.py:320
+#: astrobase.py:312
 msgid "ENIF"
 msgstr "ЭНИФ"
 
-#: astrobase.py:321
+#: astrobase.py:313
 msgid "Fomalhaut"
 msgstr "Фомальгаут"
 
-#: astrobase.py:321
+#: astrobase.py:313
 msgid "FOMALHAUT"
 msgstr "ФОМАЛЬГАУТ"
 
-#: astrobase.py:322
+#: astrobase.py:314
 msgid "Gacrux"
 msgstr "Гакрукс"
 
-#: astrobase.py:322
+#: astrobase.py:314
 msgid "GACRUX"
 msgstr "ГАКРУКС"
 
-#: astrobase.py:323
+#: astrobase.py:315
 msgid "Gienah"
 msgstr "Дженах"
 
-#: astrobase.py:323
+#: astrobase.py:315
 msgid "GIENAH"
 msgstr "ДЖЕНАХ"
 
-#: astrobase.py:324
+#: astrobase.py:316
 msgid "Hadar"
 msgstr "Хадар"
 
-#: astrobase.py:324
+#: astrobase.py:316
 msgid "HADAR"
 msgstr "ХАДАР"
 
-#: astrobase.py:325
+#: astrobase.py:317
 msgid "Hamal"
 msgstr "Хамаль"
 
-#: astrobase.py:325
+#: astrobase.py:317
 msgid "HAMAL"
 msgstr "ХАМАЛЬ"
 
-#: astrobase.py:326
+#: astrobase.py:318
 msgid "Izar"
 msgstr "Ицар"
 
-#: astrobase.py:326
+#: astrobase.py:318
 msgid "IZAR"
 msgstr "ИЦАР"
 
-#: astrobase.py:327
+#: astrobase.py:319
 msgid "Kaus Australis"
 msgstr "Каус Аустралис"
 
-#: astrobase.py:327
+#: astrobase.py:319
 msgid "KAUS AUSTRALIS"
 msgstr "КАУС АУСТРАЛИС"
 
-#: astrobase.py:328
+#: astrobase.py:320
 msgid "Kochab"
 msgstr "Кохаб"
 
-#: astrobase.py:328
+#: astrobase.py:320
 msgid "KOCHAB"
 msgstr "КОХАБ"
 
-#: astrobase.py:329
+#: astrobase.py:321
 msgid "Maia"
 msgstr "Майя"
 
-#: astrobase.py:329
+#: astrobase.py:321
 msgid "MAIA"
 msgstr "МАЙЯ"
 
-#: astrobase.py:330
+#: astrobase.py:322
 msgid "Markab"
 msgstr "Маркаб"
 
-#: astrobase.py:330
+#: astrobase.py:322
 msgid "MARKAB"
 msgstr "МАРКАБ"
 
-#: astrobase.py:331
+#: astrobase.py:323
 msgid "Megrez"
 msgstr "Мегрец"
 
-#: astrobase.py:331
+#: astrobase.py:323
 msgid "MEGREZ"
 msgstr "МЕГРЕЦ"
 
-#: astrobase.py:332
+#: astrobase.py:324
 msgid "Menkalinan"
 msgstr "Менкалинан"
 
-#: astrobase.py:332
+#: astrobase.py:324
 msgid "MENKALINAN"
 msgstr "МЕНКАЛИНАН"
 
-#: astrobase.py:333
+#: astrobase.py:325
 msgid "Menkar"
 msgstr "Менкар"
 
-#: astrobase.py:333
+#: astrobase.py:325
 msgid "MENKAR"
 msgstr "МЕНКАР"
 
-#: astrobase.py:334
+#: astrobase.py:326
 msgid "Menkent"
 msgstr "Менкент"
 
-#: astrobase.py:334
+#: astrobase.py:326
 msgid "MENKENT"
 msgstr "МЕНКЕНТ"
 
-#: astrobase.py:335
+#: astrobase.py:327
 msgid "Merak"
 msgstr "Мерак"
 
-#: astrobase.py:335
+#: astrobase.py:327
 msgid "MERAK"
 msgstr "МЕРАК"
 
-#: astrobase.py:336
+#: astrobase.py:328
 msgid "Merope"
 msgstr "Меропа"
 
-#: astrobase.py:336
+#: astrobase.py:328
 msgid "MEROPE"
 msgstr "МЕРОПА"
 
-#: astrobase.py:337
+#: astrobase.py:329
 msgid "Miaplacidus"
 msgstr "Миаплацидус"
 
-#: astrobase.py:337
+#: astrobase.py:329
 msgid "MIAPLACIDUS"
 msgstr "МИАПЛАЦИДУС"
 
-#: astrobase.py:338
+#: astrobase.py:330
 msgid "Mimosa"
 msgstr "Мимоза"
 
-#: astrobase.py:338
+#: astrobase.py:330
 msgid "MIMOSA"
 msgstr "МИМОЗА"
 
-#: astrobase.py:339
+#: astrobase.py:331
 msgid "Mintaka"
 msgstr "Минтака"
 
-#: astrobase.py:339
+#: astrobase.py:331
 msgid "MINTAKA"
 msgstr "МИНТАКА"
 
-#: astrobase.py:340
+#: astrobase.py:332
 msgid "Mirach"
 msgstr "Мирах"
 
-#: astrobase.py:340
+#: astrobase.py:332
 msgid "MIRACH"
 msgstr "МИРАХ"
 
-#: astrobase.py:341
+#: astrobase.py:333
 msgid "Mirfak"
 msgstr "Мирфак"
 
-#: astrobase.py:341
+#: astrobase.py:333
 msgid "MIRFAK"
 msgstr "МИРФАК"
 
-#: astrobase.py:342
+#: astrobase.py:334
 msgid "Mirzam"
 msgstr "Мирцам"
 
-#: astrobase.py:342
+#: astrobase.py:334
 msgid "MIRZAM"
 msgstr "МИРЦАМ"
 
-#: astrobase.py:343
+#: astrobase.py:335
 msgid "Mizar"
 msgstr "Мицар"
 
-#: astrobase.py:343
+#: astrobase.py:335
 msgid "MIZAR"
 msgstr "МИЦАР"
 
-#: astrobase.py:344
+#: astrobase.py:336
 msgid "Naos"
 msgstr "Наос"
 
-#: astrobase.py:344
+#: astrobase.py:336
 msgid "NAOS"
 msgstr "НАОС"
 
-#: astrobase.py:345
+#: astrobase.py:337
 msgid "Nihal"
 msgstr "Нихал"
 
-#: astrobase.py:345
+#: astrobase.py:337
 msgid "NIHAL"
 msgstr "НИХАЛ"
 
-#: astrobase.py:346
+#: astrobase.py:338
 msgid "Nunki"
 msgstr "Нунки"
 
-#: astrobase.py:346
+#: astrobase.py:338
 msgid "NUNKI"
 msgstr "НУНКИ"
 
-#: astrobase.py:347
+#: astrobase.py:339
 msgid "Peacock"
 msgstr "Пикок"
 
-#: astrobase.py:347
+#: astrobase.py:339
 msgid "PEACOCK"
 msgstr "ПИКОК"
 
-#: astrobase.py:348
+#: astrobase.py:340
 msgid "Phecda"
 msgstr "Фекда"
 
-#: astrobase.py:348
+#: astrobase.py:340
 msgid "PHECDA"
 msgstr "ФЕКДА"
 
-#: astrobase.py:349
+#: astrobase.py:341
 msgid "Polaris"
 msgstr "Полярная звезда"
 
-#: astrobase.py:349
+#: astrobase.py:341
 msgid "POLARIS"
 msgstr "ПОЛЯРНАЯ ЗВЕЗДА"
 
-#: astrobase.py:350
+#: astrobase.py:342
 msgid "Pollux"
 msgstr "Поллукс"
 
-#: astrobase.py:350
+#: astrobase.py:342
 msgid "POLLUX"
 msgstr "ПОЛЛУКС"
 
-#: astrobase.py:351
+#: astrobase.py:343
 msgid "Procyon"
 msgstr "Процион"
 
-#: astrobase.py:351
+#: astrobase.py:343
 msgid "PROCYON"
 msgstr "ПРОЦИОН"
 
-#: astrobase.py:352
+#: astrobase.py:344
 msgid "Rasalgethi"
 msgstr "Рас Альгети"
 
-#: astrobase.py:352
+#: astrobase.py:344
 msgid "RASALGETHI"
 msgstr "РАС АЛЬГЕТИ"
 
-#: astrobase.py:353
+#: astrobase.py:345
 msgid "Rasalhague"
 msgstr "Расальхаг"
 
-#: astrobase.py:353
+#: astrobase.py:345
 msgid "RASALHAGUE"
 msgstr "РАСАЛЬХАГ"
 
-#: astrobase.py:354
+#: astrobase.py:346
 msgid "Regulus"
 msgstr "Регул"
 
-#: astrobase.py:354
+#: astrobase.py:346
 msgid "REGULUS"
 msgstr "РЕГУЛ"
 
-#: astrobase.py:355
+#: astrobase.py:347
 msgid "Rigel"
 msgstr "Ригель"
 
-#: astrobase.py:355
+#: astrobase.py:347
 msgid "RIGEL"
 msgstr "РИГЕЛЬ"
 
-#: astrobase.py:356
+#: astrobase.py:348
 msgid "Rigil Kentaurus"
 msgstr "Ригель Кентаурус"
 
-#: astrobase.py:356
+#: astrobase.py:348
 msgid "RIGIL KENTAURUS"
 msgstr "РИГЕЛЬ КЕНТАУРУС"
 
-#: astrobase.py:357
+#: astrobase.py:349
 msgid "Rukbat"
 msgstr "Рукбат"
 
-#: astrobase.py:357
+#: astrobase.py:349
 msgid "RUKBAT"
 msgstr "РУКБАТ"
 
-#: astrobase.py:358
+#: astrobase.py:350
 msgid "Sabik"
 msgstr "Сабик"
 
-#: astrobase.py:358
+#: astrobase.py:350
 msgid "SABIK"
 msgstr "САБИК"
 
-#: astrobase.py:359
+#: astrobase.py:351
 msgid "Sadalmelik"
 msgstr "Садальмелик"
 
-#: astrobase.py:359
+#: astrobase.py:351
 msgid "SADALMELIK"
 msgstr "САДАЛЬМЕЛИК"
 
-#: astrobase.py:360
+#: astrobase.py:352
 msgid "Sadr"
 msgstr "Садр"
 
-#: astrobase.py:360
+#: astrobase.py:352
 msgid "SADR"
 msgstr "САДР"
 
-#: astrobase.py:361
+#: astrobase.py:353
 msgid "Saiph"
 msgstr "Саиф"
 
-#: astrobase.py:361
+#: astrobase.py:353
 msgid "SAIPH"
 msgstr "САИФ"
 
-#: astrobase.py:362
+#: astrobase.py:354
 msgid "Scheat"
 msgstr "Шеат"
 
-#: astrobase.py:362
+#: astrobase.py:354
 msgid "SCHEAT"
 msgstr "ШЕАТ"
 
-#: astrobase.py:363
+#: astrobase.py:355
 msgid "Schedar"
 msgstr "Шедар"
 
-#: astrobase.py:363
+#: astrobase.py:355
 msgid "SCHEDAR"
 msgstr "ШЕДАР"
 
-#: astrobase.py:364
+#: astrobase.py:356
 msgid "Shaula"
 msgstr "Шаула"
 
-#: astrobase.py:364
+#: astrobase.py:356
 msgid "SHAULA"
 msgstr "ШАУЛА"
 
-#: astrobase.py:365
+#: astrobase.py:357
 msgid "Sheliak"
 msgstr "Шелиак"
 
-#: astrobase.py:365
+#: astrobase.py:357
 msgid "SHELIAK"
 msgstr "ШЕЛИАК"
 
-#: astrobase.py:366
+#: astrobase.py:358
 msgid "Sirius"
 msgstr "Сириус"
 
-#: astrobase.py:366
+#: astrobase.py:358
 msgid "SIRIUS"
 msgstr "СИРИУС"
 
-#: astrobase.py:367
+#: astrobase.py:359
 msgid "Spica"
 msgstr "Спика"
 
-#: astrobase.py:367
+#: astrobase.py:359
 msgid "SPICA"
 msgstr "СПИКА"
 
-#: astrobase.py:368
+#: astrobase.py:360
 msgid "Suhail"
 msgstr "Сухайль"
 
-#: astrobase.py:368
+#: astrobase.py:360
 msgid "SUHAIL"
 msgstr "СУХАЙЛЬ"
 
-#: astrobase.py:369
+#: astrobase.py:361
 msgid "Sulafat"
 msgstr "Сулафат"
 
-#: astrobase.py:369
+#: astrobase.py:361
 msgid "SULAFAT"
 msgstr "СУЛАФАТ"
 
-#: astrobase.py:370
+#: astrobase.py:362
 msgid "Tarazed"
 msgstr "Таразед"
 
-#: astrobase.py:370
+#: astrobase.py:362
 msgid "TARAZED"
 msgstr "ТАРАЗЕД"
 
-#: astrobase.py:371
+#: astrobase.py:363
 msgid "Taygeta"
 msgstr "Тайгета"
 
-#: astrobase.py:371
+#: astrobase.py:363
 msgid "TAYGETA"
 msgstr "ТАЙГЕТА"
 
-#: astrobase.py:372
+#: astrobase.py:364
 msgid "Thuban"
 msgstr "Тубан"
 
-#: astrobase.py:372
+#: astrobase.py:364
 msgid "THUBAN"
 msgstr "ТУБАН"
 
-#: astrobase.py:373
+#: astrobase.py:365
 msgid "Unukalhai"
 msgstr "Унукалхай"
 
-#: astrobase.py:373
+#: astrobase.py:365
 msgid "UNUKALHAI"
 msgstr "УНУКАЛХАЙ"
 
-#: astrobase.py:374
+#: astrobase.py:366
 msgid "Vega"
 msgstr "Вега"
 
-#: astrobase.py:374
+#: astrobase.py:366
 msgid "VEGA"
 msgstr "ВЕГА"
 
-#: astrobase.py:375
+#: astrobase.py:367
 msgid "Vindemiatrix"
 msgstr "Виндемиатрикс"
 
-#: astrobase.py:375
+#: astrobase.py:367
 msgid "VINDEMIATRIX"
 msgstr "ВИНДЕМИАТРИКС"
 
-#: astrobase.py:376
+#: astrobase.py:368
 msgid "Wezen"
 msgstr "Везен"
 
-#: astrobase.py:376
+#: astrobase.py:368
 msgid "WEZEN"
 msgstr "ВЕЗЕН"
 
-#: astrobase.py:377
+#: astrobase.py:369
 msgid "Zaurak"
 msgstr "Заурак"
 
-#: astrobase.py:377
+#: astrobase.py:369
 msgid "ZAURAK"
 msgstr "ЗАУРАК"
 
-#: astrobase.py:378
+#: astrobase.py:370
 msgid "Zubenelgenubi"
 msgstr "Зубен Эльгенуби"
 
-#: astrobase.py:378
+#: astrobase.py:370
 msgid "ZUBENELGENUBI"
 msgstr "ЗУБЕН ЭЛЬГЕНУБИ"
 
-#: astrobase.py:391
+#: astrobase.py:383
 msgid "NAME"
 msgstr "НАЗВАНИЕ"
 
-#: astrobase.py:392
+#: astrobase.py:384
 msgid "NUMBER"
 msgstr "НОМЕР"
 
-#: astrobase.py:394
+#: astrobase.py:386
 msgid "INTERNATIONAL DESIGNATOR"
 msgstr "МЕЖДУНАРОДНОЕ ОБОЗНАЧЕНИЕ"
 
-#: astrobase.py:396
+#: astrobase.py:388
 msgid "RISE TIME"
 msgstr "ВРЕМЯ ВОСХОДА"
 
-#: astrobase.py:398
+#: astrobase.py:390
 msgid "SET TIME"
 msgstr "ВРЕМЯ ЗАХОДА"
 
-#: eclipse.py:225
+#: eclipse.py:229
 msgid "Annular"
 msgstr "Кольцеобразное"
 
-#: eclipse.py:228
+#: eclipse.py:232
 msgid "Hybrid (Annular/Total)"
 msgstr "Кольцеобразно-полное"
 
-#: eclipse.py:231
+#: eclipse.py:235
 msgid "Partial"
 msgstr "Частное"
 
-#: eclipse.py:234
+#: eclipse.py:238
 msgid "Penumbral"
 msgstr "Полутеневое"
 
-#: eclipse.py:237
+#: eclipse.py:241
 msgid "Total"
 msgstr "Полное"
 
-#: indicatorlunar.py:58
+#: indicatorlunar.py:53
 msgid "Indicator Lunar"
 msgstr "Лунный индикатор"
 
-#: indicatorlunar.py:180
+#: indicatorlunar.py:172
 msgid "Rise Time: "
 msgstr "Время восхода: "
 
-#: indicatorlunar.py:182
+#: indicatorlunar.py:174
 msgid "Rise Azimuth: "
 msgstr "Азимут восхода: "
 
-#: indicatorlunar.py:184
+#: indicatorlunar.py:176
 msgid "Set Time: "
 msgstr "Время захода: "
 
-#: indicatorlunar.py:186
+#: indicatorlunar.py:178
 msgid "Set Azimuth: "
 msgstr "Азимут захода: "
 
-#: indicatorlunar.py:193
+#: indicatorlunar.py:185
 #, fuzzy
 msgid "now rising..."
 msgstr " восходит"
 
-#: indicatorlunar.py:218
+#: indicatorlunar.py:210
 msgid "                                          ...werewolves about ! ! !"
 msgstr "                                 ...кругом оборотни ! ! !"
 
-#: indicatorlunar.py:219
+#: indicatorlunar.py:211
 msgid "W  A  R  N  I  N  G"
 msgstr "Т  Р  Е  В  О  Г  А"
 
-#: indicatorlunar.py:225
+#: indicatorlunar.py:217
 #, fuzzy
 msgid ""
 "Displays lunar, solar, planetary, minor planet,\n"
@@ -1119,19 +1119,19 @@ msgstr ""
 "Показывает сведения о Луне, Солнце, планетах, малых планетах, кометах, "
 "звёздах и спутниках Земли."
 
-#: indicatorlunar.py:701 indicatorlunar.py:2229
+#: indicatorlunar.py:700 indicatorlunar.py:2278
 msgid "Planets"
 msgstr "Планеты"
 
-#: indicatorlunar.py:708 indicatorlunar.py:2265
+#: indicatorlunar.py:707 indicatorlunar.py:2314
 msgid "Minor Planets"
 msgstr "Малые планеты"
 
-#: indicatorlunar.py:715 indicatorlunar.py:2282
+#: indicatorlunar.py:714 indicatorlunar.py:2331
 msgid "Comets"
 msgstr "Кометы"
 
-#: indicatorlunar.py:722 indicatorlunar.py:2311
+#: indicatorlunar.py:721 indicatorlunar.py:2360
 msgid "Stars"
 msgstr "Звёзды"
 
@@ -1163,88 +1163,88 @@ msgstr "Новолуние: "
 msgid "Third Quarter: "
 msgstr "Последняя четверть: "
 
-#: indicatorlunar.py:1033
+#: indicatorlunar.py:1038
 msgid "Sun"
 msgstr "Солнце"
 
-#: indicatorlunar.py:1041
+#: indicatorlunar.py:1046
 msgid "Equinox: "
 msgstr "Равноденствие: "
 
-#: indicatorlunar.py:1048
+#: indicatorlunar.py:1053
 msgid "Solstice: "
 msgstr "Солнцестояние: "
 
-#: indicatorlunar.py:1107
+#: indicatorlunar.py:1117
 msgid "Eclipse"
 msgstr "Затмение"
 
-#: indicatorlunar.py:1115 indicatorlunar.py:1743 indicatorlunar.py:1777
+#: indicatorlunar.py:1125 indicatorlunar.py:1776 indicatorlunar.py:1810
 msgid "Date/Time: "
 msgstr "Дата/Время: "
 
-#: indicatorlunar.py:1127
+#: indicatorlunar.py:1137
 msgid "Type: "
 msgstr "Тип: "
 
-#: indicatorlunar.py:1152
+#: indicatorlunar.py:1167
 msgid "Latitude/Longitude: "
 msgstr "Широта/Долгота: "
 
-#: indicatorlunar.py:1499
+#: indicatorlunar.py:1518
 msgid "Rise: "
 msgstr "Восход: "
 
-#: indicatorlunar.py:1510 indicatorlunar.py:1708 indicatorlunar.py:1756
-#: indicatorlunar.py:1790
+#: indicatorlunar.py:1529 indicatorlunar.py:1741 indicatorlunar.py:1789
+#: indicatorlunar.py:1823
 msgid "Azimuth: "
 msgstr "Азимут: "
 
-#: indicatorlunar.py:1520 indicatorlunar.py:1721
+#: indicatorlunar.py:1539 indicatorlunar.py:1754
 msgid "Altitude: "
 msgstr "Высота: "
 
-#: indicatorlunar.py:1531
+#: indicatorlunar.py:1550
 msgid "Set: "
 msgstr "Заход: "
 
-#: indicatorlunar.py:1642 indicatorlunar.py:2409
+#: indicatorlunar.py:1674 indicatorlunar.py:2458
 msgid "Satellites"
 msgstr "Спутники"
 
-#: indicatorlunar.py:1653
+#: indicatorlunar.py:1686
 msgid "Satellites (Polar)"
 msgstr "Спутники (полярные)"
 
-#: indicatorlunar.py:1694
+#: indicatorlunar.py:1727
 msgid "Rise Date/Time: "
 msgstr "Дата/Время восхода: "
 
-#: indicatorlunar.py:1730
+#: indicatorlunar.py:1763
 msgid "Rise"
 msgstr "Восход"
 
-#: indicatorlunar.py:1764
+#: indicatorlunar.py:1797
 msgid "Set"
 msgstr "Заход"
 
-#: indicatorlunar.py:1849
+#: indicatorlunar.py:1882
 msgid "S"
 msgstr "Ю"
 
-#: indicatorlunar.py:1852
+#: indicatorlunar.py:1885
 msgid "N"
 msgstr "С"
 
-#: indicatorlunar.py:1857
+#: indicatorlunar.py:1890
 msgid "E"
 msgstr "В"
 
-#: indicatorlunar.py:1860
+#: indicatorlunar.py:1893
 msgid "W"
 msgstr "З"
 
-#: indicatorlunar.py:2001
+#: indicatorlunar.py:2050
 #, fuzzy
 msgid ""
 "The text shown next to the indicator icon,\n"
@@ -1287,41 +1287,41 @@ msgstr ""
 "Если такая метка заключена в скобки { }, метка будет\n"
 "удалена с панели вместе со связанным текстом."
 
-#: indicatorlunar.py:2018
+#: indicatorlunar.py:2067
 msgid "Icon Text"
 msgstr "Текст возле значка"
 
-#: indicatorlunar.py:2026
+#: indicatorlunar.py:2075
 msgid "The separator will be added between pairs of { }."
 msgstr "Разделитель, добавляемый между парами скобок { }."
 
-#: indicatorlunar.py:2031
+#: indicatorlunar.py:2080
 msgid "Separator"
 msgstr "Разделитель"
 
-#: indicatorlunar.py:2060
+#: indicatorlunar.py:2109
 msgid "Tag"
 msgstr "Метка"
 
-#: indicatorlunar.py:2061
+#: indicatorlunar.py:2110
 msgid "Value"
 msgstr "Значение"
 
-#: indicatorlunar.py:2075
+#: indicatorlunar.py:2124
 msgid "Double click to add a tag to the icon text."
 msgstr ""
 "Щёлкните дважды, чтобы добавить метку\n"
 "к тексту на панели."
 
-#: indicatorlunar.py:2083
+#: indicatorlunar.py:2132
 msgid "Icon"
 msgstr "Значок"
 
-#: indicatorlunar.py:2090
+#: indicatorlunar.py:2139
 msgid "Show rise when set is before sunset"
 msgstr ""
 
-#: indicatorlunar.py:2092
+#: indicatorlunar.py:2141
 #, fuzzy
 msgid ""
 "If a body sets before sunset,\n"
@@ -1331,11 +1331,11 @@ msgstr ""
 "Если стоит отметка, то все объекты ниже горизонта\n"
 "будут скрыты (исключая спутники)."
 
-#: indicatorlunar.py:2101
+#: indicatorlunar.py:2150
 msgid "Hide bodies below the horizon"
 msgstr "Скрыть объекты, находящиеся ниже горизонта"
 
-#: indicatorlunar.py:2103
+#: indicatorlunar.py:2152
 #, fuzzy
 msgid ""
 "Hide a body if it is yet to rise\n"
@@ -1344,47 +1344,47 @@ msgstr ""
 "Если стоит отметка, то все объекты ниже горизонта\n"
 "будут скрыты (исключая спутники)."
 
-#: indicatorlunar.py:2116
+#: indicatorlunar.py:2165
 msgid ""
 "A body with a fainter magnitude will be hidden\n"
 "(excludes satellites)."
 msgstr ""
 
-#: indicatorlunar.py:2123
+#: indicatorlunar.py:2172
 msgid "Hide bodies fainter than magnitude"
 msgstr "Скрыть объекты с величиной, меньшей, чем"
 
-#: indicatorlunar.py:2133
+#: indicatorlunar.py:2182
 msgid "Add new minor planets"
 msgstr "Добавить новые малые планеты"
 
-#: indicatorlunar.py:2134
+#: indicatorlunar.py:2183
 #, fuzzy
 msgid "All minor planets are automatically added."
 msgstr "Если стоит отметка, то будут добавлены все малые планеты."
 
-#: indicatorlunar.py:2142
+#: indicatorlunar.py:2191
 msgid "Add new comets"
 msgstr "Добавить новые кометы"
 
-#: indicatorlunar.py:2143
+#: indicatorlunar.py:2192
 msgid "All comets are automatically added."
 msgstr ""
 
-#: indicatorlunar.py:2151
+#: indicatorlunar.py:2200
 msgid "Add new satellites"
 msgstr "Добавить новые спутники"
 
-#: indicatorlunar.py:2152
+#: indicatorlunar.py:2201
 #, fuzzy
 msgid "All satellites are automatically added."
 msgstr "Если стоит отметка, то будут добавлены все спутники."
 
-#: indicatorlunar.py:2160
+#: indicatorlunar.py:2209
 msgid "Sort satellites by rise date/time"
 msgstr "Сортировать спутники по моменту восхода"
 
-#: indicatorlunar.py:2162
+#: indicatorlunar.py:2211
 #, fuzzy
 msgid ""
 "If checked, satellites are sorted\n"
@@ -1399,27 +1399,27 @@ msgstr ""
 "Иначе спутники будут отсортированы\n"
 "по названию, а затем по номеру."
 
-#: indicatorlunar.py:2178
+#: indicatorlunar.py:2227
 msgid "Show satellite passes after this hour (inclusive)"
 msgstr "Отображать пролёты спутников, начиная с этого часа (включительно)"
 
-#: indicatorlunar.py:2187
+#: indicatorlunar.py:2236
 msgid "Show satellite passes before this hour (inclusive)"
 msgstr "Отображать пролёты спутников, заканчивая этим часом (включительно)"
 
-#: indicatorlunar.py:2193
+#: indicatorlunar.py:2242
 msgid "Show satellites passes from"
 msgstr "Отображать пролёты спутников с"
 
-#: indicatorlunar.py:2199
+#: indicatorlunar.py:2248
 msgid "to"
 msgstr "до"
 
-#: indicatorlunar.py:2208
+#: indicatorlunar.py:2257
 msgid "Menu"
 msgstr "Меню"
 
-#: indicatorlunar.py:2231
+#: indicatorlunar.py:2280
 #, fuzzy
 msgid ""
 "Check a planet to display in the menu.\n"
@@ -1430,7 +1430,7 @@ msgstr ""
 "Щелчок по заголовку первого столбца\n"
 "включит все отметки."
 
-#: indicatorlunar.py:2253
+#: indicatorlunar.py:2302
 #, fuzzy
 msgid ""
 "Check a minor planet to display in the menu.\n"
@@ -1441,7 +1441,7 @@ msgstr ""
 "Щелчок по заголовку первого столбца\n"
 "включит все отметки."
 
-#: indicatorlunar.py:2257
+#: indicatorlunar.py:2306
 msgid ""
 "Minor planet data is unavailable;\n"
 "the source could not be reached,\n"
@@ -1453,7 +1453,7 @@ msgstr ""
 "из источника, либо звёздная величина всех объектов\n"
 "превышает заданную."
 
-#: indicatorlunar.py:2284
+#: indicatorlunar.py:2333
 #, fuzzy
 msgid ""
 "Check a comet to display in the menu.\n"
@@ -1464,7 +1464,7 @@ msgstr ""
 "Щелчок по заголовку первого столбца\n"
 "включит все отметки."
 
-#: indicatorlunar.py:2288
+#: indicatorlunar.py:2337
 msgid ""
 "Comet data is unavailable; the source\n"
 "could not be reached, or no data was\n"
@@ -1476,7 +1476,7 @@ msgstr ""
 "получить из источника, либо звёздная величина\n"
 "всех объектов превышает заданную."
 
-#: indicatorlunar.py:2313
+#: indicatorlunar.py:2362
 #, fuzzy
 msgid ""
 "Check a star to display in the menu.\n"
@@ -1487,23 +1487,23 @@ msgstr ""
 "Щелчок по заголовку первого столбца\n"
 "включит все отметки."
 
-#: indicatorlunar.py:2328
+#: indicatorlunar.py:2377
 msgid "Natural Bodies"
 msgstr "Природные объекты"
 
-#: indicatorlunar.py:2357
+#: indicatorlunar.py:2406
 msgid "Name"
 msgstr "Название"
 
-#: indicatorlunar.py:2358
+#: indicatorlunar.py:2407
 msgid "Number"
 msgstr "Номер"
 
-#: indicatorlunar.py:2359
+#: indicatorlunar.py:2408
 msgid "International Designator"
 msgstr "Международное обозначение"
 
-#: indicatorlunar.py:2392
+#: indicatorlunar.py:2441
 #, fuzzy
 msgid ""
 "Check a satellite to display in the menu.\n"
@@ -1514,7 +1514,7 @@ msgstr ""
 "Щелчок по заголовку первого столбца\n"
 "включит все отметки."
 
-#: indicatorlunar.py:2396
+#: indicatorlunar.py:2445
 #, fuzzy
 msgid ""
 "Satellite data is unavailable;\n"
@@ -1525,11 +1525,11 @@ msgstr ""
 "источник данных, либо данные невозможно\n"
 "получить из источника."
 
-#: indicatorlunar.py:2413
+#: indicatorlunar.py:2462
 msgid "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD"
 msgstr "Справка по форматированию: https://wiki.ubuntu.com/NotifyOSD"
 
-#: indicatorlunar.py:2457
+#: indicatorlunar.py:2506
 msgid ""
 "The summary for the satellite rise notification.\n"
 "\n"
@@ -1541,7 +1541,7 @@ msgstr ""
 "Доступные метки:\n"
 "\t"
 
-#: indicatorlunar.py:2462
+#: indicatorlunar.py:2511
 msgid ""
 "The message for the satellite rise notification.\n"
 "\n"
@@ -1553,43 +1553,43 @@ msgstr ""
 "Доступные метки:\n"
 "\t"
 
-#: indicatorlunar.py:2470
+#: indicatorlunar.py:2519
 msgid "Satellite rise"
 msgstr "Восход спутника"
 
-#: indicatorlunar.py:2471
+#: indicatorlunar.py:2520
 msgid "Screen notification when a satellite rises above the horizon."
 msgstr "Всплывающее сообщение при восходе спутника над горизонтом."
 
-#: indicatorlunar.py:2473 indicatorlunar.py:2490
+#: indicatorlunar.py:2522 indicatorlunar.py:2539
 msgid "Summary"
 msgstr "Заголовок"
 
-#: indicatorlunar.py:2476 indicatorlunar.py:2493
+#: indicatorlunar.py:2525 indicatorlunar.py:2542
 msgid "Message"
 msgstr "Сообщение"
 
-#: indicatorlunar.py:2479 indicatorlunar.py:2497
+#: indicatorlunar.py:2528 indicatorlunar.py:2546
 msgid "Test"
 msgstr "Тест"
 
-#: indicatorlunar.py:2480 indicatorlunar.py:2498
+#: indicatorlunar.py:2529 indicatorlunar.py:2547
 msgid "Show the notification using the current summary/message."
 msgstr ""
 "Показать всплывающее сообщение\n"
 "с заданным заголовком/текстом."
 
-#: indicatorlunar.py:2487
+#: indicatorlunar.py:2536
 msgid "Werewolf warning"
 msgstr "Предостережение про оборотней"
 
-#: indicatorlunar.py:2488 indicatorlunar.py:2492
+#: indicatorlunar.py:2537 indicatorlunar.py:2541
 msgid "Hourly screen notification leading up to full moon."
 msgstr ""
 "Ежечасное всплывающее сообщение\n"
 "при приближении к полнолунию."
 
-#: indicatorlunar.py:2495
+#: indicatorlunar.py:2544
 msgid ""
 "The message for the werewolf notification.\n"
 "\n"
@@ -1597,11 +1597,11 @@ msgstr ""
 "Текст всплывающего сообщения про оборотней.\n"
 "\n"
 
-#: indicatorlunar.py:2504
+#: indicatorlunar.py:2553
 msgid "Notifications"
 msgstr "Уведомления"
 
-#: indicatorlunar.py:2518
+#: indicatorlunar.py:2567
 msgid ""
 "Choose a city from the list.\n"
 "Or, add in your own city name."
@@ -1609,58 +1609,58 @@ msgstr ""
 "Выберите город из списка. Или\n"
 "добавьте желаемое название города."
 
-#: indicatorlunar.py:2525
+#: indicatorlunar.py:2574
 msgid "City"
 msgstr "Город"
 
-#: indicatorlunar.py:2534
+#: indicatorlunar.py:2583
 msgid "Latitude of your location in decimal degrees."
 msgstr "Широта вашей местности в десятичных градусах."
 
-#: indicatorlunar.py:2539
+#: indicatorlunar.py:2588
 msgid "Latitude"
 msgstr "Широта"
 
-#: indicatorlunar.py:2548
+#: indicatorlunar.py:2597
 msgid "Longitude of your location in decimal degrees."
 msgstr "Долгота вашей местности в десятичных градусах."
 
-#: indicatorlunar.py:2553
+#: indicatorlunar.py:2602
 msgid "Longitude"
 msgstr "Долгота"
 
-#: indicatorlunar.py:2561
+#: indicatorlunar.py:2610
 msgid "Height in metres above sea level."
 msgstr "Высота над уровнем моря в метрах."
 
-#: indicatorlunar.py:2566
+#: indicatorlunar.py:2615
 msgid "Elevation"
 msgstr "Высота"
 
-#: indicatorlunar.py:2582
+#: indicatorlunar.py:2631
 msgid "Location"
 msgstr "Расположение"
 
-#: indicatorlunar.py:2592
+#: indicatorlunar.py:2641
 msgid "General"
 msgstr ""
 
-#: indicatorlunar.py:2605
+#: indicatorlunar.py:2654
 msgid "City cannot be empty."
 msgstr "Название города не может быть пустым."
 
-#: indicatorlunar.py:2621
+#: indicatorlunar.py:2670
 msgid "Latitude must be a number between 90 and -90 inclusive."
 msgstr "Широта должна быть числом от -90 до 90 включительно."
 
-#: indicatorlunar.py:2638
+#: indicatorlunar.py:2687
 msgid "Longitude must be a number between 180 and -180 inclusive."
 msgstr "Долгота должна быть числом от -180 до 180 включительно."
 
-#: indicatorlunar.py:2655
+#: indicatorlunar.py:2704
 msgid "Elevation must be a number between 0 and 10000 inclusive."
 msgstr "Высота должна быть числом от 0 до 10000 включительно."
 
-#: indicatorlunar.py:2664
+#: indicatorlunar.py:2718
 msgid "The start hour for satellite passes must be lower than the end hour."
 msgstr "Начальный час для пролётов спутников должен быть меньше конечного."

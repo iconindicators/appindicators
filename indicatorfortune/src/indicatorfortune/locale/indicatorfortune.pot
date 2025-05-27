@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorfortune 1.0.44\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-04-20 23:36+1000\n"
+"POT-Creation-Date: 2025-05-27 12:18+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,113 +15,113 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicatorfortune.py:44
+#: indicatorfortune.py:46
 msgid "Indicator Fortune"
 msgstr ""
 
-#: indicatorfortune.py:62
+#: indicatorfortune.py:66
 msgid "Fortune. . ."
 msgstr ""
 
-#: indicatorfortune.py:67
+#: indicatorfortune.py:77
 msgid ""
 "Calls the 'fortune' program displaying the result\n"
 "in the on-screen notification."
 msgstr ""
 
-#: indicatorfortune.py:88
+#: indicatorfortune.py:98
 msgid "New Fortune"
 msgstr ""
 
-#: indicatorfortune.py:98
+#: indicatorfortune.py:109
 msgid "Copy Last Fortune"
 msgstr ""
 
-#: indicatorfortune.py:109
+#: indicatorfortune.py:121
 msgid "Show Last Fortune"
 msgstr ""
 
-#: indicatorfortune.py:121
+#: indicatorfortune.py:133
 msgid "History"
 msgstr ""
 
-#: indicatorfortune.py:140
+#: indicatorfortune.py:152
 msgid "WARNING. . ."
 msgstr ""
 
-#: indicatorfortune.py:146
+#: indicatorfortune.py:158
 msgid "Ensure enabled fortunes contain data!"
 msgstr ""
 
-#: indicatorfortune.py:164
+#: indicatorfortune.py:176
 msgid "No enabled fortunes have a valid location!"
 msgstr ""
 
-#: indicatorfortune.py:167
+#: indicatorfortune.py:179
 msgid "No fortunes are enabled!"
 msgstr ""
 
-#: indicatorfortune.py:216
+#: indicatorfortune.py:228
 msgid "Fortune History for Session"
 msgstr ""
 
-#: indicatorfortune.py:251
+#: indicatorfortune.py:263
 msgid "Fortune"
 msgstr ""
 
-#: indicatorfortune.py:252
+#: indicatorfortune.py:264
 msgid "Double click to edit a fortune."
 msgstr ""
 
-#: indicatorfortune.py:253
+#: indicatorfortune.py:265
 msgid "Choose a fortune .dat file"
 msgstr ""
 
-#: indicatorfortune.py:254
+#: indicatorfortune.py:266
 msgid "This fortune already exists!"
 msgstr ""
 
-#: indicatorfortune.py:255
+#: indicatorfortune.py:267
 msgid "This is a system fortune and cannot be modified."
 msgstr ""
 
-#: indicatorfortune.py:256
+#: indicatorfortune.py:268
 msgid "Add a new fortune."
 msgstr ""
 
-#: indicatorfortune.py:257
+#: indicatorfortune.py:269
 msgid "Remove the selected fortune."
 msgstr ""
 
-#: indicatorfortune.py:258
+#: indicatorfortune.py:270
 msgid "This is a system fortune and cannot be removed."
 msgstr ""
 
-#: indicatorfortune.py:259
+#: indicatorfortune.py:271
 msgid "Remove the selected fortune?"
 msgstr ""
 
-#: indicatorfortune.py:262
+#: indicatorfortune.py:274
 msgid "Fortunes"
 msgstr ""
 
-#: indicatorfortune.py:272
+#: indicatorfortune.py:284
 msgid "How often a fortune is displayed."
 msgstr ""
 
-#: indicatorfortune.py:274
+#: indicatorfortune.py:286
 msgid "Refresh interval (minutes)"
 msgstr ""
 
-#: indicatorfortune.py:285
+#: indicatorfortune.py:297
 msgid "The summary text for the notification."
 msgstr ""
 
-#: indicatorfortune.py:290
+#: indicatorfortune.py:302
 msgid "Notification summary"
 msgstr ""
 
-#: indicatorfortune.py:301
+#: indicatorfortune.py:313
 msgid ""
 "If the fortune exceeds the limit,\n"
 "a new fortune is created.\n"
@@ -132,30 +132,26 @@ msgid ""
 "'fortune' program."
 msgstr ""
 
-#: indicatorfortune.py:311
+#: indicatorfortune.py:323
 msgid "Message character limit"
 msgstr ""
 
-#: indicatorfortune.py:316
+#: indicatorfortune.py:328
 msgid "Middle mouse click of the icon"
 msgstr ""
 
-#: indicatorfortune.py:332
+#: indicatorfortune.py:344
 msgid "Show a new fortune"
 msgstr ""
 
-#: indicatorfortune.py:340
-msgid "Unsupported on Ubuntun 20.04 on Wayland."
-msgstr ""
-
-#: indicatorfortune.py:350
+#: indicatorfortune.py:359
 msgid "Copy current fortune to clipboard"
 msgstr ""
 
-#: indicatorfortune.py:365
+#: indicatorfortune.py:375
 msgid "Show current fortune"
 msgstr ""
 
-#: indicatorfortune.py:376
+#: indicatorfortune.py:387
 msgid "General"
 msgstr ""
