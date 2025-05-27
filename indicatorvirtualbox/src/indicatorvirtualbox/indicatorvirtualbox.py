@@ -19,9 +19,6 @@
 ''' Application indicator for VirtualBox™ virtual machines. '''
 
 
-#TODO Check that running vboxmanage via the indicator does not block about/preferences.
-
-
 import datetime
 import time
 
