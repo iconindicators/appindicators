@@ -27,15 +27,6 @@ To view the contents of a .tar.gz:
 '''
 
 
-# TODO Work out why packaging is included in the venv_build.
-# Check for when 
-#    doing a build
-#    install via script
-#    run in source
-#    run from installed
-#    where else?
-
-
 #TODO Had a dream/thought...
 # check all usages of PyGObject...
 # For running indicator...
