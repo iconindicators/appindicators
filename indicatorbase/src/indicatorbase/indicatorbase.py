@@ -123,7 +123,7 @@ class IndicatorBase( ABC ):
 
     _EXTENSION_JSON = ".json"
 
-    _LOGGING_INITIALISED = False #TODO Not sure if this stays.
+    _LOGGING_INITIALISED = False
 
     _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ]
     _TERMINALS_AND_EXECUTION_FLAGS.extend( [
@@ -217,7 +217,7 @@ class IndicatorBase( ABC ):
                 TruncatedFileHandler(
                     Path.home() / ( self.indicator_name + ".log" ) ) ] )
 
-        IndicatorBase._LOGGING_INITIALISED = True #TODO Stays?
+        IndicatorBase._LOGGING_INITIALISED = True
 
         self.current_desktop = (
             IndicatorBase.process_run( "echo $XDG_CURRENT_DESKTOP" )[ 0 ] )
