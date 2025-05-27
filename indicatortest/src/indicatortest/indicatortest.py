@@ -464,7 +464,10 @@ class IndicatorTest( IndicatorBase ):
                 command
                 + "; ${SHELL}" + "'" )
 
-            Thread( target = self.process_call, args = ( command_, ) ).start()
+            Thread(
+                target = IndicatorBase.process_run,
+                args = ( command_, ) ).start()
+
             print( "Executing command: " + command_ )
 
 
