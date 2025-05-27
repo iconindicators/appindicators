@@ -227,7 +227,6 @@ def update_locale_source(
     Create the .pot file for indicatorbase, if required, otherwise update.
     Create the .pot file for indicator_name, if required, otherwise update.
     '''
-
     current_year_author = (
         f"{ _get_current_year() } { authors_emails[ 0 ][ 0 ] }" )
 
@@ -271,7 +270,6 @@ def build_locale_for_release(
     For each locale, merge indicatorbase .po to indicator_name .po.
     For each .po, create the .mo.
     '''
-
     directory_indicator_locale = (
         Path( '.' ) / directory_release / indicator_name / "src" / indicator_name / "locale" )
 
