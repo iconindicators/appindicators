@@ -3148,7 +3148,7 @@ class IndicatorBase( ABC ):
             return code
 
         If capture_output is True, stdout and stderr are captured;
-        otherwise, stdout and stderr are None.
+        otherwise, stdout and stderr are set to "".
 
         If print_ is True, prints stdout and stderr to the console.
 
@@ -3166,15 +3166,14 @@ class IndicatorBase( ABC ):
 # Who/when might need check = True?
 
             if capture_output:
-                print("here")#TODO
                 stdout_ = result.stdout.decode().strip()
                 stderr_ = result.stderr.decode()
                 if stderr_ and IndicatorBase._LOGGING_INITIALISED:
                     IndicatorBase.get_logging().error( stderr_ )
 
             else:
-                stdout_ = None
-                stderr_ = None
+                stdout_ = ""
+                stderr_ = ""
 
             return_code = result.returncode
 
@@ -3194,7 +3193,8 @@ class IndicatorBase( ABC ):
 # capture_output is True (stdout/stderr should be defined so decode is okay) and
 # when capture_output is False (stdout/stderr should be not be defined so decode is unsafe).
 # Can trigger the exception on grep but no result but get a return code of 1
-# but need to set check = True in the call to subprocess.run().            stdout_ = e.stdout.decode()
+# but need to set check = True in the call to subprocess.run().            
+            stdout_ = e.stdout.decode()
             stderr_ = e.stderr.decode()
             return_code = e.returncode
 
@@ -3205,10 +3205,6 @@ class IndicatorBase( ABC ):
             elif stderr_:
                 print( stderr_ )
 
-        print( command )
-        print( capture_output )
-        print( print_ )
-        print()
         return stdout_, stderr_, return_code
 
 

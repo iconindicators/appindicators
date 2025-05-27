@@ -485,7 +485,7 @@ def _package_source_for_build_wheel_process(
             Path( '.' ) / directory_indicator / "src" / indicator_name / "locale" )
 
         names_from_po_files, comments_from_po_files, message = (
-            utils_locale.get_names_and_comments_from_po_files(
+            utils_locale.get_translated_names_and_comments_from_po_files(
                 VENV_BUILD,
                 directory_indicator_locale,
                 name,

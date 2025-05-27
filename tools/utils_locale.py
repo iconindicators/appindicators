@@ -217,47 +217,6 @@ def _create_update_po(
             print( "YOU MUST UPDATE LINES 1, 4, 11, 12." )
 
 
-def _get_msgstr_from_po(
-        venv_build,
-        po,
-        msgid ):
-
-    # The comment for indicatorfortune contains text enclosed with ' which
-    # must be escaped.
-    msgid_escaped = msgid.replace( "\'", "\\\'" )
-
-    print( msgid_escaped)#TODO Testing
-    stdout_, stderr_, return_code = (
-        IndicatorBase.process_run(
-            f". { venv_build }/bin/activate && "
-            "python3 -c \""
-            "import polib; "
-            "[ print( entry.msgstr ) "
-            f"for entry in polib.pofile( \'{ po }\' ) "
-            f"if entry.msgid == \'{ msgid_escaped }\' ]"
-            "\"",
-            print_ = True ) )
-
-#TODO Testing
-    print('----')
-    print( stdout_ )
-    print('----')
-    print( stderr_)
-    print('----')
-    print( return_code)
-    print('----')
-
-    if stdout_:
-        message = ""
-        msgstr = stdout_
-
-    else:
-        message = f"Error retrieving\n\t{ msgid }\nfrom\n\t{ po }:\n\n{ stderr_ }"
-        msgstr = ""
-
-    return msgstr, message
-
-
 def update_locale_source(
     indicator_name,
     authors_emails,
@@ -281,7 +240,6 @@ def update_locale_source(
         authors_emails,
         version_indicatorbase,
         copyright_ )
-
 
     _create_update_po(
         "indicatorbase",
@@ -349,7 +307,38 @@ def build_locale_for_release(
             print_ = True )
 
 
-def get_names_and_comments_from_po_files(
+def _get_msgstr_from_po(
+        venv_build,
+        po,
+        msgid ):
+
+    # The comment for indicatorfortune contains text enclosed with ' which
+    # must be escaped.
+    msgid_escaped = msgid.replace( "\'", "\\\'" )
+
+    stdout_, stderr_, return_code = (
+        IndicatorBase.process_run(
+            f". { venv_build }/bin/activate && "
+            "python3 -c \""
+            "import polib; "
+            "[ print( entry.msgstr ) "
+            f"for entry in polib.pofile( \'{ po }\' ) "
+            f"if entry.msgid == \'{ msgid_escaped }\' ]"
+            "\"",
+            print_ = True ) )
+
+    if stderr_:
+        error = f"Error retrieving\n\t{ msgid }\nfrom\n\t{ po }:\n\n{ stderr_ }"
+        msgstr = ""
+
+    else:
+        error = ""
+        msgstr = stdout_
+
+    return msgstr, error
+
+
+def get_translated_names_and_comments_from_po_files(
     venv_build,
     directory_indicator_locale,
     name,
@@ -375,17 +364,15 @@ def get_names_and_comments_from_po_files(
     comments_from_po_files = { }
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         locale = po.parent.parent.stem
-        msgstr, error = _get_msgstr_from_po( venv_build, po, name )
-        if msgstr:
-            if msgstr != name:
-                names_from_po_files[ locale ] = msgstr
+        msgstr, error = _get_msgstr_from_po( venv_build, po, "xyz" )
 
-#TODO Should this be outdented?
-# Why only get the comments if there is a message string for the name?
-            msgstr, error = _get_msgstr_from_po( venv_build, po, comments )
-            if msgstr:
-                if msgstr != comments:
-                    comments_from_po_files[ locale ] = msgstr
+        msgstr, error = _get_msgstr_from_po( venv_build, po, name )
+        if msgstr and msgstr != name:
+            names_from_po_files[ locale ] = msgstr
+
+        msgstr, error = _get_msgstr_from_po( venv_build, po, comments )
+        if msgstr and msgstr != comments:
+            comments_from_po_files[ locale ] = msgstr
 
         if error:
             break
