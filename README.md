@@ -52,12 +52,9 @@ Next, create a symbolic link to `indicatorbase.py`:
     for dirs in indicator*; do if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py $dirs/src/$dirs/indicatorbase.py; fi ; done;
 ```
 
-which will create a symbolic link to `indicatorbase.py` for all the indicators.
+which creates a symbolic link to `indicatorbase.py` for all the indicators.  The symbolic links are also required when running under `Geany` and `Eclipse`.
 
 To run `indicatortest`:
-
-TODO Need to mention that running an indicator from the source tree will
-create a venv called venv_run. 
 
 TODO Perhaps make this into a script...at least then can make use of tools/utils.py
 If a script is written, how to incorporate additional packages for lunar et al to be installed?
@@ -65,11 +62,9 @@ If a script is written, how to incorporate additional packages for lunar et al t
 TODO Test on Linux Mint.
 ```
     indicator=indicatortest && \
+    venv=venv_run && \
     pygobject="PyGObject" && \
     pygobject_3_50_0="PyGObject<=3.50.0" && \
-    venv=venv_run && \
-    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-    . ${venv}/bin/activate && \
     etc_os_release="$(cat /etc/os-release)" && \
     if [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"12\"')" == "VERSION_ID=\"12\"" ]; then pygobject=$pygobject_3_50_0; fi && \
     if [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"11\"')" == "VERSION_ID=\"11\"" ]; then pygobject=$pygobject_3_50_0; fi && \
@@ -79,6 +74,8 @@ TODO Test on Linux Mint.
     if [ "$(echo "$etc_os_release" | grep 'ID=linuxmint')" == "ID=linuxmint" ] && [ "$(echo "$etc_os_release" | grep 'UBUNTU_CODENAME=focal')" == "UBUNTU_CODENAME=focal" ]; then pygobject=$pygobject_3_50_0; fi && \
     if [ "$(echo "$etc_os_release" | grep 'ID=linuxmint')" == "ID=linuxmint" ] && [ "$(echo "$etc_os_release" | grep 'UBUNTU_CODENAME=jammy')" == "UBUNTU_CODENAME=jammy" ]; then pygobject=$pygobject_3_50_0; fi && \
     if [ "$(echo "$etc_os_release" | grep 'ID=linuxmint')" == "ID=linuxmint" ] && [ "$(echo "$etc_os_release" | grep 'UBUNTU_CODENAME=noble')" == "UBUNTU_CODENAME=noble" ]; then pygobject=$pygobject_3_50_0; fi && \
+    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+    . ${venv}/bin/activate && \
     python3 -m pip install $pygobject && \
     cd ${indicator}/src && \
     python3 -m ${indicator}.${indicator} && \
@@ -86,11 +83,13 @@ TODO Test on Linux Mint.
     cd ../..
 ```
 
-Note for `Debian 12`, `Ubuntu 20.04` et al, the version of `PyGObject` is pinned. Subsequent distributions/versions may require similar treatment depending on whether `libgirepository-2.0-dev` becomes the default/standard.
+A `Python3` virtual environment called `venv_run` will be created, which is also used when running under `Geany` and `Eclipse`.
+
+For `Debian 12`, `Ubuntu 20.04` et al, the version of `PyGObject` is pinned. Subsequent distributions/versions may require similar treatment, depending on whether `libgirepository-2.0-dev` becomes the default/standard.
 
 If the indicator has not previously been installed to `$HOME/.local/venv_indicators`, the icon and locale will be absent.
 
-Some indicators, such as `indicatorlunar`, require additional packages, specified in the `dependencies` field of `pyproject.toml`.  Include those additional packages in the `pip install` above.
+Some indicators, such as `indicatorlunar`, require additional packages, specified in the `dependencies` field of the respective indicator's `pyproject.toml`.  Include those additional packages in the `pip install` above.
 
 To remove all the symbolic links to indicatorbase.py created earlier:
 
@@ -206,17 +205,10 @@ References:
 
 To run an indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
 
-To run from a terminal (observe any messages/errors) from any directory:
+To run from a terminal (to observe any messages/errors) from any directory:
 
-TODO Perhaps change this to calling the run script for the indicator...
-see the README.MD that comes with the indicator wheel.
 ```
-    indicator=indicatortest && \
-    venv=$HOME/.local/venv_indicators && \
-    . ${venv}/bin/activate && \
-    cd $(ls -d ${venv}/lib/python3.* | head -1)/site-packages && \
-    python3 -m ${indicator}.${indicator} && \
-    deactivate
+    . $HOME/.local/bin/indicatortest.sh
 ```
 
 Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and change `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
