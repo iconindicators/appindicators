@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatortest 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-05-27 12:19+1000\n"
+"POT-Creation-Date: 2025-05-27 13:23+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -151,14 +151,14 @@ msgid ""
 "gnome-terminal instead."
 msgstr ""
 
-#: indicatortest.py:487 indicatortest.py:488
+#: indicatortest.py:483 indicatortest.py:484
 msgid "Enable/disable X"
 msgstr ""
 
-#: indicatortest.py:506
+#: indicatortest.py:502
 msgid "Day of Week"
 msgstr ""
 
-#: indicatortest.py:513
+#: indicatortest.py:509
 msgid "Days of week containing an 'n' are bold."
 msgstr ""
