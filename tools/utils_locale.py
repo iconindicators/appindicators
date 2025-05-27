@@ -323,7 +323,7 @@ def _get_msgstr_from_po(
             f"for entry in polib.pofile( \'{ po }\' ) "
             f"if entry.msgid == \'{ msgid_escaped }\' ]"
             "\"",
-            print_ = True ) )
+            print_ = False ) )
 
     if stderr_:
         error = f"Error retrieving\n\t{ msgid }\nfrom\n\t{ po }:\n\n{ stderr_ }"
