@@ -56,7 +56,12 @@ which will create a symbolic link to `indicatorbase.py` for all the indicators.
 
 To run `indicatortest`:
 
+TODO Need to mention that running an indicator from the source tree will
+create a venv called venv_run. 
+
 TODO Perhaps make this into a script...at least then can make use of tools/utils.py
+If a script is written, how to incorporate additional packages for lunar et al to be installed?
+
 TODO Test on Linux Mint.
 ```
     indicator=indicatortest && \
@@ -86,6 +91,12 @@ Note for `Debian 12`, `Ubuntu 20.04` et al, the version of `PyGObject` is pinned
 If the indicator has not previously been installed to `$HOME/.local/venv_indicators`, the icon and locale will be absent.
 
 Some indicators, such as `indicatorlunar`, require additional packages, specified in the `dependencies` field of `pyproject.toml`.  Include those additional packages in the `pip install` above.
+
+To remove all the symbolic links to indicatorbase.py created earlier:
+
+```
+    for dirs in indicator*; do if [ -L $dirs/src/$dirs/indicatorbase.py ]; then rm $dirs/src/$dirs/indicatorbase.py; fi ; done;
+```
 
 
 ### Development under Geany
@@ -288,13 +299,6 @@ TODO Check this section
 ```
 
 Additional indicators may be appended to the above command.
-
-
-### Remove all Symbolic Links to indicatorbase.py
-
-```
-    for dirs in indicator*; do if [ -L $dirs/src/$dirs/indicatorbase.py ]; then rm $dirs/src/$dirs/indicatorbase.py; fi ; done;
-```
 
 
 ### Pylint
