@@ -65,14 +65,14 @@ def is_ubuntu2004_or_is_ubuntu2204_or_ubuntu2404():
 
 def get_pygobject():
     '''
-    PyGObject is required for building a wheel and running an indicator.    #TODO Building?  Where/how????
+    PyGObject is required for running an indicator.
 
     On Debian based distributions, the most recent version of PyGObject
-    requires libgirepository-2.0, which is only available on Ubuntu 24.04+
+    requires libgirepository-2.0-dev, which is only available on Ubuntu 24.04+
     and Debian 13+.
 
-    On Debian 11/12 and Ubuntu 20.04/22.04/24.04, PyGObject must be pinned to
-    version 3.50.0.
+    On Debian 11/12 and Ubuntu 20.04/22.04/24.04, which only have available
+    libgirepository1.0-dev, PyGObject must be pinned to version 3.50.0.
     '''
     pygobject_needs_to_be_pinned = (
         is_debian11_or_debian12()
