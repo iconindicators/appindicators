@@ -268,7 +268,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             " -A 366" )
 
         events_sorted_by_date = [ ]
-        for line in self.process_get( command ).splitlines():
+        for line in IndicatorBase.process_run( command )[ 0 ].splitlines():
             if line.startswith( '\t' ): # Continuation of the previous event.
                 date_ = events_sorted_by_date[ -1 ].get_date()
 
@@ -586,7 +586,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD,
                 True ) )
 
-        if copy_to_clipboard and not self.is_clipboard_supported():
+        if self.copy_to_clipboard and not self.is_clipboard_supported():
             self.copy_to_clipboard = False
 
         self.lines = (

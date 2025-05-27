@@ -254,7 +254,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                 self.get_logging().debug(
                     script.get_group() + " | " + script.get_name() + ": " + command )
 
-            Thread( target = self.process_call, args = ( command, ) ).start()
+            Thread(
+                target = IndicatorBase.process_run,
+                args = ( command, False, False ) ).start()
 
 
     def update_background_scripts(
@@ -297,15 +299,18 @@ class IndicatorScriptRunner( IndicatorBase ):
                 command_result = self.background_script_results[ key ]
 
                 if script.get_play_sound() and command_result:
-                    self.process_call(
-                        IndicatorBase.get_play_sound_complete_command() )
+                    IndicatorBase.process_run(
+                        IndicatorBase.get_play_sound_complete_command(),
+                        capture_output = False )
 
                 if script.get_show_notification() and command_result:
-                    self.process_call(
+                    command = (
                         "notify-send -i " +
                         self.get_icon_name() +
                         " \"" + script.get_name().replace( '-', '\\-' ) + "\"" +
                         " \"" + command_result.replace( '-', '\\-' ) + "\"" )
+
+                    IndicatorBase.process_run( command, capture_output = False )
 
 
     def _update_background_script(
@@ -317,7 +322,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.get_logging().debug(
                 script.get_group() + " | " + script.get_name() + ": " + script.get_command() )
 
-        command_result = self.process_get( script.get_command() )
+        command_result = IndicatorBase.process_run( script.get_command() )[ 0 ]
         key = self._create_key( script.get_group(), script.get_name() )
         self.background_script_results[ key ] = command_result
         self.background_script_next_update_time[ key ] = (

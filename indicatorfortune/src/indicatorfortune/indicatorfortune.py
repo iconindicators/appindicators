@@ -152,7 +152,7 @@ class IndicatorFortune( IndicatorBase ):
         if locations:
             command = "fortune" + ''.join( locations )
             while True:
-                fortune_ = self.process_get( command )
+                fortune_ = IndicatorBase.process_run( command )[ 0 ]
                 if not fortune_: # No fortune data found.
                     message = _( "Ensure enabled fortunes contain data!" )
                     break

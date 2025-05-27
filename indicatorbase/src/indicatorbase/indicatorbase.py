@@ -1116,7 +1116,7 @@ class IndicatorBase( ABC ):
             #   https://github.com/bugaevc/wl-clipboard/pull/110
             #   https://github.com/bugaevc/wl-clipboard/pull/154
             command += "2>/dev/null"
-            self.process_call( command )  #TODO If this uses new process_run, check the pipe to stderr still works!
+            IndicatorBase.process_run( command )  #TODO Check the pipe to stderr still works!
                                                 # Also, set capture_output = False?
         else:
             selection = Gdk.SELECTION_CLIPBOARD

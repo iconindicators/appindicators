@@ -3282,7 +3282,8 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def get_default_city( self ):
-        timezone = self.process_get( "timedatectl show | grep Timezone" )
+        command = "timedatectl show | grep Timezone"
+        timezone = IndicatorBase.process_run( command )[ 0 ]
         if timezone.startswith( "Timezone=" ):
             timezone = timezone.split( '=' )[ 1 ]
 
