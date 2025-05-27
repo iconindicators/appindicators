@@ -437,10 +437,12 @@ class IndicatorVirtualBox( IndicatorBase ):
         Returns a list of running virtual machine names and list of
         corresponding running virtual machine UUIDs.
         '''
+        running_vms = (
+            IndicatorBase.process_run( "VBoxManage list runningvms" )[ 0 ] )
+
         names = [ ]
         uuids = [ ]
-        result = IndicatorBase.process_run( "VBoxManage list runningvms" )[ 0 ]
-        for line in result.splitlines():
+        for line in running_vms.splitlines():
             if line.startswith( '\"' ) and line.endswith( '}' ):
                 # VBoxManage may emit a warning message along with the virtual
                 # machine information, so check each line as best as possible.
