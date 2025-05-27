@@ -13,11 +13,6 @@ maintainers = [
 #license = "GPL-3.0-or-later"  #TODO Does not build on Ubuntu 20.04; must uncomment and build on Debian 12+ or Ubuntu 22.04+
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = [
-  "pip" ]
-  #TODO Need to remove the dependencies tag completely,
-  # but ensure build wheel works with all indicators including indicatorlunar.
-  # TODO work out why packaging is included in the venv_build.
 classifiers = [
   "Development Status :: 6 - Mature",
   "Environment :: X11 Applications :: GTK",
