@@ -27,12 +27,6 @@ To view the contents of a .tar.gz:
 '''
 
 
-#TODO Had a dream/thought...
-# check all usages of PyGObject...
-# For running indicator...
-# For building indicator...
-
-
 import configparser
 import re
 import shutil
@@ -571,7 +565,10 @@ if __name__ == "__main__":
         "build",
         "pip",
         "polib",
-        utils.get_pygobject(),
+#        utils.get_pygobject(),  #TODO This is not needed on Debian 12 laptop...
+# is it needed on Ubuntu 20.04?
+# Why/how has this been put here?
+# Maybe look at the repository history for this file...
         "readme_renderer[md]" )
 
     for indicator in args.indicators:
