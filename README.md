@@ -56,6 +56,7 @@ which will create a symbolic link to `indicatorbase.py` for all the indicators.
 
 To run `indicatortest`:
 
+TODO Perhaps make this into a script...at least then can make use of tools/utils.py
 TODO Test on Linux Mint.
 ```
     indicator=indicatortest && \
@@ -196,6 +197,8 @@ To run an indicator, open the applications menu (via the `Super` key) and select
 
 To run from a terminal (observe any messages/errors) from any directory:
 
+TODO Perhaps change this to calling the run script for the indicator...
+see the README.MD that comes with the indicator wheel.
 ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
@@ -211,6 +214,7 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 ### Release to PyPI
 
 TODO Check this section
+TODO Make into a script?
 
 To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
 
@@ -240,6 +244,7 @@ To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/v
 ### Release to TestPyPI
 
 TODO Check this section
+TODO Make into a script?
 
 For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`:
 
@@ -257,6 +262,7 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
 ### Install from TestPyPI
 
 TODO Check this section
+TODO Make into a script?
 
 To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`:
 
@@ -340,7 +346,8 @@ As above, but with several checks disabled:
 
 ### Convert this Document from MD to HTML
 
- ```
+TODO Make into a script?
+```
     venv=venv_build && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
