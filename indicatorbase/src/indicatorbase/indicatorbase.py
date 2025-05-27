@@ -3073,7 +3073,7 @@ class IndicatorBase( ABC ):
 
 
 #TODO Replace with process_run
-    def process_call(
+    def process_callOLD(
         self,
         command ):
         '''
@@ -3098,7 +3098,7 @@ class IndicatorBase( ABC ):
 
 
 #TODO Replace with process_run
-    def process_get( self, command ):
+    def process_getOLD( self, command ):
         '''
         Executes the command and returns the result.
         The result of executing the command may indeed be "" which does not
