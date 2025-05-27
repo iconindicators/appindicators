@@ -380,15 +380,29 @@ def _create_symbolic_icons(
         "icons" )
 
     for hicolor_icon in list( ( Path( '.' ) / directory_icons ).glob( "*.svg" ) ):
-        symbolic_icon = directory_icons / ( str( hicolor_icon.name )[ 0 : -4 ] + "-symbolic.svg" )
+        symbolic_icon = (
+            directory_icons
+            /
+            ( str( hicolor_icon.name )[ 0 : -4 ] + "-symbolic.svg" ) )
+
         shutil.copy( hicolor_icon, symbolic_icon )
         with open( symbolic_icon, 'r', encoding = "utf-8" ) as f:
             svg_text = f.read()
             for m in re.finditer( r"fill:#", svg_text ):
-                svg_text = svg_text[ 0 : m.start() + 6 ] + "777777" + svg_text[ m.start() + 6 + 6 : ]
+                svg_text = (
+                    svg_text[ 0 : m.start() + 6 ]
+                    +
+                    "777777"
+                    +
+                    svg_text[ m.start() + 6 + 6 : ] )
 
             for m in re.finditer( r"stroke:#", svg_text ):
-                svg_text = svg_text[ 0 : m.start() + 6 ] + "777777" + svg_text[ m.start() + 6 + 6 : ]
+                svg_text = (
+                    svg_text[ 0 : m.start() + 6 ]
+                    +
+                    "777777"
+                    +
+                    svg_text[ m.start() + 6 + 6 : ] )
 
         with open( symbolic_icon, 'w', encoding = "utf-8" ) as f:
             f.write( svg_text + '\n' )
@@ -521,7 +535,12 @@ def _build_wheel_for_indicator(
     # message = _check_for_t_o_d_o_s( indicator_name ) #TODO Uncomment
     message = ""
     if not message:
-        directory_dist = Path( '.' ) / directory_release / "wheel" / ( "dist_" + indicator_name )
+        directory_dist = (
+            Path( '.' ) /
+            directory_release /
+            "wheel" /
+            ( "dist_" + indicator_name ) )
+
         if Path( directory_dist ).exists():
             shutil.rmtree( str( directory_dist ) )
 
