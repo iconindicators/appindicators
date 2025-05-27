@@ -465,10 +465,6 @@ class IndicatorTest( IndicatorBase ):
                 command
                 + "; ${SHELL}" + "'" )
 
-#TODO This is correct below (in terms of passing all parameters to
-# IndicatorBase.process_run.
-# Check all other Thread calls in all indicators and ensure all parameters are
-# passed to IndicatorBase.process_run 
             Thread(
                 target = IndicatorBase.process_run,
                 args = ( command_, False, False ) ).start()
