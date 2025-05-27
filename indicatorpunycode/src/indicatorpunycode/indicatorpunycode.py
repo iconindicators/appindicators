@@ -108,7 +108,7 @@ class IndicatorPunycode( IndicatorBase ):
     def on_convert( self ):
         summary =_( "Nothing to convert..." )
         if self.input_clipboard:
-            text = self.copy_from_selection_clipboard()
+            text = self.copy_from_clipboard()
             if text is None:
                 self.show_notification(
                     summary, _( "No text is in the clipboard." ) )
@@ -125,7 +125,7 @@ class IndicatorPunycode( IndicatorBase ):
                 else:
                     self._do_conversion( text )
 
-            self. copy_from_selection_primary(
+            self. copy_from_primary(
                 primary_received_callback_function )
 
 
@@ -256,14 +256,14 @@ class IndicatorPunycode( IndicatorBase ):
         text ):
 
         if self.output_both:
-            self.copy_to_selection( text )
-            self.copy_to_selection( text, is_primary = True )
+            self.copy_to_clipboard_or_primary( text )
+            self.copy_to_clipboard_or_primary( text, is_primary = True )
 
         elif self.input_clipboard:
-            self.copy_to_selection( text )
+            self.copy_to_clipboard_or_primary( text )
 
         else:
-            self.copy_to_selection( text, is_primary = True )
+            self.copy_to_clipboard_or_primary( text, is_primary = True )
 
 
     def on_preferences(

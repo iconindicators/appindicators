@@ -315,7 +315,7 @@ class IndicatorTest( IndicatorBase ):
             activate_functionandarguments = (
                 lambda menuitem:
                     print(
-                        f"From clipboard: { self.copy_from_selection_clipboard() }"), ),
+                        f"From clipboard: { self.copy_from_clipboard() }"), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -323,7 +323,7 @@ class IndicatorTest( IndicatorBase ):
             _( "Copy from primary" ),
             activate_functionandarguments = (
                 lambda menuitem:
-                    self. copy_from_selection_primary(
+                    self. copy_from_primary(
                         primary_received_callback_function ), ),
             indent = ( 2, 0 ) )
 
@@ -332,7 +332,8 @@ class IndicatorTest( IndicatorBase ):
             _( "Copy current time to clipboard" ),
             activate_functionandarguments = (
                 lambda menuitem:
-                    self.copy_to_selection( self._get_current_time() ), ),
+                    self.copy_to_clipboard_or_primary(
+                        self._get_current_time() ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -340,7 +341,7 @@ class IndicatorTest( IndicatorBase ):
             _( "Copy current time to primary" ),
             activate_functionandarguments = (
                 lambda menuitem:
-                    self.copy_to_selection(
+                    self.copy_to_clipboard_or_primary(
                         self._get_current_time(), is_primary = True ), ),
             indent = ( 2, 0 ) )
 

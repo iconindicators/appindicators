@@ -1095,7 +1095,7 @@ class IndicatorBase( ABC ):
                 "UBUNTU_CODENAME=focal" not in IndicatorBase.get_etc_os_release() ) )
 
 
-    def copy_to_selection(
+    def copy_to_clipboard_or_primary(
         self,
         text,
         is_primary = False ):
@@ -1116,8 +1116,10 @@ class IndicatorBase( ABC ):
             #   https://github.com/bugaevc/wl-clipboard/pull/110
             #   https://github.com/bugaevc/wl-clipboard/pull/154
             command += "2>/dev/null"
-            IndicatorBase.process_run( command )  #TODO Check the pipe to stderr still works!
-                                                # Also, set capture_output = False?
+            IndicatorBase.process_run( command )    #TODO Check the pipe to stderr still works!
+                                                    # Also, set capture_output = False?
+                                                    # Need to do this on Wayland and not Ubuntu 20.04
+
         else:
             selection = Gdk.SELECTION_CLIPBOARD
             if is_primary:
@@ -1126,7 +1128,7 @@ class IndicatorBase( ABC ):
             Gtk.Clipboard.get( selection ).set_text( text, -1 )
 
 
-    def copy_from_selection_clipboard( self ):
+    def copy_from_clipboard( self ):
         '''
         Obtain text from the clipboard.
         If there was no text copied or an error occurred, None is returned.
@@ -1143,7 +1145,7 @@ class IndicatorBase( ABC ):
         return text_in_clipboard
 
 
-    def copy_from_selection_primary(
+    def copy_from_primary(
         self,
         primary_received_callback_function ):
         '''

@@ -109,7 +109,8 @@ class IndicatorFortune( IndicatorBase ):
                 _( "Copy Last Fortune" ),
                 activate_functionandarguments = (
                     lambda menuitem:
-                        self.copy_to_selection( self.fortune.get_message() ), ),
+                        self.copy_to_clipboard_or_primary(
+                            self.fortune.get_message() ), ),
                 is_secondary_activate_target = (
                     self.middle_mouse_click_on_icon
                     ==

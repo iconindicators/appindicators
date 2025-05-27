@@ -173,7 +173,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 if self.is_clipboard_supported():
                     activate_functionandarguments = (
                         lambda menuitem:
-                            self.copy_to_selection(
+                            self.copy_to_clipboard_or_primary(
                                 menuitem.get_name() +
                                 ' ' +
                                 menuitem.get_label().strip() ), )
