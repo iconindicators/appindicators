@@ -45,10 +45,6 @@ from . import utils_locale
 from . import utils_readme
 
 
-# The virtual environment used when building the wheel.
-VENV_BUILD = "./venv_build"
-
-
 def _check_for_t_o_d_o_s(
     indicator_name ):
 
@@ -162,14 +158,14 @@ def _create_manifest_dot_in(
         Path( '.' ) / "indicatorbase" / "MANIFESTbase.in" )
 
     with open( indicatorbase_manifest_in, 'r', encoding = "utf-8" ) as f:
-        manifest_text = f.read().replace( "{indicator_name}", indicator_name )
+        manifest_text = f.read().replace( "{ indicator_name }", indicator_name )
 
     indicator_manifest_in = (
         Path( '.' ) / indicator_name / "MANIFESTspecific.in" )
 
     if Path( indicator_manifest_in ).exists():
         with open( indicator_manifest_in, 'r', encoding = "utf-8" ) as f:
-            manifest_text += f.read().replace( "{indicator_name}", indicator_name )
+            manifest_text += f.read().replace( "{ indicator_name }", indicator_name )
 
     release_manifest_in = directory_out / indicator_name / "MANIFEST.in"
     with open( release_manifest_in, 'w', encoding = "utf-8" ) as f:
@@ -347,8 +343,8 @@ def _create_scripts_for_linux(
 
         destination = directory_platform_linux / destination_script_name
         with open( destination, 'w', encoding = "utf-8" ) as f:
-            text = text.replace( "{indicator_name}", indicator_name )
-            text = text.replace( "{venv_indicators}", utils.VENV_INSTALL )
+            text = text.replace( "{ indicator_name }", indicator_name )
+            text = text.replace( "{ venv_indicators }", utils.VENV_INSTALL )
             f.write( text + '\n' )
 
         _chmod(
@@ -480,7 +476,7 @@ def _package_source_for_build_wheel_process(
             start_year )
 
         IndicatorBase.process_run(
-            f". { VENV_BUILD }/bin/activate && "
+            f". { utils.VENV_BUILD }/bin/activate && "
             "python3 -m readme_renderer "
             f"{ directory_dist }/{ indicator_name }/README.md "
             f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html",
@@ -492,7 +488,7 @@ def _package_source_for_build_wheel_process(
 
         names_from_po_files, comments_from_po_files, message = (
             utils_locale.get_translated_names_and_comments_from_po_files(
-                VENV_BUILD,
+                utils.VENV_BUILD,
                 directory_indicator_locale,
                 name,
                 comments ) )
@@ -551,7 +547,7 @@ def _build_wheel_for_indicator(
 
     if not message:
         IndicatorBase.process_run(
-            f". { VENV_BUILD }/bin/activate && "
+            f". { utils.VENV_BUILD }/bin/activate && "
             f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }",
             capture_output = False,
             print_ = True )
@@ -563,14 +559,13 @@ def _build_wheel_for_indicator(
 
 
 if __name__ == "__main__":
-    description = (
-        "Build a Python3 wheel for one or more indicators, at "
-        f"{ utils.RELEASE_DIRECTORY }." )
-
-    indicators_to_process = utils.get_indicators_to_process( description )
+    indicators_to_process = (
+        utils.get_indicators_to_process(
+            "Build a Python3 wheel for one or more indicators, at "
+            f"{ utils.RELEASE_DIRECTORY }." ) )
 
     utils.initialise_virtual_environment(
-        VENV_BUILD,
+        utils.VENV_BUILD,
         "build",
         "pip",
         "polib",

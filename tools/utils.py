@@ -19,10 +19,6 @@
 ''' Functions common to tools. '''
 
 
-#TODO Why is 'release' still needed as a parameter to the tools?
-# 'release' should be made as the location where releases are always located.
-
-
 import argparse
 import sys
 
@@ -34,13 +30,15 @@ if '../' not in sys.path:
 from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 
 
-# The directory of a .whl release.
+''' The directory of a .whl release. '''
 RELEASE_DIRECTORY = "release"
 
 
-# The virtual environment into which indicators are installed,
-# via PyPI or a local wheel.
+''' The virtual environment into which indicators are installed. '''
 VENV_INSTALL = "$HOME/.local/venv_indicators"
+
+''' The virtual environment used when building the wheel et al. '''
+VENV_BUILD = "./venv_build"
 
 
 def is_debian11_or_debian12():
@@ -88,6 +86,7 @@ def get_pygobject():
         is_ubuntu2004_or_is_ubuntu2204_or_ubuntu2404() )
 
     if pygobject_needs_to_be_pinned:
+        # Need to escape the < otherwise it will be interpreted as a redirect.
         pygobject = r"PyGObject\<=3.50.0"
 
     else:
@@ -96,7 +95,16 @@ def get_pygobject():
     return pygobject
 
 
-def initialiase_parser_and_get_arguments(
+def markdown_to_html( markdown, html ):
+    IndicatorBase.process_run(
+        "venv=venv_build && " +
+        f". { VENV_BUILD }/bin/activate && " +
+        f"python3 -m readme_renderer { markdown } -o { html }",
+        capture_output = False,
+        print_ = True )
+
+
+def get_arguments(
     description,
     argument_names,
     argument_helps = None,
@@ -120,7 +128,7 @@ def initialiase_parser_and_get_arguments(
 
 def get_indicators_to_process( description ):
     return (
-        initialiase_parser_and_get_arguments(
+        get_arguments(
             description,
             ( "indicators", ),
             {
@@ -138,7 +146,7 @@ def initialise_virtual_environment(
 
     if not Path( venv_directory ).is_dir():
         IndicatorBase.process_run(
-            f"python3 -m venv { venv_directory }", 
+            f"python3 -m venv { venv_directory }",
             capture_output = False,
             print_ = True )
 

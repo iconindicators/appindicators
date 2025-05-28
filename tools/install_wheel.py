@@ -33,19 +33,21 @@ from . import utils
 
 
 if __name__ == "__main__":
-    description = (
-        f"Install a Python3 wheel for one or more indicators, at "
-        f"{ utils.RELEASE_DIRECTORY }, into a Python3 virtual environment at "
-        f"{ utils.VENV_INSTALL } and copy across the .desktop, run script and "
-        "icons." )
+    indicators_to_process = (
+        utils.get_indicators_to_process(
+            f"Install a Python3 wheel for one or more indicators, at "
+            f"{ utils.RELEASE_DIRECTORY }, into a Python3 virtual environment "
+            f"at { utils.VENV_INSTALL } and copy across the .desktop, run "
+            "script and icons." ) )
 
-    indicators_to_process = utils.get_indicators_to_process( description )
+    utils.initialise_virtual_environment(
+        utils.VENV_INSTALL,
+        "pip",
+        utils.get_pygobject() )
 
     for indicator in indicators_to_process:
         utils.initialise_virtual_environment(
             utils.VENV_INSTALL,
-            "pip",
-            utils.get_pygobject(),
             f"$(ls -d { utils.RELEASE_DIRECTORY }/wheel/dist_{ indicator }/{ indicator }*.whl | head -1)",
             force_reinstall = True )
 

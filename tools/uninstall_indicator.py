@@ -35,13 +35,12 @@ from . import utils
 
 
 if __name__ == "__main__":
-    description = (
-        f"Uninstall one or more indicators, from the Python3 virtual "
-        f"environment at { utils.VENV_INSTALL } including the .desktop, run "
-        "script, icons, .config and .cache.  If all indicators have been "
-        "uninstalled, the virtual environment will also be removed." )
-
-    indicators_to_process = utils.get_indicators_to_process( description )
+    indicators_to_process = (
+        utils.get_indicators_to_process(
+            f"Uninstall one or more indicators, from the Python3 virtual "
+            f"environment at { utils.VENV_INSTALL } including the .desktop, "
+            "run script, icons, .config and .cache.  If all indicators have "
+            "been uninstalled, the virtual environment will also be removed." ) )
 
     for indicator in indicators_to_process:
         IndicatorBase.process_run(

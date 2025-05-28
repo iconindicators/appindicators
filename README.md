@@ -60,9 +60,9 @@ To run `indicatortest`:
 TODO Perhaps make this into a script...at least then can make use of tools/utils.py
 If a script is written, how to incorporate additional packages for lunar et al to be installed?
 If the script is called for indicatortest as:
-	python3 -m tools.run_indicator_from_source release indicatortest
-So for lunar:	
-	python3 -m tools.run_indicator_from_source release indicatorlunar ephem requests sgp4
+    python3 -m tools.run_indicator_from_source release indicatortest
+So for lunar:
+    python3 -m tools.run_indicator_from_source release indicatorlunar ephem requests sgp4
 
 
 TODO Test on Linux Mint.
@@ -348,14 +348,8 @@ As above, but with several checks disabled:
 
 ### Convert this Document from MD to HTML
 
-TODO Make into a script?
 ```
-    venv=venv_build && \
-    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-    . ${venv}/bin/activate && \
-    python3 -m pip install readme_renderer[md] && \
-    python3 -m readme_renderer README.md -o README.html && \
-    deactivate
+    python3 -m tools.markdown_to_html
 ```
 
 
