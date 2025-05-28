@@ -19,6 +19,10 @@
 ''' Functions common to tools. '''
 
 
+#TODO Why is 'release' still needed as a parameter to the tools?
+# 'release' should be made as the location where releases are always located.
+
+
 import argparse
 import sys
 
@@ -28,6 +32,10 @@ if '../' not in sys.path:
     sys.path.insert( 0, '../' ) # Allows calls to IndicatorBase.
 
 from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
+
+
+# The directory of a .whl release.
+RELEASE_DIRECTORY = "release"
 
 
 # The virtual environment into which indicators are installed,
@@ -108,6 +116,19 @@ def initialiase_parser_and_get_arguments(
             nargs = argument_nargs.get( argument_name ) )
 
     return parser.parse_args()
+
+
+def get_indicators_to_process( description ):
+    return (
+        initialiase_parser_and_get_arguments(
+            description,
+            ( "indicators", ),
+            {
+                "indicators" :
+                    "The list of indicators separated by spaces to uninstall." },
+            {
+                "indicators" :
+                    "+" } ) ).indicators
 
 
 def initialise_virtual_environment(

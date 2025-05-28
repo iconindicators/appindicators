@@ -33,16 +33,20 @@ from . import utils
 
 
 if __name__ == "__main__":
+    description = (
+        f"Uninstall one or more indicators, from the Python3 virtual "
+        f"environment at { utils.VENV_INSTALL } including the .desktop, run "
+        "script, icons, .config and .cache.  If all indicators have been "
+        "uninstalled, the virtual environment will also be removed." )
+
+#TODO If this is common then move to utils.
     args = (
         utils.initialiase_parser_and_get_arguments(
-            f"Uninstall one or more indicators, including the run script, "
-            f"icons, .desktop and .config/.cache. and additionally removing"
-            f" the shared virtual environment $HOME/.local/venv_indicators "
-            f"if no indicators are installed.",
+            description,
             ( "indicators", ),
             {
                 "indicators" :
-                    "List of indicators, space separated, to uninstall." },
+                    "The list of indicators separated by spaces to uninstall." },
             {
                 "indicators" :
                     "+" } ) )

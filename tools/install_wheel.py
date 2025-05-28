@@ -33,19 +33,20 @@ from . import utils
 
 
 if __name__ == "__main__":
+    description = (
+        f"Install a Python3 wheel for one or more indicators, at "
+        f"{ utils.RELEASE_DIRECTORY }, into a Python3 virtual environment at "
+        f"{ utils.VENV_INSTALL } and copy across the .desktop, run script and "
+        "icons." )
+
+#TODO If this is common then move to utils.
     args = (
         utils.initialiase_parser_and_get_arguments(
-            "Install a Python wheel package for one or more indicators to "
-            f"a virtual environment within { utils.VENV_INSTALL } "
-            "and copy across the .desktop, run script and icons.",
-            ( "directory_release", "indicators" ),
+            description,
+            ( "indicators", ),
             {
-                "directory_release" :
-                    f"The directory containing the Python wheel. "
-                    f"If the directory specified is 'release', "
-                    "the Python wheel must be located at 'release/wheel'.",
                 "indicators" :
-                    f"List of indicators, space separated, to install." },
+                    "The list of indicators separated by spaces to install." },
             {
                 "indicators" :
                     "+" } ) )

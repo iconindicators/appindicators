@@ -529,7 +529,6 @@ def _package_source_for_build_wheel_process(
 
 
 def _build_wheel_for_indicator(
-    directory_release,
     indicator_name ):
 
     # message = _check_for_t_o_d_o_s( indicator_name ) #TODO Uncomment
@@ -537,7 +536,7 @@ def _build_wheel_for_indicator(
     if not message:
         directory_dist = (
             Path( '.' ) /
-            directory_release /
+            utils.RELEASE_DIRECTORY /
             "wheel" /
             ( "dist_" + indicator_name ) )
 
@@ -564,20 +563,23 @@ def _build_wheel_for_indicator(
 
 
 if __name__ == "__main__":
-    args = (
-        utils.initialiase_parser_and_get_arguments(
-            "Create a Python wheel for one or more indicators.",
-            ( "directory_release", "indicators" ),
-            {
-                "directory_release" :
-                    "The output directory for the Python wheel. " +
-                    "If the directory specified is 'release', " +
-                    "the Python wheel will be created in 'release/wheel'.",
-                "indicators" :
-                    "The list of indicators separated by spaces to build." },
-            {
-                "indicators" :
-                    "+" } ) )
+    description = (
+        "Build a Python3 wheel for one or more indicators, at "
+        f"{ utils.RELEASE_DIRECTORY }." )
+
+#TODO If this is common then move to utils.
+    # args = (
+    #     utils.initialiase_parser_and_get_arguments(
+    #         description,
+    #         ( "indicators", ),
+    #         {
+    #             "indicators" :
+    #                 "The list of indicators separated by spaces to build." },
+    #         {
+    #             "indicators" :
+    #                 "+" } ) )
+
+    indicators_to_process = utils.get_indicators_to_process( description )
 
     utils.initialise_virtual_environment(
         VENV_BUILD,
@@ -586,7 +588,8 @@ if __name__ == "__main__":
         "polib",
         "readme_renderer[md]" )
 
-    for indicator in args.indicators:
-        error_message = _build_wheel_for_indicator( args.directory_release, indicator )
-        if error_message:
-            print( error_message )
+    for indicator in indicators_to_process:
+        print( indicator)
+        # error_message = _build_wheel_for_indicator( indicator )
+        # if error_message:
+        #     print( error_message )
