@@ -567,18 +567,6 @@ if __name__ == "__main__":
         "Build a Python3 wheel for one or more indicators, at "
         f"{ utils.RELEASE_DIRECTORY }." )
 
-#TODO If this is common then move to utils.
-    # args = (
-    #     utils.initialiase_parser_and_get_arguments(
-    #         description,
-    #         ( "indicators", ),
-    #         {
-    #             "indicators" :
-    #                 "The list of indicators separated by spaces to build." },
-    #         {
-    #             "indicators" :
-    #                 "+" } ) )
-
     indicators_to_process = utils.get_indicators_to_process( description )
 
     utils.initialise_virtual_environment(
@@ -589,7 +577,6 @@ if __name__ == "__main__":
         "readme_renderer[md]" )
 
     for indicator in indicators_to_process:
-        print( indicator)
-        # error_message = _build_wheel_for_indicator( indicator )
-        # if error_message:
-        #     print( error_message )
+        error_message = _build_wheel_for_indicator( indicator )
+        if error_message:
+            print( error_message )

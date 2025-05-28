@@ -23,7 +23,7 @@ Each indicator shares the common code `indicatorbase`.
 To build a wheel for `indicatortest` from the root of the source tree:
 
 ```
-    python3 -m tools.build_wheel release indicatortest
+    python3 -m tools.build_wheel indicatortest
 ```
 
 which creates a virtual environment `venv_build`, updates locale files `.pot` / `.po` and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
@@ -34,7 +34,7 @@ which creates a virtual environment `venv_build`, updates locale files `.pot` / 
 To install a `.whl` for `indicatortest` located in `release/wheel/dist_indicatortest`:
 
 ```
-    python3 -m tools.install_wheel release indicatortest
+    python3 -m tools.install_wheel indicatortest
 ```
 
 The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_indicators`. Additional indicators may be appended.
@@ -48,6 +48,7 @@ To run an indicator within the source tree, the indicator's `.whl` must first be
 
 Next, create a symbolic link to `indicatorbase.py`:
 
+TODO If we make all of this a script, maybe put the symbolic link stuff in there too?
 ```
     for dirs in indicator*; do if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py $dirs/src/$dirs/indicatorbase.py; fi ; done;
 ```
@@ -58,6 +59,11 @@ To run `indicatortest`:
 
 TODO Perhaps make this into a script...at least then can make use of tools/utils.py
 If a script is written, how to incorporate additional packages for lunar et al to be installed?
+If the script is called for indicatortest as:
+	python3 -m tools.run_indicator_from_source release indicatortest
+So for lunar:	
+	python3 -m tools.run_indicator_from_source release indicatorlunar ephem requests sgp4
+
 
 TODO Test on Linux Mint.
 ```

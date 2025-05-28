@@ -17,10 +17,12 @@
 
 
 '''
-Uninstall one or more indicators, removing the .desktop, run script
-and icons and .config/.cache.  Finally, remove the virtual environment
-if no more indicators are installed.
+Uninstall one or more indicators, including the .desktop, run script, icons,
+.config and .cache.
+
+Remove the virtual environment if no more indicators are installed.
 '''
+
 
 import sys
 
@@ -39,24 +41,14 @@ if __name__ == "__main__":
         "script, icons, .config and .cache.  If all indicators have been "
         "uninstalled, the virtual environment will also be removed." )
 
-#TODO If this is common then move to utils.
-    args = (
-        utils.initialiase_parser_and_get_arguments(
-            description,
-            ( "indicators", ),
-            {
-                "indicators" :
-                    "The list of indicators separated by spaces to uninstall." },
-            {
-                "indicators" :
-                    "+" } ) )
+    indicators_to_process = utils.get_indicators_to_process( description )
 
-    for indicator_name in args.indicators:
+    for indicator in indicators_to_process:
         IndicatorBase.process_run(
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
-            f"site-packages/{indicator_name}/platform/linux/uninstall.sh && "
+            f"site-packages/{ indicator }/platform/linux/uninstall.sh && "
             f". { utils.VENV_INSTALL }/bin/activate && "
-            f"python3 -m pip uninstall --yes {indicator_name} && "
+            f"python3 -m pip uninstall --yes { indicator } && "
             f"count=$(python3 -m pip --disable-pip-version-check list | "
             f"grep -o \"indicator\" | wc -l) && "
             f"deactivate && "

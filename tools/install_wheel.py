@@ -39,29 +39,19 @@ if __name__ == "__main__":
         f"{ utils.VENV_INSTALL } and copy across the .desktop, run script and "
         "icons." )
 
-#TODO If this is common then move to utils.
-    args = (
-        utils.initialiase_parser_and_get_arguments(
-            description,
-            ( "indicators", ),
-            {
-                "indicators" :
-                    "The list of indicators separated by spaces to install." },
-            {
-                "indicators" :
-                    "+" } ) )
+    indicators_to_process = utils.get_indicators_to_process( description )
 
-    for indicator_name in args.indicators:
+    for indicator in indicators_to_process:
         utils.initialise_virtual_environment(
             utils.VENV_INSTALL,
             "pip",
             utils.get_pygobject(),
-            f"$(ls -d { args.directory_release }/wheel/dist_{ indicator_name }/{ indicator_name }*.whl | head -1)",
+            f"$(ls -d { utils.RELEASE_DIRECTORY }/wheel/dist_{ indicator }/{ indicator }*.whl | head -1)",
             force_reinstall = True )
 
         IndicatorBase.process_run(
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | " +
-            f" head -1)/site-packages/{ indicator_name }/platform/" +
+            f" head -1)/site-packages/{ indicator }/platform/" +
             "linux/install.sh",
             capture_output = False,
             print_ = True )
