@@ -37,7 +37,7 @@ To install a `.whl` for `indicatortest` located in `release/wheel/dist_indicator
     python3 -m tools.install_wheel indicatortest
 ```
 
-The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_indicators`. Additional indicators may be appended.
+The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_indicators`. Additional indicators may be appended to the above command.
 
 Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the introduction above.
 
@@ -222,8 +222,7 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 
 ### Release to PyPI
 
-TODO Check this section
-TODO Make into a script?
+TODO Test
 
 To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
 
@@ -245,15 +244,12 @@ References:
 
 ### Install from PyPI
 
-TODO Check this section
-
 To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the introduction.
 
 
 ### Release to TestPyPI
 
-TODO Check this section
-TODO Make into a script?
+TODO Test
 
 For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`:
 
@@ -270,10 +266,12 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
 
 ### Install from TestPyPI
 
-TODO Check this section
-TODO Make into a script?
+TODO Test
 
-To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`:
+To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`,
+first, install the operating system packages listed at the indicator's `PyPI` page listed in the Introduction.
+
+Then install `indicatortest`:
 
 ```
     indicator=indicatortest && \
@@ -285,12 +283,8 @@ To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.l
     $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
 ```
 
-Additional operating system packages may be needed; refer to the installation instructions at the indicator's `PyPI` page listed in the Introduction.
-
 
 ### Uninstall an Indicator
-
-TODO Check this section
 
 ```
     python3 -m tools.uninstall_indicator indicatortest

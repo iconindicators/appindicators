@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Test this.
+
+
 '''
 Uninstall one or more indicators, including the .desktop, run script, icons,
 .config and .cache.
