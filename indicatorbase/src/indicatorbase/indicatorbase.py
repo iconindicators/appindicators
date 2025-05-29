@@ -523,10 +523,10 @@ class IndicatorBase( ABC ):
                     elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
                         if not exec_with_sleep_present:
                             if delay:
-                                output += line.replace( "{indicator_name}", self.indicator_name ).replace( '0', delay )
+                                output += line.replace( "{indicator}", self.indicator_name ).replace( '0', delay )
 
                             else:
-                                output += line.replace( "{indicator_name}", self.indicator_name )
+                                output += line.replace( "{indicator}", self.indicator_name )
 
                         made_a_change = True
 

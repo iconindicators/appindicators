@@ -46,11 +46,11 @@ from . import utils_readme
 
 
 def _check_for_t_o_d_o_s(
-    indicator_name ):
+    indicator ):
 
     paths = [
         "indicatorbase",
-        indicator_name,
+        indicator,
         "tools" ]
 
     file_types = [
@@ -90,11 +90,11 @@ def _chmod(
 
 
 def _create_pyproject_dot_toml(
-    indicator_name,
+    indicator,
     directory_out ):
 
     indicator_pyproject_toml = (
-        Path( '.' ) / indicator_name / "pyprojectspecific.toml" )
+        Path( '.' ) / indicator / "pyprojectspecific.toml" )
 
     config_indicator = configparser.ConfigParser()
     config_indicator.read( indicator_pyproject_toml )
@@ -111,7 +111,7 @@ def _create_pyproject_dot_toml(
     config_indicatorbase.set(
         "project",
         "name",
-        f"\"{ indicator_name }\"" )
+        f"\"{ indicator }\"" )
 
     config_indicatorbase.set(
         "project",
@@ -137,7 +137,7 @@ def _create_pyproject_dot_toml(
             "dependencies",
             config_indicator.get( "project", "dependencies" ) )
 
-    out_pyproject_toml = directory_out / indicator_name / "pyproject.toml"
+    out_pyproject_toml = directory_out / indicator / "pyproject.toml"
     with open( out_pyproject_toml, 'w', encoding = "utf-8" ) as f:
         config_indicatorbase.write( f )
 
@@ -151,23 +151,23 @@ def _create_pyproject_dot_toml(
 
 
 def _create_manifest_dot_in(
-    indicator_name,
+    indicator,
     directory_out ):
 
     indicatorbase_manifest_in = (
         Path( '.' ) / "indicatorbase" / "MANIFESTbase.in" )
 
     with open( indicatorbase_manifest_in, 'r', encoding = "utf-8" ) as f:
-        manifest_text = f.read().replace( "{ indicator_name }", indicator_name )
+        manifest_text = f.read().replace( "{ indicator }", indicator )
 
     indicator_manifest_in = (
-        Path( '.' ) / indicator_name / "MANIFESTspecific.in" )
+        Path( '.' ) / indicator / "MANIFESTspecific.in" )
 
     if Path( indicator_manifest_in ).exists():
         with open( indicator_manifest_in, 'r', encoding = "utf-8" ) as f:
-            manifest_text += f.read().replace( "{ indicator_name }", indicator_name )
+            manifest_text += f.read().replace( "{ indicator }", indicator )
 
-    release_manifest_in = directory_out / indicator_name / "MANIFEST.in"
+    release_manifest_in = directory_out / indicator / "MANIFEST.in"
     with open( release_manifest_in, 'w', encoding = "utf-8" ) as f:
         f.write( manifest_text + '\n' )
 
@@ -223,7 +223,7 @@ def _get_pyproject_toml_authors(
 
 
 def _get_name_categories_comments_from_indicator(
-    indicator_name,
+    indicator,
     directory_indicator ):
 
     def parse( line ):
@@ -234,8 +234,8 @@ def _get_name_categories_comments_from_indicator(
         Path( '.' ) /
         directory_indicator /
         "src" /
-        indicator_name /
-        ( indicator_name + ".py" ) )
+        indicator /
+        ( indicator + ".py" ) )
 
     name = ""
     categories = ""
@@ -266,7 +266,7 @@ def _get_name_categories_comments_from_indicator(
 
 def _create_dot_desktop(
     directory_platform_linux,
-    indicator_name,
+    indicator,
     name,
     names_from_po_files,
     comments,
@@ -302,13 +302,13 @@ def _create_dot_desktop(
 
     dot_desktop_text = (
         dot_desktop_text.format(
-            indicator_name = indicator_name,
+            indicator = indicator,
             names = "Name=" + names,
             comment = "Comment=" + comments_,
             categories = categories ) )
 
     indicator_dot_desktop_path = (
-        directory_platform_linux / ( indicator_name + ".py.desktop" ) )
+        directory_platform_linux / ( indicator + ".py.desktop" ) )
 
     with open( indicator_dot_desktop_path, 'w', encoding = "utf-8" ) as f:
         f.write( dot_desktop_text + '\n' )
@@ -322,7 +322,7 @@ def _create_dot_desktop(
 
 def _create_scripts_for_linux(
     directory_platform_linux,
-    indicator_name ):
+    indicator ):
 
     indicatorbase_platform_linux_path = (
         Path( '.' ) /
@@ -343,7 +343,7 @@ def _create_scripts_for_linux(
 
         destination = directory_platform_linux / destination_script_name
         with open( destination, 'w', encoding = "utf-8" ) as f:
-            text = text.replace( "{ indicator_name }", indicator_name )
+            text = text.replace( "{ indicator }", indicator )
             text = text.replace( "{ venv_indicators }", utils.VENV_INSTALL )
             f.write( text + '\n' )
 
@@ -354,7 +354,7 @@ def _create_scripts_for_linux(
             stat.S_IROTH | stat.S_IXOTH )
 
 
-    process( "run.sh", indicator_name + ".sh" )
+    process( "run.sh", indicator + ".sh" )
 
     install_script = "install.sh"
     process( install_script, install_script )
@@ -366,13 +366,13 @@ def _create_scripts_for_linux(
 #TODO Perhaps create the symbolic icons and commit to repository instead of creating each time?
 def _create_symbolic_icons(
     directory_wheel,
-    indicator_name ):
+    indicator ):
 
     directory_icons = (
         directory_wheel /
-        indicator_name /
+        indicator /
         "src" /
-        indicator_name /
+        indicator /
         "icons" )
 
     for hicolor_icon in list( ( Path( '.' ) / directory_icons ).glob( "*.svg" ) ):
@@ -406,26 +406,26 @@ def _create_symbolic_icons(
 
 def _package_source_for_build_wheel_process(
     directory_dist,
-    indicator_name ):
+    indicator ):
 
-    directory_indicator = directory_dist / indicator_name
+    directory_indicator = directory_dist / indicator
 
     # Copy the ENTIRE project across and create a pyproject.toml and MANIFEST.in
     # by combining those from indicatorbase and the indicator to include/exclude
     # files/folders in the build.
-    shutil.copytree( indicator_name, directory_indicator )
+    shutil.copytree( indicator, directory_indicator )
 
     shutil.copy(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "indicatorbase.py",
-        Path( '.' ) / directory_indicator / "src" / indicator_name )
+        Path( '.' ) / directory_indicator / "src" / indicator )
 
     pyproject_toml, version_indicator_base = (
         _create_pyproject_dot_toml(
-            indicator_name,
+            indicator,
             directory_dist ) )
 
     _create_manifest_dot_in(
-        indicator_name,
+        indicator,
         directory_dist )
 
     config = configparser.ConfigParser()
@@ -435,7 +435,7 @@ def _package_source_for_build_wheel_process(
         config.get( "project", "version" ).replace( "\"", '' ).strip() )
 
     changelog_markdown = (
-        Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
+        Path( indicator ) / "src" / indicator / "CHANGELOG.md" )
 
     version_from_changelog_markdown = (
         _get_version_in_changelog_markdown( changelog_markdown ) )
@@ -443,7 +443,7 @@ def _package_source_for_build_wheel_process(
     message = ""
     if version_from_pyproject_toml != version_from_changelog_markdown:
         message = (
-            f"{ indicator_name }: The most recent version in " +
+            f"{ indicator }: The most recent version in " +
             "CHANGELOG.md does not match that in pyprojectspecific.toml\n" )
 
     if not message:
@@ -452,7 +452,7 @@ def _package_source_for_build_wheel_process(
             IndicatorBase.get_year_in_changelog_markdown( changelog_markdown ) )
 
         utils_locale.update_locale_source(
-            indicator_name,
+            indicator,
             authors,
             start_year,
             version_from_pyproject_toml,
@@ -460,31 +460,36 @@ def _package_source_for_build_wheel_process(
 
         utils_locale.build_locale_for_release(
             directory_dist,
-            indicator_name )
+            indicator )
 
         name, categories, comments, message = (
             _get_name_categories_comments_from_indicator(
-                indicator_name,
+                indicator,
                 directory_indicator ) )
 
     if not message:
         utils_readme.create_readme(
             directory_indicator,
-            indicator_name,
+            indicator,
             name,
             authors,
             start_year )
 
+#TODO This needs to use utils.markdown_to_html( markdown, html )
+        utils.markdown_to_html(
+            f"{ directory_dist }/{ indicator }/README.md",
+            f"{ directory_dist }/{ indicator }/src/{ indicator }/README1.html" )
+
         IndicatorBase.process_run(
             f". { utils.VENV_BUILD }/bin/activate && "
             "python3 -m readme_renderer "
-            f"{ directory_dist }/{ indicator_name }/README.md "
-            f"-o { directory_dist }/{ indicator_name }/src/{ indicator_name }/README.html",
+            f"{ directory_dist }/{ indicator }/README.md "
+            f"-o { directory_dist }/{ indicator }/src/{ indicator }/README.html",
             capture_output = False,
             print_ = True )
 
         directory_indicator_locale = (
-            Path( '.' ) / directory_indicator / "src" / indicator_name / "locale" )
+            Path( '.' ) / directory_indicator / "src" / indicator / "locale" )
 
         names_from_po_files, comments_from_po_files, message = (
             utils_locale.get_translated_names_and_comments_from_po_files(
@@ -496,9 +501,9 @@ def _package_source_for_build_wheel_process(
     if not message:
         directory_platform_linux = (
             directory_dist /
-            indicator_name /
+            indicator /
             "src" /
-            indicator_name /
+            indicator /
             "platform" /
             "linux" )
 
@@ -506,7 +511,7 @@ def _package_source_for_build_wheel_process(
 
         _create_dot_desktop(
             directory_platform_linux,
-            indicator_name,
+            indicator,
             name,
             names_from_po_files,
             comments,
@@ -515,26 +520,26 @@ def _package_source_for_build_wheel_process(
 
         _create_scripts_for_linux(
             directory_platform_linux,
-            indicator_name )
+            indicator )
 
         _create_symbolic_icons(
             directory_dist,
-            indicator_name )
+            indicator )
 
     return message
 
 
 def _build_wheel_for_indicator(
-    indicator_name ):
+    indicator ):
 
-    # message = _check_for_t_o_d_o_s( indicator_name ) #TODO Uncomment
+    # message = _check_for_t_o_d_o_s( indicator ) #TODO Uncomment
     message = ""
     if not message:
         directory_dist = (
             Path( '.' ) /
             utils.RELEASE_DIRECTORY /
             "wheel" /
-            ( "dist_" + indicator_name ) )
+            ( "dist_" + indicator ) )
 
         if Path( directory_dist ).exists():
             shutil.rmtree( str( directory_dist ) )
@@ -543,17 +548,17 @@ def _build_wheel_for_indicator(
 
         message = (
             _package_source_for_build_wheel_process(
-                directory_dist, indicator_name ) )
+                directory_dist, indicator ) )
 
     if not message:
         IndicatorBase.process_run(
             f". { utils.VENV_BUILD }/bin/activate && "
-            f"python3 -m build --outdir { directory_dist } { directory_dist / indicator_name }",
+            f"python3 -m build --outdir { directory_dist } { directory_dist / indicator }",
             capture_output = False,
             print_ = True )
 
 # TODO Uncomment
-#         shutil.rmtree( directory_dist / indicator_name )
+#         shutil.rmtree( directory_dist / indicator )
 
     return message
 

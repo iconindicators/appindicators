@@ -110,12 +110,12 @@ class IndicatorName( Enum ):
 
 
 def _is_indicator(
-    indicator_name,
-    *indicator_names ):
+    indicator,
+    *indicators ):
 
     is_indicator = False
-    for indicator_name_ in indicator_names:
-        if indicator_name.upper() == indicator_name_.name:
+    for indicator_ in indicators:
+        if indicator.upper() == indicator_.name:
             is_indicator = True
             break
 
@@ -123,12 +123,12 @@ def _is_indicator(
 
 
 def _get_introduction(
-    indicator_name ):
+    indicator ):
 
     pattern_tag = re.compile( r".*comments = _\(.*" )
 
     filename = (
-        indicator_name + '/src/' + indicator_name + '/' + indicator_name + ".py" )
+        indicator + '/src/' + indicator + '/' + indicator + ".py" )
 
     with open( filename, encoding = "utf-8" ) as f_in:
         for line in f_in:
@@ -143,7 +143,7 @@ def _get_introduction(
                 break
 
     introduction = (
-        f"`{ indicator_name }` { comments } on "
+        f"`{ indicator }` { comments } on "
         "`Debian`, `Ubuntu`, `Fedora`" )
 
     # openSUSE Tumbleweed and Manjaro do not contain the 'calendar' package.
@@ -152,7 +152,7 @@ def _get_introduction(
     #
     # Keep indicatortest as `calendar` is only a small part of the overall
     # functionality.
-    if not _is_indicator( indicator_name, IndicatorName.INDICATORONTHISDAY ):
+    if not _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
         introduction += ", `openSUSE`, `Manjaro`"
 
     introduction += (
@@ -160,8 +160,8 @@ def _get_introduction(
         "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n" )
 
     introduction += "Other indicators in this series are:\n"
-    for indicator in _get_indicator_names_sans_current( indicator_name ):
-        introduction += f"- [{ indicator }](https://pypi.org/project/{ indicator })\n"
+    for indicator_ in _get_indicator_names_sans_current( indicator ):
+        introduction += f"- [{ indicator_ }](https://pypi.org/project/{ indicator_ })\n"
 
     introduction += '\n'
 
@@ -169,21 +169,21 @@ def _get_introduction(
 
 
 def _get_indicator_names_sans_current(
-    indicator_name ):
+    indicator ):
 
     indicators = [
         str( x )
         for x in Path( '.' ).iterdir()
         if x.is_dir() and str( x ).startswith( "indicator" ) ]
 
-    indicators.remove( indicator_name )
+    indicators.remove( indicator )
     indicators.remove( "indicatorbase" )
     indicators.sort()
     return indicators
 
 
 def _get_install_uninstall(
-    indicator_name,
+    indicator,
     install = True ):
 
     if install:
@@ -192,13 +192,13 @@ def _get_install_uninstall(
         command_fedora = "sudo dnf -y install"
 
         additional_text = ""
-        if _is_indicator( indicator_name, IndicatorName.INDICATORSCRIPTRUNNER ):
+        if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
             additional_text = (
-                f"3. Any `Python` scripts you add to `{ indicator_name }` may "
+                f"3. Any `Python` scripts you add to `{ indicator }` may "
                 "require additional modules installed to the virtual "
                 f"environment at `{ utils.VENV_INSTALL }`.\n" )
 
-        if _is_indicator( indicator_name, IndicatorName.INDICATORTIDE ):
+        if _is_indicator( indicator, IndicatorName.INDICATORTIDE ):
             additional_text = (
                 "3. You will need to write a `Python` script to retrieve your "
                 "tidal data.  In addition, your `Python` script may require "
@@ -210,7 +210,7 @@ def _get_install_uninstall(
             "-----------------------\n\n"
             "Installation and updating follow the same process:\n"
             "1. Install operating system packages.\n"
-            f"2. Install `{ indicator_name }` to a `Python3` virtual "
+            f"2. Install `{ indicator }` to a `Python3` virtual "
             f"environment at `{ utils.VENV_INSTALL }`.\n"
             f"{ additional_text }\n\n" )
 
@@ -229,13 +229,13 @@ def _get_install_uninstall(
             {
                 OperatingSystem.DEBIAN_11,
                 OperatingSystem.DEBIAN_12 },
-            indicator_name,
+            indicator,
             command_debian,
             _get_operating_system_dependencies_debian ) +
 
         function(
             { OperatingSystem.FEDORA_38 },
-            indicator_name,
+            indicator,
             command_fedora,
             _get_operating_system_dependencies_fedora ) +
 
@@ -243,13 +243,13 @@ def _get_install_uninstall(
             {
                 OperatingSystem.FEDORA_39,
                 OperatingSystem.FEDORA_40 },
-            indicator_name,
+            indicator,
             command_fedora,
             _get_operating_system_dependencies_fedora ) +
 
         function(
             { OperatingSystem.MANJARO_24 },
-            indicator_name,
+            indicator,
             "sudo pacman -S --noconfirm"
             if install else
             "sudo pacman -R --noconfirm",
@@ -257,7 +257,7 @@ def _get_install_uninstall(
 
         function(
             { OperatingSystem.OPENSUSE_TUMBLEWEED },
-            indicator_name,
+            indicator,
             "sudo zypper install -y"
             if install else
             "sudo zypper remove -y",
@@ -267,7 +267,7 @@ def _get_install_uninstall(
             {
                 OperatingSystem.LINUX_MINT_CINNAMON_20,
                 OperatingSystem.UBUNTU_2004 },
-            indicator_name,
+            indicator,
             command_debian,
             _get_operating_system_dependencies_debian ) +
 
@@ -286,7 +286,7 @@ def _get_install_uninstall(
                 OperatingSystem.UBUNTU_UNITY_2204,
                 OperatingSystem.UBUNTU_UNITY_2404,
                 OperatingSystem.XUBUNTU_2404 },
-            indicator_name,
+            indicator,
             command_debian,
             _get_operating_system_dependencies_debian ) )
 
@@ -302,13 +302,13 @@ def _os_has_no_calendar( operating_systems ):
 
 def _get_install_for_operating_system(
     operating_systems,
-    indicator_name,
+    indicator,
     install_command,
     _get_operating_system_dependencies_function ):
 
     calendar_vital_to_indicator = (
         _is_indicator(
-            indicator_name,
+            indicator,
             IndicatorName.INDICATORONTHISDAY ) )
 
     if calendar_vital_to_indicator and _os_has_no_calendar( operating_systems ):
@@ -323,7 +323,7 @@ def _get_install_for_operating_system(
         operating_system_dependencies = (
             _get_operating_system_dependencies_function(
                 operating_systems,
-                IndicatorName[ indicator_name.upper() ] ) )
+                IndicatorName[ indicator.upper() ] ) )
 
         installation = (
             "<details>"
@@ -337,12 +337,12 @@ def _get_install_for_operating_system(
 
         python_virtual_environment = (
             _get_installation_python_virtual_environment(
-                indicator_name, operating_systems ) )
+                indicator, operating_systems ) )
 
         installation += f"2. { python_virtual_environment }"
 
         additional_python_modules = (
-            _get_installation_additional_python_modules( indicator_name ) )
+            _get_installation_additional_python_modules( indicator ) )
 
         if additional_python_modules:
             installation += f"3. { additional_python_modules }"
@@ -387,7 +387,7 @@ def _get_extension(
 
 
 def _get_installation_python_virtual_environment(
-    indicator_name,
+    indicator,
     operating_systems ):
 
     # On Debian based distributions, the latest version of PyGObject requires
@@ -430,10 +430,10 @@ def _get_installation_python_virtual_environment(
         pygobject = "PyGObject\<=3.50.0"
 
     message = (
-        f"Install `{ indicator_name }`, including icons, .desktop and run "
+        f"Install `{ indicator }`, including icons, .desktop and run "
         "script, to the `Python3` virtual environment:\n"
         "    ```\n"
-        f"    indicator={ indicator_name } && \\\n"
+        f"    indicator={ indicator } && \\\n"
         f"    venv={ utils.VENV_INSTALL } && \\\n"
         f"    if [ ! -d ${{ venv }} ]; then python3 -m venv ${{ ven v}}; fi && \\\n"
         f"    . ${{ venv }}/bin/activate && \\\n"
@@ -447,7 +447,7 @@ def _get_installation_python_virtual_environment(
 
 
 def _get_installation_additional_python_modules(
-    indicator_name ):
+    indicator ):
 
     message = ''
 
@@ -459,12 +459,12 @@ def _get_installation_additional_python_modules(
         "    deactivate\n"
         "    ```\n" )
 
-    if _is_indicator( indicator_name, IndicatorName.INDICATORSCRIPTRUNNER ):
+    if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
         message += (
-            f"If you have added any `Python` scripts to `{ indicator_name }`, "
+            f"If you have added any `Python` scripts to `{ indicator }`, "
             f"you may need to install additional `Python` modules. { common }" )
 
-    if _is_indicator( indicator_name, IndicatorName.INDICATORTIDE ):
+    if _is_indicator( indicator, IndicatorName.INDICATORTIDE ):
         message += (
             "Your `Python` script which retrieves tidal data may require "
             f"additional `Python` modules. { common }" )
@@ -474,13 +474,13 @@ def _get_installation_additional_python_modules(
 
 def _get_uninstall_for_operating_system(
     operating_systems,
-    indicator_name,
+    indicator,
     uninstall_command,
     _get_operating_system_dependencies_function ):
 
     calendar_vital_to_indicator = (
         _is_indicator(
-            indicator_name,
+            indicator,
             IndicatorName.INDICATORONTHISDAY ) )
 
     if calendar_vital_to_indicator and _os_has_no_calendar( operating_systems ):
@@ -491,7 +491,7 @@ def _get_uninstall_for_operating_system(
 
         operating_system_dependencies = (
             _get_operating_system_dependencies_function(
-                operating_systems, IndicatorName[ indicator_name.upper() ] ) )
+                operating_systems, IndicatorName[ indicator.upper() ] ) )
 
         # Ideally, an extension which was installed should be uninstalled.
         #
@@ -509,7 +509,7 @@ def _get_uninstall_for_operating_system(
 
             "2. Uninstall the indicator from virtual environment:\n"
             "    ```\n"
-            f"    indicator={ indicator_name } && \\\n"
+            f"    indicator={ indicator } && \\\n"
             f"    venv={ utils.VENV_INSTALL } && \\\n"
             f"    $(ls -d ${{ venv }}/lib/python3.* | head -1)/"
             f"site-packages/${{ indicator }}/platform/linux/uninstall.sh && \\\n"
@@ -566,7 +566,7 @@ def _get_summary(
 
 def _get_operating_system_dependencies_debian(
     operating_systems,
-    indicator_name ):
+    indicator ):
 
     dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
@@ -582,7 +582,7 @@ def _get_operating_system_dependencies_debian(
     if needs_gnome_shell_extension_appindicator:
         dependencies.append( "gnome-shell-extension-appindicator" )
 
-    if indicator_name == IndicatorName.INDICATORFORTUNE:
+    if indicator == IndicatorName.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
         dependencies.append( "wl-clipboard" )
@@ -604,19 +604,19 @@ def _get_operating_system_dependencies_debian(
         { OperatingSystem.UBUNTU_UNITY_2404 }.issubset( operating_systems ) or
         { OperatingSystem.XUBUNTU_2404 }.issubset( operating_systems ) )
 
-    if indicator_name == IndicatorName.INDICATORONTHISDAY:
+    if indicator == IndicatorName.INDICATORONTHISDAY:
         dependencies.append( "wl-clipboard" )
         if needs_calendar:
             dependencies.append( "calendar" )
 
-    if indicator_name == IndicatorName.INDICATORPUNYCODE:
+    if indicator == IndicatorName.INDICATORPUNYCODE:
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == IndicatorName.INDICATORSCRIPTRUNNER:
+    if indicator == IndicatorName.INDICATORSCRIPTRUNNER:
         dependencies.append( "libnotify-bin" )
         dependencies.append( "pulseaudio-utils" )
 
-    if indicator_name == IndicatorName.INDICATORTEST:
+    if indicator == IndicatorName.INDICATORTEST:
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
         dependencies.append( "libnotify-bin" )
@@ -626,7 +626,7 @@ def _get_operating_system_dependencies_debian(
         if needs_calendar:
             dependencies.append( "calendar" )
 
-    if indicator_name == IndicatorName.INDICATORVIRTUALBOX:
+    if indicator == IndicatorName.INDICATORVIRTUALBOX:
         dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
@@ -634,7 +634,7 @@ def _get_operating_system_dependencies_debian(
 
 def _get_operating_system_dependencies_fedora(
     operating_systems,
-    indicator_name ):
+    indicator ):
 
     dependencies = [
         "cairo-gobject-devel",
@@ -644,26 +644,26 @@ def _get_operating_system_dependencies_fedora(
         "python3-devel",
         "python3-pip" ]
 
-    if indicator_name == IndicatorName.INDICATORFORTUNE:
+    if indicator == IndicatorName.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == IndicatorName.INDICATORONTHISDAY:
+    if indicator == IndicatorName.INDICATORONTHISDAY:
         dependencies.append( "calendar" )
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == IndicatorName.INDICATORPUNYCODE:
+    if indicator == IndicatorName.INDICATORPUNYCODE:
         dependencies.append( "wl-clipboard" )
 
     needs_pulseaudio = (
         { OperatingSystem.FEDORA_39 }.issubset( operating_systems ) or
         { OperatingSystem.FEDORA_40 }.issubset( operating_systems ) )
 
-    if indicator_name == IndicatorName.INDICATORSCRIPTRUNNER:
+    if indicator == IndicatorName.INDICATORSCRIPTRUNNER:
         if needs_pulseaudio:
             dependencies.append( "pulseaudio-utils" )
 
-    if indicator_name == IndicatorName.INDICATORTEST:
+    if indicator == IndicatorName.INDICATORTEST:
         dependencies.append( "calendar" )
         dependencies.append( "fortune-mod" )
         dependencies.append( "wl-clipboard" )
@@ -672,7 +672,7 @@ def _get_operating_system_dependencies_fedora(
         if needs_pulseaudio:
             dependencies.append( "pulseaudio-utils" )
 
-    if indicator_name == IndicatorName.INDICATORVIRTUALBOX:
+    if indicator == IndicatorName.INDICATORVIRTUALBOX:
         dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
@@ -680,7 +680,7 @@ def _get_operating_system_dependencies_fedora(
 
 def _get_operating_system_dependencies_manjaro(
     operating_systems,
-    indicator_name ):
+    indicator ):
 
     dependencies = [
         "cairo",
@@ -688,22 +688,22 @@ def _get_operating_system_dependencies_manjaro(
         "libayatana-appindicator",
         "pkgconf" ]
 
-    if indicator_name == IndicatorName.INDICATORFORTUNE:
+    if indicator == IndicatorName.INDICATORFORTUNE:
         dependencies.append( "fortune-mod" )
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == IndicatorName.INDICATORONTHISDAY:
+    if indicator == IndicatorName.INDICATORONTHISDAY:
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == IndicatorName.INDICATORPUNYCODE:
+    if indicator == IndicatorName.INDICATORPUNYCODE:
         dependencies.append( "wl-clipboard" )
 
-    if indicator_name == IndicatorName.INDICATORTEST:
+    if indicator == IndicatorName.INDICATORTEST:
         dependencies.append( "fortune-mod" )
         dependencies.append( "wl-clipboard" )
         dependencies.append( "wmctrl" )
 
-    if indicator_name == IndicatorName.INDICATORVIRTUALBOX:
+    if indicator == IndicatorName.INDICATORVIRTUALBOX:
         dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
@@ -711,7 +711,7 @@ def _get_operating_system_dependencies_manjaro(
 
 def _get_operating_system_dependencies_opensuse(
     operating_systems,
-    indicator_name ):
+    indicator ):
 
     dependencies = [
         "cairo-devel",
@@ -720,41 +720,41 @@ def _get_operating_system_dependencies_opensuse(
         "python3-devel",
         "typelib-1_0-AyatanaAppIndicator3-0_1" ]
 
-    if indicator_name == IndicatorName.INDICATORFORTUNE:
+    if indicator == IndicatorName.INDICATORFORTUNE:
         dependencies.append( "fortune" )
 
-    if indicator_name == IndicatorName.INDICATORTEST:
+    if indicator == IndicatorName.INDICATORTEST:
         dependencies.append( "fortune" )
 
     return ' '.join( sorted( dependencies ) )
 
 
 def _get_usage(
-    indicator_name,
-    indicator_name_human_readable ):
+    indicator,
+    indicator_human_readable ):
 
     return (
         "Usage\n"
         "-----\n\n"
 
-        f"To run `{ indicator_name }`, press the `Super` key to show the "
+        f"To run `{ indicator }`, press the `Super` key to show the "
         "applications overlay (or similar), type "
-        f"`{ indicator_name_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Removes the ™ from VirtualBox™.
+        f"`{ indicator_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Removes the ™ from VirtualBox™.
         "into the search bar and the icon should be present for you to select.  "
         "If the icon does not appear, or appears as generic or broken, you may have to "
         "log out / in (or restart).\n\n"
         "Alternatively, to run from the terminal:\n\n"
-        f"```. $HOME/.local/bin/{ indicator_name }.sh```\n\n" )
+        f"```. $HOME/.local/bin/{ indicator }.sh```\n\n" )
 
 
 def _get_limitations(
-    indicator_name ):
+    indicator ):
 
     messages = [ ]
 
 #TODO I think this is no longer the case but test on all distros...
     if _is_indicator(
-        indicator_name,
+        indicator,
         IndicatorName.INDICATORPUNYCODE ):
         messages.append(
             "- `Wayland`: Clipboard/Primary input and output function "
@@ -762,7 +762,7 @@ def _get_limitations(
 
 #TODO I think this is no longer the case but test on all distros...
     if _is_indicator(
-        indicator_name,
+        indicator,
         IndicatorName.INDICATORFORTUNE,
         IndicatorName.INDICATORONTHISDAY,
         IndicatorName.INDICATORTEST ):
@@ -770,7 +770,7 @@ def _get_limitations(
             "- `Wayland`: Clipboard copy/paste is unsupported.\n" )
 
     if _is_indicator(
-        indicator_name,
+        indicator,
         IndicatorName.INDICATORTEST,
         IndicatorName.INDICATORVIRTUALBOX ):
         messages.append(
@@ -780,7 +780,7 @@ def _get_limitations(
     # Kubuntu 24.04     KDE     No mouse wheel scroll.
     # Manjaro 24.0.7    KDE     No mouse wheel scroll.
     if _is_indicator(
-        indicator_name,
+        indicator,
         IndicatorName.INDICATORSTARDATE,
         IndicatorName.INDICATORTEST,
         IndicatorName.INDICATORVIRTUALBOX ):
@@ -798,7 +798,7 @@ def _get_limitations(
     # openSUSE Tumbleweed   ICEWM       No label/tooltip.
     # Xubuntu 24.04         XFCE        Tooltip in lieu of label.
     if _is_indicator(
-        indicator_name,
+        indicator,
         IndicatorName.INDICATORLUNAR,
         IndicatorName.INDICATORSCRIPTRUNNER,
         IndicatorName.INDICATORSTARDATE,
@@ -824,7 +824,7 @@ def _get_limitations(
     # Lubuntu 22.04     LXQt        Cannot change the icon once initially set.
     # Lubuntu 24.04     LXQt        Cannot change the icon once initially set.
     if _is_indicator(
-        indicator_name,
+        indicator,
         IndicatorName.INDICATORLUNAR,
         IndicatorName.INDICATORTEST ):
         messages.append(
@@ -836,7 +836,7 @@ def _get_limitations(
     # Lubuntu 22.04     LXQt    Default terminal (qterminal) does not work.
     # Lubuntu 24.04     LXQt    Default terminal (qterminal) all good.
     if _is_indicator(
-        indicator_name,
+        indicator,
         IndicatorName.INDICATORSCRIPTRUNNER,
         IndicatorName.INDICATORTEST ):
         messages.append(
@@ -848,7 +848,7 @@ def _get_limitations(
     # Manjaro 24            No `calendar` command.
     # openSUSE Tumbleweed   No `calendar` command.
     if _is_indicator(
-        indicator_name,
+        indicator,
         IndicatorName.INDICATORTEST ):
         messages.append(
             "- `Manjaro 24`: Does not contain the `calendar` command.\n" )
@@ -857,7 +857,7 @@ def _get_limitations(
 
     # openSUSE Tumbleweed    ICEWM      No notifications.
     if _is_indicator(
-        indicator_name,
+        indicator,
         IndicatorName.INDICATORFORTUNE,
         IndicatorName.INDICATORLUNAR,
         IndicatorName.INDICATORONTHISDAY,
@@ -878,7 +878,7 @@ def _get_limitations(
     # is no calendar package, only flag that that autostart does not work for
     # all the indicators other than indicatoronthisday.
     if not _is_indicator(
-        indicator_name,
+        indicator,
         IndicatorName.INDICATORONTHISDAY ):
         messages.append(
             "- `Manjaro 24`: No autostart.\n" )
@@ -916,17 +916,17 @@ def _get_license(
 
 def create_readme(
     directory,
-    indicator_name,
-    indicator_name_human_readable,
+    indicator,
+    indicator_human_readable,
     authors_emails,
     start_year ):
 
     Path( directory ).mkdir( parents = True, exist_ok = True )
 
     with open( Path( directory, "README.md" ), 'w', encoding = "utf-8" ) as f:
-        f.write( _get_introduction( indicator_name ) )
-        f.write( _get_install_uninstall( indicator_name ) )
-        f.write( _get_usage( indicator_name, indicator_name_human_readable ) )
-        f.write( _get_limitations( indicator_name ) )
-        f.write( _get_install_uninstall( indicator_name, install = False ) )
+        f.write( _get_introduction( indicator ) )
+        f.write( _get_install_uninstall( indicator ) )
+        f.write( _get_usage( indicator, indicator_human_readable ) )
+        f.write( _get_limitations( indicator ) )
+        f.write( _get_install_uninstall( indicator, install = False ) )
         f.write( _get_license( authors_emails, start_year ) )

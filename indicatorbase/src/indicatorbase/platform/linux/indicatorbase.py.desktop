@@ -2,7 +2,7 @@
 #
 #
 # To validate this file:
-#   desktop-file-validate {indicator_name}.py.desktop
+#   desktop-file-validate {indicator}.py.desktop
 #
 #
 # The \\$HOME in the Exec is appropriate given the above specification.
@@ -41,7 +41,7 @@
 # The operating system / desktop should update the .desktop automatically,
 # but may not do so until a log out/in or a restart.
 # From a terminal:
-#   xdg-desktop-menu install --novendor {indicator_name}.py.desktop
+#   xdg-desktop-menu install --novendor {indicator}.py.desktop
 # may perform the update (without the log out/in or restart) but depends
 # entirely on the distribution/desktop.
 #
@@ -51,7 +51,7 @@ Type=Application
 {names}
 {comment}
 {categories}
-Icon={indicator_name}
+Icon={indicator}
 Terminal=false
-Exec=sh -c "sleep 0 && \\$HOME/.local/bin/{indicator_name}.sh"
+Exec=sh -c "sleep 0 && \\$HOME/.local/bin/{indicator}.sh"
 X-GNOME-Autostart-enabled=false

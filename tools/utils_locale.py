@@ -41,10 +41,10 @@ from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 
 
 def _get_linguas_codes(
-    indicator_name ):
+    indicator ):
 
     lingua_codes = [ ]
-    with open( _get_linguas( indicator_name ), 'r', encoding = "utf-8" ) as f:
+    with open( _get_linguas( indicator ), 'r', encoding = "utf-8" ) as f:
         for line in f:
             if not line.startswith( '#' ):
                 lingua_codes = line.split()
@@ -53,17 +53,17 @@ def _get_linguas_codes(
 
 
 def _get_locale_directory(
-    indicator_name ):
+    indicator ):
 
-    return Path( '.' ) / indicator_name / "src" / indicator_name / "locale"
+    return Path( '.' ) / indicator / "src" / indicator / "locale"
 
 
 def _get_linguas(
-    indicator_name ):
+    indicator ):
 
     # The LINGUAS file lists each supported language/locale:
     #   http://www.gnu.org/software/gettext/manual/gettext.html#po_002fLINGUAS
-    return _get_locale_directory( indicator_name ) / "LINGUAS"
+    return _get_locale_directory( indicator ) / "LINGUAS"
 
 
 def _get_current_year():
@@ -71,24 +71,24 @@ def _get_current_year():
 
 
 def _create_update_pot(
-    indicator_name,
+    indicator,
     locale_directory,
     authors_emails,
     version,
     copyright_ ):
 
-    pot_file_new = f"{ locale_directory / indicator_name }.pot"
+    pot_file_new = f"{ locale_directory / indicator }.pot"
     if Path( pot_file_new ).exists():
-        pot_file_new = f"{ locale_directory / indicator_name }.new.pot"
+        pot_file_new = f"{ locale_directory / indicator }.new.pot"
 
     # Create a POT based on current source:
     #   http://www.gnu.org/software/gettext/manual/gettext.html
     IndicatorBase.process_run(
         "xgettext "
         f"-f { locale_directory / 'POTFILES.in' } "
-        f"-D { str( Path( indicator_name ) / 'src' / indicator_name ) } "
+        f"-D { str( Path( indicator ) / 'src' / indicator ) } "
         f"--copyright-holder='{ authors_emails[ 0 ][ 0 ] }.' "
-        f"--package-name={ indicator_name } "
+        f"--package-name={ indicator } "
         f"--package-version={ version } "
         f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' "
         f"-o { pot_file_new }",
@@ -100,7 +100,7 @@ def _create_update_pot(
             r.read().
             replace(
                 "SOME DESCRIPTIVE TITLE",
-                f"Portable Object Template for { indicator_name }" ).
+                f"Portable Object Template for { indicator }" ).
             replace( f"YEAR { authors_emails[ 0 ][ 0 ] }", copyright_ ).
             replace(
                 "FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.\n#\n#, fuzzy",
@@ -111,7 +111,7 @@ def _create_update_pot(
         w.write( text )
 
     if pot_file_new.endswith( ".new.pot" ):
-        pot_file_original = f"{ locale_directory / indicator_name }.pot"
+        pot_file_original = f"{ locale_directory / indicator }.pot"
         original = ""
         with open( pot_file_original, 'r', encoding = "utf-8" ) as f:
             for line in f:
@@ -133,19 +133,19 @@ def _create_update_pot(
 
 
 def _create_update_po(
-    indicator_name,
+    indicator,
     linguas_codes,
     version,
     copyright_ ):
 
-    locale_directory = _get_locale_directory( indicator_name )
-    pot_file = locale_directory / ( indicator_name + ".pot" )
+    locale_directory = _get_locale_directory( indicator )
+    pot_file = locale_directory / ( indicator + ".pot" )
     for lingua_code in linguas_codes:
         po_file_original = (
             locale_directory /
             lingua_code /
             "LC_MESSAGES" /
-            ( indicator_name + ".po" ) )
+            ( indicator + ".po" ) )
 
         if po_file_original.exists():
             po_file_new = str( po_file_original ).replace( '.po', '.new.po' )
@@ -167,7 +167,7 @@ def _create_update_po(
                 new = (
                     re.sub(
                         "Project-Id-Version.*",
-                        f"Project-Id-Version: { indicator_name } { version }\\\\n\"",
+                        f"Project-Id-Version: { indicator } { version }\\\\n\"",
                         new ) )
 
                 with open( po_file_new, 'w', encoding = "utf-8" ) as w:
@@ -199,8 +199,8 @@ def _create_update_po(
                 text = (
                     r.read().
                     replace(
-                        f"Portable Object Template for { indicator_name }",
-                        f"<English language name for { lingua_code }> translation for { indicator_name }" ).
+                        f"Portable Object Template for { indicator }",
+                        f"<English language name for { lingua_code }> translation for { indicator }" ).
                     replace(
                         f"Automatically generated, { _get_current_year() }",
                         f"<author name> <<author email>>, { _get_current_year() }" ).
@@ -218,14 +218,14 @@ def _create_update_po(
 
 
 def update_locale_source(
-    indicator_name,
+    indicator,
     authors_emails,
     start_year,
     version_indicator,
     version_indicatorbase ):
     '''
     Create the .pot file for indicatorbase, if required, otherwise update.
-    Create the .pot file for indicator_name, if required, otherwise update.
+    Create the .pot file for indicator, if required, otherwise update.
     '''
     current_year_author = (
         f"{ _get_current_year() } { authors_emails[ 0 ][ 0 ] }" )
@@ -249,29 +249,29 @@ def update_locale_source(
     copyright_ = f"{ start_year }-{ current_year_author }"
 
     _create_update_pot(
-        indicator_name,
-        Path( '.' ) / indicator_name / "src" / indicator_name / "locale",
+        indicator,
+        Path( '.' ) / indicator / "src" / indicator / "locale",
         authors_emails,
         version_indicator,
         copyright_ )
 
     _create_update_po(
-        indicator_name,
-        _get_linguas_codes( indicator_name ),
+        indicator,
+        _get_linguas_codes( indicator ),
         version_indicator,
         copyright_ )
 
 
 def build_locale_for_release(
     directory_release,
-    indicator_name ):
+    indicator ):
     '''
-    Merge indicatorbase .pot with indicator_name .pot.
-    For each locale, merge indicatorbase .po to indicator_name .po.
+    Merge indicatorbase .pot with indicator .pot.
+    For each locale, merge indicatorbase .po to indicator .po.
     For each .po, create the .mo.
     '''
     directory_indicator_locale = (
-        Path( '.' ) / directory_release / indicator_name / "src" / indicator_name / "locale" )
+        Path( '.' ) / directory_release / indicator / "src" / indicator / "locale" )
 
     directory_indicator_base_locale = (
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" )
@@ -279,9 +279,9 @@ def build_locale_for_release(
     # Merge indicatorbase POT with indicator POT.
     IndicatorBase.process_run(
         "msgcat --use-first "
-        f"{ str( directory_indicator_locale / ( indicator_name + '.pot' ) ) } "
+        f"{ str( directory_indicator_locale / ( indicator + '.pot' ) ) } "
         f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } "
-        f"-o { str( directory_indicator_locale / ( indicator_name + '.pot' ) ) }",
+        f"-o { str( directory_indicator_locale / ( indicator + '.pot' ) ) }",
         capture_output = False,
         print_ = True )
 
