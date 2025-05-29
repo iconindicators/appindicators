@@ -2,14 +2,15 @@
 #
 #
 # To validate this file:
-#   desktop-file-validate {indicator}.py.desktop
+#   desktop-file-validate indicator_name.py.desktop
+# replacing indicator_name with the specfic indicator.
 #
 #
-# The \\$HOME in the Exec is appropriate given the above specification.
-# However, the specification is somewhat confusing and so \$HOME also seems
-# appropriate.  Some Linux distributions/desktops handle no \, or one or two
-# slashes or some combination.  The vast majority of distributions handle two
-# slashes and so that is used here.
+# The \\$HOME in the Exec is appropriate as per the above specification.
+# The specification is somewhat confusing and so \$HOME also seems appropriate.
+# Some Linux distributions/desktops handle no \, or one or two slashes or some
+# combination.  The vast majority of distributions handle two slashes and so
+# that is used here.
 #
 # For reference, distributions and the number of slashes supported:
 #
@@ -39,13 +40,14 @@
 #
 #
 # The operating system / desktop should update the .desktop automatically,
-# but may not do so until a log out/in or a restart.
-# From a terminal:
-#   xdg-desktop-menu install --novendor {indicator}.py.desktop
-# may perform the update (without the log out/in or restart) but depends
-# entirely on the distribution/desktop.
+# but may not do so until a log out/in or a restart.  From a terminal:
+#   xdg-desktop-menu install --novendor indicator_name.py.desktop
+# replacing indicator_name with the specfic indicator.
+# may perform the update (without the log out/in or restart) but depends upon
+# the distribution/desktop.
 #
 #
+# Tags below, enclosed by { }, must not contain spaces.
 [Desktop Entry]
 Type=Application
 {names}

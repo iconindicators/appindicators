@@ -24,7 +24,7 @@ import datetime
 from . import stardate
 
 
-print( f"Stardate API version: {stardate.get_version() }\n" )
+print( f"Stardate API version: { stardate.get_version() }\n" )
 
 utc_now = datetime.datetime.now( datetime.timezone.utc )
 print( f"UTC now: { utc_now }\n" )

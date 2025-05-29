@@ -420,13 +420,9 @@ def _package_source_for_build_wheel_process(
         Path( '.' ) / directory_indicator / "src" / indicator )
 
     pyproject_toml, version_indicator_base = (
-        _create_pyproject_dot_toml(
-            indicator,
-            directory_dist ) )
+        _create_pyproject_dot_toml( indicator, directory_dist ) )
 
-    _create_manifest_dot_in(
-        indicator,
-        directory_dist )
+    _create_manifest_dot_in( indicator, directory_dist )
 
     config = configparser.ConfigParser()
     config.read( pyproject_toml )
@@ -458,9 +454,7 @@ def _package_source_for_build_wheel_process(
             version_from_pyproject_toml,
             version_indicator_base )
 
-        utils_locale.build_locale_for_release(
-            directory_dist,
-            indicator )
+        utils_locale.build_locale_for_release( directory_dist, indicator )
 
         name, categories, comments, message = (
             _get_name_categories_comments_from_indicator(
@@ -475,18 +469,9 @@ def _package_source_for_build_wheel_process(
             authors,
             start_year )
 
-#TODO This needs to use utils.markdown_to_html( markdown, html )
         utils.markdown_to_html(
             f"{ directory_dist }/{ indicator }/README.md",
-            f"{ directory_dist }/{ indicator }/src/{ indicator }/README1.html" )
-
-        IndicatorBase.process_run(
-            f". { utils.VENV_BUILD }/bin/activate && "
-            "python3 -m readme_renderer "
-            f"{ directory_dist }/{ indicator }/README.md "
-            f"-o { directory_dist }/{ indicator }/src/{ indicator }/README.html",
-            capture_output = False,
-            print_ = True )
+            f"{ directory_dist }/{ indicator }/src/{ indicator }/README.html" )
 
         directory_indicator_locale = (
             Path( '.' ) / directory_indicator / "src" / indicator / "locale" )
@@ -518,13 +503,8 @@ def _package_source_for_build_wheel_process(
             comments_from_po_files,
             categories )
 
-        _create_scripts_for_linux(
-            directory_platform_linux,
-            indicator )
-
-        _create_symbolic_icons(
-            directory_dist,
-            indicator )
+        _create_scripts_for_linux( directory_platform_linux, indicator )
+        _create_symbolic_icons( directory_dist, indicator )
 
     return message
 

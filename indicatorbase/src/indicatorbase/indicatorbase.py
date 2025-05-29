@@ -522,7 +522,7 @@ class IndicatorBase( ABC ):
 
                     elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
                         if not exec_with_sleep_present:
-                            if delay:
+                            if delay: #TODO Test if {indicator} can be changed to { indicator }
                                 output += line.replace( "{indicator}", self.indicator_name ).replace( '0', delay )
 
                             else:
@@ -1058,7 +1058,8 @@ class IndicatorBase( ABC ):
     def get_etc_os_release(
         print_ = False ):
         '''
-        TODO Add docstring
+        Return the result of calling
+            cat /etc/os-release
         '''
         return (
             IndicatorBase.process_run(
@@ -3131,7 +3132,7 @@ class IndicatorBase( ABC ):
 # capture_output is True (stdout/stderr should be defined so decode is okay) and
 # when capture_output is False (stdout/stderr should be not be defined so decode is unsafe).
 # Can trigger the exception on grep but no result but get a return code of 1
-# but need to set check = True in the call to subprocess.run().            
+# but need to set check = True in the call to subprocess.run().
             stdout_ = e.stdout.decode()
             stderr_ = e.stderr.decode()
             return_code = e.returncode

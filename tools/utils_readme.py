@@ -115,7 +115,7 @@ def _is_indicator(
 
     is_indicator = False
     for indicator_ in indicators:
-        if indicator.upper() == indicator_.name:
+        if indicator.upper() == indicator:
             is_indicator = True
             break
 
@@ -435,12 +435,12 @@ def _get_installation_python_virtual_environment(
         "    ```\n"
         f"    indicator={ indicator } && \\\n"
         f"    venv={ utils.VENV_INSTALL } && \\\n"
-        f"    if [ ! -d ${{ venv }} ]; then python3 -m venv ${{ ven v}}; fi && \\\n"
-        f"    . ${{ venv }}/bin/activate && \\\n"
-        f"    python3 -m pip install --upgrade { pygobject } ${{ indicator }} && \\\n"
+        f"    if [ ! -d ${{venv}} ]; then python3 -m venv ${{venv}}; fi && \\\n"
+        f"    . ${{venv}}/bin/activate && \\\n"
+        f"    python3 -m pip install --upgrade { pygobject } ${{indicator}} && \\\n"
         "    deactivate && \\\n"
-        f"    . $(ls -d ${{ venv }}/lib/python3.* | head -1)/"
-        f"site-packages/${{ indicator }}/platform/linux/install.sh\n"
+        f"    . $(ls -d ${{venv}}/lib/python3.* | head -1)/"
+        f"site-packages/${{indicator}}/platform/linux/install.sh\n"
         "    ```\n" )
 
     return message
@@ -479,9 +479,7 @@ def _get_uninstall_for_operating_system(
     _get_operating_system_dependencies_function ):
 
     calendar_vital_to_indicator = (
-        _is_indicator(
-            indicator,
-            IndicatorName.INDICATORONTHISDAY ) )
+        _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ) )
 
     if calendar_vital_to_indicator and _os_has_no_calendar( operating_systems ):
         uninstall = ''
@@ -511,13 +509,13 @@ def _get_uninstall_for_operating_system(
             "    ```\n"
             f"    indicator={ indicator } && \\\n"
             f"    venv={ utils.VENV_INSTALL } && \\\n"
-            f"    $(ls -d ${{ venv }}/lib/python3.* | head -1)/"
-            f"site-packages/${{ indicator }}/platform/linux/uninstall.sh && \\\n"
-            f"    . ${{ venv }}/bin/activate && \\\n"
-            f"    python3 -m pip uninstall --yes ${{ indicator }} && \\\n"
+            f"    $(ls -d ${{venv}}/lib/python3.* | head -1)/"
+            f"site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n"
+            f"    . ${{venv}}/bin/activate && \\\n"
+            f"    python3 -m pip uninstall --yes ${{indicator}} && \\\n"
             "    count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && \\\n"
             "    deactivate && \\\n"
-            f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{ venv }}; fi \n"
+            f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
             "    ```\n"
             "    If no other indicators are installed, the virtual "
             "environment will be deleted.\n\n"

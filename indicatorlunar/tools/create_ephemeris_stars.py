@@ -141,8 +141,8 @@ def print_ephemeris_pyephem(
             name.upper(),
             "f|S|" +
             spectral_type,
-            f"{right_ascension.hours:.8f}|{ star.ra_mas_per_year }",
-            f"{declination.degrees:.8f}|{ star.dec_mas_per_year }",
+            f"{ right_ascension.hours:.8f }|{ star.ra_mas_per_year }",#TODO Added a space in the first {}.   Make sure this still works.
+            f"{ declination.degrees:.8f }|{ star.dec_mas_per_year }",#TODO Added a space in the first {}.   Make sure this still works.
             row[ "magnitude" ],
         ]
 
