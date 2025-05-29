@@ -30,7 +30,8 @@ References:
 
 
 #TODO I think pulseaudio is no longer available on Manjaro 24...
-# try to confirm and if so, what is the new way to play a sound for scriptrunner?
+# try to confirm and if so, what is the new way to play a sound for
+# scriptrunner and test?
 
 
 #TODO Consider testing on Fedora 42.
