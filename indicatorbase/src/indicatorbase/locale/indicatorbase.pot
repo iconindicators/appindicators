@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorbase 1.0.1\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-05-27 12:18+1000\n"
+"POT-Creation-Date: 2025-05-30 08:28+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -64,39 +64,39 @@ msgstr ""
 msgid "error log"
 msgstr ""
 
-#: indicatorbase.py:1352
+#: indicatorbase.py:1353
 msgid "Autostart"
 msgstr ""
 
-#: indicatorbase.py:1353
+#: indicatorbase.py:1354
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicatorbase.py:1361
+#: indicatorbase.py:1362
 msgid "Start up delay (seconds)."
 msgstr ""
 
-#: indicatorbase.py:1379
+#: indicatorbase.py:1380
 msgid "Check Latest Version"
 msgstr ""
 
-#: indicatorbase.py:1381
+#: indicatorbase.py:1382
 msgid "Check for the latest version of the indicator on start up."
 msgstr ""
 
-#: indicatorbase.py:1394
+#: indicatorbase.py:1395
 #, python-brace-format
 msgid "An update is available at <a href=\"{0}\">{1}</a>."
 msgstr ""
 
-#: indicatorbase.py:2153
+#: indicatorbase.py:2154
 msgid "Enabled"
 msgstr ""
 
-#: indicatorbase.py:2184
+#: indicatorbase.py:2185
 msgid "Add"
 msgstr ""
 
-#: indicatorbase.py:2185
+#: indicatorbase.py:2186
 msgid "Remove"
 msgstr ""
