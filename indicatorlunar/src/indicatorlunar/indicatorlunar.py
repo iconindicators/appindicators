@@ -3015,7 +3015,7 @@ class IndicatorLunar( IndicatorBase ):
             j = 0
 
         translated_text = text
-        tags = re.findall( "\[([^\[^\]]+)\]", translated_text )  #TODO See what happens if putting an r in front does.  pylint:  (anomalous-backslash-in-string)
+        tags = re.findall( r"\[([^\[^\]]+)\]", translated_text )
         for tag in tags:
             iterator = tags_list_store.get_iter_first()
             while iterator:
