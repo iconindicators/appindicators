@@ -305,10 +305,16 @@ class AstroPyEphem( AstroBase ):
         AstroPyEphem._calculate_moon( ephem_now, observer, data )
         AstroPyEphem._calculate_sun( ephem_now, observer, data )
         AstroPyEphem._calculate_planets(
-            observer, data, planets, apparent_magnitude_maximum )
+            observer,
+            data,
+            planets,
+            apparent_magnitude_maximum )
 
         AstroPyEphem._calculate_stars(
-            observer, data, stars, apparent_magnitude_maximum )
+            observer,
+            data,
+            stars,
+            apparent_magnitude_maximum )
 
         AstroPyEphem._calculate_comets(
             observer,
@@ -507,11 +513,12 @@ class AstroPyEphem( AstroBase ):
         apparent_magnitude_maximum ):
 
         for star in stars:
-            # Did test obtaining the absolute magnitude directly
-            # from the ephemeris before reading in and computing the body.
-            # After timing tests, this makes no difference,
-            # so follow "traditional" route of read, compute and obtain
-            # the absolute magnitude.
+            # Did a test obtaining the absolute magnitude directly from the
+            # ephemeris before reading in and computing the body.
+            #
+            # After timing tests, this makes no difference, so follow the
+            # "traditional" route of read, compute and obtain the absolute
+            # magnitude.
             body = ephem.readdb( AstroPyEphem._EPHEMERIS_STARS[ star.upper() ] )
             body.compute( observer )
             if body.mag <= apparent_magnitude_maximum:
@@ -558,12 +565,9 @@ class AstroPyEphem( AstroBase ):
 
                 else:
                     logging.warning(
-                        "Found unknown object type "
-                        +
-                        object_type
-                        +
-                        " for comet "
-                        +
+                        "Found unknown object type " +
+                        object_type +
+                        " for comet " +
                         key )
 
                     continue
@@ -651,12 +655,9 @@ class AstroPyEphem( AstroBase ):
         '''
         try:
             bad = (
-                math.isnan( body.earth_distance )
-                or
-                math.isnan( body.phase )
-                or
-                math.isnan( body.size )
-                or
+                math.isnan( body.earth_distance ) or
+                math.isnan( body.phase ) or
+                math.isnan( body.size ) or
                 math.isnan( body.sun_distance ) )
 
         except RuntimeError:
@@ -720,8 +721,7 @@ class AstroPyEphem( AstroBase ):
         utc_now = ephem_now.datetime().replace( tzinfo = datetime.timezone.utc )
 
         utc_now_plus_search_duration = (
-            utc_now
-            +
+            utc_now +
             datetime.timedelta( hours = AstroBase.SATELLITE_SEARCH_DURATION_HOURS ) )
 
         windows = (
@@ -820,8 +820,7 @@ class AstroPyEphem( AstroBase ):
                     # Look for the next pass starting shortly after current set.
                     current_date_time = (
                         ephem.Date(
-                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ]
-                            +
+                            next_pass[ AstroPyEphem._PYEPHEM_SATELLITE_SETTING_DATE ] +
                             ephem.minute * 15 ) )
 
                 else:
@@ -899,8 +898,6 @@ class AstroPyEphem( AstroBase ):
         sun.compute( observer_visible_passes )
 
         return (
-            not satellite.eclipsed
-            and
-            sun.alt > ephem.degrees( "-18" )
-            and
+            not satellite.eclipsed and
+            sun.alt > ephem.degrees( "-18" ) and
             sun.alt < ephem.degrees( "-6" ) )
