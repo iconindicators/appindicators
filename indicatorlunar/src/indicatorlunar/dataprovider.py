@@ -17,8 +17,8 @@
 
 
 '''
-Base class for downloading from a URL and loading from file,
-data for comets minor planets and satellites.
+Base class for downloading from a URL or loading from a file, the data for
+comets, minor planets and satellites.
 '''
 
 
@@ -27,7 +27,8 @@ from abc import ABC, abstractmethod
 
 class DataProvider( ABC ):
     '''
-    Base class for downloading and persisting data for astronomical objects.
+    Base class for downloading and loading of data for comets, minor planets
+    and satellites.
     '''
 
     @staticmethod
@@ -39,7 +40,7 @@ class DataProvider( ABC ):
         '''
         Download data and save to file.
 
-        Return True on success; false otherwise and may log.
+        Return True on success; false otherwise with optional log.
         '''
         return True
 
@@ -53,6 +54,6 @@ class DataProvider( ABC ):
         '''
         Load data from file and return in a dictionary.
 
-        Return dictionary which may be empty and may log.
+        Return dictionary which may be empty with optional log.
         '''
         return { }

@@ -17,8 +17,8 @@
 
 
 '''
-Download from URL, load from file and hold in memory,
-apparent magnitude for comets and minor planets.
+Download from URL, load from file and hold in memory, apparent magnitude for
+comets and minor planets.
 '''
 
 
