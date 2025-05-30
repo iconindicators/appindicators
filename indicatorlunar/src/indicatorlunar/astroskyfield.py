@@ -19,6 +19,25 @@
 ''' Calculate astronomical information using Skyfield. '''
 
 
+#TODO Ran the indicator with skyfield and debug = True and got the following:
+# magnitude : timing (seconds)
+# 7 : 6
+# 8 : 6
+# 9 : 6
+# 10 : 7
+# 11 : 9
+# 12 : 16
+# 13 : 37
+# 14 : 77 
+# 15 : 159
+#
+# Maybe tidy up astroskyfield then do same timing tests...
+# ...maybe release indicatorlunar with skyfield instead of pyephem?
+# Ask Oleg!
+#
+# How long does it take to run at mag 7 on laptop?
+
+
 #TODO If/when astroskyfield is included in the release and ephem is dropped...
 #
 # In pyprojectspecific.toml, replace
