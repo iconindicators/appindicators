@@ -48,20 +48,19 @@ class DataProviderApparentMagnitude( DataProvider ):
         if is_comet:
             # COBS does not provide apparent magnitude data.
             # Instead, when downloading orbital element data,
-            # a maximum apparent magnitude can be specified which filters out
-            # comets with an apparent magnitude greater.
+            # a maximum apparent magnitude is used to filter.
             downloaded = False
 
         else:
             downloaded = (
-                DataProviderApparentMagnitude._download_from_lowell_minor_planet_services(
+                DataProviderApparentMagnitude._download_from_lowell(
                     filename, logging, apparent_magnitude_maximum ) )
 
         return downloaded
 
 
     @staticmethod
-    def _download_from_lowell_minor_planet_services(
+    def _download_from_lowell(
         filename,
         logging,
         apparent_magnitude_maximum ):
@@ -131,16 +130,11 @@ class DataProviderApparentMagnitude( DataProvider ):
                         str( minor_planet[ "ephemeris" ][ 0 ][ "v_mag" ] ) )
 
                     f.write(
-                        str( asteroid_number )
-                        +
-                        ' '
-                        +
-                        designation_name
-                        +
-                        ','
-                        +
-                        apparent_magnitude
-                        +
+                        str( asteroid_number ) +
+                        ' ' +
+                        designation_name +
+                        ',' +
+                        apparent_magnitude +
                         '\n' )
 
             downloaded = True
