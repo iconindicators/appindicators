@@ -40,8 +40,11 @@ class DataProviderGeneralPerturbation( DataProvider ):
         Download general perturbation data from Celestrak and save to the
         given filename.
         '''
-        url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=xml"
-        return IndicatorBase.download( url, filename, logging )
+        return (
+            IndicatorBase.download(
+                "https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=xml",
+                filename,
+                logging ) )
 
 
     @staticmethod
@@ -79,15 +82,14 @@ class GeneralPerturbation():
             https://github.com/brandon-rhodes/pyephem/discussions/243
 
         Ensure propagation occurs when the NORAD catalog number exceeds 339,999:
-            Swap out the NORAD catalog number with '0'
-            (NORAD catalog numbers start from '1'),
-            perform the propagation, then swap back in.
+            Swap out the NORAD catalog number with '0' which is safe as NORAD
+            catalog numbers start from '1', perform the propagation, then swap
+            back in.
 
         Although the resultant satellite record will contain a value of '0'
         for the NORAD catalog number, the actual NORAD catalog number is still
         available via get_number().
         '''
-
         self.satellite_record = Satrec()
 
         # Satellite record does not hold the name.
