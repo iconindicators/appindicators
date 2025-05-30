@@ -224,7 +224,10 @@ class DataProviderOrbitalElement( DataProvider ):
                             ' ', # 14
                             str( round( float( slope_parameter ), 2 ) ).rjust( 5 ),
                             ' ', # 20
-                            DataProviderOrbitalElement.get_packed_date( minor_planet[ "epoch" ][ 0 : 4 ], minor_planet[ "epoch" ][ 5 : 7 ], minor_planet[ "epoch" ][ 8 : 10 ] ).rjust( 5 ),
+                            DataProviderOrbitalElement.get_packed_date(
+                                minor_planet[ "epoch" ][ 0 : 4 ],
+                                minor_planet[ "epoch" ][ 5 : 7 ],
+                                minor_planet[ "epoch" ][ 8 : 10 ] ).rjust( 5 ),
                             ' ', # 26
                             str( round( float( mean_anomaly_epoch ), 5 ) ).rjust( 9 ),
                             ' ' * 2, # 36, 37
@@ -367,13 +370,15 @@ class DataProviderOrbitalElement( DataProvider ):
                 # https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
                 name_start = 103
                 name_end = 158
-                valid_indices = [ 13, 14, 19, 22, 30, 40, 41, 50, 51, 60, 61, 70, 71, 80, 81, 90, 91, 96, 101, 102, 159 ]
+                valid_indices = [
+                    13, 14, 19, 22, 30, 40, 41, 50, 51, 60, 61, 70, 71, 80, 81, 90, 91, 96, 101, 102, 159 ]
 
             else:
                 # https://minorplanetcenter.net/iau/info/MPOrbitFormat.html
                 name_start = 167
                 name_end = 194
-                valid_indices = [ 8, 14, 20, 26, 36, 37, 47, 48, 58, 59, 69, 70, 80, 92, 104, 105, 107, 117, 123, 127, 137, 142, 146, 150, 161, 166 ] # Ignore 132.
+                valid_indices = [
+                    8, 14, 20, 26, 36, 37, 47, 48, 58, 59, 69, 70, 80, 92, 104, 105, 107, 117, 123, 127, 137, 142, 146, 150, 161, 166 ] # Ignore 132.
 
             with open( filename, 'r', encoding = "utf-8" ) as f:
                 for line in f.read().splitlines():
@@ -394,14 +399,24 @@ class DataProviderOrbitalElement( DataProvider ):
                     if not line.startswith( '{' ):
                         # Sometimes the COBS download emits an error message
                         # of the form:
-                        #   {"code": "400",
-                        #    "message": "Invalid integer value provided in the parameter.",
-                        #    "moreInfo": "invalid literal for int() with base 10: 'false'",
-                        #    "signature": {"source": "COBS Query API", "version": "1.3", "date": "2024 May"}}
+                        #   {
+                        #       "code": "400",
+                        #       "message": "Invalid integer value provided in the parameter.",
+                        #       "moreInfo": "invalid literal for int() with base 10: 'false'",
+                        #       "signature":
+                        #       {
+                        #           "source": "COBS Query API",
+                        #           "version": "1.3",
+                        #           "date": "2024 May"
+                        #       }
+                        #   }
+                        #
                         # In this event, keep the download file as is for bug
-                        # tracking if needed, but skip loading the data as there
-                        # is no data to load.  When the cache becomes stale,
-                        # a fresh and hopefully successful download will occur.
+                        # tracking if needed, but skip loading the data as
+                        # there is no data to load.
+                        #
+                        # When the cache becomes stale, a fresh and hopefully
+                        # successful download will occur.
                         name = line[ : line.find( ',' ) ].strip()
                         oe = OrbitalElement( name, line, orbital_element_data_type )
                         oe_data[ oe.get_name().upper() ] = oe
