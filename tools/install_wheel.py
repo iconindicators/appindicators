@@ -40,14 +40,11 @@ if __name__ == "__main__":
             f"at { utils.VENV_INSTALL } and copy across the .desktop, run "
             "script and icons." ) )
 
-    utils.initialise_virtual_environment(
-        utils.VENV_INSTALL,
-        "pip",
-        utils.get_pygobject() )
-
     for indicator in indicators_to_process:
         utils.initialise_virtual_environment(
             utils.VENV_INSTALL,
+            "pip",
+            utils.get_pygobject(),
             f"$(ls -d { utils.RELEASE_DIRECTORY }/wheel/dist_{ indicator }/{ indicator }*.whl | head -1)",
             force_reinstall = True )
 
