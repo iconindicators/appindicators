@@ -596,10 +596,8 @@ class AstroBase( ABC ):
         # Not really sure what can be done, or should be done;
         # leave things as they are and the caller can catch the error/exception.
         numerator = (
-            body_sun_distance_au * body_sun_distance_au
-            +
-            body_earth_distance_au * body_earth_distance_au
-            -
+            body_sun_distance_au * body_sun_distance_au +
+            body_earth_distance_au * body_earth_distance_au -
             earth_sun_distance_au * earth_sun_distance_au )
 
         denominator = 2 * body_sun_distance_au * body_earth_distance_au
@@ -611,10 +609,8 @@ class AstroBase( ABC ):
         psi_2 = math.exp( -1.87 * psi_t )
 
         apparent_magnitude = (
-            h_absolute_magnitude
-            +
-            5.0 * math.log10( body_sun_distance_au * body_earth_distance_au )
-            -
+            h_absolute_magnitude +
+            5.0 * math.log10( body_sun_distance_au * body_earth_distance_au ) -
             2.5 * math.log10( ( 1 - g_slope ) * psi_1 + g_slope * psi_2 ) )
 
         return apparent_magnitude
@@ -702,8 +698,7 @@ class AstroBase( ABC ):
         t = s / 36525.0
         t0 = ( 6.697374558 + ( 2400.051336 * t ) + ( 0.000025862 * t * t ) ) % 24
         universal_time_decimal = (
-            ( ( ( utc_now.second / 60 ) + utc_now.minute ) / 60 )
-            +
+            ( ( ( utc_now.second / 60 ) + utc_now.minute ) / 60 ) +
             utc_now.hour )
 
         a = universal_time_decimal * 1.002737909
@@ -783,10 +778,8 @@ class AstroBase( ABC ):
         x = x1 - x2
         parallactic_angle = math.atan2( y, x )
 
-        return (
-            ( position_angle_of_bright_limb - parallactic_angle )
-            %
-            ( 2.0 * math.pi ) )
+        two_pi = 2.0 * math.pi
+        return ( position_angle_of_bright_limb - parallactic_angle ) % two_pi
 
 
     @staticmethod
@@ -803,17 +796,17 @@ class AstroBase( ABC ):
         Used, for example, to limit satellite passes dusk.
 
         The start hour (as date/time in UTC) < end hour (as date/time UTC).
-        '''
 
-        # Scenarios:
-        #
-        #  SH           EH
-        #               SH           EH
-        #                            SH           EH
-        #                                         SH            EH
-        #                                                       SH            EH
-        #                     X------------------------X
-        #              start_date_time            end_date_time
+        Scenarios:
+
+          SH           EH
+                       SH           EH
+                                    SH           EH
+                                                 SH            EH
+                                                               SH            EH
+                             X------------------------X
+                      start_date_time            end_date_time
+        '''
         windows = [ ]
 
         current = start_date_time - datetime.timedelta( days = 1 )
