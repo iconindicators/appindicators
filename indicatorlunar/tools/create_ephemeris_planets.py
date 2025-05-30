@@ -43,6 +43,17 @@ Alternately to running this script, download a .bsp and
 use spkmerge to create a smaller subset:
     https://github.com/skyfielders/python-skyfield/issues/123
     https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
+
+
+venv=venv_xxx && \
+if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+. ${venv}/bin/activate && \
+python3 -m pip install jplephem && \
+python3 create_ephemeris_planets.py ~/Downloads/de442s.bsp planets.bsp 10 && \
+deactivate
+
+#TODO I don't think it is possible to install jplephem on 32 bit.
+# Try running this script (and stars?) on Ubuntu 22.04 or 24.04 in a new, clean venv.
 '''
 
 
