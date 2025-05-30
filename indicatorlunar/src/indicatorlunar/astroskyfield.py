@@ -300,17 +300,23 @@ class AstroSkyfield( AstroBase ):
             wgs84.latlon( latitude, longitude, elevation ) )
 
         location = (
-            AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._PLANET_EARTH ]
-            +
+            AstroSkyfield._EPHEMERIS_PLANETS[ AstroSkyfield._PLANET_EARTH ] +
             wgs84.latlon( latitude, longitude, elevation ) )
 
         location_at_now = location.at( now )
 
         AstroSkyfield._calculate_moon(
-            now, location, location_at_now, data )
+            now,
+            location,
+            location_at_now,
+            data )
 
         AstroSkyfield._calculate_sun(
-            now, now_plus_twenty_five_hours, location, location_at_now, data )
+            now,
+            now_plus_twenty_five_hours,
+            location,
+            location_at_now,
+            data )
 
         AstroSkyfield._calculate_planets(
             now,
@@ -643,7 +649,8 @@ class AstroSkyfield( AstroBase ):
         for planet_name in planets:
             index_planet = AstroSkyfield._PLANET_MAPPINGS[ planet_name ]
             planet = AstroSkyfield._EPHEMERIS_PLANETS[ index_planet ]
-            apparent_magnitude = planetary_magnitude( earth_at_now.observe( planet ) )
+            apparent_magnitude = (
+                planetary_magnitude( earth_at_now.observe( planet ) ) )
 
             is_saturn_bad_apparent_magnitude = (
                 planet_name == AstroBase.PLANET_SATURN
@@ -940,7 +947,7 @@ class AstroSkyfield( AstroBase ):
             if event == 0: # Satellite rose above altitude_degrees.
                 rise_date_time = date_time
 
-            elif event == 1: # Satellite culminated and started to descend again.
+            elif event == 1: # Satellite culminated and started to descend.
                 culmination_date_times.append( date_time )
 
             else: # Satellite fell below altitude_degrees.
@@ -996,10 +1003,7 @@ class AstroSkyfield( AstroBase ):
                 start_date_time.utc.second + seconds_from_rise_to_set ) )
 
         # Set a step interval of 60 seconds.
-#TODO R1731: Consider using 'range_step = max(range_step, 1.0)' instead of unnecessary if block (consider-using-max-builtin)
-        range_step = math.ceil( seconds_from_rise_to_set / 60.0 )
-        if range_step < 1.0:
-            range_step = 1.0
+        range_step = max( math.ceil( seconds_from_rise_to_set / 60.0 ), 1.0 )
 
         transit_range = (
             timescale.utc(
@@ -1016,7 +1020,10 @@ class AstroSkyfield( AstroBase ):
         # almanac.TWILIGHTS[ 2 ], Nautical twilight
         is_twilight_nautical = is_twilight_function( transit_range ) == 2
 
-        is_sunlit = earth_satellite.at( transit_range ).is_sunlit( AstroSkyfield._EPHEMERIS_PLANETS ) #TODO Too long
+        is_sunlit = (
+            earth_satellite.at( transit_range ).is_sunlit(
+                AstroSkyfield._EPHEMERIS_PLANETS ) )
+
         is_visible = False
         z = zip( is_twilight_astronomical, is_twilight_nautical, is_sunlit )
         for twilight_astronomical, twilight_nautical, sunlit in z:

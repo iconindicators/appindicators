@@ -302,8 +302,16 @@ class AstroPyEphem( AstroBase ):
         observer.elev = elevation
         observer.date = ephem_now
 
-        AstroPyEphem._calculate_moon( ephem_now, observer, data )
-        AstroPyEphem._calculate_sun( ephem_now, observer, data )
+        AstroPyEphem._calculate_moon(
+            ephem_now,
+            observer,
+            data )
+
+        AstroPyEphem._calculate_sun(
+            ephem_now,
+            observer,
+            data )
+
         AstroPyEphem._calculate_planets(
             observer,
             data,
