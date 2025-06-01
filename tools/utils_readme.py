@@ -430,6 +430,8 @@ def _get_installation_python_virtual_environment(
     if pygobject_needs_to_be_pinned:
         pygobject = "PyGObject\<=3.50.0"
 
+#TODO Should I have --force-reinstall after --upgrade?
+# See similar note in README.md
     message = (
         f"Install `{ indicator }`, including icons, .desktop and run "
         "script, to the `Python3` virtual environment:\n"
