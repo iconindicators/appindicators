@@ -223,7 +223,7 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 ### Release to PyPI
 
 TODO Test
-
+Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
 To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
 
 ```
@@ -273,6 +273,9 @@ first, install the operating system packages listed at the indicator's `PyPI` pa
 
 Then install `indicatortest`:
 
+TODO Should I have --upgrade after install?
+See similar note in utils_readme.py
+Should this be put into a script...and combine with install from PyPI but with a switch?
 ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
