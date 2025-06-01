@@ -23,6 +23,11 @@ IAU CSN Catalog with accompanying HIP and absolute magnitude.
 '''
 
 
+#TODO This script needs to run the guts in a venv.
+# Also verify if that works on 32 bit and/or Ubuntu 20.04...
+# ...some packages may need to be pinned according to the OS version.
+
+
 import argparse
 import textwrap
 

@@ -43,18 +43,66 @@ Alternately to running this script, download a .bsp and
 use spkmerge to create a smaller subset:
     https://github.com/skyfielders/python-skyfield/issues/123
     https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
+'''
 
 
-venv=venv_xxx && \
-if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-. ${venv}/bin/activate && \
-python3 -m pip install jplephem && \
-python3 create_ephemeris_planets.py ~/Downloads/de442s.bsp planets.bsp 10 && \
-deactivate
+#TODO
+# venv=venv_xxx && \
+# if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+# . ${venv}/bin/activate && \
+# python3 -m pip install jplephem && \
+# python3 create_ephemeris_planets.py ~/Downloads/de442s.bsp planets.bsp 10 && \
+# deactivate
 
 #TODO I don't think it is possible to install jplephem on 32 bit.
-# Try running this script (and stars?) on Ubuntu 22.04 or 24.04 in a new, clean venv.
-'''
+# Try running this script (and create ephemeris stars?) on Ubuntu 22.04 or 24.04 in a new, clean venv.
+#
+# https://numpy.org/doc/2.0/release/1.21.0-notes.html
+# For 32 bit on Linux, might need to pin numpy to < 1.22.0
+#
+# https://numpy.org/doc/2.0/release/1.25.0-notes.html
+# For Ubuntu 20.04 et al, pin numpy to < 1.25.0
+# 
+# Ubuntu 22.04 has python 3.10 so should not need numpy pinning until 3.10 is 
+# deprecated or unsupported by numpy.
+# 
+# Debian 11 has python 3.9 so should not need numpy pinning until 3.9 is
+# deprecated or unsupported by numpy.
+# 
+# Pandas 2.0.0 supports python3.8+ and numpy 1.20.3 so only good for ubuntu 20.04+
+# 
+# Pandas 2.1.0 supports python3.9+ and numpy 1.22.4 so only good for ubuntu 22.04+
+# 
+# Test on Debian 12 vm and then Debian 12 32 laptop.
+#
+# Don't forget to check all of these for Fedora, Manjaro and openSUSE!
+#
+# 
+#
+# What about the need to pin
+#    requests?
+#    sgp4?
+# Neither seem to have any issue but test on Debian 32 bit!
+#
+#
+# Further, this pinning may be a normal thing for all indicators...
+# The pyproject.tom.specific for lunar may need to change somehow (if skyfield is used)
+# and any install instructions will need to include the pinning there,
+# rather than in the dependencies of pyproject.toml (which should contain no
+# dependencies). 
+#
+# This script needs to create a venv, install jplephem
+# (pinned or not and/or check os version)
+# and then run the guts of the script.
+#
+#
+# Undecided if the venv should be created in the indicatorlunar/tools
+# directory only for developer's use, or included in the release...
+# If part of the release, can use INdicatorbase process_run...but no access
+# to utils venv stuff.
+# Is it possible to run the script (within the installed .local/venv_indicators)
+# activate venv_indicators and run the internals of the script? 
+# Then won't need to install jplephem, etc...should already be installed.
 
 
 import argparse
@@ -63,9 +111,13 @@ import subprocess
 import textwrap
 
 from dateutil.relativedelta import relativedelta
+from pathlib import Path
 
 
-def create_ephemeris_planets(
+VENV_INSTALL = "$HOME/.local/venv_indicators"
+
+
+def _create_ephemeris_planets(
     in_bsp,
     out_bsp,
     years ):
@@ -76,25 +128,98 @@ def create_ephemeris_planets(
     date_format = "%Y/%m/%d"
 
     command = (
+        f". { VENV_INSTALL }/bin/activate && " #TODO Maybe create the venv in case it does not exist?
+        "python3 -m pip install jplephem && " # TODO Not sure if this is needed if/when skyfield is released/installed.
         "python3 -m jplephem excerpt " +
         start_date.strftime( date_format ) +
         " " +
         end_date.strftime( date_format ) +
         " " +
         in_bsp +
-        " " +
+        " " + #TODO Why need the + here and above?
         out_bsp )
+        
+    # command = (
+    #     "python3 -m jplephem excerpt " +
+    #     start_date.strftime( date_format ) +
+    #     " " +
+    #     end_date.strftime( date_format ) +
+    #     " " +
+    #     in_bsp +
+    #     " " +
+    #     out_bsp )
 
     print( "Processing...\n\t", command )
-    subprocess.run( command, shell = True, check = False )
+    # subprocess.run( command, shell = True, check = False )
+    result = (
+        subprocess.run(
+            command,
+            shell = True,
+            capture_output = True ) )
+
+    stdout_ = result.stdout.decode()
+    if stdout_:
+        print( stdout_ )
+
+    stderr_ = result.stderr.decode()
+    if stderr_ :
+        print( stderr_ )
+
+
+
+# def _ddd():
+    #
+    # venv_directory = Path( '.' ) / "venv"
+    # print( venv_directory )
+    # print( venv_directory.exists() )
+    # created = True
+    # if not Path( venv_directory ).is_dir():
+    #     print( "making venv")
+    #     command = f"python3 -m venv { venv_directory }",
+    #     result = (
+    #         subprocess.run(
+    #             command,
+    #             shell = True,
+    #             capture_output = True ) )
+    #
+    #     stdout_ = result.stdout.decode()
+    #     if stdout_:
+    #         print( stdout_ )
+    #
+    #     stderr_ = result.stderr.decode()
+    #     if stderr_ :
+    #         created = False
+    #         print( stderr_ )
+    #
+    # print( venv_directory.exists() )
+    # if created:
+        # command = (
+        #     f". { venv_directory }/bin/activate && "
+        #     "python3 -m pip install jplephem" )
+        #
+        # result = (
+        #     subprocess.run(
+        #         command,
+        #         shell = True,
+        #         capture_output = True ) )
+        #
+        # stdout_ = result.stdout.decode()
+        # if stdout_:
+        #     print( stdout_ )
+        #
+        # stderr_ = result.stderr.decode()
+        # if stderr_ :
+        #     created = False
+        #     print( stderr_ )
+
 
 
 if __name__ == "__main__":
     description = (
         textwrap.dedent(
             r'''
-            From an existing .bsp, create a new .bsp with a date range
-            from today to a specified number of years from today.
+            From an existing .bsp, create a new .bsp with a date range starting
+            one month prior to today, to a specified number of years from today.
 
             For example:
                 python3 %(prog)s de421.bsp planets.bsp 5
@@ -122,4 +247,4 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    create_ephemeris_planets( args.in_bsp, args.out_bsp, int( args.years ) )
+    _create_ephemeris_planets( args.in_bsp, args.out_bsp, int( args.years ) )
