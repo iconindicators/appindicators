@@ -107,101 +107,16 @@ use spkmerge to create a smaller subset:
 
 import argparse
 import datetime
-import subprocess
 import sys
 import textwrap
 
 from dateutil.relativedelta import relativedelta
-from pathlib import Path
 
 
 if '../' not in sys.path:
     sys.path.insert( 0, '../../' ) # Allows calls to IndicatorBase.
 
 from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
-
-
-def _create_ephemeris_planets_OLD(
-    in_bsp,
-    out_bsp,
-    years ):
-
-    today = datetime.date.today()
-    start_date = today - relativedelta( months = 1 )
-    end_date = today.replace( year = today.year + years )
-    date_format = "%Y/%m/%d"
-
-    command = ""
-    if not Path( f"{ IndicatorBase.VENV_INSTALL }" ).is_dir():
-        command = f"python3 -m venv { IndicatorBase.VENV_INSTALL } && "
-
-    command += (
-        f". { IndicatorBase.VENV_INSTALL }/bin/activate && "
-        "python3 -m pip install jplephem && "
-        "python3 -m jplephem excerpt "
-        f"{ start_date.strftime( date_format ) } "
-        f"{ end_date.strftime( date_format ) } "
-        f"{ in_bsp } { out_bsp } && deactivate" )
-
-    print( "Processing...\n\t", command )
-    result = (
-        subprocess.run(
-            command,
-            shell = True,
-            capture_output = True ) )
-
-    stdout_ = result.stdout.decode()
-    if stdout_:
-        print( stdout_ )
-
-    stderr_ = result.stderr.decode()
-    if stderr_ :
-        print( stderr_ )
-
-
-def _create_ephemeris_planets_OLD2(
-    in_bsp,
-    out_bsp,
-    years ):
-
-    today = datetime.date.today()
-    start_date = today - relativedelta( months = 1 )
-    end_date = today.replace( year = today.year + years )
-    date_format = "%Y/%m/%d"
-
-    IndicatorBase.initialise_virtual_environment(
-        IndicatorBase.VENV_INSTALL,
-        "jplephem",
-        force_reinstall = False )
-
-    command = ""
-    if not Path( f"{ IndicatorBase.VENV_INSTALL }" ).is_dir():
-        command = f"python3 -m venv { IndicatorBase.VENV_INSTALL } && "
-
-    command += (
-        f". { IndicatorBase.VENV_INSTALL }/bin/activate && "
-        "python3 -m pip install jplephem && "
-        "python3 -m jplephem excerpt "
-        f"{ start_date.strftime( date_format ) } "
-        f"{ end_date.strftime( date_format ) } "
-        f"{ in_bsp } { out_bsp } && deactivate" )
-
-    print( command )
-
-    # print( "Processing...\n\t", command )
-    # result = (
-    #     subprocess.run(
-    #         command,
-    #         shell = True,
-    #         capture_output = True ) )
-    #
-    # stdout_ = result.stdout.decode()
-    # if stdout_:
-    #     print( stdout_ )
-    #
-    # stderr_ = result.stderr.decode()
-    # if stderr_ :
-    #     print( stderr_ )
 
 
 def _create_ephemeris_planets(
