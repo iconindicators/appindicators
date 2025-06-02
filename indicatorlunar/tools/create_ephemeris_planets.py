@@ -108,16 +108,20 @@ use spkmerge to create a smaller subset:
 import argparse
 import datetime
 import subprocess
+import sys
 import textwrap
 
 from dateutil.relativedelta import relativedelta
 from pathlib import Path
 
 
-VENV_INSTALL = "$HOME/.local/venv_indicators"
+if '../' not in sys.path:
+    sys.path.insert( 0, '../../' ) # Allows calls to IndicatorBase.
+
+from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 
 
-def _create_ephemeris_planets(
+def _create_ephemeris_planets_OLD(
     in_bsp,
     out_bsp,
     years ):
@@ -127,30 +131,19 @@ def _create_ephemeris_planets(
     end_date = today.replace( year = today.year + years )
     date_format = "%Y/%m/%d"
 
-    command = (
-        f". { VENV_INSTALL }/bin/activate && " #TODO Maybe create the venv in case it does not exist?
-        "python3 -m pip install jplephem && " # TODO Not sure if this is needed if/when skyfield is released/installed.
-        "python3 -m jplephem excerpt " +
-        start_date.strftime( date_format ) +
-        " " +
-        end_date.strftime( date_format ) +
-        " " +
-        in_bsp +
-        " " + #TODO Why need the + here and above?
-        out_bsp )
-        
-    # command = (
-    #     "python3 -m jplephem excerpt " +
-    #     start_date.strftime( date_format ) +
-    #     " " +
-    #     end_date.strftime( date_format ) +
-    #     " " +
-    #     in_bsp +
-    #     " " +
-    #     out_bsp )
+    command = ""
+    if not Path( f"{ IndicatorBase.VENV_INSTALL }" ).is_dir():
+        command = f"python3 -m venv { IndicatorBase.VENV_INSTALL } && "
+
+    command += (
+        f". { IndicatorBase.VENV_INSTALL }/bin/activate && "
+        "python3 -m pip install jplephem && "
+        "python3 -m jplephem excerpt "
+        f"{ start_date.strftime( date_format ) } "
+        f"{ end_date.strftime( date_format ) } "
+        f"{ in_bsp } { out_bsp } && deactivate" )
 
     print( "Processing...\n\t", command )
-    # subprocess.run( command, shell = True, check = False )
     result = (
         subprocess.run(
             command,
@@ -166,52 +159,67 @@ def _create_ephemeris_planets(
         print( stderr_ )
 
 
+def _create_ephemeris_planets_OLD2(
+    in_bsp,
+    out_bsp,
+    years ):
 
-# def _ddd():
-    #
-    # venv_directory = Path( '.' ) / "venv"
-    # print( venv_directory )
-    # print( venv_directory.exists() )
-    # created = True
-    # if not Path( venv_directory ).is_dir():
-    #     print( "making venv")
-    #     command = f"python3 -m venv { venv_directory }",
-    #     result = (
-    #         subprocess.run(
-    #             command,
-    #             shell = True,
-    #             capture_output = True ) )
-    #
-    #     stdout_ = result.stdout.decode()
-    #     if stdout_:
-    #         print( stdout_ )
-    #
-    #     stderr_ = result.stderr.decode()
-    #     if stderr_ :
-    #         created = False
-    #         print( stderr_ )
-    #
-    # print( venv_directory.exists() )
-    # if created:
-        # command = (
-        #     f". { venv_directory }/bin/activate && "
-        #     "python3 -m pip install jplephem" )
-        #
-        # result = (
-        #     subprocess.run(
-        #         command,
-        #         shell = True,
-        #         capture_output = True ) )
-        #
-        # stdout_ = result.stdout.decode()
-        # if stdout_:
-        #     print( stdout_ )
-        #
-        # stderr_ = result.stderr.decode()
-        # if stderr_ :
-        #     created = False
-        #     print( stderr_ )
+    today = datetime.date.today()
+    start_date = today - relativedelta( months = 1 )
+    end_date = today.replace( year = today.year + years )
+    date_format = "%Y/%m/%d"
 
+    IndicatorBase.initialise_virtual_environment(
+        IndicatorBase.VENV_INSTALL,
+        "jplephem",
+        force_reinstall = False )
+
+    command = ""
+    if not Path( f"{ IndicatorBase.VENV_INSTALL }" ).is_dir():
+        command = f"python3 -m venv { IndicatorBase.VENV_INSTALL } && "
+
+    command += (
+        f". { IndicatorBase.VENV_INSTALL }/bin/activate && "
+        "python3 -m pip install jplephem && "
+        "python3 -m jplephem excerpt "
+        f"{ start_date.strftime( date_format ) } "
+        f"{ end_date.strftime( date_format ) } "
+        f"{ in_bsp } { out_bsp } && deactivate" )
+
+    print( command )
+
+    # print( "Processing...\n\t", command )
+    # result = (
+    #     subprocess.run(
+    #         command,
+    #         shell = True,
+    #         capture_output = True ) )
+    #
+    # stdout_ = result.stdout.decode()
+    # if stdout_:
+    #     print( stdout_ )
+    #
+    # stderr_ = result.stderr.decode()
+    # if stderr_ :
+    #     print( stderr_ )
+
+
+def _create_ephemeris_planets(
+    in_bsp,
+    out_bsp,
+    years ):
+
+    today = datetime.date.today()
+    start_date = today - relativedelta( months = 1 )
+    end_date = today.replace( year = today.year + years )
+    date_format = "%Y/%m/%d"
+
+    IndicatorBase.run_python_command_in_virtual_environment(
+        IndicatorBase.VENV_INSTALL,
+        "python3 -m jplephem excerpt "
+        f"{ start_date.strftime( date_format ) } "
+        f"{ end_date.strftime( date_format ) } { in_bsp } { out_bsp }",
+        "jplephem" )
 
 
 if __name__ == "__main__":
@@ -235,6 +243,12 @@ if __name__ == "__main__":
         argparse.ArgumentParser(
             formatter_class = argparse.RawDescriptionHelpFormatter,
             description = description ) )
+
+#TODO Somewhere/somehow (maybe in the above description) mention that the
+# date range starts from today minus one month so the input .bsp must have
+# data to match the range.
+
+#TODO What happens if the input .bsp does not have data for the end date range?
 
     parser.add_argument( "in_bsp", help = "The input .bsp file." )
 

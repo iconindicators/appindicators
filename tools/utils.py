@@ -139,11 +139,15 @@ def get_indicators_to_process( description ):
                     "+" } ) ).indicators
 
 
+#TODO Maybe move this into indicatorbase...allows the (eventual) indicatorlunar
+# scripts create planets and create stars to run in place (installed).
 def initialise_virtual_environment(
     venv_directory,
     *modules_to_install,
     force_reinstall = False ):
 
+#TODO I think change the two blocks below into one; if the venv dir does not exist,
+# append the create line to the second command so it all runs in one process.
     if not Path( venv_directory ).is_dir():
         IndicatorBase.process_run(
             f"python3 -m venv { venv_directory }",

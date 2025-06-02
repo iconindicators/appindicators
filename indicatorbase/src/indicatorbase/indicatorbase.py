@@ -3146,6 +3146,36 @@ class IndicatorBase( ABC ):
 
         return stdout_, stderr_, return_code
 
+    
+    #TODO Put somewhere else.
+    VENV_INSTALL = "$HOME/.local/venv_indicators"
+
+
+    @staticmethod
+    def run_python_command_in_virtual_environment(
+        venv_directory,
+        command,
+        *modules_to_install,
+        force_reinstall = False ):  #TODO Is this needed?  Maybe always set to False?
+        '''
+        Creates the Python3 virtual environment if it does not exist,
+        installs modules specified and runs the Python3 command,
+        printing stdout and stderr.
+        '''
+        command_ = ""
+        if not Path( f"{ venv_directory }" ).is_dir():
+            command_ = f"python3 -m venv { venv_directory } && "
+
+        command_ += (
+            f". { venv_directory }/bin/activate && "
+            "python3 -m pip install --upgrade "
+            f"{ '--force-reinstall' if force_reinstall else '' } "
+            f"{ ' '.join( modules_to_install ) } && "
+            f"{ command } && "
+            "deactivate" )
+
+        IndicatorBase.process_run( command_, print_ = True )
+
 
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
     '''
