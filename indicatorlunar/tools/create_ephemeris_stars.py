@@ -70,10 +70,9 @@ def get_stars_and_hips( iau_catalog_file ):
 
 
 def print_formatted_stars(
-    stars_and_hips_,
-    star_information_url ):
+    stars_and_hips_ ):
 
-    print( f"Printing formatted stars for AstroBase from { star_information_url }" )
+    print( f"List of stars for AstroBase:" )
     for name, hip in stars_and_hips_:
         spacing_name = ' ' * ( IAUCSN_NAME_END - IAUCSN_NAME_START - len( name ) - 1 )
         spacing_hip = ' ' * ( IAUCSN_HIP_END - IAUCSN_HIP_START - len( str( hip ) ) + 1 )
@@ -99,7 +98,7 @@ def create_ephemeris_skyfield(
     with load.open( star_ephemeris, "rb" ) as in_file, open( out_file, "wb" ) as f:
         for line in in_file:
             # HIP is located at bytes 9 - 14
-            # http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
+            #    http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
             hip = int( line.decode()[ 9 - 1 : 14 - 1 + 1 ].strip() )
             if hip in hipparcos_identifiers:
                 f.write( line )
@@ -115,7 +114,7 @@ def print_ephemeris_pyephem(
     Mostly taken from
         https://github.com/brandon-rhodes/pyephem/blob/master/bin/rebuild-star-data
     '''
-    print( "Printing ephemeris for PyEphem..." )
+    print( "Ephemeris for PyEphem..." )
     with load.open( star_ephemeris, "rb" ) as f:
         stars_ = hipparcos.load_dataframe( f )
         f.seek( 0 )
@@ -156,6 +155,56 @@ def print_ephemeris_pyephem(
         print( f"            \"{ line }\"," )
 
     print( "Done" )
+
+
+import sys
+if "../" not in sys.path:
+    sys.path.insert( 0, "../../" ) # Allows calls to IndicatorBase.
+
+from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
+
+
+def _create_ephemeris_stars_internal(
+        output_filename_for_skyfield_star_ephemeris,
+        planet_ephemeris,
+        star_ephemeris,
+        star_information ):
+
+    print( "BABY!!!!!!!!!!!!!!!!!!!!!!!!")
+    stars_and_hips = get_stars_and_hips( star_information )
+    print_formatted_stars( stars_and_hips )
+    create_ephemeris_skyfield(
+        output_filename_for_skyfield_star_ephemeris,
+        star_ephemeris,
+        stars_and_hips )
+
+    print_ephemeris_pyephem(
+        planet_ephemeris,
+        star_ephemeris,
+        stars_and_hips )
+
+
+def _create_ephemeris_stars( 
+        output_filename_for_skyfield_star_ephemeris,
+        planet_ephemeris,
+        star_ephemeris,
+        star_information ):
+
+    # command =f"python3 -c \"print( 111 )\""  #TODO Test
+    command = (
+        "python3 -c \"import argparse; import create_ephemeris_stars; "
+        f"create_ephemeris_stars._create_ephemeris_stars_internal( "
+        f"\\\"{ output_filename_for_skyfield_star_ephemeris }\\\", "
+        f"\\\"{ planet_ephemeris }\\\", "
+        f"\\\"{ star_ephemeris }\\\", "
+        f"\\\"{ star_information }\\\" )\"" )
+
+    IndicatorBase.run_python_command_in_virtual_environment(
+        IndicatorBase.VENV_INSTALL,
+        command,
+        "ephem",
+        "pandas",
+        "skyfield" )
 
 
 if __name__ == "__main__":
@@ -214,14 +263,23 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    stars_and_hips = get_stars_and_hips( args.star_information )
-    print_formatted_stars( stars_and_hips, STAR_INFORMATION_URL )
-    create_ephemeris_skyfield(
+    _create_ephemeris_stars(
         args.output_filename_for_skyfield_star_ephemeris,
-        args.star_ephemeris,
-        stars_and_hips )
-
-    print_ephemeris_pyephem(
         args.planet_ephemeris,
         args.star_ephemeris,
-        stars_and_hips )
+        args. star_information )
+
+#TODO Orig
+    # args = parser.parse_args()
+    #
+    # stars_and_hips = get_stars_and_hips( args.star_information )
+    # print_formatted_stars( stars_and_hips, STAR_INFORMATION_URL )
+    # create_ephemeris_skyfield(
+    #     args.output_filename_for_skyfield_star_ephemeris,
+    #     args.star_ephemeris,
+    #     stars_and_hips )
+    #
+    # print_ephemeris_pyephem(
+    #     args.planet_ephemeris,
+    #     args.star_ephemeris,
+    #     stars_and_hips )

@@ -3148,7 +3148,7 @@ class IndicatorBase( ABC ):
 
     
     #TODO Put somewhere else.
-    VENV_INSTALL = "$HOME/.local/venv_indicators"
+    VENV_INSTALL = Path.home() / ".local" / "venv_indicators"
 
 
     @staticmethod
@@ -3160,19 +3160,25 @@ class IndicatorBase( ABC ):
         '''
         Creates the Python3 virtual environment if it does not exist,
         installs modules specified and runs the Python3 command,
-        printing stdout and stderr.
+        printing to stdout and stderr.
         '''
         command_ = ""
         if not Path( f"{ venv_directory }" ).is_dir():
-            command_ = f"python3 -m venv { venv_directory } && "
+            command_ += f"python3 -m venv { venv_directory } && "
 
-        command_ += (
-            f". { venv_directory }/bin/activate && "
-            "python3 -m pip install --upgrade "
-            f"{ '--force-reinstall' if force_reinstall else '' } "
-            f"{ ' '.join( modules_to_install ) } && "
-            f"{ command } && "
-            "deactivate" )
+        command_ += f". { venv_directory }/bin/activate && "
+
+        if len( modules_to_install ):
+            command_ += (
+                "python3 -m pip install --upgrade "
+                f"{ '--force-reinstall' if force_reinstall else '' } "
+                f"{ ' '.join( modules_to_install ) } && " )
+
+        command_ += f"{ command } && deactivate"
+
+        print()#TODO Testing
+        print( f"Executing command:\n\t{ command_ }" )
+        print()
 
         IndicatorBase.process_run( command_, print_ = True )
 
