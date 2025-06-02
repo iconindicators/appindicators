@@ -35,8 +35,8 @@ import sys
 
 from pathlib import Path
 
-if '../' not in sys.path:
-    sys.path.insert( 0, '../' ) # Allows calls to IndicatorBase.
+if "../" not in sys.path:
+    sys.path.insert( 0, "../" ) # Allows calls to IndicatorBase.
 
 from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 

@@ -24,8 +24,8 @@ import sys
 
 from pathlib import Path
 
-if '../' not in sys.path:
-    sys.path.insert( 0, '../' ) # Allows calls to IndicatorBase.
+if "../" not in sys.path:
+    sys.path.insert( 0, "../" ) # Allows calls to IndicatorBase.
 
 from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 
@@ -34,6 +34,8 @@ from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 RELEASE_DIRECTORY = "release"
 
 
+#TODO $HOME does not work...need Path.home()...check where $HOME is used
+# in tools and all indicators!
 ''' The virtual environment into which indicators are installed. '''
 VENV_INSTALL = "$HOME/.local/venv_indicators"
 
