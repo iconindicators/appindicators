@@ -49,7 +49,7 @@ use spkmerge to create a smaller subset:
 #TODO I don't think it is possible to install jplephem on 32 bit.
 # Try running this script (and create ephemeris stars?) on Ubuntu 22.04 or 24.04 in a new, clean venv.
 #
-# https://numpy.org/doc/2.0/release/1.21.0-notes.html
+# https://numpy.org/doc/2.0/release/1.22.0-notes.html
 # For 32 bit on Linux, might need to pin numpy to < 1.22.0
 #
 # https://numpy.org/doc/2.0/release/1.25.0-notes.html
@@ -95,6 +95,9 @@ use spkmerge to create a smaller subset:
 # Is it possible to run the script (within the installed .local/venv_indicators)
 # activate venv_indicators and run the internals of the script? 
 # Then won't need to install jplephem, etc...should already be installed.
+#
+# Unable to install numpy/pandas on Debian 12 32 bit.
+# This means skyfield will not work on 32 bit...
 
 
 import argparse

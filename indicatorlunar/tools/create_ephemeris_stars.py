@@ -25,6 +25,9 @@ IAU CSN Catalog with accompanying HIP and absolute magnitude.
 
 #TODO Verify this script works on 32 bit and/or Ubuntu 20.04...
 # ...some packages may need to be pinned according to the OS version.
+#
+# Unable to install numpy/pandas on Debian 12 32 bit.
+# This means skyfield will not work on 32 bit...
 
 
 import argparse
