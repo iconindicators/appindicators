@@ -3171,7 +3171,7 @@ class IndicatorBase( ABC ):
         if len( modules_to_install ):
             command_ += (
                 "python3 -m pip install --upgrade "
-                f"{ '--force-reinstall' if force_reinstall else '' } "
+                f"{ '--force-reinstall' if force_reinstall else '' } "  #TODO Needed?  If not, remove space at end after --upgrade.
                 f"{ ' '.join( modules_to_install ) } && " )
 
         command_ += f"{ command } && deactivate"

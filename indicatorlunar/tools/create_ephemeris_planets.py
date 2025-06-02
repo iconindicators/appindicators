@@ -46,14 +46,6 @@ use spkmerge to create a smaller subset:
 '''
 
 
-#TODO
-# venv=venv_xxx && \
-# if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-# . ${venv}/bin/activate && \
-# python3 -m pip install jplephem && \
-# python3 create_ephemeris_planets.py ~/Downloads/de442s.bsp planets.bsp 10 && \
-# deactivate
-
 #TODO I don't think it is possible to install jplephem on 32 bit.
 # Try running this script (and create ephemeris stars?) on Ubuntu 22.04 or 24.04 in a new, clean venv.
 #
@@ -119,24 +111,6 @@ if '../' not in sys.path:
 from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 
 
-def _create_ephemeris_planets(
-    in_bsp,
-    out_bsp,
-    years ):
-
-    today = datetime.date.today()
-    start_date = today - relativedelta( months = 1 )
-    end_date = today.replace( year = today.year + years )
-    date_format = "%Y/%m/%d"
-
-    IndicatorBase.run_python_command_in_virtual_environment(
-        IndicatorBase.VENV_INSTALL,
-        "python3 -m jplephem excerpt "
-        f"{ start_date.strftime( date_format ) } "
-        f"{ end_date.strftime( date_format ) } { in_bsp } { out_bsp }",
-        "jplephem" )
-
-
 if __name__ == "__main__":
     description = (
         textwrap.dedent(
@@ -176,5 +150,18 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    _create_ephemeris_planets( args.in_bsp, args.out_bsp, int( args.years ) )
+    today = datetime.date.today()
+    start_date = today - relativedelta( months = 1 )
+    end_date = today.replace( year = today.year + int( args.years ) )
+    date_format = "%Y/%m/%d"
 
+    command = (
+        "python3 -m jplephem excerpt "
+        f"{ start_date.strftime( date_format ) } "
+        f"{ end_date.strftime( date_format ) } "
+        f"{ args.in_bsp } { args.out_bsp }" )
+
+    IndicatorBase.run_python_command_in_virtual_environment(
+        IndicatorBase.VENV_INSTALL,
+        command,
+        "jplephem" )

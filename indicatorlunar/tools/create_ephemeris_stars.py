@@ -17,18 +17,18 @@
 
 
 '''
-Create a star ephemeris for use in both PyEphem and Skyfield
+Create a star ephemeris for use in both PyEphem and Skyfield,
 using stars from PyEphem, keeping only those present in the
 IAU CSN Catalog with accompanying HIP and absolute magnitude.
 '''
 
 
-#TODO This script needs to run the guts in a venv.
-# Also verify if that works on 32 bit and/or Ubuntu 20.04...
+#TODO Verify this script works on 32 bit and/or Ubuntu 20.04...
 # ...some packages may need to be pinned according to the OS version.
 
 
 import argparse
+import sys
 import textwrap
 
 from pandas import read_csv
@@ -36,6 +36,11 @@ from skyfield.api import Star, load
 from skyfield.data import hipparcos
 
 from ephem import stars
+
+if "../" not in sys.path:
+    sys.path.insert( 0, "../../" ) # Allows calls to IndicatorBase.
+
+from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 
 
 # Indices for columns at
@@ -46,7 +51,7 @@ IAUCSN_HIP_START = 91
 IAUCSN_HIP_END = 96
 
 
-def get_stars_and_hips( iau_catalog_file ):
+def _get_stars_and_hips( iau_catalog_file ):
     stars_from_pyephem = stars.stars.keys()
     stars_and_hips_from_iau = [ ]
     with open( iau_catalog_file, 'r', encoding = "utf-8" ) as f_in:
@@ -69,7 +74,7 @@ def get_stars_and_hips( iau_catalog_file ):
     return stars_and_hips_from_iau
 
 
-def print_formatted_stars(
+def _print_formatted_stars(
     stars_and_hips_ ):
 
     print( f"List of stars for AstroBase:" )
@@ -86,7 +91,7 @@ def print_formatted_stars(
     print( "Done" )
 
 
-def create_ephemeris_skyfield(
+def _create_ephemeris_skyfield(
     out_file,
     star_ephemeris,
     stars_and_hips_ ):
@@ -106,7 +111,7 @@ def create_ephemeris_skyfield(
     print( "Done" )
 
 
-def print_ephemeris_pyephem(
+def _print_ephemeris_pyephem(
     bsp_file,
     star_ephemeris,
     stars_and_hips_ ):
@@ -157,54 +162,23 @@ def print_ephemeris_pyephem(
     print( "Done" )
 
 
-import sys
-if "../" not in sys.path:
-    sys.path.insert( 0, "../../" ) # Allows calls to IndicatorBase.
-
-from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
-
-
-def _create_ephemeris_stars_internal(
+def _create_ephemeris_stars(
         output_filename_for_skyfield_star_ephemeris,
         planet_ephemeris,
         star_ephemeris,
         star_information ):
 
-    print( "BABY!!!!!!!!!!!!!!!!!!!!!!!!")
-    stars_and_hips = get_stars_and_hips( star_information )
-    print_formatted_stars( stars_and_hips )
-    create_ephemeris_skyfield(
+    stars_and_hips = _get_stars_and_hips( star_information )
+    _print_formatted_stars( stars_and_hips )
+    _create_ephemeris_skyfield(
         output_filename_for_skyfield_star_ephemeris,
         star_ephemeris,
         stars_and_hips )
 
-    print_ephemeris_pyephem(
+    _print_ephemeris_pyephem(
         planet_ephemeris,
         star_ephemeris,
         stars_and_hips )
-
-
-def _create_ephemeris_stars( 
-        output_filename_for_skyfield_star_ephemeris,
-        planet_ephemeris,
-        star_ephemeris,
-        star_information ):
-
-    # command =f"python3 -c \"print( 111 )\""  #TODO Test
-    command = (
-        "python3 -c \"import argparse; import create_ephemeris_stars; "
-        f"create_ephemeris_stars._create_ephemeris_stars_internal( "
-        f"\\\"{ output_filename_for_skyfield_star_ephemeris }\\\", "
-        f"\\\"{ planet_ephemeris }\\\", "
-        f"\\\"{ star_ephemeris }\\\", "
-        f"\\\"{ star_information }\\\" )\"" )
-
-    IndicatorBase.run_python_command_in_virtual_environment(
-        IndicatorBase.VENV_INSTALL,
-        command,
-        "ephem",
-        "pandas",
-        "skyfield" )
 
 
 if __name__ == "__main__":
@@ -263,23 +237,17 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    _create_ephemeris_stars(
-        args.output_filename_for_skyfield_star_ephemeris,
-        args.planet_ephemeris,
-        args.star_ephemeris,
-        args. star_information )
+    command = (
+        "python3 -c \"import create_ephemeris_stars; "
+        f"create_ephemeris_stars._create_ephemeris_stars( "
+        f"\\\"{ args.output_filename_for_skyfield_star_ephemeris }\\\", "
+        f"\\\"{ args.planet_ephemeris }\\\", "
+        f"\\\"{ args.star_ephemeris }\\\", "
+        f"\\\"{ args.star_information }\\\" )\"" )
 
-#TODO Orig
-    # args = parser.parse_args()
-    #
-    # stars_and_hips = get_stars_and_hips( args.star_information )
-    # print_formatted_stars( stars_and_hips, STAR_INFORMATION_URL )
-    # create_ephemeris_skyfield(
-    #     args.output_filename_for_skyfield_star_ephemeris,
-    #     args.star_ephemeris,
-    #     stars_and_hips )
-    #
-    # print_ephemeris_pyephem(
-    #     args.planet_ephemeris,
-    #     args.star_ephemeris,
-    #     stars_and_hips )
+    IndicatorBase.run_python_command_in_virtual_environment(
+        IndicatorBase.VENV_INSTALL,
+        command,
+        "ephem",
+        "pandas",
+        "skyfield" )
