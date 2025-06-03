@@ -124,23 +124,18 @@ if __name__ == "__main__":
             For example:
                 python3 %(prog)s de421.bsp planets.bsp 5
 
-            -------------------------------------------------------
-            --- INPUT & OUTPUT PATHNAMES CONTAINING SPACES MUST ---
-            ---     * BE DOUBLE QUOTED                          ---
-            ---     * HAVE SPACES ESCAPED WITH A \              ---
-            -------------------------------------------------------
+            Ensure that the existing .bsp contains data for the date range
+            "one month before today" up to "today plus the specified years".
+
+            Input and output pathnames which contain spaces must:
+                - Be double quoted
+                - Have spaces escaped with a \
             ''' ) )
 
     parser = (
         argparse.ArgumentParser(
             formatter_class = argparse.RawDescriptionHelpFormatter,
             description = description ) )
-
-#TODO Somewhere/somehow (maybe in the above description) mention that the
-# date range starts from today minus one month so the input .bsp must have
-# data to match the range.
-
-#TODO What happens if the input .bsp does not have data for the end date range?
 
     parser.add_argument( "in_bsp", help = "The input .bsp file." )
 
