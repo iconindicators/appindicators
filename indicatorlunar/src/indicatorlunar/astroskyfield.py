@@ -19,6 +19,20 @@
 ''' Calculate astronomical information using Skyfield. '''
 
 
+#TODO Unable to install numpy/pandas on Debian 12 32 bit.
+# This means skyfield will not work on 32 bit...
+# So figure out what to do if/when astroskyfield is used.
+# Keep astropyephem as a separate install for 32 bit?
+#
+# I thought skyfield needs mumpy and pandas, but only needs numpy (I believe).
+# I need pandas for the create stars epehemeris script...so that script will
+# run on 32 bit.
+# So maybe check again if it is possible to install numpy (pinned or otherwise)
+# on 32 bit.
+#
+# Maybe try on Debian 12 32 bit on the virtual machine?
+
+
 #TODO Ran the indicator with skyfield and debug = True and got the following:
 # magnitude : timing (seconds)
 # 7 : 6
