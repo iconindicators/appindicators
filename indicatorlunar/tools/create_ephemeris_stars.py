@@ -20,14 +20,9 @@
 Create a star ephemeris for use in both PyEphem and Skyfield,
 using stars from PyEphem, keeping only those present in the
 IAU CSN Catalog with accompanying HIP and absolute magnitude.
+
+WILL NOT WORK ON 32 BIT!!!
 '''
-
-
-#TODO Verify this script works on 32 bit and/or Ubuntu 20.04...
-# ...some packages may need to be pinned according to the OS version.
-#
-# Unable to install numpy/pandas on Debian 12 32 bit.
-# This means skyfield will not work on 32 bit...
 
 
 import argparse
@@ -200,6 +195,8 @@ if __name__ == "__main__":
             Input and output pathnames which contain spaces must:
                 - Be double quoted
                 - Have spaces escaped with a \
+
+            WILL NOT WORK ON 32 BIT!!!
             ''' ) )
 
     parser = (

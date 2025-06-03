@@ -43,6 +43,8 @@ Alternately to running this script, download a .bsp and
 use spkmerge to create a smaller subset:
     https://github.com/skyfielders/python-skyfield/issues/123
     https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
+
+WILL NOT WORK ON 32 BIT!!!
 '''
 
 
@@ -130,6 +132,8 @@ if __name__ == "__main__":
             Input and output pathnames which contain spaces must:
                 - Be double quoted
                 - Have spaces escaped with a \
+
+            WILL NOT WORK ON 32 BIT!!!
             ''' ) )
 
     parser = (
