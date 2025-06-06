@@ -30,6 +30,8 @@ import csv
 import sys
 import textwrap
 
+from pandas import read_csv
+
 from skyfield.api import Star, load
 from skyfield.data import hipparcos
 
@@ -95,6 +97,34 @@ def _get_hips_to_names( iau_catalog_file ):
     return hips_to_names
 
 
+def _get_names_to_hips( iau_catalog_file ):
+    '''
+    Reads the IAU Catalog of Star Names (IAU-CSN) and returns a dictionary:
+        Key: star name (string(
+        Value: HIP (int)
+    '''
+    stars_from_pyephem = stars.stars.keys()
+    names_to_hips = { }
+    with open( iau_catalog_file, 'r', encoding = "utf-8" ) as f_in:
+        for line in f_in:
+            if not ( line.startswith( '#' ) or line.startswith( '$' ) ):
+                try:
+                    start = IAUCSN_NAME_START - 1
+                    end = IAUCSN_NAME_END - 1 + 1
+                    name_utf8 = line[ start : end ].strip()
+                    if name_utf8 in stars_from_pyephem:
+                        start = IAUCSN_HIP_START - 1
+                        end = IAUCSN_HIP_END - 1 + 1
+                        hip = int( line[ start : end ] )
+
+                        names_to_hips[ name_utf8 ] = hip
+
+                except ValueError:
+                    pass
+
+    return names_to_hips
+
+
 def _print_formatted_stars(
     stars_and_hips_ ):
 
@@ -132,7 +162,8 @@ def _create_ephemeris_skyfield(
     print( "Done" )
 
 
-def _print_ephemeris_pyephem(
+#TODO Keep?
+def _print_ephemeris_pyephemORIG(
     star_information,
     star_ephemeris,
     planet_ephemeris ): 
@@ -211,6 +242,60 @@ def _print_ephemeris_pyephem(
                 line = ','.join( str( item ) for item in components )
                 results.append(
                     f"        \"{ name }\" :\n            \"{ line }\"," )
+
+    results.sort()
+    print( *results, sep = '\n' )
+    print( "Done" )
+
+
+def _print_ephemeris_pyephem(
+    star_information,
+    star_ephemeris,
+    planet_ephemeris ): 
+    '''
+    Mostly taken from
+        https://github.com/brandon-rhodes/pyephem/blob/master/bin/rebuild-star-data
+    '''
+    print( "Ephemeris for PyEphem..." )
+
+    with load.open( star_ephemeris ) as f:
+        dataframe = hipparcos.load_dataframe( f )
+
+    # Required to obtain spectral type as this is dropped from the above load.
+    with load.open( star_ephemeris ) as f:
+        dataframe_raw = (
+            read_csv(
+                f,
+                sep = '|',
+                names = hipparcos._COLUMN_NAMES,
+                na_values = [ '     ', '       ', '        ', '            ' ],
+                low_memory = False ) )
+
+        dataframe_raw = dataframe_raw.set_index( "HIP" )
+
+    names_to_hips = _get_names_to_hips( star_information )
+    names = list( names_to_hips.keys() )
+
+    timescale = load.timescale().J( 2000.0 )
+    sun_at = load( planet_ephemeris )[ "Sun" ].at( timescale )
+    results = [ ]
+    for name in sorted( names):
+        hip = names_to_hips[ name ]
+        row = dataframe.loc[ hip ]
+        star = Star.from_dataframe( row )
+        right_ascension, declination, _ = sun_at.observe( star ).radec()
+
+        components = [
+            name.upper(),
+            "f|S|" +
+            dataframe_raw.loc[ hip ][ "SpType" ][ : 2 ],
+            f"{right_ascension.hours:.8f}|{ star.ra_mas_per_year }",
+            f"{declination.degrees:.8f}|{ star.dec_mas_per_year }",
+            row[ "magnitude"] ]
+
+        line = ','.join( str( item ) for item in components )
+        results.append(
+            f"        \"{ name.upper() }\" :\n            \"{ line }\"," )
 
     results.sort()
     print( *results, sep = '\n' )
