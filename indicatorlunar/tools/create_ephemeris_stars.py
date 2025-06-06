@@ -21,15 +21,15 @@ Create a star ephemeris for use in both PyEphem and Skyfield,
 using stars from PyEphem, keeping only those present in the
 IAU CSN Catalog with accompanying HIP and absolute magnitude.
 
-WILL NOT WORK ON 32 BIT!!!
+WILL NOT WORK ON 32 BIT!!!    TODO Check this...might work on the VM...but not laptop...!
 '''
 
 
 import argparse
+import csv
 import sys
 import textwrap
 
-from pandas import read_csv
 from skyfield.api import Star, load
 from skyfield.data import hipparcos
 
@@ -132,66 +132,15 @@ def _create_ephemeris_skyfield(
     print( "Done" )
 
 
-#TODO Hopefully delete
-def _print_ephemeris_pyephem_ORIG(
-    bsp_file,  #TODO Call this planet_ephemeris
+def _print_ephemeris_pyephem(
+    star_information,
     star_ephemeris,
-    stars_and_hips_ ):
+    planet_ephemeris ): 
     '''
     Mostly taken from
         https://github.com/brandon-rhodes/pyephem/blob/master/bin/rebuild-star-data
     '''
     print( "Ephemeris for PyEphem..." )
-    with load.open( star_ephemeris, "rb" ) as f:
-        stars_ = hipparcos.load_dataframe( f )
-        f.seek( 0 )
-        stars_with_spectral_type = (
-            read_csv(
-                f,
-                sep = '|',
-                names = hipparcos._COLUMN_NAMES,
-                na_values = [ '     ', '       ', '        ', '            ' ],
-                low_memory = False, ) )
-
-    stars_with_spectral_type = stars_with_spectral_type.set_index( "HIP" )
-    sun_at = load( bsp_file )[ "Sun" ].at( load.timescale().J( 2000.0 ) )
-    for name, hip in stars_and_hips_:
-        row = stars_.loc[ hip ]
-        star = Star.from_dataframe( row )
-        right_ascension, declination, _ = sun_at.observe( star ).radec()
-
-        spectral_type = stars_with_spectral_type.loc[ hip ][ "SpType" ]
-        if isinstance( spectral_type, str ):
-            spectral_type = spectral_type[ : 2 ]
-
-        else:
-            # Is NaN; to fix, set to two blank characters (see _libastro.c).
-            spectral_type = "  "
-
-        components = [
-            name.upper(),
-            "f|S|" +
-            spectral_type,
-            f"{ right_ascension.hours:.8f}|{ star.ra_mas_per_year }",
-            f"{ declination.degrees:.8f}|{ star.dec_mas_per_year }",
-            row[ "magnitude" ],
-        ]
-
-        line = ','.join( str( item ) for item in components )
-        print( f"        \"{ name.upper() }\" :" )
-        print( f"            \"{ line }\"," )
-
-    print( "Done" )
-
-
-def _print_ephemeris_pyephem(
-    star_information,
-    star_ephemeris,
-    planet_ephemeris ): 
-
-    import csv #TODO Move to top
-
-    hips_to_names = _get_hips_to_names( star_information )
 
     hipparcos_dialect = "hipparcos_main_catalog"
     csv.register_dialect(
@@ -207,6 +156,7 @@ def _print_ephemeris_pyephem(
     HIPPARCOS_PM_DEC = 13
     HIPPARCOS_SP_TYPE = 76
 
+    hips_to_names = _get_hips_to_names( star_information )
     hips = list( hips_to_names.keys() )
     sun_at = load( planet_ephemeris )[ "Sun" ].at( load.timescale().J( 2000.0 ) )
     results = [ ]
@@ -214,17 +164,11 @@ def _print_ephemeris_pyephem(
         reader = csv.reader( f, hipparcos_dialect )
         for row in reader:
             hip = row[ HIPPARCOS_HIP ].strip()
-            # print( hip )
-
             if hip in hips:
-            # if hip == "87937":
-                # print( row  )
-
                 right_ascension = ( [
                     float( x )
                     for x in row[ HIPPARCOS_RA_HMS ].split() ] )
 
-#TODO Check for values with a - at the front.
                 declination = ( [
                     float( x )
                     for x in row[ HIPPARCOS_DE_DMS ].split() ] )
