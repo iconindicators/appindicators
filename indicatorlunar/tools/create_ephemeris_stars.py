@@ -72,6 +72,29 @@ def _get_stars_and_hips( iau_catalog_file ):
     return stars_and_hips_from_iau
 
 
+def _get_hips_to_names( iau_catalog_file ):
+    stars_from_pyephem = stars.stars.keys()
+    hips_to_names = { }
+    with open( iau_catalog_file, 'r', encoding = "utf-8" ) as f_in:
+        for line in f_in:
+            if not ( line.startswith( '#' ) or line.startswith( '$' ) ):
+                try:
+                    start = IAUCSN_NAME_START - 1
+                    end = IAUCSN_NAME_END - 1 + 1
+                    name_utf8 = line[ start : end ].strip()
+                    if name_utf8 in stars_from_pyephem:
+                        start = IAUCSN_HIP_START - 1
+                        end = IAUCSN_HIP_END - 1 + 1
+                        hip = int( line[ start : end ] )
+
+                        hips_to_names[ str( hip ) ] = name_utf8
+
+                except ValueError:
+                    pass
+
+    return hips_to_names
+
+
 def _print_formatted_stars(
     stars_and_hips_ ):
 
@@ -109,8 +132,9 @@ def _create_ephemeris_skyfield(
     print( "Done" )
 
 
-def _print_ephemeris_pyephem(
-    bsp_file,
+#TODO Hopefully delete
+def _print_ephemeris_pyephem_ORIG(
+    bsp_file,  #TODO Call this planet_ephemeris
     star_ephemeris,
     stars_and_hips_ ):
     '''
@@ -160,6 +184,95 @@ def _print_ephemeris_pyephem(
     print( "Done" )
 
 
+def _print_ephemeris_pyephem(
+    star_information,
+    star_ephemeris,
+    planet_ephemeris ): 
+
+    import csv #TODO Move to top
+
+    hips_to_names = _get_hips_to_names( star_information )
+
+    hipparcos_dialect = "hipparcos_main_catalog"
+    csv.register_dialect(
+        hipparcos_dialect,
+        delimiter = '|',
+        quoting = csv.QUOTE_NONE )
+
+    HIPPARCOS_HIP = 1
+    HIPPARCOS_RA_HMS = 3
+    HIPPARCOS_DE_DMS = 4
+    HIPPARCOS_V_MAG = 5
+    HIPPARCOS_PM_RA = 12
+    HIPPARCOS_PM_DEC = 13
+    HIPPARCOS_SP_TYPE = 76
+
+    hips = list( hips_to_names.keys() )
+    sun_at = load( planet_ephemeris )[ "Sun" ].at( load.timescale().J( 2000.0 ) )
+    results = [ ]
+    with open( star_ephemeris, newline = '' ) as f:
+        reader = csv.reader( f, hipparcos_dialect )
+        for row in reader:
+            hip = row[ HIPPARCOS_HIP ].strip()
+            # print( hip )
+
+            if hip in hips:
+            # if hip == "87937":
+                # print( row  )
+
+                right_ascension = ( [
+                    float( x )
+                    for x in row[ HIPPARCOS_RA_HMS ].split() ] )
+
+#TODO Check for values with a - at the front.
+                declination = ( [
+                    float( x )
+                    for x in row[ HIPPARCOS_DE_DMS ].split() ] )
+
+                star = (
+                    Star(
+                        ra_hours = tuple( right_ascension ),
+                        dec_degrees = tuple( declination ),
+                        ra_mas_per_year = float( row[ HIPPARCOS_PM_RA ].strip() ),
+                        dec_mas_per_year = float( row[ HIPPARCOS_PM_DEC ].strip() ) ) )
+
+                right_ascension, declination, _ = sun_at.observe( star ).radec()
+
+                spectral_type = row[ HIPPARCOS_SP_TYPE ].strip()
+                if isinstance( spectral_type, str ):
+                    spectral_type = spectral_type[ : 2 ]
+
+                else:
+                    spectral_type = "  "
+                    # Is NaN; to fix, set to two blank characters (see _libastro.c).
+
+                name = hips_to_names[ hip ].upper()
+
+                components = [
+                    name,
+                    "f|S|" +
+                    spectral_type,
+                    f"{right_ascension.hours:.8f}|{ star.ra_mas_per_year }",
+                    f"{declination.degrees:.8f}|{ star.dec_mas_per_year }",
+                    float( row[ HIPPARCOS_V_MAG ] ),
+                ]
+
+                # print( ','.join( str( item ) for item in components ) )
+                # print()
+
+                # line = ','.join( str( item ) for item in components )
+                # print( f"        \"{ name }\" :" )
+                # print( f"            \"{ line }\"," )
+
+                line = ','.join( str( item ) for item in components )
+                results.append(
+                    f"        \"{ name }\" :\n            \"{ line }\"," )
+
+    results.sort()
+    print( *results, sep = '\n' )
+    print( "Done" )
+
+
 def _create_ephemeris_stars(
         output_filename_for_skyfield_star_ephemeris,
         planet_ephemeris,
@@ -204,48 +317,48 @@ if __name__ == "__main__":
             formatter_class = argparse.RawDescriptionHelpFormatter,
             description = description ) )
 
-    STAR_INFORMATION_URL = (
-        "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt" )
-
     parser.add_argument(
         "star_information",
         help =
             "A text file containing the list of stars, downloaded from " +
-            STAR_INFORMATION_URL + "." )
+            "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt" )
 
-    STAR_EPHEMERIS_URL = "https://cdsarc.cds.unistra.fr/ftp/cats/I/239/"
     parser.add_argument(
         "star_ephemeris",
         help =
             "A star ephemeris file, typically hip_main.dat downloaded from " +
-            STAR_EPHEMERIS_URL + "." )
-
-    PLANET_EPHEMERIS_URL = (
-        "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets" )
+            "https://cdsarc.cds.unistra.fr/ftp/cats/I/239" )
 
     parser.add_argument(
         "planet_ephemeris",
         help =
             "A planet ephemeris file in .bsp format, downloaded from " +
-            PLANET_EPHEMERIS_URL + "." )
+            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets" )
 
     parser.add_argument(
         "output_filename_for_skyfield_star_ephemeris",
         help = "The output filename for the Skyfield star ephemeris." )
 
-    args = parser.parse_args()
+#     args = parser.parse_args()
+#
+#     command = (
+#         "python3 -c \"import create_ephemeris_stars; "
+#         f"create_ephemeris_stars._create_ephemeris_stars( "
+#         f"\\\"{ args.output_filename_for_skyfield_star_ephemeris }\\\", "
+#         f"\\\"{ args.planet_ephemeris }\\\", "
+#         f"\\\"{ args.star_ephemeris }\\\", "
+#         f"\\\"{ args.star_information }\\\" )\"" )
+#
+#     IndicatorBase.run_python_command_in_virtual_environment(
+#         IndicatorBase.VENV_INSTALL,
+#         command,
+#         "ephem",
+#         "pandas",   #TODO Why need pandas?  Needed for read_csv() so is there an equivalent?
+# # I don't want to release this script to the end-user only to have them need to install pandas.        
+#         "skyfield" )
 
-    command = (
-        "python3 -c \"import create_ephemeris_stars; "
-        f"create_ephemeris_stars._create_ephemeris_stars( "
-        f"\\\"{ args.output_filename_for_skyfield_star_ephemeris }\\\", "
-        f"\\\"{ args.planet_ephemeris }\\\", "
-        f"\\\"{ args.star_ephemeris }\\\", "
-        f"\\\"{ args.star_information }\\\" )\"" )
+    star_information = "../../../IndicatorLunarData/IAU-CSN.txt"
+    star_ephemeris = "../../../IndicatorLunarData/hip_main.dat"
+    planet_ephemeris = "../../../IndicatorLunarData/de421.bsp" 
 
-    IndicatorBase.run_python_command_in_virtual_environment(
-        IndicatorBase.VENV_INSTALL,
-        command,
-        "ephem",
-        "pandas",
-        "skyfield" )
+    _print_ephemeris_pyephem( star_information, star_ephemeris, planet_ephemeris )
