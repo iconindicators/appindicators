@@ -71,7 +71,7 @@
 # with
 #     dependencies = [
 #       "numpy",
-#       "pandas",    #TODO Why is pandas here?
+#       "pandas",    # Needed for mpc (and I think loading stars/planets).
 #       "requests",
 #       "sgp4",
 #       "skyfield" ]
