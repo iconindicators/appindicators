@@ -22,11 +22,11 @@ using stars from PyEphem, keeping only those present in the
 IAU CSN Catalog with accompanying HIP and absolute magnitude.
 
 WILL NOT WORK ON 32 BIT!!!    TODO Check this...might work on the VM...but not laptop...!
+# Perhaps try to figure a way to pin various parts (pandas) to work on 32 bit.
 '''
 
 
 import argparse
-import csv
 import sys
 import textwrap
 
@@ -51,55 +51,9 @@ IAUCSN_HIP_START = 91
 IAUCSN_HIP_END = 96
 
 
-def _get_stars_and_hips( iau_catalog_file ):
-    stars_from_pyephem = stars.stars.keys()
-    stars_and_hips_from_iau = [ ]
-    with open( iau_catalog_file, 'r', encoding = "utf-8" ) as f_in:
-        for line in f_in:
-            if not ( line.startswith( '#' ) or line.startswith( '$' ) ):
-                try:
-                    start = IAUCSN_NAME_START - 1
-                    end = IAUCSN_NAME_END - 1 + 1
-                    name_utf8 = line[ start : end ].strip()
-                    if name_utf8 in stars_from_pyephem:
-                        start = IAUCSN_HIP_START - 1
-                        end = IAUCSN_HIP_END - 1 + 1
-                        hip = int( line[ start : end ] )
-
-                        stars_and_hips_from_iau.append( [ name_utf8, hip ] )
-
-                except ValueError:
-                    pass
-
-    return stars_and_hips_from_iau
-
-
-def _get_hips_to_names( iau_catalog_file ):
-    stars_from_pyephem = stars.stars.keys()
-    hips_to_names = { }
-    with open( iau_catalog_file, 'r', encoding = "utf-8" ) as f_in:
-        for line in f_in:
-            if not ( line.startswith( '#' ) or line.startswith( '$' ) ):
-                try:
-                    start = IAUCSN_NAME_START - 1
-                    end = IAUCSN_NAME_END - 1 + 1
-                    name_utf8 = line[ start : end ].strip()
-                    if name_utf8 in stars_from_pyephem:
-                        start = IAUCSN_HIP_START - 1
-                        end = IAUCSN_HIP_END - 1 + 1
-                        hip = int( line[ start : end ] )
-
-                        hips_to_names[ str( hip ) ] = name_utf8
-
-                except ValueError:
-                    pass
-
-    return hips_to_names
-
-
 def _get_names_to_hips( iau_catalog_file ):
     '''
-    Reads the IAU Catalog of Star Names (IAU-CSN) and returns a dictionary:
+    Reads the IAU Catalog of Star Names file and returns a dictionary:
         Key: star name (string(
         Value: HIP (int)
     '''
@@ -126,12 +80,15 @@ def _get_names_to_hips( iau_catalog_file ):
 
 
 def _print_formatted_stars(
-    stars_and_hips_ ):
+    names_to_hips ):
 
     print( f"List of stars for AstroBase:" )
-    for name, hip in stars_and_hips_:
-        spacing_name = ' ' * ( IAUCSN_NAME_END - IAUCSN_NAME_START - len( name ) - 1 )
-        spacing_hip = ' ' * ( IAUCSN_HIP_END - IAUCSN_HIP_START - len( str( hip ) ) + 1 )
+    name_length = IAUCSN_NAME_END - IAUCSN_NAME_START
+    hip_length = IAUCSN_HIP_END - IAUCSN_HIP_START
+    for name in sorted( names_to_hips.keys() ):
+        hip = names_to_hips[ name ]
+        spacing_name = ' ' * ( name_length - len( name ) - 1 )
+        spacing_hip = ' ' * ( hip_length - len( str( hip ) ) + 1 )
         print(
             "        [ " +
             f"\"{ name.upper() }\",{ spacing_name }" +
@@ -145,12 +102,9 @@ def _print_formatted_stars(
 def _create_ephemeris_skyfield(
     out_file,
     star_ephemeris,
-    stars_and_hips_ ):
+    hipparcos_identifiers ):
 
     print( f"Creating { out_file } for Skyfield..." )
-    hipparcos_identifiers = (
-        [ star_and_hip[ 1 ] for star_and_hip in stars_and_hips_ ] )
-
     with load.open( star_ephemeris, "rb" ) as in_file, open( out_file, "wb" ) as f:
         for line in in_file:
             # HIP is located at bytes 9 - 14
@@ -162,96 +116,10 @@ def _create_ephemeris_skyfield(
     print( "Done" )
 
 
-#TODO Keep?
-def _print_ephemeris_pyephemORIG(
-    star_information,
-    star_ephemeris,
-    planet_ephemeris ): 
-    '''
-    Mostly taken from
-        https://github.com/brandon-rhodes/pyephem/blob/master/bin/rebuild-star-data
-    '''
-    print( "Ephemeris for PyEphem..." )
-
-    hipparcos_dialect = "hipparcos_main_catalog"
-    csv.register_dialect(
-        hipparcos_dialect,
-        delimiter = '|',
-        quoting = csv.QUOTE_NONE )
-
-    HIPPARCOS_HIP = 1
-    HIPPARCOS_RA_HMS = 3
-    HIPPARCOS_DE_DMS = 4
-    HIPPARCOS_V_MAG = 5
-    HIPPARCOS_PM_RA = 12
-    HIPPARCOS_PM_DEC = 13
-    HIPPARCOS_SP_TYPE = 76
-
-    hips_to_names = _get_hips_to_names( star_information )
-    hips = list( hips_to_names.keys() )
-    sun_at = load( planet_ephemeris )[ "Sun" ].at( load.timescale().J( 2000.0 ) )
-    results = [ ]
-    with open( star_ephemeris, newline = '' ) as f:
-        reader = csv.reader( f, hipparcos_dialect )
-        for row in reader:
-            hip = row[ HIPPARCOS_HIP ].strip()
-            if hip in hips:
-                right_ascension = ( [
-                    float( x )
-                    for x in row[ HIPPARCOS_RA_HMS ].split() ] )
-
-                declination = ( [
-                    float( x )
-                    for x in row[ HIPPARCOS_DE_DMS ].split() ] )
-
-                star = (
-                    Star(
-                        ra_hours = tuple( right_ascension ),
-                        dec_degrees = tuple( declination ),
-                        ra_mas_per_year = float( row[ HIPPARCOS_PM_RA ].strip() ),
-                        dec_mas_per_year = float( row[ HIPPARCOS_PM_DEC ].strip() ) ) )
-
-                right_ascension, declination, _ = sun_at.observe( star ).radec()
-
-                spectral_type = row[ HIPPARCOS_SP_TYPE ].strip()
-                if isinstance( spectral_type, str ):
-                    spectral_type = spectral_type[ : 2 ]
-
-                else:
-                    spectral_type = "  "
-                    # Is NaN; to fix, set to two blank characters (see _libastro.c).
-
-                name = hips_to_names[ hip ].upper()
-
-                components = [
-                    name,
-                    "f|S|" +
-                    spectral_type,
-                    f"{right_ascension.hours:.8f}|{ star.ra_mas_per_year }",
-                    f"{declination.degrees:.8f}|{ star.dec_mas_per_year }",
-                    float( row[ HIPPARCOS_V_MAG ] ),
-                ]
-
-                # print( ','.join( str( item ) for item in components ) )
-                # print()
-
-                # line = ','.join( str( item ) for item in components )
-                # print( f"        \"{ name }\" :" )
-                # print( f"            \"{ line }\"," )
-
-                line = ','.join( str( item ) for item in components )
-                results.append(
-                    f"        \"{ name }\" :\n            \"{ line }\"," )
-
-    results.sort()
-    print( *results, sep = '\n' )
-    print( "Done" )
-
-
 def _print_ephemeris_pyephem(
-    star_information,
+    planet_ephemeris,
     star_ephemeris,
-    planet_ephemeris ): 
+    names_to_hips ):
     '''
     Mostly taken from
         https://github.com/brandon-rhodes/pyephem/blob/master/bin/rebuild-star-data
@@ -273,13 +141,11 @@ def _print_ephemeris_pyephem(
 
         dataframe_raw = dataframe_raw.set_index( "HIP" )
 
-    names_to_hips = _get_names_to_hips( star_information )
-    names = list( names_to_hips.keys() )
-
     timescale = load.timescale().J( 2000.0 )
     sun_at = load( planet_ephemeris )[ "Sun" ].at( timescale )
+
     results = [ ]
-    for name in sorted( names):
+    for name in sorted( list( names_to_hips.keys() ) ):
         hip = names_to_hips[ name ]
         row = dataframe.loc[ hip ]
         star = Star.from_dataframe( row )
@@ -298,6 +164,7 @@ def _print_ephemeris_pyephem(
             f"        \"{ name.upper() }\" :\n            \"{ line }\"," )
 
     results.sort()
+    results[ -1 ] = results[ -1 ][ 0 : -1 ] # Trim last ,
     print( *results, sep = '\n' )
     print( "Done" )
 
@@ -306,19 +173,21 @@ def _create_ephemeris_stars(
         output_filename_for_skyfield_star_ephemeris,
         planet_ephemeris,
         star_ephemeris,
-        star_information ):
+        iau_catalog_file ):
 
-    stars_and_hips = _get_stars_and_hips( star_information )
-    _print_formatted_stars( stars_and_hips )
+    names_to_hips = _get_names_to_hips( iau_catalog_file )
+
+    _print_formatted_stars( names_to_hips )
+
     _create_ephemeris_skyfield(
         output_filename_for_skyfield_star_ephemeris,
         star_ephemeris,
-        stars_and_hips )
+        list( names_to_hips.values() ) )
 
     _print_ephemeris_pyephem(
         planet_ephemeris,
         star_ephemeris,
-        stars_and_hips )
+        names_to_hips )
 
 
 if __name__ == "__main__":
@@ -347,7 +216,7 @@ if __name__ == "__main__":
             description = description ) )
 
     parser.add_argument(
-        "star_information",
+        "iau_catalog_file",
         help =
             "A text file containing the list of stars, downloaded from " +
             "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt" )
@@ -368,26 +237,29 @@ if __name__ == "__main__":
         "output_filename_for_skyfield_star_ephemeris",
         help = "The output filename for the Skyfield star ephemeris." )
 
-#     args = parser.parse_args()
-#
-#     command = (
-#         "python3 -c \"import create_ephemeris_stars; "
-#         f"create_ephemeris_stars._create_ephemeris_stars( "
-#         f"\\\"{ args.output_filename_for_skyfield_star_ephemeris }\\\", "
-#         f"\\\"{ args.planet_ephemeris }\\\", "
-#         f"\\\"{ args.star_ephemeris }\\\", "
-#         f"\\\"{ args.star_information }\\\" )\"" )
-#
-#     IndicatorBase.run_python_command_in_virtual_environment(
-#         IndicatorBase.VENV_INSTALL,
-#         command,
-#         "ephem",
-#         "pandas",   #TODO Why need pandas?  Needed for read_csv() so is there an equivalent?
-# # I don't want to release this script to the end-user only to have them need to install pandas.        
-#         "skyfield" )
+    args = parser.parse_args()
 
-    star_information = "../../../IndicatorLunarData/IAU-CSN.txt"
-    star_ephemeris = "../../../IndicatorLunarData/hip_main.dat"
-    planet_ephemeris = "../../../IndicatorLunarData/de421.bsp" 
+    command = (
+        "python3 -c \"import create_ephemeris_stars; "
+        f"create_ephemeris_stars._create_ephemeris_stars( "
+        f"\\\"{ args.output_filename_for_skyfield_star_ephemeris }\\\", "
+        f"\\\"{ args.planet_ephemeris }\\\", "
+        f"\\\"{ args.star_ephemeris }\\\", "
+        f"\\\"{ args.iau_catalog_file }\\\" )\"" )
 
-    _print_ephemeris_pyephem( star_information, star_ephemeris, planet_ephemeris )
+    IndicatorBase.run_python_command_in_virtual_environment(
+        IndicatorBase.VENV_INSTALL,
+        command,
+        "ephem",
+        "pandas",
+        "skyfield" )
+
+#TODO Testing
+    # iau_catalog_file = "../../../IndicatorLunarData/IAU-CSN.txt"
+    # star_ephemeris = "../../../IndicatorLunarData/hip_main.dat"
+    # planet_ephemeris = "../../../IndicatorLunarData/de421.bsp" 
+    #
+    # _print_ephemeris_pyephem(
+    #     iau_catalog_file,
+    #     star_ephemeris,
+    #     planet_ephemeris )
