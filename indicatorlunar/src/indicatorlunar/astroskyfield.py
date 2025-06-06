@@ -31,6 +31,15 @@
 # on 32 bit.
 #
 # Maybe try on Debian 12 32 bit on the virtual machine?
+# Did a 
+#   python3 -m pip install numpy
+# and successfully installed numpy 2.2.6
+# then installed skyfield and ran an example which uses numpy and it worked.
+# How the hell does numpy latest version install when supposedly should not
+# install from 1.22.0 onwards for 32 bit...?
+# https://numpy.org/doc/2.0/release/1.22.0-notes.html
+#
+# Need to clarify with Numpy; how is it the latest version installed on Debian 12 32 bit...?
 
 
 #TODO Ran the indicator with skyfield and debug = True and got the following:
@@ -62,7 +71,7 @@
 # with
 #     dependencies = [
 #       "numpy",
-#       "pandas",
+#       "pandas",    #TODO Why is pandas here?
 #       "requests",
 #       "sgp4",
 #       "skyfield" ]

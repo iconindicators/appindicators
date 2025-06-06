@@ -55,7 +55,7 @@ WILL NOT WORK ON 32 BIT!!!
 # For 32 bit on Linux, might need to pin numpy to < 1.22.0
 #
 # https://numpy.org/doc/2.0/release/1.25.0-notes.html
-# For Ubuntu 20.04 et al, pin numpy to < 1.25.0
+# For Ubuntu 20.04 et al, pin numpy to < 1.25.0 as Python 3.9+ is supported.
 # 
 # Ubuntu 22.04 has python 3.10 so should not need numpy pinning until 3.10 is 
 # deprecated or unsupported by numpy.
@@ -71,6 +71,8 @@ WILL NOT WORK ON 32 BIT!!!
 #
 # Don't forget to check all of these for Fedora, Manjaro and openSUSE!
 #
+#
+# WHY NEED PANDAS???  jplephem only needs numpy.
 # 
 #
 # What about the need to pin
