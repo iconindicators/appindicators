@@ -253,13 +253,3 @@ if __name__ == "__main__":
         "ephem",
         "pandas",
         "skyfield" )
-
-#TODO Testing
-    # iau_catalog_file = "../../../IndicatorLunarData/IAU-CSN.txt"
-    # star_ephemeris = "../../../IndicatorLunarData/hip_main.dat"
-    # planet_ephemeris = "../../../IndicatorLunarData/de421.bsp" 
-    #
-    # _print_ephemeris_pyephem(
-    #     iau_catalog_file,
-    #     star_ephemeris,
-    #     planet_ephemeris )
