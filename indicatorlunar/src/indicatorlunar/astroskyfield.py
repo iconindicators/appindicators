@@ -24,6 +24,26 @@
 # AS THOSE ARE NOW UP TO DATE.
 
 
+#TODO
+# Is there a need to pin
+#    requests
+#    sgp4
+#
+# Neither seem to have any issue but test on Debian 32 bit!
+
+
+#TODO
+# Pinning may be a normal thing for all indicators...
+# The pyproject.tom.specific for lunar may need to change somehow (if skyfield is used)
+# and any install instructions will need to include the pinning there,
+# rather than in the dependencies of pyproject.toml (which should contain no
+# dependencies). 
+
+
+#TODO Do I need to explicitly put pandas and/or numpy into the dependencies?
+# May need to do so for pinning...but instead, have alternate install instructions.
+
+
 #TODO Unable to install numpy/pandas on Debian 12 32 bit.
 # This means skyfield will not work on 32 bit...
 # So figure out what to do if/when astroskyfield is used.
