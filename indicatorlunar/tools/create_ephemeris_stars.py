@@ -215,8 +215,6 @@ if __name__ == "__main__":
             Input and output pathnames which contain spaces must:
                 - Be double quoted
                 - Have spaces escaped with a \
-
-            WILL NOT WORK ON 32 BIT!!!
             ''' ) )
 
     parser = (
