@@ -41,14 +41,16 @@ Alternatively to running this script, download a .bsp and use spkmerge:
 '''
 
 
-#TODO I don't think it is possible to install jplephem on 32 bit.
-# Try running this script (and create ephemeris stars?) on Ubuntu 22.04 or 24.04 in a new, clean venv.
+#TODO This script uses Python3, jplephem and numpy. 
+#
+# Need to verify it works on 32 bit and also Ubuntu 20.04
+# as some pinning of versions may need to be done.
 #
 # https://numpy.org/doc/2.0/release/1.22.0-notes.html
 # For 32 bit on Linux, might need to pin numpy to < 1.22.0
 #
 # https://numpy.org/doc/2.0/release/1.25.0-notes.html
-# For Ubuntu 20.04 et al, pin numpy to < 1.25.0 as Python 3.9+ is supported.
+# For Ubuntu 20.04 et al, pin numpy to < 1.25.0 as < Python 3.9 is unsupported.
 # 
 # Ubuntu 22.04 has python 3.10 so should not need numpy pinning until 3.10 is 
 # deprecated or unsupported by numpy.
@@ -56,45 +58,7 @@ Alternatively to running this script, download a .bsp and use spkmerge:
 # Debian 11 has python 3.9 so should not need numpy pinning until 3.9 is
 # deprecated or unsupported by numpy.
 # 
-# Pandas 2.0.0 supports python3.8+ and numpy 1.20.3 so only good for ubuntu 20.04+
-# 
-# Pandas 2.1.0 supports python3.9+ and numpy 1.22.4 so only good for ubuntu 22.04+
-# 
-# Test on Debian 12 vm and then Debian 12 32 laptop.
-#
-# Don't forget to check all of these for Fedora, Manjaro and openSUSE!
-#
-#
-# WHY NEED PANDAS???  jplephem only needs numpy.
-# 
-#
-# What about the need to pin
-#    requests?
-#    sgp4?
-# Neither seem to have any issue but test on Debian 32 bit!
-#
-#
-# Further, this pinning may be a normal thing for all indicators...
-# The pyproject.tom.specific for lunar may need to change somehow (if skyfield is used)
-# and any install instructions will need to include the pinning there,
-# rather than in the dependencies of pyproject.toml (which should contain no
-# dependencies). 
-#
-# This script needs to create a venv, install jplephem
-# (pinned or not and/or check os version)
-# and then run the guts of the script.
-#
-#
-# Undecided if the venv should be created in the indicatorlunar/tools
-# directory only for developer's use, or included in the release...
-# If part of the release, can use INdicatorbase process_run...but no access
-# to utils venv stuff.
-# Is it possible to run the script (within the installed .local/venv_indicators)
-# activate venv_indicators and run the internals of the script? 
-# Then won't need to install jplephem, etc...should already be installed.
-#
-# Unable to install numpy/pandas on Debian 12 32 bit.
-# This means skyfield will not work on 32 bit...
+# Check for Fedora, Manjaro and openSUSE!
 
 
 import argparse
@@ -159,8 +123,7 @@ if __name__ == "__main__":
         f"{ args.in_bsp } { args.out_bsp }" )
 
     IndicatorBase.run_python_command_in_virtual_environment(
-        # IndicatorBase.VENV_INSTALL,
-        "/home/bernard/Programming/Indicators/venv_create_ephemeris_planets",  #TODO Put line above back in.
+        IndicatorBase.VENV_INSTALL,
         command,
         "jplephem" ) #TODO jplephem will install numpy.
 # For 32 bit and/or Ubuntu 20.04 might need to explicitly

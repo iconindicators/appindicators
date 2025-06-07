@@ -35,6 +35,12 @@ The ephemeris is used in:
 #
 # If ultimately does not work on 32 bit,
 # put in a note in the comment header and the parser description.
+#
+# Pandas 2.0.0 supports python3.8+ and numpy 1.20.3 so only good for ubuntu 20.04+
+# 
+# Pandas 2.1.0 supports python3.9+ and numpy 1.22.4 so only good for ubuntu 22.04+
+# 
+# Check for Fedora, Manjaro and openSUSE!
 
 
 import argparse
