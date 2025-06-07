@@ -121,7 +121,9 @@ def process_line_and_write_lowell_minorplanet(
     '''
     # Field numbers:  1  2   3   4   5   6   7   8   9  10   11   12   13   14   15   16   17   18   19   20   21   22   23   24   25
     start_indices = [ 1, 8, 27, 43, 50, 55, 60, 66, 74, 96, 101, 107, 116, 127, 138, 149, 159, 170, 182, 191, 200, 208, 217, 234, 251 ]
-    start_indices = [ x - 1 for x in start_indices ] # Offset back to zero to match each line read into a string.
+
+    # Offset back to zero to match each line read into a string.
+    start_indices = [ x - 1 for x in start_indices ]
 
     # Inspired by https://stackoverflow.com/a/10851479/2156453
     fields = (
