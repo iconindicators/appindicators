@@ -19,6 +19,11 @@
 ''' Calculate astronomical information using Skyfield. '''
 
 
+#TODO ALL THE TODOS BELOW IN REGARDS TO 32 BIT, NUMPY, JPLEPHEM AND PANDAS
+# NEED TO BE CHECKED AGAINST THE CREATE STARS/PLANETS EPEHEMERIS SCRIPTS
+# AS THOSE ARE NOW UP TO DATE.
+
+
 #TODO Unable to install numpy/pandas on Debian 12 32 bit.
 # This means skyfield will not work on 32 bit...
 # So figure out what to do if/when astroskyfield is used.
