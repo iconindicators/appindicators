@@ -31,6 +31,8 @@ The ephemeris is used in:
 # test to see if works on 32 bit (both laptop and VM),
 # which may require version pinning.
 #
+# May also require pinning for Ubuntu 20.04 (using an old Python3 version).
+#
 # If ultimately does not work on 32 bit,
 # put in a note in the comment header and the parser description.
 
