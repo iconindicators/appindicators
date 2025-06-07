@@ -17,18 +17,15 @@
 
 
 '''
-Create a planet ephemeris for use in Skyfield which commences from today's date
-and ends at a specified number of years from today.
+Create a planet ephemeris for use in astroskyfield (and Skyfield),
+commencing from today's date, ending at a specified number of years from today.
 
-The start date is wound back one month to take into account a quirk in the
-Skyfield lunar eclipse algorithm.
+The start date is wound back one month to take into account the underlying
+Skyfield lunar eclipse finding algorithm.
 
 This script essentially wraps up the following command:
 
     python3 -m jplephem excerpt start_date end_date in_file.bsp out_file.bsp
-
-Requires jplephem:
-    https://pypi.org/project/jplephem
 
 BSP files:
     https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
@@ -39,12 +36,8 @@ References:
     ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
     ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
 
-Alternately to running this script, download a .bsp and
-use spkmerge to create a smaller subset:
+Alternatively to running this script, download a .bsp and use spkmerge:
     https://github.com/skyfielders/python-skyfield/issues/123
-    https://github.com/skyfielders/python-skyfield/issues/231#issuecomment-450507640
-
-WILL NOT WORK ON 32 BIT!!!
 '''
 
 
@@ -128,14 +121,14 @@ if __name__ == "__main__":
             For example:
                 python3 %(prog)s de421.bsp planets.bsp 5
 
-            Ensure that the existing .bsp contains data for the date range
-            "one month before today" up to "today plus the specified years".
+            Ensure that the existing .bsp contains data from
+                "one month before today"
+            up to
+                "today plus the specified years".
 
             Input and output pathnames which contain spaces must:
                 - Be double quoted
                 - Have spaces escaped with a \
-
-            WILL NOT WORK ON 32 BIT!!!
             ''' ) )
 
     parser = (
@@ -166,6 +159,10 @@ if __name__ == "__main__":
         f"{ args.in_bsp } { args.out_bsp }" )
 
     IndicatorBase.run_python_command_in_virtual_environment(
-        IndicatorBase.VENV_INSTALL,
+        # IndicatorBase.VENV_INSTALL,
+        "/home/bernard/Programming/Indicators/venv_create_ephemeris_planets",  #TODO Put line above back in.
         command,
-        "jplephem" )
+        "jplephem" ) #TODO jplephem will install numpy.
+# For 32 bit and/or Ubuntu 20.04 might need to explicitly
+# list numpy and pin to a version.
+# specific version. 
