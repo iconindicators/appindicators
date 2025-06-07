@@ -17,13 +17,22 @@
 
 
 '''
-Create a star ephemeris for use in both PyEphem and Skyfield,
-using stars from PyEphem, keeping only those present in the
-IAU CSN Catalog with accompanying HIP and absolute magnitude.
+Create a star ephemeris using stars from PyEphem,
+keeping only those present in the IAU CSN Catalog,
+with accompanying HIP and absolute magnitude.
 
-WILL NOT WORK ON 32 BIT!!!    TODO Check this...might work on the VM...but not laptop...!
-# Perhaps try to figure a way to pin various parts (pandas) to work on 32 bit.
+The ephemeris is used in:
+    astropyephem (wrapper around PyEphem)
+    astroskyfield (wrapper around Skyfield)
 '''
+
+
+#TODO Given that pandas and numpy (through skyfield) are used in this script,
+# test to see if works on 32 bit (both laptop and VM),
+# which may require version pinning.
+#
+# If ultimately does not work on 32 bit,
+# put in a note in the comment header and the parser description.
 
 
 import argparse
@@ -121,7 +130,7 @@ def _print_ephemeris_pyephem(
     star_ephemeris,
     names_to_hips ):
     '''
-    Mostly taken from
+    Taken from
         https://github.com/brandon-rhodes/pyephem/blob/master/bin/rebuild-star-data
     '''
     print( "Ephemeris for PyEphem..." )
