@@ -19,8 +19,8 @@
 '''
 Convert:
     Minor planets from Lowell Observatory to Skyfield / XEphem format.
-    Minor planets file from Minor Planet Center to XEphem format.
-    Comets file from Minor Planet Center to XEphem format.
+    Minor planets from Minor Planet Center to XEphem format.
+    Comets from Minor Planet Center to XEphem format.
 
 Formats:
     https://asteroid.lowell.edu/astorb/
@@ -28,7 +28,7 @@ Formats:
     https://www.minorplanetcenter.net/iau/info/MPOrbitFormat.html
     https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
 
-  References:
+References:
     https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/astorb2edb.pl
     https://github.com/XEphem/XEphem/blob/main/GUI/xephem/auxil/mpcorb2edb.pl
     https://github.com/XEphem/XEphem/blob/main/GUI/xephem/tools/mpccomet2edb.pl
@@ -42,9 +42,7 @@ import textwrap
 
 def get_unpacked_date(
     packed_date ):
-    '''
-    https://www.minorplanetcenter.net/iau/info/PackedDates.html
-    '''
+    ''' https://www.minorplanetcenter.net/iau/info/PackedDates.html '''
 
     def get_month_or_day_from_packed(
         packed_month_or_day ):
@@ -78,9 +76,7 @@ def get_packed_date(
     year,
     month,
     day ):
-    '''
-    https://www.minorplanetcenter.net/iau/info/PackedDates.html
-    '''
+    ''' https://www.minorplanetcenter.net/iau/info/PackedDates.html '''
     packed_year = year[ 2 : ]
     if int( year ) < 1900:
         packed_year = 'I' + packed_year
