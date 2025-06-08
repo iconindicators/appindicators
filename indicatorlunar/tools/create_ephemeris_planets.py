@@ -85,7 +85,7 @@ if __name__ == "__main__":
             one month prior to today, to a specified number of years from today.
 
             For example:
-                python3 %(prog)s de421.bsp planets.bsp 5
+                python3 %(prog)s de442s.bsp planets.bsp 5
 
             Ensure that the existing .bsp contains data from
                 "one month before today"

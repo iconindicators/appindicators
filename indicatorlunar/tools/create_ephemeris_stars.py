@@ -188,7 +188,7 @@ if __name__ == "__main__":
 
             For example:
                 . $HOME/.local/venv_indicators/bin/activate && \
-                python3 %(prog)s IAU-CSN.txt hip_main.dat de440s.bsp stars.dat && \
+                python3 %(prog)s IAU-CSN.txt hip_main.dat de442s.bsp stars.dat && \
                 deactivate
 
             Requires ephem, pandas and skyfield.
