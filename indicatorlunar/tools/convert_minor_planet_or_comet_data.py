@@ -435,9 +435,10 @@ if __name__ == "__main__":
 
             The output will ALWAYS be written to a text file.
 
-            ------------------------------------------------------------------------
-            --- INPUT & OUTPUT PATHNAMES CONTAINING SPACES MUST BE DOUBLE QUOTED ---
-            ------------------------------------------------------------------------''' ) )
+            -------------------------------------------
+            --- INPUT & OUTPUT PATHNAMES CONTAINING ---
+            ---    SPACES MUST BE DOUBLE QUOTED     ---
+            -------------------------------------------''' ) )
 
     parser = (
         argparse.ArgumentParser(
