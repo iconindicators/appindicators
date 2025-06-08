@@ -17,42 +17,31 @@
 
 
 '''
-From the intersection of stars from the IAU CSN Catalog and PyEphem:
-
-    Create a list of stars for astrobase, with accompanying HIP.
-
-    Create ephemeris data for astropyephem.
-
-    Create an ephemeris file for astroskyfield.
+From the intersection of stars from the IAU CSN Catalog and PyEphem create...
+    A list of stars for astrobase, with accompanying HIP.
+    Ephemeris data for astropyephem.
+    An ephemeris file for astroskyfield.
 '''
 
-#TODO On Debian 32 bit on the VM, the import of pandas, skyfield and ephem
-# did not work...but works on Ubuntu...is this because these are already installed
-# and on the OS path on Ubuntu?
-#
-# Need to make a change so that any errors (import or otherwise) show on the console.
+
+#TODO Works on Debian 32 bit on the VM, but not on the laptop 
+# (build error during the install of numpy, et al).
+# Based on reading of numpy/pandas, should not install on 32 bit.
+# Need more investigation...
 
 
-#TODO Given that pandas and numpy (through skyfield) are used in this script,
-# test to see if works on 32 bit (both laptop and VM),
-# which may require version pinning.
-#
-# May also require pinning for Ubuntu 20.04 (using an old Python3 version).
-#
-# If ultimately does not work on 32 bit,
-# put in a note in the comment header and the parser description.
+#TODO May need to add to documentation notes about pinning numpy/pandas to 
+# particular versions given Python versions may no longer be supported
+# (for Ubuntu 20.04) and for 32 bit.
 #
 # Pandas 2.0.0 supports python3.8+ and numpy 1.20.3 so only good for ubuntu 20.04+
 # 
 # Pandas 2.1.0 supports python3.9+ and numpy 1.22.4 so only good for ubuntu 22.04+
 # 
 # Check for Fedora, Manjaro and openSUSE!
-#
-# Test running this script from installed in .venv_indicators
 
 
 import argparse
-import sys
 import textwrap
 
 from pandas import read_csv
@@ -61,11 +50,6 @@ from skyfield.api import Star, load
 from skyfield.data import hipparcos
 
 from ephem import stars
-
-if "../" not in sys.path:
-    sys.path.insert( 0, "../../" ) # Allows calls to IndicatorBase.
-
-from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 
 
 # Indices for columns at
@@ -89,13 +73,12 @@ def _get_names_to_hips( iau_catalog_file ):
                 try:
                     start = IAUCSN_NAME_START - 1
                     end = IAUCSN_NAME_END - 1 + 1
-                    name_utf8 = line[ start : end ].strip()
-                    if name_utf8 in stars_from_pyephem:
+                    name = line[ start : end ].strip()
+                    if name in stars_from_pyephem:
                         start = IAUCSN_HIP_START - 1
                         end = IAUCSN_HIP_END - 1 + 1
                         hip = int( line[ start : end ] )
-
-                        names_to_hips[ name_utf8 ] = hip
+                        names_to_hips[ name ] = hip
 
                 except ValueError:
                     pass
@@ -193,39 +176,22 @@ def _print_ephemeris_pyephem(
     print( "Done" )
 
 
-def _create_ephemeris_stars(
-        output_filename_for_skyfield_star_ephemeris,
-        planet_ephemeris,
-        star_ephemeris,
-        iau_catalog_file ):
-
-    names_to_hips = _get_names_to_hips( iau_catalog_file )
-
-    _print_formatted_stars( names_to_hips )
-
-    _create_ephemeris_skyfield(
-        output_filename_for_skyfield_star_ephemeris,
-        star_ephemeris,
-        list( names_to_hips.values() ) )
-
-    _print_ephemeris_pyephem(
-        planet_ephemeris,
-        star_ephemeris,
-        names_to_hips )
-
-
 if __name__ == "__main__":
     description = (
         textwrap.dedent(
             r'''
-            Takes the star information and:
+            Using a list of stars from IAU CSN:
             1) Prints a list of star names, corresponding HIP and star name
-               for translation (as a Python list of lists).
-            2) Creates a star ephemeris file for Skyfield.
-            3) Prints a star ephemeris for PyEphem as a Python dictionary.
+               for translation (as a Python list of lists) for astrobase.
+            2) Creates a star ephemeris file for astroskyfield.
+            3) Prints a star ephemeris for astropyephem as a Python dictionary.
 
             For example:
-                python3 %(prog)s IAU-CSN.txt hip_main.dat de440s.bsp stars.dat
+                . $HOME/.local/venv_indicators/bin/activate && \
+                python3 %(prog)s IAU-CSN.txt hip_main.dat de440s.bsp stars.dat && \
+                deactivate
+
+            Requires ephem, pandas and skyfield.
 
             Input and output pathnames which contain spaces must:
                 - Be double quoted
@@ -260,21 +226,6 @@ if __name__ == "__main__":
         help = "The output filename for the Skyfield star ephemeris." )
 
     args = parser.parse_args()
-
-    # command = (
-    #     "python3 -c \"import create_ephemeris_stars; "
-    #     f"create_ephemeris_stars._create_ephemeris_stars( "
-    #     f"\\\"{ args.output_filename_for_skyfield_star_ephemeris }\\\", "
-    #     f"\\\"{ args.planet_ephemeris }\\\", "
-    #     f"\\\"{ args.star_ephemeris }\\\", "
-    #     f"\\\"{ args.iau_catalog_file }\\\" )\"" )
-    #
-    # IndicatorBase.run_python_command_in_virtual_environment(
-    #     IndicatorBase.VENV_INSTALL,
-    #     command,
-    #     "ephem",
-    #     "pandas",
-    #     "skyfield" )
 
     names_to_hips = _get_names_to_hips( args.iau_catalog_file )
 
