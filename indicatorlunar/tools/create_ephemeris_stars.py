@@ -17,9 +17,15 @@
 
 
 '''
-Create a star ephemeris for astropyephem and astroskyfield
-using stars from PyEphem, retaining only those stars present in
-the IAU CSN Catalog, with accompanying HIP and absolute magnitude.
+From the intersection of stars in the IAU CSN Catalog and PyEphem's:
+
+    Create a list of stars for astrobase, with accompanying HIP.
+
+    Create ephemeris data for astropyephem for those stars from
+    the astrobase list above.
+
+    Create an ephemeris file for astroskyfield for those stars from
+    the astrobase list above, in identical format to hip_main.dat.
 '''
 
 #TODO On Debian 32 bit on the VM, the import of pandas, skyfield and ephem
@@ -74,14 +80,13 @@ IAUCSN_HIP_END = 96
 
 def _get_names_to_hips( iau_catalog_file ):
     '''
-    Reads the IAU Catalog of Star Names file and returns a dictionary:
-        Key: star name (string(
-        Value: HIP (int)
+    Return a dictionary of star name (str) to HIP (int) for each star in the
+    IAU Catalog of Star Names also present in the PyEphem list of stars.
     '''
     stars_from_pyephem = stars.stars.keys()
     names_to_hips = { }
-    with open( iau_catalog_file, 'r', encoding = "utf-8" ) as f_in:
-        for line in f_in:
+    with open( iau_catalog_file, 'r', encoding = "utf-8" ) as f:
+        for line in f:
             if not ( line.startswith( '#' ) or line.startswith( '$' ) ):
                 try:
                     start = IAUCSN_NAME_START - 1
@@ -222,7 +227,7 @@ if __name__ == "__main__":
             3) Prints a star ephemeris for PyEphem as a Python dictionary.
 
             For example:
-                python3 %(prog)s IAU-CSN.txt hip_main.dat de421.bsp stars.dat
+                python3 %(prog)s IAU-CSN.txt hip_main.dat de440s.bsp stars.dat
 
             Input and output pathnames which contain spaces must:
                 - Be double quoted
@@ -243,7 +248,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "star_ephemeris",
         help =
-            "A star ephemeris file, typically hip_main.dat downloaded from " +
+            "A star ephemeris file, typically hip_main.dat, downloaded from " +
             "https://cdsarc.cds.unistra.fr/ftp/cats/I/239" )
 
     parser.add_argument(

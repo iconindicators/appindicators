@@ -181,11 +181,11 @@ from .astrobase import AstroBase
 class AstroSkyfield( AstroBase ):
     ''' Wrapper frontend to the Skyfield library. '''
 
-    # Planets ephemeris must be created using create_ephemeris_planets.py.
+    # Planets ephemeris MUST be created using create_ephemeris_planets.py.
     _EPHEMERIS_PLANETS = (
         load( str( Path( __file__ ).parent / "data" / "planets.bsp" ) ) )
 
-    # Stars ephemeris must be created using create_ephemeris_stars.py.
+    # Stars ephemeris MUST be created using create_ephemeris_stars.py.
     ephemeris_stars_path = Path( __file__ ).parent / "data" / "stars.dat"
     with load.open( str( ephemeris_stars_path ) ) as f:
         _EPHEMERIS_STARS = hipparcos.load_dataframe( f )
