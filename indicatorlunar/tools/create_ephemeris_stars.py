@@ -17,15 +17,13 @@
 
 
 '''
-From the intersection of stars in the IAU CSN Catalog and PyEphem's:
+From the intersection of stars from the IAU CSN Catalog and PyEphem:
 
     Create a list of stars for astrobase, with accompanying HIP.
 
-    Create ephemeris data for astropyephem for those stars from
-    the astrobase list above.
+    Create ephemeris data for astropyephem.
 
-    Create an ephemeris file for astroskyfield for those stars from
-    the astrobase list above, in identical format to hip_main.dat.
+    Create an ephemeris file for astroskyfield.
 '''
 
 #TODO On Debian 32 bit on the VM, the import of pandas, skyfield and ephem
@@ -263,17 +261,31 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    command = (
-        "python3 -c \"import create_ephemeris_stars; "
-        f"create_ephemeris_stars._create_ephemeris_stars( "
-        f"\\\"{ args.output_filename_for_skyfield_star_ephemeris }\\\", "
-        f"\\\"{ args.planet_ephemeris }\\\", "
-        f"\\\"{ args.star_ephemeris }\\\", "
-        f"\\\"{ args.iau_catalog_file }\\\" )\"" )
+    # command = (
+    #     "python3 -c \"import create_ephemeris_stars; "
+    #     f"create_ephemeris_stars._create_ephemeris_stars( "
+    #     f"\\\"{ args.output_filename_for_skyfield_star_ephemeris }\\\", "
+    #     f"\\\"{ args.planet_ephemeris }\\\", "
+    #     f"\\\"{ args.star_ephemeris }\\\", "
+    #     f"\\\"{ args.iau_catalog_file }\\\" )\"" )
+    #
+    # IndicatorBase.run_python_command_in_virtual_environment(
+    #     IndicatorBase.VENV_INSTALL,
+    #     command,
+    #     "ephem",
+    #     "pandas",
+    #     "skyfield" )
 
-    IndicatorBase.run_python_command_in_virtual_environment(
-        IndicatorBase.VENV_INSTALL,
-        command,
-        "ephem",
-        "pandas",
-        "skyfield" )
+    names_to_hips = _get_names_to_hips( args.iau_catalog_file )
+
+    _print_formatted_stars( names_to_hips )
+
+    _create_ephemeris_skyfield(
+        args.output_filename_for_skyfield_star_ephemeris,
+        args.star_ephemeris,
+        list( names_to_hips.values() ) )
+
+    _print_ephemeris_pyephem(
+        args.planet_ephemeris,
+        args.star_ephemeris,
+        names_to_hips )
