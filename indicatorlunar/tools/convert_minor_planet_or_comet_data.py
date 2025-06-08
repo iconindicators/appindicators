@@ -415,7 +415,8 @@ def convert(
 
 if __name__ == "__main__":
     description = (
-        textwrap.dedent( '''\
+        textwrap.dedent(
+            '''
             Convert an ephemeris file for minor planets or comets...
 
             1) Convert a minor planets file from Lowell Observatory
@@ -435,10 +436,10 @@ if __name__ == "__main__":
 
             The output will ALWAYS be written to a text file.
 
-            -------------------------------------------
-            --- INPUT & OUTPUT PATHNAMES CONTAINING ---
-            ---    SPACES MUST BE DOUBLE QUOTED     ---
-            -------------------------------------------''' ) )
+            Input and output pathnames which contain spaces must:
+                - Be double quoted
+                - Have spaces escaped with a \
+            ''' ) )
 
     parser = (
         argparse.ArgumentParser(
