@@ -20,7 +20,7 @@
 
 
 #TODO ALL THE TODOS BELOW IN REGARDS TO 32 BIT, NUMPY, JPLEPHEM AND PANDAS
-# NEED TO BE CHECKED AGAINST THE CREATE STARS/PLANETS EPEHEMERIS SCRIPTS
+# NEED TO BE CHECKED AGAINST THE CREATE STARS/PLANETS EPHEMERIS SCRIPTS
 # AS THOSE ARE NOW UP TO DATE.
 
 
@@ -30,6 +30,37 @@
 #    sgp4
 #
 # Neither seem to have any issue but test on Debian 32 bit!
+
+
+#TODO Determine if 32 or 64 bit:
+#    getconf LONG_BIT
+# either 32 or 64
+
+
+#TODO What happens if the planets.bsp start/end date no longer matches with today's date?
+# For example, looking for the next eclipse and there is only a month of data left in the bsp?
+# How to check for this...?
+# What happens if there is 6 months of data but a very high latitude (+- 89)
+# and it winter so the sun never rises (or some planet never rises)
+# or is summer so the sun never sets (or some planet never sets).
+# Is this an issue?
+#
+# Or a user switches for a new bsp for which it's date range ends before today?
+# Maybe just do a date check: end date < today's date is error.
+#
+# To get the start/end dates:
+#
+#     from skyfield.api import load
+#
+#     ts = load.timescale()
+#     planets = load(  "../../../IndicatorLunarData/de421.bsp" )
+#
+#     start, end = planets.segments[ 0 ].time_range( ts )
+#     print( start.tdb_strftime().split()[ 0 ] )
+#     print( end.tdb_strftime().split()[ 0 ] )
+#
+# 1849-12-26
+# 2150-01-22
 
 
 #TODO

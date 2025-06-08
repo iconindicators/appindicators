@@ -17,14 +17,16 @@
 
 
 '''
-Create a star ephemeris using stars from PyEphem,
-keeping only those present in the IAU CSN Catalog,
-with accompanying HIP and absolute magnitude.
-
-The ephemeris is used in:
-    astropyephem (wrapper around PyEphem)
-    astroskyfield (wrapper around Skyfield)
+Create a star ephemeris for astropyephem and astroskyfield
+using stars from PyEphem, retaining only those stars present in
+the IAU CSN Catalog, with accompanying HIP and absolute magnitude.
 '''
+
+#TODO On Debian 32 bit on the VM, the import of pandas, skyfield and ephem
+# did not work...but works on Ubuntu...is this because these are already installed
+# and on the OS path on Ubuntu?
+#
+# Need to make a change so that any errors (import or otherwise) show on the console.
 
 
 #TODO Given that pandas and numpy (through skyfield) are used in this script,
@@ -41,6 +43,8 @@ The ephemeris is used in:
 # Pandas 2.1.0 supports python3.9+ and numpy 1.22.4 so only good for ubuntu 22.04+
 # 
 # Check for Fedora, Manjaro and openSUSE!
+#
+# Test running this script from installed in .venv_indicators
 
 
 import argparse

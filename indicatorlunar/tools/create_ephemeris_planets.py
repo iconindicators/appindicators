@@ -59,6 +59,8 @@ Alternatively to running this script, download a .bsp and use spkmerge:
 # deprecated or unsupported by numpy.
 # 
 # Check for Fedora, Manjaro and openSUSE!
+#
+# Test running this script from installed in .venv_indicators
 
 
 import argparse
