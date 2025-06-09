@@ -106,9 +106,9 @@ if __name__ == "__main__":
         f"\\\"{ args.star_ephemeris }\\\", "
         f"\\\"{ args.iau_catalog_file }\\\" )\"" )
 
-    IndicatorBase.run_python_command_in_virtual_environment(
-        IndicatorBase.VENV_INSTALL,
+    IndicatorBase.python_run(
         command,
+        IndicatorBase.VENV_INSTALL,
         "ephem",
         "pandas",
         "skyfield" )

@@ -123,9 +123,9 @@ if __name__ == "__main__":
         f"{ end_date.strftime( date_format ) } "
         f"{ args.in_bsp } { args.out_bsp }" )
 
-    IndicatorBase.run_python_command_in_virtual_environment(
-        IndicatorBase.VENV_INSTALL,
+    IndicatorBase.python_run(
         command,
+        IndicatorBase.VENV_INSTALL,
         "jplephem" )
 
 #TODO jplephem will install numpy.
