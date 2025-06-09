@@ -70,7 +70,6 @@ import textwrap
 
 from dateutil.relativedelta import relativedelta
 
-
 if '../' not in sys.path:
     sys.path.insert( 0, '../../' ) # Allows calls to IndicatorBase.
 

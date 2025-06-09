@@ -101,7 +101,7 @@ if __name__ == "__main__":
     command = (
         "python3 -c \"import utils_ephemeris; "
         f"utils_ephemeris.create_ephemeris_stars( "
-        f"\\\"{ args.output_filename_for_skyfield_star_ephemeris }\\\", "
+        f"\\\"{ args.output_filename_for_astroskyfield_star_ephemeris }\\\", "
         f"\\\"{ args.planet_ephemeris }\\\", "
         f"\\\"{ args.star_ephemeris }\\\", "
         f"\\\"{ args.iau_catalog_file }\\\" )\"" )

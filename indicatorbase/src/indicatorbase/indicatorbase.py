@@ -3144,6 +3144,9 @@ class IndicatorBase( ABC ):
             elif stderr_:
                 print( stderr_ )
 
+            if return_code != 0:
+                print( f"return code: { return_code }" )
+
         return stdout_, stderr_, return_code
 
     
@@ -3175,10 +3178,6 @@ class IndicatorBase( ABC ):
                 f"{ ' '.join( modules_to_install ) } && " )
 
         command_ += f"{ command } && deactivate"
-
-        print()#TODO Testing
-        print( f"Executing command:\n\t{ command_ }" )
-        print()
 
         IndicatorBase.process_run( command_, print_ = True )
 
