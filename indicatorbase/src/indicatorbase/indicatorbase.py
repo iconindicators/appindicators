@@ -3086,9 +3086,11 @@ class IndicatorBase( ABC ):
             stderr
             return code
 
+#TODO Why not ALWAYS capture output?
         If capture_output is True, stdout and stderr are captured;
         otherwise, stdout and stderr are set to "".
 
+#TODO Is this needed? If end user wants the result, up to end user to sift stdout from stderr.
         If print_ is True, prints stdout and stderr to the console.
 
         On stderr or exception, logs to a file, if logging was previously
@@ -3155,9 +3157,9 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
-    def run_python_command_in_virtual_environment(
-        venv_directory,
+    def python_run(
         command,
+        venv_directory,
         *modules_to_install,
         force_reinstall = False ):  #TODO Is this needed?  Maybe always set to False?
         '''
@@ -3178,6 +3180,8 @@ class IndicatorBase( ABC ):
                 f"{ ' '.join( modules_to_install ) } && " )
 
         command_ += f"{ command } && deactivate"
+
+        print( command_ )#TODO Testing
 
         IndicatorBase.process_run( command_, print_ = True )
 
