@@ -22,8 +22,6 @@
 import argparse
 import sys
 
-from pathlib import Path
-
 if "../" not in sys.path:
     sys.path.insert( 0, "../" ) # Allows calls to IndicatorBase.
 
@@ -33,11 +31,6 @@ from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 ''' The directory of a .whl release. '''
 RELEASE_DIRECTORY = "release"
 
-
-#TODO $HOME does not work...need Path.home()...check where $HOME is used
-# in tools and all indicators!
-''' The virtual environment into which indicators are installed. '''
-VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 ''' The virtual environment used when building the wheel et al. '''
 VENV_BUILD = "./venv_build"
