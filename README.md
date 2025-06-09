@@ -198,6 +198,8 @@ Ensure a `.whl` for `indicatortest` is built as per the earlier section on build
 
 Create a `Python` interpreter similarly to above which uses `venv_build`:
 
+TODO utils.initialise_virtual_environment no longer exists, so check the line below...
+
 If `utils.initialise_virtual_environment` will be called by the tool, temporarily comment out the call.
 
 Under `Run Configuration` for the tool, ensure that `Working Directory` is set to `Default` and the `Python` interpreter is set to `venv_build`.
