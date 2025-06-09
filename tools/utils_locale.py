@@ -362,7 +362,6 @@ def get_translated_names_and_comments_from_po_files(
     comments_from_po_files = { }
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         locale = po.parent.parent.stem
-        msgstr, error = _get_msgstr_from_po( venv_build, po, "xyz" )
 
         msgstr, error = _get_msgstr_from_po( venv_build, po, name )
         if msgstr and msgstr != name:

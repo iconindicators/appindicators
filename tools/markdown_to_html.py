@@ -21,15 +21,27 @@
 
 from pathlib import Path
 
+import sys
+
+if "../" not in sys.path:
+    sys.path.insert( 0, "../" ) # Allows calls to IndicatorBase.
+
+from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
+
 from . import utils
 
 
 if __name__ == "__main__":
-    utils.initialise_virtual_environment(
-        utils.VENV_BUILD,
-        "pip",
-        "readme_renderer[md]" )
+#TODO Test on Ubuntu 20.04
+#TODO Test on Debian 32 bit
+    command = (
+        utils.get_markdown_to_html_command(
+            Path.cwd() / "README.md",
+            Path.cwd() / "README.html" ))
 
-    utils.markdown_to_html(
-        Path.cwd() / "README.md",
-        Path.cwd() / "README.html" )
+    IndicatorBase.python_run(
+        command,
+        IndicatorBase.VENV_INSTALL,
+        "pip",
+        "readme_renderer[md]",
+        force_reinstall = True )

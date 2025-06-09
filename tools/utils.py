@@ -97,6 +97,7 @@ def get_pygobject():
     return pygobject
 
 
+#TODO Needed?
 def markdown_to_html( markdown, html ):
     IndicatorBase.process_run(
         "venv=venv_build && " +
@@ -104,6 +105,10 @@ def markdown_to_html( markdown, html ):
         f"python3 -m readme_renderer { markdown } -o { html }",
         capture_output = False,
         print_ = True )
+
+
+def get_markdown_to_html_command( markdown, html ):
+    return f"python3 -m readme_renderer { markdown } -o { html }"
 
 
 def get_arguments(

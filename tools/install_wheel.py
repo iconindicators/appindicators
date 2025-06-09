@@ -17,8 +17,9 @@
 
 
 '''
-Install a wheel for one or more indicators to a virtual environment at
-$HOME/.local/venv_indicators and then run install.sh.
+Install a wheel, from the release directory, for one or more indicators,
+to the release virtual environment at $HOME/.local/venv_indicators and then
+run install.sh from the indicator's platform/linux directory.
 '''
 
 
@@ -37,20 +38,23 @@ if __name__ == "__main__":
         utils.get_indicators_to_process(
             f"Install a Python3 wheel for one or more indicators, at "
             f"{ utils.RELEASE_DIRECTORY }, into a Python3 virtual environment "
-            f"at { utils.VENV_INSTALL } and copy across the .desktop, run "
+            f"at { IndicatorBase.VENV_INSTALL } and copy across the .desktop, run "
             "script and icons." ) )
 
+#TODO Test on Ubuntu 20.04
+#TODO Test on Debian 32 bit
     for indicator in indicators_to_process:
-        utils.initialise_virtual_environment(
-            utils.VENV_INSTALL,
+        # Whilst this is not a Python3 command, use python_run()
+        # to install the wheel and then run the subsequent install.sh
+        command = (
+            f"$(ls -d { IndicatorBase.VENV_INSTALL }/lib/python3.* | " +
+            f" head -1)/site-packages/{ indicator }/platform/" +
+            "linux/install.sh" )
+
+        IndicatorBase.python_run(
+            command,
+            IndicatorBase.VENV_INSTALL,
             "pip",
             utils.get_pygobject(),
             f"$(ls -d { utils.RELEASE_DIRECTORY }/wheel/dist_{ indicator }/{ indicator }*.whl | head -1)",
             force_reinstall = True )
-
-        IndicatorBase.process_run(
-            f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | " +
-            f" head -1)/site-packages/{ indicator }/platform/" +
-            "linux/install.sh",
-            capture_output = False,
-            print_ = True )
