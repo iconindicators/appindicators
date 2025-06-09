@@ -17,11 +17,11 @@
 
 
 '''
-Create a planet ephemeris for use in astroskyfield (and Skyfield),
-commencing from today's date, ending at a specified number of years from today.
+Create a planet ephemeris for use in astroskyfield, from today's date,
+ending at a specified number of years from today.
 
-The start date is wound back one month to take into account the underlying
-Skyfield lunar eclipse finding algorithm.
+The start date is wound back one month to take into account the Skyfield
+lunar eclipse algorithm.
 
 This script essentially wraps up the following command:
 
@@ -127,7 +127,8 @@ if __name__ == "__main__":
     IndicatorBase.run_python_command_in_virtual_environment(
         IndicatorBase.VENV_INSTALL,
         command,
-        "jplephem" ) #TODO jplephem will install numpy.
+        "jplephem" )
+
+#TODO jplephem will install numpy.
 # For 32 bit and/or Ubuntu 20.04 might need to explicitly
 # list numpy and pin to a version.
-# specific version. 
