@@ -21,27 +21,21 @@
 
 from pathlib import Path
 
-import sys
-
-if "../" not in sys.path:
-    sys.path.insert( 0, "../" ) # Allows calls to IndicatorBase.
-
-from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
-
 from . import utils
 
 
 if __name__ == "__main__":
 #TODO Test on Ubuntu 20.04
 #TODO Test on Debian 32 bit
+    current_working_directory = Path.cwd()
+    markdown = str( current_working_directory / "README.md" )
+    html = str( current_working_directory / "README.html" )
     command = (
-        utils.get_markdown_to_html_command(
-            Path.cwd() / "README.md",
-            Path.cwd() / "README.html" ))
+        "python3 -c \"import tools.utils; "
+        f"tools.utils.markdown_to_html( \\\"{ markdown }\\\", \\\"{ html }\\\" )\"" )
 
-    IndicatorBase.python_run(
+    utils.python_run(
         command,
-        IndicatorBase.VENV_INSTALL,
+        utils.VENV_BUILD,
         "pip",
-        "readme_renderer[md]",
-        force_reinstall = True )
+        "readme_renderer[md]" )

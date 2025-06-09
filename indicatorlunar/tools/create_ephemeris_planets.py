@@ -16,6 +16,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+
+#TODO Do NOT include this script in the release.  Then consider...
+# Dropping this script altogether.
+# 
+# Putting in some documentation into the indicatorlunar README.md,
+# which appears on the PyPI page, describing how/why to make a new planets.bsp
+# 
+# Make a note in astroskyfield where planets.bsp is loaded about how to use
+# jplephem (in a venv) to create/update planets.bsp
+
+
 '''
 Create a planet ephemeris for use in astroskyfield, from today's date,
 ending at a specified number of years from today.
@@ -71,7 +82,7 @@ import textwrap
 from dateutil.relativedelta import relativedelta
 
 if '../' not in sys.path:
-    sys.path.insert( 0, '../../' ) # Allows calls to IndicatorBase.
+    sys.path.insert( 0, '../../' )
 
 from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
 

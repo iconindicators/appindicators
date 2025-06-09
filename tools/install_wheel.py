@@ -23,13 +23,6 @@ run install.sh from the indicator's platform/linux directory.
 '''
 
 
-import sys
-
-if "../" not in sys.path:
-    sys.path.insert( 0, "../" ) # Allows calls to IndicatorBase.
-
-from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
-
 from . import utils
 
 
@@ -38,7 +31,7 @@ if __name__ == "__main__":
         utils.get_indicators_to_process(
             f"Install a Python3 wheel for one or more indicators, at "
             f"{ utils.RELEASE_DIRECTORY }, into a Python3 virtual environment "
-            f"at { IndicatorBase.VENV_INSTALL } and copy across the .desktop, run "
+            f"at { utils.VENV_INSTALL } and copy across the .desktop, run "
             "script and icons." ) )
 
 #TODO Test on Ubuntu 20.04
@@ -47,13 +40,13 @@ if __name__ == "__main__":
         # Whilst this is not a Python3 command, use python_run()
         # to install the wheel and then run the subsequent install.sh
         command = (
-            f"$(ls -d { IndicatorBase.VENV_INSTALL }/lib/python3.* | " +
+            f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | " +
             f" head -1)/site-packages/{ indicator }/platform/" +
             "linux/install.sh" )
 
-        IndicatorBase.python_run(
+        utils.python_run(
             command,
-            IndicatorBase.VENV_INSTALL,
+            utils.VENV_INSTALL,
             "pip",
             utils.get_pygobject(),
             f"$(ls -d { utils.RELEASE_DIRECTORY }/wheel/dist_{ indicator }/{ indicator }*.whl | head -1)",

@@ -37,7 +37,7 @@ import requests
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from .indicatorbase import IndicatorBase
+from .indicatorbase import IndicatorBase, shared
 
 from . import eclipse
 
@@ -3283,7 +3283,7 @@ class IndicatorLunar( IndicatorBase ):
 
     def get_default_city( self ):
         command = "timedatectl show | grep Timezone"
-        timezone = IndicatorBase.process_run( command )[ 0 ]
+        timezone = shared.process_run( command )[ 0 ]
         if timezone.startswith( "Timezone=" ):
             timezone = timezone.split( '=' )[ 1 ]
 

@@ -33,9 +33,9 @@ import polib
 from pathlib import Path
 
 if "../" not in sys.path:
-    sys.path.insert( 0, "../" ) # Allows calls to IndicatorBase.
+    sys.path.insert( 0, "../" )
 
-from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
+from indicatorbase.src.indicatorbase import shared
 
 from . import utils
 from . import utils_readme
@@ -84,7 +84,7 @@ def _create_update_pot(
 
     # Create a POT based on current source:
     #   http://www.gnu.org/software/gettext/manual/gettext.html
-    IndicatorBase.process_run(
+    shared.process_run(
         "xgettext "
         f"-f { locale_directory / 'POTFILES.in' } "
         f"-D { str( Path( indicator ) / 'src' / indicator ) } "
@@ -150,7 +150,7 @@ def _create_update_po(
 
         if po_file_original.exists():
             po_file_new = str( po_file_original ).replace( '.po', '.new.po' )
-            IndicatorBase.process_run(
+            shared.process_run(
                 f"msgmerge { po_file_original } { pot_file } "
                 f"-o { po_file_new }",
                 capture_output = False,
@@ -187,7 +187,7 @@ def _create_update_po(
                 parents = True,
                 exist_ok = True )
 
-            IndicatorBase.process_run(
+            shared.process_run(
                 "msginit "
                 f"-i { pot_file } "
                 f"-o { po_file_original } "
@@ -278,7 +278,7 @@ def _build_locale_for_release(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" )
 
     # Merge indicatorbase POT with indicator POT.
-    IndicatorBase.process_run(
+    shared.process_run(
         "msgcat --use-first "
         f"{ str( directory_indicator_locale / ( indicator + '.pot' ) ) } "
         f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } "
@@ -289,7 +289,7 @@ def _build_locale_for_release(
     # For each locale, merge indicatorbase PO with indicator PO.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         language_code = po.parent.parts[ -2 ]
-        IndicatorBase.process_run(
+        shared.process_run(
             "msgcat --use-first "
             f"{ str( po ) } "
             f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } "
@@ -299,7 +299,7 @@ def _build_locale_for_release(
 
     # Create .mo files.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
-        IndicatorBase.process_run(
+        shared.process_run(
             f"msgfmt { str( po ) } "
             f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }",
             capture_output = False,
@@ -659,7 +659,7 @@ def _create_scripts_for_linux(
         destination = directory_platform_linux / destination_script_name
         with open( destination, 'w', encoding = "utf-8" ) as f:
             text = text.replace( "{ indicator }", indicator )
-            text = text.replace( "{ venv_indicators }", str( IndicatorBase.VENV_INSTALL ) )
+            text = text.replace( "{ venv_indicators }", str( utils.VENV_INSTALL ) )
             f.write( text + '\n' )
 
         _chmod(
@@ -734,6 +734,10 @@ def _package_source(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "indicatorbase.py",
         Path( '.' ) / directory_indicator / "src" / indicator )
 
+    shutil.copy(
+        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "shared.py",
+        Path( '.' ) / directory_indicator / "src" / indicator )
+
     pyproject_toml, version_indicator_base = (
         _create_pyproject_dot_toml( indicator, directory_dist ) )
 
@@ -760,7 +764,7 @@ def _package_source(
     if not message:
         authors = _get_pyproject_toml_authors( config )
         start_year = (
-            IndicatorBase.get_year_in_changelog_markdown( changelog_markdown ) )
+            shared.get_year_in_changelog_markdown( changelog_markdown ) )
 
         _update_locale_source(
             indicator,
@@ -852,7 +856,7 @@ def build_wheel(
         message = _package_source( directory_dist, indicator )
 
     if not message:
-        IndicatorBase.process_run(
+        shared.process_run(
             f"python3 -m build --outdir { directory_dist } { directory_dist / indicator }",
             capture_output = False,  #TODO Why is this not True?
             print_ = True )

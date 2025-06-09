@@ -34,7 +34,7 @@ from gi.repository import Gtk
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
-from .indicatorbase import IndicatorBase
+from .indicatorbase import IndicatorBase, shared
 
 
 class IndicatorTest( IndicatorBase ):
@@ -173,14 +173,14 @@ class IndicatorTest( IndicatorBase ):
 
         command = "gsettings get org.gnome.desktop.interface "
 
-        result = IndicatorBase.process_run( command + "icon-theme" )[ 0 ]
+        result = shared.process_run( command + "icon-theme" )[ 0 ]
         result = result.replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
             command + "icon-theme: " + result,
             indent = ( 2, 0 ) )
 
-        result = IndicatorBase.process_run( command + "gtk-theme" )[ 0 ]
+        result = shared.process_run( command + "gtk-theme" )[ 0 ]
         result = result.replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
@@ -369,7 +369,7 @@ class IndicatorTest( IndicatorBase ):
             f"notify-send -i { self.get_icon_name() } 'summary...' 'body...'",
             self.get_play_sound_complete_command() ]
 
-        if self.is_calendar_supported():
+        if IndicatorBase.is_calendar_supported():  #TODO Test that this works; changed from self.is_calendar_supported() to static.
             labels.insert( 0, "calendar" )
             commands.insert(
                 0, "calendar -f /usr/share/calendar/calendar.all -A 3" )
@@ -466,7 +466,7 @@ class IndicatorTest( IndicatorBase ):
                 + "; ${SHELL}" + "'" )
 
             Thread(
-                target = IndicatorBase.process_run,
+                target = shared.process_run,
                 args = ( command_, False, False ) ).start()
 
             print( "Executing command: " + command_ )

@@ -35,7 +35,7 @@ from gi.repository import Gtk
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
-from .indicatorbase import IndicatorBase
+from .indicatorbase import IndicatorBase, shared
 
 from .script import Background, NonBackground, Info
 
@@ -255,7 +255,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     script.get_group() + " | " + script.get_name() + ": " + command )
 
             Thread(
-                target = IndicatorBase.process_run,
+                target = shared.process_run,
                 args = ( command, False, False ) ).start()
 
 
@@ -299,7 +299,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 command_result = self.background_script_results[ key ]
 
                 if script.get_play_sound() and command_result:
-                    IndicatorBase.process_run(
+                    shared.process_run(
                         IndicatorBase.get_play_sound_complete_command(),
                         capture_output = False )
 
@@ -310,7 +310,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         " \"" + script.get_name().replace( '-', '\\-' ) + "\"" +
                         " \"" + command_result.replace( '-', '\\-' ) + "\"" )
 
-                    IndicatorBase.process_run( command, capture_output = False )
+                    shared.process_run( command, capture_output = False )
 
 
     def _update_background_script(
@@ -322,7 +322,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.get_logging().debug(
                 script.get_group() + " | " + script.get_name() + ": " + script.get_command() )
 
-        command_result = IndicatorBase.process_run( script.get_command() )[ 0 ]
+        command_result = shared.process_run( script.get_command() )[ 0 ]
         key = self._create_key( script.get_group(), script.get_name() )
         self.background_script_results[ key ] = command_result
         self.background_script_next_update_time[ key ] = (

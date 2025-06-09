@@ -27,13 +27,6 @@ To view the contents of a .tar.gz:
 '''
 
 
-import sys
-
-if "../" not in sys.path:
-    sys.path.insert( 0, "../" ) # Allows calls to IndicatorBase.
-
-from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
-
 from . import utils
 
 
@@ -48,9 +41,9 @@ if __name__ == "__main__":
             "python3 -c \"import tools.utils_build; "
             f"tools.utils_build.build_wheel( \\\"{ indicator }\\\" )\"" )
 
-        IndicatorBase.python_run(
+        utils.python_run(
             command,
-            IndicatorBase.VENV_INSTALL,
+            utils.VENV_BUILD,
             "build",
             "pip",
             "polib",

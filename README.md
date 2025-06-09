@@ -46,11 +46,12 @@ Various operating system packages will likely need to be installed; refer to the
 
 To run an indicator within the source tree, the indicator's `.whl` must first be built as above.
 
-Next, create a symbolic link to `indicatorbase.py`:
+Next, create a symbolic link to `indicatorbase.py` and `shared.py`:
 
 TODO If we make all of this a script, maybe put the symbolic link stuff in there too?
 ```
     for dirs in indicator*; do if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py $dirs/src/$dirs/indicatorbase.py; fi ; done;
+    for dirs in indicator*; do if [ ! -f $dirs/src/$dirs/shared.py ]; then ln -sr indicatorbase/src/indicatorbase/shared.py $dirs/src/$dirs/shared.py; fi ; done;
 ```
 
 which creates a symbolic link to `indicatorbase.py` for all the indicators.  The symbolic links are also required when running under `Geany` and `Eclipse`.

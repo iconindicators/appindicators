@@ -16,6 +16,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Do NOT include this script in the release.
+# Have this script run in a venv (say venv build)?
+# 
+# It will have a dependency on indicatorbase which pulls in gi (pygobject)
+# which is annoying given this is building not running.
+# But this will also happen for the tools given they use indicatorbase for
+# create/run in a venv.
+#
+# So perhaps need a process_run() in both indicatorbase AND tools.
+
+
 '''
 From the intersection of stars from the IAU CSN Catalog and PyEphem create...
     A list of stars for astrobase, with accompanying HIP.
@@ -46,9 +57,11 @@ import sys
 import textwrap
 
 if '../' not in sys.path:
-    sys.path.insert( 0, '../../' ) # Allows calls to IndicatorBase.
+    sys.path.insert( 0, '../../' )
 
-from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
+# from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
+#TODO Check below works.
+from tools import utils
 
 
 if __name__ == "__main__":

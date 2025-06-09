@@ -61,7 +61,7 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from .indicatorbase import IndicatorBase
+from .indicatorbase import IndicatorBase, shared
 
 from .event import Event
 
@@ -268,7 +268,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             " -A 366" )
 
         events_sorted_by_date = [ ]
-        for line in IndicatorBase.process_run( command )[ 0 ].splitlines():
+        for line in shared.process_run( command )[ 0 ].splitlines():
             if line.startswith( '\t' ): # Continuation of the previous event.
                 date_ = events_sorted_by_date[ -1 ].get_date()
 

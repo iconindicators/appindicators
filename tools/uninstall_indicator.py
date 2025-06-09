@@ -27,13 +27,6 @@ Remove the virtual environment if no further indicators are installed.
 '''
 
 
-import sys
-
-if "../" not in sys.path:
-    sys.path.insert( 0, "../" ) # Allows calls to IndicatorBase.
-
-from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
-
 from . import utils
 
 
@@ -41,7 +34,7 @@ if __name__ == "__main__":
     indicators_to_process = (
         utils.get_indicators_to_process(
             f"Uninstall one or more indicators, from the Python3 virtual "
-            f"environment at { IndicatorBase.VENV_INSTALL } including the "
+            f"environment at { utils.VENV_INSTALL } including the "
             ".desktop, run script, icons, .config and .cache.  "
             "If all indicators have been uninstalled, the virtual environment "
             "will also be removed." ) )
@@ -56,14 +49,14 @@ if __name__ == "__main__":
         # Would need to check return value on each and only call next on success.
         # Only need to do the check for no more indicators once.
         command = (
-            f"$(ls -d { IndicatorBase.VENV_INSTALL }/lib/python3.* | head -1)/"
+            f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
             f"site-packages/{ indicator }/platform/linux/uninstall.sh && "
-            f". { IndicatorBase.VENV_INSTALL }/bin/activate && "
+            f". { utils.VENV_INSTALL }/bin/activate && "
             f"python3 -m pip uninstall --yes { indicator } && "
             f"count=$(python3 -m pip --disable-pip-version-check list | "
             f"grep -o \"indicator\" | wc -l) && "
             f"deactivate && "
             f"if [ \"$count\" -eq \"0\" ]; "
-            f"then rm -f -r { IndicatorBase.VENV_INSTALL }; fi" )
+            f"then rm -f -r { utils.VENV_INSTALL }; fi" )
 
-        IndicatorBase.python_run( command, IndicatorBase.VENV_INSTALL )
+        utils.python_run( command, utils.VENV_INSTALL )

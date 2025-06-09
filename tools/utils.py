@@ -22,10 +22,14 @@
 import argparse
 import sys
 
-if "../" not in sys.path:
-    sys.path.insert( 0, "../" ) # Allows calls to IndicatorBase.
+from pathlib import Path
 
-from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
+from readme_renderer.markdown import render
+
+if "../" not in sys.path:
+    sys.path.insert( 0, "../" )
+
+from indicatorbase.src.indicatorbase import shared
 
 
 ''' The directory of a .whl release. '''
@@ -36,8 +40,12 @@ RELEASE_DIRECTORY = "release"
 VENV_BUILD = "./venv_build"
 
 
+''' The virtual environment into which indicators are installed. '''
+VENV_INSTALL = Path.home() / ".local" / "venv_indicators"
+
+
 def is_debian11_or_debian12():
-    etc_os_release = IndicatorBase.get_etc_os_release( print_ = True )
+    etc_os_release = shared.get_etc_os_release( print_ = True )
     return (
         'ID=debian' in etc_os_release
         and (
@@ -47,7 +55,7 @@ def is_debian11_or_debian12():
 
 
 def is_ubuntu2004_or_is_ubuntu2204_or_ubuntu2404():
-    etc_os_release = IndicatorBase.get_etc_os_release( print_ = True )
+    etc_os_release = shared.get_etc_os_release( print_ = True )
     return ( (
         'ID=ubuntu' in etc_os_release and (
             'VERSION_ID="20.04"' in etc_os_release
@@ -90,18 +98,41 @@ def get_pygobject():
     return pygobject
 
 
-#TODO Needed?
 def markdown_to_html( markdown, html ):
-    IndicatorBase.process_run(
-        "venv=venv_build && " +
-        f". { VENV_BUILD }/bin/activate && " +
-        f"python3 -m readme_renderer { markdown } -o { html }",
-        capture_output = False,
-        print_ = True )
+    with open( markdown, encoding = "utf-8" ) as f_in:
+        with open( html, 'w', encoding = "utf-8" ) as f_out:
+            f_out.write( render( f_in.read(), variant = "CommonMark" ) )
 
 
-def get_markdown_to_html_command( markdown, html ):
-    return f"python3 -m readme_renderer { markdown } -o { html }"
+def python_run(
+    command,
+    venv_directory,
+    *modules_to_install,
+    force_reinstall = False ):  #TODO Is this needed?  Maybe always set to False?
+    '''
+    Creates the Python3 virtual environment if it does not exist,
+    installs modules specified and runs the Python3 command,
+    printing to stdout and stderr.
+    '''
+    command_ = ""
+    if not Path( f"{ venv_directory }" ).is_dir():
+        command_ += f"python3 -m venv { venv_directory } && "
+
+    command_ += f". { venv_directory }/bin/activate && "
+
+    if len( modules_to_install ):
+        command_ += (
+            "python3 -m pip install --upgrade "
+            f"{ '--force-reinstall' if force_reinstall else '' } "  #TODO Needed?  If not, remove space at end after --upgrade.
+            f"{ ' '.join( modules_to_install ) } && " )
+
+    command_ += f"{ command } && deactivate"
+
+    print()
+    print( command_ )#TODO Testing
+    print()
+
+    shared.process_run( command_, print_ = True )
 
 
 def get_arguments(

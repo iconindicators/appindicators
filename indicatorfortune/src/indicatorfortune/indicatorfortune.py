@@ -34,7 +34,7 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from .indicatorbase import IndicatorBase
+from .indicatorbase import IndicatorBase, shared
 
 from .fortune import Fortune
 
@@ -153,7 +153,7 @@ class IndicatorFortune( IndicatorBase ):
         if locations:
             command = "fortune" + ''.join( locations )
             while True:
-                fortune_ = IndicatorBase.process_run( command )[ 0 ]
+                fortune_ = shared.process_run( command )[ 0 ]
                 if not fortune_: # No fortune data found.
                     message = _( "Ensure enabled fortunes contain data!" )
                     break
