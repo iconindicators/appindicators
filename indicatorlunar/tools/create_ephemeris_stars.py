@@ -59,8 +59,6 @@ import textwrap
 if '../' not in sys.path:
     sys.path.insert( 0, '../../' )
 
-# from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
-#TODO Check below works.
 from tools import utils
 
 
@@ -119,9 +117,9 @@ if __name__ == "__main__":
         f"\\\"{ args.star_ephemeris }\\\", "
         f"\\\"{ args.iau_catalog_file }\\\" )\"" )
 
-    IndicatorBase.python_run(
+    utils.python_run(
         command,
-        IndicatorBase.VENV_INSTALL,
+        utils.VENV_BUILD,
         "ephem",
         "pandas",
         "skyfield" )

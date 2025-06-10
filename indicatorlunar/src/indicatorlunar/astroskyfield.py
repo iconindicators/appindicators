@@ -24,6 +24,21 @@
 # AS THOSE ARE NOW UP TO DATE.
 
 
+#TODO Do NOT include the tools/scripts in the release.
+
+
+#TODO Is it possible to do a check to see if the planets.bsp date range is valid?
+# That is, starts at least a month before today's date AND runs far enough into
+# the future (whatever "far enough" means).
+# If the planets.bsp is not okay, then what?
+# Flash message to user?
+# Autoswitch to astropyephem?
+# I think that if planets.bsp is no good, then NONE of the calculations will work!
+
+
+#TODO Document perhaps in the PyPI page about how to make a new planets.bsp
+
+
 #TODO
 # Is there a need to pin
 #    requests
