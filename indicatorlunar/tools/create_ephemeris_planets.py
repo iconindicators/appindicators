@@ -16,17 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-
-#TODO Do NOT include this script in the release.  Then consider...
-# Dropping this script altogether.
-# 
-# Putting in some documentation into the indicatorlunar README.md,
-# which appears on the PyPI page, describing how/why to make a new planets.bsp
-# 
-# Make a note in astroskyfield where planets.bsp is loaded about how to use
-# jplephem (in a venv) to create/update planets.bsp
-
-
 '''
 Create a planet ephemeris for use in astroskyfield, from today's date,
 ending at a specified number of years from today.
@@ -70,8 +59,11 @@ Alternatively to running this script, download a .bsp and use spkmerge:
 # deprecated or unsupported by numpy.
 # 
 # Check for Fedora, Manjaro and openSUSE!
-#
-# Test running this script from installed in .venv_indicators
+
+
+#TODO jplephem will install numpy.
+# For 32 bit and/or Ubuntu 20.04 might need to explicitly
+# list numpy and pin to a version.
 
 
 import argparse
@@ -84,7 +76,7 @@ from dateutil.relativedelta import relativedelta
 if '../' not in sys.path:
     sys.path.insert( 0, '../../' )
 
-from indicatorbase.src.indicatorbase.indicatorbase import IndicatorBase
+from tools import utils
 
 
 if __name__ == "__main__":
@@ -134,11 +126,7 @@ if __name__ == "__main__":
         f"{ end_date.strftime( date_format ) } "
         f"{ args.in_bsp } { args.out_bsp }" )
 
-    IndicatorBase.python_run(
+    utils.python_run(
         command,
-        IndicatorBase.VENV_INSTALL,
+        utils.VENV_INSTALL,
         "jplephem" )
-
-#TODO jplephem will install numpy.
-# For 32 bit and/or Ubuntu 20.04 might need to explicitly
-# list numpy and pin to a version.
