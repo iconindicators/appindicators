@@ -104,10 +104,13 @@ if __name__ == "__main__":
             formatter_class = argparse.RawDescriptionHelpFormatter,
             description = description ) )
 
-    parser.add_argument( "in_bsp", help = "The input .bsp file." )
+    parser.add_argument(
+        "in_bsp",
+        help = "The input .bsp file." )
 
     parser.add_argument(
-        "out_bsp", help = "The output .bsp file with reduced date range." )
+        "out_bsp",
+        help = "The output .bsp file with reduced date range." )
 
     parser.add_argument(
         "years",
