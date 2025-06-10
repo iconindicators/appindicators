@@ -39,3 +39,5 @@ if __name__ == "__main__":
         utils.VENV_BUILD,
         "pip",
         "readme_renderer[md]" )
+
+    print( f"\nCreated { html }" )

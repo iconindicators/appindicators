@@ -29,7 +29,7 @@ from . import utils
 if __name__ == "__main__":
     indicators_to_process = (
         utils.get_indicators_to_process(
-            f"Install a Python3 wheel for one or more indicators, at "
+            f"Install a Python3 wheel for one or more indicators at "
             f"{ utils.RELEASE_DIRECTORY }, into a Python3 virtual environment "
             f"at { utils.VENV_INSTALL } and copy across the .desktop, run "
             "script and icons." ) )

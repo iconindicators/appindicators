@@ -56,13 +56,13 @@ if __name__ == "__main__":
         textwrap.dedent(
             r'''
             Using a list of stars from IAU CSN:
-            1) Prints a list of star names, corresponding HIP and star name
+            1) Prints a list of star names, with corresponding HIP and star name
                for translation (as a Python3 list of lists) for astrobase.
             2) Creates a star ephemeris file for astroskyfield.
             3) Prints a star ephemeris for astropyephem as a Python3 dictionary.
 
             For example:
-                python3 %(prog)s IAU-CSN.txt hip_main.dat de442s.bsp stars.dat
+                python3 -m %(prog)s IAU-CSN.txt hip_main.dat de442s.bsp stars.dat
 
             Input and output pathnames which contain spaces must:
                 * Be double quoted
@@ -70,9 +70,9 @@ if __name__ == "__main__":
             ''' ) )
 
     parser = (
-        argparse.ArgumentParser(
-            formatter_class = argparse.RawDescriptionHelpFormatter,
-            description = description ) )
+        utils.get_parser(
+            description,
+            formatter_class = argparse.RawDescriptionHelpFormatter ) )
 
     parser.add_argument(
         "iau_catalog_file",
@@ -99,8 +99,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     command = (
-        "python3 -c \"import _create_ephemeris_stars; "
-        f"_create_ephemeris_stars.create_ephemeris_stars( "
+        "python3 -c \"import indicatorlunar.tools._create_ephemeris_stars; "
+        f"indicatorlunar.tools._create_ephemeris_stars.create_ephemeris_stars( "
         f"\\\"{ args.output_filename_for_astroskyfield_star_ephemeris }\\\", "
         f"\\\"{ args.planet_ephemeris }\\\", "
         f"\\\"{ args.star_ephemeris }\\\", "

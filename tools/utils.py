@@ -35,9 +35,8 @@ from indicatorbase.src.indicatorbase import shared
 ''' The directory of a .whl release. '''
 RELEASE_DIRECTORY = "release"
 
-
 ''' The virtual environment used when building the wheel et al. '''
-VENV_BUILD = "./venv_build"
+VENV_BUILD = "venv_build"
 
 
 ''' The virtual environment into which indicators are installed. '''
@@ -135,6 +134,27 @@ def python_run(
     shared.process_run( command_, print_ = True )
 
 
+def get_module():
+    ''' Return the module (file) name, without the .py extension. '''
+    return sys.argv[ 0 ].split( '/' )[ -1 ].split( '.' )[ 0 ]
+
+
+def get_parser(
+    description,
+    formatter_class = argparse.ArgumentDefaultsHelpFormatter ):
+    '''
+    Create an argument parser, setting:
+        The program name without the .py extension.
+        The usage using including the -m parameter for module.
+    '''
+    return (
+        argparse.ArgumentParser(
+            prog = get_module(),
+            usage = f"python3 -m { get_module() } [options]",
+            description = description,
+            formatter_class = formatter_class ) )
+
+
 def get_arguments(
     description,
     argument_names,
@@ -147,7 +167,8 @@ def get_arguments(
     if argument_nargs is None:
         argument_nargs = { }
 
-    parser = argparse.ArgumentParser( description = description )
+    parser = get_parser( description )
+
     for argument_name in argument_names:
         parser.add_argument(
             argument_name,

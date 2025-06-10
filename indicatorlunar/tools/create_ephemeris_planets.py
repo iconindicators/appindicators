@@ -84,25 +84,25 @@ if __name__ == "__main__":
         textwrap.dedent(
             r'''
             From an existing .bsp, create a new .bsp with a date range starting
-            one month prior to today, to a specified number of years from today.
+            one month prior to today, to the specified number of years from today.
 
             For example:
-                python3 %(prog)s de442s.bsp planets.bsp 5
+                python3 -m %(prog)s de442s.bsp planets.bsp 5
 
             Ensure that the existing .bsp contains data from
                 "one month before today"
             up to
-                "today plus the specified years".
+                "today plus the specified years"
 
             Input and output pathnames which contain spaces must:
-                - Be double quoted
-                - Have spaces escaped with a \
+                * Be double quoted
+                * Have spaces escaped with a \
             ''' ) )
 
     parser = (
-        argparse.ArgumentParser(
-            formatter_class = argparse.RawDescriptionHelpFormatter,
-            description = description ) )
+        utils.get_parser(
+            description,
+            formatter_class = argparse.RawDescriptionHelpFormatter ) )
 
     parser.add_argument(
         "in_bsp",
@@ -110,11 +110,11 @@ if __name__ == "__main__":
 
     parser.add_argument(
         "out_bsp",
-        help = "The output .bsp file with reduced date range." )
+        help = "The output .bsp file with the specified date range." )
 
     parser.add_argument(
         "years",
-        help = "The number of years from today to include in the output .bsp." )
+        help = "The number of years from today the output .bsp will span." )
 
     args = parser.parse_args()
 
@@ -131,5 +131,5 @@ if __name__ == "__main__":
 
     utils.python_run(
         command,
-        utils.VENV_INSTALL,
+        utils.VENV_BUILD,
         "jplephem" )
