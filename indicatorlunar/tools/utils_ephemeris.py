@@ -90,11 +90,11 @@ def _create_ephemeris_skyfield(
     hipparcos_identifiers ):
 
     print( f"Creating { out_file } for astroskyfield..." )
-    with load.open( star_ephemeris, "rb" ) as in_file, open( out_file, "wb" ) as f:  #TODO I don't think I need "rb" and instead "r" or nothing...see print_ephemeris_pyephem
+    with load.open( star_ephemeris, 'r' ) as in_file, open( out_file, 'w' ) as f:
         for line in in_file:
             # HIP is located at bytes 9 - 14
             #    http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
-            hip = int( line.decode()[ 9 - 1 : 14 - 1 + 1 ].strip() )
+            hip = int( line[ 9 - 1 : 14 - 1 + 1 ].strip() )
             if hip in hipparcos_identifiers:
                 f.write( line )
 
@@ -111,7 +111,7 @@ def _print_ephemeris_pyephem(
     '''
     print( "Ephemeris for astropyephem..." )
 
-    with load.open( star_ephemeris ) as f:  #TODO I think the default is "rb" which is wrong as hip_main.dat is text.
+    with load.open( star_ephemeris, 'r' ) as f:
         dataframe = hipparcos.load_dataframe( f )
 
     # Required to obtain spectral type as this is dropped from the above load.
