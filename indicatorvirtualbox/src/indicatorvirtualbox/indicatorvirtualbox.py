@@ -30,9 +30,11 @@ from gi.repository import Gdk
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from .indicatorbase import IndicatorBase, shared
+from .indicatorbase import IndicatorBase
 
 from .virtualmachine import Group, VirtualMachine
+
+from . import shared
 
 
 class IndicatorVirtualBox( IndicatorBase ):

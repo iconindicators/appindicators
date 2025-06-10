@@ -61,9 +61,11 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from .indicatorbase import IndicatorBase, shared
+from .indicatorbase import IndicatorBase
 
 from .event import Event
+
+from . import shared
 
 
 class IndicatorOnThisDay( IndicatorBase ):

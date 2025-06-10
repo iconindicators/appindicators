@@ -115,7 +115,7 @@ def _is_indicator(
     *indicators ):
 
     is_indicator = False
-    for indicator_ in indicators:
+    for indicator_ in indicators:  #TODO Why is this unused...?
         if indicator.upper() == indicator:
             is_indicator = True
             break

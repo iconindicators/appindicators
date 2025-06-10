@@ -34,7 +34,9 @@ from gi.repository import Gtk
 gi.require_version( "Pango", "1.0" )
 from gi.repository import Pango
 
-from .indicatorbase import IndicatorBase, shared
+from .indicatorbase import IndicatorBase
+
+from . import shared
 
 
 class IndicatorTest( IndicatorBase ):

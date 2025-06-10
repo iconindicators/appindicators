@@ -34,9 +34,11 @@ import gi
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
 
-from .indicatorbase import IndicatorBase, shared
+from .indicatorbase import IndicatorBase
 
 from .fortune import Fortune
+
+from . import shared
 
 
 class IndicatorFortune( IndicatorBase ):
