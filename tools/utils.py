@@ -134,11 +134,6 @@ def python_run(
     shared.process_run( command_, print_ = True )
 
 
-def get_module():
-    ''' Return the module (file) name, without the .py extension. '''
-    return sys.argv[ 0 ].split( '/' )[ -1 ].split( '.' )[ 0 ]
-
-
 def get_parser(
     description,
     formatter_class = argparse.ArgumentDefaultsHelpFormatter ):
@@ -147,10 +142,14 @@ def get_parser(
         The program name without the .py extension.
         The usage using including the -m parameter for module.
     '''
+    
+    # The module (file) name, without the .py extension.
+    module = sys.argv[ 0 ].split( '/' )[ -1 ].split( '.' )[ 0 ]
+
     return (
         argparse.ArgumentParser(
-            prog = get_module(),
-            usage = f"python3 -m { get_module() } [options]",
+            prog = module,
+            usage = f"python3 -m { module } [options]",
             description = description,
             formatter_class = formatter_class ) )
 
