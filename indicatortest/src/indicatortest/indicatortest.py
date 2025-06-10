@@ -371,7 +371,7 @@ class IndicatorTest( IndicatorBase ):
             f"notify-send -i { self.get_icon_name() } 'summary...' 'body...'",
             self.get_play_sound_complete_command() ]
 
-        if IndicatorBase.is_calendar_supported():  #TODO Test that this works; changed from self.is_calendar_supported() to static.
+        if IndicatorBase.is_calendar_supported():
             labels.insert( 0, "calendar" )
             commands.insert(
                 0, "calendar -f /usr/share/calendar/calendar.all -A 3" )
