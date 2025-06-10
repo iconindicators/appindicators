@@ -16,7 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-''' Utility for building a Python3 wheel. '''
+'''
+Utility for building a Python3 wheel.
+
+  *** NOT TO BE RUN DIRECTLY ***
+'''
 
 
 import configparser
