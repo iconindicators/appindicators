@@ -99,24 +99,18 @@ if __name__ == "__main__":
                 * Have spaces escaped with a \
             ''' ) )
 
-    parser = (
-        utils.get_parser(
+    args = (
+        utils.get_arguments(
             description,
+            ( "in_bsp", "out_bsp", "years" ),
+            {
+                "in_bsp":
+                    "The input .bsp file.",
+                "out_bsp":
+                    "The output .bsp file with the specified date range.",
+                "years":
+                    "The number of years from today the output .bsp will span." },
             formatter_class = argparse.RawDescriptionHelpFormatter ) )
-
-    parser.add_argument(
-        "in_bsp",
-        help = "The input .bsp file." )
-
-    parser.add_argument(
-        "out_bsp",
-        help = "The output .bsp file with the specified date range." )
-
-    parser.add_argument(
-        "years",
-        help = "The number of years from today the output .bsp will span." )
-
-    args = parser.parse_args()
 
     today = datetime.date.today()
     start_date = today - relativedelta( months = 1 )

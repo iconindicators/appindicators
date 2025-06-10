@@ -134,7 +134,7 @@ def python_run(
     shared.process_run( command_, print_ = True )
 
 
-def get_parser(
+def _get_parser(
     description,
     formatter_class = argparse.ArgumentDefaultsHelpFormatter ):
     '''
@@ -158,7 +158,8 @@ def get_arguments(
     description,
     argument_names,
     argument_helps = None,
-    argument_nargs = None ):
+    argument_nargs = None,
+    formatter_class = argparse.ArgumentDefaultsHelpFormatter ):
 
     if argument_helps is None:
         argument_helps = { }
@@ -166,7 +167,7 @@ def get_arguments(
     if argument_nargs is None:
         argument_nargs = { }
 
-    parser = get_parser( description )
+    parser = _get_parser( description, formatter_class )
 
     for argument_name in argument_names:
         parser.add_argument(
@@ -178,6 +179,7 @@ def get_arguments(
 
 
 def get_indicators_to_process( description ):
+    ''' Returns the list of indicators on the command line. '''
     return (
         get_arguments(
             description,

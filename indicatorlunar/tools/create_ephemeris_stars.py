@@ -69,34 +69,27 @@ if __name__ == "__main__":
                 * Have spaces escaped with a \
             ''' ) )
 
-    parser = (
-        utils.get_parser(
+    args = (
+        utils.get_arguments(
             description,
+            (
+                "iau_catalog_file",
+                "star_ephemeris",
+                "planet_ephemeris",
+                "output_filename_for_astroskyfield_star_ephemeris" ),
+            {
+                "iau_catalog_file":
+                    "A text file containing the list of stars, downloaded from " +
+                    "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt",
+                "star_ephemeris":
+                    "A star ephemeris file, typically hip_main.dat, downloaded from " +
+                    "https://cdsarc.cds.unistra.fr/ftp/cats/I/239",
+                "planet_ephemeris":
+                    "A planet ephemeris file in .bsp format, downloaded from " +
+                    "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets",
+                "output_filename_for_astroskyfield_star_ephemeris":
+                    "The output filename for the astroskyfield star ephemeris." },
             formatter_class = argparse.RawDescriptionHelpFormatter ) )
-
-    parser.add_argument(
-        "iau_catalog_file",
-        help =
-            "A text file containing the list of stars, downloaded from " +
-            "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt" )
-
-    parser.add_argument(
-        "star_ephemeris",
-        help =
-            "A star ephemeris file, typically hip_main.dat, downloaded from " +
-            "https://cdsarc.cds.unistra.fr/ftp/cats/I/239" )
-
-    parser.add_argument(
-        "planet_ephemeris",
-        help =
-            "A planet ephemeris file in .bsp format, downloaded from " +
-            "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets" )
-
-    parser.add_argument(
-        "output_filename_for_astroskyfield_star_ephemeris",
-        help = "The output filename for the astroskyfield star ephemeris." )
-
-    args = parser.parse_args()
 
     command = (
         "python3 -c \"import indicatorlunar.tools._create_ephemeris_stars; "
