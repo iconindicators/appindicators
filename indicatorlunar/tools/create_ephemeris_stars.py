@@ -99,8 +99,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     command = (
-        "python3 -c \"import utils_ephemeris; "
-        f"utils_ephemeris.create_ephemeris_stars( "
+        "python3 -c \"import _create_ephemeris_stars; "
+        f"_create_ephemeris_stars.create_ephemeris_stars( "
         f"\\\"{ args.output_filename_for_astroskyfield_star_ephemeris }\\\", "
         f"\\\"{ args.planet_ephemeris }\\\", "
         f"\\\"{ args.star_ephemeris }\\\", "
