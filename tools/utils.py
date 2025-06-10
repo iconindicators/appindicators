@@ -24,8 +24,6 @@ import sys
 
 from pathlib import Path
 
-from readme_renderer.markdown import render
-
 if "../" not in sys.path:
     sys.path.insert( 0, "../" )
 
@@ -98,6 +96,7 @@ def get_pygobject():
 
 
 def markdown_to_html( markdown, html ):
+    from readme_renderer.markdown import render
     with open( markdown, encoding = "utf-8" ) as f_in:
         with open( html, 'w', encoding = "utf-8" ) as f_out:
             f_out.write( render( f_in.read(), variant = "CommonMark" ) )
@@ -142,7 +141,7 @@ def _get_parser(
         The program name without the .py extension.
         The usage using including the -m parameter for module.
     '''
-    
+
     # The module (file) name, without the .py extension.
     module = sys.argv[ 0 ].split( '/' )[ -1 ].split( '.' )[ 0 ]
 
