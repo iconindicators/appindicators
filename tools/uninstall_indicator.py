@@ -16,9 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Test this.
-
-
 '''
 Uninstall one or more indicators, including the .desktop, run script, icons,
 .config and .cache.
@@ -42,20 +39,14 @@ if __name__ == "__main__":
 #TODO Test on Ubuntu 20.04
 #TODO Test on Debian 32 bit
     for indicator in indicators_to_process:
-        #TODO Could/should the command be split into 3:
-        #    Run process to run uninstall.sh
-        #    Run python pip uninstall
-        #    Remove venv install dir
-        # Would need to check return value on each and only call next on success.
-        # Only need to do the check for no more indicators once.
         command = (
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
             f"site-packages/{ indicator }/platform/linux/uninstall.sh && "
-            f". { utils.VENV_INSTALL }/bin/activate && "
+            # f". { utils.VENV_INSTALL }/bin/activate && " #TODO Hopefully not needed.
             f"python3 -m pip uninstall --yes { indicator } && "
             f"count=$(python3 -m pip --disable-pip-version-check list | "
             f"grep -o \"indicator\" | wc -l) && "
-            f"deactivate && "
+            # f"deactivate && " #TODO Hopefully not needed.
             f"if [ \"$count\" -eq \"0\" ]; "
             f"then rm -f -r { utils.VENV_INSTALL }; fi" )
 
