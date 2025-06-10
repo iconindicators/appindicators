@@ -129,7 +129,7 @@ def python_run(
     command_ += f"{ command } && deactivate"
 
     print()
-    print( command_ )#TODO Testing
+    print( command_ )#TODO Testing.  Maybe make this an option?
     print()
 
     shared.process_run( command_, print_ = True )
