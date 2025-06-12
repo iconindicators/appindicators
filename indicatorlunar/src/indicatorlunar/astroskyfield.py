@@ -90,6 +90,10 @@
 # May need to do so for pinning...but instead, have alternate install instructions.
 
 
+#TODO
+# https://github.com/brandon-rhodes/python-jplephem/issues/60
+
+
 #TODO Unable to install numpy/pandas on Debian 12 32 bit.
 # This means skyfield will not work on 32 bit...
 # So figure out what to do if/when astroskyfield is used.
