@@ -53,20 +53,27 @@ def is_debian11_or_debian12():
 
 def is_ubuntu2004_or_is_ubuntu2204_or_ubuntu2404():
     etc_os_release = shared.get_etc_os_release( print_ = True )
-    return ( (
-        'ID=ubuntu' in etc_os_release and (
+
+    is_ubuntu = (
+        'ID=ubuntu' in etc_os_release
+        and (
             'VERSION_ID="20.04"' in etc_os_release
             or
             'VERSION_ID="22.04"' in etc_os_release
             or
             'VERSION_ID="24.04"' in etc_os_release ) )
-        or (
-        'ID=linuxmint' in etc_os_release and (
+
+    # Linux Mint is different to all other Ubuntu derivatives.
+    is_linux_mint = (
+        'ID=linuxmint' in etc_os_release
+        and (
             'UBUNTU_CODENAME=focal' in etc_os_release
             or
             'UBUNTU_CODENAME=jammy' in etc_os_release
             or
-            'UBUNTU_CODENAME=noble' in etc_os_release ) ) )
+            'UBUNTU_CODENAME=noble' in etc_os_release ) )
+
+    return is_ubuntu or is_linux_mint
 
 
 def get_pygobject():
