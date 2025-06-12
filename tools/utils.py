@@ -177,7 +177,9 @@ def get_arguments(
     return parser.parse_args()
 
 
-def get_indicators_to_process( description ):
+def get_indicators_to_process(
+    description,
+    last_word ):
     ''' Returns the list of indicators on the command line. '''
     return (
         get_arguments(
@@ -185,7 +187,7 @@ def get_indicators_to_process( description ):
             ( "indicators", ),
             {
                 "indicators" :
-                    "The list of indicators separated by spaces to uninstall." },
+                    f"List of indicators separated by spaces to { last_word }." },
             {
                 "indicators" :
                     "+" } ) ).indicators

@@ -32,7 +32,8 @@ if __name__ == "__main__":
             f"Install a Python3 wheel for one or more indicators at "
             f"{ utils.RELEASE_DIRECTORY }, into a Python3 virtual environment "
             f"at { utils.VENV_INSTALL } and copy across the .desktop, run "
-            "script and icons." ) )
+            "script and icons.",
+            "install" ) )
 
 #TODO Test on Ubuntu 20.04
 #TODO Test on Debian 32 bit

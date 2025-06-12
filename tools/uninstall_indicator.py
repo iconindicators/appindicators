@@ -34,7 +34,8 @@ if __name__ == "__main__":
             f"environment at { utils.VENV_INSTALL } including the "
             ".desktop, run script, icons, .config and .cache.  "
             "If all indicators have been uninstalled, the virtual environment "
-            "will also be removed." ) )
+            "will also be removed.",
+            "uninstall" ) )
 
 #TODO Test on Ubuntu 20.04
 #TODO Test on Debian 32 bit
