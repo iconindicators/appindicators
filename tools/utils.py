@@ -38,7 +38,7 @@ VENV_BUILD = "venv_build"
 
 
 ''' The virtual environment into which indicators are installed. '''
-VENV_INSTALL = Path.home() / ".local" / "venv_indicators"
+VENV_INSTALL = str( Path.home() / ".local" / "venv_indicators" )
 
 
 def is_debian11_or_debian12():
