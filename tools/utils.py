@@ -95,21 +95,6 @@ def get_pygobject():
     return pygobject
 
 
-def markdown_to_html( markdown, html ):
-    # This import, if at the top, will cause the calling function/module
-    # to fail as readme_renderer.markdown will not yet have been installed.
-    # The caller will first create a virtual environment and install
-    # readme_renderer.markdown and then this function may be safely called.
-    from readme_renderer.markdown import render
-#TODO Given the import above is here and not at the top of the file,
-# perhaps create _markdown_to_html.py which contains just this function
-# and import.
-# How will/would this affect build_wheel (or really _build_wheel)?
-    with open( markdown, encoding = "utf-8" ) as f_in:
-        with open( html, 'w', encoding = "utf-8" ) as f_out:
-            f_out.write( render( f_in.read(), variant = "CommonMark" ) )
-
-
 def python_run(
     command,
     venv_directory,

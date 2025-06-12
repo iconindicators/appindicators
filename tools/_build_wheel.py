@@ -41,6 +41,7 @@ if "../" not in sys.path:
 
 from indicatorbase.src.indicatorbase import shared
 
+from . import _markdown_to_html
 from . import utils
 from . import utils_readme
 
@@ -792,17 +793,14 @@ def _package_source(
             authors,
             start_year )
 
-#TODO See if using the API 
-# https://github.com/pypa/readme_renderer/blob/main/readme_renderer/markdown.py
-# and
-# from readme_renderer.markdown import render, variants
-# can be used instead of calling the module.
-# Also note as of version 43.0
+#TODO Note as of version 43.0
 # https://pypi.org/project/readme-renderer/43.0/
 # only python 3.8 is supported so may have to pin.
 # May need a function similar to get_pygobject()
 # https://docs.python.org/3/library/sys.html#sys.version
-        utils.markdown_to_html(
+#
+#TODO Test that this works given markdown moved to a backend module.
+        _markdown_to_html.markdown_to_html(
             f"{ directory_dist }/{ indicator }/README.md",
             f"{ directory_dist }/{ indicator }/src/{ indicator }/README.html" )
 

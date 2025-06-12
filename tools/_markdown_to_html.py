@@ -16,28 +16,17 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-''' Convert the project README.md to README.html '''
+'''
+Utility for converting markdown to html.
+
+    *** NOT TO BE RUN DIRECTLY ***
+'''
 
 
-from pathlib import Path
-
-from . import utils
+from readme_renderer.markdown import render
 
 
-if __name__ == "__main__":
-#TODO Test on Ubuntu 20.04
-#TODO Test on Debian 32 bit
-    current_working_directory = Path.cwd()
-    markdown = str( current_working_directory / "README.md" )
-    html = str( current_working_directory / "README.html" )
-    command = (
-        "python3 -c \"import tools._markdown_to_html; "
-        f"tools._markdown_to_html.markdown_to_html( \\\"{ markdown }\\\", \\\"{ html }\\\" )\"" )
-
-    utils.python_run(
-        command,
-        utils.VENV_BUILD,
-        "pip",
-        "readme_renderer[md]" )
-
-    print( f"\nCreated { html }" )
+def markdown_to_html( markdown, html ):
+    with open( markdown, encoding = "utf-8" ) as f_in:
+        with open( html, 'w', encoding = "utf-8" ) as f_out:
+            f_out.write( render( f_in.read(), variant = "CommonMark" ) )
