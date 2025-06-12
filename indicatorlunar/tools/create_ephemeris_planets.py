@@ -67,11 +67,8 @@ Alternatively to running this script, download a .bsp and use spkmerge:
 
 
 import argparse
-import datetime
 import sys
 import textwrap
-
-from dateutil.relativedelta import relativedelta
 
 if '../' not in sys.path:
     sys.path.insert( 0, '../../' )
@@ -102,7 +99,10 @@ if __name__ == "__main__":
     args = (
         utils.get_arguments(
             description,
-            ( "in_bsp", "out_bsp", "years" ),
+            (
+                "in_bsp",
+                "out_bsp",
+                "years" ),
             {
                 "in_bsp":
                     "The input .bsp file.",
@@ -112,18 +112,15 @@ if __name__ == "__main__":
                     "The number of years from today the output .bsp will span." },
             formatter_class = argparse.RawDescriptionHelpFormatter ) )
 
-    today = datetime.date.today()
-    start_date = today - relativedelta( months = 1 )
-    end_date = today.replace( year = today.year + int( args.years ) )
-    date_format = "%Y/%m/%d"
-
     command = (
-        "python3 -m jplephem excerpt "
-        f"{ start_date.strftime( date_format ) } "
-        f"{ end_date.strftime( date_format ) } "
-        f"{ args.in_bsp } { args.out_bsp }" )
+        "python3 -c \"import indicatorlunar.tools._create_ephemeris_planets; "
+        f"indicatorlunar.tools._create_ephemeris_planets.create_ephemeris_planets( "
+        f"\\\"{ args.in_bsp }\\\", "
+        f"\\\"{ args.out_bsp }\\\", "
+        f"\\\"{ args.years }\\\" )\"" )
 
     utils.python_run(
         command,
         utils.VENV_BUILD,
-        "jplephem" )
+        "jplephem",
+        "python-dateutil" )
