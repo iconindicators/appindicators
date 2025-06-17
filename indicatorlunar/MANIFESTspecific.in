@@ -6,3 +6,12 @@ exclude src/indicatorlunar/meteorshowertest.py
 #
 # warning: no previously-included files found matching 'src/indicatorlunar/astroskyfield.py'
 # warning: no previously-included files found matching 'src/indicatorlunar/meteorshowertest.py'
+
+
+#TODO Test how to do a release with astroskyfield which includes
+# data/stars.dat and data/planets.bsp
+# Also need to remove the exlude on astroskyfield.py
+#
+# https://setuptools.pypa.io/en/latest/userguide/datafiles.html
+# Do we need just to list the data files here using an include line for each,
+# which has include-package-data = true by default in pyproject.toml

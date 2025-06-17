@@ -31,6 +31,7 @@ from . import utils
 
 
 if __name__ == "__main__":
+    print( "build_wheel ---------------------------------" )#TODO Test
     indicators_to_process = (
         utils.get_indicators_to_process(
             "Build a Python3 wheel for one or more indicators at "
