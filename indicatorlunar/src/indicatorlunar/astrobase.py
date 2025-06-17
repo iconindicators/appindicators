@@ -236,11 +236,12 @@ class AstroBase( ABC ):
     _STARS_INDEX_TAG_TRANSLATION = 3
 
 
-    # PyEphem provides a list of stars and data, whereas Skyfield does not.
-    # Over time, that list has accumulated duplicates and misspellings,
-    # which must be kept for backward compatibility.
+    # PyEphem provides a list of stars and ephemeris, whereas Skyfield does not.
+    # Over time, that list has accumulated duplicates and misspellings, which
+    # must be retained for backward compatibility.
     #
-    # Several possibilities are available for creating a new list of stars...
+    # PyEphem and Skyfield must draw upon the same common list of stars.
+    # Several possibilities are available:
     #
     #    http://fer3.com/arc/imgx/Bowditch-American-Practical-Navigator-2002-(2004).pdf
     #    https://en.wikipedia.org/wiki/List_of_stars_for_navigation
@@ -250,17 +251,17 @@ class AstroBase( ABC ):
     #
     #    http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt
     #        Contains official names and corresponding HIPs.
-    #        Unfortunately too many stars, resulting in updating too frequently
-    #        and there is no easy/obvious way to cull to a manageable size.
+    #        Unfortunately too many stars, frequently updated and there is no
+    #        obvious way to cull to a manageable size.
     #
     #    https://www.cosmos.esa.int/web/hipparcos/common-star-names
     #        Contains around 96 stars, with some names misspelt.
     #        Not all stars in PyEphem are present in this list.
     #
-    # Ultimately, start with PyEphem's list of stars and drop those which are
-    # not listed in the IAU CSN Catalog.
+    # Solution: Start with PyEphem's list of stars and drop those which are not
+    # listed in the IAU CSN Catalog.
     #
-    # The list of stars below MUST be created using create_ephemeris_stars.py.
+    # DO NOT EDIT: MUST be created using create_ephemeris_stars.py.
     STARS = [
         [ "ACAMAR",          13847,  _( "Acamar" ),          _( "ACAMAR" ) ],
         [ "ACHERNAR",        7588,   _( "Achernar" ),        _( "ACHERNAR" ) ],

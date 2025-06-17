@@ -17,10 +17,10 @@
 
 
 '''
-Backend which creates the list of stars for astrobase and the star ephemerides
-for astropyephem and astroskyfield.
+Backend which creates the list of stars for astrobase and
+the star ephemerides for astropyephem and astroskyfield.
 
-                      *** NOT TO BE RUN DIRECTLY ***
+            *** NOT TO BE RUN DIRECTLY ***
 '''
 
 

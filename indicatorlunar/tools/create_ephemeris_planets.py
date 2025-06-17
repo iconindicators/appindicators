@@ -16,8 +16,26 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Not sure if this script (and the equivalent _) remains.
+# Maybe instead have a big juicy comment in astroskyfield where the planents.bsp
+# is defined.
+#
+# Then explain how the planets.bsp comes fron an excerpt and has a reduced date range.
+# Also explain where to get a new .bsp and how to do the extraction.
+#
+# Include the full command with creating the venv, running and so on.
+# Can then effectively delete this script.
+#
+# BUT will want to create the stars.dat on initial release and
+# a planets.bsp on EVERY release...so for planets, take the code in
+# _create_ephemeris_planets perhaps and use that as a function.
+# Otherwise, maybe call jplephem directly.
+#
+# https://github.com/brandon-rhodes/python-jplephem/issues/60
+
+
 '''
-Create a planet ephemeris for use in astroskyfield, from today's date,
+Create a planet ephemeris for astroskyfield, from today's date,
 ending at a specified number of years from today.
 
 The start date is wound back one month to take into account the Skyfield

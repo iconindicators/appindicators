@@ -35,7 +35,7 @@ from .astrobase import AstroBase
 class AstroPyEphem( AstroBase ):
     ''' Wrapper frontend to the PyEphem library. '''
 
-    # DO NOT EDIT: Content must be created using 'create_ephemeris_stars.py'.
+    # DO NOT EDIT: MUST be created using create_ephemeris_stars.py.
     _EPHEMERIS_STARS = {
         "ACAMAR" :
             "ACAMAR,f|S|A4,2.97102074|-53.53,-40.30467239|25.71,2.88",

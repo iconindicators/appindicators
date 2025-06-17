@@ -27,6 +27,40 @@
 #TODO Do NOT include the tools/scripts in the release.
 
 
+#TODO To check the start/end of planets ephemeris .bsp
+    # from skyfield.api import load
+    #
+    #
+    # def print_epoch( bsp ):
+    #     planets = load( bsp )
+    #
+    #     print( f"Name: { bsp }" )
+    #     print( f"Print: { planets }" )
+    #
+    #     for i in range( len( planets.segments ) ):
+    #         segment = planets.segments[ i ]
+    #         start, end = segment.time_range( load.timescale() )
+    #         print( f"\tCenter: { segment.center_name }" )
+    #         print( f"\tTarget: { segment.target_name }" )
+    #         print( f"\tDate range: { start.tdb_strftime() } - { end.tdb_strftime() }" )
+    #         print()
+    #
+    #     print()
+    #     print()
+    #
+    #
+    # print_epoch( "de442s.bsp" )
+    # print_epoch( "de442s_excerpt.bsp" )
+# 
+# https://github.com/brandon-rhodes/python-jplephem/issues/60
+# See in the issue above if there are any relevent comments, etc
+# that should be put here in the comments or elsewhere.
+#
+# Take note that need to get the start of each segment and find the most recent
+# of those; get the most past end of each segment;
+# then those become the actual date range.
+
+
 #TODO Is it possible to do a check to see if the planets.bsp date range is valid?
 # That is, starts at least a month before today's date AND runs far enough into
 # the future (whatever "far enough" means).

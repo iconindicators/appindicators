@@ -23,6 +23,16 @@ Backend which creates a planet ephemeris for use in astroskyfield.
 '''
 
 
+#TODO THinking that this stays as is and is called by the build_wheel.py
+# process at some point (when building indicatorlunar with astroskyfield).
+#
+# How would the build know about this...?
+# Probably should be called after the source is copied across.
+# The build_wheel.py needs to check if the indicator == indicatorluar and if so,
+# call this script/code...but how to specify the in.bsp?
+# The in.bsp can be a different file over the years.
+
+
 import datetime
 
 from dateutil.relativedelta import relativedelta
@@ -61,20 +71,3 @@ def create_ephemeris_planets(
                 _gregorian_to_julian( start_date.strftime( date_format ) ),
                 _gregorian_to_julian( end_date.strftime( date_format ) ),
                 summaries )
-
-#TODO Creates ephemeris with odd dates...
-# https://github.com/brandon-rhodes/python-jplephem/issues/60
-
-
-
-    # from skyfield.api import load
-    #
-    # ts = load.timescale()
-    #
-    # planets = load( "de442s.bsp" )
-    #
-    # segment = planets.segments[ 0 ]
-    # start, end = segment.time_range( ts )
-    # print('Center:', segment.center_name)
-    # print('Target:', segment.target_name)
-    # print('Date range:', start.tdb_strftime(), '-', end.tdb_strftime())
