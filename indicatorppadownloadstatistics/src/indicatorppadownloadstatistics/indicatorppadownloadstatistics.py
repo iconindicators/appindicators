@@ -19,6 +19,20 @@
 ''' Application indicator which displays PPA download statistics. '''
 
 
+#TODO Is it possible to incorporate snap download statistics?
+# Any other app store too?
+#
+# https://snapcraft.io/docs
+# https://forum.snapcraft.io/t/snap-store-api/14156
+# https://api.snapcraft.io/docs/info.html
+# 
+# https://docs.appimage.org/contact.html
+# https://docs.appimage.org/api/libappimage/api/library_root.html
+# 
+# https://docs.flatpak.org/en/latest/portal-api-reference.html
+# https://docs.flatpak.org/en/latest/libflatpak-api-reference.html
+
+
 import concurrent.futures
 import locale
 
