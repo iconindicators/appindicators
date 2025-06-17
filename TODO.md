@@ -106,6 +106,12 @@ Tested wlrctl on Ubuntu 24.04 but does not work when attempting to access
 window information:
   error message: Foreign Toplevel Management interface not found!
 
+https://github.com/CZ-NIC/run-or-raise 
+GNOME extension; maybe could be used but only works on GNOME presumably.
+
+https://github.com/ickyicky/window-calls
+GNOME extension; maybe could be used but only works on GNOME presumably.
+
 
 ## Access Data at Runtime
 Reading
