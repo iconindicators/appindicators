@@ -34,7 +34,7 @@ if __name__ == "__main__":
     indicators_to_process = (
         utils.get_indicators_to_process(
             "Build a Python3 wheel for one or more indicators at "
-            f"{  utils.RELEASE_DIRECTORY }.",
+            f"{ utils.RELEASE_DIRECTORY }.",
             "build" ) )
 
     for indicator in indicators_to_process:

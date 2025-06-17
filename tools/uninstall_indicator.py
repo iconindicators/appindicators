@@ -43,11 +43,9 @@ if __name__ == "__main__":
         command = (
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
             f"site-packages/{ indicator }/platform/linux/uninstall.sh && "
-            # f". { utils.VENV_INSTALL }/bin/activate && " #TODO Hopefully not needed.
             f"python3 -m pip uninstall --yes { indicator } && "
             f"count=$(python3 -m pip --disable-pip-version-check list | "
             f"grep -o \"indicator\" | wc -l) && "
-            # f"deactivate && " #TODO Hopefully not needed.
             f"if [ \"$count\" -eq \"0\" ]; "
             f"then rm -f -r { utils.VENV_INSTALL }; fi" )
 
