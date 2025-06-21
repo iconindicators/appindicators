@@ -236,11 +236,15 @@ class AstroBase( ABC ):
     _STARS_INDEX_TAG_TRANSLATION = 3
 
 
-    # PyEphem provides a list of stars and ephemeris, whereas Skyfield does not.
-    # Over time, that list has accumulated duplicates and misspellings, which
-    # must be retained for backward compatibility.
+    # The list of PyEphem supported stars
+    #   https://github.com/brandon-rhodes/pyephem/blob/master/ephem/stars.py
+    # contains duplicates and misspellings which must be kept in support of
+    # previous versions.
     #
-    # PyEphem and Skyfield must draw upon the same common list of stars.
+    # Skyfield contains no list of stars.
+    #
+    # PyEphem and Skyfield must use the same list of stars.
+    #
     # Several possibilities are available:
     #
     #    http://fer3.com/arc/imgx/Bowditch-American-Practical-Navigator-2002-(2004).pdf
@@ -258,10 +262,8 @@ class AstroBase( ABC ):
     #        Contains around 96 stars, with some names misspelt.
     #        Not all stars in PyEphem are present in this list.
     #
-    # Solution: Start with PyEphem's list of stars and drop those which are not
-    # listed in the IAU CSN Catalog.
-    #
-    # DO NOT EDIT: MUST be created using create_ephemeris_stars.py.
+    # Solution: Start with PyEphem's stars, remove duplicates/misspellings
+    # and drop those not listed in the IAU CSN Catalog.
     STARS = [
         [ "ACAMAR",          13847,  _( "Acamar" ),          _( "ACAMAR" ) ],
         [ "ACHERNAR",        7588,   _( "Achernar" ),        _( "ACHERNAR" ) ],
