@@ -234,6 +234,7 @@ from .astrobase import AstroBase
 class AstroSkyfield( AstroBase ):
     ''' Wrapper frontend to the Skyfield library. '''
 
+#TODO Check this comment after dust has settled.
     # Planets ephemeris has an effective life span of 10 years from the release
     # date of the indicator.
     #
@@ -245,6 +246,7 @@ class AstroSkyfield( AstroBase ):
     _EPHEMERIS_PLANETS = (
         load( str( Path( __file__ ).parent / "data" / "planets.bsp" ) ) )
 
+#TODO Check this comment after dust has settled.
     # Stars ephemeris MUST be created using create_ephemeris_stars.py.
     ephemeris_stars_path = Path( __file__ ).parent / "data" / "stars.dat"
     with load.open( str( ephemeris_stars_path ) ) as f:

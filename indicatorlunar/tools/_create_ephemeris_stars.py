@@ -40,9 +40,6 @@ IAUCSN_HIP_START = 91
 IAUCSN_HIP_END = 96
 
 
-#TODO What to do about Minkar?
-# Does not appear in the IAU list of stars, so leave out
-#
 #TODO 
 # https://github.com/brandon-rhodes/pyephem/issues/289
 # Until resolved, leave out Albireo as it is incorrect,
@@ -59,6 +56,8 @@ IAUCSN_HIP_END = 96
 # to create the list of stars below, with corresponding HIP, which contains
 # only corrected star names (no duplicates) which correlate to those stars
 # in PyEphem.
+#
+# Omit the star Minkar which appears in PyEphem but not in the IAU.
 NAMES_TO_HIPS = {
     "ACAMAR"         :  13847,
     "ACHERNAR"       :  7588,
@@ -168,32 +167,7 @@ NAMES_TO_HIPS = {
     "ZUBENELGENUBI"  :  72622 }
 
 
-def _get_names_to_hips( iau_catalog_file ): 
-    '''              
-    Return a dictionary of star name (str) to HIP (int) for each star in the
-    IAU Catalog of Star Names also present in the PyEphem list of stars.
-    '''
-    stars_from_pyephem = stars.stars.keys()
-    names_to_hips = { }
-    with open( iau_catalog_file, 'r', encoding = "utf-8" ) as f:
-        for line in f:
-            if not ( line.startswith( '#' ) or line.startswith( '$' ) ):
-                try:
-                    start = IAUCSN_NAME_START - 1
-                    end = IAUCSN_NAME_END - 1 + 1
-                    name = line[ start : end ].strip()
-                    if name in stars_from_pyephem:
-                        start = IAUCSN_HIP_START - 1
-                        end = IAUCSN_HIP_END - 1 + 1
-                        hip = int( line[ start : end ] )
-                        names_to_hips[ name ] = hip
-
-                except ValueError:
-                    pass
-
-    return names_to_hips
-
-
+#TODO Could keep this.
 def _print_formatted_stars(
     names_to_hips ):
 
@@ -231,102 +205,17 @@ def _create_ephemeris_skyfield(
     print( "Done\n" )
 
 
-def _print_ephemeris_pyephem(
-    planet_ephemeris,
-    star_ephemeris,
-    names_to_hips ):
-    '''
-    Taken from
-        https://github.com/brandon-rhodes/pyephem/blob/master/bin/rebuild-star-data
-    '''
-    print( "Ephemeris for astropyephem..." )
-
-    with load.open( star_ephemeris, 'r' ) as f:
-        dataframe = hipparcos.load_dataframe( f )
-
-    # Required to obtain spectral type as this is dropped from the above load.
-    with load.open( star_ephemeris ) as f:
-        dataframe_raw = (
-            read_csv(
-                f,
-                sep = '|',
-                names = hipparcos._COLUMN_NAMES,
-                na_values = [ '     ', '       ', '        ', '            ' ],
-                low_memory = False ) )
-
-        dataframe_raw = dataframe_raw.set_index( "HIP" )
-
-    timescale = load.timescale().J( 2000.0 )
-    sun_at = load( planet_ephemeris )[ "Sun" ].at( timescale )
-
-    results = [ ]
-    for name in sorted( list( names_to_hips.keys() ) ):
-        hip = names_to_hips[ name ]
-        row = dataframe.loc[ hip ]
-        star = Star.from_dataframe( row )
-        right_ascension, declination, _ = sun_at.observe( star ).radec()
-
-        components = [
-            name.upper(),
-            "f|S|" +
-            dataframe_raw.loc[ hip ][ "SpType" ][ : 2 ],
-            f"{right_ascension.hours:.8f}|{ star.ra_mas_per_year }",
-            f"{declination.degrees:.8f}|{ star.dec_mas_per_year }",
-            row[ "magnitude"] ]
-
-        line = ','.join( str( item ) for item in components )
-        results.append(
-            f"        \"{ name.upper() }\" :\n            \"{ line }\"," )
-
-    results.sort()
-    results[ -1 ] = results[ -1 ][ 0 : -1 ] # Trim last ,
-    print( *results, sep = '\n' )
-    print( "Done\n" )
 
 
-
-#TODO Maybe change name...or need additional API?
-def create_ephemeris_stars(
-    output_filename_for_skyfield_star_ephemeris,
-    planet_ephemeris,
-    star_ephemeris,
-    iau_catalog_file ):
-
-    names_to_hips = _get_names_to_hips( iau_catalog_file )
-
-    _print_formatted_stars( names_to_hips )
-
-    _create_ephemeris_skyfield(
-        output_filename_for_skyfield_star_ephemeris,
-        star_ephemeris,
-        list( names_to_hips.values() ) )
-
-    _print_ephemeris_pyephem(
-        planet_ephemeris,
-        star_ephemeris,
-        names_to_hips )
-
-
-#TODO Maybe this all goes?
-# #TODO Best to rename this to something other than create...
-# # Maybe initialise or something else?
-# # Also rename this file/module AND the calling module.
 # def create_ephemeris_stars(
 #     output_filename_for_skyfield_star_ephemeris,
 #     planet_ephemeris,
 #     star_ephemeris,
 #     iau_catalog_file ):
 #
-#     names_to_hips = _get_names_to_hips( iau_catalog_file )
-#
-#     _print_formatted_stars( names_to_hips )
-#
 #     _create_ephemeris_skyfield(
 #         output_filename_for_skyfield_star_ephemeris,
 #         star_ephemeris,
 #         list( names_to_hips.values() ) )
-#
-#     _print_ephemeris_pyephem(
-#         planet_ephemeris,
-#         star_ephemeris,
-#         names_to_hips )
+
+

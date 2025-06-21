@@ -122,7 +122,8 @@ def python_run(
 
     if len( modules_to_install ):
         command_ += (
-            "python3 -m pip install --upgrade "
+            # "python3 -m pip install --upgrade "
+            "python3 -m pip install  "#TODO Replace with above
             f"{ '--force-reinstall' if force_reinstall else '' } "  #TODO Needed?  If not, remove space at end after --upgrade.
             f"{ ' '.join( modules_to_install ) } && " )
 

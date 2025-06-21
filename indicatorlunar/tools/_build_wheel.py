@@ -35,7 +35,24 @@ if '../../' not in sys.path:  #TODO Check that the path here matches the path in
 from tools import utils
 
 
-def _create_ephemeris_planets( out_path ):
+
+#TODO Check all of this below...comment too.
+# Needed to get over the _ definition not in astrobase.
+if '../../' not in sys.path:
+    sys.path.insert( 0, '../../' )
+
+import gettext
+_ = gettext.gettext
+
+gettext.install( "text" )
+
+from indicatorlunar.src.indicatorlunar.astrobase import AstroBase 
+
+
+
+def _create_ephemeris_planets(
+    out_path ):
+
     print( "Finally here")
     message = ""
 
@@ -51,11 +68,7 @@ def _create_ephemeris_planets( out_path ):
         end_date = today.replace( year = today.year + years_from_today )
         date_format = "%Y/%m/%d"
 
-        out_path_ = Path( out_path ) / "data"
-        if not Path( out_path_ ).exists():
-            out_path_.mkdir( parents = True )
-
-        out_bsp = out_path_ / "planets.bsp"
+        out_bsp = out_path / "planets.bsp"
 
         command = (
             f"python3 -m jplephem excerpt { start_date.strftime( date_format ) } "
@@ -84,12 +97,56 @@ def _create_ephemeris_planets( out_path ):
     return message
 
 
+def _create_ephemeris_stars(
+    out_path ):
+
+    print( f"Creating stars.dat for astroskyfield..." )
+    message = ""
+    hip_main_dot_dat = "indicatorlunar/src/indicatorlunar/data/hip_main.dat" #TODO Comment similarly to de442s.bsp
+    if Path( hip_main_dot_dat ).exists():
+        hips = [ star[ 1 ] for star in AstroBase.STARS ]
+        #TODO Comment why these are here and not at top
+        from skyfield.api import load
+
+        stars_dot_dat = out_path / "stars.dat"
+
+        with load.open( hip_main_dot_dat, 'r' ) as f_in, open( stars_dot_dat, 'w' ) as f_out:
+            for line in f_in:
+                # HIP is located at bytes 9 - 14
+                #    http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
+                hip = int( line[ 9 - 1 : 14 - 1 + 1 ].strip() )
+                if hip in hips:
+                    f_out.write( line )
+    else:
+        message = f"Cannot locate { hip_main_dot_dat }"
+
+    return message
+
+
+# def create_ephemeris_stars(
+#     output_filename_for_skyfield_star_ephemeris,
+#     planet_ephemeris,
+#     star_ephemeris,
+#     iau_catalog_file ):
+#
+#     _create_ephemeris_skyfield(
+#         output_filename_for_skyfield_star_ephemeris,
+#         star_ephemeris,
+#         list( names_to_hips.values() ) )
+
+
+
+
 def build( out_path ):
     print( "indicator build script")
     message = ""
 
-    # Build planets.bsp
-    command = "python3 -m pip install --upgrade jplephem python-dateutil"
+    out_path_ = Path( out_path ) / "data"
+    if not Path( out_path_ ).exists():
+        out_path_.mkdir( parents = True )
+
+    command = "python3 -m pip install jplephem python-dateutil" #TODO replace with below
+    # command = "python3 -m pip install --upgrade jplephem python-dateutil"
     stdout_, stderr_, return_code = (
         utils.python_run(
             command,
@@ -100,10 +157,12 @@ def build( out_path ):
         message = stderr_
 
     if return_code == 0:
-        message = _create_ephemeris_planets( out_path )
+        message = _create_ephemeris_planets( out_path_ )
         if not message:
             print( "build stars!!!!!!!!!!!!!!!!!!!!!!!!!!!!") #TODO Build stars.dat
-            # message = _create_ephemeris_stars( out_path )
+            message = _create_ephemeris_stars( out_path_ )
+        else:
+            print( "THERE IS A MESSAFE")
 
     else:
         # Non-zero return code indicating an error.
