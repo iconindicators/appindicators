@@ -29,7 +29,7 @@ import sys
 
 from pathlib import Path
 
-if '../../' not in sys.path:  #TODO Check that the path here matches the path in the next line for all occurrences.
+if '../../' not in sys.path:  #TODO Check that the path here matches the path in the next line for all scripts/places.
     sys.path.insert( 0, '../../' )
 
 from tools import utils
@@ -41,11 +41,15 @@ def _create_ephemeris_planets( out_path ):
 
     #TODO DOcument 
     in_bsp = "indicatorlunar/src/indicatorlunar/data/de442s.bsp"#TODO Leave as is?  Cannot really be passed in...
-    if not Path( in_bsp ).exists():
-        message = f"Cannot locate { in_bsp }"
+    if Path( in_bsp ).exists():
+        years_from_today = 10 #TODO Add a comment
 
-    if not message:
-        years_from_today = 10
+        from dateutil.relativedelta import relativedelta #TODO Comment why this is here.
+
+        today = datetime.date.today()
+        start_date = today - relativedelta( months = 1 )  #TODO Explain this
+        end_date = today.replace( year = today.year + years_from_today )
+        date_format = "%Y/%m/%d"
 
         out_path_ = Path( out_path ) / "data"
         if not Path( out_path_ ).exists():
@@ -53,17 +57,11 @@ def _create_ephemeris_planets( out_path ):
 
         out_bsp = out_path_ / "planets.bsp"
 
-        from dateutil.relativedelta import relativedelta #TODO Comment why this is here.
-        today = datetime.date.today()
-        start_date = today - relativedelta( months = 1 )
-        end_date = today.replace( year = today.year + years_from_today )
-        date_format = "%Y/%m/%d"
-
         command = (
             f"python3 -m jplephem excerpt { start_date.strftime( date_format ) } "
             f"{ end_date.strftime( date_format ) } { in_bsp } { out_bsp }" )
 
-        print( command ) #TODO Test
+        # print( command ) #TODO Test
 
         stdout_, stderr_, return_code = (
             utils.python_run(
@@ -71,21 +69,17 @@ def _create_ephemeris_planets( out_path ):
                 utils.VENV_BUILD,
                 activate_deactivate = False ) )
 
-        if stdout_:
-            message = f"THIS IS STDOUT PLANETS: { stdout_ }"
-            # message = stdout_
-
         if stderr_:
-            message = f"THIS IS STDERR PLANETS: { stderr_ }"
-            # message = stderr_
+            print( f"THIS IS STDERR PLANETS: { stderr_ }" )#TODO Test
+            message = stderr_
 
-        print( f"Return code PLANETS: { return_code }")
+        if return_code != 0 and not stderr_:
+            # Non-zero return code and stderr is empty,
+            # so return the return code.
+            message = f"Return code: { return_code }"
 
-#TODO Not sure if the text emitted when making planets.bsp which is all good
-# should be passed back as a message.
-# When all good, want an empty message.
-# So maybe check for the return code being 0?
-# If not 0, then return what? stdout or stderr?
+    else:
+        message = f"Cannot locate { in_bsp }"
 
     return message
 
@@ -94,32 +88,27 @@ def build( out_path ):
     print( "indicator build script")
     message = ""
 
-    #TODO Delete eventually
-    # command = (
-    #     "python3 -m pip install --upgrade jplephem python-dateutil && "
-    #     "python3 -c \"from indicatorlunar.tools import _create_ephemeris_planets; "
-    #     f"_create_ephemeris_planets.create_ephemeris_planets( \\\"{ out_path }\\\" )\"" )
-
     # Build planets.bsp
     command = "python3 -m pip install --upgrade jplephem python-dateutil"
     stdout_, stderr_, return_code = (
-        utils.python_run( command, utils.VENV_BUILD ) )
-
-    if stdout_:
-        # message = f"THIS IS STDOUT INSTALL: { stdout_ }"
-        pass
-        # message = stdout_
+        utils.python_run(
+            command,
+            utils.VENV_BUILD,
+            activate_deactivate = False ) )
 
     if stderr_:
-        message = f"THIS IS STDERR INSTALL: { stderr_ }"
-        # message = stderr_
+        message = stderr_
 
-    # if return_code == 0:
-    #     message = _create_ephemeris_planets( out_path )
-    #     if not message:
-    #         pass #TODO Create stars.dat
-    #         # message = _create_ephemeris_stars( out_path )
+    if return_code == 0:
+        message = _create_ephemeris_planets( out_path )
+        if not message:
+            print( "build stars!!!!!!!!!!!!!!!!!!!!!!!!!!!!") #TODO Build stars.dat
+            # message = _create_ephemeris_stars( out_path )
 
-    print( f"Return code INSTALL: { return_code }")
+    else:
+        # Non-zero return code indicating an error.
+        # If stderr is empty, use the return code as the returned message.
+        if not stderr_:
+            message = f"Return code: { return_code }"
 
     return message
