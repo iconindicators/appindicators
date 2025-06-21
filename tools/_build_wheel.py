@@ -26,6 +26,7 @@ Utility for building a Python3 wheel.
 import configparser
 import datetime
 import filecmp
+import importlib
 import os
 import re
 import shutil
@@ -220,7 +221,7 @@ def _create_update_po(
             with open( po_file_original, 'w', encoding = "utf-8" ) as w:
                 w.write( text )
 
-            print( "YOU MUST UPDATE LINES 1, 4, 11, 12." )
+            print( "YOU MUST UPDATE LINES 1, 4, 11, 12." )   #TODO Make sure this appears!!!!
 
 
 def _update_locale_source(
@@ -835,6 +836,26 @@ def _package_source(
         _create_scripts_for_linux( directory_platform_linux, indicator )
         _create_symbolic_icons( directory_dist, indicator )
 
+        # Indicators can have a build script located at
+        #   { indicator } / tools / _build_wheel.py
+        # which must have a function called
+        #   build( out_path )
+        #
+        # For example, indicatorlunar's astroskyfield requires planets.bsp
+        # and stars.dat to be built and included as part of the wheel.
+        indicator_build_script = Path( indicator ) / "tools" / "_build_wheel.py" 
+        if Path( indicator_build_script ).exists():
+            print( "Running indicator specific build script...")#TODO Test
+            module = f"{ indicator }.tools._build_wheel"
+            try:#TODO Remove try/except
+                indicator_build_wheel = importlib.import_module( module )
+                pass#TODO Test
+            except Exception as e:
+                print( f"Exception: { e }" )
+            out_path = directory_dist / indicator / "src" / indicator
+            message = indicator_build_wheel.build( out_path )
+            # print( f"Message from indicator build script: { message }")
+
     return message
 
 
@@ -858,11 +879,11 @@ def build_wheel(
 
         message = _package_source( directory_dist, indicator )
 
-    if not message:
-        shared.process_run(
-            f"python3 -m build --outdir { directory_dist } { directory_dist / indicator }",
-            capture_output = False,  #TODO Why is this not True?
-            print_ = True )
+    # if not message:
+    #     shared.process_run(
+    #         f"python3 -m build --outdir { directory_dist } { directory_dist / indicator }",
+    #         capture_output = False,  #TODO Why is this not True?
+    #         print_ = True )
 
 # TODO Uncomment
 #         shutil.rmtree( directory_dist / indicator )

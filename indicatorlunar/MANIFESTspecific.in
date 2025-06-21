@@ -15,3 +15,6 @@ exclude src/indicatorlunar/meteorshowertest.py
 # https://setuptools.pypa.io/en/latest/userguide/datafiles.html
 # Do we need just to list the data files here using an include line for each,
 # which has include-package-data = true by default in pyproject.toml
+
+include src/indicatorlunar/data/planets.bsp
+include src/indicatorlunar/data/stars.dat

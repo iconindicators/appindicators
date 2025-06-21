@@ -156,6 +156,9 @@ def _print_ephemeris_pyephem(
     print( "Done\n" )
 
 
+#TODO Best to rename this to something other than create...
+# Maybe initialise or something else?
+# Also rename this file/module AND the calling module.
 def create_ephemeris_stars(
     output_filename_for_skyfield_star_ephemeris,
     planet_ephemeris,

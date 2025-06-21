@@ -106,7 +106,8 @@ def python_run(
     command,
     venv_directory,
     *modules_to_install,
-    force_reinstall = False ):  #TODO Is this needed?  Maybe always set to False?
+    force_reinstall = False,  #TODO Is this needed?  Maybe always set to False?
+    activate_deactivate = True ):
     '''
     Creates the Python3 virtual environment if it does not exist,
     installs modules specified and runs the Python3 command,
@@ -116,7 +117,8 @@ def python_run(
     if not Path( f"{ venv_directory }" ).is_dir():
         command_ += f"python3 -m venv { venv_directory } && "
 
-    command_ += f". { venv_directory }/bin/activate && "
+    if activate_deactivate:
+        command_ += f". { venv_directory }/bin/activate && "
 
     if len( modules_to_install ):
         command_ += (
@@ -124,13 +126,20 @@ def python_run(
             f"{ '--force-reinstall' if force_reinstall else '' } "  #TODO Needed?  If not, remove space at end after --upgrade.
             f"{ ' '.join( modules_to_install ) } && " )
 
-    command_ += f"{ command } && deactivate"
+    command_ += f"{ command }"
+
+    if activate_deactivate:
+        command_ += f" && deactivate"
 
     print()
     print( command_ )#TODO Testing.  Maybe make this an option?
     print()
 
-    shared.process_run( command_, print_ = True )
+#TODO This originally did not return.
+# For the new code calling indicatorlunar.tools._build_wheel.build()
+# I think the return is needed.
+# So does the return affect anything other callers?    
+    return shared.process_run( command_, print_ = True )
 
 
 def _get_parser(

@@ -71,41 +71,105 @@ Backend which creates a planet ephemeris for use in astroskyfield.
 # to see if being called twice).  
 # Do the same for _build_wheel.py to see if it is being run twice by build_wheel.py.
 
+
 import datetime
+import sys
+
+from pathlib import Path
 
 from dateutil.relativedelta import relativedelta
 
-from jplephem.daf import DAF
-from jplephem.spk import SPK
-from jplephem import calendar, excerpter
+if '../' not in sys.path:
+    sys.path.insert( 0, '../../' )
+
+from tools import utils
+
+# from jplephem.daf import DAF
+# from jplephem.spk import SPK
+# from jplephem import calendar, excerpter
 
 
-def _gregorian_to_julian( yyyy_slash_mm_slash_dd ):
-    '''
-    Taken from
-        https://github.com/brandon-rhodes/python-jplephem/blob/master/jplephem/commandline.py
-    '''
-    fields = [ int( f ) for f in yyyy_slash_mm_slash_dd.split( '/' ) ]
-    return calendar.compute_julian_date( *fields )
+#TODO Delete
+# def _gregorian_to_julian( yyyy_slash_mm_slash_dd ):
+#     '''
+#     Taken from
+#         https://github.com/brandon-rhodes/python-jplephem/blob/master/jplephem/commandline.py
+#     '''
+#     fields = [ int( f ) for f in yyyy_slash_mm_slash_dd.split( '/' ) ]
+#     return calendar.compute_julian_date( *fields )
 
 
-def create_ephemeris_planets(
-    in_bsp,
-    out_bsp,
-    years ):
+#TODO Delete
+# def create_ephemeris_planets(
+#     in_bsp,
+#     out_bsp,
+#     years ):
+#
+#     today = datetime.date.today()
+#     start_date = today - relativedelta( months = 1 )
+#     end_date = today.replace( year = today.year + int( years ) )
+#     date_format = "%Y/%m/%d"
+#
+#     with open( in_bsp, "rb" ) as f_in:
+#         spk = SPK( DAF( f_in ) )
+#         summaries = spk.daf.summaries()
+#         with open( out_bsp, "w+b" ) as f_out:
+#             excerpter.write_excerpt(
+#                 spk,
+#                 f_out,
+#                 _gregorian_to_julian( start_date.strftime( date_format ) ),
+#                 _gregorian_to_julian( end_date.strftime( date_format ) ),
+#                 summaries )
 
-    today = datetime.date.today()
-    start_date = today - relativedelta( months = 1 )
-    end_date = today.replace( year = today.year + int( years ) )
-    date_format = "%Y/%m/%d"
 
-    with open( in_bsp, "rb" ) as f_in:
-        spk = SPK( DAF( f_in ) )
-        summaries = spk.daf.summaries()
-        with open( out_bsp, "w+b" ) as f_out:
-            excerpter.write_excerpt(
-                spk,
-                f_out,
-                _gregorian_to_julian( start_date.strftime( date_format ) ),
-                _gregorian_to_julian( end_date.strftime( date_format ) ),
-                summaries )
+def create_ephemeris_planets( out_path ):
+    print( "Finally here")
+    message = ""
+
+    #TODO DOcument 
+    in_bsp = "indicatorlunar/src/indicatorlunar/data/de442s.bsp"#TODO Leave as is?  Cannot really be passed in...
+    if not Path( in_bsp ).exists():
+        message = f"Cannot locate { in_bsp }"
+
+    if not message:
+        years_from_today = 10
+
+        out_path_ = Path( out_path ) / "data"
+        if not Path( out_path_ ).exists():
+            out_path_.mkdir( parents = True )
+
+        out_bsp = out_path_ / "planets.bsp"
+
+        today = datetime.date.today()
+        start_date = today - relativedelta( months = 1 )
+        end_date = today.replace( year = today.year + years_from_today )
+        date_format = "%Y/%m/%d"
+
+        command = (
+            # "python3 -m pip install --upgrade jplephem python-dateutil && "
+            f"python3 -m jplephem excerpt { start_date.strftime( date_format ) } "
+            f"{ end_date.strftime( date_format ) } { in_bsp } { out_bsp }" )
+
+        print( command ) #TODO Test
+
+        stdout_, stderr_, return_code = (
+            utils.python_run(
+                command,
+                utils.VENV_BUILD,
+                activate_deactivate = False ) )
+
+        if stdout_:
+            message = f"THIS IS STDOUT: { stdout_ }"
+            # message = stdout_
+
+        if stderr_:
+            message = f"THIS IS STDERR: { stderr_ }"
+            # message = stderr_
+
+#TODO Not sure if the text emitted when making planets.bsp which is all good
+# should be passed back as a message.
+# When all good, want an empty message.
+# So maybe check for the return code being 0?
+# If not 0, then return what? stdout or stderr?
+
+    return message

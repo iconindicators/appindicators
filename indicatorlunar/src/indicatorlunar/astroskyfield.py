@@ -234,7 +234,14 @@ from .astrobase import AstroBase
 class AstroSkyfield( AstroBase ):
     ''' Wrapper frontend to the Skyfield library. '''
 
-    # Planets ephemeris MUST be created using create_ephemeris_planets.py.
+    # Planets ephemeris has an effective life span of 10 years from the release
+    # date of the indicator.
+    #
+    # If no release of the indicator, download a .bsp with suitable date range from 
+    #   https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
+    # blah blah TODO Finish this and tidy up...
+    # ...mention that the start date of the bsp must be at least one month
+    # before today's date.
     _EPHEMERIS_PLANETS = (
         load( str( Path( __file__ ).parent / "data" / "planets.bsp" ) ) )
 
