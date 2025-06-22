@@ -879,11 +879,11 @@ def build_wheel(
 
         message = _package_source( directory_dist, indicator )
 
-    # if not message:
-    #     shared.process_run(
-    #         f"python3 -m build --outdir { directory_dist } { directory_dist / indicator }",
-    #         capture_output = False,  #TODO Why is this not True?
-    #         print_ = True )
+    if not message:
+        shared.process_run(
+            f"python3 -m build --outdir { directory_dist } { directory_dist / indicator }",
+            capture_output = False,  #TODO Why is this not True?
+            print_ = True )
 
 # TODO Uncomment
 #         shutil.rmtree( directory_dist / indicator )
