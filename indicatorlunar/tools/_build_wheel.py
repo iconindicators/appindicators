@@ -51,8 +51,30 @@ gettext.install( "indicatorlunar.tools._build_wheel" )
 from indicatorlunar.src.indicatorlunar.astrobase import AstroBase 
 
 
+def _initialise():
+    command = "python3 -m pip install --upgrade jplephem python-dateutil skyfield"
+    command = "python3 -m pip install jplephem python-dateutil skyfield" #TODO Remove after testing
+    message = ""
+    stdout_, stderr_, return_code = (
+        utils.python_run(
+            command,
+            utils.VENV_BUILD,
+            activate_deactivate = False ) )
+
+    if stderr_:
+        message = stderr_
+
+    if return_code != 0:
+        # Non-zero return code indicating an error.
+        # If stderr is empty, use the return code as the returned message.
+        if not stderr_:
+            message = f"Return code: { return_code }"
+
+    return message
+
+
 def _create_ephemeris_planets(
-    out_path ):
+    data_path ):
     '''
     TODO NEED ANY OF THIS?
 Create a planet ephemeris for astroskyfield, from today's date,
@@ -98,11 +120,11 @@ Alternatively to running this script, download a .bsp and use spkmerge:
         end_date = today.replace( year = today.year + years_from_today )
         date_format = "%Y/%m/%d"
 
-        out_bsp = out_path / "planets.bsp"
+        planets_bsp = data_path / "planets.bsp"
 
         command = (
             f"python3 -m jplephem excerpt { start_date.strftime( date_format ) } "
-            f"{ end_date.strftime( date_format ) } { in_bsp } { out_bsp }" )
+            f"{ end_date.strftime( date_format ) } { in_bsp } { planets_bsp }" )
 
         # print( command ) #TODO Test
 
@@ -113,7 +135,7 @@ Alternatively to running this script, download a .bsp and use spkmerge:
                 activate_deactivate = False ) )
 
         if stderr_:
-            print( f"THIS IS STDERR PLANETS: { stderr_ }" )#TODO Test
+            # print( f"THIS IS STDERR PLANETS: { stderr_ }" )#TODO Test
             message = stderr_
 
         if return_code != 0 and not stderr_:
@@ -128,7 +150,7 @@ Alternatively to running this script, download a .bsp and use spkmerge:
 
 
 def _create_ephemeris_stars(
-    out_path ):
+    data_path ):
     '''
     TODO Need any of this:
     
@@ -145,29 +167,27 @@ def _create_ephemeris_stars(
                     "The output filename for the astroskyfield star ephemeris." },
     
     '''
-    print( f"Creating stars.dat for astroskyfield..." )
+    # print( f"Creating stars.dat for astroskyfield..." )
     message = ""
-    hip_main_dot_dat = "indicatorlunar/src/indicatorlunar/data/hip_main.dat" #TODO Comment similarly to de442s.bsp
-    if Path( hip_main_dot_dat ).exists():
-        hips = [ star[ 1 ] for star in AstroBase.STARS ]
+    hip_main_dat = "indicatorlunar/src/indicatorlunar/data/hip_main.dat" #TODO Comment similarly to de442s.bsp
+    if Path( hip_main_dat ).exists():
+
         #TODO Comment why these are here and not at top
         from skyfield.api import load
-#TODO I think I have forgotten to pip install skyfield as I have for jplephem in planets.
 
-        stars_dot_dat = out_path / "stars.dat"
-
-        with load.open( hip_main_dot_dat, 'r' ) as f_in, open( stars_dot_dat, 'w' ) as f_out:
-            for line in f_in:
-                # HIP is located at bytes 9 - 14
-                #    http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
-                hip = int( line[ 9 - 1 : 14 - 1 + 1 ].strip() )
-                if hip in hips:
-                    f_out.write( line )
-
-        message = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"
+        stars_dat = data_path / "stars.dat"
+        hips = [ star[ 1 ] for star in AstroBase.STARS ]
+        with load.open( hip_main_dat, 'r' ) as f_in:
+            with open( stars_dat, 'w' ) as f_out:
+                for line in f_in:
+                    # HIP is located at bytes 9 - 14
+                    #    http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
+                    hip = int( line[ 9 - 1 : 14 - 1 + 1 ].strip() )
+                    if hip in hips:
+                        f_out.write( line )
 
     else:
-        message = f"Cannot locate { hip_main_dot_dat }"
+        message = f"Cannot locate { hip_main_dat }"
 
     return message
 
@@ -201,44 +221,44 @@ def _create_ephemeris_stars(
 # For 32 bit and/or Ubuntu 20.04 might need to explicitly
 # list numpy and pin to a version.
 
+
 def build( out_path ):
     '''
+    TODO Finish
     Creates the 
     '''
+    data_path = Path( out_path ) / "data"
 
-    message = ""
-
-    out_path_ = Path( out_path ) / "data"
-    if not Path( out_path_ ).exists():
-        out_path_.mkdir( parents = True )
-
-#TODO Why is this done here outside of create_planets?
-# Can it be moved into create_planets and combined into one call along with jplephem excerpt?
-#
-# BUT...stars needs skfyfield, so could leave out here and add skyfield.
-    command = "python3 -m pip install jplephem python-dateutil" #TODO replace with below
-    # command = "python3 -m pip install --upgrade jplephem python-dateutil"
-    stdout_, stderr_, return_code = (
-        utils.python_run(
-            command,
-            utils.VENV_BUILD,
-            activate_deactivate = False ) )
-
-    if stderr_:
-        message = stderr_
-
-    if return_code == 0:
-        message = _create_ephemeris_planets( out_path_ )
+    message = _initialise()
+    if not message:
+        message = _create_ephemeris_planets( data_path )
         if not message:
-            print( "build stars!!!!!!!!!!!!!!!!!!!!!!!!!!!!") #TODO Build stars.dat
-            message = _create_ephemeris_stars( out_path_ )
-        else:
-            print( "THERE IS A MESSAFE")
+            # print( "build stars!!!!!!!!!!!!!!!!!!!!!!!!!!!!") #TODO Build stars.dat
+            message = _create_ephemeris_stars( data_path )
 
-    else:
-        # Non-zero return code indicating an error.
-        # If stderr is empty, use the return code as the returned message.
-        if not stderr_:
-            message = f"Return code: { return_code }"
+    # command = "python3 -m pip install jplephem python-dateutil skyfield" #TODO replace with below
+    # # command = "python3 -m pip install --upgrade jplephem python-dateutil skyfield"
+    # stdout_, stderr_, return_code = (
+    #     utils.python_run(
+    #         command,
+    #         utils.VENV_BUILD,
+    #         activate_deactivate = False ) )
+    #
+    # if stderr_:
+    #     message = stderr_
+    #
+    # if return_code == 0:
+    #     message = _create_ephemeris_planets( out_path_ )
+    #     if not message:
+    #         print( "build stars!!!!!!!!!!!!!!!!!!!!!!!!!!!!") #TODO Build stars.dat
+    #         message = _create_ephemeris_stars( out_path_ )
+    #     else:
+    #         print( "THERE IS A MESSAFE")
+    #
+    # else:
+    #     # Non-zero return code indicating an error.
+    #     # If stderr is empty, use the return code as the returned message.
+    #     if not stderr_:
+    #         message = f"Return code: { return_code }"
 
     return message
