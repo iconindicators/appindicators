@@ -263,7 +263,7 @@ class AstroBase( ABC ):
     #        Not all stars in PyEphem are present in this list.
     #
     # Solution: Start with PyEphem's stars, remove duplicates/misspellings
-    # and drop those not listed in the IAU CSN Catalog.
+    # and drop stars not listed in the IAU CSN Catalog.
     STARS = [
         [ "ACAMAR",          13847,  _( "Acamar" ),          _( "ACAMAR" ) ],
         [ "ACHERNAR",        7588,   _( "Achernar" ),        _( "ACHERNAR" ) ],
