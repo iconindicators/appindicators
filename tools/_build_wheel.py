@@ -836,13 +836,15 @@ def _package_source(
         _create_scripts_for_linux( directory_platform_linux, indicator )
         _create_symbolic_icons( directory_dist, indicator )
 
-        # Indicators can have a build script located at
+        # If an indicator has a build script located at
         #   { indicator } / tools / _build_wheel.py
-        # which must have a function called
+        # with a function called
         #   build( out_path )
+        # that function will be called now.
         #
         # For example, indicatorlunar's astroskyfield requires planets.bsp
-        # and stars.dat to be built and included as part of the wheel.
+        # and stars.dat to be built and included as part of the wheel which
+        # can be done in the indicator's build script.
         #
         # Note that any messages written to stdout by the indicator's build
         # script will appear AFTER the messages written by the Python3 build
