@@ -851,16 +851,10 @@ def _package_source(
         # process despite happening BEFORE!
         indicator_build_script = Path( indicator ) / "tools" / "_build_wheel.py" 
         if Path( indicator_build_script ).exists():
-            print( "Running indicator specific build script...")#TODO Test
             module = f"{ indicator }.tools._build_wheel"
-            try:#TODO Remove try/except
-                indicator_build_wheel = importlib.import_module( module )
-                pass#TODO Test
-            except Exception as e:
-                print( f"Exception: { e }" )
+            indicator_build_wheel = importlib.import_module( module )
             out_path = directory_dist / indicator / "src" / indicator
             message = indicator_build_wheel.build( out_path )
-            # print( f"Message from indicator build script: { message }")
 
     return message
 
