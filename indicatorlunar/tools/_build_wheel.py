@@ -232,6 +232,8 @@ def build( out_path ):
     TODO Finish
     Creates the 
     '''
+#TODO If only releasing pypehem (not skyfield)
+# comment out the code below and just return ""    
     data_path = Path( out_path ) / "data"
 
     message = _initialise()
