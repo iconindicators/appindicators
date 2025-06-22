@@ -35,6 +35,36 @@ Creates the planets.bsp and stars.dat used in astroskyfield.
 # Check all scripts in tools or indicatorlunar/tools.
 
 
+#TODO This will unlikely not work on 32 bit due to numpy et al...
+# so maybe put in a check to not run this script on 32 bit (just pass).
+# But somehow need to let the user know without passing a message back which
+# causes the build to abort.
+
+#TODO This script uses Python3, jplephem and numpy. 
+#
+# Need to verify it works on 32 bit and also Ubuntu 20.04
+# as some pinning of versions may need to be done.
+#
+# https://numpy.org/doc/2.0/release/1.22.0-notes.html
+# For 32 bit on Linux, might need to pin numpy to < 1.22.0
+#
+# https://numpy.org/doc/2.0/release/1.25.0-notes.html
+# For Ubuntu 20.04 et al, pin numpy to < 1.25.0 as < Python 3.9 is unsupported.
+# 
+# Ubuntu 22.04 has python 3.10 so should not need numpy pinning until 3.10 is 
+# deprecated or unsupported by numpy.
+# 
+# Debian 11 has python 3.9 so should not need numpy pinning until 3.9 is
+# deprecated or unsupported by numpy.
+# 
+# Check for Fedora, Manjaro and openSUSE!
+
+
+#TODO jplephem will install numpy.
+# For 32 bit and/or Ubuntu 20.04 might need to explicitly
+# list numpy and pin to a version.
+
+
 import datetime
 import gettext
 import sys
@@ -51,9 +81,12 @@ gettext.install( "indicatorlunar.tools._build_wheel" )
 from indicatorlunar.src.indicatorlunar.astrobase import AstroBase 
 
 
+IN_BSP = "de442s.bsp"
+HIP_MAIN_DAT = "hip_main.dat" 
+
+
 def _initialise():
     command = "python3 -m pip install --upgrade jplephem python-dateutil skyfield"
-    command = "python3 -m pip install jplephem python-dateutil skyfield" #TODO Remove after testing
     message = ""
     stdout_, stderr_, return_code = (
         utils.python_run(
@@ -64,11 +97,10 @@ def _initialise():
     if stderr_:
         message = stderr_
 
-    if return_code != 0:
-        # Non-zero return code indicating an error.
-        # If stderr is empty, use the return code as the returned message.
-        if not stderr_:
-            message = f"Return code: { return_code }"
+    if return_code != 0 and not stderr_:
+        # Non-zero return code and stderr is empty,
+        # so return the return code.
+        message = f"Return code: { return_code }"
 
     return message
 
@@ -105,28 +137,31 @@ Alternatively to running this script, download a .bsp and use spkmerge:
             up to
                 "today plus the specified years"
 
+Mention that we make the excerpt for 10 years
+Mention that we go back one month from today.
     '''
     message = ""
 
-    #TODO DOcument 
-    in_bsp = "indicatorlunar/src/indicatorlunar/data/de442s.bsp"#TODO Leave as is?  Cannot really be passed in...
-    if Path( in_bsp ).exists():
-        years_from_today = 10 #TODO Add a comment
+    in_bsp = data_path / IN_BSP
+    if in_bsp.exists():
+        years_from_today = 10
 
+        # Must import this here rather than the top.
+        #
+        # If the virtual environment does not have python-dateutil installed
+        # at run-time, the import will fail.
         from dateutil.relativedelta import relativedelta #TODO Comment why this is here.
 
         today = datetime.date.today()
-        start_date = today - relativedelta( months = 1 )  #TODO Explain this
+        start_date = today - relativedelta( months = 1 )
         end_date = today.replace( year = today.year + years_from_today )
         date_format = "%Y/%m/%d"
 
-        planets_bsp = data_path / "planets.bsp"
-
         command = (
-            f"python3 -m jplephem excerpt { start_date.strftime( date_format ) } "
-            f"{ end_date.strftime( date_format ) } { in_bsp } { planets_bsp }" )
-
-        # print( command ) #TODO Test
+            f"python3 -m jplephem excerpt "
+            f"{ start_date.strftime( date_format ) } "
+            f"{ end_date.strftime( date_format ) } "
+            f"{ in_bsp } { data_path / 'planets.bsp' }" )
 
         stdout_, stderr_, return_code = (
             utils.python_run(
@@ -135,7 +170,6 @@ Alternatively to running this script, download a .bsp and use spkmerge:
                 activate_deactivate = False ) )
 
         if stderr_:
-            # print( f"THIS IS STDERR PLANETS: { stderr_ }" )#TODO Test
             message = stderr_
 
         if return_code != 0 and not stderr_:
@@ -167,18 +201,19 @@ def _create_ephemeris_stars(
                     "The output filename for the astroskyfield star ephemeris." },
     
     '''
-    # print( f"Creating stars.dat for astroskyfield..." )
     message = ""
-    hip_main_dat = "indicatorlunar/src/indicatorlunar/data/hip_main.dat" #TODO Comment similarly to de442s.bsp
-    if Path( hip_main_dat ).exists():
+    hip_main_dat = data_path / HIP_MAIN_DAT
+    if hip_main_dat.exists():
 
-        #TODO Comment why these are here and not at top
+        # Must import this here rather than the top.
+        #
+        # If the virtual environment does not have skyfield installed
+        # at run-time, the import will fail.
         from skyfield.api import load
 
-        stars_dat = data_path / "stars.dat"
         hips = [ star[ 1 ] for star in AstroBase.STARS ]
-        with load.open( hip_main_dat, 'r' ) as f_in:
-            with open( stars_dat, 'w' ) as f_out:
+        with load.open( str( hip_main_dat ), 'r' ) as f_in:
+            with open( data_path / "stars.dat", 'w' ) as f_out:
                 for line in f_in:
                     # HIP is located at bytes 9 - 14
                     #    http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
@@ -192,36 +227,6 @@ def _create_ephemeris_stars(
     return message
 
 
-#TODO This will unlikely not work on 32 bit due to numpy et al...
-# so maybe put in a check to not run this script on 32 bit (just pass).
-# But somehow need to let the user know without passing a message back which
-# causes the build to abort.
-
-#TODO This script uses Python3, jplephem and numpy. 
-#
-# Need to verify it works on 32 bit and also Ubuntu 20.04
-# as some pinning of versions may need to be done.
-#
-# https://numpy.org/doc/2.0/release/1.22.0-notes.html
-# For 32 bit on Linux, might need to pin numpy to < 1.22.0
-#
-# https://numpy.org/doc/2.0/release/1.25.0-notes.html
-# For Ubuntu 20.04 et al, pin numpy to < 1.25.0 as < Python 3.9 is unsupported.
-# 
-# Ubuntu 22.04 has python 3.10 so should not need numpy pinning until 3.10 is 
-# deprecated or unsupported by numpy.
-# 
-# Debian 11 has python 3.9 so should not need numpy pinning until 3.9 is
-# deprecated or unsupported by numpy.
-# 
-# Check for Fedora, Manjaro and openSUSE!
-
-
-#TODO jplephem will install numpy.
-# For 32 bit and/or Ubuntu 20.04 might need to explicitly
-# list numpy and pin to a version.
-
-
 def build( out_path ):
     '''
     TODO Finish
@@ -233,32 +238,6 @@ def build( out_path ):
     if not message:
         message = _create_ephemeris_planets( data_path )
         if not message:
-            # print( "build stars!!!!!!!!!!!!!!!!!!!!!!!!!!!!") #TODO Build stars.dat
             message = _create_ephemeris_stars( data_path )
-
-    # command = "python3 -m pip install jplephem python-dateutil skyfield" #TODO replace with below
-    # # command = "python3 -m pip install --upgrade jplephem python-dateutil skyfield"
-    # stdout_, stderr_, return_code = (
-    #     utils.python_run(
-    #         command,
-    #         utils.VENV_BUILD,
-    #         activate_deactivate = False ) )
-    #
-    # if stderr_:
-    #     message = stderr_
-    #
-    # if return_code == 0:
-    #     message = _create_ephemeris_planets( out_path_ )
-    #     if not message:
-    #         print( "build stars!!!!!!!!!!!!!!!!!!!!!!!!!!!!") #TODO Build stars.dat
-    #         message = _create_ephemeris_stars( out_path_ )
-    #     else:
-    #         print( "THERE IS A MESSAFE")
-    #
-    # else:
-    #     # Non-zero return code indicating an error.
-    #     # If stderr is empty, use the return code as the returned message.
-    #     if not stderr_:
-    #         message = f"Return code: { return_code }"
 
     return message
