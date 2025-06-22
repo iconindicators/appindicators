@@ -17,9 +17,10 @@
 
 
 '''
-Called by the build wheel process.
+Called by the build wheel process to create the planets.bsp and stars.dat
+used in astroskyfield.
 
-Creates the planets.bsp and stars.dat used in astroskyfield.
+It is assumed this script is called from within a Python3 virtual environment.
 '''
 
 
@@ -81,11 +82,24 @@ gettext.install( "indicatorlunar.tools._build_wheel" )
 from indicatorlunar.src.indicatorlunar.astrobase import AstroBase 
 
 
+'''
+The source ephemeris for planets (.bsp) and stars (.dat)
+which must be present at
+    indicatorlunar/src/indicatorlunar/data
+
+Sources:
+    bsp:
+        https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
+    
+    hip_main.dat:
+        https://cdsarc.cds.unistra.fr/ftp/cats/I/239/hip_main.dat
+'''
 IN_BSP = "de442s.bsp"
 HIP_MAIN_DAT = "hip_main.dat" 
 
 
 def _initialise():
+    ''' Install dependencies into the Python3 virtual environment. '''
     command = "python3 -m pip install --upgrade jplephem python-dateutil skyfield"
     message = ""
     stdout_, stderr_, return_code = (
@@ -108,37 +122,15 @@ def _initialise():
 def _create_ephemeris_planets(
     data_path ):
     '''
-    TODO NEED ANY OF THIS?
-Create a planet ephemeris for astroskyfield, from today's date,
-ending at a specified number of years from today.
+    Create a planet ephemeris for astroskyfield, from today's date,
+    ending at 10 (ten) years from today.
 
-The start date is wound back one month to take into account the Skyfield
-lunar eclipse algorithm.
+    The start date is wound back one month to take into account the Skyfield
+    lunar eclipse algorithm.
 
-This script essentially wraps up the following command:
-
-    python3 -m jplephem excerpt start_date end_date in_file.bsp out_file.bsp
-
-BSP files:
-    https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
-
-References:
-    https://github.com/skyfielders/python-skyfield/issues/123
-    https://github.com/skyfielders/python-skyfield/issues/531
-    ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
-    ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
-
-Alternatively to running this script, download a .bsp and use spkmerge:
-    https://github.com/skyfielders/python-skyfield/issues/123
-
-
-            Ensure that the existing .bsp contains data from
-                "one month before today"
-            up to
-                "today plus the specified years"
-
-Mention that we make the excerpt for 10 years
-Mention that we go back one month from today.
+    References:
+        https://github.com/skyfielders/python-skyfield/issues/123
+        https://github.com/skyfielders/python-skyfield/issues/531
     '''
     message = ""
 
@@ -185,22 +177,7 @@ Mention that we go back one month from today.
 
 def _create_ephemeris_stars(
     data_path ):
-    '''
-    TODO Need any of this:
-    
-                "iau_catalog_file":
-                    "A text file containing the list of stars, downloaded from " +
-                    "http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt",
-                "star_ephemeris":
-                    "A star ephemeris file, typically hip_main.dat, downloaded from " +
-                    "https://cdsarc.cds.unistra.fr/ftp/cats/I/239",
-                "planet_ephemeris":
-                    "A planet ephemeris file in .bsp format, downloaded from " +
-                    "https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets",
-                "output_filename_for_astroskyfield_star_ephemeris":
-                    "The output filename for the astroskyfield star ephemeris." },
-    
-    '''
+    ''' Create a star ephemeris for astroskyfield. '''
     message = ""
     hip_main_dat = data_path / HIP_MAIN_DAT
     if hip_main_dat.exists():
@@ -229,8 +206,7 @@ def _create_ephemeris_stars(
 
 def build( out_path ):
     '''
-    TODO Finish
-    Creates the 
+    Called during the build wheel process to create planets.bsp and stars.dat
     '''
 #TODO If only releasing pypehem (not skyfield)
 # comment out the code below and just return ""    

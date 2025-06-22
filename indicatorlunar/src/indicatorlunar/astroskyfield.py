@@ -234,58 +234,29 @@ from .astrobase import AstroBase
 class AstroSkyfield( AstroBase ):
     ''' Wrapper frontend to the Skyfield library. '''
 
-#TODO Check this comment after dust has settled.
-    # Planets ephemeris has an effective life span of 10 years from the release
-    # date of the indicator.
+    # Planets ephemeris has an effective life span of 10 (ten) years from the
+    # indicator's release date.
     #
-    # If no release of the indicator, download a .bsp with suitable date range from 
+    # In the event of no updated release of the indicator and so the planets
+    # ephemeris is no longer valid, download a .bsp with suitable date range
     #   https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
-    # blah blah TODO Finish this and tidy up...
-    # ...mention that the start date of the bsp must be at least one month
-    # before today's date.
-# NEED ANY OF THIS?    
-# Create a planet ephemeris for astroskyfield, from today's date,
-# ending at a specified number of years from today.
-#
-# The start date is wound back one month to take into account the Skyfield
-# lunar eclipse algorithm.
-#
-# This script essentially wraps up the following command:
-#
-#     python3 -m jplephem excerpt start_date end_date in_file.bsp out_file.bsp
-#
-# BSP files:
-#     https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
-#
-# References:
-#     https://github.com/skyfielders/python-skyfield/issues/123
-#     https://github.com/skyfielders/python-skyfield/issues/531
-#     ftp://ssd.jpl.nasa.gov/pub/eph/planets/README.txt
-#     ftp://ssd.jpl.nasa.gov/pub/eph/planets/ascii/ascii_format.txt
-#
-# Alternatively to running this script, download a .bsp and use spkmerge:
-#     https://github.com/skyfielders/python-skyfield/issues/123
+    # and create a new planets.bsp
+    #   python3 -m jplephem excerpt start_date end_date in.bsp planets.bsp
+    # ensuring the start date is at least ONE MONTH before today's date.
+    #
+    # You will likely have to create a Python3 virtual environment and
+    # install jplephem first.
+    #
+    # References:
+    #   https://pypi.org/project/jplephem
+    #   https://github.com/skyfielders/python-skyfield/issues/123
+    #   https://github.com/skyfielders/python-skyfield/issues/531
+    #
+    # Alternatively, download a .bsp and use spkmerge
+    #     https://github.com/skyfielders/python-skyfield/issues/123
     _EPHEMERIS_PLANETS = (
         load( str( Path( __file__ ).parent / "data" / "planets.bsp" ) ) )
 
-#TODO Check this comment after dust has settled.
-# https://github.com/brandon-rhodes/pyephem/issues/289
-# Until resolved, leave out Albireo as it is incorrect,
-# and also leave out Albereo because not part of PyEphem.
-# When resolved, add Albereo back in.
-
-# Given the list of PyEphem supported stars
-#   https://github.com/brandon-rhodes/pyephem/blob/master/ephem/stars.py
-# there are duplicates and misspellings which must be kept in support of
-# previous versions.
-#
-# Match these stars against the official names from the IAU Catalog
-#   http://www.pas.rochester.edu/~emamajek/WGSN/IAU-CSN.txt
-# to create the list of stars below, with corresponding HIP, which contains
-# only corrected star names (no duplicates) which correlate to those stars
-# in PyEphem.
-#
-# Omit the star Minkar which appears in PyEphem but not in the IAU.
     ephemeris_stars_path = Path( __file__ ).parent / "data" / "stars.dat"
     with load.open( str( ephemeris_stars_path ) ) as f:
         _EPHEMERIS_STARS = hipparcos.load_dataframe( f )
