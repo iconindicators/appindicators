@@ -210,6 +210,9 @@ def build( out_path ):
     '''
 #TODO If only releasing pypehem (not skyfield)
 # comment out the code below and just return ""    
+#
+# In addition, this will not build on 32 bit, so maybe
+# also do a check for 32 bit and if so, just return ""
     data_path = Path( out_path ) / "data"
 
     message = _initialise()
