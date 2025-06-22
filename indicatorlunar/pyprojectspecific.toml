@@ -6,6 +6,9 @@ version = "1.0.101"
 description = "Application indicator for the home astronomer."
 classifiers = [
   "Topic :: Scientific/Engineering :: Astronomy" ]
+#TODO I think if possible figure out how to use LONG_BIT in the install bash
+# command to determine either to pip install ephem for 32 or skyfield for 64.
+# So likely need to remove ephem from the dependencies below.
 dependencies = [
   "ephem",
   "requests",

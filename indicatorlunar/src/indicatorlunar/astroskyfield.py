@@ -84,6 +84,13 @@
 #TODO Determine if 32 or 64 bit:
 #    getconf LONG_BIT
 # either 32 or 64
+#
+# Check if this works on fedora, manjaro, openSUSE.
+#
+# If this works, then maybe adjust the pip install such that
+# if 64 bit install skyfield and if 32 bit install pyephem.
+#
+# For 64 bit should ALWAYS install BOTH skfield and pyephem?
 
 
 #TODO What happens if the planets.bsp start/end date no longer matches with today's date?

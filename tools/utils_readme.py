@@ -25,6 +25,12 @@ References:
     https://stackoverflow.com/q/60779139/2156453
 '''
 
+#TODO I think need to add in a section for indicatorlunar in the pip install
+# section that only does an ephem install if 
+#   getconf LONG_BIT
+# returns 32
+# or a skyfield install if returns 64.
+
 
 #TODO Will wmctrl be dropped for Wayland only distros?
 
