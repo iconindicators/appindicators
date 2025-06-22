@@ -236,14 +236,14 @@ class AstroBase( ABC ):
     _STARS_INDEX_TAG_TRANSLATION = 3
 
 
-    # The list of PyEphem supported stars
+    # PyEphem provides a list of stars (and ephemeris)
     #   https://github.com/brandon-rhodes/pyephem/blob/master/ephem/stars.py
-    # contains duplicates and misspellings which must be kept in support of
+    # containing duplicates and misspellings, which must be kept in support of
     # previous versions.
     #
-    # Skyfield contains no list of stars.
+    # Skyfield contains no list of stars nor ephemeris.
     #
-    # PyEphem and Skyfield must use the same list of stars.
+    # For user consistency, PyEphem and Skyfield must use the same stars.
     #
     # Several possibilities are available:
     #
