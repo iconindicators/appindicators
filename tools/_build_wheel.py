@@ -849,7 +849,7 @@ def _package_source(
         # Note that any messages written to stdout by the indicator's build
         # script will appear AFTER the messages written by the Python3 build
         # process despite happening BEFORE!
-        indicator_build_script = Path( indicator ) / "tools" / "_build_wheel.py" 
+        indicator_build_script = Path( indicator ) / "tools" / "_build_wheel.py"
         if Path( indicator_build_script ).exists():
             module = f"{ indicator }.tools._build_wheel"
             indicator_build_wheel = importlib.import_module( module )
@@ -862,7 +862,6 @@ def _package_source(
 def build_wheel(
     indicator ):
 
-    print( "_build_wheel ---------------------------------" )#TODO Test
     # message = _check_for_t_o_d_o_s( indicator ) #TODO Uncomment
     message = ""
     if not message:
@@ -871,10 +870,10 @@ def build_wheel(
             utils.RELEASE_DIRECTORY /
             "wheel" /
             ( "dist_" + indicator ) )
-    
+
         if Path( directory_dist ).exists():
             shutil.rmtree( str( directory_dist ) )
-        
+
         directory_dist.mkdir( parents = True )
 
         message = _package_source( directory_dist, indicator )

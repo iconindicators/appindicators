@@ -16,15 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-'''
-Build a Python3 .whl and .tar.gz for one or more indicators.
-
-To view the contents of a .whl:
-   unzip -l indicatortest-1.0.7-py3-none-any.whl
-
-To view the contents of a .tar.gz:
-   tar tf indicatortest-1.0.7.tar.gz
-'''
+''' Run one or more indicators from within the source tree. '''
 
 
 from . import utils
@@ -33,19 +25,20 @@ from . import utils
 if __name__ == "__main__":
     indicators_to_process = (
         utils.get_indicators_to_process(
-            "Build a Python3 wheel for one or more indicators at "
-            f"{ utils.RELEASE_DIRECTORY }.",
-            "build" ) )
+            f"Run one or more indicators from within the source tree.",
+            "install" ) )
 
     for indicator in indicators_to_process:
+#TODO Would be ideal to parse the pyproject.toml dependencies to install requests and sgp4 for lunar...
+# but skyfield/pyephem will not be in the dependences...so now what?
         command = (
-            "python3 -c \"import tools._build_wheel; "
-            f"tools._build_wheel.build_wheel( \\\"{ indicator }\\\" )\"" )
+            "for dirs in indicator*; do if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py $dirs/src/$dirs/indicatorbase.py; fi ; done && "
+            "for dirs in indicator*; do if [ ! -f $dirs/src/$dirs/shared.py ]; then ln -sr indicatorbase/src/indicatorbase/shared.py $dirs/src/$dirs/shared.py; fi ; done && "
+            f"cd { indicator }/src && "
+            f"python3 -m { indicator }.{ indicator }" )
 
         utils.python_run(
             command,
-            utils.VENV_BUILD,
-            "build",
+            utils.VENV_RUN,
             "pip",
-            "polib",
-            "readme_renderer[md]" )
+            utils.get_pygobject() )

@@ -37,12 +37,16 @@ RELEASE_DIRECTORY = "release"
 VENV_BUILD = "venv_build"
 
 
+''' The virtual environment used when running an indicator. '''
+VENV_RUN = "venv_run"
+
+
 ''' The virtual environment into which indicators are installed. '''
 VENV_INSTALL = str( Path.home() / ".local" / "venv_indicators" )
 
 
 def is_debian11_or_debian12():
-    etc_os_release = shared.get_etc_os_release( print_ = True )
+    etc_os_release = shared.get_etc_os_release()
     return (
         'ID=debian' in etc_os_release
         and (
@@ -52,7 +56,7 @@ def is_debian11_or_debian12():
 
 
 def is_ubuntu2004_or_is_ubuntu2204_or_ubuntu2404():
-    etc_os_release = shared.get_etc_os_release( print_ = True )
+    etc_os_release = shared.get_etc_os_release()
 
     is_ubuntu = (
         'ID=ubuntu' in etc_os_release
@@ -139,7 +143,7 @@ def python_run(
 #TODO This originally did not return.
 # For the new code calling indicatorlunar.tools._build_wheel.build()
 # I think the return is needed.
-# So does the return affect anything other callers?    
+# So does the return affect anything other callers?
     return shared.process_run( command_, print_ = True )
 
 
