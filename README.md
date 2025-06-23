@@ -15,7 +15,7 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 - `indicatortide` - [https://pypi.org/project/indicatortide](https://pypi.org/project/indicatortide)
 - `indicatorvirtualbox` - [https://pypi.org/project/indicatorvirtualbox](https://pypi.org/project/indicatorvirtualbox)
 
-Each indicator shares the common code `indicatorbase`.
+Each indicator shares the common code `indicatorbase` and `shared`.
 
 
 ### Build a Wheel
