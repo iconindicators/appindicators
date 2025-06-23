@@ -46,20 +46,19 @@ def get_year_in_changelog_markdown(
     return year
 
 
-def get_etc_os_release(
-    print_ = False ):
+def get_etc_os_release():
     '''
     Return the result of calling
         cat /etc/os-release
     '''
-    return process_run( "cat /etc/os-release", print_ = print_ )[ 0 ]
+    return process_run( "cat /etc/os-release" )[ 0 ]
 
 
 def process_run(
     command,
     capture_output = True,
     print_ = False,
-    logging = None ):  #TODO Handle logging...will (SHOULD) exist for calls from indicators, but not from tools. 
+    logging = None ):  #TODO Handle logging...will (SHOULD) exist for calls from indicators, but not from tools.
     '''
     Executes the command, returning the tuple:
         stdout
