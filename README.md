@@ -42,68 +42,34 @@ The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_in
 Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the introduction above.
 
 
-### Run an Indicator (within the source tree)
+### Run an Indicator (from within the source tree)
 
-To run an indicator within the source tree, the indicator's `.whl` must first be built as above.
+Prerequisite: the indicator's `.whl` must be built as above.
 
-Next, create a symbolic link to `indicatorbase.py` and `shared.py`:
+To run a `indicatortest`:
 
-TODO If we make all of this a script, maybe put the symbolic link stuff in there too?
 ```
-    for dirs in indicator*; do if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py $dirs/src/$dirs/indicatorbase.py; fi ; done;
-    for dirs in indicator*; do if [ ! -f $dirs/src/$dirs/shared.py ]; then ln -sr indicatorbase/src/indicatorbase/shared.py $dirs/src/$dirs/shared.py; fi ; done;
+    python3 -m tools.run_indicator_from_source indicatortest
 ```
 
-which creates a symbolic link to `indicatorbase.py` for all the indicators.  The symbolic links are also required when running under `Geany` and `Eclipse`.
+A virtual environment will be created at `venv_run`. Additional indicators may be appended to the above command.
 
-To run `indicatortest`:
+Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the introduction above.
 
-TODO Perhaps make this into a script...at least then can make use of tools/utils.py
-If a script is written, how to incorporate additional packages for lunar et al to be installed?
-If the script is called for indicatortest as:
-    python3 -m tools.run_indicator_from_source release indicatortest
-So for lunar:
-    python3 -m tools.run_indicator_from_source release indicatorlunar ephem requests sgp4
-
-
-TODO Test on Linux Mint.
-```
-    indicator=indicatortest && \
-    venv=venv_run && \
-    pygobject="PyGObject" && \
-    pygobject_3_50_0="PyGObject<=3.50.0" && \
-    etc_os_release="$(cat /etc/os-release)" && \
-    if [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"12\"')" == "VERSION_ID=\"12\"" ]; then pygobject=$pygobject_3_50_0; fi && \
-    if [ "$(echo "$etc_os_release" | grep 'ID=debian')" == "ID=debian" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"11\"')" == "VERSION_ID=\"11\"" ]; then pygobject=$pygobject_3_50_0; fi && \
-    if [ "$(echo "$etc_os_release" | grep 'ID=ubuntu')" == "ID=ubuntu" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"20.04\"')" == "VERSION_ID=\"20.04\"" ]; then pygobject=$pygobject_3_50_0; fi && \
-    if [ "$(echo "$etc_os_release" | grep 'ID=ubuntu')" == "ID=ubuntu" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"22.04\"')" == "VERSION_ID=\"22.04\"" ]; then pygobject=$pygobject_3_50_0; fi && \
-    if [ "$(echo "$etc_os_release" | grep 'ID=ubuntu')" == "ID=ubuntu" ] && [ "$(echo "$etc_os_release" | grep 'VERSION_ID=\"24.04\"')" == "VERSION_ID=\"24.04\"" ]; then pygobject=$pygobject_3_50_0; fi && \
-    if [ "$(echo "$etc_os_release" | grep 'ID=linuxmint')" == "ID=linuxmint" ] && [ "$(echo "$etc_os_release" | grep 'UBUNTU_CODENAME=focal')" == "UBUNTU_CODENAME=focal" ]; then pygobject=$pygobject_3_50_0; fi && \
-    if [ "$(echo "$etc_os_release" | grep 'ID=linuxmint')" == "ID=linuxmint" ] && [ "$(echo "$etc_os_release" | grep 'UBUNTU_CODENAME=jammy')" == "UBUNTU_CODENAME=jammy" ]; then pygobject=$pygobject_3_50_0; fi && \
-    if [ "$(echo "$etc_os_release" | grep 'ID=linuxmint')" == "ID=linuxmint" ] && [ "$(echo "$etc_os_release" | grep 'UBUNTU_CODENAME=noble')" == "UBUNTU_CODENAME=noble" ]; then pygobject=$pygobject_3_50_0; fi && \
-    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-    . ${venv}/bin/activate && \
-    python3 -m pip install $pygobject && \
-    cd ${indicator}/src && \
-    python3 -m ${indicator}.${indicator} && \
-    deactivate && \
-    cd ../..
-```
-
-A `Python3` virtual environment called `venv_run` will be created, which is also used when running under `Geany` and `Eclipse`.
-
-For `Debian 12`, `Ubuntu 20.04` et al, the version of `PyGObject` is pinned. Subsequent distributions/versions may require similar treatment, depending on whether `libgirepository-2.0-dev` becomes the default/standard.
+As part of running the indicator, a symbolic link to `indicatorbase.py` and `shared.py` is created for all indicators.
 
 If the indicator has not previously been installed to `$HOME/.local/venv_indicators`, the icon and locale will be absent.
 
-Some indicators, such as `indicatorlunar`, require additional packages, specified in the `dependencies` field of the respective indicator's `pyproject.toml`.  Include those additional packages in the `pip install` above.
-
-To remove all the symbolic links to indicatorbase.py created earlier:
+To remove all the symbolic links to `indicatorbase.py` and `shared.py`:
 
 ```
-    for dirs in indicator*; do if [ -L $dirs/src/$dirs/indicatorbase.py ]; then rm $dirs/src/$dirs/indicatorbase.py; fi ; done;
+	for dirs in indicator*; \
+	do if [ -L $dirs/src/$dirs/indicatorbase.py ]; \
+	then rm $dirs/src/$dirs/indicatorbase.py; fi ; done && \
+	for dirs in indicator*; \
+	do if [ -L $dirs/src/$dirs/shared.py ]; \
+	then rm $dirs/src/$dirs/shared.py; fi ; done;
 ```
-
 
 ### Development under Geany
 
@@ -225,8 +191,10 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 
 ### Release to PyPI
 
-TODO Test
-Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
+TODO
+	Test
+	Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
+
 To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
 
 ```
@@ -252,7 +220,9 @@ To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/v
 
 ### Release to TestPyPI
 
-TODO Test
+TODO
+	Test
+	Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
 
 For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`:
 
@@ -269,16 +239,18 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
 
 ### Install from TestPyPI
 
-TODO Test
+TODO
+	Test
 
 To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`,
 first, install the operating system packages listed at the indicator's `PyPI` page listed in the Introduction.
 
 Then install `indicatortest`:
 
-TODO Should I have --upgrade after install?
-See similar note in utils_readme.py
-Should this be put into a script...and combine with install from PyPI but with a switch?
+TODO
+	Should I have --upgrade after install?
+	See similar note in utils_readme.py
+	Should this be put into a script...and combine with install from PyPI but with a switch?
 ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \

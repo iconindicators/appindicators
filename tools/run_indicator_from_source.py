@@ -19,7 +19,23 @@
 ''' Run one or more indicators from within the source tree. '''
 
 
+import sys
+import threading
+
+from itertools import compress
+
 from . import utils
+
+
+indicator_to_dependencies = {
+    "indicatorlunar" :
+        list( compress(
+            [ "ephem", "requests", "sgp4",       "skyfield" ],
+            [  True,      True,     True,   sys.maxsize > 2**32 ] ) ),
+    "indicatorscriptrunner" :
+        [ "requests" ],
+    "indicatortide" :
+        [ "requests" ] }
 
 
 if __name__ == "__main__":
@@ -29,16 +45,22 @@ if __name__ == "__main__":
             "install" ) )
 
     for indicator in indicators_to_process:
-#TODO Would be ideal to parse the pyproject.toml dependencies to install requests and sgp4 for lunar...
-# but skyfield/pyephem will not be in the dependences...so now what?
         command = (
-            "for dirs in indicator*; do if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py $dirs/src/$dirs/indicatorbase.py; fi ; done && "
-            "for dirs in indicator*; do if [ ! -f $dirs/src/$dirs/shared.py ]; then ln -sr indicatorbase/src/indicatorbase/shared.py $dirs/src/$dirs/shared.py; fi ; done && "
+            "for dirs in indicator*; "
+            "do if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; "
+            "then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py "
+            "$dirs/src/$dirs/indicatorbase.py; fi ; done && "
+            "for dirs in indicator*; "
+            "do if [ ! -f $dirs/src/$dirs/shared.py ]; "
+            "then ln -sr indicatorbase/src/indicatorbase/shared.py "
+            "$dirs/src/$dirs/shared.py; fi ; done && "
             f"cd { indicator }/src && "
             f"python3 -m { indicator }.{ indicator }" )
 
-        utils.python_run(
-            command,
-            utils.VENV_RUN,
-            "pip",
-            utils.get_pygobject() )
+        dependencies = [ "pip", f"{ utils.get_pygobject() }" ]
+        if indicator in indicator_to_dependencies:
+            dependencies += indicator_to_dependencies[ indicator ]
+
+        threading.Thread(
+            target = utils.python_run,
+            args = ( command, utils.VENV_RUN, *dependencies ) ).start()
