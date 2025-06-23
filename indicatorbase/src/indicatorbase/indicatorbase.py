@@ -694,82 +694,10 @@ class IndicatorBase( ABC ):
         next_update_in_seconds = self.update( menu )
 
         if self.is_debug():
-            menu_has_children = len( menu.get_children() ) > 0
-
-            menu.prepend( Gtk.SeparatorMenuItem() )
-
-            if next_update_in_seconds:
-                delta = datetime.timedelta( seconds = next_update_in_seconds )
-                next_update_date_time = datetime.datetime.now() + delta
-                label = (
-                    "Next update: " +
-                    str( next_update_date_time ).split( '.', maxsplit = 1 )[ 0 ] )
-
-                menu.prepend( Gtk.MenuItem.new_with_label( label ) )
-
-            label = "Time to update: "
-            time_to_update = ( datetime.datetime.now() - update_start )
-
-
-#            print( time_to_update )
-#            print( time_to_update.seconds )
-
-            '''
-            if time_to_update.seconds == 0:
-                label += f"{ time_to_update.microseconds } microseconds"
-
-            else:
-                if time_to_update.seconds > 3600:
-                    print( "hours" )
-
-                else:
-                    if time_to_update.seconds > 60:
-                        minutes = int( time_to_update.seconds / 60 )
-                        seconds =
-                        label += f"{ int( time_to_update.seconds } minutes, "
-                        label += f"{ int( time_to_update.seconds } minutes, "
-                        label += f"{ time_to_update.seconds } seconds"
-
-                    else:
-                        label += f"{ time_to_update.seconds } seconds"
-
-            '''
-
-            def x( time_to_update ):
-                print( time_to_update )
-                minutes, seconds = divmod( time_to_update.seconds, 60 )
-                hours, minutes = divmod( minutes, 60 )
-                milliseconds = round( time_to_update.microseconds / 1000, 0 )
-                label = ""
-                if hours > 0:
-                    label += f"{ hours } hours, "
-
-                if minutes > 0:
-                    label += f"{ minutes } minutes, "
-
-                if seconds > 0:
-                    label += f"{ seconds } seconds"
-
-                if milliseconds > 0 and not label:
-                    label += f"{ int( milliseconds ) } milliseconds"
-
-                if not label:
-                    label += f"{ time_to_update.microseconds } microseconds"
-
-                print( label )
-                print()
-
-            time_to_update = datetime.timedelta( hours = 5, minutes = 10, seconds = 30 )
-            x( datetime.timedelta( hours = 11, minutes = 22, seconds = 33, milliseconds = 44, microseconds = 55 ) )
-            x( datetime.timedelta( minutes = 22, seconds = 33, milliseconds = 44, microseconds = 55 ) )
-            x( datetime.timedelta( seconds = 33, milliseconds = 44, microseconds = 55 ) )
-            x( datetime.timedelta( milliseconds = 44, microseconds = 55 ) )
-            x( datetime.timedelta( microseconds = 55 ) )
-
-            menu.prepend( Gtk.MenuItem.new_with_label( label ) )
-
-            if menu_has_children:
-                menu.append( Gtk.SeparatorMenuItem() )
+            self._add_debug_information_to_menu(
+            menu,
+            update_start,
+            next_update_in_seconds )
 
         else:
             if len( menu.get_children() ) > 0:
@@ -795,6 +723,52 @@ class IndicatorBase( ABC ):
             self.request_update( next_update_in_seconds )
 
         return False
+
+
+    def _add_debug_information_to_menu(
+        self,
+        menu,
+        update_start,
+        next_update_in_seconds ):
+
+        menu_has_children = len( menu.get_children() ) > 0
+
+        menu.prepend( Gtk.SeparatorMenuItem() )
+
+        if next_update_in_seconds:
+            delta = datetime.timedelta( seconds = next_update_in_seconds )
+            next_update_date_time = datetime.datetime.now() + delta
+            label = (
+                "Next update:  " +
+                str( next_update_date_time ).split( '.', maxsplit = 1 )[ 0 ] )
+
+            menu.prepend( Gtk.MenuItem.new_with_label( label ) )
+
+        time_to_update = ( datetime.datetime.now() - update_start )
+        minutes, seconds = divmod( time_to_update.seconds, 60 )
+        hours, minutes = divmod( minutes, 60 )
+        milliseconds = round( time_to_update.microseconds / 1000, 0 )
+        label = ""
+        if hours > 0:
+            label += f"{ hours } hours, "
+
+        if minutes > 0:
+            label += f"{ minutes } minutes, "
+
+        if seconds > 0:
+            label += f"{ seconds } seconds"
+
+        if milliseconds > 0 and not label:
+            label += f"{ int( milliseconds ) } milliseconds"
+
+        if not label:
+            label += f"{ time_to_update.microseconds } microseconds"
+
+        menu.prepend(
+            Gtk.MenuItem.new_with_label( "Time to update:  " + label ) )
+
+        if menu_has_children:
+            menu.append( Gtk.SeparatorMenuItem() )
 
 
     def set_label_or_tooltip(
