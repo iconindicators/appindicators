@@ -1,13 +1,11 @@
-exclude src/indicatorlunar/astroskyfield.py
-exclude src/indicatorlunar/meteorshowertest.py
-
-#TODO If astroskyfield is to be released,
-# remove the exclude on astroskyfield.py above and
-# uncomment the below include for planets.bsp / stars.dat and
-# place at the top of this file:
-#
+#TODO If astroskyfield is to be released:
+#   Remove the "exclude src/indicatorlunar/astroskyfield.py"
+#   Uncomment the includes for planets.bsp / stars.dat 
 #include src/indicatorlunar/data/planets.bsp
 #include src/indicatorlunar/data/stars.dat
+
+exclude src/indicatorlunar/astroskyfield.py
+exclude src/indicatorlunar/meteorshowertest.py
 
 # The following warnings appear during the build which can be ignored.
 # https://github.com/pypa/setuptools/discussions/4905

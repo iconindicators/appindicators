@@ -205,20 +205,28 @@ def _create_ephemeris_stars(
 
 
 def build( out_path ):
-    '''
-    Called during the build wheel process to create planets.bsp and stars.dat
-    '''
-#TODO If only releasing pypehem (not skyfield)
-# comment out the code below and just return ""    
-#
-# In addition, this will not build on 32 bit, so maybe
-# also do a check for 32 bit and if so, just return ""
-    data_path = Path( out_path ) / "data"
+    ''' Called by the build wheel process. '''
+    if True: return "" #TODO Remove this line if including astroskyfield et al.
+    
+    message = ""
 
-    message = _initialise()
-    if not message:
-        message = _create_ephemeris_planets( data_path )
+    # On 32 bit, numpy, used by skyfield and jplephem to create stars.dat and
+    # planets.bsp respectively, will not install, so skip.
+    #
+    # https://stackoverflow.com/a/9964440/2156453
+    # https://docs.python.org/3/library/platform.html#cross-platform
+    # https://docs.python.org/3/library/sys.html#sys.maxsize
+    if sys.maxsize > 2**32:
+        data_path = Path( out_path ) / "data"
+        message = _initialise()
         if not message:
-            message = _create_ephemeris_stars( data_path )
+            message = _create_ephemeris_planets( data_path )
+            if not message:
+                message = _create_ephemeris_stars( data_path )
+
+    else:
+        print(
+            "WARNING: THIS IS A 32 BIT OPERATING SYSTEM,\n"
+            "NEITHER PLANETS.BSP NOR STARS.DAT HAVE BEEN BUILT!" )
 
     return message
