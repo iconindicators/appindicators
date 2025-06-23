@@ -24,6 +24,18 @@
 # AS THOSE ARE NOW UP TO DATE.
 
 
+#TODO Not sure how/when astroskyfield will be included/released.
+#
+# However...
+# Skyfield does not seem to work on 32 bit, so must keep PyEphem.
+# Skyfield still runs slower than PyEphem (for example 6 seconds to do a full
+# update with comets and minor planets enabled, versus 2 seconds on PyEphem). 
+#
+# Perhaps install PyEphem if the OS is 32 bit and both if OS is 64 bit.
+# On 32 bit, always run PyEphem; on 64 bit give the user a choice.
+# On 64 bit, what should be the default: Skyfield or PyEphem?
+
+
 #TODO Do NOT include the tools/scripts in the release.
 
 
@@ -82,12 +94,17 @@
 
 
 #TODO Determine if 32 or 64 bit:
-#    getconf LONG_BIT
-# either 32 or 64
+# is_64=$(grep -q 'flags.*_lm.*' /proc/cpuinfo ; echo $?) ; echo $is_64
 #
-# Check if this works on fedora, manjaro, openSUSE.
+# Returns 0 on 64 bit (as 0 is exit code from grep when successfully finding result)
 #
-# If this works, then maybe adjust the pip install such that
+# Returns 1 on 32 bit (exit code for when NOT finding)
+#
+# https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/arch/x86/include/asm/cpufeatures.h
+#
+# Works on fedora, manjaro, openSUSE.
+#
+# Maybe adjust the pip install such that
 # if 64 bit install skyfield and if 32 bit install pyephem.
 #
 # For 64 bit should ALWAYS install BOTH skfield and pyephem?
