@@ -13,5 +13,6 @@ classifiers = [
 # line to include PyEphem or both PyEphem and Skyfield.
 dependencies = [
   "ephem",
-  "requests",
-  "sgp4" ]
+  "requests",  #TODO Why/where is requests used?  Is there a standard library equivalent?
+  "sgp4" ]  #TODO This has cpp code; ensure this installs on 32 bit, as it is
+            # needed in the satellite stuff irrespective of pyephem or skyfield.

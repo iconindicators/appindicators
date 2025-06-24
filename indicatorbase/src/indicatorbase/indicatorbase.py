@@ -1088,6 +1088,8 @@ class IndicatorBase( ABC ):
                 self.is_session_type_wayland()
                 and
                 "UBUNTU_CODENAME=focal" not in shared.get_etc_os_release() ) )
+#TODO Check Linux Mint if it contains "UBUNTU_CODENAME" to ensure the above works
+# for any Ubuntu 20.04 derivative (although they all should now be EOL).
 
 
     def copy_to_clipboard_or_primary(
