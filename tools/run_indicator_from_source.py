@@ -46,14 +46,14 @@ if __name__ == "__main__":
 
     for indicator in indicators_to_process:
         command = (
-            "for dirs in indicator*; "
-            "do if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; "
+            "for dirs in indicator*; do "
+            "if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; "
             "then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py "
-            "$dirs/src/$dirs/indicatorbase.py; fi ; done && "
-            "for dirs in indicator*; "
-            "do if [ ! -f $dirs/src/$dirs/shared.py ]; "
+            "$dirs/src/$dirs/indicatorbase.py; fi ; "
+            "if [ ! -f $dirs/src/$dirs/shared.py ]; "
             "then ln -sr indicatorbase/src/indicatorbase/shared.py "
-            "$dirs/src/$dirs/shared.py; fi ; done && "
+            "$dirs/src/$dirs/shared.py; fi ; "
+            "done && "
             f"cd { indicator }/src && "
             f"python3 -m { indicator }.{ indicator }" )
 
