@@ -25,12 +25,30 @@
 # https://snapcraft.io/docs
 # https://forum.snapcraft.io/t/snap-store-api/14156
 # https://api.snapcraft.io/docs/info.html
-# 
-# https://docs.appimage.org/contact.html
-# https://docs.appimage.org/api/libappimage/api/library_root.html
+# https://forum.snapcraft.io/t/how-to-get-the-total-downloads-of-my-snap/29779/7
+'''
+import os
+import json
+
+
+
+if __name__ == "__main__":
+    stream = os.popen('snapcraft metrics <SNAP_NAME> --name daily_device_change --format=json --start <DATE_WHEN_THE_SNAP_RELEASED>')
+    output = stream.read()
+    metric = json.loads(output)
+    for i in metric["series"]:
+        if("name" in i and i["name"] == "new"):
+            values = [int(value) for value in i["values"] if value != None]
+            print(sum(values))
+'''
+# https://forum.snapcraft.io/t/snapcraft-metrics/25732
+# https://api.snapcraft.io/docs/metrics.html
+# https://documentation.ubuntu.com/snapcraft/latest/how-to/publishing/get-snap-metrics/
 # 
 # https://docs.flatpak.org/en/latest/portal-api-reference.html
 # https://docs.flatpak.org/en/latest/libflatpak-api-reference.html
+# https://github.com/flathub/flathub/issues/177
+# https://ahayzen.com/direct/flathub.html
 
 
 import concurrent.futures
