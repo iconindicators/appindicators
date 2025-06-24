@@ -28,6 +28,8 @@ if "../" not in sys.path:
     sys.path.insert( 0, "../" )
 
 from indicatorbase.src.indicatorbase import shared
+#TODO Why is it I cannot import IndicatorBase?
+# What is the error?  Is it _ or something else like a bunch of imports?
 
 
 ''' The directory of a .whl release. '''

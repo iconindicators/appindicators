@@ -26,9 +26,9 @@ import datetime
 
 from enum import auto, IntEnum
 
-import requests
+import requests  #TODO Does this need to be installed via pip?  Can't "from urllib.request import urlopen" be used?
 
-from requests.exceptions import RequestException
+from requests.exceptions import RequestException  #TODO Does this need to be installed via pip?  Can't "from urllib.request import urlopen" be used?
 
 from .dataprovider import DataProvider
 from .indicatorbase import IndicatorBase

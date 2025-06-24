@@ -60,7 +60,7 @@ class TideDataGetterBase( ABC ):
         Do not include @abstractmethod at the top of your own function!
 
         To install other packages, such as 'requests':
-
+#TODO Does this need to be installed via pip?  Can't "from urllib.request import urlopen" be used?
             . $HOME/.local/venv_indicators/bin/activate && python3 -m pip install --upgrade requests
         '''
         raise NotImplementedError()

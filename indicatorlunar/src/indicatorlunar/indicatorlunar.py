@@ -32,7 +32,7 @@ import webbrowser
 from urllib.error import URLError
 
 import gi
-import requests
+import requests  #TODO Does this need to be installed via pip?  Can't "from urllib.request import urlopen" be used?
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
