@@ -18,7 +18,7 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 Each indicator shares the common code `indicatorbase` and `shared`.
 
 
-### Build a Wheel
+### Build an Indicator's Wheel
 
 To build a wheel for `indicatortest` from the root of the source tree:
 
@@ -31,7 +31,9 @@ which creates a virtual environment `venv_build`, updates locale files `.pot` / 
 Additional indicators may be appended to the above command.
 
 
-### Install a Wheel
+### Install an Indicator's Wheel
+
+Prerequisite: the indicator's `.whl` must be built.
 
 To install a `.whl` for `indicatortest` located in `release/wheel/dist_indicatortest`:
 
@@ -48,7 +50,7 @@ Various operating system packages will likely need to be installed; refer to the
 
 ### Run an Indicator (from within the source tree)
 
-Prerequisite: the indicator's `.whl` must be built as above.
+Prerequisite: the indicator's `.whl` must be built.
 
 To run a `indicatortest`:
 
@@ -56,7 +58,7 @@ To run a `indicatortest`:
     python3 -m tools.run_indicator_from_source indicatortest
 ```
 
-A virtual environment will be created at `venv_run`. 
+A virtual environment will be created at `venv_run`.
 
 Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the introduction above.
 
@@ -67,20 +69,20 @@ If the indicator has not previously been installed to `$HOME/.local/venv_indicat
 As part of running the indicator, a symbolic link to `indicatorbase.py` and `shared.py` is created for all indicators.  To remove all the symbolic links to `indicatorbase.py` and `shared.py`:
 
 ```
-TODO Can this be done in one for loop???
-	for dirs in indicator*; \
-	do if [ -L $dirs/src/$dirs/indicatorbase.py ]; \
-	then rm $dirs/src/$dirs/indicatorbase.py; fi ; done && \
-	for dirs in indicator*; \
-	do if [ -L $dirs/src/$dirs/shared.py ]; \
-	then rm $dirs/src/$dirs/shared.py; fi ; done;
+    for dirs in indicator*; do \
+    if [ -L $dirs/src/$dirs/indicatorbase.py ]; \
+    then rm $dirs/src/$dirs/indicatorbase.py; fi ; \
+    if [ -L $dirs/src/$dirs/shared.py ]; \
+    then rm $dirs/src/$dirs/shared.py; fi ; \
+    done;
 ```
+
 
 ### Development under Geany
 
 #### Geany Setup
 
-Ensure `indicatortest` runs in a terminal within the source tree as per the earlier section and `venv_run` exists.
+Prerequisite: the indicator's `.whl` must be built and run within the source tree.
 
 Run `Geany`:
 
@@ -114,7 +116,7 @@ References:
 
 #### Eclipse Setup
 
-Ensure `indicatortest` runs in a terminal within the source tree as per the earlier section and `venv_run` exists.
+Prerequisite: the indicator's `.whl` must be built and run within the source tree.
 
 Run `Eclipse` and install [Liclipse](https://www.liclipse.com/) via the update site.
 
@@ -183,6 +185,8 @@ References:
 
 ### Run an Installed Indicator
 
+Prerequisite: the indicator's `.whl` must be built and installed.
+
 To run an indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
 
 To run from a terminal (to observe any messages/errors) from any directory:
@@ -197,8 +201,8 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 ### Release to PyPI
 
 TODO
-	Test
-	Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
+    Test
+    Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
 
 To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
 
@@ -226,8 +230,8 @@ To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/v
 ### Release to TestPyPI
 
 TODO
-	Test
-	Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
+    Test
+    Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
 
 For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`:
 
@@ -245,7 +249,7 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
 ### Install from TestPyPI
 
 TODO
-	Test
+    Test
 
 To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`,
 first, install the operating system packages listed at the indicator's `PyPI` page listed in the Introduction.
@@ -253,9 +257,9 @@ first, install the operating system packages listed at the indicator's `PyPI` pa
 Then install `indicatortest`:
 
 TODO
-	Should I have --upgrade after install?
-	See similar note in utils_readme.py
-	Should this be put into a script...and combine with install from PyPI but with a switch?
+    Should I have --upgrade after install?
+    See similar note in utils_readme.py
+    Should this be put into a script...and combine with install from PyPI but with a switch?
 ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
