@@ -26,7 +26,9 @@ To build a wheel for `indicatortest` from the root of the source tree:
     python3 -m tools.build_wheel indicatortest
 ```
 
-which creates a virtual environment `venv_build`, updates locale files `.pot` / `.po` and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`. Additional indicators may be appended to the above command.
+which creates a virtual environment `venv_build`, updates locale files `.pot` / `.po` and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`.
+
+Additional indicators may be appended to the above command.
 
 
 ### Install a Wheel
@@ -37,7 +39,9 @@ To install a `.whl` for `indicatortest` located in `release/wheel/dist_indicator
     python3 -m tools.install_wheel indicatortest
 ```
 
-The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_indicators`. Additional indicators may be appended to the above command.
+The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_indicators`.
+
+Additional indicators may be appended to the above command.
 
 Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the introduction above.
 
@@ -52,17 +56,18 @@ To run a `indicatortest`:
     python3 -m tools.run_indicator_from_source indicatortest
 ```
 
-A virtual environment will be created at `venv_run`. Additional indicators may be appended to the above command.
+A virtual environment will be created at `venv_run`. 
 
 Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the introduction above.
 
-As part of running the indicator, a symbolic link to `indicatorbase.py` and `shared.py` is created for all indicators.
+Additional indicators may be appended to the above command.
 
 If the indicator has not previously been installed to `$HOME/.local/venv_indicators`, the icon and locale will be absent.
 
-To remove all the symbolic links to `indicatorbase.py` and `shared.py`:
+As part of running the indicator, a symbolic link to `indicatorbase.py` and `shared.py` is created for all indicators.  To remove all the symbolic links to `indicatorbase.py` and `shared.py`:
 
 ```
+TODO Can this be done in one for loop???
 	for dirs in indicator*; \
 	do if [ -L $dirs/src/$dirs/indicatorbase.py ]; \
 	then rm $dirs/src/$dirs/indicatorbase.py; fi ; done && \
