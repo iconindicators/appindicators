@@ -29,10 +29,7 @@ import math
 import re
 import webbrowser
 
-from urllib.error import URLError
-
 import gi
-import requests  #TODO Does this need to be installed via pip?  Can't "from urllib.request import urlopen" be used?
 
 gi.require_version( "Gtk", "3.0" )
 from gi.repository import Gtk
@@ -1219,45 +1216,13 @@ class IndicatorLunar( IndicatorBase ):
         def comet_on_click_function(
             menuitem ):
 
-#TODO Can this below replace the further below?
-# https://stackoverflow.com/questions/12965203/how-to-get-json-from-webpage-into-python-script
-# https://docs.python.org/3/library/urllib.request.html
-# https://docs.python.org/3.8/howto/urllib2.html
-            try:
-                import urllib.request, json 
-                import urllib.error
-                with (
-                    urllib.request.urlopen(
-                        menuitem.get_name(),
-                        timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) ) as url:
+            json_, error_network, error_timeout = (
+                self.get_json( menuitem.get_name() ) )
 
-                    webbrowser.open(
-                        f"{ IndicatorLunar.SEARCH_URL_COMET_ID }"
-                        f"{ str( json.load( url )[ 'object' ][ 'id' ] ) }" )
-            
-            except urllib.error.URLError as e:
-                #TODO Handle
-                if hasattr( e, "reason" ):
-                    print('We failed to reach a server.')
-                    print('Reason: ', e.reason )
-                elif hasattr( e, "code" ):
-                    print('The server couldn\'t fulfill the request.')
-                    print('Error code: ', e.code )
-
-            # try:
-            #     response = (
-            #         requests.get(
-            #             menuitem.get_name(),
-            #             timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) )
-            #
-            #     object_id = str( response.json()[ "object" ][ "id" ] )
-            #     print( object_id )#TODO Test
-            #
-            #     webbrowser.open(
-            #         IndicatorLunar.SEARCH_URL_COMET_ID + object_id )
-            #
-            # except URLError:
-            #     pass
+            if json_:
+                webbrowser.open(
+                    f"{ IndicatorLunar.SEARCH_URL_COMET_ID }"
+                    f"{ str( json_[ 'object' ][ 'id' ] ) }" )
 
 
         def get_on_click_function():
