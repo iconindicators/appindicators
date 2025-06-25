@@ -26,10 +26,6 @@ import datetime
 
 from enum import auto, IntEnum
 
-import requests  #TODO Does this need to be installed via pip?  Can't "from urllib.request import urlopen" be used?
-
-from requests.exceptions import RequestException  #TODO Does this need to be installed via pip?  Can't "from urllib.request import urlopen" be used?
-
 from .dataprovider import DataProvider
 from .indicatorbase import IndicatorBase
 
@@ -134,11 +130,12 @@ class DataProviderOrbitalElement( DataProvider ):
             '''
 
         url = "https://astorbdb.lowell.edu/v1/graphql"
-        json = { "query": query, "variables": variables }
-        try:
-            response = requests.post( url, None, json, timeout = 5 )
-            data = response.json()
-            minor_planets = data[ "data" ][ "query_closest_orbelements" ]
+        data = { "query": query, "variables": variables }
+        json_, error_network, error_timeout = (
+            IndicatorBase.get_json_static( url, data = data ) )
+
+        if json_:
+            minor_planets = json_[ "data" ][ "query_closest_orbelements" ]
 
             with open( filename, 'w', encoding = "utf-8" ) as f:
                 for minor_planet in minor_planets:
@@ -270,12 +267,9 @@ class DataProviderOrbitalElement( DataProvider ):
 
             downloaded = True
 
-        except RequestException as e:
+        else:
             downloaded = False
-            logging.error(
-                f"Error retrieving orbital element data from { str( url ) }" )
-
-            logging.exception( e )
+            logging.error( "Unable to retrieve orbital element data " )
 
         return downloaded
 

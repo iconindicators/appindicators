@@ -59,10 +59,6 @@ class TideDataGetterBase( ABC ):
 
         Do not include @abstractmethod at the top of your own function!
 
-TODO Does this need to be installed via pip?  Can't "from urllib.request import urlopen" be used?
-Need to make this change in getTideDataFromBOM.py
-Even if I make the change for my code, maybe leave the comment below in for other users.
-Where else is requests mentioned for end user code?  Script runner?  Maybe leave the comment there too. 
         To install other packages, such as 'requests':
             . $HOME/.local/venv_indicators/bin/activate && python3 -m pip install --upgrade requests
         '''

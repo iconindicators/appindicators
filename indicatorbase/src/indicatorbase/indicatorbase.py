@@ -60,6 +60,7 @@ from importlib import metadata
 from pathlib import Path, PosixPath
 from threading import Lock
 from urllib.error import HTTPError, URLError
+from urllib.parse import urlencode
 from urllib.request import urlopen
 from zipfile import ZipFile
 
@@ -311,6 +312,7 @@ class IndicatorBase( ABC ):
                 self.show_notification( summary, message )
 
 
+#TODO See who uses this and if it can be swapped out for the static version which has a post/data parameter.
     def get_json(
         self,
         url ):
@@ -331,7 +333,7 @@ class IndicatorBase( ABC ):
         error_timeout = False
         try:
             with urlopen( url, timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) as f:
-                json_ = json.loads( f.read().decode( "utf8" ) )
+                json_ = json.loads( f.read().decode( "utf8" ) )  #TODO I think this should be utf-8
 
         except ( HTTPError, URLError ) as e:
             if isinstance( e.reason, socket.timeout ):
@@ -339,6 +341,61 @@ class IndicatorBase( ABC ):
             else:
                 error_network = True
 
+            self.get_logging().error( f"Problem with { url }" )
+            self.get_logging().exception( e )
+            json_ = None
+
+        except socket.timeout as e:
+            error_timeout = True
+            self.get_logging().error( f"Problem with { url }" )
+            self.get_logging().exception( e )
+            json_ = None
+
+        return json_, error_network, error_timeout
+
+
+    @staticmethod
+    def get_json_static(
+        url,
+        data = None ):
+        '''
+        Retrieves the JSON content from a URL.
+
+        If data is not None, this request is treated as a POST.
+
+        On success, returns a tuple of the JSON and two booleans set to false.
+
+        On exception (timeout, network error) returns a tuple with None for the
+        JSON followed by two booleans, one of which will be set to True.
+        The first boolean indicates a network error and the second boolean
+        indicates a timeout.
+
+        https://stackoverflow.com/q/72388829/2156453
+        https://stackoverflow.com/q/8763451/2156453
+        '''
+        error_network = False
+        error_timeout = False
+        try:
+            if data:
+                data_ = json.dumps( data ).encode( "utf-8" ) # Convert to bytes.
+
+            with (
+                urlopen(
+                    url,
+                    data = data_, 
+                    timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) ) as f:
+
+                json_ = json.loads( f.read().decode( "utf-8" ) )
+
+        except ( HTTPError, URLError ) as e:
+            if isinstance( e.reason, socket.timeout ):
+                error_timeout = True
+
+            else:
+                error_network = True
+
+#TODO As this is static (or maybe don't need to make static)
+# need to pass in the logging.
             self.get_logging().error( f"Problem with { url }" )
             self.get_logging().exception( e )
             json_ = None
@@ -646,7 +703,7 @@ class IndicatorBase( ABC ):
 
                 or
 
-                An indicator experiences and event and requests an update.
+                An indicator experiences an event and requests an update.
                 For example, starting a virtual machine will request an update
                 to refresh the menu.
 

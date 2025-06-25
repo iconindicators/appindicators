@@ -87,7 +87,6 @@
 
 #TODO
 # Is there a need to pin
-#    requests
 #    sgp4
 #
 # Neither seem to have any issue but test on Debian 32 bit!
@@ -199,13 +198,11 @@
 # In pyprojectspecific.toml, replace
 #     dependencies = [
 #       "ephem",
-#       "requests",
 #       "sgp4" ]
 # with
 #     dependencies = [
 #       "numpy",
 #       "pandas",    # Needed for mpc (and I think loading stars/planets).
-#       "requests",
 #       "sgp4",
 #       "skyfield" ]
 #

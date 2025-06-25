@@ -30,12 +30,12 @@ from . import utils
 indicator_to_dependencies = {
     "indicatorlunar" :
         list( compress(
-            [ "ephem", "requests", "sgp4",       "skyfield" ],
-            [  True,      True,     True,   sys.maxsize > 2**32 ] ) ),
+            [ "ephem", "sgp4",       "skyfield" ],
+            [  True,    True,   sys.maxsize > 2**32 ] ) ),
     "indicatorscriptrunner" :
-        [ "requests" ],
+        [ "requests" ], #TODO See what script/command I have that uses requests.  Can I swap for urllib?
     "indicatortide" :
-        [ "requests" ] }
+        [ "requests" ] } #TODO Can I swap for urllib in getTideDataFromBOM.py?
 
 
 if __name__ == "__main__":

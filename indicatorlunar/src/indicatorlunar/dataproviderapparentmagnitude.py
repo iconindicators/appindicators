@@ -24,11 +24,8 @@ comets and minor planets.
 
 import datetime
 
-import requests  #TODO Does this need to be installed via pip?  Can't "from urllib.request import urlopen" be used?
-
-from requests.exceptions import RequestException  #TODO Does this need to be installed via pip?  Can't "from urllib.request import urlopen" be used?
-
 from .dataprovider import DataProvider
+from .indicatorbase import IndicatorBase
 
 
 class DataProviderApparentMagnitude( DataProvider ):
@@ -109,11 +106,12 @@ class DataProviderApparentMagnitude( DataProvider ):
             '''
 
         url = "https://astorbdb.lowell.edu/v1/graphql"
-        json = { "query": query, "variables": variables }
-        try:
-            response = requests.post( url, None, json, timeout = 5 )
-            data = response.json()
-            minor_planets = data[ "data" ][ "minorplanet" ]
+        data = { "query": query, "variables": variables }
+        json_, error_network, error_timeout = (
+            IndicatorBase.get_json_static( url, data = data ) )
+
+        if json_:
+            minor_planets = json_[ "data" ][ "minorplanet" ]
 
             with open( filename, 'w', encoding = "utf-8" ) as f:
                 for minor_planet in minor_planets:
@@ -140,12 +138,9 @@ class DataProviderApparentMagnitude( DataProvider ):
 
             downloaded = True
 
-        except RequestException as e:
+        else:
             downloaded = False
-            logging.error(
-                f"Error retrieving apparent magnitude data from { str( url ) }" )
-
-            logging.exception( e )
+            logging.error( "Unable to retrieve apparent magnitude data " )
 
         return downloaded
 
