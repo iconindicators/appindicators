@@ -1225,27 +1225,39 @@ class IndicatorLunar( IndicatorBase ):
 # https://docs.python.org/3.8/howto/urllib2.html
             try:
                 import urllib.request, json 
-                with urllib.request.urlopen( menuitem.get_name() ) as url:
-                    data = json.load( url )
-                    print( data[ "object" ][ "id" ] )
-            except Exception as e:
-                print( e )
-
-
-            try:
-                response = (
-                    requests.get(
+                import urllib.error
+                with (
+                    urllib.request.urlopen(
                         menuitem.get_name(),
-                        timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) )
+                        timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) ) as url:
 
-                object_id = str( response.json()[ "object" ][ "id" ] )
-                print( object_id )#TODO Test
+                    webbrowser.open(
+                        f"{ IndicatorLunar.SEARCH_URL_COMET_ID }"
+                        f"{ str( json.load( url )[ 'object' ][ 'id' ] ) }" )
+            
+            except urllib.error.URLError as e:
+                #TODO Handle
+                if hasattr( e, "reason" ):
+                    print('We failed to reach a server.')
+                    print('Reason: ', e.reason )
+                elif hasattr( e, "code" ):
+                    print('The server couldn\'t fulfill the request.')
+                    print('Error code: ', e.code )
 
-                webbrowser.open(
-                    IndicatorLunar.SEARCH_URL_COMET_ID + object_id )
-
-            except URLError:
-                pass
+            # try:
+            #     response = (
+            #         requests.get(
+            #             menuitem.get_name(),
+            #             timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) )
+            #
+            #     object_id = str( response.json()[ "object" ][ "id" ] )
+            #     print( object_id )#TODO Test
+            #
+            #     webbrowser.open(
+            #         IndicatorLunar.SEARCH_URL_COMET_ID + object_id )
+            #
+            # except URLError:
+            #     pass
 
 
         def get_on_click_function():
