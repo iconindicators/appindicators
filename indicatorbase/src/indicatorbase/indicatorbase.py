@@ -357,7 +357,8 @@ class IndicatorBase( ABC ):
     @staticmethod
     def get_json_static(
         url,
-        data = None ):
+        data = None,
+        logging = None ):
         '''
         Retrieves the JSON content from a URL.
 
@@ -376,6 +377,7 @@ class IndicatorBase( ABC ):
         error_network = False
         error_timeout = False
         try:
+            data_ = data
             if data:
                 data_ = json.dumps( data ).encode( "utf-8" ) # Convert to bytes.
 
@@ -394,17 +396,22 @@ class IndicatorBase( ABC ):
             else:
                 error_network = True
 
-#TODO As this is static (or maybe don't need to make static)
-# need to pass in the logging.
-            self.get_logging().error( f"Problem with { url }" )
-            self.get_logging().exception( e )
+            if logging:
+                logging.error( f"Problem with { url }" )
+                logging.exception( e )
+
             json_ = None
 
         except socket.timeout as e:
             error_timeout = True
-            self.get_logging().error( f"Problem with { url }" )
-            self.get_logging().exception( e )
+            if logging:
+                logging.error( f"Problem with { url }" )
+                logging.exception( e )
+
             json_ = None
+
+        except Exception as e:
+            print( e )
 
         return json_, error_network, error_timeout
 

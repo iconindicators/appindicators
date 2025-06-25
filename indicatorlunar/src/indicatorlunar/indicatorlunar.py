@@ -1216,8 +1216,13 @@ class IndicatorLunar( IndicatorBase ):
         def comet_on_click_function(
             menuitem ):
 
+            print( menuitem.get_name() )
             json_, error_network, error_timeout = (
-                self.get_json( menuitem.get_name() ) )
+                # IndicatorBase.get_json_static(
+                #     menuitem.get_name(),
+                #     logging = self.get_logging() ) )
+                self.get_json(
+                    menuitem.get_name() ) )
 
             if json_:
                 webbrowser.open(
@@ -1352,7 +1357,11 @@ class IndicatorLunar( IndicatorBase ):
                 # A/2018 V3
                 # P/2020 M2
             if '(' in name:
+                print( name )
                 designation = name.split( '(' )[ 0 ]
+                print( designation )
+                print( designation.strip() )
+                print()
 
             else:
                 designation = name
@@ -1361,7 +1370,11 @@ class IndicatorLunar( IndicatorBase ):
             logging.error( "Unknown designation for comet: " + name )
             designation = ''
 
-        return designation.strip()
+#TODO Tidy this up...
+#TODO Where else do I need this?  For minor planets?
+        from urllib.parse import urlencode
+        return urlencode( { 'des': designation.strip() } ).split( '=', maxsplit = 1 )[ 1 ]
+        # return designation.strip()
 
 
     @staticmethod
