@@ -130,7 +130,10 @@ class DataProviderOrbitalElement( DataProvider ):
             '''
 
         url = "https://astorbdb.lowell.edu/v1/graphql"
-        data = { "query": query, "variables": variables }
+        data = {
+            "query": query,
+            "variables": variables }
+
         json_, error_network, error_timeout = (
             IndicatorBase.get_json_static(
                 url,

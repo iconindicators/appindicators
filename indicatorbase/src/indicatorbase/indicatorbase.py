@@ -302,7 +302,7 @@ class IndicatorBase( ABC ):
         summary = _(
             "New version of {0} available..." ).format( self.indicator_name )
 
-        data_json, error_network, error_timeout = self.get_json( url )
+        data_json, error_network, error_timeout = IndicatorBase.get_json_static( url, logging = self.get_logging() )
         if data_json:
             version_pypi = (
                 IndicatorBase.versiontuple( data_json[ "info" ][ "version" ] ) )
@@ -355,6 +355,7 @@ class IndicatorBase( ABC ):
 
 
     @staticmethod
+#TODO If this stays, remove _static
     def get_json_static(
         url,
         data = None,
@@ -362,7 +363,8 @@ class IndicatorBase( ABC ):
         '''
         Retrieves the JSON content from a URL.
 
-        If data is not None, this request is treated as a POST.
+        If data is not None, this request is treated as a POST
+        and the data is serialised to a JSON object.
 
         On success, returns a tuple of the JSON and two booleans set to false.
 
@@ -409,9 +411,6 @@ class IndicatorBase( ABC ):
                 logging.exception( e )
 
             json_ = None
-
-        except Exception as e:
-            print( e )
 
         return json_, error_network, error_timeout
 

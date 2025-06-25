@@ -329,7 +329,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self_links = [ ]
         next_collection_link = "next_collection_link"
         while True:
-            json, error_network, error_timeout = self.get_json( url )
+            # json, error_network, error_timeout = self.get_json( url )
+            json, error_network, error_timeout = IndicatorBase.get_json_static( url, logging = self.get_logging() )
             if error_network:
                 ppa.set_status( PPA.Status.ERROR_NETWORK )
                 break
@@ -401,7 +402,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             error = ppa.has_status_error( ignore_other = True )
 
         if not error:
-            download_count, error_network, error_timeout = self.get_json( url )
+            # download_count, error_network, error_timeout = self.get_json( url )
+            download_count, error_network, error_timeout = IndicatorBase.get_json_static( url, logging = self.get_logging() )
             if error_network:
                 with lock:
                     ppa.set_status( PPA.Status.ERROR_NETWORK )

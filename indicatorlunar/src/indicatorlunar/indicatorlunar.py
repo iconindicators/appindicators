@@ -29,6 +29,8 @@ import math
 import re
 import webbrowser
 
+from urllib.parse import urlencode
+
 import gi
 
 gi.require_version( "Gtk", "3.0" )
@@ -1195,10 +1197,17 @@ class IndicatorLunar( IndicatorBase ):
 
             elif body_type == IndicatorLunar.astro_backend.BodyType.COMET:
                 def get_menuitem_name_for_comet( name ):
-                    return (
-                        IndicatorLunar.SEARCH_URL_COMET_DATABASE +
+                    designation = (
                         IndicatorLunar._get_comet_designation_from_cobs(
                             name, self.get_logging() ) )
+
+                    # The comet designation may contain / or other characters
+                    # which must first be URL encoded prior to use within a URL.
+                    query = { 'des': designation }
+
+                    return (
+                        IndicatorLunar.SEARCH_URL_COMET_DATABASE +
+                        urlencode( query ).split( '=', maxsplit = 1 )[ 1 ] )
 
                 menuitem_name_function = get_menuitem_name_for_comet
 
@@ -1215,19 +1224,16 @@ class IndicatorLunar( IndicatorBase ):
 
         def comet_on_click_function(
             menuitem ):
-
-            print( menuitem.get_name() )
             json_, error_network, error_timeout = (
-                # IndicatorBase.get_json_static(
-                #     menuitem.get_name(),
-                #     logging = self.get_logging() ) )
-                self.get_json(
-                    menuitem.get_name() ) )
+                IndicatorBase.get_json_static(
+                    menuitem.get_name(),
+                    logging = self.get_logging() ) )
 
             if json_:
                 webbrowser.open(
                     f"{ IndicatorLunar.SEARCH_URL_COMET_ID }"
                     f"{ str( json_[ 'object' ][ 'id' ] ) }" )
+#TODO If json_ is None, then show an OSD message to the user (to check the log)?
 
 
         def get_on_click_function():
@@ -1335,12 +1341,12 @@ class IndicatorLunar( IndicatorBase ):
         '''
         if name[ 0 ].isnumeric():
             # Examples:
-                # 1P/Halley
-                # 332P/Ikeya-Murakami
-                # 332P-B/Ikeya-Murakami
-                # 332P-C/Ikeya-Murakami
-                # 1I/`Oumuamua
-                # 282P
+            #   1P/Halley
+            #   332P/Ikeya-Murakami
+            #   332P-B/Ikeya-Murakami
+            #   332P-C/Ikeya-Murakami
+            #   1I/`Oumuamua
+            #   282P
             slash = name.find( '/' )
             if slash == -1:
                 designation = name
@@ -1350,18 +1356,14 @@ class IndicatorLunar( IndicatorBase ):
 
         elif name[ 0 ].isalpha():
             # Examples:
-                # C/1995 O1 (Hale-Bopp)
-                # P/1998 VS24 (LINEAR)
-                # P/2011 UA134 (Spacewatch-PANSTARRS)
-                # C/2019 Y4-D (ATLAS)
-                # A/2018 V3
-                # P/2020 M2
+            #    C/1995 O1 (Hale-Bopp)
+            #    P/1998 VS24 (LINEAR)
+            #    P/2011 UA134 (Spacewatch-PANSTARRS)
+            #    C/2019 Y4-D (ATLAS)
+            #    A/2018 V3
+            #    P/2020 M2
             if '(' in name:
-                print( name )
                 designation = name.split( '(' )[ 0 ]
-                print( designation )
-                print( designation.strip() )
-                print()
 
             else:
                 designation = name
@@ -1370,11 +1372,7 @@ class IndicatorLunar( IndicatorBase ):
             logging.error( "Unknown designation for comet: " + name )
             designation = ''
 
-#TODO Tidy this up...
-#TODO Where else do I need this?  For minor planets?
-        from urllib.parse import urlencode
-        return urlencode( { 'des': designation.strip() } ).split( '=', maxsplit = 1 )[ 1 ]
-        # return designation.strip()
+        return designation.strip()
 
 
     @staticmethod
