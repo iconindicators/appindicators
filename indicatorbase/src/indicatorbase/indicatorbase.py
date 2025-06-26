@@ -60,7 +60,6 @@ from importlib import metadata
 from pathlib import Path, PosixPath
 from threading import Lock
 from urllib.error import HTTPError, URLError
-from urllib.parse import urlencode
 from urllib.request import urlopen
 from zipfile import ZipFile
 
