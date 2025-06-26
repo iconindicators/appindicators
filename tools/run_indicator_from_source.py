@@ -33,9 +33,7 @@ indicator_to_dependencies = {
             [ "ephem", "sgp4",       "skyfield" ],
             [  True,    True,   sys.maxsize > 2**32 ] ) ),
     "indicatorscriptrunner" :
-        [ "requests" ], #TODO See what script/command I have that uses requests.  Can I swap for urllib?
-    "indicatortide" :
-        [ "requests" ] } #TODO Can I swap for urllib in getTideDataFromBOM.py?
+        [ "requests" ] } #TODO See what script/command I have that uses requests.  Can I swap for urllib?
 
 
 if __name__ == "__main__":
