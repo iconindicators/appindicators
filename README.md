@@ -224,7 +224,7 @@ References:
 
 ### Install from PyPI
 
-To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the introduction.
+To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the introduction above.
 
 
 ### Release to TestPyPI
@@ -252,7 +252,7 @@ TODO
     Test
 
 To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`,
-first, install the operating system packages listed at the indicator's `PyPI` page listed in the Introduction.
+first, install the operating system packages listed at the indicator's `PyPI` page listed in the introduction above.
 
 Then install `indicatortest`:
 
