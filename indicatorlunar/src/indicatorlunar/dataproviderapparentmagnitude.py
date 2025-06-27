@@ -111,7 +111,7 @@ class DataProviderApparentMagnitude( DataProvider ):
             "variables": variables }
 
         json_, error_network, error_timeout = (
-            IndicatorBase.get_json_static(
+            IndicatorBase.get_json(
                 url,
                 data = data,
                 logging = logging ) )

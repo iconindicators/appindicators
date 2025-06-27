@@ -1225,7 +1225,7 @@ class IndicatorLunar( IndicatorBase ):
         def comet_on_click_function(
             menuitem ):
             json_, error_network, error_timeout = (
-                IndicatorBase.get_json_static(
+                IndicatorBase.get_json(
                     menuitem.get_name(),
                     logging = self.get_logging() ) )
 
