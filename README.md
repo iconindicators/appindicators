@@ -15,7 +15,7 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 - `indicatortide` - [https://pypi.org/project/indicatortide](https://pypi.org/project/indicatortide)
 - `indicatorvirtualbox` - [https://pypi.org/project/indicatorvirtualbox](https://pypi.org/project/indicatorvirtualbox)
 
-Each indicator shares the common code `indicatorbase` and `shared`.
+Each indicator shares the common code `indicatorbase`.
 
 ---
 
@@ -69,16 +69,12 @@ Additional indicators may be appended to the above command.
 
 If the indicator has not previously been installed to `$HOME/.local/venv_indicators`, the icon and locale will be absent.
 
-TODO HOPEFULLY CAN REMOVE REFERNCES TO shared.py
-
-As part of running the indicator, a symbolic link to `indicatorbase.py` and `shared.py` is created for all indicators.  To remove all the symbolic links to `indicatorbase.py` and `shared.py`:
+As part of running the indicator, a symbolic link to `indicatorbase.py` is created for all indicators.  To remove:
 
 ```
     for dirs in indicator*; do \
     if [ -L $dirs/src/$dirs/indicatorbase.py ]; \
     then rm $dirs/src/$dirs/indicatorbase.py; fi ; \
-    if [ -L $dirs/src/$dirs/shared.py ]; \
-    then rm $dirs/src/$dirs/shared.py; fi ; \
     done;
 ```
 

@@ -27,18 +27,7 @@ from pathlib import Path
 if "../" not in sys.path:
     sys.path.insert( 0, "../" )
 
-print( "HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!") #TODO Testing
-# from indicatorbase.src.indicatorbase import shared
 from indicatorbase.src.indicatorbase import indicatorbase
-# sys.modules[ "gi" ] = None
-# from indicatorbase.src.indicatorbase import indicatorbase  #TODO Testing
-#TODO Why is it I cannot import IndicatorBase?
-# What is the error?  Is it _ or something else like a bunch of imports?
-
-
-# def test( t ):
-#     print( "utils.test" )
-#     indicatorbase.IndicatorBase.test( t )
 
 
 ''' The directory of a .whl release. '''

@@ -36,8 +36,6 @@ from gi.repository import Pango
 
 from .indicatorbase import IndicatorBase
 
-# from . import shared
-
 
 class IndicatorTest( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''

@@ -49,7 +49,6 @@ from pathlib import Path
 if "../" not in sys.path:
     sys.path.insert( 0, "../" )
 
-# from indicatorbase.src.indicatorbase import shared
 from indicatorbase.src.indicatorbase import indicatorbase  #TODO Testing
 
 from . import _markdown_to_html
@@ -748,11 +747,6 @@ def _package_source(
 
     shutil.copy(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "indicatorbase.py",
-        Path( '.' ) / directory_indicator / "src" / indicator )
-
-#TODO Hopefully can go
-    shutil.copy(
-        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "shared.py",
         Path( '.' ) / directory_indicator / "src" / indicator )
 
     pyproject_toml, version_indicator_base = (

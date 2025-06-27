@@ -39,8 +39,6 @@ from .indicatorbase import IndicatorBase
 
 from .script import Background, NonBackground, Info
 
-from . import shared
-
 
 class IndicatorScriptRunner( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
@@ -257,7 +255,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     script.get_group() + " | " + script.get_name() + ": " + command )
 
             Thread(
-                target = shared.process_run,
+                target = IndicatorBase.process_run,
                 args = ( command, False, False ) ).start()
 
 
@@ -301,7 +299,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 command_result = self.background_script_results[ key ]
 
                 if script.get_play_sound() and command_result:
-                    shared.process_run(
+                    IndicatorBase.process_run(
                         IndicatorBase.get_play_sound_complete_command(),
                         capture_output = False )
 
@@ -312,7 +310,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         " \"" + script.get_name().replace( '-', '\\-' ) + "\"" +
                         " \"" + command_result.replace( '-', '\\-' ) + "\"" )
 
-                    shared.process_run( command, capture_output = False )
+                    IndicatorBase.process_run( command, capture_output = False )
 
 
     def _update_background_script(
@@ -324,7 +322,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.get_logging().debug(
                 script.get_group() + " | " + script.get_name() + ": " + script.get_command() )
 
-        command_result = shared.process_run( script.get_command() )[ 0 ]
+        command_result = IndicatorBase.process_run( script.get_command() )[ 0 ]
         key = self._create_key( script.get_group(), script.get_name() )
         self.background_script_results[ key ] = command_result
         self.background_script_next_update_time[ key ] = (

@@ -38,8 +38,6 @@ from gi.repository import Gtk
 
 from .indicatorbase import IndicatorBase
 
-from . import eclipse, shared
-
 from .dataproviderapparentmagnitude import DataProviderApparentMagnitude
 from .dataprovidergeneralperturbation import DataProviderGeneralPerturbation
 from .dataproviderorbitalelement import DataProviderOrbitalElement, OrbitalElement
@@ -3291,7 +3289,7 @@ class IndicatorLunar( IndicatorBase ):
 
     def get_default_city( self ):
         command = "timedatectl show | grep Timezone"
-        timezone = shared.process_run( command )[ 0 ]
+        timezone = IndicatorBase.process_run( command )[ 0 ]
         if timezone.startswith( "Timezone=" ):
             timezone = timezone.split( '=' )[ 1 ]
 

@@ -65,8 +65,6 @@ from .indicatorbase import IndicatorBase
 
 from .event import Event
 
-from . import shared
-
 
 class IndicatorOnThisDay( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
@@ -270,7 +268,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             " -A 366" )
 
         events_sorted_by_date = [ ]
-        for line in shared.process_run( command )[ 0 ].splitlines():
+        for line in IndicatorBase.process_run( command )[ 0 ].splitlines():
             if line.startswith( '\t' ): # Continuation of the previous event.
                 date_ = events_sorted_by_date[ -1 ].get_date()
 
