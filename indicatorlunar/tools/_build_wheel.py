@@ -66,7 +66,7 @@ import sys
 
 from pathlib import Path
 
-if '../../' not in sys.path:  #TODO Check that the path here matches the path in the next line for all scripts/places.
+if '../../' not in sys.path:
     sys.path.insert( 0, '../../' )
 
 from tools import utils
