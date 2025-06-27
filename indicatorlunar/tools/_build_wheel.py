@@ -21,36 +21,29 @@ Called by the build wheel process to create the planets.bsp and stars.dat
 used in astroskyfield.
 
 It is assumed this script is called from within a Python3 virtual environment.
+
+This script will NOT work on 32 bit; running will generate a warning,
+however, the build will continue without failing.
 '''
 
 
 #TODO 
-# Will need a main
-# https://stackoverflow.com/questions/59703821/import-module-without-running-it
+# Might need a main
+#    https://stackoverflow.com/questions/59703821/import-module-without-running-it
 # in the files/modules that create planets/stars
 #
 # Given importing a module will run that module unless there is a __main__,
 # check all the scripts with a _ in tools and lunar/tools.  
 # See if _build_wheel.py is being run twice by build_wheel.py.
 #
-# Check all scripts in tools or indicatorlunar/tools.
+# Check all scripts in tools and indicatorlunar/tools.
 
 
-#TODO This will unlikely not work on 32 bit due to numpy et al...
-# so maybe put in a check to not run this script on 32 bit (just pass).
-# But somehow need to let the user know without passing a message back which
-# causes the build to abort.
-
-#TODO This script uses Python3, jplephem and numpy. 
-#
-# Need to verify it works on 32 bit and also Ubuntu 20.04
-# as some pinning of versions may need to be done.
-#
-# https://numpy.org/doc/2.0/release/1.22.0-notes.html
-# For 32 bit on Linux, might need to pin numpy to < 1.22.0
-#
+#TODO
 # https://numpy.org/doc/2.0/release/1.25.0-notes.html
-# For Ubuntu 20.04 et al, pin numpy to < 1.25.0 as < Python 3.9 is unsupported.
+#
+# For Ubuntu 20.04 et al, might need to pin numpy to < 1.25.0 as 
+# < Python 3.9 is unsupported.
 # 
 # Ubuntu 22.04 has python 3.10 so should not need numpy pinning until 3.10 is 
 # deprecated or unsupported by numpy.
@@ -59,11 +52,12 @@ It is assumed this script is called from within a Python3 virtual environment.
 # deprecated or unsupported by numpy.
 # 
 # Check for Fedora, Manjaro and openSUSE!
-
-
-#TODO jplephem will install numpy.
-# For 32 bit and/or Ubuntu 20.04 might need to explicitly
-# list numpy and pin to a version.
+#
+# Given that this script DOES indeed work on Ubuntu 20.04, how does that happen
+# without the pinning?  Does pip figure out the most recent/correct version
+# automatically?
+# I think the answer is yes, pip figures out the correct package for the Python3
+# version...so may not need to be concerned about pinning numpy, et al.
 
 
 import datetime
@@ -210,8 +204,11 @@ def build( out_path ):
     
     message = ""
 
-    # On 32 bit, numpy, used by skyfield and jplephem to create stars.dat and
-    # planets.bsp respectively, will not install, so skip.
+    # On 32 bit, numpy, used by
+    #   skyfield to create stars.dat
+    #   jplephem to create planets.bsp
+    # will not install, so skip without failing (returning a message)
+    # so that the build process continues; however emit a warning!
     #
     # https://stackoverflow.com/a/9964440/2156453
     # https://docs.python.org/3/library/platform.html#cross-platform
