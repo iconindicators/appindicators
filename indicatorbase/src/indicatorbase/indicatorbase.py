@@ -343,7 +343,7 @@ class IndicatorBase( ABC ):
             with (
                 urlopen(
                     url,
-                    data = data_, 
+                    data = data_,
                     timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) ) as f:
 
                 json_ = json.loads( f.read().decode( "utf-8" ) )
@@ -2862,6 +2862,7 @@ class IndicatorBase( ABC ):
             -
             datetime.timedelta( hours = maximum_age_in_hours ) )
 
+#TODO Is file below a keyword?
         for file in self.get_cache_directory().iterdir():
             # Sometimes the base name is shared
             # ("icon-" versus "icon-fullmoon-")
@@ -3103,14 +3104,14 @@ class IndicatorBase( ABC ):
             stdout
             stderr
             return code
-    
+
     #TODO Why not ALWAYS capture output?
         If capture_output is True, stdout and stderr are captured;
         otherwise, stdout and stderr are set to "".
-    
+
     #TODO Is this needed? If end user wants the result, up to end user to sift stdout from stderr.
         If print_ is True, prints stdout and stderr to the console.
-    
+
         On stderr or exception, logs to a file, if logging was previously
         initialised.
         '''
@@ -3123,19 +3124,19 @@ class IndicatorBase( ABC ):
     #TODO Used to have check = True, but that throws an exception for grep when grep
     # finds no result but returns a 1 (which is not 0 and thus an exception is thrown).
     # Who/when might need check = True?
-    
+
             if capture_output:
                 stdout_ = result.stdout.decode().strip()
                 stderr_ = result.stderr.decode()
                 # if stderr_ and IndicatorBase._LOGGING_INITIALISED:
                 #     IndicatorBase.get_logging().error( stderr_ )
-    
+
             else:
                 stdout_ = ""
                 stderr_ = ""
-    
+
             return_code = result.returncode
-    
+
         except subprocess.CalledProcessError as e:
             print( "EXCEPTION" ) #TODO Testing
             # if logging:# TODO Need this but what about below?
@@ -3148,7 +3149,7 @@ class IndicatorBase( ABC ):
             #     print( e.returncode )
             #     print("----")
             #     IndicatorBase.get_logging().error( e.stderr.decode() )
-    
+
     #TODO Find a way to trigger this exception and determine what happens when
     # capture_output is True (stdout/stderr should be defined so decode is okay) and
     # when capture_output is False (stdout/stderr should be not be defined so decode is unsafe).
@@ -3157,17 +3158,17 @@ class IndicatorBase( ABC ):
             stdout_ = e.stdout.decode()
             stderr_ = e.stderr.decode()
             return_code = e.returncode
-    
+
         if print_:
             if stdout_:
                 print( stdout_ )
-    
+
             elif stderr_:
                 print( stderr_ )
-    
+
             if return_code != 0:
                 print( f"return code: { return_code }" )
-    
+
         return stdout_, stderr_, return_code
 
 
@@ -3195,15 +3196,15 @@ class IndicatorBase( ABC ):
             lines = f.readlines()
             if first_year:
                 lines = reversed( lines )
-    
+
             for line in lines:
                 if line.startswith( "## v" ):
                     left_parenthesis = line.find( '(' )
                     year = (
                         line[ left_parenthesis + 1 : left_parenthesis + 1 + 4 ] )
-    
+
                     break
-    
+
         return year
 
 
