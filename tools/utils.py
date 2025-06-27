@@ -27,9 +27,18 @@ from pathlib import Path
 if "../" not in sys.path:
     sys.path.insert( 0, "../" )
 
-from indicatorbase.src.indicatorbase import shared
+print( "HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!") #TODO Testing
+# from indicatorbase.src.indicatorbase import shared
+from indicatorbase.src.indicatorbase import indicatorbase
+# sys.modules[ "gi" ] = None
+# from indicatorbase.src.indicatorbase import indicatorbase  #TODO Testing
 #TODO Why is it I cannot import IndicatorBase?
 # What is the error?  Is it _ or something else like a bunch of imports?
+
+
+# def test( t ):
+#     print( "utils.test" )
+#     indicatorbase.IndicatorBase.test( t )
 
 
 ''' The directory of a .whl release. '''
@@ -48,7 +57,7 @@ VENV_INSTALL = str( Path.home() / ".local" / "venv_indicators" )
 
 
 def is_debian11_or_debian12():
-    etc_os_release = shared.get_etc_os_release()
+    etc_os_release = indicatorbase.IndicatorBase.get_etc_os_release()
     return (
         'ID=debian' in etc_os_release
         and (
@@ -58,7 +67,7 @@ def is_debian11_or_debian12():
 
 
 def is_ubuntu2004_or_is_ubuntu2204_or_ubuntu2404():
-    etc_os_release = shared.get_etc_os_release()
+    etc_os_release = indicatorbase.IndicatorBase.get_etc_os_release()
 
     is_ubuntu = (
         'ID=ubuntu' in etc_os_release
@@ -146,7 +155,7 @@ def python_run(
 # For the new code calling indicatorlunar.tools._build_wheel.build()
 # I think the return is needed.
 # So does the return affect anything other callers?
-    return shared.process_run( command_, print_ = True )
+    return indicatorbase.IndicatorBase.process_run( command_, print_ = True )
 
 
 def _get_parser(

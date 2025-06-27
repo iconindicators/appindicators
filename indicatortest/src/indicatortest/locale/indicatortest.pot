@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatortest 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-05-27 13:23+1000\n"
+"POT-Creation-Date: 2025-06-27 17:29+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,150 +15,150 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicatortest.py:44
+#: indicatortest.py:46
 msgid "Indicator Test"
 msgstr ""
 
-#: indicatortest.py:54
+#: indicatortest.py:56
 msgid "Test Indicator"
 msgstr ""
 
-#: indicatortest.py:60
+#: indicatortest.py:62
 msgid "Exercises a range of indicator functionality."
 msgstr ""
 
-#: indicatortest.py:93
+#: indicatortest.py:95
 msgid "Information"
 msgstr ""
 
-#: indicatortest.py:101
+#: indicatortest.py:103
 msgid "Functionality"
 msgstr ""
 
-#: indicatortest.py:118
+#: indicatortest.py:120
 msgid "Machine: "
 msgstr ""
 
-#: indicatortest.py:119
+#: indicatortest.py:121
 msgid "Node: "
 msgstr ""
 
-#: indicatortest.py:120
+#: indicatortest.py:122
 msgid "Processor: "
 msgstr ""
 
-#: indicatortest.py:121
+#: indicatortest.py:123
 msgid "Release: "
 msgstr ""
 
-#: indicatortest.py:122
+#: indicatortest.py:124
 msgid "System: "
 msgstr ""
 
-#: indicatortest.py:123
+#: indicatortest.py:125
 msgid "Version: "
 msgstr ""
 
-#: indicatortest.py:131
+#: indicatortest.py:133
 msgid "Platform | Uname"
 msgstr ""
 
-#: indicatortest.py:156
+#: indicatortest.py:158
 msgid "Desktop"
 msgstr ""
 
-#: indicatortest.py:192
+#: indicatortest.py:194
 msgid "Icon Theme"
 msgstr ""
 
-#: indicatortest.py:206
+#: indicatortest.py:208
 msgid "Terminal: "
 msgstr ""
 
-#: indicatortest.py:206 indicatortest.py:214
+#: indicatortest.py:208 indicatortest.py:216
 msgid "Unknown terminal!"
 msgstr ""
 
-#: indicatortest.py:214
+#: indicatortest.py:216
 msgid "Execution flag: "
 msgstr ""
 
-#: indicatortest.py:222
+#: indicatortest.py:224
 msgid "Terminal"
 msgstr ""
 
-#: indicatortest.py:234
+#: indicatortest.py:236
 msgid "Reset icon"
 msgstr ""
 
-#: indicatortest.py:255
+#: indicatortest.py:257
 msgid "Icon"
 msgstr ""
 
-#: indicatortest.py:267
+#: indicatortest.py:269
 msgid "Reset label"
 msgstr ""
 
-#: indicatortest.py:275
+#: indicatortest.py:277
 msgid "Show current time in label"
 msgstr ""
 
-#: indicatortest.py:285
+#: indicatortest.py:287
 msgid "Show current time in OSD"
 msgstr ""
 
-#: indicatortest.py:289
+#: indicatortest.py:291
 msgid "Current time..."
 msgstr ""
 
-#: indicatortest.py:294
+#: indicatortest.py:296
 msgid "Label | Tooltip | OSD"
 msgstr ""
 
-#: indicatortest.py:314
+#: indicatortest.py:316
 msgid "Copy from clipboard"
 msgstr ""
 
-#: indicatortest.py:323
+#: indicatortest.py:325
 msgid "Copy from primary"
 msgstr ""
 
-#: indicatortest.py:332
+#: indicatortest.py:334
 msgid "Copy current time to clipboard"
 msgstr ""
 
-#: indicatortest.py:341
+#: indicatortest.py:343
 msgid "Copy current time to primary"
 msgstr ""
 
-#: indicatortest.py:350
+#: indicatortest.py:352
 msgid "Clipboard"
 msgstr ""
 
-#: indicatortest.py:393
+#: indicatortest.py:395
 msgid "Execute Terminal Command"
 msgstr ""
 
-#: indicatortest.py:439
+#: indicatortest.py:441
 msgid ""
 "Cannot run script as no terminal and/or terminal execution flag found; "
 "please install gnome-terminal."
 msgstr ""
 
-#: indicatortest.py:454
+#: indicatortest.py:456
 msgid ""
 "Cannot run script as qterminal incorrectly parses arguments; please install "
 "gnome-terminal instead."
 msgstr ""
 
-#: indicatortest.py:483 indicatortest.py:484
+#: indicatortest.py:485 indicatortest.py:486
 msgid "Enable/disable X"
 msgstr ""
 
-#: indicatortest.py:502
+#: indicatortest.py:504
 msgid "Day of Week"
 msgstr ""
 
-#: indicatortest.py:509
+#: indicatortest.py:511
 msgid "Days of week containing an 'n' are bold."
 msgstr ""

@@ -27,6 +27,11 @@ To view the contents of a .tar.gz:
 '''
 
 
+#TODO I think the paths are mucked up when running this under Eclipse
+# because the dist directory (or similarly named) creates infinite sub-directories.
+# COuld be an issue with the run config in Eclipse perhaps as this works fine in a terminal.
+
+
 from . import utils
 
 
@@ -48,4 +53,5 @@ if __name__ == "__main__":
             "build",
             "pip",
             "polib",
+            utils.get_pygobject(),
             "readme_renderer[md]" )

@@ -36,7 +36,7 @@ from gi.repository import Pango
 
 from .indicatorbase import IndicatorBase
 
-from . import shared
+# from . import shared
 
 
 class IndicatorTest( IndicatorBase ):
@@ -175,14 +175,14 @@ class IndicatorTest( IndicatorBase ):
 
         command = "gsettings get org.gnome.desktop.interface "
 
-        result = shared.process_run( command + "icon-theme" )[ 0 ]
+        result = IndicatorBase.process_run( command + "icon-theme" )[ 0 ]
         result = result.replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
             command + "icon-theme: " + result,
             indent = ( 2, 0 ) )
 
-        result = shared.process_run( command + "gtk-theme" )[ 0 ]
+        result = IndicatorBase.process_run( command + "gtk-theme" )[ 0 ]
         result = result.replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
@@ -468,7 +468,7 @@ class IndicatorTest( IndicatorBase ):
                 + "; ${SHELL}" + "'" )
 
             Thread(
-                target = shared.process_run,
+                target = IndicatorBase.process_run,
                 args = ( command_, False, False ) ).start()
 
             print( "Executing command: " + command_ )

@@ -69,6 +69,8 @@ Additional indicators may be appended to the above command.
 
 If the indicator has not previously been installed to `$HOME/.local/venv_indicators`, the icon and locale will be absent.
 
+TODO HOPEFULLY CAN REMOVE REFERNCES TO shared.py
+
 As part of running the indicator, a symbolic link to `indicatorbase.py` and `shared.py` is created for all indicators.  To remove all the symbolic links to `indicatorbase.py` and `shared.py`:
 
 ```

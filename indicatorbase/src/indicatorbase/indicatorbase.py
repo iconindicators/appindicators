@@ -50,6 +50,7 @@ import pickle
 import shutil
 import signal
 import socket
+import subprocess
 import sys
 import threading
 import webbrowser
@@ -90,8 +91,6 @@ except ValueError:
     except ValueError:
         print( "Unable to find neither AyatanaAppIndicator3 nor AppIndicator3.")
         sys.exit( 1 )
-
-from . import shared
 
 
 class IndicatorBase( ABC ):
@@ -221,10 +220,10 @@ class IndicatorBase( ABC ):
         IndicatorBase._LOGGING_INITIALISED = True
 
         self.current_desktop = (
-            shared.process_run( "echo $XDG_CURRENT_DESKTOP" )[ 0 ] )
+            IndicatorBase.process_run( "echo $XDG_CURRENT_DESKTOP" )[ 0 ] )
 
         self.session_type = (
-            shared.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )
+            IndicatorBase.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )
 
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
@@ -969,7 +968,7 @@ class IndicatorBase( ABC ):
 
         about_dialog.set_copyright(
             "Copyright \xa9 " +
-            shared.get_year_in_changelog_markdown(
+            IndicatorBase.get_year_in_changelog_markdown(
                 changelog_markdown_path ) +
             '-' +
             str( datetime.datetime.now().year ) +
@@ -1083,7 +1082,7 @@ class IndicatorBase( ABC ):
     @staticmethod
     def is_calendar_supported():
         ''' The calendar package is unavailable on some distributions. '''
-        etc_os_release = shared.get_etc_os_release()
+        etc_os_release = IndicatorBase.get_etc_os_release()
         is_manjaro = "NAME=\"Manjaro Linux\"" in etc_os_release
         is_opensuse_tumbleweed = (
             "NAME=\"openSUSE Tumbleweed\"" in etc_os_release )
@@ -1108,7 +1107,7 @@ class IndicatorBase( ABC ):
             or (
                 self.is_session_type_wayland()
                 and
-                "UBUNTU_CODENAME=focal" not in shared.get_etc_os_release() ) )
+                "UBUNTU_CODENAME=focal" not in IndicatorBase.get_etc_os_release() ) )
 #TODO Check Linux Mint if it contains "UBUNTU_CODENAME" to ensure the above works
 # for any Ubuntu 20.04 derivative (although they all should now be EOL).
 
@@ -1134,7 +1133,7 @@ class IndicatorBase( ABC ):
             #   https://github.com/bugaevc/wl-clipboard/pull/110
             #   https://github.com/bugaevc/wl-clipboard/pull/154
             command += "2>/dev/null"
-            shared.process_run( command )    #TODO Check the pipe to stderr still works!
+            IndicatorBase.process_run( command )    #TODO Check the pipe to stderr still works!
                                                     # Also, set capture_output = False?
                                                     # Need to do this on Wayland and not Ubuntu 20.04
 
@@ -1153,7 +1152,7 @@ class IndicatorBase( ABC ):
         '''
         text_in_clipboard = None
         if self.is_session_type_wayland():
-            text_in_clipboard = shared.process_run( "wl-paste" )[ 0 ]
+            text_in_clipboard = IndicatorBase.process_run( "wl-paste" )[ 0 ]
 
         else:
             text_in_clipboard = (
@@ -1186,7 +1185,7 @@ class IndicatorBase( ABC ):
             # Shield the user from having to know about Wayland or X11 by
             # wrapping wl-clipboard within a callback function.
             primary_received_callback_function(
-                shared.process_run( "wl-paste --primary" )[ 0 ] )
+                IndicatorBase.process_run( "wl-paste --primary" )[ 0 ] )
 
         else:
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
@@ -2559,7 +2558,7 @@ class IndicatorBase( ABC ):
         is_qterminal_and_broken_ = False
         if "qterminal" in terminal:
             qterminal_version = (
-                shared.process_run( "qterminal --version" )[ 0 ] )
+                IndicatorBase.process_run( "qterminal --version" )[ 0 ] )
 
             is_qterminal_and_broken_ = qterminal_version < "1.2.0"
 
@@ -2574,7 +2573,7 @@ class IndicatorBase( ABC ):
         terminal = None
         execution_flag = None
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
-            terminal = shared.process_run( "which " + _terminal )[ 0 ]
+            terminal = IndicatorBase.process_run( "which " + _terminal )[ 0 ]
             if terminal:
                 execution_flag = _execution_flag
                 break
@@ -3090,6 +3089,122 @@ class IndicatorBase( ABC ):
         directory = Path.home() / user_base_directory / application_base_directory
         directory.mkdir( parents = True, exist_ok = True )
         return directory
+
+
+#TODO Hopefully can stay
+    @staticmethod
+    def process_run(
+        command,
+        capture_output = True,
+        print_ = False,
+        logging = None ):  #TODO Handle logging...will (SHOULD) exist for calls from indicators, but not from tools.
+        '''
+        Executes the command, returning the tuple:
+            stdout
+            stderr
+            return code
+    
+    #TODO Why not ALWAYS capture output?
+        If capture_output is True, stdout and stderr are captured;
+        otherwise, stdout and stderr are set to "".
+    
+    #TODO Is this needed? If end user wants the result, up to end user to sift stdout from stderr.
+        If print_ is True, prints stdout and stderr to the console.
+    
+        On stderr or exception, logs to a file, if logging was previously
+        initialised.
+        '''
+        try:
+            result = (
+                subprocess.run(
+                    command,
+                    shell = True,
+                    capture_output = capture_output ) )
+    #TODO Used to have check = True, but that throws an exception for grep when grep
+    # finds no result but returns a 1 (which is not 0 and thus an exception is thrown).
+    # Who/when might need check = True?
+    
+            if capture_output:
+                stdout_ = result.stdout.decode().strip()
+                stderr_ = result.stderr.decode()
+                # if stderr_ and IndicatorBase._LOGGING_INITIALISED:
+                #     IndicatorBase.get_logging().error( stderr_ )
+    
+            else:
+                stdout_ = ""
+                stderr_ = ""
+    
+            return_code = result.returncode
+    
+        except subprocess.CalledProcessError as e:
+            print( "EXCEPTION" ) #TODO Testing
+            # if logging:# TODO Need this but what about below?
+            # if IndicatorBase._LOGGING_INITIALISED:
+            #     print("----") #TODO Testing
+            #     print( e.stdout )
+            #     print("----")
+            #     print( e.stderr )
+            #     print("----")
+            #     print( e.returncode )
+            #     print("----")
+            #     IndicatorBase.get_logging().error( e.stderr.decode() )
+    
+    #TODO Find a way to trigger this exception and determine what happens when
+    # capture_output is True (stdout/stderr should be defined so decode is okay) and
+    # when capture_output is False (stdout/stderr should be not be defined so decode is unsafe).
+    # Can trigger the exception on grep but no result but get a return code of 1
+    # but need to set check = True in the call to subprocess.run().
+            stdout_ = e.stdout.decode()
+            stderr_ = e.stderr.decode()
+            return_code = e.returncode
+    
+        if print_:
+            if stdout_:
+                print( stdout_ )
+    
+            elif stderr_:
+                print( stderr_ )
+    
+            if return_code != 0:
+                print( f"return code: { return_code }" )
+    
+        return stdout_, stderr_, return_code
+
+
+#TODO Can this stay?
+    @staticmethod
+    def get_etc_os_release():
+        '''
+        Return the result of calling
+            cat /etc/os-release
+        '''
+        return IndicatorBase.process_run( "cat /etc/os-release" )[ 0 ]
+
+
+#TODO Hopefully can stay
+    @staticmethod
+    def get_year_in_changelog_markdown(
+        changelog_markdown,
+        first_year = True ):
+        '''
+        If first_year = True, retrieves the first/earliest year from
+        CHANGELOG.md otherwise retrieves the most recent year.
+        '''
+        year = ""
+        with open( changelog_markdown, 'r', encoding = "utf-8" ) as f:
+            lines = f.readlines()
+            if first_year:
+                lines = reversed( lines )
+    
+            for line in lines:
+                if line.startswith( "## v" ):
+                    left_parenthesis = line.find( '(' )
+                    year = (
+                        line[ left_parenthesis + 1 : left_parenthesis + 1 + 4 ] )
+    
+                    break
+    
+        return year
 
 
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):

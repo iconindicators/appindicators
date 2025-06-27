@@ -46,9 +46,10 @@ if __name__ == "__main__":
             "if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; "
             "then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py "
             "$dirs/src/$dirs/indicatorbase.py; fi ; "
-            "if [ ! -f $dirs/src/$dirs/shared.py ]; "
-            "then ln -sr indicatorbase/src/indicatorbase/shared.py "
-            "$dirs/src/$dirs/shared.py; fi ; "
+#TODO Hopefully can go
+            # "if [ ! -f $dirs/src/$dirs/shared.py ]; "
+            # "then ln -sr indicatorbase/src/indicatorbase/shared.py "
+            # "$dirs/src/$dirs/shared.py; fi ; "
             "done && "
             f"cd { indicator }/src && "
             f"python3 -m { indicator }.{ indicator }" )
@@ -57,6 +58,9 @@ if __name__ == "__main__":
         if indicator in indicator_to_dependencies:
             dependencies += indicator_to_dependencies[ indicator ]
 
-        threading.Thread(
-            target = utils.python_run,
-            args = ( command, utils.VENV_RUN, *dependencies ) ).start()
+        # threading.Thread(
+        #     target = utils.python_run,
+        #     args = ( command, utils.VENV_RUN, *dependencies ) ).start()
+
+#TODO How does this work but build_wheel does not yet appears to run the same setup code...?
+        utils.python_run( command, utils.VENV_RUN, *dependencies )
