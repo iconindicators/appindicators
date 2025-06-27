@@ -41,6 +41,7 @@ import shutil
 import stat
 import sys
 
+# Will be installed by the calling script.
 import polib
 
 from pathlib import Path

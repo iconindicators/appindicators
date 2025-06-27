@@ -23,6 +23,7 @@ Utility for converting markdown to html.
 '''
 
 
+# Will be installed by the calling script.
 from readme_renderer.markdown import render
 
 
