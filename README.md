@@ -1,7 +1,7 @@
 # AppIndicators for Ubuntu et al...
 
 
-### Introduction
+## Introduction
 
 This project contains application indicators written in `Python3` for `Ubuntu 20.04` or similar:
 - `indicatorfortune` - [https://pypi.org/project/indicatorfortune](https://pypi.org/project/indicatorfortune)
@@ -17,8 +17,9 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 
 Each indicator shares the common code `indicatorbase` and `shared`.
 
+---
 
-### Build an Indicator's Wheel
+## Build an Indicator's Wheel
 
 To build a wheel for `indicatortest` from the root of the source tree:
 
@@ -30,8 +31,9 @@ which creates a virtual environment `venv_build`, updates locale files `.pot` / 
 
 Additional indicators may be appended to the above command.
 
+---
 
-### Install an Indicator's Wheel
+## Install an Indicator's Wheel
 
 Prerequisite: the indicator's `.whl` must be built.
 
@@ -47,8 +49,9 @@ Additional indicators may be appended to the above command.
 
 Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the introduction above.
 
+---
 
-### Run an Indicator (from within the source tree)
+## Run an Indicator (from within the source tree)
 
 Prerequisite: the indicator's `.whl` must be built.
 
@@ -77,21 +80,22 @@ As part of running the indicator, a symbolic link to `indicatorbase.py` and `sha
     done;
 ```
 
+---
 
-### Development under Geany
-
-#### Geany Setup
+## Development under Geany
 
 Prerequisite: the indicator's `.whl` must be built and run within the source tree.
 
-Run `Geany`:
+**Geany Setup**
+
+Run `Geany` then:
 
 ```
     Build > Set Build Commands > Execute Commands
         Execute: cd /home/bernard/Programming/Indicators/%e/src ; /home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.%e"
 ```
 
-#### Project Setup
+**Project Setup**
 
 ```
     Project > New
@@ -111,12 +115,13 @@ References:
 - [https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment](https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment)
 - [https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide](https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide)
 
+---
 
-### Development under Eclipse
-
-#### Eclipse Setup
+## Development under Eclipse
 
 Prerequisite: the indicator's `.whl` must be built and run within the source tree.
+
+**Eclipse Setup**
 
 Run `Eclipse` and install [Liclipse](https://www.liclipse.com/) via the update site.
 
@@ -134,7 +139,7 @@ Create a `Python` interpreter which uses `venv_run`:
             Check Launch modules with 'python -m mod.name'
 ```
 
-#### Project Setup
+**Project Setup**
 
 ```
     File > New > PyDev Project
@@ -145,7 +150,7 @@ Create a `Python` interpreter which uses `venv_run`:
         Finish
 ```
 
-#### Run Indicator
+**Run Indicator**
 
 ```
     Right click on indicatortest.py
@@ -166,9 +171,7 @@ which should fail, then:
 
 Repeat for each indicator, or as each indicator is run.
 
-#### Run Tool
-
-Ensure a `.whl` for `indicatortest` is built as per the earlier section on building a wheel and `venv_build` exists.
+**Run Tool**
 
 Create a `Python` interpreter similarly to above which uses `venv_build`:
 
@@ -182,8 +185,9 @@ References:
 
 - [https://www.pydev.org/manual_101_interpreter.html](https://www.pydev.org/manual_101_interpreter.html)
 
+---
 
-### Run an Installed Indicator
+## Run an Installed Indicator
 
 Prerequisite: the indicator's `.whl` must be built and installed.
 
@@ -197,8 +201,9 @@ To run from a terminal (to observe any messages/errors) from any directory:
 
 Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and change `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
 
+---
 
-### Release to PyPI
+## Release to PyPI
 
 TODO
     Test
@@ -221,13 +226,15 @@ which assumes the username `__token__` and prompts for the password (starts with
 References:
 - [https://twine.readthedocs.io/en/latest](https://twine.readthedocs.io/en/latest)
 
+---
 
-### Install from PyPI
+## Install from PyPI
 
 To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the introduction above.
 
+---
 
-### Release to TestPyPI
+## Release to TestPyPI
 
 TODO
     Test
@@ -245,8 +252,9 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
     deactivate
 ```
 
+---
 
-### Install from TestPyPI
+## Install from TestPyPI
 
 TODO
     Test
@@ -270,8 +278,9 @@ TODO
     $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
 ```
 
+---
 
-### Uninstall an Indicator
+## Uninstall an Indicator
 
 ```
     python3 -m tools.uninstall_indicator indicatortest
@@ -279,8 +288,9 @@ TODO
 
 Additional indicators may be appended to the above command.
 
+---
 
-### Pylint
+## Pylint
 
 In a terminal, one directory **above** the source tree root (assumed to the directory `Indicators`):
 
@@ -326,15 +336,17 @@ As above, but with several checks disabled:
     sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2n pylint.txt
 ```
 
+---
 
-### Convert this Document from MD to HTML
+## Convert this Document from MD to HTML
 
 ```
     python3 -m tools.markdown_to_html
 ```
 
+---
 
-### License
+## License
 
 This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.
 
