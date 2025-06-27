@@ -1233,7 +1233,11 @@ class IndicatorLunar( IndicatorBase ):
                 webbrowser.open(
                     f"{ IndicatorLunar.SEARCH_URL_COMET_ID }"
                     f"{ str( json_[ 'object' ][ 'id' ] ) }" )
-#TODO If json_ is None, then show an OSD message to the user (to check the log)?
+
+            else:
+                self.show_notification(
+                    _( "Unable to lookup comet..." ),
+                    _( "An error occurred; check the log for more details." ) )
 
 
         def get_on_click_function():
