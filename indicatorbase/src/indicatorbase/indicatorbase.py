@@ -2862,15 +2862,14 @@ class IndicatorBase( ABC ):
             -
             datetime.timedelta( hours = maximum_age_in_hours ) )
 
-#TODO Is file below a keyword?
-        for file in self.get_cache_directory().iterdir():
+        for file_ in self.get_cache_directory().iterdir():
             # Sometimes the base name is shared
             # ("icon-" versus "icon-fullmoon-")
             # so use the date/time to ensure the correct group of files.
-            if file.name.startswith( basename ):
+            if file_.name.startswith( basename ):
                 # len( YYYYMMDDHHMMSS ) = 14.
                 date_time = (
-                    file.name[ len( basename ) : len( basename ) + 14 ] )
+                    file_.name[ len( basename ) : len( basename ) + 14 ] )
 
                 if date_time.isdigit():
                     file_date_time = (
@@ -2879,7 +2878,7 @@ class IndicatorBase( ABC ):
                             IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) )
 
                     if file_date_time < cache_maximum_age_date_time:
-                        file.unlink()
+                        file_.unlink()
 
 
     def read_cache_binary(
