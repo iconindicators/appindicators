@@ -43,12 +43,9 @@ if __name__ == "__main__":
             "build" ) )
 
     for indicator in indicators_to_process:
-        command = (
-            "python3 -c \"import tools._build_wheel; "
-            f"tools._build_wheel.build_wheel( \\\"{ indicator }\\\" )\"" )
-
         utils.python_run(
-            command,
+            "python3 -c \"import tools._build_wheel; "
+            f"tools._build_wheel.build_wheel( \\\"{ indicator }\\\" )\"",
             utils.VENV_BUILD,
             "build",
             "pip",

@@ -106,6 +106,8 @@ def get_pygobject():
     return pygobject
 
 
+#TODO WHo calls this?
+# Are any of the commands install?
 def python_run(
     command,
     venv_directory,
