@@ -27,13 +27,13 @@ however, the build will continue without failing.
 '''
 
 
-#TODO 
+#TODO
 # Might need a main
 #    https://stackoverflow.com/questions/59703821/import-module-without-running-it
 # in the files/modules that create planets/stars
 #
 # Given importing a module will run that module unless there is a __main__,
-# check all the scripts with a _ in tools and lunar/tools.  
+# check all the scripts with a _ in tools and lunar/tools.
 # See if _build_wheel.py is being run twice by build_wheel.py.
 #
 # Check all scripts in tools and indicatorlunar/tools.
@@ -42,15 +42,15 @@ however, the build will continue without failing.
 #TODO
 # https://numpy.org/doc/2.0/release/1.25.0-notes.html
 #
-# For Ubuntu 20.04 et al, might need to pin numpy to < 1.25.0 as 
+# For Ubuntu 20.04 et al, might need to pin numpy to < 1.25.0 as
 # < Python 3.9 is unsupported.
-# 
-# Ubuntu 22.04 has python 3.10 so should not need numpy pinning until 3.10 is 
+#
+# Ubuntu 22.04 has python 3.10 so should not need numpy pinning until 3.10 is
 # deprecated or unsupported by numpy.
-# 
+#
 # Debian 11 has python 3.9 so should not need numpy pinning until 3.9 is
 # deprecated or unsupported by numpy.
-# 
+#
 # Check for Fedora, Manjaro and openSUSE!
 #
 # Given that this script DOES indeed work on Ubuntu 20.04, how does that happen
@@ -60,10 +60,10 @@ however, the build will continue without failing.
 # version...so may not need to be concerned about pinning numpy, et al.
 
 
-import datetime
 import gettext
 import sys
 
+from datetime import date, datetime, timedelta
 from pathlib import Path
 
 if '../../' not in sys.path:
@@ -71,9 +71,9 @@ if '../../' not in sys.path:
 
 from tools import utils
 
-# Needed otherwise '_' will be undefined when importing AstroBase.  
+# Needed otherwise '_' will be undefined when importing AstroBase.
 gettext.install( "indicatorlunar.tools._build_wheel" )
-from indicatorlunar.src.indicatorlunar.astrobase import AstroBase 
+from indicatorlunar.src.indicatorlunar.astrobase import AstroBase
 
 
 '''
@@ -84,17 +84,16 @@ which must be present at
 Sources:
     bsp:
         https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
-    
+
     hip_main.dat:
         https://cdsarc.cds.unistra.fr/ftp/cats/I/239/hip_main.dat
 '''
 IN_BSP = "de442s.bsp"
-HIP_MAIN_DAT = "hip_main.dat" 
+HIP_MAIN_DAT = "hip_main.dat"
 
 
 def _initialise():
-    ''' Install dependencies into the Python3 virtual environment. '''
-    command = "python3 -m pip install --upgrade jplephem python-dateutil skyfield"
+    command = "python3 -m pip install --upgrade jplephem skyfield"
     message = ""
     stdout_, stderr_, return_code = (
         utils.python_run(
@@ -131,15 +130,8 @@ def _create_ephemeris_planets(
     in_bsp = data_path / IN_BSP
     if in_bsp.exists():
         years_from_today = 10
-
-        # Must import this here rather than the top.
-        #
-        # If the virtual environment does not have python-dateutil installed
-        # at run-time, the import will fail.
-        from dateutil.relativedelta import relativedelta #TODO Comment why this is here.
-
-        today = datetime.date.today()
-        start_date = today - relativedelta( months = 1 )
+        today = date.today()
+        start_date = today - timedelta( days = 31 )
         end_date = today.replace( year = today.year + years_from_today )
         date_format = "%Y/%m/%d"
 
@@ -201,7 +193,7 @@ def _create_ephemeris_stars(
 def build( out_path ):
     ''' Called by the build wheel process. '''
     if True: return "" #TODO Remove this line if including astroskyfield et al.
-    
+
     message = ""
 
     # On 32 bit, numpy, used by
