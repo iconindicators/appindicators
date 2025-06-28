@@ -622,8 +622,9 @@ def _create_dot_desktop(
     for language, name_ in names_from_po_files.items():
         names += f"\nName[{ language }]={ name_ }"
 
-    # Some indicators use a \n to split the comment so as to not appear too long
-    # when displayed in the About dialog.
+    # Some indicators use a \n to split the comment so not be too long when
+    # displayed in the About dialog.
+    #
     # For the .desktop file, do not split the comment.
     comments_ = comments.replace( "\\n", ' ' )
     newline = '\n'
