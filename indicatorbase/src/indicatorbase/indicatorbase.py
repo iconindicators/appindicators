@@ -432,6 +432,9 @@ class IndicatorBase( ABC ):
         return first_wheel, error_message
 
 
+#TODO Look at when autostart is enabled/disabled.
+# I think extra lines are being added.
+
     def _initialise_desktop_file_in_user_home( self ):
         autostart_path = Path.home() / ".config" / "autostart"
         autostart_path.mkdir( parents = True, exist_ok = True )
