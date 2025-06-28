@@ -35,7 +35,6 @@ if __name__ == "__main__":
             "script and icons.",
             "install" ) )
 
-#TODO Test on Ubuntu 20.04
 #TODO Test on Debian 32 bit
     for indicator in indicators_to_process:
         # Whilst this is not a Python3 command, use python_run()

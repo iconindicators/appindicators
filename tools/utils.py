@@ -42,7 +42,7 @@ VENV_RUN = "venv_run"
 
 
 ''' The virtual environment into which indicators are installed. '''
-VENV_INSTALL = str( Path.home() / ".local" / "venv_indicators" )
+VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 
 def is_debian11_or_debian12():
@@ -118,7 +118,13 @@ def python_run(
     printing to stdout and stderr.
     '''
     command_ = ""
-    if not Path( f"{ venv_directory }" ).is_dir():
+
+    venv_directory_ = venv_directory
+    if "$HOME" in venv_directory_:
+        venv_directory_ = (
+            Path( venv_directory_.replace( "$HOME", '~' ) ).expanduser() )
+
+    if not Path( venv_directory_ ).is_dir():
         command_ += f"python3 -m venv { venv_directory } && "
 
     if activate_deactivate:
