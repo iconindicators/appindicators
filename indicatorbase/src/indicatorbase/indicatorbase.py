@@ -454,6 +454,7 @@ class IndicatorBase( ABC ):
         return error_message
 
 
+#TODO This function is too long...
     def _process_existing_dot_desktop_file_to_home_config_autostart(
         self,
         desktop_file_virtual_environment ):
@@ -524,6 +525,8 @@ class IndicatorBase( ABC ):
         if tags_missing:
             # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled
             # line from the original .desktop file (production or development).
+#TODO Why both with development?
+# This function only runs on released versions to handle old .desktop files, right?
             if desktop_file_virtual_environment.exists():
                 desktop_file_original = desktop_file_virtual_environment
 
@@ -543,6 +546,9 @@ class IndicatorBase( ABC ):
 
                     elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
                         if not exec_with_sleep_present:
+#TODO Not sure about the TODO below...
+# How could/can there be a {indicator} still in a .desktop file that is in
+# production or released?
                             if delay: #TODO Test if {indicator} can be changed to { indicator }
                                 output += line.replace( "{indicator}", self.indicator_name ).replace( '0', delay )
 
