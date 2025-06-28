@@ -93,11 +93,10 @@ HIP_MAIN_DAT = "hip_main.dat"
 
 
 def _initialise():
-    command = "python3 -m pip install --upgrade jplephem skyfield"
     message = ""
     stdout_, stderr_, return_code = (
         utils.python_run(
-            command,
+            "python3 -m pip install --upgrade jplephem skyfield",
             utils.VENV_BUILD,
             activate_deactivate = False ) )
 
@@ -135,15 +134,12 @@ def _create_ephemeris_planets(
         end_date = today.replace( year = today.year + years_from_today )
         date_format = "%Y/%m/%d"
 
-        command = (
-            f"python3 -m jplephem excerpt "
-            f"{ start_date.strftime( date_format ) } "
-            f"{ end_date.strftime( date_format ) } "
-            f"{ in_bsp } { data_path / 'planets.bsp' }" )
-
         stdout_, stderr_, return_code = (
             utils.python_run(
-                command,
+                f"python3 -m jplephem excerpt "
+                f"{ start_date.strftime( date_format ) } "
+                f"{ end_date.strftime( date_format ) } "
+                f"{ in_bsp } { data_path / 'planets.bsp' }",
                 utils.VENV_BUILD,
                 activate_deactivate = False ) )
 
