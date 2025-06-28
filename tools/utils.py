@@ -97,7 +97,7 @@ def get_pygobject():
         is_ubuntu2004_or_is_ubuntu2204_or_ubuntu2404() )
 
     if pygobject_needs_to_be_pinned:
-        # Need to escape the < otherwise it will be interpreted as a redirect.
+        # Escape the < otherwise it will be interpreted as a redirect.
         pygobject = r"PyGObject\<=3.50.0"
 
     else:
@@ -142,9 +142,7 @@ def python_run(
     if activate_deactivate:
         command_ += f" && deactivate"
 
-    print()
-    print( command_ )#TODO Testing.  Maybe make this an option?
-    print()
+    print( f"Executing command:\n\n{ command_ }\n\n" )
 
 #TODO This originally did not return.
 # For the new code calling indicatorlunar.tools._build_wheel.build()

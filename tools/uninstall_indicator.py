@@ -31,7 +31,7 @@ if __name__ == "__main__":
     indicators_to_process = (
         utils.get_indicators_to_process(
             f"Uninstall one or more indicators, from the Python3 virtual "
-            f"environment at { utils.VENV_INSTALL } including the "  #TODO This can be $HOME
+            f"environment at { utils.VENV_INSTALL } including the "
             ".desktop, run script, icons, .config and .cache.  "
             "If all indicators have been uninstalled, the virtual environment "
             "will also be removed.",
@@ -40,7 +40,7 @@ if __name__ == "__main__":
 #TODO Test on Debian 32 bit
     for indicator in indicators_to_process:
         command = (
-            f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"  #TODO This can be $HOME
+            f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
             f"site-packages/{ indicator }/platform/linux/uninstall.sh && "
             f"python3 -m pip uninstall --yes { indicator } && "
             f"count=$(python3 -m pip --disable-pip-version-check list | "

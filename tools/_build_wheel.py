@@ -49,7 +49,7 @@ from pathlib import Path
 if "../" not in sys.path:
     sys.path.insert( 0, "../" )
 
-from indicatorbase.src.indicatorbase import indicatorbase  #TODO Testing
+from indicatorbase.src.indicatorbase import indicatorbase
 
 from . import _markdown_to_html
 from . import utils
@@ -674,7 +674,7 @@ def _create_scripts_for_linux(
         destination = directory_platform_linux / destination_script_name
         with open( destination, 'w', encoding = "utf-8" ) as f:
             text = text.replace( "{ indicator }", indicator )
-            text = text.replace( "{ venv_indicators }", utils.VENV_INSTALL )  #TODO This must be $HOME
+            text = text.replace( "{ venv_indicators }", utils.VENV_INSTALL )
             f.write( text + '\n' )
 
         _chmod(
