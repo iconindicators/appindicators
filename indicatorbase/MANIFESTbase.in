@@ -8,3 +8,17 @@ include src/{ indicator }/platform/linux/uninstall.sh
 recursive-include src/{ indicator }/icons *.svg
 recursive-include src/{ indicator }/locale *.mo
 recursive-include src/{ indicator }/locale *.po
+
+
+
+
+include src/{indicator}/CHANGELOG.md
+include src/{indicator}/README.html
+include src/{indicator}/locale/{indicator}.pot
+include src/{indicator}/platform/linux/{indicator}.py.desktop
+include src/{indicator}/platform/linux/{indicator}.sh
+include src/{indicator}/platform/linux/install.sh
+include src/{indicator}/platform/linux/uninstall.sh
+recursive-include src/{indicator}/icons *.svg
+recursive-include src/{indicator}/locale *.mo
+recursive-include src/{indicator}/locale *.po

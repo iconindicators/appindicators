@@ -48,6 +48,11 @@
 #
 #
 # Tags below, enclosed by { }, must not contain spaces.
+     #TODO Why NOT contain spaces?  If these are tags that will be swapped out in the build process,
+     # then adding spaces adds readability.
+     #
+     # So either no spaces and therefore adjust install.sh, run.sh, uninstall.sh and MANIFESTbase.in
+     # or add spaces here.
 [Desktop Entry]
 Type=Application
 {names}
