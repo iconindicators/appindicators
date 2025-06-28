@@ -488,14 +488,14 @@ def _create_manifest_dot_in(
         Path( '.' ) / "indicatorbase" / "MANIFESTbase.in" )
 
     with open( indicatorbase_manifest_in, 'r', encoding = "utf-8" ) as f:
-        manifest_text = f.read().replace( "{ indicator }", indicator )
+        manifest_text = f.read().replace( "{indicator}", indicator )
 
     indicator_manifest_in = (
         Path( '.' ) / indicator / "MANIFESTspecific.in" )
 
     if Path( indicator_manifest_in ).exists():
         with open( indicator_manifest_in, 'r', encoding = "utf-8" ) as f:
-            manifest_text += f.read().replace( "{ indicator }", indicator )
+            manifest_text += f.read().replace( "{indicator}", indicator )
 
     release_manifest_in = directory_out / indicator / "MANIFEST.in"
     with open( release_manifest_in, 'w', encoding = "utf-8" ) as f:
@@ -674,8 +674,8 @@ def _create_scripts_for_linux(
 
         destination = directory_platform_linux / destination_script_name
         with open( destination, 'w', encoding = "utf-8" ) as f:
-            text = text.replace( "{ indicator }", indicator )
-            text = text.replace( "{ venv_indicators }", utils.VENV_INSTALL )
+            text = text.replace( "{indicator}", indicator )
+            text = text.replace( "{venv_indicators}", utils.VENV_INSTALL )
             f.write( text + '\n' )
 
         _chmod(

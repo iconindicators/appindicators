@@ -546,10 +546,7 @@ class IndicatorBase( ABC ):
 
                     elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
                         if not exec_with_sleep_present:
-#TODO Not sure about the TODO below...
-# How could/can there be a {indicator} still in a .desktop file that is in
-# production or released?
-                            if delay: #TODO Test if {indicator} can be changed to { indicator }
+                            if delay:
                                 output += line.replace( "{indicator}", self.indicator_name ).replace( '0', delay )
 
                             else:
