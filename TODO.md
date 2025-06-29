@@ -110,6 +110,7 @@ Create Github page, but unaffiliated with my username.
 This should be an organisation:
     https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/creating-a-new-organization-from-scratch
 Call it perhaps appindicators and the repository appindicators.
+See more discussion below in stardatesystemtray/worldtimesystemtray.
 Check if appindicators is trade marked.
 If possible, put in a placeholder README saying this page will hold the source at some point.
 Can then add the URL to the pyproject.toml so it appears at PyPI.
@@ -129,9 +130,9 @@ https://stackoverflow.com/questions/6695783/import-subversion-repository-into-gi
 
 ##### What about stardatesystemtray and worldtimesystemtray?
 Should these two projects also be under git/github?
-Perhaps the github organisation could be called indicators or icon-indicators.
-For the appindicators, call that repository appindicators or python-appindicators.
-For stardatesystemtray and worldtimesystemtray, call the repository perhaps java-system-tray-icons
+Perhaps the github organisation could be called indicators or icon-indicators or indicator-icons.
+For the Linux appindicators, call that repository appindicators or python-appindicators.
+For Windows stardatesystemtray and worldtimesystemtray, call the repository perhaps java-system-tray-icons.
 Need to look into what version of Java and/or Windows to support.
 Windows XP is no longer supported and neither is Java 6.
 So maybe look at supporting only Windows 10/11 (check for the EOL dates),
