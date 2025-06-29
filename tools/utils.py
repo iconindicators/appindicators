@@ -110,7 +110,7 @@ def python_run(
     command,
     venv_directory,
     *modules_to_install,
-    force_reinstall = False ):  #TODO Is this needed?  Maybe always set to False?
+    force_reinstall = False ):
     '''
     Creates the Python3 virtual environment if it does not exist,
     installs modules specified and runs the Python3 command,
@@ -132,9 +132,8 @@ def python_run(
 
     if len( modules_to_install ):
         commands.append(
-            # "python3 -m pip install --upgrade "
-            "python3 -m pip install "#TODO Replace with above
-            f"{ '--force-reinstall' if force_reinstall else '' } "  #TODO Needed?  If not, remove space at end after --upgrade.
+            "python3 -m pip install --upgrade"
+            f"{ ' --force-reinstall' if force_reinstall else '' } "
             f"{ ' '.join( modules_to_install ) }" )
 
     if command:
