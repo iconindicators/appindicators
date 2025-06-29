@@ -80,6 +80,9 @@ def is_ubuntu2004_or_is_ubuntu2204_or_ubuntu2404():
     return is_ubuntu or is_linux_mint
 
 
+#TODO Not sure if this comment
+#   https://github.com/beeware/toga/issues/3143#issuecomment-3002687050
+# is relevant.
 def get_pygobject():
     '''
     PyGObject is required for running an indicator.
