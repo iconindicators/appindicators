@@ -649,6 +649,31 @@ class IndicatorBase( ABC ):
         return changelog
 
 
+    @staticmethod
+    def get_year_in_changelog_markdown(
+        changelog_markdown,
+        first_year = True ):
+        '''
+        If first_year = True, retrieves the first/earliest year from
+        CHANGELOG.md otherwise retrieves the most recent year.
+        '''
+        year = ""
+        with open( changelog_markdown, 'r', encoding = "utf-8" ) as f:
+            lines = f.readlines()
+            if first_year:
+                lines = reversed( lines )
+
+            for line in lines:
+                if line.startswith( "## v" ):
+                    left_parenthesis = line.find( '(' )
+                    year = (
+                        line[ left_parenthesis + 1 : left_parenthesis + 1 + 4 ] )
+
+                    break
+
+        return year
+
+
     def main( self ):
         ''' Entry point to the indicator. '''
         self.request_update()
@@ -1083,6 +1108,15 @@ class IndicatorBase( ABC ):
         if len( menuitems ) > 1:
             for menuitem in self.indicator.get_menu().get_children():
                 menuitem.set_sensitive( toggle )
+
+
+    @staticmethod
+    def get_etc_os_release():
+        '''
+        Return the result of calling
+            cat /etc/os-release
+        '''
+        return IndicatorBase.process_run( "cat /etc/os-release" )[ 0 ]
 
 
     @staticmethod
@@ -2494,18 +2528,9 @@ class IndicatorBase( ABC ):
         return y
 
 
-    @staticmethod
-    def get_logging():
-        logging_ = None
-        if IndicatorBase._LOGGING_INITIALISED:
-            logging_ = logging
-
-        return logging_
-
-#TODO If the above stays, need to find all calls to self.get_logging()
-# and replace with IndicatorBase.get_logging()
-    # def get_logging( self ):
-    #     return logging
+    def get_logging( self ):
+        ''' Return a handle to the logger. '''
+        return logging
 
 
     def is_number(
@@ -3097,13 +3122,13 @@ class IndicatorBase( ABC ):
         return directory
 
 
-#TODO Hopefully can stay
     @staticmethod
     def process_run(
         command,
         capture_output = True,
         print_ = False,
-        logging = None ):  #TODO Handle logging...will (SHOULD) exist for calls from indicators, but not from tools.
+        logging = None ):
+#TODO Check if logging is done for all cases.
         '''
         Executes the command, returning the tuple:
             stdout
@@ -3133,8 +3158,8 @@ class IndicatorBase( ABC ):
             if capture_output:
                 stdout_ = result.stdout.decode().strip()
                 stderr_ = result.stderr.decode()
-                # if stderr_ and IndicatorBase._LOGGING_INITIALISED:
-                #     IndicatorBase.get_logging().error( stderr_ )
+                # if stderr_:
+                #     logging.error( stderr_ )
 
             else:
                 stdout_ = ""
@@ -3175,42 +3200,6 @@ class IndicatorBase( ABC ):
                 print( f"return code: { return_code }" )
 
         return stdout_, stderr_, return_code
-
-
-#TODO Can this stay?
-    @staticmethod
-    def get_etc_os_release():
-        '''
-        Return the result of calling
-            cat /etc/os-release
-        '''
-        return IndicatorBase.process_run( "cat /etc/os-release" )[ 0 ]
-
-
-#TODO Hopefully can stay
-    @staticmethod
-    def get_year_in_changelog_markdown(
-        changelog_markdown,
-        first_year = True ):
-        '''
-        If first_year = True, retrieves the first/earliest year from
-        CHANGELOG.md otherwise retrieves the most recent year.
-        '''
-        year = ""
-        with open( changelog_markdown, 'r', encoding = "utf-8" ) as f:
-            lines = f.readlines()
-            if first_year:
-                lines = reversed( lines )
-
-            for line in lines:
-                if line.startswith( "## v" ):
-                    left_parenthesis = line.find( '(' )
-                    year = (
-                        line[ left_parenthesis + 1 : left_parenthesis + 1 + 4 ] )
-
-                    break
-
-        return year
 
 
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
