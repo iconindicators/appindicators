@@ -188,7 +188,7 @@ def _create_ephemeris_stars(
 
 def build( out_path ):
     ''' Called by the build wheel process. '''
-    # if True: return "" #TODO Remove this line if including astroskyfield et al.
+    if True: return "" #TODO Remove this line if including astroskyfield et al.
 
     message = ""
 
