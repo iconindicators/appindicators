@@ -108,7 +108,7 @@ def _create_update_pot(
         f"--package-version={ version } "
         f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' "
         f"-o { pot_file_new }",
-        capture_output = False,
+        capture_output = False, #TODO What happens if capture_output is True?
         print_ = True )
 
     with open( pot_file_new, 'r', encoding = "utf-8" ) as r:
@@ -168,7 +168,7 @@ def _create_update_po(
             indicatorbase.IndicatorBase.process_run(
                 f"msgmerge { po_file_original } { pot_file } "
                 f"-o { po_file_new }",
-                capture_output = False,
+                capture_output = False, #TODO What happens if capture_output is True?
                 print_ = True )
 
             with open( po_file_new, 'r', encoding = "utf-8" ) as r:
@@ -208,7 +208,7 @@ def _create_update_po(
                 f"-o { po_file_original } "
                 f"-l { lingua_code } "
                 "--no-translator",
-                capture_output = False,
+                capture_output = False, #TODO What happens if capture_output is True?
                 print_ = True )
 
             with open( po_file_original, 'r', encoding = "utf-8" ) as r:
@@ -298,7 +298,7 @@ def _build_locale_for_release(
         f"{ str( directory_indicator_locale / ( indicator + '.pot' ) ) } "
         f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } "
         f"-o { str( directory_indicator_locale / ( indicator + '.pot' ) ) }",
-        capture_output = False,
+        capture_output = False, #TODO What happens if capture_output is True?
         print_ = True )
 
     # For each locale, merge indicatorbase PO with indicator PO.
@@ -309,7 +309,7 @@ def _build_locale_for_release(
             f"{ str( po ) } "
             f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } "
             f"-o { str( po ) } ",
-            capture_output = False,
+            capture_output = False, #TODO What happens if capture_output is True?
             print_ = True )
 
     # Create .mo files.
@@ -317,7 +317,7 @@ def _build_locale_for_release(
         indicatorbase.IndicatorBase.process_run(
             f"msgfmt { str( po ) } "
             f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }",
-            capture_output = False,
+            capture_output = False, #TODO What happens if capture_output is True?
             print_ = True )
 
 

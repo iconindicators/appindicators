@@ -310,7 +310,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         " \"" + script.get_name().replace( '-', '\\-' ) + "\"" +
                         " \"" + command_result.replace( '-', '\\-' ) + "\"" )
 
-                    IndicatorBase.process_run( command, capture_output = False )
+                    IndicatorBase.process_run( command, capture_output = False )  #TODO What happens if capture_output is True????
 
 
     def _update_background_script(

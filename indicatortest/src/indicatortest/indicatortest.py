@@ -467,7 +467,7 @@ class IndicatorTest( IndicatorBase ):
 
             Thread(
                 target = IndicatorBase.process_run,
-                args = ( command_, False, False ) ).start()
+                args = ( command_, False, False ) ).start()  #TODO What happens if capture_output (first False) is True?
 
             print( "Executing command: " + command_ )
 

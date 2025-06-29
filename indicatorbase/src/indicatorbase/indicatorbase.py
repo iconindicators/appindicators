@@ -3125,81 +3125,145 @@ class IndicatorBase( ABC ):
     @staticmethod
     def process_run(
         command,
-        capture_output = True,
-        print_ = False,
         logging = None ):
-#TODO Check if logging is done for all cases.
         '''
         Executes the command, returning the tuple:
             stdout
             stderr
             return code
 
-    #TODO Why not ALWAYS capture output?
-        If capture_output is True, stdout and stderr are captured;
-        otherwise, stdout and stderr are set to "".
-
-    #TODO Is this needed? If end user wants the result, up to end user to sift stdout from stderr.
-        If print_ is True, prints stdout and stderr to the console.
-
-        On stderr or exception, logs to a file, if logging was previously
-        initialised.
+        On stderr or exception, logs to a file if a logger is provided.
         '''
         try:
             result = (
                 subprocess.run(
                     command,
                     shell = True,
-                    capture_output = capture_output ) )
-    #TODO Used to have check = True, but that throws an exception for grep when grep
-    # finds no result but returns a 1 (which is not 0 and thus an exception is thrown).
-    # Who/when might need check = True?
+                    capture_output = True ) )
+#TODO Used to have check = True, but that throws an exception for grep when grep
+# finds no result but returns a 1 (which is not 0 and thus an exception is thrown).
+# Who/when might need check = True?
+#
+# Keep the above as a comment...want to make sure I don't later add in check = True and break stuff!
 
-            if capture_output:
-                stdout_ = result.stdout.decode().strip()
-                stderr_ = result.stderr.decode()
-                # if stderr_:
-                #     logging.error( stderr_ )
-
-            else:
-                stdout_ = ""
-                stderr_ = ""
-
+            stdout_ = result.stdout.decode().strip()
+            stderr_ = result.stderr.decode()
             return_code = result.returncode
+            if stderr_ and logging:
+                logging.error( stderr_ )
 
         except subprocess.CalledProcessError as e:
             print( "EXCEPTION" ) #TODO Testing
-            # if logging:# TODO Need this but what about below?
-            # if IndicatorBase._LOGGING_INITIALISED:
-            #     print("----") #TODO Testing
-            #     print( e.stdout )
-            #     print("----")
-            #     print( e.stderr )
-            #     print("----")
-            #     print( e.returncode )
-            #     print("----")
-            #     IndicatorBase.get_logging().error( e.stderr.decode() )
-
-    #TODO Find a way to trigger this exception and determine what happens when
-    # capture_output is True (stdout/stderr should be defined so decode is okay) and
-    # when capture_output is False (stdout/stderr should be not be defined so decode is unsafe).
-    # Can trigger the exception on grep but no result but get a return code of 1
-    # but need to set check = True in the call to subprocess.run().
-            stdout_ = e.stdout.decode()
+            stdout_ = e.stdout.decode().strip()
             stderr_ = e.stderr.decode()
             return_code = e.returncode
+            if logging:
+                logging.error( stderr_ )
 
-        if print_:
-            if stdout_:
-                print( stdout_ )
+            #TODO Find a way to trigger this exception and determine what happens when
+            # capture_output is True (stdout/stderr should be defined so decode is okay) and
+            # when capture_output is False (stdout/stderr should be not be defined so decode is unsafe).
+            # Can trigger the exception on grep but no result but get a return code of 1
+            # but need to set check = True in the call to subprocess.run().
+            #
+            # IS THIS STILL RELEVENT?  
 
-            elif stderr_:
-                print( stderr_ )
-
-            if return_code != 0:
-                print( f"return code: { return_code }" )
+#TODO What's the point of printing here if we return the same stuff after the print?
+# Maybe saves each caller some work?
+        # if print_:
+        #     if stdout_:
+        #         print( stdout_ )
+        #
+        #     elif stderr_:
+        #         print( stderr_ )
+        #
+        #     if return_code != 0:
+        #         print( f"return code: { return_code }" )
 
         return stdout_, stderr_, return_code
+
+
+##### ORIGINAL ######
+#     @staticmethod
+#     def process_run(
+#         command,
+#         capture_output = True,  #TODO I think this should always be true.
+#         print_ = False,
+#         logging = None ):
+# #TODO Check if logging is done for all cases.
+#         '''
+#         Executes the command, returning the tuple:
+#             stdout
+#             stderr
+#             return code
+#
+#     #TODO Why not ALWAYS capture output?
+#         If capture_output is True, stdout and stderr are captured;
+#         otherwise, stdout and stderr are set to "".
+#
+#     #TODO Is this needed? If end user wants the result, up to end user to sift stdout from stderr.
+#         If print_ is True, prints stdout and stderr to the console.
+#
+#         On stderr or exception, logs to a file, if logging was previously
+#         initialised.
+#         '''
+#         try:
+#             result = (
+#                 subprocess.run(
+#                     command,
+#                     shell = True,
+#                     capture_output = capture_output ) )
+#     #TODO Used to have check = True, but that throws an exception for grep when grep
+#     # finds no result but returns a 1 (which is not 0 and thus an exception is thrown).
+#     # Who/when might need check = True?
+#
+#             if capture_output:
+#                 stdout_ = result.stdout.decode().strip()
+#                 stderr_ = result.stderr.decode()
+#                 # if stderr_:
+#                 #     logging.error( stderr_ )
+#
+#             else:
+#                 stdout_ = ""
+#                 stderr_ = ""
+#
+#             return_code = result.returncode
+#
+#         except subprocess.CalledProcessError as e:
+#             print( "EXCEPTION" ) #TODO Testing
+#             # if logging:# TODO Need this but what about below?
+#             # if IndicatorBase._LOGGING_INITIALISED:
+#             #     print("----") #TODO Testing
+#             #     print( e.stdout )
+#             #     print("----")
+#             #     print( e.stderr )
+#             #     print("----")
+#             #     print( e.returncode )
+#             #     print("----")
+#             #     IndicatorBase.get_logging().error( e.stderr.decode() )
+#
+#     #TODO Find a way to trigger this exception and determine what happens when
+#     # capture_output is True (stdout/stderr should be defined so decode is okay) and
+#     # when capture_output is False (stdout/stderr should be not be defined so decode is unsafe).
+#     # Can trigger the exception on grep but no result but get a return code of 1
+#     # but need to set check = True in the call to subprocess.run().
+#             stdout_ = e.stdout.decode()
+#             stderr_ = e.stderr.decode()
+#             return_code = e.returncode
+#
+# #TODO What's the point of printing here if we return the same stuff after the print?
+# # Maybe saves each caller some work?
+#         if print_:
+#             if stdout_:
+#                 print( stdout_ )
+#
+#             elif stderr_:
+#                 print( stderr_ )
+#
+#             if return_code != 0:
+#                 print( f"return code: { return_code }" )
+#
+#         return stdout_, stderr_, return_code
 
 
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):

@@ -287,7 +287,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         else:
             IndicatorBase.process_run(
                 self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &",
-                capture_output = False )
+                capture_output = False ) #TODO What happens if capture_output is True?
 
 
     def bring_window_to_front(
@@ -319,7 +319,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                         window_id = line[ 0 : line.find( " " ) ]
                         IndicatorBase.process_run(
                             "wmctrl -i -a " + window_id,
-                            capture_output = False )
+                            capture_output = False ) #TODO What happens if capture_output is True?
 
                         break
 
@@ -397,7 +397,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         def start_virtualbox_manager():
             IndicatorBase.process_run(
                 IndicatorBase.process_run( "which VirtualBox" )[ 0 ] + " &",
-                capture_output = False )
+                capture_output = False ) #TODO What happens if capture_output is True?
 
 
         if self.is_session_type_x11():
@@ -419,7 +419,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 window_id = window_information.split()[ 0 ]
                 IndicatorBase.process_run(
                     f"wmctrl -ia { window_id }",
-                    capture_output = False )
+                    capture_output = False ) #TODO What happens if capture_output is True?
 
             else:
                 start_virtualbox_manager()
