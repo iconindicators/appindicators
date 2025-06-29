@@ -35,7 +35,7 @@ Additional indicators may be appended to the above command.
 
 ## Install an Indicator's Wheel
 
-Prerequisite: the indicator's `.whl` must be built.
+**Prerequisite:** the indicator's `.whl` must be built.
 
 To install a `.whl` for `indicatortest` located in `release/wheel/dist_indicatortest`:
 
@@ -53,7 +53,7 @@ Various operating system packages will likely need to be installed; refer to the
 
 ## Run an Indicator (from within the source tree)
 
-Prerequisite: the indicator's `.whl` must be built.
+**Prerequisite:** the indicator's `.whl` must be built.
 
 To run a `indicatortest`:
 
@@ -82,7 +82,7 @@ As part of running the indicator, a symbolic link to `indicatorbase.py` is creat
 
 ## Development under Geany
 
-Prerequisite: the indicator's `.whl` must be built and run within the source tree.
+**Prerequisite:** the indicator's `.whl` must be built and run within the source tree.
 
 **Geany Setup**
 
@@ -117,7 +117,7 @@ References:
 
 ## Development under Eclipse
 
-Prerequisite: the indicator's `.whl` must be built and run within the source tree.
+**Prerequisite:** the indicator's `.whl` must be built and run within the source tree.
 
 **Eclipse Setup**
 
@@ -181,7 +181,7 @@ References:
 
 ## Run an Installed Indicator
 
-Prerequisite: the indicator's `.whl` must be built and installed.
+**Prerequisite:** the indicator's `.whl` must be built and installed.
 
 To run an indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
 
