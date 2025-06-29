@@ -30,8 +30,8 @@ from . import utils
 indicator_to_dependencies = {
     "indicatorlunar" :
         list( compress(
-            [ "ephem", "sgp4",       "skyfield" ],
-            [  True,    True,   sys.maxsize > 2**32 ] ) ) }
+            [ "ephem", "sgp4",     "skyfield",           "pandas"       ],
+            [  True,    True,  sys.maxsize > 2**32, sys.maxsize > 2**32 ] ) ) }
 
 
 if __name__ == "__main__":
@@ -48,7 +48,8 @@ if __name__ == "__main__":
             "$dirs/src/$dirs/indicatorbase.py; fi ; "
             "done && "
             f"cd { indicator }/src && "
-            f"python3 -m { indicator }.{ indicator }" )
+            f"python3 -m { indicator }.{ indicator } && "
+            "cd ../.." )
 
         dependencies = [ "pip", f"{ utils.get_pygobject() }" ]
         if indicator in indicator_to_dependencies:
