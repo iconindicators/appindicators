@@ -37,8 +37,6 @@ if __name__ == "__main__":
 
 #TODO Test on Debian 32 bit
     for indicator in indicators_to_process:
-        # Whilst this is not a Python3 command, use python_run()
-        # to install the wheel and then run the subsequent install.sh
         command = (
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
             f"site-packages/{ indicator }/platform/linux/install.sh" )

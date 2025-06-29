@@ -63,7 +63,7 @@ however, the build will continue without failing.
 import gettext
 import sys
 
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from pathlib import Path
 
 if '../../' not in sys.path:
@@ -96,9 +96,10 @@ def _initialise():
     message = ""
     stdout_, stderr_, return_code = (
         utils.python_run(
-            "python3 -m pip install --upgrade jplephem skyfield",
+            "",
             utils.VENV_BUILD,
-            activate_deactivate = False ) )
+            "jplephem",
+            "skyfield" ) )
 
     if stderr_:
         message = stderr_
@@ -140,8 +141,7 @@ def _create_ephemeris_planets(
                 f"{ start_date.strftime( date_format ) } "
                 f"{ end_date.strftime( date_format ) } "
                 f"{ in_bsp } { data_path / 'planets.bsp' }",
-                utils.VENV_BUILD,
-                activate_deactivate = False ) )
+                utils.VENV_BUILD ) )
 
         if stderr_:
             message = stderr_
@@ -188,7 +188,7 @@ def _create_ephemeris_stars(
 
 def build( out_path ):
     ''' Called by the build wheel process. '''
-    if True: return "" #TODO Remove this line if including astroskyfield et al.
+    # if True: return "" #TODO Remove this line if including astroskyfield et al.
 
     message = ""
 

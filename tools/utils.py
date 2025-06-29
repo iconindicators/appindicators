@@ -106,20 +106,17 @@ def get_pygobject():
     return pygobject
 
 
-#TODO WHo calls this?
-# Are any of the commands install?
 def python_run(
     command,
     venv_directory,
     *modules_to_install,
-    force_reinstall = False,  #TODO Is this needed?  Maybe always set to False?
-    activate_deactivate = True ):
+    force_reinstall = False ):  #TODO Is this needed?  Maybe always set to False?
     '''
     Creates the Python3 virtual environment if it does not exist,
     installs modules specified and runs the Python3 command,
-    printing to stdout and stderr.
+    returning stdout, stderr and the return code as a tuple.
     '''
-    command_ = ""
+    commands = [ ]
 
     venv_directory_ = venv_directory
     if "$HOME" in venv_directory_:
@@ -127,24 +124,28 @@ def python_run(
             Path( venv_directory_.replace( "$HOME", '~' ) ).expanduser() )
 
     if not Path( venv_directory_ ).is_dir():
-        command_ += f"python3 -m venv { venv_directory } && "
+        commands.append( f"python3 -m venv { venv_directory }" )
 
-    if activate_deactivate:
-        command_ += f". { venv_directory }/bin/activate && "
+    # https://docs.python.org/3/library/venv.html#how-venvs-work
+    if sys.prefix == sys.base_prefix:
+        commands.append( f". { venv_directory }/bin/activate" )
 
     if len( modules_to_install ):
-        command_ += (
+        commands.append(
             # "python3 -m pip install --upgrade "
-            "python3 -m pip install  "#TODO Replace with above
+            "python3 -m pip install "#TODO Replace with above
             f"{ '--force-reinstall' if force_reinstall else '' } "  #TODO Needed?  If not, remove space at end after --upgrade.
-            f"{ ' '.join( modules_to_install ) } && " )
+            f"{ ' '.join( modules_to_install ) }" )
 
-    command_ += f"{ command }"
+    if command:
+        commands.append( f"{ command }" )
 
-    if activate_deactivate:
-        command_ += f" && deactivate"
+    if sys.prefix == sys.base_prefix:
+        commands.append( "deactivate" )
 
-    print( f"Executing command:\n\n{ command_ }\n\n" )
+    command_ = " && ".join( commands )
+
+    print( f"\n\nExecuting command:\n\n{ command_ }\n\n" )
 
 #TODO This originally did not return.
 # For the new code calling indicatorlunar.tools._build_wheel.build()
