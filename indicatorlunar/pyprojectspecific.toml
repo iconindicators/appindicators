@@ -13,6 +13,7 @@ classifiers = [
 # In the pip install instructions, use bash trickery to determine if
 # 32 bit or 64 bit and adjust the install line to include PyEphem or
 # both PyEphem and Skyfield.
+# For Skyfield, also specify pandas for use in minor planets / comets).
 dependencies = [
   "ephem",
   "sgp4" ]  #TODO This has cpp code; ensure this installs on 32 bit, as it is
