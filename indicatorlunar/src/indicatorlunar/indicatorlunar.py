@@ -42,6 +42,8 @@ from .dataproviderapparentmagnitude import DataProviderApparentMagnitude
 from .dataprovidergeneralperturbation import DataProviderGeneralPerturbation
 from .dataproviderorbitalelement import DataProviderOrbitalElement, OrbitalElement
 
+from . import eclipse
+
 
 class IndicatorLunar( IndicatorBase ):
     ''' Main class which encapsulates the indicator. '''
@@ -249,10 +251,6 @@ class IndicatorLunar( IndicatorBase ):
 
         self.flush_the_cache()
         self.initialise_download_counts_and_cache_date_times()
-
-        # On comet lookup and download of comet / minor planet data,
-        # an unnecessary log message is created, so ignore.
-        self.get_logging().getLogger( "urllib3" ).propagate = False
 
 
     def flush_the_cache( self ):
