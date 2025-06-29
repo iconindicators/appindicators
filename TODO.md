@@ -114,7 +114,6 @@ Check if appindicators is trade marked.
 If possible, put in a placeholder README saying this page will hold the source at some point.
 Can then add the URL to the pyproject.toml so it appears at PyPI.
 
-
 ##### Importing an existing repository into git/github
 Include the history?
 http://esr.ibiblio.org/?p=6778
@@ -127,7 +126,6 @@ https://stackoverflow.com/questions/79165/how-do-i-migrate-an-svn-repository-wit
 https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
 https://git-scm.com/docs/git-svn
 https://stackoverflow.com/questions/6695783/import-subversion-repository-into-git
-
 
 ##### What about stardatesystemtray and worldtimesystemtray?
 Should these two projects also be under git/github?
