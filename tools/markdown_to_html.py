@@ -25,7 +25,6 @@ from . import utils
 
 
 if __name__ == "__main__":
-#TODO Test on Debian 32 bit
     current_working_directory = Path.cwd()
     markdown = str( current_working_directory / "README.md" )
     html = str( current_working_directory / "README.html" )

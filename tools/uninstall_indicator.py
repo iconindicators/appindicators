@@ -37,7 +37,6 @@ if __name__ == "__main__":
             "will also be removed.",
             "uninstall" ) )
 
-#TODO Test on Debian 32 bit
     for indicator in indicators_to_process:
         command = (
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
