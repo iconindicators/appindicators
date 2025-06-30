@@ -268,7 +268,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             " -A 366" )
 
         events_sorted_by_date = [ ]
-        for line in IndicatorBase.process_run( command )[ 0 ].splitlines():
+        for line in IndicatorBase.process_run( command )[ 0 ].splitlines():#TODO Should this check stderr/return code?  What to do on failure?
             if line.startswith( '\t' ): # Continuation of the previous event.
                 date_ = events_sorted_by_date[ -1 ].get_date()
 

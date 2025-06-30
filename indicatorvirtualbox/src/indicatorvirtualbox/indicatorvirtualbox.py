@@ -274,7 +274,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         uuid ):
 
         command = f"VBoxManage list vms | grep { uuid }"
-        virtual_machines = IndicatorBase.process_run( command )[ 0 ]
+        virtual_machines = IndicatorBase.process_run( command )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
         if uuid not in virtual_machines:
             message = _(
                 "The virtual machine could not be found - " +
@@ -285,7 +285,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.show_notification( _( "Error" ), message )
 
         else:
-            IndicatorBase.process_run(
+            IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
                 self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &",
                 capture_output = False ) #TODO What happens if capture_output is True?
 
@@ -298,7 +298,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         if self.is_session_type_x11():
             command = 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l'
             number_of_windows_with_the_same_name = (
-                IndicatorBase.process_run( command )[ 0 ] )
+                IndicatorBase.process_run( command )[ 0 ] )#TODO Should this check stderr/return code?  What to do on failure?
 
             if number_of_windows_with_the_same_name == "0":
                 message = _(
@@ -313,11 +313,11 @@ class IndicatorVirtualBox( IndicatorBase ):
                     delay_in_seconds = delay_in_seconds )
 
             elif number_of_windows_with_the_same_name == "1":
-                window_list = IndicatorBase.process_run( "wmctrl -l" )[ 0 ]
+                window_list = IndicatorBase.process_run( "wmctrl -l" )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
                 for line in window_list.splitlines():
                     if virtual_machine_name in line:
                         window_id = line[ 0 : line.find( " " ) ]
-                        IndicatorBase.process_run(
+                        IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
                             "wmctrl -i -a " + window_id,
                             capture_output = False ) #TODO What happens if capture_output is True?
 
@@ -395,8 +395,8 @@ class IndicatorVirtualBox( IndicatorBase ):
     def on_launch_virtual_box_manager( self ):
 
         def start_virtualbox_manager():
-            IndicatorBase.process_run(
-                IndicatorBase.process_run( "which VirtualBox" )[ 0 ] + " &",
+            IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
+                IndicatorBase.process_run( "which VirtualBox" )[ 0 ] + " &",#TODO Should this check stderr/return code?  What to do on failure?
                 capture_output = False ) #TODO What happens if capture_output is True?
 
 
@@ -414,10 +414,10 @@ class IndicatorVirtualBox( IndicatorBase ):
             command = (
                 f"wmctrl -l | grep \"{ self.virtualbox_manager_window_name }\"" )
 
-            window_information = IndicatorBase.process_run( command )[ 0 ]
+            window_information = IndicatorBase.process_run( command )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
             if window_information:
                 window_id = window_information.split()[ 0 ]
-                IndicatorBase.process_run(
+                IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
                     f"wmctrl -ia { window_id }",
                     capture_output = False ) #TODO What happens if capture_output is True?
 
@@ -435,7 +435,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         Returns a list of running virtual machine names and list of
         corresponding running virtual machine UUIDs.
         '''
-        running_vms = IndicatorBase.process_run( "VBoxManage list runningvms" )[ 0 ]
+        running_vms = IndicatorBase.process_run( "VBoxManage list runningvms" )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
         names = [ ]
         uuids = [ ]
         for line in running_vms.splitlines():
@@ -454,7 +454,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         uuid ):
 
         command = "VBoxManage list runningvms | grep " + uuid
-        return uuid in IndicatorBase.process_run( command )[ 0 ]
+        return uuid in IndicatorBase.process_run( command )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
 
 
     def get_virtual_machines( self ):
@@ -488,7 +488,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         top_group = Group( "" )
         command = "VBoxManage list vms --long"
-        for line in IndicatorBase.process_run( command )[ 0 ].splitlines():
+        for line in IndicatorBase.process_run( command )[ 0 ].splitlines():#TODO Should this check stderr/return code?  What to do on failure?
             if line.startswith( "Name:" ):
                 name = line.split( "Name:" )[ 1 ].strip()
 
@@ -505,7 +505,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def is_vboxmanage_installed( self ):
-        which_vboxmanage = IndicatorBase.process_run( "which VBoxManage" )[ 0 ]
+        which_vboxmanage = IndicatorBase.process_run( "which VBoxManage" )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
         return which_vboxmanage.find( "VBoxManage" ) > -1
 
 

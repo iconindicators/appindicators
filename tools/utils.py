@@ -153,7 +153,7 @@ def python_run(
 # For the new code calling indicatorlunar.tools._build_wheel.build()
 # I think the return is needed.
 # So does the return affect anything other callers?
-    return indicatorbase.IndicatorBase.process_run( command_, print_ = True )
+    return indicatorbase.IndicatorBase.process_run( command_, print_ = True )#TODO Should this check stderr/return code?  What to do on failure?
 
 
 def _get_parser(

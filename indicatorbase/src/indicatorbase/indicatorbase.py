@@ -220,10 +220,10 @@ class IndicatorBase( ABC ):
         IndicatorBase._LOGGING_INITIALISED = True
 
         self.current_desktop = (
-            IndicatorBase.process_run( "echo $XDG_CURRENT_DESKTOP" )[ 0 ] )
+            IndicatorBase.process_run( "echo $XDG_CURRENT_DESKTOP" )[ 0 ] )#TODO Should this check stderr/return code?  What to do on failure?
 
         self.session_type = (
-            IndicatorBase.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )
+            IndicatorBase.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )#TODO Should this check stderr/return code?  What to do on failure?
 
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
@@ -1116,7 +1116,7 @@ class IndicatorBase( ABC ):
         Return the result of calling
             cat /etc/os-release
         '''
-        return IndicatorBase.process_run( "cat /etc/os-release" )[ 0 ]
+        return IndicatorBase.process_run( "cat /etc/os-release" )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
 
 
     @staticmethod
@@ -1176,6 +1176,7 @@ class IndicatorBase( ABC ):
             IndicatorBase.process_run( command )    #TODO Check the pipe to stderr still works!
                                                     # Also, set capture_output = False?
                                                     # Need to do this on Wayland and not Ubuntu 20.04
+                                                    #TODO Should this check stderr/return code?  What to do on failure?
 
         else:
             selection = Gdk.SELECTION_CLIPBOARD
@@ -1192,7 +1193,7 @@ class IndicatorBase( ABC ):
         '''
         text_in_clipboard = None
         if self.is_session_type_wayland():
-            text_in_clipboard = IndicatorBase.process_run( "wl-paste" )[ 0 ]
+            text_in_clipboard = IndicatorBase.process_run( "wl-paste" )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
 
         else:
             text_in_clipboard = (
@@ -1225,7 +1226,7 @@ class IndicatorBase( ABC ):
             # Shield the user from having to know about Wayland or X11 by
             # wrapping wl-clipboard within a callback function.
             primary_received_callback_function(
-                IndicatorBase.process_run( "wl-paste --primary" )[ 0 ] )
+                IndicatorBase.process_run( "wl-paste --primary" )[ 0 ] )#TODO Should this check stderr/return code?  What to do on failure?
 
         else:
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
@@ -2589,7 +2590,7 @@ class IndicatorBase( ABC ):
         is_qterminal_and_broken_ = False
         if "qterminal" in terminal:
             qterminal_version = (
-                IndicatorBase.process_run( "qterminal --version" )[ 0 ] )
+                IndicatorBase.process_run( "qterminal --version" )[ 0 ] )#TODO Should this check stderr/return code?  What to do on failure?
 
             is_qterminal_and_broken_ = qterminal_version < "1.2.0"
 
@@ -2604,7 +2605,7 @@ class IndicatorBase( ABC ):
         terminal = None
         execution_flag = None
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
-            terminal = IndicatorBase.process_run( "which " + _terminal )[ 0 ]
+            terminal = IndicatorBase.process_run( "which " + _terminal )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
             if terminal:
                 execution_flag = _execution_flag
                 break
@@ -3271,12 +3272,10 @@ class IndicatorBase( ABC ):
 # To be called as follows:
     '''
         self.test_method( command = "command" )
-
-        print( 111 )
-
         IndicatorBase.test_method( command = "command", logging = self.get_logging() )
-
     '''
+# Also double check; maybe it is okay to call a static function within a class
+# using self rather than the class name.
     def test_method( self = None, command = "", logging = None ):
         if self is None:
             print("static bit")
