@@ -2530,7 +2530,7 @@ class IndicatorBase( ABC ):
     # def get_logging( self ):
     #     ''' Return a handle to the logger. '''
     #     return logging
-#TODO Not sure if the above goes...depends if this new static version 
+#TODO Not sure if the above goes...depends if this new static version
 # can be referenced from indicators.
 
     @staticmethod
@@ -3123,8 +3123,6 @@ class IndicatorBase( ABC ):
         return directory
 
 
-#TODO Check who calls this: any legacy callers still referring to logging or capture_output
-# or anything else other than command?
     @staticmethod
     def process_run(
         command ):
@@ -3149,7 +3147,7 @@ class IndicatorBase( ABC ):
                 if return_code != 0:
                     IndicatorBase.get_logging().error( f"Return code: { return_code }" )
 
-        
+
         try:
             result = (
                 subprocess.run(
@@ -3169,13 +3167,18 @@ class IndicatorBase( ABC ):
                 log( command, stdout_, stderr_, return_code )
 
         except subprocess.CalledProcessError as e:
-            #TODO Find a way to trigger this exception and determine what happens when
-            # capture_output is True (stdout/stderr should be defined so decode is okay) and
-            # when capture_output is False (stdout/stderr should be not be defined so decode is unsafe).
-            # Can trigger the exception on grep but no result but get a return code of 1
-            # but need to set check = True in the call to subprocess.run().
+            #TODO Not sure if check = True is needed (default is false).
+            # https://docs.python.org/3/library/subprocess.html#subprocess.run
             #
-            # IS THIS ISSUE STILL RELEVENT?
+            # If check is true, and the process exits with a non-zero exit code,
+            # a CalledProcessError exception will be raised.
+            # Attributes of that exception hold the arguments, the exit code,
+            # and stdout and stderr if they were captured.
+            #
+            # Is there a way to test this (whether or not check = True always
+            # or check = False always?
+            # Consider testing with 'grep'...what is passed back on a grep match
+            # and no grep match (stdout, stderr and return code)?
             stdout_ = e.stdout.decode().strip()
             stderr_ = e.stderr.decode()
             return_code = e.returncode
