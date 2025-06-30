@@ -107,9 +107,7 @@ def _create_update_pot(
         f"--package-name={ indicator } "
         f"--package-version={ version } "
         f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' "
-        f"-o { pot_file_new }",
-        capture_output = False, #TODO What happens if capture_output is True?
-        print_ = True )
+        f"-o { pot_file_new }" )
 
     with open( pot_file_new, 'r', encoding = "utf-8" ) as r:
         text = (
@@ -167,9 +165,7 @@ def _create_update_po(
             po_file_new = str( po_file_original ).replace( '.po', '.new.po' )
             indicatorbase.IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
                 f"msgmerge { po_file_original } { pot_file } "
-                f"-o { po_file_new }",
-                capture_output = False, #TODO What happens if capture_output is True?
-                print_ = True )
+                f"-o { po_file_new }" )
 
             with open( po_file_new, 'r', encoding = "utf-8" ) as r:
                 new = r.read()
@@ -207,9 +203,7 @@ def _create_update_po(
                 f"-i { pot_file } "
                 f"-o { po_file_original } "
                 f"-l { lingua_code } "
-                "--no-translator",
-                capture_output = False, #TODO What happens if capture_output is True?
-                print_ = True )
+                "--no-translator" )
 
             with open( po_file_original, 'r', encoding = "utf-8" ) as r:
                 text = (
@@ -297,9 +291,7 @@ def _build_locale_for_release(
         "msgcat --use-first "
         f"{ str( directory_indicator_locale / ( indicator + '.pot' ) ) } "
         f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } "
-        f"-o { str( directory_indicator_locale / ( indicator + '.pot' ) ) }",
-        capture_output = False, #TODO What happens if capture_output is True?
-        print_ = True )
+        f"-o { str( directory_indicator_locale / ( indicator + '.pot' ) ) }" )
 
     # For each locale, merge indicatorbase PO with indicator PO.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
@@ -308,17 +300,13 @@ def _build_locale_for_release(
             "msgcat --use-first "
             f"{ str( po ) } "
             f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } "
-            f"-o { str( po ) } ",
-            capture_output = False, #TODO What happens if capture_output is True?
-            print_ = True )
+            f"-o { str( po ) } " )
 
     # Create .mo files.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         indicatorbase.IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
             f"msgfmt { str( po ) } "
-            f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }",
-            capture_output = False, #TODO What happens if capture_output is True?
-            print_ = True )
+            f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }" )
 
 
 def _get_msgstr_from_po(
@@ -885,10 +873,9 @@ def build_wheel(
         message = _package_source( directory_dist, indicator )
 
     if not message:
+#TODO Why not call python_run for this?        
         indicatorbase.IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
-            f"python3 -m build --outdir { directory_dist } { directory_dist / indicator }",
-            capture_output = False,  #TODO Why is this not True?
-            print_ = True )
+            f"python3 -m build --outdir { directory_dist } { directory_dist / indicator }" )
 
 # TODO Uncomment
 #         shutil.rmtree( directory_dist / indicator )

@@ -256,7 +256,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             Thread(
                 target = IndicatorBase.process_run,#TODO Should this check stderr/return code?  What to do on failure?
-                args = ( command, False, False ) ).start()
+                args = ( command, ) ).start()
 
 
     def update_background_scripts(
@@ -299,9 +299,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 command_result = self.background_script_results[ key ]
 
                 if script.get_play_sound() and command_result:
-                    IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
-                        IndicatorBase.get_play_sound_complete_command(),
-                        capture_output = False )
+                    IndicatorBase.process_run(
+                        IndicatorBase.get_play_sound_complete_command() )
 
                 if script.get_show_notification() and command_result:
                     command = (
@@ -310,8 +309,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         " \"" + script.get_name().replace( '-', '\\-' ) + "\"" +
                         " \"" + command_result.replace( '-', '\\-' ) + "\"" )
 
-                    IndicatorBase.process_run( command, capture_output = False )  #TODO What happens if capture_output is True????
-                    #TODO Should this check stderr/return code?  What to do on failure?
+                    IndicatorBase.process_run( command )
 
 
     def _update_background_script(

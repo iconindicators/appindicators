@@ -220,10 +220,10 @@ class IndicatorBase( ABC ):
         IndicatorBase._LOGGING_INITIALISED = True
 
         self.current_desktop = (
-            IndicatorBase.process_run( "echo $XDG_CURRENT_DESKTOP" )[ 0 ] )#TODO Should this check stderr/return code?  What to do on failure?
+            IndicatorBase.process_run( "echo $XDG_CURRENT_DESKTOP" )[ 0 ] )
 
         self.session_type = (
-            IndicatorBase.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )#TODO Should this check stderr/return code?  What to do on failure?
+            IndicatorBase.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )
 
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
@@ -1116,7 +1116,7 @@ class IndicatorBase( ABC ):
         Return the result of calling
             cat /etc/os-release
         '''
-        return IndicatorBase.process_run( "cat /etc/os-release" )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
+        return IndicatorBase.process_run( "cat /etc/os-release" )[ 0 ]
 
 
     @staticmethod
@@ -1148,11 +1148,6 @@ class IndicatorBase( ABC ):
                 self.is_session_type_wayland()
                 and
                 "UBUNTU_CODENAME=focal" not in IndicatorBase.get_etc_os_release() ) )
-#TODO Check Linux Mint if it contains "UBUNTU_CODENAME" to ensure the above works
-# for any Ubuntu 20.04 derivative (although they all should now be EOL).
-# Linux Mint Cinnamon 20: UBUNTU_CODENAME=focal
-# Linux Mint Cinnamon 21: UBUNTU_CODENAME=jammy
-# Linux Mint Cinnamon 22: UBUNTU_CODENAME=noble
 
 
     def copy_to_clipboard_or_primary(
@@ -2591,10 +2586,11 @@ class IndicatorBase( ABC ):
         Fixed in version 1.2.0
             https://github.com/lxqt/qterminal/releases
         '''
+        print( f"terminal: { terminal }")
         is_qterminal_and_broken_ = False
         if "qterminal" in terminal:
             qterminal_version = (
-                IndicatorBase.process_run( "qterminal --version" )[ 0 ] )#TODO Should this check stderr/return code?  What to do on failure?
+                IndicatorBase.process_run( "qterminal --version" )[ 0 ] )
 
             is_qterminal_and_broken_ = qterminal_version < "1.2.0"
 
@@ -2609,7 +2605,7 @@ class IndicatorBase( ABC ):
         terminal = None
         execution_flag = None
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
-            terminal = IndicatorBase.process_run( "which " + _terminal )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
+            terminal = IndicatorBase.process_run( "which " + _terminal )[ 0 ]
             if terminal:
                 execution_flag = _execution_flag
                 break
@@ -3127,6 +3123,8 @@ class IndicatorBase( ABC ):
         return directory
 
 
+#TODO Check who calls this: any legacy callers still referring to logging or capture_output
+# or anything else other than command?
     @staticmethod
     def process_run(
         command ):
@@ -3138,6 +3136,20 @@ class IndicatorBase( ABC ):
 
         On stderr or exception, logs to a file if a logger is provided.
         '''
+
+        def log( command, stdout_, stderr_, return_code ):
+            if IndicatorBase._LOGGING_INITIALISED:
+                IndicatorBase.get_logging().error( f"Error running: { command }" )
+                if stdout_:
+                    IndicatorBase.get_logging().error( f"stdout: { stdout_ }" )
+
+                if stderr_:
+                    IndicatorBase.get_logging().error( f"stderr: { stderr_ }" )
+
+                if return_code != 0:
+                    IndicatorBase.get_logging().error( f"Return code: { return_code }" )
+
+        
         try:
             result = (
                 subprocess.run(
@@ -3153,23 +3165,21 @@ class IndicatorBase( ABC ):
             stdout_ = result.stdout.decode().strip()
             stderr_ = result.stderr.decode()
             return_code = result.returncode
-            if stderr_ and IndicatorBase._LOGGING_INITIALISED:
-                IndicatorBase.get_logging().error( stderr_ )
+            if stderr_ or return_code != 0:
+                log( command, stdout_, stderr_, return_code )
 
         except subprocess.CalledProcessError as e:
-            stdout_ = e.stdout.decode().strip()
-            stderr_ = e.stderr.decode()
-            return_code = e.returncode
-            if IndicatorBase._LOGGING_INITIALISED:
-                logging.error( stderr_ )
-
             #TODO Find a way to trigger this exception and determine what happens when
             # capture_output is True (stdout/stderr should be defined so decode is okay) and
             # when capture_output is False (stdout/stderr should be not be defined so decode is unsafe).
             # Can trigger the exception on grep but no result but get a return code of 1
             # but need to set check = True in the call to subprocess.run().
             #
-            # IS THIS STILL RELEVENT?
+            # IS THIS ISSUE STILL RELEVENT?
+            stdout_ = e.stdout.decode().strip()
+            stderr_ = e.stderr.decode()
+            return_code = e.returncode
+            log( command, stdout_, stderr_, return_code )
 
         return stdout_, stderr_, return_code
 

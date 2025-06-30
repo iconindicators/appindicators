@@ -173,14 +173,14 @@ class IndicatorTest( IndicatorBase ):
 
         command = "gsettings get org.gnome.desktop.interface "
 
-        result = IndicatorBase.process_run( command + "icon-theme" )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
+        result = IndicatorBase.process_run( command + "icon-theme" )[ 0 ]
         result = result.replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
             command + "icon-theme: " + result,
             indent = ( 2, 0 ) )
 
-        result = IndicatorBase.process_run( command + "gtk-theme" )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
+        result = IndicatorBase.process_run( command + "gtk-theme" )[ 0 ]
         result = result.replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
@@ -466,8 +466,8 @@ class IndicatorTest( IndicatorBase ):
                 + "; ${SHELL}" + "'" )
 
             Thread(
-                target = IndicatorBase.process_run,#TODO Should this check stderr/return code?  What to do on failure?
-                args = ( command_, False, False ) ).start()  #TODO What happens if capture_output (first False) is True?
+                target = IndicatorBase.process_run,
+                args = ( command_, ) ).start()
 
             print( "Executing command: " + command_ )
 
