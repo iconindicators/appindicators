@@ -149,11 +149,7 @@ def python_run(
 
     print( f"\n\nExecuting command:\n\n{ command_ }\n\n" )
 
-#TODO This originally did not return.
-# For the new code calling indicatorlunar.tools._build_wheel.build()
-# I think the return is needed.
-# So does the return affect anything other callers?
-    return indicatorbase.IndicatorBase.process_run( command_, )#TODO Should this check stderr/return code?  What to do on failure?
+    return indicatorbase.IndicatorBase.process_run( command_, )
 
 
 def _get_parser(

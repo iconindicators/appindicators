@@ -99,7 +99,11 @@ def _create_update_pot(
 
     # Create a POT based on current source:
     #   http://www.gnu.org/software/gettext/manual/gettext.html
-    indicatorbase.IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
+#TODO Should this check stderr/return code?  What to do on failure?
+# There will be no logging, so might be best to print...
+# Perhaps test this out by causing an error...maybe misspell POTFILES.in
+# If this fails/errors, really need to abort and pass back a message.
+    indicatorbase.IndicatorBase.process_run(
         "xgettext "
         f"-f { locale_directory / 'POTFILES.in' } "
         f"-D { str( Path( indicator ) / 'src' / indicator ) } "
@@ -163,7 +167,8 @@ def _create_update_po(
 
         if po_file_original.exists():
             po_file_new = str( po_file_original ).replace( '.po', '.new.po' )
-            indicatorbase.IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
+#TODO See TODO above in regards to capturing error/output.
+            indicatorbase.IndicatorBase.process_run(
                 f"msgmerge { po_file_original } { pot_file } "
                 f"-o { po_file_new }" )
 
@@ -198,7 +203,8 @@ def _create_update_po(
                 parents = True,
                 exist_ok = True )
 
-            indicatorbase.IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
+#TODO See TODO above in regards to capturing error/output.
+            indicatorbase.IndicatorBase.process_run(
                 "msginit "
                 f"-i { pot_file } "
                 f"-o { po_file_original } "
@@ -287,7 +293,8 @@ def _build_locale_for_release(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" )
 
     # Merge indicatorbase POT with indicator POT.
-    indicatorbase.IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
+#TODO See TODO above in regards to capturing error/output.
+    indicatorbase.IndicatorBase.process_run(
         "msgcat --use-first "
         f"{ str( directory_indicator_locale / ( indicator + '.pot' ) ) } "
         f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } "
@@ -296,7 +303,8 @@ def _build_locale_for_release(
     # For each locale, merge indicatorbase PO with indicator PO.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
         language_code = po.parent.parts[ -2 ]
-        indicatorbase.IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
+#TODO See TODO above in regards to capturing error/output.
+        indicatorbase.IndicatorBase.process_run(
             "msgcat --use-first "
             f"{ str( po ) } "
             f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } "
@@ -304,7 +312,8 @@ def _build_locale_for_release(
 
     # Create .mo files.
     for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
-        indicatorbase.IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
+#TODO See TODO above in regards to capturing error/output.
+        indicatorbase.IndicatorBase.process_run(
             f"msgfmt { str( po ) } "
             f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }" )
 
@@ -873,8 +882,9 @@ def build_wheel(
         message = _package_source( directory_dist, indicator )
 
     if not message:
-#TODO Why not call python_run for this?        
-        indicatorbase.IndicatorBase.process_run(#TODO Should this check stderr/return code?  What to do on failure?
+#TODO Why not call python_run for this?
+#TODO See TODO above in regards to capturing error/output.
+        indicatorbase.IndicatorBase.process_run(
             f"python3 -m build --outdir { directory_dist } { directory_dist / indicator }" )
 
 # TODO Uncomment
