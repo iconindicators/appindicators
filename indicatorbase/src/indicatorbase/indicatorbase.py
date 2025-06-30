@@ -2527,12 +2527,6 @@ class IndicatorBase( ABC ):
         return y
 
 
-    # def get_logging( self ):
-    #     ''' Return a handle to the logger. '''
-    #     return logging
-#TODO Not sure if the above goes...depends if this new static version
-# can be referenced from indicators.
-
     @staticmethod
     def get_logging():
         ''' Return a handle to the logger. '''
