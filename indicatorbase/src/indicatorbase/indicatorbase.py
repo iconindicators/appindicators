@@ -123,7 +123,7 @@ class IndicatorBase( ABC ):
 
     _EXTENSION_JSON = ".json"
 
-    _LOGGING_INITIALISED = False #TODO May not be needed.
+    _LOGGING_INITIALISED = False
 
     _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ]
     _TERMINALS_AND_EXECUTION_FLAGS.extend( [
@@ -963,11 +963,11 @@ class IndicatorBase( ABC ):
 
 
     def is_session_type_wayland( self ):
-        return self.session_type == IndicatorBase.SESSION_TYPE_WAYLAND
+        return self.get_session_type() == IndicatorBase.SESSION_TYPE_WAYLAND
 
 
     def is_session_type_x11( self ):
-        return self.session_type == IndicatorBase.SESSION_TYPE_X11
+        return self.get_session_type() == IndicatorBase.SESSION_TYPE_X11
 
 
     def _on_about(
@@ -1150,6 +1150,9 @@ class IndicatorBase( ABC ):
                 "UBUNTU_CODENAME=focal" not in IndicatorBase.get_etc_os_release() ) )
 #TODO Check Linux Mint if it contains "UBUNTU_CODENAME" to ensure the above works
 # for any Ubuntu 20.04 derivative (although they all should now be EOL).
+# Linux Mint Cinnamon 20: UBUNTU_CODENAME=focal
+# Linux Mint Cinnamon 21: UBUNTU_CODENAME=jammy
+# Linux Mint Cinnamon 22: UBUNTU_CODENAME=noble
 
 
     def copy_to_clipboard_or_primary(
@@ -2529,7 +2532,14 @@ class IndicatorBase( ABC ):
         return y
 
 
-    def get_logging( self ):
+    # def get_logging( self ):
+    #     ''' Return a handle to the logger. '''
+    #     return logging
+#TODO Not sure if the above goes...depends if this new static version 
+# can be referenced from indicators.
+
+    @staticmethod
+    def get_logging():
         ''' Return a handle to the logger. '''
         return logging
 
@@ -2555,24 +2565,18 @@ class IndicatorBase( ABC ):
         Lubuntu 20.04/22.04 does not support setting/updating of icon
         label/tooltip.
         '''
-        desktop_environment = self.get_current_desktop()
         label_or_tooltip_update_unsupported = (
-            desktop_environment is None
+            self.get_current_desktop() == IndicatorBase._DESKTOP_ICEWM
             or
-            desktop_environment == IndicatorBase._DESKTOP_ICEWM
-            or
-            desktop_environment == IndicatorBase._DESKTOP_LXQT )
+            self.get_current_desktop() == IndicatorBase._DESKTOP_LXQT )
 
         return not label_or_tooltip_update_unsupported
 
 
     def _is_icon_update_supported( self ):
         ''' Lubuntu 20.04/22.04 does not support updating of icon once set. '''
-        desktop_environment = self.get_current_desktop()
         icon_update_unsupported = (
-            desktop_environment is None
-            or
-            desktop_environment == IndicatorBase._DESKTOP_LXQT )
+            self.get_current_desktop() == IndicatorBase._DESKTOP_LXQT )
 
         return not icon_update_unsupported
 
@@ -3125,8 +3129,7 @@ class IndicatorBase( ABC ):
 
     @staticmethod
     def process_run(
-        command,
-        logging = None ):
+        command ):
         '''
         Executes the command, returning the tuple:
             stdout
@@ -3150,15 +3153,14 @@ class IndicatorBase( ABC ):
             stdout_ = result.stdout.decode().strip()
             stderr_ = result.stderr.decode()
             return_code = result.returncode
-            if stderr_ and logging:
-                logging.error( stderr_ )
+            if stderr_ and IndicatorBase._LOGGING_INITIALISED:
+                IndicatorBase.get_logging().error( stderr_ )
 
         except subprocess.CalledProcessError as e:
-            print( "EXCEPTION" ) #TODO Testing
             stdout_ = e.stdout.decode().strip()
             stderr_ = e.stderr.decode()
             return_code = e.returncode
-            if logging:
+            if IndicatorBase._LOGGING_INITIALISED:
                 logging.error( stderr_ )
 
             #TODO Find a way to trigger this exception and determine what happens when
@@ -3168,18 +3170,6 @@ class IndicatorBase( ABC ):
             # but need to set check = True in the call to subprocess.run().
             #
             # IS THIS STILL RELEVENT?
-
-#TODO What's the point of printing here if we return the same stuff after the print?
-# Maybe saves each caller some work?
-        # if print_:
-        #     if stdout_:
-        #         print( stdout_ )
-        #
-        #     elif stderr_:
-        #         print( stderr_ )
-        #
-        #     if return_code != 0:
-        #         print( f"return code: { return_code }" )
 
         return stdout_, stderr_, return_code
 
@@ -3267,23 +3257,24 @@ class IndicatorBase( ABC ):
 #         return stdout_, stderr_, return_code
 
 
-#TODO This could be the way to have logging happen for a static method
-# which is also called within an instance function.
-# To be called as follows:
-    '''
-        self.test_method( command = "command" )
-        IndicatorBase.test_method( command = "command", logging = self.get_logging() )
-    '''
-# Also double check; maybe it is okay to call a static function within a class
-# using self rather than the class name.
-    def test_method( self = None, command = "", logging = None ):
-        if self is None:
-            print("static bit")
-            logging.info( "static" )
-        else:
-            print("instance bit")
-            print( self.indicator_name )
-            self.get_logging().info( "instance" )
+#TODO May not need this after all...
+# #TODO This could be the way to have logging happen for a static method
+# # which is also called within an instance function.
+# # To be called as follows:
+#     '''
+#         self.test_method( command = "command" )
+#         IndicatorBase.test_method( command = "command", logging = self.get_logging() )
+#     '''
+# # Also double check; maybe it is okay to call a static function within a class
+# # using self rather than the class name.
+#     def test_method( self = None, command = "", logging = None ):
+#         if self is None:
+#             print("static bit")
+#             logging.info( "static" )
+#         else:
+#             print("instance bit")
+#             print( self.indicator_name )
+#             self.get_logging().info( "instance" )
 
 
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
