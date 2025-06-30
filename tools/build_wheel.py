@@ -38,12 +38,20 @@ if __name__ == "__main__":
             "build" ) )
 
     for indicator in indicators_to_process:
-        utils.python_run(
-            "python3 -c \"import tools._build_wheel; "
-            f"tools._build_wheel.build_wheel( \\\"{ indicator }\\\" )\"",
-            utils.VENV_BUILD,
-            "build",
-            "pip",
-            "polib",
-            utils.get_pygobject(),
-            "readme_renderer[md]" )
+#TODO For all scripts, ensure a message is passed back to the caller,
+# whether that be a wrapper script or the actual script,
+# then print the message.
+        message = (
+            utils.python_run(
+                "python3 -c \"import tools._build_wheel; "
+                f"tools._build_wheel.build_wheel( \\\"{ indicator }\\\" )\"",
+                utils.VENV_BUILD,
+                "build",
+                "pip",
+                "polib",
+                utils.get_pygobject(),
+                "readme_renderer[md]" ) )
+
+        if message:
+            print( *message )
+            break

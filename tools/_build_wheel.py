@@ -99,55 +99,62 @@ def _create_update_pot(
 
     # Create a POT based on current source:
     #   http://www.gnu.org/software/gettext/manual/gettext.html
-#TODO Should this check stderr/return code?  What to do on failure?
-# There will be no logging, so might be best to print...
-# Perhaps test this out by causing an error...maybe misspell POTFILES.in
-# If this fails/errors, really need to abort and pass back a message.
-    indicatorbase.IndicatorBase.process_run(
-        "xgettext "
-        f"-f { locale_directory / 'POTFILES.in' } "
-        f"-D { str( Path( indicator ) / 'src' / indicator ) } "
-        f"--copyright-holder='{ authors_emails[ 0 ][ 0 ] }.' "
-        f"--package-name={ indicator } "
-        f"--package-version={ version } "
-        f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' "
-        f"-o { pot_file_new }" )
+    stdout_, stderr_, return_code = (
+        indicatorbase.IndicatorBase.process_run(
+            "xgettext "
+            f"-f { locale_directory / 'POTFILES.in' } "
+            f"-D { str( Path( indicator ) / 'src' / indicator ) } "
+            f"--copyright-holder='{ authors_emails[ 0 ][ 0 ] }.' "
+            f"--package-name={ indicator } "
+            f"--package-version={ version } "
+            f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' "
+            f"-o { pot_file_new }" ) )
 
-    with open( pot_file_new, 'r', encoding = "utf-8" ) as r:
-        text = (
-            r.read().
-            replace(
-                "SOME DESCRIPTIVE TITLE",
-                f"Portable Object Template for { indicator }" ).
-            replace( f"YEAR { authors_emails[ 0 ][ 0 ] }", copyright_ ).
-            replace(
-                "FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.\n#\n#, fuzzy",
-                "FIRST AUTHOR <EMAIL@ADDRESS>, YEAR."  ).
-            replace( "CHARSET", "UTF-8" ) )
+    message = ""
+    if stderr_:
+        message = stderr_
 
-    with open( pot_file_new, 'w', encoding = "utf-8" ) as w:
-        w.write( text )
+    elif return_code != 0:
+        message = f"Return code: { return_code }"
 
-    if pot_file_new.endswith( ".new.pot" ):
-        pot_file_original = f"{ locale_directory / indicator }.pot"
-        original = ""
-        with open( pot_file_original, 'r', encoding = "utf-8" ) as f:
-            for line in f:
-                if "POT-Creation-Date" not in line:
-                    original += line
+    if not message:
+        with open( pot_file_new, 'r', encoding = "utf-8" ) as r:
+            text = (
+                r.read().
+                replace(
+                    "SOME DESCRIPTIVE TITLE",
+                    f"Portable Object Template for { indicator }" ).
+                replace( f"YEAR { authors_emails[ 0 ][ 0 ] }", copyright_ ).
+                replace(
+                    "FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.\n#\n#, fuzzy",
+                    "FIRST AUTHOR <EMAIL@ADDRESS>, YEAR."  ).
+                replace( "CHARSET", "UTF-8" ) )
 
-        new = ""
-        with open( pot_file_new, 'r', encoding = "utf-8" ) as f:
-            for line in f:
-                if "POT-Creation-Date" not in line:
-                    new += line
+        with open( pot_file_new, 'w', encoding = "utf-8" ) as w:
+            w.write( text )
 
-        if original == new:
-            os.remove( pot_file_new )
+        if pot_file_new.endswith( ".new.pot" ):
+            pot_file_original = f"{ locale_directory / indicator }.pot"
+            original = ""
+            with open( pot_file_original, 'r', encoding = "utf-8" ) as f:
+                for line in f:
+                    if "POT-Creation-Date" not in line:
+                        original += line
 
-        else:
-            os.remove( pot_file_original )
-            os.rename( pot_file_new, pot_file_original )
+            new = ""
+            with open( pot_file_new, 'r', encoding = "utf-8" ) as f:
+                for line in f:
+                    if "POT-Creation-Date" not in line:
+                        new += line
+
+            if original == new:
+                os.remove( pot_file_new )
+
+            else:
+                os.remove( pot_file_original )
+                os.rename( pot_file_new, pot_file_original )
+
+    return message
 
 
 def _create_update_po(
@@ -158,6 +165,7 @@ def _create_update_po(
 
     locale_directory = _get_locale_directory( indicator )
     pot_file = locale_directory / ( indicator + ".pot" )
+    message = ""
     for lingua_code in linguas_codes:
         po_file_original = (
             locale_directory /
@@ -167,10 +175,19 @@ def _create_update_po(
 
         if po_file_original.exists():
             po_file_new = str( po_file_original ).replace( '.po', '.new.po' )
-#TODO See TODO above in regards to capturing error/output.
-            indicatorbase.IndicatorBase.process_run(
-                f"msgmerge { po_file_original } { pot_file } "
-                f"-o { po_file_new }" )
+            stdout_, stderr_, return_code = (
+                indicatorbase.IndicatorBase.process_run(
+                    f"msgmerge { po_file_original } { pot_file } "
+                    f"-o { po_file_new }" ) )
+
+            if stderr_:
+                message = stderr_
+
+            elif return_code != 0:
+                message = f"Return code: { return_code }"
+
+            if message:
+                break
 
             with open( po_file_new, 'r', encoding = "utf-8" ) as r:
                 new = r.read()
@@ -203,13 +220,22 @@ def _create_update_po(
                 parents = True,
                 exist_ok = True )
 
-#TODO See TODO above in regards to capturing error/output.
-            indicatorbase.IndicatorBase.process_run(
-                "msginit "
-                f"-i { pot_file } "
-                f"-o { po_file_original } "
-                f"-l { lingua_code } "
-                "--no-translator" )
+            stdout_, stderr_, return_code = (
+                indicatorbase.IndicatorBase.process_run(
+                    "msginit "
+                    f"-i { pot_file } "
+                    f"-o { po_file_original } "
+                    f"-l { lingua_code } "
+                    "--no-translator" ) )
+
+            if stderr_:
+                message = stderr_
+
+            elif return_code != 0:
+                message = f"Return code: { return_code }"
+
+            if message:
+                break
 
             with open( po_file_original, 'r', encoding = "utf-8" ) as r:
                 text = (
@@ -232,6 +258,8 @@ def _create_update_po(
 
             print( "YOU MUST UPDATE LINES 1, 4, 11, 12." )   #TODO Make sure this appears!!!!
 
+    return message
+
 
 def _update_locale_source(
     indicator,
@@ -249,33 +277,42 @@ def _update_locale_source(
     start_year_indicatorbase = "2017"
     copyright_ = f"{ start_year_indicatorbase }-{ current_year_author }"
 
-    _create_update_pot(
-        "indicatorbase",
-        Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale",
-        authors_emails,
-        version_indicatorbase,
-        copyright_ )
+    message = (
+        _create_update_pot(
+            "indicatorbase",
+            Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale",
+            authors_emails,
+            version_indicatorbase,
+            copyright_ ) )
 
-    _create_update_po(
-        "indicatorbase",
-        _get_linguas_codes( "indicatorbase" ),
-        version_indicatorbase,
-        copyright_ )
+    if not message:
+        message = (
+            _create_update_po(
+                "indicatorbase",
+                _get_linguas_codes( "indicatorbase" ),
+                version_indicatorbase,
+                copyright_ ) )
 
-    copyright_ = f"{ start_year }-{ current_year_author }"
+    if not message:
+        copyright_ = f"{ start_year }-{ current_year_author }"
 
-    _create_update_pot(
-        indicator,
-        Path( '.' ) / indicator / "src" / indicator / "locale",
-        authors_emails,
-        version_indicator,
-        copyright_ )
+        message = (
+            _create_update_pot(
+                indicator,
+                Path( '.' ) / indicator / "src" / indicator / "locale",
+                authors_emails,
+                version_indicator,
+                copyright_ ) )
 
-    _create_update_po(
-        indicator,
-        _get_linguas_codes( indicator ),
-        version_indicator,
-        copyright_ )
+    if not message:
+        message = (
+            _create_update_po(
+                indicator,
+                _get_linguas_codes( indicator ),
+                version_indicator,
+                copyright_ ) )
+
+    return message
 
 
 def _build_locale_for_release(
@@ -293,29 +330,57 @@ def _build_locale_for_release(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" )
 
     # Merge indicatorbase POT with indicator POT.
-#TODO See TODO above in regards to capturing error/output.
-    indicatorbase.IndicatorBase.process_run(
-        "msgcat --use-first "
-        f"{ str( directory_indicator_locale / ( indicator + '.pot' ) ) } "
-        f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } "
-        f"-o { str( directory_indicator_locale / ( indicator + '.pot' ) ) }" )
-
-    # For each locale, merge indicatorbase PO with indicator PO.
-    for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
-        language_code = po.parent.parts[ -2 ]
-#TODO See TODO above in regards to capturing error/output.
+    stdout_, stderr_, return_code = (
         indicatorbase.IndicatorBase.process_run(
             "msgcat --use-first "
-            f"{ str( po ) } "
-            f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } "
-            f"-o { str( po ) } " )
+            f"{ str( directory_indicator_locale / ( indicator + '.pot' ) ) } "
+            f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } "
+            f"-o { str( directory_indicator_locale / ( indicator + '.pot' ) ) }" ) )
 
-    # Create .mo files.
-    for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
-#TODO See TODO above in regards to capturing error/output.
-        indicatorbase.IndicatorBase.process_run(
-            f"msgfmt { str( po ) } "
-            f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }" )
+    if stderr_:
+        message = stderr_
+
+    elif return_code != 0:
+        message = f"Return code: { return_code }"
+
+    if not message:
+        # For each locale, merge indicatorbase PO with indicator PO.
+        for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
+            language_code = po.parent.parts[ -2 ]
+            stdout_, stderr_, return_code = (
+                indicatorbase.IndicatorBase.process_run(
+                    "msgcat --use-first "
+                    f"{ str( po ) } "
+                    f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } "
+                    f"-o { str( po ) } " ) )
+
+            if stderr_:
+                message = stderr_
+
+            elif return_code != 0:
+                message = f"Return code: { return_code }"
+
+            if message:
+                break
+
+    if not message:
+        # Create .mo files.
+        for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
+            stdout_, stderr_, return_code = (
+                indicatorbase.IndicatorBase.process_run(
+                    f"msgfmt { str( po ) } "
+                    f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }" ) )
+
+            if stderr_:
+                message = stderr_
+
+            elif return_code != 0:
+                message = f"Return code: { return_code }"
+
+            if message:
+                break
+
+    return message
 
 
 def _get_msgstr_from_po(
@@ -775,15 +840,18 @@ def _package_source(
         start_year = (
             indicatorbase.IndicatorBase.get_year_in_changelog_markdown( changelog_markdown ) )
 
-        _update_locale_source(
-            indicator,
-            authors,
-            start_year,
-            version_from_pyproject_toml,
-            version_indicator_base )
+        message = (
+            _update_locale_source(
+                indicator,
+                authors,
+                start_year,
+                version_from_pyproject_toml,
+                version_indicator_base ) )
 
-        _build_locale_for_release( directory_dist, indicator )
+    if not message:
+        message = _build_locale_for_release( directory_dist, indicator )
 
+    if not message:
         name, categories, comments, message = (
             _get_name_categories_comments_from_indicator(
                 indicator,
@@ -882,13 +950,22 @@ def build_wheel(
         message = _package_source( directory_dist, indicator )
 
     if not message:
-#TODO Why not call python_run for this?
-#TODO See TODO above in regards to capturing error/output.
-        indicatorbase.IndicatorBase.process_run(
-            f"python3 -m build --outdir { directory_dist } { directory_dist / indicator }" )
+        command = (
+            "python3 -m build --outdir "
+            f"{ directory_dist } { directory_dist / indicator }" )
+
+        stdout_, stderr_, return_code = (
+            indicatorbase.IndicatorBase.process_run( command ) )
+
+        message = ""
+        if stderr_:
+            message = stderr_
+
+        elif return_code != 0:
+            message = f"Return code: { return_code }"
 
 # TODO Uncomment
-#         shutil.rmtree( directory_dist / indicator )
+#    shutil.rmtree( directory_dist / indicator )
 
     if message:
         print( message )
