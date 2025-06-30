@@ -123,7 +123,7 @@ class IndicatorBase( ABC ):
 
     _EXTENSION_JSON = ".json"
 
-    _LOGGING_INITIALISED = False
+    _LOGGING_INITIALISED = False #TODO May not be needed.
 
     _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ]
     _TERMINALS_AND_EXECUTION_FLAGS.extend( [
@@ -3166,7 +3166,7 @@ class IndicatorBase( ABC ):
             # Can trigger the exception on grep but no result but get a return code of 1
             # but need to set check = True in the call to subprocess.run().
             #
-            # IS THIS STILL RELEVENT?  
+            # IS THIS STILL RELEVENT?
 
 #TODO What's the point of printing here if we return the same stuff after the print?
 # Maybe saves each caller some work?
@@ -3264,6 +3264,27 @@ class IndicatorBase( ABC ):
 #                 print( f"return code: { return_code }" )
 #
 #         return stdout_, stderr_, return_code
+
+
+#TODO This could be the way to have logging happen for a static method
+# which is also called within an instance function.
+# To be called as follows:
+    '''
+        self.test_method( command = "command" )
+
+        print( 111 )
+
+        IndicatorBase.test_method( command = "command", logging = self.get_logging() )
+
+    '''
+    def test_method( self = None, command = "", logging = None ):
+        if self is None:
+            print("static bit")
+            logging.info( "static" )
+        else:
+            print("instance bit")
+            print( self.indicator_name )
+            self.get_logging().info( "instance" )
 
 
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
