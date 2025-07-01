@@ -64,4 +64,4 @@ if __name__ == "__main__":
     utils.print_stdout_stderr_return_code( *result )
 
     if len( indicators_to_process ) > 1:
-        print( "NOT RUNNING blah TODO finish!" )
+        print( "\n\nSubsequent indicators will not be run; one at a time!" )
