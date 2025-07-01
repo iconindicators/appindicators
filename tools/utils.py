@@ -152,6 +152,25 @@ def python_run(
     return indicatorbase.IndicatorBase.process_run( command_, )
 
 
+def print_stdout_stderr_return_code(
+    stdout_,
+    stderr_,
+    return_code,
+    zero_return_code_message = "" ):
+
+    if stdout_:
+        print( stdout_ )
+
+    if stderr_ or return_code != 0:
+        print( f"\nstderr: { stderr_ }")
+        print( f"\nReturn code: { return_code }")
+
+    if return_code == 0 and zero_return_code_message:
+        print( f"\n{ zero_return_code_message }" )
+
+    return stderr_ or return_code != 0
+
+
 def _get_parser(
     description,
     formatter_class = argparse.ArgumentDefaultsHelpFormatter ):

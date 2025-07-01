@@ -38,10 +38,10 @@ if __name__ == "__main__":
             "build" ) )
 
     for indicator in indicators_to_process:
-#TODO For all scripts, ensure a message is passed back to the caller,
-# whether that be a wrapper script or the actual script,
-# then print the message.
-        message = (
+#TODO Check the message handling below. 
+# Test for a successful run.
+# Test for each function/clause for failure and a message should appear and abort.
+        result = (
             utils.python_run(
                 "python3 -c \"import tools._build_wheel; "
                 f"tools._build_wheel.build_wheel( \\\"{ indicator }\\\" )\"",
@@ -52,6 +52,5 @@ if __name__ == "__main__":
                 utils.get_pygobject(),
                 "readme_renderer[md]" ) )
 
-        if message:
-            print( *message )
+        if utils.print_stdout_stderr_return_code( *result ):
             break

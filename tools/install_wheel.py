@@ -40,10 +40,17 @@ if __name__ == "__main__":
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
             f"site-packages/{ indicator }/platform/linux/install.sh" )
 
-        utils.python_run(
-            command,
-            utils.VENV_INSTALL,
-            "pip",
-            utils.get_pygobject(),
-            f"$(ls -d { utils.RELEASE_DIRECTORY }/wheel/dist_{ indicator }/{ indicator }*.whl | head -1)",
-            force_reinstall = True )
+        wheel = (
+            f"$(ls -d { utils.RELEASE_DIRECTORY }/wheel/dist_{ indicator }/{ indicator }*.whl | head -1)" )
+
+        result = (
+            utils.python_run(
+                command,
+                utils.VENV_INSTALL,
+                "pip",
+                utils.get_pygobject(),
+                wheel,
+                force_reinstall = True ) )
+
+        if utils.print_stdout_stderr_return_code( *result ):
+            break

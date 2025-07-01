@@ -57,6 +57,7 @@ if __name__ == "__main__":
 
         # Run each indicator in a thread otherwise the first indicator will
         # block the second indicator and so on.
+#TODO How to capture output?        
         threading.Thread(
             target = utils.python_run,
             args = ( command, utils.VENV_RUN, *dependencies ) ).start()

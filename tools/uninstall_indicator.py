@@ -47,4 +47,10 @@ if __name__ == "__main__":
             f"if [ \"$count\" -eq \"0\" ]; "
             f"then rm -f -r { utils.VENV_INSTALL }; fi" )
 
-        utils.python_run( command, utils.VENV_INSTALL )
+        result = (
+            utils.python_run(
+                command,
+                utils.VENV_INSTALL ) )
+
+        if utils.print_stdout_stderr_return_code( *result ):
+            break

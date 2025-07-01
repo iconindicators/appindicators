@@ -30,12 +30,16 @@ if __name__ == "__main__":
     html = str( current_working_directory / "README.html" )
     command = (
         "python3 -c \"import tools._markdown_to_html; "
-        f"tools._markdown_to_html.markdown_to_html( \\\"{ markdown }\\\", \\\"{ html }\\\" )\"" )
+        "tools._markdown_to_html.markdown_to_html( "
+        f"\\\"{ markdown }\\\", \\\"{ html }\\\" )\"" )
 
-    utils.python_run(
-        command,
-        utils.VENV_BUILD,
-        "pip",
-        "readme_renderer[md]" )
+    result = (
+        utils.python_run(
+            command,
+            utils.VENV_BUILD,
+            "pip",
+            "readme_renderer[md]" ) )
 
-    print( f"\nCreated { html }" )
+    utils.print_stdout_stderr_return_code(
+        *result,
+        f"Created { html }" )
