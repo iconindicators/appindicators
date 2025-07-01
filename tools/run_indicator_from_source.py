@@ -16,11 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-''' Run one or more indicators from within the source tree. '''
+''' Run an indicator from within the source tree. '''
 
 
 import sys
-import threading
 
 from itertools import compress
 
@@ -37,27 +36,32 @@ indicator_to_dependencies = {
 if __name__ == "__main__":
     indicators_to_process = (
         utils.get_indicators_to_process(
-            f"Run one or more indicators from within the source tree.",
+            f"Run an indicator from within the source tree.",
             "install" ) )
 
-    for indicator in indicators_to_process:
-        command = (
-            "for dirs in indicator*; do "
-            "if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; "
-            "then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py "
-            "$dirs/src/$dirs/indicatorbase.py; fi ; "
-            "done && "
-            f"cd { indicator }/src && "
-            f"python3 -m { indicator }.{ indicator } && "
-            "cd ../.." )
+    indicator = indicators_to_process[ 0 ] # Only run the first indicator.
 
-        dependencies = [ "pip", f"{ utils.get_pygobject() }" ]
-        if indicator in indicator_to_dependencies:
-            dependencies += indicator_to_dependencies[ indicator ]
+    command = (
+        "for dirs in indicator*; do "
+        "if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; "
+        "then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py "
+        "$dirs/src/$dirs/indicatorbase.py; fi ; "
+        "done && "
+        f"cd { indicator }/src && "
+        f"python3 -m { indicator }.{ indicator } && "
+        "cd ../.." )
 
-        # Run each indicator in a thread otherwise the first indicator will
-        # block the second indicator and so on.
-#TODO How to capture output?        
-        threading.Thread(
-            target = utils.python_run,
-            args = ( command, utils.VENV_RUN, *dependencies ) ).start()
+    dependencies = [ "pip", f"{ utils.get_pygobject() }" ]
+    if indicator in indicator_to_dependencies:
+        dependencies += indicator_to_dependencies[ indicator ]
+
+    result = (
+        utils.python_run(
+            command,
+            utils.VENV_RUN,
+            *dependencies ) )
+
+    utils.print_stdout_stderr_return_code( *result )
+
+    if len( indicators_to_process ) > 1:
+        print( "NOT RUNNING blah TODO finish!" )
