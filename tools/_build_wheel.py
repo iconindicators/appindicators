@@ -176,35 +176,26 @@ def _create_po(
             f"-l { lingua_code } "
             "--no-translator" ) )
 
-    # On success, msginit will write to stderr, rather than stdout,
-    # with a return code of 0.  In this case the user will need to
-    # update some lines in the created .po file.
+    # On success, msginit writes to stderr, rather than stdout,
+    # with a return code of 0.
+    #
+    # The user will then need to update lines in the created .po file,
+    # so pass this message back to the user.
     #
     # On error, report back to the user.
-    print( f"return code { return_code }")
     if return_code == 0:
         if stdout_:
-            message = stdout_.strip()  #TODO Should be empty.
-            print( "stdout" )
+            message = stdout_
 
         else:
-            message = stderr_.strip()
-            print("stderr")
-
-        print( f"message1: {message}")
+            message = stderr_
 
     else:
         if stderr_:
-            message = stderr_.strip()
+            message = stderr_
 
         else:
             message = f"Return code: { return_code }"
-
-        print( f"message2: {message}")
-
-    print( f"stdout: {stdout_.strip()}")
-    print( f"stderr: {stderr_.strip()}")
-    print( f"return code: {return_code}")
 
     if return_code == 0:
         with open( po_file_original, 'r', encoding = "utf-8" ) as r:
@@ -227,7 +218,6 @@ def _create_po(
             w.write( text )
 
         message += "\nYOU MUST UPDATE LINES 1, 4, 11, 12."
-        print( f"message3: {message}")
 
     return message
 
@@ -243,16 +233,16 @@ def _update_po(
     stdout_, stderr_, return_code = (
         indicatorbase.IndicatorBase.process_run(
             f"msgmerge { po_file_original } { pot_file } -o { po_file_new }" ) )
-#TODO Print the above line, run from terminal to see the output.
 
+    # On success, msgmerge writes to stderr, rather than stdout,
+    # with a return code of 0.
+    #
+    # The user does not need to update/modify the .po file,
+    # so no need to message the user.
+    #
+    # On error, report back to the user.
     message = ""
-    if stderr_:
-        message = stderr_
-
-    elif return_code != 0:
-        message = f"Return code: { return_code }"
-
-    else:
+    if return_code == 0:
         with open( po_file_new, 'r', encoding = "utf-8" ) as r:
             new = r.read()
 
@@ -277,6 +267,13 @@ def _update_po(
         else:
             os.remove( po_file_original )
             os.rename( po_file_new, po_file_original )
+
+    else:
+        if stderr_:
+            message = stderr_
+
+        else:
+            message = f"Return code: { return_code }"
 
     return message
 
@@ -351,10 +348,6 @@ def _update_locale_source(
                 _get_linguas_codes( "indicatorbase" ),
                 version_indicatorbase,
                 copyright_ ) )
-        
-        print( 888888888888888 )
-        print( message )
-        print( 99999999999999999999)
 
     if not message:
         copyright_ = f"{ start_year }-{ current_year_author }"
@@ -392,6 +385,8 @@ def _build_locale_for_release(
     directory_indicator_base_locale = (
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "locale" )
 
+    message = ""
+
     # Merge indicatorbase POT with indicator POT.
     stdout_, stderr_, return_code = (
         indicatorbase.IndicatorBase.process_run(
@@ -400,13 +395,7 @@ def _build_locale_for_release(
             f"{ str( directory_indicator_base_locale / 'indicatorbase.pot' ) } "
             f"-o { str( directory_indicator_locale / ( indicator + '.pot' ) ) }" ) )
 
-    if stderr_:
-        message = stderr_
-
-    elif return_code != 0:
-        message = f"Return code: { return_code }"
-
-    if not message:
+    if return_code == 0:
         # For each locale, merge indicatorbase PO with indicator PO.
         for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
             language_code = po.parent.parts[ -2 ]
@@ -417,31 +406,42 @@ def _build_locale_for_release(
                     f"{ str( directory_indicator_base_locale / language_code / 'LC_MESSAGES' / 'indicatorbase.po' ) } "
                     f"-o { str( po ) } " ) )
 
-            if stderr_:
-                message = stderr_
-
-            elif return_code != 0:
-                message = f"Return code: { return_code }"
-
-            if message:
-                break
-
-    if not message:
-        # Create .mo files.
-        for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
-            stdout_, stderr_, return_code = (
-                indicatorbase.IndicatorBase.process_run(
-                    f"msgfmt { str( po ) } "
-                    f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }" ) )
+            if return_code == 0:
+                continue
 
             if stderr_:
                 message = stderr_
 
-            elif return_code != 0:
+            else:
                 message = f"Return code: { return_code }"
 
-            if message:
+            break
+
+        if return_code == 0:
+            # Create .mo files.
+            for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
+                stdout_, stderr_, return_code = (
+                    indicatorbase.IndicatorBase.process_run(
+                        f"msgfmt { str( po ) } "
+                        f"-o { str( po.parent / ( str( po.stem ) + '.mo' ) ) }" ) )
+
+                if return_code == 0:
+                    continue
+
+                if stderr_:
+                    message = stderr_
+
+                else:
+                    message = f"Return code: { return_code }"
+
                 break
+
+    else:
+        if stderr_:
+            message = stderr_
+
+        else:
+            message = f"Return code: { return_code }"
 
     return message
 
@@ -1013,9 +1013,7 @@ def build_wheel(
 
         message = _package_source( directory_dist, indicator )
 
-    print( 1 )
     if not message:
-        print( 2 )
         command = (
             "python3 -m build --outdir "
             f"{ directory_dist } { directory_dist / indicator }" )
@@ -1023,26 +1021,23 @@ def build_wheel(
         stdout_, stderr_, return_code = (
             indicatorbase.IndicatorBase.process_run( command ) )
 
-        print( 3 )
-        message = ""
-        if stderr_:
-            message = stderr_
-
-        elif return_code != 0:
-            message = f"Return code: { return_code }"
-
-    else:
-        print( 4 )
+        #TODO Not getting the full output of the build...why?
+        print( 111111111111 )
         print( message )
-        print( 5 )
+        print( 22222222222222 )
+
+        message = ""
+        if return_code == 0:
+            message = stdout_
+
+        else:
+            if stderr_:
+                message = stderr_
+
+            else:
+                message = f"Return code: { return_code }"
 
 # TODO Uncomment
 #    shutil.rmtree( directory_dist / indicator )
 
-#TODO I'm expecting to see more output (from the build command at least)
-# but nothing...why?    
-    # if message:
-    #     print( 5 )
-    #     print( message )
-    
     return message

@@ -38,7 +38,7 @@ if __name__ == "__main__":
             "build" ) )
 
     for indicator in indicators_to_process:
-#TODO Check the message handling below. 
+#TODO Check the message handling below.
 # Test for a successful run.
 # Test for each function/clause for failure and a message should appear and abort.
         stdout_, stderr_, return_code = (
@@ -54,5 +54,3 @@ if __name__ == "__main__":
 
         if utils.print_result_from_python_run( stdout_, stderr_, return_code ):
             break
-
-        # print( stdout_ )#TODO Testing...I'm expecting more output that I'm seeing.
