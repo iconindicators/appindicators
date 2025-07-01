@@ -41,7 +41,7 @@ if __name__ == "__main__":
 #TODO Check the message handling below. 
 # Test for a successful run.
 # Test for each function/clause for failure and a message should appear and abort.
-        result = (
+        stdout_, stderr_, return_code = (
             utils.python_run(
                 "python3 -c \"import tools._build_wheel; "
                 f"tools._build_wheel.build_wheel( \\\"{ indicator }\\\" )\"",
@@ -52,5 +52,7 @@ if __name__ == "__main__":
                 utils.get_pygobject(),
                 "readme_renderer[md]" ) )
 
-        if utils.print_stdout_stderr_return_code( *result ):
+        if utils.print_result_from_python_run( stdout_, stderr_, return_code ):
             break
+
+        # print( stdout_ )#TODO Testing...I'm expecting more output that I'm seeing.

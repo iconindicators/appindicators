@@ -152,21 +152,29 @@ def python_run(
     return indicatorbase.IndicatorBase.process_run( command_, )
 
 
-def print_stdout_stderr_return_code(
+def print_result_from_python_run(
     stdout_,
     stderr_,
     return_code,
     zero_return_code_message = "" ):
-
-    if stdout_:
-        print( stdout_ )
-
-    if stderr_ or return_code != 0:
+    '''
+    TODO Comment!!!!
+    '''
+    if stderr_:
         print( f"\nstderr: { stderr_ }")
+
+    elif return_code != 0:
         print( f"\nReturn code: { return_code }")
 
-    if return_code == 0 and zero_return_code_message:
-        print( f"\n{ zero_return_code_message }" )
+    else:
+        print( stdout_ )
+
+
+    '''TODO What is this for?
+    if return_code == 0:
+        if zero_return_code_message:
+            print( f"\n{ zero_return_code_message }" )
+    '''
 
     return stderr_ or return_code != 0
 

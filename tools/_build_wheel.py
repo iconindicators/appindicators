@@ -157,6 +157,130 @@ def _create_update_pot(
     return message
 
 
+def _create_po(
+    indicator,
+    pot_file,
+    po_file_original,
+    lingua_code ):
+
+    # http://www.gnu.org/software/gettext/manual/gettext.html#Creating
+    po_file_original.parents[ 0 ].mkdir(
+        parents = True,
+        exist_ok = True )
+
+    stdout_, stderr_, return_code = (
+        indicatorbase.IndicatorBase.process_run(
+            "msginit "
+            f"-i { pot_file } "
+            f"-o { po_file_original } "
+            f"-l { lingua_code } "
+            "--no-translator" ) )
+
+    # On success, msginit will write to stderr, rather than stdout,
+    # with a return code of 0.  In this case the user will need to
+    # update some lines in the created .po file.
+    #
+    # On error, report back to the user.
+    print( f"return code { return_code }")
+    if return_code == 0:
+        if stdout_:
+            message = stdout_.strip()  #TODO Should be empty.
+            print( "stdout" )
+
+        else:
+            message = stderr_.strip()
+            print("stderr")
+
+        print( f"message1: {message}")
+
+    else:
+        if stderr_:
+            message = stderr_.strip()
+
+        else:
+            message = f"Return code: { return_code }"
+
+        print( f"message2: {message}")
+
+    print( f"stdout: {stdout_.strip()}")
+    print( f"stderr: {stderr_.strip()}")
+    print( f"return code: {return_code}")
+
+    if return_code == 0:
+        with open( po_file_original, 'r', encoding = "utf-8" ) as r:
+            text = (
+                r.read().
+                replace(
+                    f"Portable Object Template for { indicator }",
+                    f"<English language name for { lingua_code }> translation for { indicator }" ).
+                replace(
+                    f"Automatically generated, { _get_current_year() }",
+                    f"<author name> <<author email>>, { _get_current_year() }" ).
+                replace(
+                    "Last-Translator: Automatically generated",
+                    "Last-Translator: <author name> <<author email>>" ).
+                replace(
+                    "Language-Team: none",
+                    f"Language-Team: <English language name for { lingua_code }>" ) )
+
+        with open( po_file_original, 'w', encoding = "utf-8" ) as w:
+            w.write( text )
+
+        message += "\nYOU MUST UPDATE LINES 1, 4, 11, 12."
+        print( f"message3: {message}")
+
+    return message
+
+
+def _update_po(
+    indicator,
+    pot_file,
+    po_file_original,
+    version,
+    copyright_ ):
+
+    po_file_new = str( po_file_original ).replace( '.po', '.new.po' )
+    stdout_, stderr_, return_code = (
+        indicatorbase.IndicatorBase.process_run(
+            f"msgmerge { po_file_original } { pot_file } -o { po_file_new }" ) )
+#TODO Print the above line, run from terminal to see the output.
+
+    message = ""
+    if stderr_:
+        message = stderr_
+
+    elif return_code != 0:
+        message = f"Return code: { return_code }"
+
+    else:
+        with open( po_file_new, 'r', encoding = "utf-8" ) as r:
+            new = r.read()
+
+            new = (
+                re.sub(
+                    r"Copyright \(C\).*",
+                    f"Copyright (C) { copyright_ }.",
+                    new ) )
+
+            new = (
+                re.sub(
+                    "Project-Id-Version.*",
+                    f"Project-Id-Version: { indicator } { version }\\\\n\"",
+                    new ) )
+
+            with open( po_file_new, 'w', encoding = "utf-8" ) as w:
+                w.write( new )
+
+        if filecmp.cmp( po_file_original, po_file_new ):
+            os.remove( po_file_new )
+
+        else:
+            os.remove( po_file_original )
+            os.rename( po_file_new, po_file_original )
+
+    return message
+
+
 def _create_update_po(
     indicator,
     linguas_codes,
@@ -174,89 +298,24 @@ def _create_update_po(
             ( indicator + ".po" ) )
 
         if po_file_original.exists():
-            po_file_new = str( po_file_original ).replace( '.po', '.new.po' )
-            stdout_, stderr_, return_code = (
-                indicatorbase.IndicatorBase.process_run(
-                    f"msgmerge { po_file_original } { pot_file } "
-                    f"-o { po_file_new }" ) )
-
-            if stderr_:
-                message = stderr_
-
-            elif return_code != 0:
-                message = f"Return code: { return_code }"
-
-            if message:
-                break
-
-            with open( po_file_new, 'r', encoding = "utf-8" ) as r:
-                new = r.read()
-
-                new = (
-                    re.sub(
-                        r"Copyright \(C\).*",
-                        f"Copyright (C) { copyright_ }.",
-                        new ) )
-
-                new = (
-                    re.sub(
-                        "Project-Id-Version.*",
-                        f"Project-Id-Version: { indicator } { version }\\\\n\"",
-                        new ) )
-
-                with open( po_file_new, 'w', encoding = "utf-8" ) as w:
-                    w.write( new )
-
-            if filecmp.cmp( po_file_original, po_file_new ):
-                os.remove( po_file_new )
-
-            else:
-                os.remove( po_file_original )
-                os.rename( po_file_new, po_file_original )
+            message = (
+                _update_po(
+                    indicator,
+                    pot_file,
+                    po_file_original,
+                    version,
+                    copyright_ ) )
 
         else:
-            # http://www.gnu.org/software/gettext/manual/gettext.html#Creating
-            po_file_original.parents[ 0 ].mkdir(
-                parents = True,
-                exist_ok = True )
+            message = (
+                _create_po(
+                    indicator,
+                    pot_file,
+                    po_file_original,
+                    lingua_code ) )
 
-            stdout_, stderr_, return_code = (
-                indicatorbase.IndicatorBase.process_run(
-                    "msginit "
-                    f"-i { pot_file } "
-                    f"-o { po_file_original } "
-                    f"-l { lingua_code } "
-                    "--no-translator" ) )
-
-            if stderr_:
-                message = stderr_
-
-            elif return_code != 0:
-                message = f"Return code: { return_code }"
-
-            if message:
-                break
-
-            with open( po_file_original, 'r', encoding = "utf-8" ) as r:
-                text = (
-                    r.read().
-                    replace(
-                        f"Portable Object Template for { indicator }",
-                        f"<English language name for { lingua_code }> translation for { indicator }" ).
-                    replace(
-                        f"Automatically generated, { _get_current_year() }",
-                        f"<author name> <<author email>>, { _get_current_year() }" ).
-                    replace(
-                        "Last-Translator: Automatically generated",
-                        "Last-Translator: <author name> <<author email>>" ).
-                    replace(
-                        "Language-Team: none",
-                        f"Language-Team: <English language name for { lingua_code }>" ) )
-
-            with open( po_file_original, 'w', encoding = "utf-8" ) as w:
-                w.write( text )
-
-            print( "YOU MUST UPDATE LINES 1, 4, 11, 12." )   #TODO Make sure this appears!!!!
+        if message:
+            break
 
     return message
 
@@ -292,6 +351,10 @@ def _update_locale_source(
                 _get_linguas_codes( "indicatorbase" ),
                 version_indicatorbase,
                 copyright_ ) )
+        
+        print( 888888888888888 )
+        print( message )
+        print( 99999999999999999999)
 
     if not message:
         copyright_ = f"{ start_year }-{ current_year_author }"
@@ -838,7 +901,8 @@ def _package_source(
     if not message:
         authors = _get_pyproject_toml_authors( config )
         start_year = (
-            indicatorbase.IndicatorBase.get_year_in_changelog_markdown( changelog_markdown ) )
+            indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
+                changelog_markdown ) )
 
         message = (
             _update_locale_source(
@@ -949,7 +1013,9 @@ def build_wheel(
 
         message = _package_source( directory_dist, indicator )
 
+    print( 1 )
     if not message:
+        print( 2 )
         command = (
             "python3 -m build --outdir "
             f"{ directory_dist } { directory_dist / indicator }" )
@@ -957,6 +1023,7 @@ def build_wheel(
         stdout_, stderr_, return_code = (
             indicatorbase.IndicatorBase.process_run( command ) )
 
+        print( 3 )
         message = ""
         if stderr_:
             message = stderr_
@@ -964,8 +1031,18 @@ def build_wheel(
         elif return_code != 0:
             message = f"Return code: { return_code }"
 
+    else:
+        print( 4 )
+        print( message )
+        print( 5 )
+
 # TODO Uncomment
 #    shutil.rmtree( directory_dist / indicator )
 
-    if message:
-        print( message )
+#TODO I'm expecting to see more output (from the build command at least)
+# but nothing...why?    
+    # if message:
+    #     print( 5 )
+    #     print( message )
+    
+    return message
