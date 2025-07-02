@@ -61,7 +61,7 @@ if __name__ == "__main__":
             utils.VENV_RUN,
             *dependencies ) )
 
-    utils.print_result_from_python_run( *result )
+    utils.print_stdout_stderr_return_code( *result )
 
     if len( indicators_to_process ) > 1:
         print( "\n\nSubsequent indicators will not be run; one at a time!" )

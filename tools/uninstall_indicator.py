@@ -52,5 +52,5 @@ if __name__ == "__main__":
                 command,
                 utils.VENV_INSTALL ) )
 
-        if not utils.print_result_from_python_run( *result ):
+        if not utils.print_stdout_stderr_return_code( *result ):
             break
