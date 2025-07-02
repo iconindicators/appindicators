@@ -23,11 +23,12 @@ Utility for building a Python3 wheel.
 '''
 
 
+#TODO Add comments to py project toml in regards to why pygobject is not in there.
+
+
 #TODO
-# Add comments to py project toml in regards to why pygobject is not in there
-#
-# Also somehow want to note why (eventually) ephem and skyfield are not in the toml file.
-# Is there a way of extracting a comment from indicator lunar tomll file and
+# Somehow note why (eventually) ephem and skyfield are not in the toml file.
+# Is there a way of extracting a comment from indicator lunar toml file and
 # place it into the main toml?
 
 
@@ -911,13 +912,6 @@ def _package_source(
             authors,
             start_year )
 
-#TODO Note as of version 43.0
-# https://pypi.org/project/readme-renderer/43.0/
-# only python 3.8 is supported so may have to pin.
-# May need a function similar to get_pygobject()
-# https://docs.python.org/3/library/sys.html#sys.version
-#
-#TODO Test that this works given markdown moved to a backend module.
         _markdown_to_html.markdown_to_html(
             f"{ directory_dist }/{ indicator }/README.md",
             f"{ directory_dist }/{ indicator }/src/{ indicator }/README.html" )
