@@ -46,7 +46,7 @@ if __name__ == "__main__":
         newest_wheel = (
             f"$(ls -d { all_wheels } | head -1)" )
 
-        stdout_, stderr_, return_code = (
+        result = (
             utils.python_run(
                 command,
                 utils.VENV_INSTALL,
@@ -55,5 +55,5 @@ if __name__ == "__main__":
                 newest_wheel,
                 force_reinstall = True ) )
 
-        if utils.print_result_from_python_run( stdout_, stderr_, return_code ):
+        if not utils.print_stdout_stderr_return_code( *result ):
             break

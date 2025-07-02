@@ -40,6 +40,6 @@ if __name__ == "__main__":
             "pip",
             "readme_renderer[md]" ) )
 
-    utils.print_stdout_stderr_return_code(
-        *result,
-        f"Created { html }" )
+    utils.print_stdout_stderr_return_code( *result )
+    if result[ 2 ] == 0: # Return code of zero.
+        print( f"Created { html }" )

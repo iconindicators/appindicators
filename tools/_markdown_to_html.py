@@ -23,8 +23,8 @@ Utility for converting markdown to html.
 '''
 
 
-# Will be installed by the calling script.
-from readme_renderer.markdown import render
+
+from readme_renderer.markdown import render # Installed by the calling script.
 
 
 def markdown_to_html( markdown, html ):

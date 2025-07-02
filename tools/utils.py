@@ -152,29 +152,21 @@ def python_run(
     return indicatorbase.IndicatorBase.process_run( command_, )
 
 
-def print_results(
+def print_stdout_stderr_return_code(
     stdout_,
     stderr_,
-    return_code,
-    zero_return_code_message = "" ):
+    return_code ):
     '''
-    TODO Comment!!!!
+    Print either stdout or stderr along with the (non-zero) return code.
+
+    Return True if the return code is 0; False otherwise.
     '''
     if return_code == 0:
-        print( f"\n\nstdout:\n{ stdout_ }" )
+        print( stdout_ )
 
     else:
-        if stderr_:
-            print( f"\n\nstderr:\n{ stderr_ }" )
-
-        else:
-            print( f"\n\nReturn code:\n{ return_code }" )
-
-    '''TODO What is this for? Who uses/used this?
-    if return_code == 0:
-        if zero_return_code_message:
-            print( f"\n{ zero_return_code_message }" )
-    '''
+        print( f"\n\nstderr:\n{ stderr_ }" )
+        print( f"\n\nReturn code:\n{ return_code }" )
 
     return return_code == 0
 

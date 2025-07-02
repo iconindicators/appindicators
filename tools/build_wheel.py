@@ -38,10 +38,7 @@ if __name__ == "__main__":
             "build" ) )
 
     for indicator in indicators_to_process:
-#TODO Check the message handling below.
-# Test for a successful run.
-# Test for each function/clause for failure and a message should appear and abort.
-        stdout_, stderr_, return_code = (
+        result = (
             utils.python_run(
                 "python3 -c \"import tools._build_wheel; "
                 f"tools._build_wheel.build_wheel( \\\"{ indicator }\\\" )\"",
@@ -52,13 +49,5 @@ if __name__ == "__main__":
                 utils.get_pygobject(),
                 "readme_renderer[md]" ) )
 
-        # print( 1111 )
-        # print( stdout_ )
-        # print( 2222 )
-        # print( stderr_ )
-        # print( 3333 )
-        # print( return_code )
-        # print( 4444 )
-
-        if not utils.print_results( stdout_, stderr_, return_code ):
+        if not utils.print_stdout_stderr_return_code( *result ):
             break

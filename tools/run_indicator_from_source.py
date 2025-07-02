@@ -55,13 +55,13 @@ if __name__ == "__main__":
     if indicator in indicator_to_dependencies:
         dependencies += indicator_to_dependencies[ indicator ]
 
-    stdout_, stderr_, return_code = (
+    result = (
         utils.python_run(
             command,
             utils.VENV_RUN,
             *dependencies ) )
 
-    utils.print_result_from_python_run( stdout_, stderr_, return_code )
+    utils.print_result_from_python_run( *result )
 
     if len( indicators_to_process ) > 1:
         print( "\n\nSubsequent indicators will not be run; one at a time!" )

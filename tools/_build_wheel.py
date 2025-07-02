@@ -1008,41 +1008,6 @@ def build_wheel(
         stdout_, stderr_, return_code = (
             indicatorbase.IndicatorBase.process_run( command ) )
 
-        #TODO Not getting the full output of the build...why?
-        '''
-        print()
-        print()
-        print()
-        print( 111111111111 )
-        print()
-        print()
-        print()
-        print( stdout_ )
-        print()
-        print()
-        print()
-        print( 22222222222222 )
-        print()
-        print()
-        print()
-        print( stderr_ )
-        print()
-        print()
-        print()
-        print( 33333333333333 )
-        print()
-        print()
-        print()
-        print( return_code )
-        print()
-        print()
-        print()
-        print( 44444444444444 )
-        print()
-        print()
-        print()
-        '''
-
         message = ""
         if return_code == 0:
             message = stdout_
