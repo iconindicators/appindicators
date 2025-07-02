@@ -243,7 +243,12 @@ class IndicatorScriptRunner( IndicatorBase ):
                 command += "; " + notification
 
             if script.get_play_sound():
-                command += "; " + IndicatorBase.get_play_sound_complete_command()
+#TODO Test this works.
+                play_sound_complete_command = (
+                    IndicatorBase.get_play_sound_complete_command() )
+
+                if play_sound_complete_command:
+                    command += "; " + get_play_sound_complete_command
 
             if script.get_terminal_open():
                 command += "; cd $HOME; ${SHELL}"
@@ -299,8 +304,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                 command_result = self.background_script_results[ key ]
 
                 if script.get_play_sound() and command_result:
-                    IndicatorBase.process_run(
+#TODO Test this works.
+                    play_sound_complete_command = (
                         IndicatorBase.get_play_sound_complete_command() )
+
+                    if play_sound_complete_command:
+                        IndicatorBase.process_run(
+                            get_play_sound_complete_command )
 
                 if script.get_show_notification() and command_result:
                     command = (

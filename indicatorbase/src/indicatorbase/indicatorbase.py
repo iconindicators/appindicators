@@ -231,6 +231,9 @@ class IndicatorBase( ABC ):
         project_url = project_metadata.get_all( "Project-URL" )[ 0 ]
         self.website = project_url.split( ',' )[ 1 ].strip()
 
+        self.play_sound_complete_command = (
+            self._get_play_sound_complete_command() )
+
         self.lock_update = Lock()
         self.id_update = 0 # ID returned when scheduling an update.
 
@@ -1191,7 +1194,7 @@ class IndicatorBase( ABC ):
         '''
         text_in_clipboard = None
         if self.is_session_type_wayland():
-            text_in_clipboard = IndicatorBase.process_run( "wl-paste" )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
+            text_in_clipboard = IndicatorBase.process_run( "wl-paste" )[ 0 ]
 
         else:
             text_in_clipboard = (
@@ -1218,13 +1221,13 @@ class IndicatorBase( ABC ):
             # GTK interacts with the X11 clipboard via a user callback
             # function to receive the selection.
             #
-            # Under Wayland, there is presently no GTK equivalent.
-            # Instead, the package wl-clipboard is called via a terminal.
+            # Under Wayland, there is no equivalent.
+            # Rather, the package wl-clipboard is called via a terminal.
             #
             # Shield the user from having to know about Wayland or X11 by
             # wrapping wl-clipboard within a callback function.
             primary_received_callback_function(
-                IndicatorBase.process_run( "wl-paste --primary" )[ 0 ] )#TODO Should this check stderr/return code?  What to do on failure?
+                IndicatorBase.process_run( "wl-paste --primary" )[ 0 ] )
 
         else:
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
@@ -1253,17 +1256,32 @@ class IndicatorBase( ABC ):
         primary_received_callback_function( text )
 
 
-#TODO Should there be a check for the presence of paplay AND the .oga which is played?
-# Maybe check if paplay is always present in each distro's packages.
-# paplay is part of pulseaudio...
-# but it seems pipewire is soon to be the default.
-# pipewire apparently uses pw-cat
-#
-# Maybe instead, this function can figure out what application is available
-# for plaing a sound file and what sound file is available to be played,
-# hiding this from the caller.
+    def _get_play_sound_complete_command( self ):
+        play_sound_command = IndicatorBase.process_run( "which pw-play" )[ 0 ]
+        if len( play_sound_command ) == 0:
+            play_sound_command = IndicatorBase.process_run( "which paplay" )[ 0 ]
+            if len( play_sound_command ) == 0:
+                play_sound_command = None
+                self.get_logging().error( "Unable to locate pw-play nor paplay." )
+
+        complete_oga = "/usr/share/sounds/freedesktop/stereo/complete.oga"
+        sound_complete = (
+            IndicatorBase.process_run( f"ls { complete_oga }" )[ 0 ] )
+
+        if len( sound_complete ) == 0:
+            sound_complete = None
+            self.get_logging().error( f"Unable to locate { complete_oga }." )
+
+        play_sound_complete_command = None
+        if play_sound_command and sound_complete:
+            play_sound_complete_command = (
+                f"{ play_sound_command } { sound_complete }" )
+
+        return play_sound_complete_command
+
+
     def get_play_sound_complete_command( self ):
-        return "paplay /usr/share/sounds/freedesktop/stereo/complete.oga"
+        return self.play_sound_complete_command
 
 
     def create_dialog(

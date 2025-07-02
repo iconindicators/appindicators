@@ -360,14 +360,17 @@ class IndicatorTest( IndicatorBase ):
         labels = [
             "fortune",
             "ls",
-            "notify-send",
-            "paplay" ]
+            "notify-send" ]
 
         commands = [
             "fortune",
             "ls -la",
-            f"notify-send -i { self.get_icon_name() } 'summary...' 'body...'",
-            self.get_play_sound_complete_command() ]
+            f"notify-send -i { self.get_icon_name() } 'summary...' 'body...'" ]
+
+        play_sound_complete_command = self.get_play_sound_complete_command()
+        if play_sound_complete_command:
+            labels.append( "pw-play / paplay" )
+            commands.append( play_sound_complete_command )
 
         if IndicatorBase.is_calendar_supported():
             labels.insert( 0, "calendar" )
