@@ -22,8 +22,8 @@ used in astroskyfield.
 
 It is assumed this script is called from within a Python3 virtual environment.
 
-This script will NOT work on 32 bit; running will generate a warning,
-however, the build will continue without failing.
+Running this script on 32 bit will not work correctly; however, the build wheel
+will continue without failing.
 '''
 
 
@@ -37,27 +37,6 @@ however, the build will continue without failing.
 # See if _build_wheel.py is being run twice by build_wheel.py.
 #
 # Check all scripts in tools and indicatorlunar/tools.
-
-
-#TODO
-# https://numpy.org/doc/2.0/release/1.25.0-notes.html
-#
-# For Ubuntu 20.04 et al, might need to pin numpy to < 1.25.0 as
-# < Python 3.9 is unsupported.
-#
-# Ubuntu 22.04 has python 3.10 so should not need numpy pinning until 3.10 is
-# deprecated or unsupported by numpy.
-#
-# Debian 11 has python 3.9 so should not need numpy pinning until 3.9 is
-# deprecated or unsupported by numpy.
-#
-# Check for Fedora, Manjaro and openSUSE!
-#
-# Given that this script DOES indeed work on Ubuntu 20.04, how does that happen
-# without the pinning?  Does pip figure out the most recent/correct version
-# automatically?
-# I think the answer is yes, pip figures out the correct package for the Python3
-# version...so may not need to be concerned about pinning numpy, et al.
 
 
 import gettext
