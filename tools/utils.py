@@ -152,7 +152,7 @@ def python_run(
     return indicatorbase.IndicatorBase.process_run( command_, )
 
 
-def print_result_from_python_run(
+def print_results(
     stdout_,
     stderr_,
     return_code,
@@ -160,15 +160,15 @@ def print_result_from_python_run(
     '''
     TODO Comment!!!!
     '''
-    if stderr_:
-        print( f"\nstderr: { stderr_ }")
-
-    elif return_code != 0:
-        print( f"\nReturn code: { return_code }")
+    if return_code == 0:
+        print( f"\n\nstdout:\n{ stdout_ }" )
 
     else:
-        print( stdout_ )
+        if stderr_:
+            print( f"\n\nstderr:\n{ stderr_ }" )
 
+        else:
+            print( f"\n\nReturn code:\n{ return_code }" )
 
     '''TODO What is this for? Who uses/used this?
     if return_code == 0:
@@ -176,7 +176,7 @@ def print_result_from_python_run(
             print( f"\n{ zero_return_code_message }" )
     '''
 
-    return stderr_ or return_code != 0
+    return return_code == 0
 
 
 def _get_parser(

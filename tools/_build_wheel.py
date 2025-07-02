@@ -41,8 +41,7 @@ import shutil
 import stat
 import sys
 
-# Will be installed by the calling script.
-import polib
+import polib # Installed by the calling script.
 
 from pathlib import Path
 
@@ -86,6 +85,20 @@ def _get_current_year():
     return datetime.datetime.now( datetime.timezone.utc ).strftime( '%Y' )
 
 
+def _get_message(
+    stderr_,
+    return_code ):
+
+    message = ""
+    if stderr_:
+        message = stderr_
+
+    else:
+        message = f"Return code: { return_code }"
+
+    return message
+
+
 def _create_update_pot(
     indicator,
     locale_directory,
@@ -110,14 +123,7 @@ def _create_update_pot(
             f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' "
             f"-o { pot_file_new }" ) )
 
-    message = ""
-    if stderr_:
-        message = stderr_
-
-    elif return_code != 0:
-        message = f"Return code: { return_code }"
-
-    if not message:
+    if return_code == 0:
         with open( pot_file_new, 'r', encoding = "utf-8" ) as r:
             text = (
                 r.read().
@@ -154,6 +160,11 @@ def _create_update_pot(
                 os.remove( pot_file_original )
                 os.rename( pot_file_new, pot_file_original )
 
+        message = ""
+
+    else:
+        message = _get_message( stderr_, return_code )
+
     return message
 
 
@@ -179,25 +190,13 @@ def _create_po(
     # On success, msginit writes to stderr, rather than stdout,
     # with a return code of 0.
     #
-    # The user will then need to update lines in the created .po file,
-    # so pass this message back to the user.
+    # On success, the user must update lines in the created .po file,
+    # so pass this message back to the user (which will stop the build).
     #
     # On error, report back to the user.
     if return_code == 0:
-        if stdout_:
-            message = stdout_
+        message = stderr_
 
-        else:
-            message = stderr_
-
-    else:
-        if stderr_:
-            message = stderr_
-
-        else:
-            message = f"Return code: { return_code }"
-
-    if return_code == 0:
         with open( po_file_original, 'r', encoding = "utf-8" ) as r:
             text = (
                 r.read().
@@ -219,6 +218,9 @@ def _create_po(
 
         message += "\nYOU MUST UPDATE LINES 1, 4, 11, 12."
 
+    else:
+        message = _get_message( stderr_, return_code )
+
     return message
 
 
@@ -236,9 +238,7 @@ def _update_po(
 
     # On success, msgmerge writes to stderr, rather than stdout,
     # with a return code of 0.
-    #
-    # The user does not need to update/modify the .po file,
-    # so no need to message the user.
+    # The message is of little use to the end user, so is dropped.
     #
     # On error, report back to the user.
     message = ""
@@ -269,11 +269,7 @@ def _update_po(
             os.rename( po_file_new, po_file_original )
 
     else:
-        if stderr_:
-            message = stderr_
-
-        else:
-            message = f"Return code: { return_code }"
+        message = _get_message( stderr_, return_code )
 
     return message
 
@@ -409,16 +405,11 @@ def _build_locale_for_release(
             if return_code == 0:
                 continue
 
-            if stderr_:
-                message = stderr_
-
-            else:
-                message = f"Return code: { return_code }"
-
+            message = _get_message( stderr_, return_code )
             break
 
         if return_code == 0:
-            # Create .mo files.
+            # Create .mo file for each locale.
             for po in list( Path( directory_indicator_locale ).rglob( "*.po" ) ):
                 stdout_, stderr_, return_code = (
                     indicatorbase.IndicatorBase.process_run(
@@ -428,20 +419,11 @@ def _build_locale_for_release(
                 if return_code == 0:
                     continue
 
-                if stderr_:
-                    message = stderr_
-
-                else:
-                    message = f"Return code: { return_code }"
-
+                message = _get_message( stderr_, return_code )
                 break
 
     else:
-        if stderr_:
-            message = stderr_
-
-        else:
-            message = f"Return code: { return_code }"
+        message = _get_message( stderr_, return_code )
 
     return message
 
@@ -968,8 +950,13 @@ def _package_source(
             comments_from_po_files,
             categories )
 
-        _create_scripts_for_linux( directory_platform_linux, indicator )
-        _create_symbolic_icons( directory_dist, indicator )
+        _create_scripts_for_linux(
+            directory_platform_linux,
+            indicator )
+
+        _create_symbolic_icons(
+            directory_dist,
+            indicator )
 
         # If an indicator has a build script located at
         #   { indicator } / tools / _build_wheel.py
@@ -1022,22 +1009,48 @@ def build_wheel(
             indicatorbase.IndicatorBase.process_run( command ) )
 
         #TODO Not getting the full output of the build...why?
+        '''
+        print()
+        print()
+        print()
         print( 111111111111 )
-        print( message )
+        print()
+        print()
+        print()
+        print( stdout_ )
+        print()
+        print()
+        print()
         print( 22222222222222 )
+        print()
+        print()
+        print()
+        print( stderr_ )
+        print()
+        print()
+        print()
+        print( 33333333333333 )
+        print()
+        print()
+        print()
+        print( return_code )
+        print()
+        print()
+        print()
+        print( 44444444444444 )
+        print()
+        print()
+        print()
+        '''
 
         message = ""
         if return_code == 0:
             message = stdout_
 
         else:
-            if stderr_:
-                message = stderr_
-
-            else:
-                message = f"Return code: { return_code }"
+            message = _get_message( stderr_, return_code )
 
 # TODO Uncomment
 #    shutil.rmtree( directory_dist / indicator )
 
-    return message
+    sys.stdout.write( message )

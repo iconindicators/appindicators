@@ -52,5 +52,13 @@ if __name__ == "__main__":
                 utils.get_pygobject(),
                 "readme_renderer[md]" ) )
 
-        if utils.print_result_from_python_run( stdout_, stderr_, return_code ):
+        # print( 1111 )
+        # print( stdout_ )
+        # print( 2222 )
+        # print( stderr_ )
+        # print( 3333 )
+        # print( return_code )
+        # print( 4444 )
+
+        if not utils.print_results( stdout_, stderr_, return_code ):
             break
