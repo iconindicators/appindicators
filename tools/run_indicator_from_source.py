@@ -39,7 +39,10 @@ if __name__ == "__main__":
             f"Run an indicator from within the source tree.",
             "install" ) )
 
-    indicator = indicators_to_process[ 0 ] # Only run the first indicator.
+    if len( indicators_to_process ) > 1:
+        print( "Only the first indicator will be run!" )
+
+    indicator = indicators_to_process[ 0 ]
 
     command = (
         "for dirs in indicator*; do "
@@ -51,17 +54,17 @@ if __name__ == "__main__":
         f"python3 -m { indicator }.{ indicator } && "
         "cd ../.." )
 
-    dependencies = [ "pip", f"{ utils.get_pygobject() }" ]
+    modules_to_install = [
+        "pip",
+        f"{ utils.get_pygobject() }" ]
+
     if indicator in indicator_to_dependencies:
-        dependencies += indicator_to_dependencies[ indicator ]
+        modules_to_install.append( indicator_to_dependencies[ indicator ] )
 
     result = (
         utils.python_run(
             command,
             utils.VENV_RUN,
-            *dependencies ) )
+            *modules_to_install ) )
 
     utils.print_stdout_stderr_return_code( *result )
-
-    if len( indicators_to_process ) > 1:
-        print( "\n\nSubsequent indicators will not be run; one at a time!" )

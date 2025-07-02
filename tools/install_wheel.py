@@ -17,9 +17,9 @@
 
 
 '''
-Install a wheel, from the release directory, for one or more indicators,
-to the release virtual environment at $HOME/.local/venv_indicators and then
-run install.sh from the indicator's platform/linux directory.
+Install a wheel, for one or more indicators, from the release directory
+to the Python3 virtual environment at $HOME/.local/venv_indicators
+then run install.sh from the indicator's platform/linux directory.
 '''
 
 
@@ -40,19 +40,16 @@ if __name__ == "__main__":
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
             f"site-packages/{ indicator }/platform/linux/install.sh" )
 
-        all_wheels = (
-            f"{ utils.RELEASE_DIRECTORY }/wheel/dist_{ indicator }/{ indicator }*.whl" )
-
-        newest_wheel = (
-            f"$(ls -d { all_wheels } | head -1)" )
+        modules_to_install = [
+            "pip",
+            utils.get_pygobject(),
+            f"$(ls -d { utils.RELEASE_DIRECTORY }/wheel/dist_{ indicator }/{ indicator }*.whl | head -1)" ]
 
         result = (
             utils.python_run(
                 command,
                 utils.VENV_INSTALL,
-                "pip",
-                utils.get_pygobject(),
-                newest_wheel,
+                *modules_to_install,
                 force_reinstall = True ) )
 
         if not utils.print_stdout_stderr_return_code( *result ):

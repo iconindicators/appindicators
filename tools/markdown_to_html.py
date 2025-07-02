@@ -33,13 +33,16 @@ if __name__ == "__main__":
         "tools._markdown_to_html.markdown_to_html( "
         f"\\\"{ markdown }\\\", \\\"{ html }\\\" )\"" )
 
+    modules_to_install = [
+        "pip",
+        "readme_renderer[md]" ]
+
     result = (
         utils.python_run(
             command,
             utils.VENV_BUILD,
-            "pip",
-            "readme_renderer[md]" ) )
+            *modules_to_install ) )
 
     utils.print_stdout_stderr_return_code( *result )
-    if result[ 2 ] == 0: # Return code of zero.
-        print( f"Created { html }" )
+    if result[ 2 ] == 0: # Return code of zero; all is well.
+        print( f"\nCreated { html }" )

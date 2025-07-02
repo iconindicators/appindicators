@@ -38,16 +38,22 @@ if __name__ == "__main__":
             "build" ) )
 
     for indicator in indicators_to_process:
+        command = (
+            "python3 -c \"import tools._build_wheel; "
+            f"tools._build_wheel.build_wheel( \\\"{ indicator }\\\" )\"" )
+
+        modules_to_install = [
+            "build",
+            "pip",
+            "polib",
+            utils.get_pygobject(),
+            "readme_renderer[md]" ]
+
         result = (
             utils.python_run(
-                "python3 -c \"import tools._build_wheel; "
-                f"tools._build_wheel.build_wheel( \\\"{ indicator }\\\" )\"",
+                command,
                 utils.VENV_BUILD,
-                "build",
-                "pip",
-                "polib",
-                utils.get_pygobject(),
-                "readme_renderer[md]" ) )
+                *modules_to_install ) )
 
         if not utils.print_stdout_stderr_return_code( *result ):
             break
