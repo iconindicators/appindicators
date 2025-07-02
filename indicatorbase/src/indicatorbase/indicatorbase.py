@@ -1257,6 +1257,12 @@ class IndicatorBase( ABC ):
 
 
     def _get_play_sound_complete_command( self ):
+        '''
+        Determine if pw-play is present, and if not, then paplay.
+        If neither, then log.
+
+        Determine if complete.oga is present; if not log.
+        '''
         play_sound_command = IndicatorBase.process_run( "which pw-play" )[ 0 ]
         if len( play_sound_command ) == 0:
             play_sound_command = IndicatorBase.process_run( "which paplay" )[ 0 ]
@@ -1281,6 +1287,15 @@ class IndicatorBase( ABC ):
 
 
     def get_play_sound_complete_command( self ):
+        '''
+        Return the full command to play a sound,
+        either pw-play for pipewire, or paplay for pulseaudio,
+        followed by the full path to the sound file complete.oga.
+        
+        If neither pw-play nor paplay can be found,
+        or complete.oga is not found, None is returned
+        and the underlying issue is logged.
+        '''
         return self.play_sound_complete_command
 
 
