@@ -16,5 +16,4 @@ classifiers = [
 # For Skyfield, also specify pandas for use in minor planets / comets).
 dependencies = [
   "ephem",
-  "sgp4" ]  #TODO This has cpp code; ensure this installs on 32 bit, as it is
-            # needed in the satellite stuff irrespective of pyephem or skyfield.
+  "sgp4" ]
