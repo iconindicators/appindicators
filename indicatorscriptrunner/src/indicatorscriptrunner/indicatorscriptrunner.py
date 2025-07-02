@@ -255,7 +255,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     script.get_group() + " | " + script.get_name() + ": " + command )
 
             Thread(
-                target = IndicatorBase.process_run,#TODO Should this check stderr/return code?  What to do on failure?
+                target = IndicatorBase.process_run,
                 args = ( command, ) ).start()
 
 
@@ -321,7 +321,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.get_logging().debug(
                 script.get_group() + " | " + script.get_name() + ": " + script.get_command() )
 
-        command_result = IndicatorBase.process_run( script.get_command() )[ 0 ]#TODO Should this check stderr/return code?  What to do on failure?
+        command_result = IndicatorBase.process_run( script.get_command() )[ 0 ]
         key = self._create_key( script.get_group(), script.get_name() )
         self.background_script_results[ key ] = command_result
         self.background_script_next_update_time[ key ] = (
@@ -530,7 +530,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         if len( treestore ):
             self._select_row(
-                scripts_treeview, 
+                scripts_treeview,
                 treestore.get_iter_from_string( "0:0" ) )
 
         grid.attach( scripts_scrolledwindow, 0, 0, 1, 20 )
