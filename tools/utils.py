@@ -80,19 +80,20 @@ def is_ubuntu2004_or_is_ubuntu2204_or_ubuntu2404():
     return is_ubuntu or is_linux_mint
 
 
-#TODO Not sure if this comment
-#   https://github.com/beeware/toga/issues/3143#issuecomment-3002687050
-# is relevant.
 def get_pygobject():
     '''
     PyGObject is required for running an indicator.
 
     On Debian based distributions, the most recent version of PyGObject
-    requires libgirepository-2.0-dev, which is only available on Ubuntu 24.04+
-    and Debian 13+.
+    requires libgirepository-2.0-dev, which is only available on
+    Ubuntu 24.04+ and Debian 13+.
 
-    On Debian 11/12 and Ubuntu 20.04/22.04/24.04, which only have available
-    libgirepository1.0-dev, PyGObject must be pinned to version 3.50.0.
+    For Debian 11/12 and Ubuntu 20.04/22.04/24.04, PyGObject must be pinned
+    to version 3.50.1.
+
+    This issue came to light through
+        https://github.com/beeware/toga/issues/3143
+        https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
     '''
     pygobject_needs_to_be_pinned = (
         is_debian11_or_debian12()
@@ -101,7 +102,7 @@ def get_pygobject():
 
     if pygobject_needs_to_be_pinned:
         # Escape the < otherwise it will be interpreted as a redirect.
-        pygobject = r"PyGObject\<=3.50.0"
+        pygobject = r"PyGObject\<=3.50.1"
 
     else:
         pygobject = "PyGObject"
