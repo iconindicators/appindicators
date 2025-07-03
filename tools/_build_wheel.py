@@ -801,10 +801,11 @@ def _create_scripts_for_linux(
     process( uninstall_script, uninstall_script )
 
 
-#TODO Perhaps create the symbolic icons and commit to repository instead of creating each time?
 def _create_symbolic_icons(
     directory_wheel,
     indicator ):
+
+    regular_expressions = [ r"fill:#", r"stroke:#" ]
 
     directory_icons = (
         directory_wheel /
@@ -813,33 +814,25 @@ def _create_symbolic_icons(
         indicator /
         "icons" )
 
-    for hicolor_icon in list( ( Path( '.' ) / directory_icons ).glob( "*.svg" ) ):
+    hicolor_icons = list( ( Path( '.' ) / directory_icons ).glob( "*.svg" ) )
+
+    for hicolor_icon in hicolor_icons:
+        with open( hicolor_icon, 'r', encoding = "utf-8" ) as f:
+            symbolic_svg = f.read()
+
+        for regular_expression in regular_expressions:
+            symbolic_svg = (
+                re.sub(
+                    regular_expression + r"([a-fA-F0-9]){6}",
+                    regular_expression + "777777",
+                    symbolic_svg ) )
+
         symbolic_icon = (
-            directory_icons
-            /
-            ( str( hicolor_icon.name )[ 0 : -4 ] + "-symbolic.svg" ) )
-
-        shutil.copy( hicolor_icon, symbolic_icon )
-        with open( symbolic_icon, 'r', encoding = "utf-8" ) as f:
-            svg_text = f.read()
-            for m in re.finditer( r"fill:#", svg_text ):
-                svg_text = (
-                    svg_text[ 0 : m.start() + 6 ]
-                    +
-                    "777777"
-                    +
-                    svg_text[ m.start() + 6 + 6 : ] )
-
-            for m in re.finditer( r"stroke:#", svg_text ):
-                svg_text = (
-                    svg_text[ 0 : m.start() + 6 ]
-                    +
-                    "777777"
-                    +
-                    svg_text[ m.start() + 6 + 6 : ] )
+            hicolor_icon.parent /
+            ( str( hicolor_icon.stem ) + "-symbolic.svg" ) )
 
         with open( symbolic_icon, 'w', encoding = "utf-8" ) as f:
-            f.write( svg_text + '\n' )
+            f.write( symbolic_svg )
 
 
 def _package_source(
