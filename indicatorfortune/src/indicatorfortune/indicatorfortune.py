@@ -19,11 +19,6 @@
 ''' Application indicator which displays fortunes. '''
 
 
-#TODO Test with/without clipboard supported
-# AND
-# with/without preference set to copy last.
-
-
 import fnmatch
 import os
 
@@ -153,7 +148,7 @@ class IndicatorFortune( IndicatorBase ):
         if locations:
             command = "fortune" + ''.join( locations )
             while True:
-                fortune_ = IndicatorBase.process_run( command )[ 0 ]
+                fortune_ = self.process_run( command )[ 0 ]
                 if not fortune_: # No fortune data found.
                     message = _( "Ensure enabled fortunes contain data!" )
                     break
@@ -538,9 +533,9 @@ class IndicatorFortune( IndicatorBase ):
                 IndicatorFortune.NOTIFICATION_SUMMARY ) )
 
         version_from_config = (
-            IndicatorBase.versiontuple( self.get_version_from_config( config ) ) )
+            self.versiontuple( self.get_version_from_config( config ) ) )
 
-        if version_from_config < IndicatorBase.versiontuple( "1.0.44" ):
+        if version_from_config < self.versiontuple( "1.0.44" ):
             self._upgrade_1_0_44()
 
         if len( self.fortunes ) == 0:

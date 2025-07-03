@@ -274,7 +274,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         uuid ):
 
         command = f"VBoxManage list vms | grep { uuid }"
-        virtual_machines = IndicatorBase.process_run( command )[ 0 ]
+        virtual_machines = self.process_run( command )[ 0 ]
         if uuid not in virtual_machines:
             message = _(
                 "The virtual machine could not be found - " +
@@ -285,7 +285,7 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.show_notification( _( "Error" ), message )
 
         else:
-            IndicatorBase.process_run(
+            self.process_run(
                 self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &" )
 
 
@@ -297,7 +297,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         if self.is_session_type_x11():
             command = 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l'
             number_of_windows_with_the_same_name = (
-                IndicatorBase.process_run( command )[ 0 ] )
+                self.process_run( command )[ 0 ] )
 
             if number_of_windows_with_the_same_name == "0":
                 message = _(
@@ -312,11 +312,11 @@ class IndicatorVirtualBox( IndicatorBase ):
                     delay_in_seconds = delay_in_seconds )
 
             elif number_of_windows_with_the_same_name == "1":
-                window_list = IndicatorBase.process_run( "wmctrl -l" )[ 0 ]
+                window_list = self.process_run( "wmctrl -l" )[ 0 ]
                 for line in window_list.splitlines():
                     if virtual_machine_name in line:
                         window_id = line[ 0 : line.find( " " ) ]
-                        IndicatorBase.process_run( "wmctrl -i -a " + window_id )
+                        self.process_run( "wmctrl -i -a " + window_id )
                         break
 
             else:
@@ -391,8 +391,8 @@ class IndicatorVirtualBox( IndicatorBase ):
     def on_launch_virtual_box_manager( self ):
 
         def start_virtualbox_manager():
-            IndicatorBase.process_run(
-                IndicatorBase.process_run( "which VirtualBox" )[ 0 ] + " &" )
+            self.process_run(
+                self.process_run( "which VirtualBox" )[ 0 ] + " &" )
 
 
         if self.is_session_type_x11():
@@ -409,10 +409,10 @@ class IndicatorVirtualBox( IndicatorBase ):
             command = (
                 f"wmctrl -l | grep \"{ self.virtualbox_manager_window_name }\"" )
 
-            window_information = IndicatorBase.process_run( command )[ 0 ]
+            window_information = self.process_run( command )[ 0 ]
             if window_information:
                 window_id = window_information.split()[ 0 ]
-                IndicatorBase.process_run( f"wmctrl -ia { window_id }" )
+                self.process_run( f"wmctrl -ia { window_id }" )
 
             else:
                 start_virtualbox_manager()
@@ -429,7 +429,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         corresponding running virtual machine UUIDs.
         '''
         command = "VBoxManage list runningvms"
-        running_vms = IndicatorBase.process_run( command )[ 0 ]
+        running_vms = self.process_run( command )[ 0 ]
         names = [ ]
         uuids = [ ]
         for line in running_vms.splitlines():
@@ -448,7 +448,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         uuid ):
 
         command = "VBoxManage list runningvms | grep " + uuid
-        return uuid in IndicatorBase.process_run( command )[ 0 ]
+        return uuid in self.process_run( command )[ 0 ]
 
 
     def get_virtual_machines( self ):
@@ -482,7 +482,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         top_group = Group( "" )
         command = "VBoxManage list vms --long"
-        for line in IndicatorBase.process_run( command )[ 0 ].splitlines():
+        for line in self.process_run( command )[ 0 ].splitlines():
             if line.startswith( "Name:" ):
                 name = line.split( "Name:" )[ 1 ].strip()
 
@@ -499,7 +499,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def is_vboxmanage_installed( self ):
-        which_vboxmanage = IndicatorBase.process_run( "which VBoxManage" )[ 0 ]
+        which_vboxmanage = self.process_run( "which VBoxManage" )[ 0 ]
         return which_vboxmanage.find( "VBoxManage" ) > -1
 
 

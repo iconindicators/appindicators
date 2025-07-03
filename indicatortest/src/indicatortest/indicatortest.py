@@ -173,14 +173,14 @@ class IndicatorTest( IndicatorBase ):
 
         command = "gsettings get org.gnome.desktop.interface "
 
-        result = IndicatorBase.process_run( command + "icon-theme" )[ 0 ]
+        result = self.process_run( command + "icon-theme" )[ 0 ]
         result = result.replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
             command + "icon-theme: " + result,
             indent = ( 2, 0 ) )
 
-        result = IndicatorBase.process_run( command + "gtk-theme" )[ 0 ]
+        result = self.process_run( command + "gtk-theme" )[ 0 ]
         result = result.replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
@@ -372,7 +372,7 @@ class IndicatorTest( IndicatorBase ):
             labels.append( "pw-play / paplay" )
             commands.append( play_sound_complete_command )
 
-        if IndicatorBase.is_calendar_supported():
+        if self.is_calendar_supported():
             labels.insert( 0, "calendar" )
             commands.insert(
                 0, "calendar -f /usr/share/calendar/calendar.all -A 3" )
@@ -469,7 +469,7 @@ class IndicatorTest( IndicatorBase ):
                 + "; ${SHELL}" + "'" )
 
             Thread(
-                target = IndicatorBase.process_run,
+                target = self.process_run,
                 args = ( command_, ) ).start()
 
             print( "Executing command: " + command_ )

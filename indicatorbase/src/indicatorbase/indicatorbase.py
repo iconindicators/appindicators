@@ -195,7 +195,7 @@ class IndicatorBase( ABC ):
         self.indicator_name = IndicatorBase.INDICATOR_NAME
 
         project_metadata, error_message = (
-            IndicatorBase.get_project_metadata( self.indicator_name ) )
+            self.get_project_metadata( self.indicator_name ) )
 
         if error_message:
             self._show_message_and_exit( error_message )
@@ -220,10 +220,10 @@ class IndicatorBase( ABC ):
         IndicatorBase._LOGGING_INITIALISED = True
 
         self.current_desktop = (
-            IndicatorBase.process_run( "echo $XDG_CURRENT_DESKTOP" )[ 0 ] )
+            self.process_run( "echo $XDG_CURRENT_DESKTOP" )[ 0 ] )
 
         self.session_type = (
-            IndicatorBase.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )
+            self.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )
 
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
@@ -304,13 +304,13 @@ class IndicatorBase( ABC ):
             "New version of {0} available..." ).format( self.indicator_name )
 
         data_json, error_network, error_timeout = (
-            IndicatorBase.get_json( url, logging = self.get_logging() ) )
+            self.get_json( url, logging = self.get_logging() ) )
 
         if data_json:
             version_pypi = (
-                IndicatorBase.versiontuple( data_json[ "info" ][ "version" ] ) )
+                self.versiontuple( data_json[ "info" ][ "version" ] ) )
 
-            if IndicatorBase.versiontuple( self.version ) < version_pypi:
+            if self.versiontuple( self.version ) < version_pypi:
                 self.new_version_available = True
                 self.show_notification( summary, message )
 
@@ -395,7 +395,7 @@ class IndicatorBase( ABC ):
             # No pip information found; assume running in development;
             # look for a .whl file in the release folder.
             wheel_in_release, error_message = (
-                IndicatorBase._get_wheel_in_release( indicator_name ) )
+                self._get_wheel_in_release( indicator_name ) )
 
             if wheel_in_release is None:
                 project_metadata = None
@@ -588,7 +588,7 @@ class IndicatorBase( ABC ):
 
         else:
             wheel_in_release, error_message = (
-                IndicatorBase._get_wheel_in_release( self.indicator_name ) )
+                self._get_wheel_in_release( self.indicator_name ) )
 
             if wheel_in_release:
                 with ZipFile( wheel_in_release, 'r' ) as z:
@@ -994,7 +994,7 @@ class IndicatorBase( ABC ):
 
         about_dialog.set_comments( self.comments )
 
-        changelog_markdown_path = IndicatorBase.get_changelog_markdown_path()
+        changelog_markdown_path = self.get_changelog_markdown_path()
 
         authors = [
             author_and_email[ 0 ]
@@ -1002,7 +1002,7 @@ class IndicatorBase( ABC ):
 
         about_dialog.set_copyright(
             "Copyright \xa9 " +
-            IndicatorBase.get_year_in_changelog_markdown(
+            self.get_year_in_changelog_markdown(
                 changelog_markdown_path ) +
             '-' +
             str( datetime.datetime.now().year ) +
@@ -1119,13 +1119,13 @@ class IndicatorBase( ABC ):
         Return the result of calling
             cat /etc/os-release
         '''
-        return IndicatorBase.process_run( "cat /etc/os-release" )[ 0 ]
+        return self.process_run( "cat /etc/os-release" )[ 0 ]
 
 
     @staticmethod
     def is_calendar_supported():
         ''' The calendar package is unavailable on some distributions. '''
-        etc_os_release = IndicatorBase.get_etc_os_release()
+        etc_os_release = self.get_etc_os_release()
         is_manjaro = "NAME=\"Manjaro Linux\"" in etc_os_release
         is_opensuse_tumbleweed = (
             "NAME=\"openSUSE Tumbleweed\"" in etc_os_release )
@@ -1150,7 +1150,7 @@ class IndicatorBase( ABC ):
             or (
                 self.is_session_type_wayland()
                 and
-                "UBUNTU_CODENAME=focal" not in IndicatorBase.get_etc_os_release() ) )
+                "UBUNTU_CODENAME=focal" not in self.get_etc_os_release() ) )
 
 
     def copy_to_clipboard_or_primary(
@@ -1174,7 +1174,7 @@ class IndicatorBase( ABC ):
             #   https://github.com/bugaevc/wl-clipboard/pull/110
             #   https://github.com/bugaevc/wl-clipboard/pull/154
             command += "2>/dev/null"
-            IndicatorBase.process_run( command )    #TODO Check the pipe to stderr still works!
+            self.process_run( command )    #TODO Check the pipe to stderr still works!
                                                     # Need to do this on Wayland and not Ubuntu 20.04
                                                     #TODO Should this check stderr/return code?  What to do on failure?
 
@@ -1193,7 +1193,7 @@ class IndicatorBase( ABC ):
         '''
         text_in_clipboard = None
         if self.is_session_type_wayland():
-            text_in_clipboard = IndicatorBase.process_run( "wl-paste" )[ 0 ]
+            text_in_clipboard = self.process_run( "wl-paste" )[ 0 ]
 
         else:
             text_in_clipboard = (
@@ -1226,7 +1226,7 @@ class IndicatorBase( ABC ):
             # Shield the user from having to know about Wayland or X11 by
             # wrapping wl-clipboard within a callback function.
             primary_received_callback_function(
-                IndicatorBase.process_run( "wl-paste --primary" )[ 0 ] )
+                self.process_run( "wl-paste --primary" )[ 0 ] )
 
         else:
             Gtk.Clipboard.get( Gdk.SELECTION_PRIMARY ).request_text(
@@ -1262,16 +1262,16 @@ class IndicatorBase( ABC ):
 
         Determine if complete.oga is present; if not log.
         '''
-        play_sound_command = IndicatorBase.process_run( "which pw-play" )[ 0 ]
+        play_sound_command = self.process_run( "which pw-play" )[ 0 ]
         if len( play_sound_command ) == 0:
-            play_sound_command = IndicatorBase.process_run( "which paplay" )[ 0 ]
+            play_sound_command = self.process_run( "which paplay" )[ 0 ]
             if len( play_sound_command ) == 0:
                 play_sound_command = None
                 self.get_logging().error( "Unable to locate pw-play nor paplay." )
 
         complete_oga = "/usr/share/sounds/freedesktop/stereo/complete.oga"
         sound_complete = (
-            IndicatorBase.process_run( f"ls { complete_oga }" )[ 0 ] )
+            self.process_run( f"ls { complete_oga }" )[ 0 ] )
 
         if len( sound_complete ) == 0:
             sound_complete = None
@@ -1290,7 +1290,7 @@ class IndicatorBase( ABC ):
         Return the full command to play a sound,
         either pw-play for pipewire, or paplay for pulseaudio,
         followed by the full path to the sound file complete.oga.
-        
+
         If neither pw-play nor paplay can be found,
         or complete.oga is not found, None is returned
         and the underlying issue is logged.
@@ -2526,7 +2526,7 @@ class IndicatorBase( ABC ):
 
         else:
             number_of_menuitems = (
-                IndicatorBase.interpolate(
+                self.interpolate(
                     screen_heights_in_pixels,
                     numbers_of_menuitems,
                     screen_height_in_pixels ) )
@@ -2612,11 +2612,10 @@ class IndicatorBase( ABC ):
         Fixed in version 1.2.0
             https://github.com/lxqt/qterminal/releases
         '''
-        print( f"terminal: { terminal }")
         is_qterminal_and_broken_ = False
         if "qterminal" in terminal:
             qterminal_version = (
-                IndicatorBase.process_run( "qterminal --version" )[ 0 ] )
+                self.process_run( "qterminal --version" )[ 0 ] )
 
             is_qterminal_and_broken_ = qterminal_version < "1.2.0"
 
@@ -2631,7 +2630,7 @@ class IndicatorBase( ABC ):
         terminal = None
         execution_flag = None
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
-            terminal = IndicatorBase.process_run( "which " + _terminal )[ 0 ]
+            terminal = self.process_run( "which " + _terminal )[ 0 ]
             if terminal:
                 execution_flag = _execution_flag
                 break
@@ -3175,15 +3174,15 @@ class IndicatorBase( ABC ):
 
         def log( command, stdout_, stderr_, return_code ):
             if IndicatorBase._LOGGING_INITIALISED:
-                IndicatorBase.get_logging().error( f"Error running: { command }" )
+                self.get_logging().error( f"Error running: { command }" )
                 if stdout_:
-                    IndicatorBase.get_logging().error( f"stdout: { stdout_ }" )
+                    self.get_logging().error( f"stdout: { stdout_ }" )
 
                 if stderr_:
-                    IndicatorBase.get_logging().error( f"stderr: { stderr_ }" )
+                    self.get_logging().error( f"stderr: { stderr_ }" )
 
                 if return_code != 0:
-                    IndicatorBase.get_logging().error( f"Return code: { return_code }" )
+                    self.get_logging().error( f"Return code: { return_code }" )
 
 
         try:

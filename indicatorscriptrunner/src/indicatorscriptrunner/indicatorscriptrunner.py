@@ -243,9 +243,8 @@ class IndicatorScriptRunner( IndicatorBase ):
                 command += "; " + notification
 
             if script.get_play_sound():
-#TODO Test this works.
                 play_sound_complete_command = (
-                    IndicatorBase.get_play_sound_complete_command() )
+                    self.get_play_sound_complete_command() )
 
                 if play_sound_complete_command:
                     command += "; " + play_sound_complete_command
@@ -260,7 +259,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     script.get_group() + " | " + script.get_name() + ": " + command )
 
             Thread(
-                target = IndicatorBase.process_run,
+                target = self.process_run,
                 args = ( command, ) ).start()
 
 
@@ -304,12 +303,11 @@ class IndicatorScriptRunner( IndicatorBase ):
                 command_result = self.background_script_results[ key ]
 
                 if script.get_play_sound() and command_result:
-#TODO Test this works.
                     play_sound_complete_command = (
-                        IndicatorBase.get_play_sound_complete_command() )
+                        self.get_play_sound_complete_command() )
 
                     if play_sound_complete_command:
-                        IndicatorBase.process_run( play_sound_complete_command )
+                        self.process_run( play_sound_complete_command )
 
                 if script.get_show_notification() and command_result:
                     command = (
@@ -318,7 +316,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         " \"" + script.get_name().replace( '-', '\\-' ) + "\"" +
                         " \"" + command_result.replace( '-', '\\-' ) + "\"" )
 
-                    IndicatorBase.process_run( command )
+                    self.process_run( command )
 
 
     def _update_background_script(
@@ -330,7 +328,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.get_logging().debug(
                 script.get_group() + " | " + script.get_name() + ": " + script.get_command() )
 
-        command_result = IndicatorBase.process_run( script.get_command() )[ 0 ]
+        command_result = self.process_run( script.get_command() )[ 0 ]
         key = self._create_key( script.get_group(), script.get_name() )
         self.background_script_results[ key ] = command_result
         self.background_script_next_update_time[ key ] = (

@@ -19,38 +19,6 @@
 ''' Application indicator which displays PPA download statistics. '''
 
 
-#TODO Is it possible to incorporate snap download statistics?
-# Any other app store too?
-#
-# https://snapcraft.io/docs
-# https://forum.snapcraft.io/t/snap-store-api/14156
-# https://api.snapcraft.io/docs/info.html
-# https://forum.snapcraft.io/t/how-to-get-the-total-downloads-of-my-snap/29779/7
-'''
-import os
-import json
-
-
-
-if __name__ == "__main__":
-    stream = os.popen('snapcraft metrics <SNAP_NAME> --name daily_device_change --format=json --start <DATE_WHEN_THE_SNAP_RELEASED>')
-    output = stream.read()
-    metric = json.loads(output)
-    for i in metric["series"]:
-        if("name" in i and i["name"] == "new"):
-            values = [int(value) for value in i["values"] if value != None]
-            print(sum(values))
-'''
-# https://forum.snapcraft.io/t/snapcraft-metrics/25732
-# https://api.snapcraft.io/docs/metrics.html
-# https://documentation.ubuntu.com/snapcraft/latest/how-to/publishing/get-snap-metrics/
-# 
-# https://docs.flatpak.org/en/latest/portal-api-reference.html
-# https://docs.flatpak.org/en/latest/libflatpak-api-reference.html
-# https://github.com/flathub/flathub/issues/177
-# https://ahayzen.com/direct/flathub.html
-
-
 import concurrent.futures
 import locale
 
@@ -330,9 +298,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         next_collection_link = "next_collection_link"
         while True:
             json, error_network, error_timeout = (
-                IndicatorBase.get_json(
-                    url,
-                    logging = self.get_logging() ) )
+                self.get_json( url, logging = self.get_logging() ) )
 
             if error_network:
                 ppa.set_status( PPA.Status.ERROR_NETWORK )
@@ -406,9 +372,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
         if not error:
             download_count, error_network, error_timeout = (
-                IndicatorBase.get_json(
-                    url,
-                    logging = self.get_logging() ) )
+                self.get_json( url, logging = self.get_logging() ) )
 
             if error_network:
                 with lock:
@@ -968,9 +932,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self.ppas = [ ]
 
         version_from_config = (
-            IndicatorBase.versiontuple( self.get_version_from_config( config ) ) )
+            self.versiontuple( self.get_version_from_config( config ) ) )
 
-        if version_from_config < IndicatorBase.versiontuple( "1.0.81" ):
+        if version_from_config < self.versiontuple( "1.0.81" ):
             self._upgrade_1_0_81( ppas, config.get( "filters", [ ] ) )
 
         else:

@@ -19,27 +19,23 @@
 ''' Calculate astronomical information using Skyfield. '''
 
 
-#TODO ALL THE TODOS BELOW IN REGARDS TO 32 BIT, NUMPY, JPLEPHEM AND PANDAS
-# NEED TO BE CHECKED AGAINST THE CREATE STARS/PLANETS EPHEMERIS SCRIPTS
-# AS THOSE ARE NOW UP TO DATE.
-
-
-#TODO Not sure how/when astroskyfield will be included/released.
+#TODO If astroskyfield will be released, it will only be for 64 bit.
 #
-# However...
-# Skyfield does not seem to work on 32 bit, so must keep PyEphem.
-# Skyfield still runs slower than PyEphem (for example 6 seconds to do a full
-# update with comets and minor planets enabled, versus 2 seconds on PyEphem). 
+# So for 32 bit, only install ephem.
+# For 64 bit, install skyfield/pandas, but also ephem?
 #
-# Perhaps install PyEphem if the OS is 32 bit and both if OS is 64 bit.
-# On 32 bit, always run PyEphem; on 64 bit give the user a choice.
-# On 64 bit, what should be the default: Skyfield or PyEphem?
+# What is the point of installing ephem on 64 bit?
 
 
-#TODO Do NOT include the tools/scripts in the release.
-
-
-#TODO To check the start/end of planets ephemeris .bsp
+#TODO Is it possible to do a check to see if the planets.bsp date range is valid?
+# See TODO further down.
+# That is, starts at least a month before today's date AND runs far enough into
+# the future (whatever "far enough" means).
+# If the planets.bsp is not okay, then what?
+# Flash message to user?
+# Autoswitch to astropyephem?
+# I think that if planets.bsp is no good, then NONE of the calculations will work!
+#
     # from skyfield.api import load
     #
     #
@@ -63,118 +59,16 @@
     #
     # print_epoch( "de442s.bsp" )
     # print_epoch( "de442s_excerpt.bsp" )
-# 
-# https://github.com/brandon-rhodes/python-jplephem/issues/60
-# See in the issue above if there are any relevent comments, etc
-# that should be put here in the comments or elsewhere.
 #
-# Take note that need to get the start of each segment and find the most recent
-# of those; get the most past end of each segment;
-# then those become the actual date range.
-
-
-#TODO Is it possible to do a check to see if the planets.bsp date range is valid?
-# That is, starts at least a month before today's date AND runs far enough into
-# the future (whatever "far enough" means).
-# If the planets.bsp is not okay, then what?
-# Flash message to user?
-# Autoswitch to astropyephem?
-# I think that if planets.bsp is no good, then NONE of the calculations will work!
+# https://github.com/brandon-rhodes/python-jplephem/issues/60
 
 
 #TODO Document perhaps in the PyPI page about how to make a new planets.bsp
+# Refer to the jplephem page?
 
 
-#TODO
-# Is there a need to pin
-#    sgp4
-#
-# Neither seem to have any issue but test on Debian 32 bit!
-
-
-#TODO Determine if 32 or 64 bit:
-# is_64=$(grep -q 'flags.*_lm.*' /proc/cpuinfo ; echo $?) ; echo $is_64
-#
-# Returns 0 on 64 bit (as 0 is exit code from grep when successfully finding result)
-#
-# Returns 1 on 32 bit (exit code for when NOT finding)
-#
-# https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/tree/arch/x86/include/asm/cpufeatures.h
-#
-# Works on fedora, manjaro, openSUSE.
-#
-# Maybe adjust the pip install such that
-# if 64 bit install skyfield and if 32 bit install pyephem.
-#
-# For 64 bit should ALWAYS install BOTH skfield and pyephem?
-
-
-#TODO What happens if the planets.bsp start/end date no longer matches with today's date?
-# For example, looking for the next eclipse and there is only a month of data left in the bsp?
-# How to check for this...?
-# What happens if there is 6 months of data but a very high latitude (+- 89)
-# and it winter so the sun never rises (or some planet never rises)
-# or is summer so the sun never sets (or some planet never sets).
-# Is this an issue?
-#
-# Or a user switches for a new bsp for which it's date range ends before today?
-# Maybe just do a date check: end date < today's date is error.
-#
-# To get the start/end dates:
-#
-#     from skyfield.api import load
-#
-#     ts = load.timescale()
-#     planets = load(  "../../../IndicatorLunarData/de421.bsp" )
-#
-#     start, end = planets.segments[ 0 ].time_range( ts )
-#     print( start.tdb_strftime().split()[ 0 ] )
-#     print( end.tdb_strftime().split()[ 0 ] )
-#
-# 1849-12-26
-# 2150-01-22
-
-
-#TODO
-# Pinning may be a normal thing for all indicators...
-# The pyproject.tom.specific for lunar may need to change somehow (if skyfield is used)
-# and any install instructions will need to include the pinning there,
-# rather than in the dependencies of pyproject.toml (which should contain no
-# dependencies). 
-
-
-#TODO Do I need to explicitly put pandas and/or numpy into the dependencies?
-# May need to do so for pinning...but instead, have alternate install instructions.
-
-
-#TODO
-# https://github.com/brandon-rhodes/python-jplephem/issues/60
-
-
-#TODO Unable to install numpy/pandas on Debian 12 32 bit.
-# This means skyfield will not work on 32 bit...
-# So figure out what to do if/when astroskyfield is used.
-# Keep astropyephem as a separate install for 32 bit?
-#
-# I thought skyfield needs mumpy and pandas, but only needs numpy (I believe).
-# I need pandas for the create stars epehemeris script...so that script will
-# run on 32 bit.
-# So maybe check again if it is possible to install numpy (pinned or otherwise)
-# on 32 bit.
-#
-# Maybe try on Debian 12 32 bit on the virtual machine?
-# Did a 
-#   python3 -m pip install numpy
-# and successfully installed numpy 2.2.6
-# then installed skyfield and ran an example which uses numpy and it worked.
-# How the hell does numpy latest version install when supposedly should not
-# install from 1.22.0 onwards for 32 bit...?
-# https://numpy.org/doc/2.0/release/1.22.0-notes.html
-#
-# Need to clarify with Numpy; how is it the latest version installed on Debian 12 32 bit...?
-
-
-#TODO Ran the indicator with skyfield and debug = True and got the following:
+#TODO Ran the indicator with skyfield on Ubuntu 20.04
+# with debug = True and got the following:
 # magnitude : timing (seconds)
 # 7 : 6
 # 8 : 6
@@ -183,40 +77,14 @@
 # 11 : 9
 # 12 : 16
 # 13 : 37
-# 14 : 77 
+# 14 : 77
 # 15 : 159
 #
 # Maybe tidy up astroskyfield then do same timing tests...
 # ...maybe release indicatorlunar with skyfield instead of pyephem?
-# Ask Oleg!
-#
-# How long does it take to run at mag 7 on laptop?
 
 
 #TODO If/when astroskyfield is included in the release and ephem is dropped...
-#
-# In pyprojectspecific.toml, replace
-#     dependencies = [
-#       "ephem",
-#       "sgp4" ]
-# with
-#     dependencies = [
-#       "numpy",
-#       "pandas",    # Needed for mpc (and I think loading stars/planets).
-#       "sgp4",
-#       "skyfield" ]
-#
-# In MANIFESTspecific.in, replace
-#     exclude src/indicatorlunar/astroskyfield.py
-#     exclude src/indicatorlunar/meteorshowertest.py
-# with
-#     exclude src/indicatorlunar/meteorshowertest.py
-#     recursive-include src/{indicator_name}/data *   <--- Is this needed?  Will the data files be included by default?
-#
-# Need a check in tools/build_wheel.py to ensure planets.bsp / starts.dat are present?
-# Perhaps/hopefully not; instead include these in the MANIFESTspecific.in
-# and hopefully if these files are not present, the build gives a warning/error.
-#
 # Add astroskyfield.py to locale/POTFILES.in.
 
 
@@ -542,6 +410,7 @@ class AstroSkyfield( AstroBase ):
 
 
 #TODO If/when astroskyfield is activated, uncomment the function below.
+# See TODO at top of this file...
 # Should be called at the top of indicatorlunar before running the __init()__
 # to abort if the planet ephemeris is out of date
 # and send the message to alert the user.

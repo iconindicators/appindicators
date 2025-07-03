@@ -1233,7 +1233,7 @@ class IndicatorLunar( IndicatorBase ):
         def comet_on_click_function(
             menuitem ):
             json_, error_network, error_timeout = (
-                IndicatorBase.get_json(
+                self.get_json(
                     menuitem.get_name(),
                     logging = self.get_logging() ) )
 
@@ -3299,13 +3299,13 @@ class IndicatorLunar( IndicatorBase ):
 
     def get_default_city( self ):
         command = "timedatectl show | grep Timezone"
-        timezone = IndicatorBase.process_run( command )[ 0 ]
+        timezone = self.process_run( command )[ 0 ]
         if timezone.startswith( "Timezone=" ):
             timezone = timezone.split( '=' )[ 1 ]
 
         else:
             command = "cat /etc/timezone"
-            timezone = IndicatorBase.process_run( command )[ 0 ]
+            timezone = self.process_run( command )[ 0 ]
 
         cities = IndicatorLunar.astro_backend.get_cities()
         the_city = cities[ 0 ] # Default to first city.

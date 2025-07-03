@@ -16,11 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Test with/without clipboard supported
-# AND
-# preference copy_to_clipboard set to True/False.
-
-
 '''
 Application indicator which displays calendar events.
 
@@ -268,7 +263,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             " -A 366" )
 
         events_sorted_by_date = [ ]
-        for line in IndicatorBase.process_run( command )[ 0 ].splitlines():
+        for line in self.process_run( command )[ 0 ].splitlines():
             if line.startswith( '\t' ): # Continuation of the previous event.
                 date_ = events_sorted_by_date[ -1 ].get_date()
 
@@ -573,10 +568,10 @@ class IndicatorOnThisDay( IndicatorBase ):
                 [ [ system_calendar_default, True ] ] if system_calendar_default
                 else [ ] ) )
 
-        version_0_0_0 = IndicatorBase.versiontuple( "0.0.0" )
-        version_1_0_17 = IndicatorBase.versiontuple( "1.0.17" )
+        version_0_0_0 = self.versiontuple( "0.0.0" )
+        version_1_0_17 = self.versiontuple( "1.0.17" )
         version_from_config = (
-            IndicatorBase.versiontuple( self.get_version_from_config( config ) ) )
+            self.versiontuple( self.get_version_from_config( config ) ) )
 
         if version_0_0_0 < version_from_config < version_1_0_17:
             self._upgrade_1_0_17()
@@ -592,7 +587,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         self.lines = (
             config.get(
                 IndicatorOnThisDay.CONFIG_LINES,
-                IndicatorBase.get_menuitems_guess() ) )
+                self.get_menuitems_guess() ) )
 
         self.notify = config.get( IndicatorOnThisDay.CONFIG_NOTIFY, True )
 
