@@ -23,14 +23,6 @@ Utility for building a Python3 wheel.
 '''
 
 
-#TODO Add comments to py project toml in regards to why pygobject is not in there.
-
-
-#TODO Somehow note why (eventually) ephem and skyfield are not in the toml file.
-# Is there a way of extracting a comment from indicator lunar toml file and
-# place it into the main toml?
-
-
 import configparser
 import datetime
 import filecmp
