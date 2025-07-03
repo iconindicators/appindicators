@@ -353,7 +353,10 @@ class IndicatorLunar( IndicatorBase ):
         utc_now ):
 
         # Update comet data.
-        self.comet_orbital_element_data, self.download_count_comet, self.next_download_time_comet = (
+        (
+            self.comet_orbital_element_data,
+            self.download_count_comet,
+            self.next_download_time_comet ) = (
             self._update_data(
                 utc_now,
                 self.comet_orbital_element_data,
@@ -373,7 +376,10 @@ class IndicatorLunar( IndicatorBase ):
             self.add_new_bodies( self.comet_orbital_element_data, self.comets )
 
         # Update minor planet data.
-        self.minor_planet_orbital_element_data, self.download_count_minor_planet, self.next_download_time_minor_planet = (
+        (
+            self.minor_planet_orbital_element_data,
+            self.download_count_minor_planet,
+            self.next_download_time_minor_planet ) = (
             self._update_data(
                 utc_now,
                 self.minor_planet_orbital_element_data,
@@ -394,7 +400,10 @@ class IndicatorLunar( IndicatorBase ):
                 self.minor_planet_orbital_element_data, self.minor_planets )
 
         # Update minor planet apparent magnitudes.
-        self.minor_planet_apparent_magnitude_data, self.download_count_apparent_magnitude, self.next_download_time_apparent_magnitude = (
+        (
+            self.minor_planet_apparent_magnitude_data,
+            self.download_count_apparent_magnitude,
+            self.next_download_time_apparent_magnitude ) = (
             self._update_data(
                 utc_now,
                 self.minor_planet_apparent_magnitude_data,
@@ -409,7 +418,10 @@ class IndicatorLunar( IndicatorBase ):
                 [ ] ) )
 
         # Update satellite data.
-        self.satellite_general_perturbation_data, self.download_count_satellite, self.next_download_time_satellite = (
+        (
+            self.satellite_general_perturbation_data,
+            self.download_count_satellite,
+            self.next_download_time_satellite ) = (
             self._update_data(
                 utc_now,
                 self.satellite_general_perturbation_data,
