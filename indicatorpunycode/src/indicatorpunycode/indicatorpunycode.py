@@ -24,7 +24,6 @@ Application indicator which converts domain names between Unicode and ASCII.
 #TODO Test with/without clipboard supported.
 #TODO Test Debian 12 laptop x11.
 #TODO Test Debian 12 laptop wayland.
-#TODO Test Ubuntu 20.04 wayland.
 
 
 import encodings.idna
