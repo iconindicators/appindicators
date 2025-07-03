@@ -248,7 +248,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     IndicatorBase.get_play_sound_complete_command() )
 
                 if play_sound_complete_command:
-                    command += "; " + get_play_sound_complete_command
+                    command += "; " + play_sound_complete_command
 
             if script.get_terminal_open():
                 command += "; cd $HOME; ${SHELL}"
@@ -309,8 +309,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         IndicatorBase.get_play_sound_complete_command() )
 
                     if play_sound_complete_command:
-                        IndicatorBase.process_run(
-                            get_play_sound_complete_command )
+                        IndicatorBase.process_run( play_sound_complete_command )
 
                 if script.get_show_notification() and command_result:
                     command = (
