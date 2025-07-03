@@ -23,14 +23,24 @@ import sys
 
 from itertools import compress
 
+if '../' not in sys.path:
+    sys.path.insert( 0, '../' )
+
+from indicatorbase.src.indicatorbase import indicatorbase
+
 from . import utils
 
 
+'''
+Only indicatorlunar uses Python3 packages outside the standard library.
+Further, select some packages based upon running on 64 bit (or more).
+'''
+is_64_bit_or_more = indicatorbase.IndicatorBase.is_64_bit_or_more()
 indicator_to_dependencies = {
     "indicatorlunar" :
         list( compress(
-            [ "ephem", "sgp4",     "skyfield",           "pandas"       ],
-            [  True,    True,  sys.maxsize > 2**32, sys.maxsize > 2**32 ] ) ) }
+            [ "ephem", "sgp4",     "skyfield",         "pandas"     ],
+            [  True,    True,  is_64_bit_or_more, is_64_bit_or_more ] ) ) }
 
 
 if __name__ == "__main__":

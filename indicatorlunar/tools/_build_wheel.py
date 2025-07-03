@@ -48,6 +48,7 @@ from pathlib import Path
 if '../../' not in sys.path:
     sys.path.insert( 0, '../../' )
 
+from indicatorbase.src.indicatorbase import indicatorbase
 from tools import utils
 
 # Needed otherwise '_' will be undefined when importing AstroBase.
@@ -169,18 +170,17 @@ def build( out_path ):
     ''' Called by the build wheel process. '''
     if True: return "" #TODO Remove this line if including astroskyfield et al.
 
-    message = ""
-
-    # On 32 bit, numpy, used by
+    # The package numpy, which is used by
     #   skyfield to create stars.dat
     #   jplephem to create planets.bsp
-    # will not install, so skip without failing (returning a message)
-    # so that the build process continues; however emit a warning!
+    # will not install on 32 bit.
     #
-    # https://stackoverflow.com/a/9964440/2156453
-    # https://docs.python.org/3/library/platform.html#cross-platform
-    # https://docs.python.org/3/library/sys.html#sys.maxsize
-    if sys.maxsize > 2**32:
+    # Skip the build (of planets.bsp/stars.dat) and return an empty message
+    # so that the build wheel process continues.
+    #
+    # However, emit a warning to the console!
+    message = ""
+    if not indicatorbase.IndicatorBase.is_64_bit_or_more():
         data_path = Path( out_path ) / "data"
         message = _initialise()
         if not message:
@@ -190,7 +190,7 @@ def build( out_path ):
 
     else:
         print(
-            "WARNING: THIS IS A 32 BIT OPERATING SYSTEM,\n"
-            "NEITHER PLANETS.BSP NOR STARS.DAT HAVE BEEN BUILT!" )
+            "\n\nWARNING: THIS IS A 32 BIT OPERATING SYSTEM,\n"
+            "NEITHER PLANETS.BSP NOR STARS.DAT HAVE BEEN BUILT!\n\n" )
 
     return message

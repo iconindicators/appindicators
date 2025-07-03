@@ -1175,7 +1175,6 @@ class IndicatorBase( ABC ):
             #   https://github.com/bugaevc/wl-clipboard/pull/154
             command += "2>/dev/null"
             IndicatorBase.process_run( command )    #TODO Check the pipe to stderr still works!
-                                                    # Also, set capture_output = False?
                                                     # Need to do this on Wayland and not Ubuntu 20.04
                                                     #TODO Should this check stderr/return code?  What to do on failure?
 
@@ -2638,6 +2637,18 @@ class IndicatorBase( ABC ):
                 break
 
         return terminal, execution_flag
+
+
+    @staticmethod
+    def is_64_bit_or_more():
+        '''
+        Determines if the architecture is 64 bits (or better).
+
+        https://stackoverflow.com/a/9964440/2156453
+        https://docs.python.org/3/library/platform.html#cross-platform
+        https://docs.python.org/3/library/sys.html#sys.maxsize
+        '''
+        return sys.maxsize > 2**32
 
 
     @staticmethod
