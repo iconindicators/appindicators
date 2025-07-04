@@ -22,6 +22,8 @@
 import datetime
 import time
 
+from threading import Thread
+
 import gi
 
 gi.require_version( "Gdk", "3.0" )
@@ -393,18 +395,25 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
 #TODO Under X11 (so Ubuntu 20.04) run virtualbox manager,
-# then minimise, then middle mouse click the icon.
-# Does not bring to front, but if I close the window, another launches...
-# ...so something is blocked when first launching I guess.
+# VirtualBox manager was blocking scrolling.
+# Seems okay now as using a thread to launch.
 #
-# See if the same happens to virtual machines running.
-# If virtualbox manager is already running, mouse wheel scroll is blocked too,
-# so the virtual machine(s) come up after virtual box manager is closed.
+# However on starting vm 'B', when mouse wheel scrolling, got a message
+# about multiple windows with same name, so maybe it's just another window
+# has a 'B' in it...so check.
+#
+# But, the indicator now hangs...so maybe each VM also needs to launch in a thread?
+# What happens if the indicator is closed or even killed?
+# Does that crash the VMs running?
     def on_launch_virtual_box_manager( self ):
 
         def start_virtualbox_manager():
-            self.process_run(
-                self.process_run( "which VirtualBox" )[ 0 ] + " &" )
+            virtual_box_manager = self.process_run( "which VirtualBox" )[ 0 ]
+
+            # Must be run in a thread otherwise all other actions will block.
+            Thread(
+                target = self.process_run,
+                args = ( virtual_box_manager, ) ).start()
 
 
         if self.is_session_type_x11():
