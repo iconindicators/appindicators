@@ -3177,13 +3177,6 @@ class IndicatorBase( ABC ):
         return directory
 
 
-#TODO Find all callers of this function.
-# Those that have a command like 'which ...'
-# or 'ls ...' check that I should/could be using
-# the ignore_stderr... parameter set to True.
-# Only want this though when "just checking" for something,
-# rather than a real issue, say VBoxManage is not present
-# which could be okay if just initially checking. 
     @staticmethod
     def process_run(
         command,
@@ -3220,11 +3213,8 @@ class IndicatorBase( ABC ):
                     command,
                     shell = True,
                     capture_output = True ) )
-#TODO Used to have check = True, but that throws an exception for grep when grep
-# finds no result but returns a 1 (which is not 0 and thus an exception is thrown).
-# Who/when might need check = True?
-#
-# Keep the above as a comment...want to make sure I don't later add in check = True and break stuff!
+                    # Don't want check = True as that throws an exception for
+                    # grep when grep finds no result and returns a code of 1.
 
             stdout_ = result.stdout.decode().strip()
             stderr_ = result.stderr.decode()
@@ -3235,18 +3225,6 @@ class IndicatorBase( ABC ):
                     log( command, stdout_, stderr_, return_code )
 
         except subprocess.CalledProcessError as e:
-            #TODO Not sure if check = True is needed (default is false).
-            # https://docs.python.org/3/library/subprocess.html#subprocess.run
-            #
-            # If check is true, and the process exits with a non-zero exit code,
-            # a CalledProcessError exception will be raised.
-            # Attributes of that exception hold the arguments, the exit code,
-            # and stdout and stderr if they were captured.
-            #
-            # Is there a way to test this (whether or not check = True always
-            # or check = False always?
-            # Consider testing with 'grep'...what is passed back on a grep match
-            # and no grep match (stdout, stderr and return code)?
             stdout_ = e.stdout.decode().strip()
             stderr_ = e.stderr.decode()
             return_code = e.returncode
