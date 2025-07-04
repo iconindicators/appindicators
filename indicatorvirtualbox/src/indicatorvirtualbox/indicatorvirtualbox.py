@@ -398,6 +398,8 @@ class IndicatorVirtualBox( IndicatorBase ):
 # ...so something is blocked when first launching I guess.
 #
 # See if the same happens to virtual machines running.
+# If virtualbox manager is already running, mouse wheel scroll is blocked too,
+# so the virtual machine(s) come up after virtual box manager is closed.
     def on_launch_virtual_box_manager( self ):
 
         def start_virtualbox_manager():
