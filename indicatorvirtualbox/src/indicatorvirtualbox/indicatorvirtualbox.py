@@ -274,7 +274,11 @@ class IndicatorVirtualBox( IndicatorBase ):
         uuid ):
 
         command = f"VBoxManage list vms | grep { uuid }"
-        virtual_machines = self.process_run( command )[ 0 ]
+        virtual_machines = (
+            self.process_run(
+                command,
+                ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
         if uuid not in virtual_machines:
             message = _(
                 "The virtual machine could not be found - " +
@@ -388,6 +392,12 @@ class IndicatorVirtualBox( IndicatorBase ):
                     10 )
 
 
+#TODO Under X11 (so Ubuntu 20.04) run virtualbox manager,
+# then minimise, then middle mouse click the icon.
+# Does not bring to front, but if I close the window, another launches...
+# ...so something is blocked when first launching I guess.
+#
+# See if the same happens to virtual machines running.
     def on_launch_virtual_box_manager( self ):
 
         def start_virtualbox_manager():
@@ -409,7 +419,11 @@ class IndicatorVirtualBox( IndicatorBase ):
             command = (
                 f"wmctrl -l | grep \"{ self.virtualbox_manager_window_name }\"" )
 
-            window_information = self.process_run( command )[ 0 ]
+            window_information = (
+                self.process_run(
+                    command,
+                    ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
             if window_information:
                 window_id = window_information.split()[ 0 ]
                 self.process_run( f"wmctrl -ia { window_id }" )
@@ -447,8 +461,12 @@ class IndicatorVirtualBox( IndicatorBase ):
         self,
         uuid ):
 
-        command = "VBoxManage list runningvms | grep " + uuid
-        return uuid in self.process_run( command )[ 0 ]
+        virtual_machines_running = (
+            self.process_run(
+                "VBoxManage list runningvms | grep " + uuid,
+                ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
+        return uuid in virtual_machines_running
 
 
     def get_virtual_machines( self ):
@@ -499,7 +517,11 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def is_vboxmanage_installed( self ):
-        which_vboxmanage = self.process_run( "which VBoxManage" )[ 0 ]
+        which_vboxmanage = (
+            self.process_run(
+                "which VBoxManage",
+                ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
         return which_vboxmanage.find( "VBoxManage" ) > -1
 
 

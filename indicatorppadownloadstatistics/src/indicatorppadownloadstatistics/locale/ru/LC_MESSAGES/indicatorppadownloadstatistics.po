@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorppadownloadstatistics 1.0.81\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-05-27 12:19+1000\n"
+"POT-Creation-Date: 2025-07-04 11:18+1000\n"
 "PO-Revision-Date: 2025-03-14 16:55+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -45,49 +45,49 @@ msgstr "(нет опубликованных двоичных файлов)"
 msgid "Displays the total downloads of PPAs."
 msgstr "Показать статистику закачек из PPA."
 
-#: indicatorppadownloadstatistics.py:404
+#: indicatorppadownloadstatistics.py:408
 msgid "Double click to edit a PPA."
 msgstr "Щёлкните дважды, чтобы отредактировать PPA."
 
-#: indicatorppadownloadstatistics.py:405
+#: indicatorppadownloadstatistics.py:409
 msgid "Remove the selected PPA."
 msgstr "Удалить выбранный PPA."
 
-#: indicatorppadownloadstatistics.py:411 indicatorppadownloadstatistics.py:663
+#: indicatorppadownloadstatistics.py:415 indicatorppadownloadstatistics.py:667
 #, fuzzy
 msgid "User"
 msgstr "Пользователь PPA"
 
-#: indicatorppadownloadstatistics.py:412 indicatorppadownloadstatistics.py:693
+#: indicatorppadownloadstatistics.py:416 indicatorppadownloadstatistics.py:697
 #, fuzzy
 msgid "Name"
 msgstr "Название PPA"
 
-#: indicatorppadownloadstatistics.py:413 indicatorppadownloadstatistics.py:723
+#: indicatorppadownloadstatistics.py:417 indicatorppadownloadstatistics.py:727
 msgid "Filter"
 msgstr "Фильтр"
 
-#: indicatorppadownloadstatistics.py:437
+#: indicatorppadownloadstatistics.py:441
 msgid "Add"
 msgstr "Добавить"
 
-#: indicatorppadownloadstatistics.py:438
+#: indicatorppadownloadstatistics.py:442
 msgid "Remove"
 msgstr "Удалить"
 
-#: indicatorppadownloadstatistics.py:440
+#: indicatorppadownloadstatistics.py:444
 msgid "Add a new PPA."
 msgstr "Добавить новый PPA."
 
-#: indicatorppadownloadstatistics.py:464
+#: indicatorppadownloadstatistics.py:468
 msgid "PPAs"
 msgstr "PPA"
 
-#: indicatorppadownloadstatistics.py:471
+#: indicatorppadownloadstatistics.py:475
 msgid "Show PPAs as submenus"
 msgstr "Показывать PPA в виде подменю"
 
-#: indicatorppadownloadstatistics.py:473
+#: indicatorppadownloadstatistics.py:477
 msgid ""
 "The download statistics for each PPA\n"
 "are shown in a separate submenu."
@@ -95,20 +95,20 @@ msgstr ""
 "Статистика загрузок для каждого PPA\n"
 "будет отображаться в отдельном подменю."
 
-#: indicatorppadownloadstatistics.py:481
+#: indicatorppadownloadstatistics.py:485
 msgid "Sort by download"
 msgstr "Сортировать по закачкам"
 
-#: indicatorppadownloadstatistics.py:482
+#: indicatorppadownloadstatistics.py:486
 msgid "Sort by download count within each PPA."
 msgstr "Сортировать по количеству закачек в каждом PPA."
 
-#: indicatorppadownloadstatistics.py:488
+#: indicatorppadownloadstatistics.py:492
 #, fuzzy
 msgid "Clip amount"
 msgstr "  Ограничить количество"
 
-#: indicatorppadownloadstatistics.py:498
+#: indicatorppadownloadstatistics.py:502
 msgid ""
 "Limit the number of entries\n"
 "when sorting by download.\n"
@@ -120,23 +120,23 @@ msgstr ""
 "\n"
 "Нулевое значение отключает ограничение."
 
-#: indicatorppadownloadstatistics.py:520
+#: indicatorppadownloadstatistics.py:524
 msgid "Low bandwidth"
 msgstr "Медленное соединение"
 
-#: indicatorppadownloadstatistics.py:522
+#: indicatorppadownloadstatistics.py:526
 msgid "Enable if your internet connection is slow."
 msgstr "Включите, если у вашего Интернет-соединения низкая скорость."
 
-#: indicatorppadownloadstatistics.py:533
+#: indicatorppadownloadstatistics.py:537
 msgid "General"
 msgstr "Общие"
 
-#: indicatorppadownloadstatistics.py:611
+#: indicatorppadownloadstatistics.py:615
 msgid "Remove the selected PPA?"
 msgstr "Удалить выбранный PPA?"
 
-#: indicatorppadownloadstatistics.py:739
+#: indicatorppadownloadstatistics.py:743
 #, fuzzy
 msgid ""
 "Each line of plain text is compared\n"
@@ -162,37 +162,37 @@ msgstr ""
 "Регулярные выражения и символы\n"
 "группировки не допускаются!"
 
-#: indicatorppadownloadstatistics.py:756
+#: indicatorppadownloadstatistics.py:760
 msgid "Edit PPA"
 msgstr "Редактировать PPA"
 
-#: indicatorppadownloadstatistics.py:758
+#: indicatorppadownloadstatistics.py:762
 msgid "Add PPA"
 msgstr "Добавить PPA"
 
-#: indicatorppadownloadstatistics.py:778
+#: indicatorppadownloadstatistics.py:782
 #, fuzzy
 msgid "User cannot be empty."
 msgstr "Пользователь PPA не может быть пустым."
 
-#: indicatorppadownloadstatistics.py:783
+#: indicatorppadownloadstatistics.py:787
 #, fuzzy
 msgid "Name cannot be empty."
 msgstr "Название PPA не может быть пустым."
 
-#: indicatorppadownloadstatistics.py:803
+#: indicatorppadownloadstatistics.py:807
 msgid "User and name already in use!"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:819
+#: indicatorppadownloadstatistics.py:823
 msgid "Filter text may not contain duplicates."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:831
+#: indicatorppadownloadstatistics.py:835
 msgid "Filter text may not contain spaces."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:952
+#: indicatorppadownloadstatistics.py:956
 msgid ""
 "No PPAs are present.\n"
 "\n"

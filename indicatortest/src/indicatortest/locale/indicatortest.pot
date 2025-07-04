@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatortest 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-06-27 18:01+1000\n"
+"POT-Creation-Date: 2025-07-04 16:07+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -135,30 +135,30 @@ msgstr ""
 msgid "Clipboard"
 msgstr ""
 
-#: indicatortest.py:393
+#: indicatortest.py:396
 msgid "Execute Terminal Command"
 msgstr ""
 
-#: indicatortest.py:439
+#: indicatortest.py:442
 msgid ""
 "Cannot run script as no terminal and/or terminal execution flag found; "
 "please install gnome-terminal."
 msgstr ""
 
-#: indicatortest.py:454
+#: indicatortest.py:456
 msgid ""
 "Cannot run script as qterminal incorrectly parses arguments; please install "
 "gnome-terminal instead."
 msgstr ""
 
-#: indicatortest.py:483 indicatortest.py:484
+#: indicatortest.py:484 indicatortest.py:485
 msgid "Enable/disable X"
 msgstr ""
 
-#: indicatortest.py:502
+#: indicatortest.py:503
 msgid "Day of Week"
 msgstr ""
 
-#: indicatortest.py:509
+#: indicatortest.py:510
 msgid "Days of week containing an 'n' are bold."
 msgstr ""

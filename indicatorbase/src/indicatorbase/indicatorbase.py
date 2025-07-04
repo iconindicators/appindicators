@@ -395,7 +395,7 @@ class IndicatorBase( ABC ):
             # No pip information found; assume running in development;
             # look for a .whl file in the release folder.
             wheel_in_release, error_message = (
-                self._get_wheel_in_release( indicator_name ) )
+                IndicatorBase._get_wheel_in_release( indicator_name ) )
 
             if wheel_in_release is None:
                 project_metadata = None
@@ -1002,8 +1002,7 @@ class IndicatorBase( ABC ):
 
         about_dialog.set_copyright(
             "Copyright \xa9 " +
-            self.get_year_in_changelog_markdown(
-                changelog_markdown_path ) +
+            self.get_year_in_changelog_markdown( changelog_markdown_path ) +
             '-' +
             str( datetime.datetime.now().year ) +
             " " +
@@ -1119,13 +1118,13 @@ class IndicatorBase( ABC ):
         Return the result of calling
             cat /etc/os-release
         '''
-        return self.process_run( "cat /etc/os-release" )[ 0 ]
+        return IndicatorBase.process_run( "cat /etc/os-release" )[ 0 ]
 
 
     @staticmethod
     def is_calendar_supported():
         ''' The calendar package is unavailable on some distributions. '''
-        etc_os_release = self.get_etc_os_release()
+        etc_os_release = IndicatorBase.get_etc_os_release()
         is_manjaro = "NAME=\"Manjaro Linux\"" in etc_os_release
         is_opensuse_tumbleweed = (
             "NAME=\"openSUSE Tumbleweed\"" in etc_os_release )
@@ -1261,17 +1260,33 @@ class IndicatorBase( ABC ):
         If neither, then log.
 
         Determine if complete.oga is present; if not log.
+
+        If pw-play / paplay are present, return the path to that excutable.
+        If complete.oga is present, return the path to the file.
+
+        If either pw-play / paplay or complete.oga are not present, return None.
         '''
-        play_sound_command = self.process_run( "which pw-play" )[ 0 ]
+        play_sound_command = (
+            self.process_run(
+                "which pw-play",
+                ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
         if len( play_sound_command ) == 0:
-            play_sound_command = self.process_run( "which paplay" )[ 0 ]
+            play_sound_command = (
+                self.process_run(
+                    "which paplay",
+                    ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
             if len( play_sound_command ) == 0:
                 play_sound_command = None
-                self.get_logging().error( "Unable to locate pw-play nor paplay." )
+                self.get_logging().error(
+                    "Unable to locate pw-play nor paplay." )
 
         complete_oga = "/usr/share/sounds/freedesktop/stereo/complete.oga"
         sound_complete = (
-            self.process_run( f"ls { complete_oga }" )[ 0 ] )
+            self.process_run(
+                f"ls { complete_oga }",
+                ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
 
         if len( sound_complete ) == 0:
             sound_complete = None
@@ -2526,7 +2541,7 @@ class IndicatorBase( ABC ):
 
         else:
             number_of_menuitems = (
-                self.interpolate(
+                IndicatorBase.interpolate(
                     screen_heights_in_pixels,
                     numbers_of_menuitems,
                     screen_height_in_pixels ) )
@@ -2614,9 +2629,7 @@ class IndicatorBase( ABC ):
         '''
         is_qterminal_and_broken_ = False
         if "qterminal" in terminal:
-            qterminal_version = (
-                self.process_run( "qterminal --version" )[ 0 ] )
-
+            qterminal_version = self.process_run( "qterminal --version" )[ 0 ]
             is_qterminal_and_broken_ = qterminal_version < "1.2.0"
 
         return is_qterminal_and_broken_
@@ -2630,7 +2643,11 @@ class IndicatorBase( ABC ):
         terminal = None
         execution_flag = None
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
-            terminal = self.process_run( "which " + _terminal )[ 0 ]
+            terminal = (
+                self.process_run(
+                    "which " + _terminal,
+                    ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
             if terminal:
                 execution_flag = _execution_flag
                 break
@@ -3160,29 +3177,41 @@ class IndicatorBase( ABC ):
         return directory
 
 
+#TODO Find all callers of this function.
+# Those that have a command like 'which ...'
+# or 'ls ...' check that I should/could be using
+# the ignore_stderr... parameter set to True.
+# Only want this though when "just checking" for something,
+# rather than a real issue, say VBoxManage is not present
+# which could be okay if just initially checking. 
     @staticmethod
     def process_run(
-        command ):
+        command,
+        ignore_stderr_and_non_zero_return_code = False ):
         '''
         Executes the command, returning the tuple:
             stdout
             stderr
             return code
 
-        On stderr or exception, logs to a file if a logger is provided.
+        On stderr, a non-zero return code, or exception, a log entry will be
+        made if a logger has been initialised.
+
+        If ignore_stderr_and_non_zero_return_code is True and either stderr
+        or a non-zero return code results, no log entry will be made. 
         '''
 
         def log( command, stdout_, stderr_, return_code ):
             if IndicatorBase._LOGGING_INITIALISED:
-                self.get_logging().error( f"Error running: { command }" )
+                IndicatorBase.get_logging().error( f"Error running: { command }" )
                 if stdout_:
-                    self.get_logging().error( f"stdout: { stdout_ }" )
+                    IndicatorBase.get_logging().error( f"stdout: { stdout_ }" )
 
                 if stderr_:
-                    self.get_logging().error( f"stderr: { stderr_ }" )
+                    IndicatorBase.get_logging().error( f"stderr: { stderr_ }" )
 
                 if return_code != 0:
-                    self.get_logging().error( f"Return code: { return_code }" )
+                    IndicatorBase.get_logging().error( f"Return code: { return_code }" )
 
 
         try:
@@ -3200,8 +3229,10 @@ class IndicatorBase( ABC ):
             stdout_ = result.stdout.decode().strip()
             stderr_ = result.stderr.decode()
             return_code = result.returncode
-            if stderr_ or return_code != 0:
-                log( command, stdout_, stderr_, return_code )
+
+            if not ignore_stderr_and_non_zero_return_code:
+                if stderr_ or return_code != 0:
+                    log( command, stdout_, stderr_, return_code )
 
         except subprocess.CalledProcessError as e:
             #TODO Not sure if check = True is needed (default is false).

@@ -150,7 +150,7 @@ def python_run(
 
     print( f"\n\nExecuting command:\n\n{ command_ }\n\n" )
 
-    return indicatorbase.IndicatorBase.process_run( command_, )
+    return indicatorbase.IndicatorBase.process_run( command_ )
 
 
 def print_stdout_stderr_return_code(

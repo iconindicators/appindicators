@@ -3298,14 +3298,26 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def get_default_city( self ):
-        command = "timedatectl show | grep Timezone"
-        timezone = self.process_run( command )[ 0 ]
+        command_timedatectl = "timedatectl show | grep Timezone"
+        timezone = (
+            self.process_run(
+                command_timedatectl,
+                ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
         if timezone.startswith( "Timezone=" ):
             timezone = timezone.split( '=' )[ 1 ]
 
         else:
-            command = "cat /etc/timezone"
-            timezone = self.process_run( command )[ 0 ]
+            command_cat = "cat /etc/timezone"
+            timezone = (
+                self.process_run(
+                    command_cat,
+                    ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
+        if len( timezone ) == 0:
+            self.get_logging().warn(
+                f"Unable to locate neither '{ command_timedatectl }' "
+                f"nor '{ command_cat }'." )
 
         cities = IndicatorLunar.astro_backend.get_cities()
         the_city = cities[ 0 ] # Default to first city.

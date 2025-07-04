@@ -440,7 +440,6 @@ class IndicatorTest( IndicatorBase ):
         if terminal is None:
             message = _(
                 "Cannot run script as no terminal and/or terminal execution "
-                +
                 "flag found; please install gnome-terminal." )
 
             self.get_logging().error( message )
@@ -455,7 +454,6 @@ class IndicatorTest( IndicatorBase ):
             # workaround is to install gnome-terminal.
             message = _(
                 "Cannot run script as qterminal incorrectly parses arguments; "
-                +
                 "please install gnome-terminal instead." )
 
             self.get_logging().error( message )

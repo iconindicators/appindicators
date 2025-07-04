@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorppadownloadstatistics 1.0.81\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-05-27 12:19+1000\n"
+"POT-Creation-Date: 2025-07-04 11:18+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -43,65 +43,65 @@ msgstr ""
 msgid "Displays the total downloads of PPAs."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:404
+#: indicatorppadownloadstatistics.py:408
 msgid "Double click to edit a PPA."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:405
+#: indicatorppadownloadstatistics.py:409
 msgid "Remove the selected PPA."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:411 indicatorppadownloadstatistics.py:663
+#: indicatorppadownloadstatistics.py:415 indicatorppadownloadstatistics.py:667
 msgid "User"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:412 indicatorppadownloadstatistics.py:693
+#: indicatorppadownloadstatistics.py:416 indicatorppadownloadstatistics.py:697
 msgid "Name"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:413 indicatorppadownloadstatistics.py:723
+#: indicatorppadownloadstatistics.py:417 indicatorppadownloadstatistics.py:727
 msgid "Filter"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:437
+#: indicatorppadownloadstatistics.py:441
 msgid "Add"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:438
+#: indicatorppadownloadstatistics.py:442
 msgid "Remove"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:440
+#: indicatorppadownloadstatistics.py:444
 msgid "Add a new PPA."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:464
+#: indicatorppadownloadstatistics.py:468
 msgid "PPAs"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:471
+#: indicatorppadownloadstatistics.py:475
 msgid "Show PPAs as submenus"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:473
+#: indicatorppadownloadstatistics.py:477
 msgid ""
 "The download statistics for each PPA\n"
 "are shown in a separate submenu."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:481
+#: indicatorppadownloadstatistics.py:485
 msgid "Sort by download"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:482
+#: indicatorppadownloadstatistics.py:486
 msgid "Sort by download count within each PPA."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:488
+#: indicatorppadownloadstatistics.py:492
 msgid "Clip amount"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:498
+#: indicatorppadownloadstatistics.py:502
 msgid ""
 "Limit the number of entries\n"
 "when sorting by download.\n"
@@ -109,23 +109,23 @@ msgid ""
 "A value of zero will not clip."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:520
+#: indicatorppadownloadstatistics.py:524
 msgid "Low bandwidth"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:522
+#: indicatorppadownloadstatistics.py:526
 msgid "Enable if your internet connection is slow."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:533
+#: indicatorppadownloadstatistics.py:537
 msgid "General"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:611
+#: indicatorppadownloadstatistics.py:615
 msgid "Remove the selected PPA?"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:739
+#: indicatorppadownloadstatistics.py:743
 msgid ""
 "Each line of plain text is compared\n"
 "against the name of each built package,\n"
@@ -140,35 +140,35 @@ msgid ""
 "network requests."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:756
+#: indicatorppadownloadstatistics.py:760
 msgid "Edit PPA"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:758
+#: indicatorppadownloadstatistics.py:762
 msgid "Add PPA"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:778
+#: indicatorppadownloadstatistics.py:782
 msgid "User cannot be empty."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:783
+#: indicatorppadownloadstatistics.py:787
 msgid "Name cannot be empty."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:803
+#: indicatorppadownloadstatistics.py:807
 msgid "User and name already in use!"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:819
+#: indicatorppadownloadstatistics.py:823
 msgid "Filter text may not contain duplicates."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:831
+#: indicatorppadownloadstatistics.py:835
 msgid "Filter text may not contain spaces."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:952
+#: indicatorppadownloadstatistics.py:956
 msgid ""
 "No PPAs are present.\n"
 "\n"

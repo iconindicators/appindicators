@@ -69,7 +69,7 @@ if __name__ == "__main__":
         f"{ utils.get_pygobject() }" ]
 
     if indicator in indicator_to_dependencies:
-        modules_to_install.append( indicator_to_dependencies[ indicator ] )
+        modules_to_install.extend( indicator_to_dependencies[ indicator ] )
 
     result = (
         utils.python_run(

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorpunycode 1.0.16\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-05-27 12:19+1000\n"
+"POT-Creation-Date: 2025-07-04 11:18+1000\n"
 "PO-Revision-Date: 2025-03-14 18:18+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -17,70 +17,70 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: indicatorpunycode.py:47
+#: indicatorpunycode.py:41
 msgid "Indicator Punycode"
 msgstr "Индикатор Punycode-конвертер"
 
-#: indicatorpunycode.py:61
+#: indicatorpunycode.py:55
 msgid "Converts domain names between Unicode and ASCII."
 msgstr "Преобразователь доменных имён, содержащих символы Уникода."
 
-#: indicatorpunycode.py:74
+#: indicatorpunycode.py:68
 msgid "Convert"
 msgstr "Преобразовать"
 
-#: indicatorpunycode.py:84
+#: indicatorpunycode.py:78
 msgid "Unicode:  "
 msgstr "Уникод:  "
 
-#: indicatorpunycode.py:92
+#: indicatorpunycode.py:86
 msgid "ASCII:  "
 msgstr "ASCII:       "
 
-#: indicatorpunycode.py:99
+#: indicatorpunycode.py:93
 msgid "Clipboard is unsupported for your session type."
 msgstr ""
 
-#: indicatorpunycode.py:102
+#: indicatorpunycode.py:96
 #, python-brace-format
 msgid "{0} is inoperative..."
 msgstr ""
 
-#: indicatorpunycode.py:109
+#: indicatorpunycode.py:103
 msgid "Nothing to convert..."
 msgstr "Преобразование невозможно..."
 
-#: indicatorpunycode.py:114
+#: indicatorpunycode.py:108
 msgid "No text is in the clipboard."
 msgstr "Буфер обмена пуст."
 
-#: indicatorpunycode.py:123
+#: indicatorpunycode.py:117
 msgid "No text is highlighted/selected."
 msgstr "Буфер выделения пуст."
 
-#: indicatorpunycode.py:149
+#: indicatorpunycode.py:143
 #, fuzzy
 msgid "Unable to convert..."
 msgstr "Преобразование невозможно..."
 
-#: indicatorpunycode.py:279
+#: indicatorpunycode.py:273
 msgid "Input source"
 msgstr "Источник данных"
 
-#: indicatorpunycode.py:287
+#: indicatorpunycode.py:281
 msgid "Clipboard"
 msgstr "Буфер обмена"
 
-#: indicatorpunycode.py:289
+#: indicatorpunycode.py:283
 #, fuzzy
 msgid "Input is taken from the clipboard."
 msgstr "Буфер обмена пуст."
 
-#: indicatorpunycode.py:300
+#: indicatorpunycode.py:294
 msgid "Primary"
 msgstr "Буфер выделения"
 
-#: indicatorpunycode.py:302
+#: indicatorpunycode.py:296
 #, fuzzy
 msgid "Input is taken from the currently selected text."
 msgstr ""
@@ -88,11 +88,11 @@ msgstr ""
 "кнопки мыши на значок индикатора\n"
 "после выделения текста."
 
-#: indicatorpunycode.py:312
+#: indicatorpunycode.py:306
 msgid "Output to clipboard and primary"
 msgstr "Поместить результат в оба буфера"
 
-#: indicatorpunycode.py:314
+#: indicatorpunycode.py:308
 #, fuzzy
 msgid ""
 "If checked, the converted text is sent\n"
@@ -107,11 +107,11 @@ msgstr ""
 "Иначе он помещается только в буфер,\n"
 "в котором содержались исходные данные."
 
-#: indicatorpunycode.py:327
+#: indicatorpunycode.py:321
 msgid "Drop path/query in output"
 msgstr "Отбросить символы за доменным именем"
 
-#: indicatorpunycode.py:329
+#: indicatorpunycode.py:323
 msgid ""
 "If checked, the output text will not\n"
 "contain any path/query (if present)."
@@ -119,7 +119,7 @@ msgstr ""
 "Если стоит отметка, все символы, следующие\n"
 "за доменным именем, будут отброшены."
 
-#: indicatorpunycode.py:344
+#: indicatorpunycode.py:338
 msgid ""
 "The number of most recent\n"
 "results to show in the menu.\n"
@@ -135,7 +135,7 @@ msgstr ""
 "содержит результат, поместит\n"
 "этот результат в буфер обмена."
 
-#: indicatorpunycode.py:354
+#: indicatorpunycode.py:348
 msgid "Maximum results"
 msgstr "Количество результатов"
 
