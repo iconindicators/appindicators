@@ -291,8 +291,15 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.show_notification( _( "Error" ), message )
 
         else:
-            self.process_run(
-                self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &" )
+#TODO Original
+            # self.process_run(
+            #     self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &" )
+
+            # Must be run in a thread otherwise all other actions will block.
+            command = self.get_start_command( uuid ).replace( "%VM%", uuid )
+            Thread(
+                target = self.process_run,
+                args = ( command, ) ).start()
 
 
     def bring_window_to_front(
@@ -405,6 +412,11 @@ class IndicatorVirtualBox( IndicatorBase ):
 # But, the indicator now hangs...so maybe each VM also needs to launch in a thread?
 # What happens if the indicator is closed or even killed?
 # Does that crash the VMs running?
+#
+# Tried start_new_session in process_run...makes no difference to virtualbox
+# manager blocking the indicator from quitting.
+# Maybe try also a &
+# Note that running a VM in a thread (without &) does not seem to block the indicator.
     def on_launch_virtual_box_manager( self ):
 
         def start_virtualbox_manager():
