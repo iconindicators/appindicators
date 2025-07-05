@@ -6,14 +6,21 @@ version = "1.0.101"
 description = "Application indicator for the home astronomer."
 classifiers = [
   "Topic :: Scientific/Engineering :: Astronomy" ]
-#TODO If/when Skyfield is released, this will not install on 32 bit becuase of numpy.
+#TODO If/when Skyfield is released,
+# this will not install on 32 bit becuase of numpy.
 # So keep PyEphem in addition to Skyfield.
 #
-# For the dependencies below, remove ephem.
-# In the pip install instructions, use bash trickery to determine if
-# 32 bit or 64 bit and adjust the install line to include PyEphem or
-# both PyEphem and Skyfield.
-# For Skyfield, also specify pandas for use in minor planets / comets).
+# In the dependencies below, remove ephem, leaving sgp4
+# as it is used by both PyEphem and Skyfield and works on both 32 and 64 bit,
+#
+# In the pip PyPI install instructions, use some sort of bash/script trickery
+# to determine if the end user is running on 32 bit or 64 bit
+# and adjust the install line to include PyEphem or both PyEphem and Skyfield.
+# However at this stage, not sure if running on 64 bit should install PyEphem
+# along with Skyfield.  Why install PyEphem?
+#
+# For Skyfield, specify pandas in the pip install instructions
+# (used by minor planets / comets).
 dependencies = [
   "ephem",
   "sgp4" ]
