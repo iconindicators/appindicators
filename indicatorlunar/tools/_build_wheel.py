@@ -27,18 +27,6 @@ will continue without failing.
 '''
 
 
-#TODO
-# Might need a main
-#    https://stackoverflow.com/questions/59703821/import-module-without-running-it
-# in the files/modules that create planets/stars
-#
-# Given importing a module will run that module unless there is a __main__,
-# check all the scripts with a _ in tools and lunar/tools.
-# See if _build_wheel.py is being run twice by build_wheel.py.
-#
-# Check all scripts in tools and indicatorlunar/tools.
-
-
 import gettext
 import sys
 
