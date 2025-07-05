@@ -423,9 +423,16 @@ class IndicatorVirtualBox( IndicatorBase ):
             virtual_box_manager = self.process_run( "which VirtualBox" )[ 0 ]
 
             # Must be run in a thread otherwise all other actions will block.
-            Thread(
-                target = self.process_run,
-                args = ( virtual_box_manager, ) ).start()
+            # Thread(
+            #     target = self.process_run,
+            #     args = ( virtual_box_manager, ) ).start()
+
+#Trying out ways to get this to run without blocking...
+            import subprocess
+            subprocess.run(
+                virtual_box_manager + " &",
+                shell = True,
+                capture_output = False )
 
 
         if self.is_session_type_x11():

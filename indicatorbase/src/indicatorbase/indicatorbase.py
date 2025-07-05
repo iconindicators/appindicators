@@ -3179,7 +3179,7 @@ class IndicatorBase( ABC ):
     def process_run(
         command,
         ignore_stderr_and_non_zero_return_code = False,
-        start_new_session = False ): #TODO Not sure if this stays.
+        capture_output = True ): #TODO Not sure if this stays.
         '''
         Executes the command, returning the tuple:
             stdout
@@ -3208,13 +3208,12 @@ class IndicatorBase( ABC ):
 
         try:
             result = (
+                # Don't want check = True as that throws an exception for
+                # grep when grep finds no result and returns a code of 1.
                 subprocess.run(
                     command,
                     shell = True,
-                    capture_output = True,
-                    start_new_session = True ) )#TODO Not sure if this stays.
-                    # Don't want check = True as that throws an exception for
-                    # grep when grep finds no result and returns a code of 1.
+                    capture_output = capture_output ) )  #TODO Not sure if the variable stays, or set back to True.
 
             stdout_ = result.stdout.decode().strip()
             stderr_ = result.stderr.decode()
