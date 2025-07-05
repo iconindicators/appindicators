@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorvirtualbox 1.0.75\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-04 16:07+1000\n"
+"POT-Creation-Date: 2025-07-04 23:27+1000\n"
 "PO-Revision-Date: 2025-03-14 18:30+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -14,30 +14,30 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#: indicatorvirtualbox.py:42
+#: indicatorvirtualbox.py:44
 msgid "Indicator VirtualBox™"
 msgstr "Индикатор VirtualBox™"
 
-#: indicatorvirtualbox.py:66
+#: indicatorvirtualbox.py:68
 #, fuzzy
 msgid "VirtualBox™ is not installed"
 msgstr "(VirtualBox не установлен)"
 
-#: indicatorvirtualbox.py:72
+#: indicatorvirtualbox.py:74
 #, fuzzy
 msgid ""
 "Shows VirtualBox™ virtual machines\n"
 "and allows them to be started."
 msgstr "Показывает виртуальные машины VirtualBox™ и позволяет запускать их."
 
-#: indicatorvirtualbox.py:126
+#: indicatorvirtualbox.py:128
 msgid "Launch VirtualBox™ Manager"
 msgstr "Запустить Менеджер VirtualBox"
 
-#: indicatorvirtualbox.py:284
+#: indicatorvirtualbox.py:286
 msgid ""
 "The virtual machine could not be found - perhaps it has been renamed or "
 "deleted.  The list of virtual machines has been refreshed - please try again."
@@ -45,11 +45,11 @@ msgstr ""
 "Виртуальная машина не найдена: возможно, она была переименована или удалена. "
 "Список виртуальных машин был обновлён - пожалуйста, повторите попытку."
 
-#: indicatorvirtualbox.py:289
+#: indicatorvirtualbox.py:291
 msgid "Error"
 msgstr "Ошибка"
 
-#: indicatorvirtualbox.py:308
+#: indicatorvirtualbox.py:317
 #, python-brace-format
 msgid ""
 "Unable to find the window for the virtual machine '{0}' - perhaps it is "
@@ -58,11 +58,11 @@ msgstr ""
 "Не удалось найти окно виртуальной машины '{0}': вероятно, она запущена в "
 "автономном режиме."
 
-#: indicatorvirtualbox.py:312 indicatorvirtualbox.py:332
+#: indicatorvirtualbox.py:321 indicatorvirtualbox.py:341
 msgid "Warning"
 msgstr "Предупреждение"
 
-#: indicatorvirtualbox.py:328
+#: indicatorvirtualbox.py:337
 #, python-brace-format
 msgid ""
 "Unable to bring the virtual machine '{0}' to front as there is more than one "
@@ -71,7 +71,7 @@ msgstr ""
 "Невозможно переместить виртуальную машину '{0}' на передний план, так как "
 "существует несколько окон, чьи имена совпадают."
 
-#: indicatorvirtualbox.py:589
+#: indicatorvirtualbox.py:612
 #, fuzzy
 msgid ""
 "Click on a virtual machine's start command to edit.\n"
@@ -90,29 +90,29 @@ msgstr ""
 "или\n"
 "\tVBoxHeadless --startvm %VM% --vrde off"
 
-#: indicatorvirtualbox.py:597
+#: indicatorvirtualbox.py:620
 #, fuzzy
 msgid "No virtual machines found."
 msgstr "Виртуальные машины"
 
-#: indicatorvirtualbox.py:606
+#: indicatorvirtualbox.py:629
 #, fuzzy
 msgid "Groups / Virtual Machines"
 msgstr "Виртуальные машины"
 
-#: indicatorvirtualbox.py:607
+#: indicatorvirtualbox.py:630
 msgid "Autostart"
 msgstr "Автозапуск"
 
-#: indicatorvirtualbox.py:608
+#: indicatorvirtualbox.py:631
 msgid "Start Command"
 msgstr "Команда запуска"
 
-#: indicatorvirtualbox.py:637
+#: indicatorvirtualbox.py:660
 msgid "Virtual Machines"
 msgstr "Виртуальные машины"
 
-#: indicatorvirtualbox.py:647
+#: indicatorvirtualbox.py:670
 #, fuzzy
 msgid ""
 "The window title of VirtualBox™ Manager.\n"
@@ -126,15 +126,15 @@ msgstr ""
 "Заголовок окна Менеджера VirtualBox.\n"
 "Настройте название для вашего языка."
 
-#: indicatorvirtualbox.py:657
+#: indicatorvirtualbox.py:680
 msgid "VirtualBox™ Manager"
 msgstr "Менеджер VirtualBox"
 
-#: indicatorvirtualbox.py:665
+#: indicatorvirtualbox.py:688
 msgid "Sort groups and virtual machines equally"
 msgstr ""
 
-#: indicatorvirtualbox.py:667
+#: indicatorvirtualbox.py:690
 msgid ""
 "If checked, groups and virtual machines\n"
 "are sorted without distinction.\n"
@@ -143,11 +143,11 @@ msgid ""
 "followed by virtual machines."
 msgstr ""
 
-#: indicatorvirtualbox.py:681
+#: indicatorvirtualbox.py:704
 msgid "Show groups as submenus"
 msgstr "Показывать подменю для групп"
 
-#: indicatorvirtualbox.py:683
+#: indicatorvirtualbox.py:706
 #, fuzzy
 msgid ""
 "If checked, groups are shown using submenus.\n"
@@ -159,7 +159,7 @@ msgstr ""
 "\n"
 "Иначе группы отображаются в виде списка с отступом."
 
-#: indicatorvirtualbox.py:698
+#: indicatorvirtualbox.py:721
 msgid ""
 "How often the list of virtual machines\n"
 "and their running status are updated."
@@ -167,11 +167,11 @@ msgstr ""
 "Насколько часто обновляется список\n"
 "виртуальных машин и их статус."
 
-#: indicatorvirtualbox.py:704
+#: indicatorvirtualbox.py:727
 msgid "Refresh interval (minutes)"
 msgstr "Интервал обновления (в минутах)"
 
-#: indicatorvirtualbox.py:718
+#: indicatorvirtualbox.py:741
 msgid ""
 "Amount of time to wait from automatically\n"
 "starting one virtual machine to the next."
@@ -179,15 +179,15 @@ msgstr ""
 "Интервал времени до автоматического запуска следующей\n"
 "виртуальной машины после запуска предыдущей."
 
-#: indicatorvirtualbox.py:724
+#: indicatorvirtualbox.py:747
 msgid "Startup delay (seconds)"
 msgstr "Задержка запуска (в секундах)"
 
-#: indicatorvirtualbox.py:737
+#: indicatorvirtualbox.py:760
 msgid "General"
 msgstr "Общие"
 
-#: indicatorvirtualbox.py:835
+#: indicatorvirtualbox.py:858
 #, fuzzy
 msgid ""
 "The start command must contain\n"
