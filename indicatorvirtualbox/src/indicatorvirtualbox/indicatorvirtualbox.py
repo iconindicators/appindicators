@@ -297,9 +297,12 @@ class IndicatorVirtualBox( IndicatorBase ):
 
             # Must be run in a thread otherwise all other actions will block.
             command = self.get_start_command( uuid ).replace( "%VM%", uuid )
-            Thread(
-                target = self.process_run,
-                args = ( command, ) ).start()
+            # Thread(
+            #     target = self.process_run,
+            #     args = ( command, ) ).start()
+            self.process_run(
+                self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &",
+                capture_output = False )
 
 
     def bring_window_to_front(
@@ -308,7 +311,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         delay_in_seconds = 0 ):
 
         if self.is_session_type_x11():
-            command = 'wmctrl -l | grep "' + virtual_machine_name + '" | wc -l'
+            command = 'wmctrl -l | grep -w "' + virtual_machine_name + '" | wc -l'
             number_of_windows_with_the_same_name = (
                 self.process_run( command )[ 0 ] )
 
@@ -372,6 +375,9 @@ class IndicatorVirtualBox( IndicatorBase ):
         delta,
         scroll_direction ):
 
+#TODO Run A and B virtual machines.
+# Try scrolling with mouse wheel; B does not come up.
+# Is it something to do with B or is it the scrolling code below that is broken?
         if self.is_vboxmanage_installed():
             running_names, running_uuids = self.get_running_virtual_machines()
             if running_uuids:
@@ -401,37 +407,11 @@ class IndicatorVirtualBox( IndicatorBase ):
                     10 )
 
 
-#TODO Under X11 (so Ubuntu 20.04) run virtualbox manager,
-# VirtualBox manager was blocking scrolling.
-# Seems okay now as using a thread to launch.
-#
-# However on starting vm 'B', when mouse wheel scrolling, got a message
-# about multiple windows with same name, so maybe it's just another window
-# has a 'B' in it...so check.
-#
-# But, the indicator now hangs...so maybe each VM also needs to launch in a thread?
-# What happens if the indicator is closed or even killed?
-# Does that crash the VMs running?
-#
-# Tried start_new_session in process_run...makes no difference to virtualbox
-# manager blocking the indicator from quitting.
-# Maybe try also a &
-# Note that running a VM in a thread (without &) does not seem to block the indicator.
     def on_launch_virtual_box_manager( self ):
 
         def start_virtualbox_manager():
-            virtual_box_manager = self.process_run( "which VirtualBox" )[ 0 ]
-
-            # Must be run in a thread otherwise all other actions will block.
-            # Thread(
-            #     target = self.process_run,
-            #     args = ( virtual_box_manager, ) ).start()
-
-#Trying out ways to get this to run without blocking...
-            import subprocess
-            subprocess.run(
-                virtual_box_manager + " &",
-                shell = True,
+            self.process_run(
+                self.process_run( "which VirtualBox" )[ 0 ] + " &",
                 capture_output = False )
 
 

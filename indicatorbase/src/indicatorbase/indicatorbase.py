@@ -3215,13 +3215,14 @@ class IndicatorBase( ABC ):
                     shell = True,
                     capture_output = capture_output ) )  #TODO Not sure if the variable stays, or set back to True.
 
-            stdout_ = result.stdout.decode().strip()
-            stderr_ = result.stderr.decode()
-            return_code = result.returncode
+            if capture_output:
+                stdout_ = result.stdout.decode().strip()
+                stderr_ = result.stderr.decode()
+                return_code = result.returncode
 
-            if not ignore_stderr_and_non_zero_return_code:
-                if stderr_ or return_code != 0:
-                    log( command, stdout_, stderr_, return_code )
+                if not ignore_stderr_and_non_zero_return_code:
+                    if stderr_ or return_code != 0:
+                        log( command, stdout_, stderr_, return_code )
 
         except subprocess.CalledProcessError as e:
             stdout_ = e.stdout.decode().strip()
@@ -3229,7 +3230,8 @@ class IndicatorBase( ABC ):
             return_code = e.returncode
             log( command, stdout_, stderr_, return_code )
 
-        return stdout_, stderr_, return_code
+        if capture_output:
+            return stdout_, stderr_, return_code
 
 
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
