@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorbase 1.0.1\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-04 16:06+1000\n"
+"POT-Creation-Date: 2025-07-04 23:24+1000\n"
 "PO-Revision-Date: 2025-03-14 11:29+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -14,8 +14,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: indicatorbase.py:257
 msgid "Initialising..."
@@ -30,7 +30,7 @@ msgstr ""
 msgid "New version of {0} available..."
 msgstr ""
 
-#: indicatorbase.py:760 indicatorbase.py:1086
+#: indicatorbase.py:760 indicatorbase.py:1085
 msgid "Preferences"
 msgstr "Параметры"
 
@@ -42,63 +42,63 @@ msgstr "О программе"
 msgid "Quit"
 msgstr "Выход"
 
-#: indicatorbase.py:1015
+#: indicatorbase.py:1014
 msgid "translator-credits"
 msgstr "Олег Мойсейчук"
 
-#: indicatorbase.py:1021
+#: indicatorbase.py:1020
 msgid "Credits"
 msgstr "Благодарность"
 
-#: indicatorbase.py:1026 indicatorbase.py:1035
+#: indicatorbase.py:1025 indicatorbase.py:1034
 msgid "View the"
 msgstr "Просмотреть"
 
-#: indicatorbase.py:1027
+#: indicatorbase.py:1026
 msgid "changelog"
 msgstr "список изменений"
 
-#: indicatorbase.py:1028 indicatorbase.py:1037
+#: indicatorbase.py:1027 indicatorbase.py:1036
 msgid "text file."
 msgstr "."
 
-#: indicatorbase.py:1036
+#: indicatorbase.py:1035
 msgid "error log"
 msgstr "журнал ошибок"
 
-#: indicatorbase.py:1456
+#: indicatorbase.py:1455
 msgid "Autostart"
 msgstr "Автозапуск"
 
-#: indicatorbase.py:1457
+#: indicatorbase.py:1456
 msgid "Run the indicator automatically."
 msgstr "Запускать индикатор автоматически."
 
-#: indicatorbase.py:1465
+#: indicatorbase.py:1464
 msgid "Start up delay (seconds)."
 msgstr "Задержка запуска (в секундах)."
 
-#: indicatorbase.py:1483
+#: indicatorbase.py:1482
 msgid "Check Latest Version"
 msgstr ""
 
-#: indicatorbase.py:1485
+#: indicatorbase.py:1484
 msgid "Check for the latest version of the indicator on start up."
 msgstr ""
 
-#: indicatorbase.py:1498
+#: indicatorbase.py:1497
 #, python-brace-format
 msgid "An update is available at <a href=\"{0}\">{1}</a>."
 msgstr ""
 
-#: indicatorbase.py:2257
+#: indicatorbase.py:2256
 msgid "Enabled"
 msgstr ""
 
-#: indicatorbase.py:2288
+#: indicatorbase.py:2287
 msgid "Add"
 msgstr ""
 
-#: indicatorbase.py:2289
+#: indicatorbase.py:2288
 msgid "Remove"
 msgstr ""

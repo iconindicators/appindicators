@@ -1173,9 +1173,7 @@ class IndicatorBase( ABC ):
             #   https://github.com/bugaevc/wl-clipboard/pull/110
             #   https://github.com/bugaevc/wl-clipboard/pull/154
             command += "2>/dev/null"
-            self.process_run( command )    #TODO Check the pipe to stderr still works!
-                                                    # Need to do this on Wayland and not Ubuntu 20.04
-                                                    #TODO Should this check stderr/return code?  What to do on failure?
+            self.process_run( command )
 
         else:
             selection = Gdk.SELECTION_CLIPBOARD
@@ -3192,7 +3190,7 @@ class IndicatorBase( ABC ):
         made if a logger has been initialised.
 
         If ignore_stderr_and_non_zero_return_code is True and either stderr
-        or a non-zero return code results, no log entry will be made. 
+        or a non-zero return code results, no log entry will be made.
         '''
 
         def log( command, stdout_, stderr_, return_code ):
