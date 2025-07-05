@@ -10,7 +10,13 @@ authors = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
 maintainers = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
-#license = "GPL-3.0-or-later"  #TODO Does not build on Ubuntu 20.04; must uncomment and build on Debian 12+ or Ubuntu 22.04+
+#TODO Does not build on Ubuntu 20.04;
+# for an actual release to upload to PyPI,
+# must uncomment and build on Debian 12+ (laptop is fine) or Ubuntu 22.04+
+#
+#TODO Build a wheel on the laptop and
+# see if that wheel will install on Ubuntu 20.04
+#license = "GPL-3.0-or-later"
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
