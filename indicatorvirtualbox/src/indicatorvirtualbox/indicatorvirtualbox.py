@@ -22,7 +22,7 @@
 import datetime
 import time
 
-from threading import Thread
+from threading import Thread #TODO Hopefully can go.
 
 import gi
 
@@ -80,7 +80,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         # Mouse wheel scroll events use wmctrl to cycle through running
         # virtual machines to bring each to the front (only work on X11).
-        if self.is_session_type_x11():
+        if self.is_session_type_x11() and self.is_vboxmanage_installed():
             self.request_mouse_wheel_scroll_events(
                 ( self.on_mouse_wheel_scroll, ) )
 
@@ -311,11 +311,20 @@ class IndicatorVirtualBox( IndicatorBase ):
         delay_in_seconds = 0 ):
 
         if self.is_session_type_x11():
-            command = 'wmctrl -l | grep -w "' + virtual_machine_name + '" | wc -l'
-            number_of_windows_with_the_same_name = (
-                self.process_run( command )[ 0 ] )
+            all_windows = self.process_run( "wmctrl -l" )[ 0 ]
+            matches = [ ]
+            for window in all_windows.splitlines():
+                window_information = window.split( maxsplit = 3 )
+                window_name = window_information[ 3 ]
+                if window_name.startswith( virtual_machine_name ):
+                    matches.append( window_information[ 0 ] )
 
-            if number_of_windows_with_the_same_name == "0":
+            print( virtual_machine_name)
+            print( matches )
+            print()
+            # return
+
+            if len( matches ) == 0:
                 message = _(
                     "Unable to find the window for the virtual machine '{0}' " +
                     "- perhaps it is running as headless." ).format(
@@ -327,15 +336,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                     message,
                     delay_in_seconds = delay_in_seconds )
 
-            elif number_of_windows_with_the_same_name == "1":
-                window_list = self.process_run( "wmctrl -l" )[ 0 ]
-                for line in window_list.splitlines():
-                    if virtual_machine_name in line:
-                        window_id = line[ 0 : line.find( " " ) ]
-                        self.process_run( "wmctrl -i -a " + window_id )
-                        break
-
-            else:
+            elif len( matches ) > 1:
                 message = _(
                     "Unable to bring the virtual machine '{0}' to front " +
                     "as there is more than one window " +
@@ -346,6 +347,56 @@ class IndicatorVirtualBox( IndicatorBase ):
                     summary,
                     message,
                     delay_in_seconds = delay_in_seconds )
+
+            else:
+                self.process_run( "wmctrl -i -a " + matches[ 0 ] )
+
+        # if self.is_session_type_x11():
+        #     command = 'wmctrl -l | grep -w "' + virtual_machine_name + '" | wc -l'
+        #     number_of_windows_with_the_same_name = (
+        #         self.process_run( command )[ 0 ] )
+        #
+        #     print( f"{ number_of_windows_with_the_same_name }" )#TODO Test
+        #
+        #     if number_of_windows_with_the_same_name == "0":
+        #         message = _(
+        #             "Unable to find the window for the virtual machine '{0}' " +
+        #             "- perhaps it is running as headless." ).format(
+        #                 virtual_machine_name )
+        #
+        #         summary = _( "Warning" )
+        #         self.show_notification_with_delay(
+        #             summary,
+        #             message,
+        #             delay_in_seconds = delay_in_seconds )
+        #
+        #     # else:
+        #     #     window_list = self.process_run( "wmctrl -l" )[ 0 ]
+        #     #     for line in window_list.splitlines():
+        #     #
+        #     #
+        #
+        #
+        #     elif number_of_windows_with_the_same_name == "1":
+        #         window_list = self.process_run( "wmctrl -l" )[ 0 ]
+        #         for line in window_list.splitlines():
+        #             print( line )
+        #             if virtual_machine_name in line:
+        #                 window_id = line[ 0 : line.find( " " ) ]
+        #                 self.process_run( "wmctrl -i -a " + window_id )
+        #                 break
+        #
+        #     else:
+        #         message = _(
+        #             "Unable to bring the virtual machine '{0}' to front " +
+        #             "as there is more than one window " +
+        #             "with overlapping names." ).format( virtual_machine_name )
+        #
+        #         summary = _( "Warning" )
+        #         self.show_notification_with_delay(
+        #             summary,
+        #             message,
+        #             delay_in_seconds = delay_in_seconds )
 
 
     def show_notification_with_delay(
@@ -378,33 +429,33 @@ class IndicatorVirtualBox( IndicatorBase ):
 #TODO Run A and B virtual machines.
 # Try scrolling with mouse wheel; B does not come up.
 # Is it something to do with B or is it the scrolling code below that is broken?
-        if self.is_vboxmanage_installed():
-            running_names, running_uuids = self.get_running_virtual_machines()
-            if running_uuids:
-                if self.scroll_uuid is None or self.scroll_uuid not in running_uuids:
-                    self.scroll_uuid = running_uuids[ 0 ]
+        running_names, running_uuids = self.get_running_virtual_machines()
+        if running_uuids:
+            import datetime #TODO Test
+            print( f"{ datetime.datetime.now() }: { running_names }" )#TODO Test
+            if self.scroll_uuid is None or self.scroll_uuid not in running_uuids:
+                self.scroll_uuid = running_uuids[ 0 ]
 
-                if scroll_direction == Gdk.ScrollDirection.UP:
-                    index = (
-                        ( running_uuids.index( self.scroll_uuid ) + 1 )
-                        %
-                        len( running_uuids ) )
+            if scroll_direction == Gdk.ScrollDirection.UP:
+                index = (
+                    ( running_uuids.index( self.scroll_uuid ) + 1 )
+                    %
+                    len( running_uuids ) )
 
-                    self.scroll_uuid = running_uuids[ index ]
-                    self.scroll_direction_is_up = True
+                self.scroll_uuid = running_uuids[ index ]
+                self.scroll_direction_is_up = True
 
-                else:
-                    index = (
-                        ( running_uuids.index( self.scroll_uuid ) - 1 )
-                        %
-                        len( running_uuids ) )
+            else:
+                index = (
+                    ( running_uuids.index( self.scroll_uuid ) - 1 )
+                    %
+                    len( running_uuids ) )
 
-                    self.scroll_uuid = running_uuids[ index ]
-                    self.scroll_direction_is_up = False
+                self.scroll_uuid = running_uuids[ index ]
+                self.scroll_direction_is_up = False
 
-                self.bring_window_to_front(
-                    running_names[ running_uuids.index( self.scroll_uuid ) ],
-                    10 )
+            self.bring_window_to_front(
+                running_names[ running_uuids.index( self.scroll_uuid ) ], 10 )
 
 
     def on_launch_virtual_box_manager( self ):
