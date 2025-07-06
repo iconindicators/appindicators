@@ -29,5 +29,6 @@ classifiers = [
 
 [project.urls]
 homepage = "https://appindicators.sourceforge.io"  #TODO This page/repository was deleted by SourceForge because I had not submitted code/releases.  Maybe think about Github instead (and even migrate Stardate System Tray and World Time System Tray too).  https://sourceforge.net/p/forge/site-support/26844/
+
 [tool.setuptools.packages.find]
 where = [ "src" ]
