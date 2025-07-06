@@ -224,6 +224,8 @@ References:
 
 To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the introduction above.
 
+Note that if installing over an existing install with the same version, will need to add `--force-reinstall` after `--upgrade` (which may be removed from a [future release](https://github.com/pypa/pip/issues/8238) of `pip`).
+
 ---
 
 ## Release to TestPyPI
@@ -248,28 +250,13 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
 
 ## Install from TestPyPI
 
-TODO
-    Test
-
-To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`,
-first, install the operating system packages listed at the indicator's `PyPI` page listed in the introduction above.
+To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`, first, install the operating system packages listed at the indicator's `PyPI` page listed in the introduction above.
 
 Then install `indicatortest`:
 
 TODO
-    Given
-        https://pip.pypa.io/en/stable/ux-research-design/research-results/pip-force-reinstall/
-    I think that I should not use --force-reinstall.  Perhaps instead,
-    flag to myself, somehow, the installed version is x.y and the testpypi version is x.y so nothing will happen.
-    What about on the release site?  Do this too, or just have a comment about installing with same versin is a NOP?
-    I added a comment to 
-        https://github.com/pypa/pip/issues/8238
-    about if --force-reinstall is to be kept.
-    
-    I think for an end-user, just --upgrade is fine.
-    For me (developer) want --upgrade and --force-reinstall. 
-    
     Should the command below be put into a script...and combine with install from PyPI but with a switch?
+    Test (the command itself and/or if a script is created).
 ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
