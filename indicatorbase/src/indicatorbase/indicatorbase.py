@@ -3205,7 +3205,6 @@ class IndicatorBase( ABC ):
 
         def log( command, stdout_, stderr_, return_code ):
             if IndicatorBase._LOGGING_INITIALISED:
-#TODO Test this works
                 logging.error( f"Error running: { command }" )
                 if stdout_:
                     logging.error( f"stdout: { stdout_ }" )
@@ -3228,7 +3227,7 @@ class IndicatorBase( ABC ):
 
             if capture_output:
                 stdout_ = result.stdout.decode().strip()
-                stderr_ = result.stderr.decode()
+                stderr_ = result.stderr.decode().strip()
                 return_code = result.returncode
 
                 if not ignore_stderr_and_non_zero_return_code:
@@ -3242,7 +3241,7 @@ class IndicatorBase( ABC ):
 
         except subprocess.CalledProcessError as e:
             stdout_ = e.stdout.decode().strip()
-            stderr_ = e.stderr.decode()
+            stderr_ = e.stderr.decode().strip()
             return_code = e.returncode
             log( command, stdout_, stderr_, return_code )
 
