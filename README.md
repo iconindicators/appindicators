@@ -255,7 +255,8 @@ To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.l
 Then install `indicatortest`:
 
 TODO
-    Should the command below be put into a script...and combine with install from PyPI but with a switch?
+    Should the command below be put into a script?
+    If so, perhaps also combine with install from PyPI with a switch?
     Test (the command itself and/or if a script is created).
 ```
     indicator=indicatortest && \
