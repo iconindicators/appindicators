@@ -119,6 +119,9 @@ def python_run(
     Creates the Python3 virtual environment if it does not exist,
     installs modules specified and runs the Python3 command,
     returning stdout, stderr and the return code as a tuple.
+
+    Note that --force-reinstall could be removed in the future:
+        https://github.com/pypa/pip/issues/8238
     '''
     commands = [ ]
 
