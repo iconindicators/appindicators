@@ -19,6 +19,19 @@
 ''' Calculate astronomical information using Skyfield. '''
 
 
+#TODO Doing more reading; it is possible that numpy/pandas did not install on
+# the Debian 12 32 bit laptop due to some error; this suggests that numpy/pandas
+# should install and so too then should skyfield.
+#
+# Based on this reading:
+#
+#     https://numpy.org/doc/2.0/release/1.22.0-notes.html
+#     https://discuss.python.org/t/dropping-32-bit-packages/5476
+#     https://discuss.python.org/t/python-3-12-1-32-bit-unable-to-pip-install-pandas/42407
+#     https://stackoverflow.com/questions/78339788/how-can-i-use-numpy-and-pandas-on-python-3-8-32-bits
+#     https://pypi.org/project/pandas/2.0.3/#files
+
+
 #TODO If astroskyfield will be released, it will only be for 64 bit.
 #
 # So for 32 bit, only install ephem.
