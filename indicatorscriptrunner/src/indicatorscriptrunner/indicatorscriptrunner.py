@@ -25,8 +25,6 @@ import concurrent.futures
 import datetime
 import math
 
-from threading import Thread
-
 import gi
 
 gi.require_version( "Gtk", "3.0" )
@@ -255,9 +253,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 self.get_logging().debug(
                     script.get_group() + " | " + script.get_name() + ": " + command )
 
-            Thread(
-                target = self.process_run,
-                args = ( command, ) ).start()
+            self.process_run( command + " &" )
 
 
     def update_background_scripts(
@@ -321,7 +317,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
         if self.send_command_to_log:
             self.get_logging().debug(
-                script.get_group() + " | " + script.get_name() + ": " + script.get_command() )
+                script.get_group() +
+                " | " +
+                script.get_name() +
+                ": " +
+                script.get_command() )
 
         command_result = self.process_run( script.get_command() )[ 0 ]
         key = self._create_key( script.get_group(), script.get_name() )
