@@ -20,6 +20,8 @@ The project was reinstated, but perhaps the indicators (source code) should
 be put onto GitHub instead (or somewhere else).
 If that is the case, also consider moving Stardate System Tray and World Time System Tray.
 
+Could also move to https://gitlab.freedesktop.org
+
 #### How to create a GitHub page for the project
 Create Github page, but unaffiliated with my username.
 This should be an organisation:
@@ -187,16 +189,28 @@ Determine which distros/desktops these are and if anything can be done.
 
 ## Replacement for wmctrl for indicatorvirtualbox on Wayland
 https://git.sr.ht/~brocellous/wlrctl
+https://launchpad.net/ubuntu/+source/wlroots
 is a work-in-progress wmctrl replacement.
 Tested wlrctl on Ubuntu 24.04 but does not work when attempting to access
 window information:
   error message: Foreign Toplevel Management interface not found!
+Maybe wlroots was not installed and/or Wayland on Ubuntu 20.04 is no good...
+...I have a memory of being unable to switch to Wayland on Ubuntu 20.04
+but that could have been on the VM and not the desktop itself.
+So could check on the desktop, but also Ubuntu 22.04/24.04.
 
 https://github.com/CZ-NIC/run-or-raise 
 GNOME extension; maybe could be used but only works on GNOME presumably.
 
 https://github.com/ickyicky/window-calls
 GNOME extension; maybe could be used but only works on GNOME presumably.
+
+https://unix.stackexchange.com/questions/688583/focus-window-by-title-in-gnome-shell-41-under-wayland?rq=1
+https://github.com/lucaswerkmeister/activate-window-by-title
+
+https://wiki.python.org/moin/DbusExamples
+
+https://unix.stackexchange.com/questions/702236/how-to-list-all-object-paths-under-a-dbus-service-only-usign-dbus-command-line-u
 
 
 ## Access Data at Runtime
