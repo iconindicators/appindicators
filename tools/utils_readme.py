@@ -524,9 +524,9 @@ def _get_uninstall_for_operating_system(
             "    deactivate && \\\n"
             f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
             "    ```\n"
-            "    If no other indicators are installed, the virtual "
-            "environment will be deleted.\n\n"
-
+            "    If no other indicators are installed, the virtual "  #TODO Could move this text to under the Uninstall
+            "environment will be deleted.\n\n" # heading (end of _get_install_uninstall()) and also mention that
+                                                # the $HOME/.config/{indicator} directory will not be removed.
             "</details>\n\n" )
 
     return uninstall
