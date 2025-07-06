@@ -247,7 +247,6 @@ class IndicatorVirtualBox( IndicatorBase ):
                 need_one_last_sleep = True
 
         if need_one_last_sleep:
-
             # Delay ensuring the running status of the last virtual machine
             # starts up and is captured in the immediate update.
             time.sleep( 10 )
