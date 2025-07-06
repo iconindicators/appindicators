@@ -885,7 +885,7 @@ def _get_limitations(
 
 #TODO Is wl-clipboard needed for openSUSE?
 #
-# Not sure why I wrote the TODO above...I guess check all distros under Wayland!
+# Not sure why I wrote the above...I guess check all distros under Wayland!
 
 
     message = ""
