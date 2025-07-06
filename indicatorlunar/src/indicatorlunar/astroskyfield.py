@@ -80,12 +80,14 @@
 # 14 : 77
 # 15 : 159
 #
-# Maybe tidy up astroskyfield then do same timing tests...
-# ...maybe release indicatorlunar with skyfield instead of pyephem?
+# Compare with PyEphem at around 2 to 3 seconds (even up to magnitude 15).
+ 
+
+#TODO If/when astroskyfield is included, add astroskyfield.py to
+# locale/POTFILES.in.
 
 
-#TODO If/when astroskyfield is included in the release and ephem is dropped...
-# Add astroskyfield.py to locale/POTFILES.in.
+#TODO If astropyephem is dropped, remove from POTFILES.in
 
 
 #TODO Might be able to use new OMM method to load satellite data:
