@@ -319,84 +319,27 @@ class IndicatorVirtualBox( IndicatorBase ):
                 if window_name.startswith( virtual_machine_name ):
                     matches.append( window_information[ 0 ] )
 
-            print( virtual_machine_name)
-            print( matches )
-            print()
-            # return
-
-            if len( matches ) == 0:
-                message = _(
-                    "Unable to find the window for the virtual machine '{0}' " +
-                    "- perhaps it is running as headless." ).format(
-                        virtual_machine_name )
-
-                summary = _( "Warning" )
-                self.show_notification_with_delay(
-                    summary,
-                    message,
-                    delay_in_seconds = delay_in_seconds )
-
-            elif len( matches ) > 1:
-                message = _(
-                    "Unable to bring the virtual machine '{0}' to front " +
-                    "as there is more than one window " +
-                    "with overlapping names." ).format( virtual_machine_name )
-
-                summary = _( "Warning" )
-                self.show_notification_with_delay(
-                    summary,
-                    message,
-                    delay_in_seconds = delay_in_seconds )
-
-            else:
+            if len( matches ) == 1:
                 self.process_run( "wmctrl -i -a " + matches[ 0 ] )
 
-        # if self.is_session_type_x11():
-        #     command = 'wmctrl -l | grep -w "' + virtual_machine_name + '" | wc -l'
-        #     number_of_windows_with_the_same_name = (
-        #         self.process_run( command )[ 0 ] )
-        #
-        #     print( f"{ number_of_windows_with_the_same_name }" )#TODO Test
-        #
-        #     if number_of_windows_with_the_same_name == "0":
-        #         message = _(
-        #             "Unable to find the window for the virtual machine '{0}' " +
-        #             "- perhaps it is running as headless." ).format(
-        #                 virtual_machine_name )
-        #
-        #         summary = _( "Warning" )
-        #         self.show_notification_with_delay(
-        #             summary,
-        #             message,
-        #             delay_in_seconds = delay_in_seconds )
-        #
-        #     # else:
-        #     #     window_list = self.process_run( "wmctrl -l" )[ 0 ]
-        #     #     for line in window_list.splitlines():
-        #     #
-        #     #
-        #
-        #
-        #     elif number_of_windows_with_the_same_name == "1":
-        #         window_list = self.process_run( "wmctrl -l" )[ 0 ]
-        #         for line in window_list.splitlines():
-        #             print( line )
-        #             if virtual_machine_name in line:
-        #                 window_id = line[ 0 : line.find( " " ) ]
-        #                 self.process_run( "wmctrl -i -a " + window_id )
-        #                 break
-        #
-        #     else:
-        #         message = _(
-        #             "Unable to bring the virtual machine '{0}' to front " +
-        #             "as there is more than one window " +
-        #             "with overlapping names." ).format( virtual_machine_name )
-        #
-        #         summary = _( "Warning" )
-        #         self.show_notification_with_delay(
-        #             summary,
-        #             message,
-        #             delay_in_seconds = delay_in_seconds )
+            else:
+                if len( matches ) == 0:
+                    message = _(
+                        "Unable to find the window for the virtual machine " +
+                        "'{0}' - perhaps it is running as headless." ).format(
+                            virtual_machine_name )
+
+                else:
+                    message = _(
+                        "Unable to bring the virtual machine '{0}' to front " +
+                        "as there is more than one window with overlapping " +
+                        "names." ).format( virtual_machine_name )
+
+                summary = _( "Warning" )
+                self.show_notification_with_delay(
+                    summary,
+                    message,
+                    delay_in_seconds = delay_in_seconds )
 
 
     def show_notification_with_delay(
@@ -426,13 +369,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         delta,
         scroll_direction ):
 
-#TODO Run A and B virtual machines.
-# Try scrolling with mouse wheel; B does not come up.
-# Is it something to do with B or is it the scrolling code below that is broken?
         running_names, running_uuids = self.get_running_virtual_machines()
         if running_uuids:
-            import datetime #TODO Test
-            print( f"{ datetime.datetime.now() }: { running_names }" )#TODO Test
             if self.scroll_uuid is None or self.scroll_uuid not in running_uuids:
                 self.scroll_uuid = running_uuids[ 0 ]
 
