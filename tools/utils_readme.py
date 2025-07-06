@@ -438,6 +438,14 @@ def _get_installation_python_virtual_environment(
 
 #TODO Should I have --force-reinstall after --upgrade?
 # See similar note in README.md
+# Not sure if the --force-reinstall will be dropped.
+# I added a comment to 
+#     https://github.com/pypa/pip/issues/8238
+# about if --force-reinstall is to be kept.
+# 
+# I think for an end-user, just --upgrade is fine.
+# For me (developer) want --upgrade and --force-reinstall. 
+
     message = (
         f"Install `{ indicator }`, including icons, .desktop and run "
         "script, to the `Python3` virtual environment:\n"

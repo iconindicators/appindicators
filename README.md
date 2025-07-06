@@ -257,15 +257,25 @@ first, install the operating system packages listed at the indicator's `PyPI` pa
 Then install `indicatortest`:
 
 TODO
-    Should I have --upgrade after install?
-    See similar note in utils_readme.py
-    Should this be put into a script...and combine with install from PyPI but with a switch?
+    Given
+        https://pip.pypa.io/en/stable/ux-research-design/research-results/pip-force-reinstall/
+    I think that I should not use --force-reinstall.  Perhaps instead,
+    flag to myself, somehow, the installed version is x.y and the testpypi version is x.y so nothing will happen.
+    What about on the release site?  Do this too, or just have a comment about installing with same versin is a NOP?
+    I added a comment to 
+        https://github.com/pypa/pip/issues/8238
+    about if --force-reinstall is to be kept.
+    
+    I think for an end-user, just --upgrade is fine.
+    For me (developer) want --upgrade and --force-reinstall. 
+    
+    Should the command below be put into a script...and combine with install from PyPI but with a switch?
 ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --force-reinstall --extra-index-url https://test.pypi.org/simple ${indicator} && \
+    python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple ${indicator} && \
     deactivate && \
     $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
 ```
