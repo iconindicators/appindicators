@@ -32,14 +32,6 @@ References:
 # to include either ephem (32 bit) or skyfield (64 bit).
 
 
-#TODO Will wmctrl be dropped for Wayland only distros?
-
-
-#TODO I think pulseaudio is no longer available on Manjaro 24...
-# try to confirm and if so, what is the new way to play a sound for
-# scriptrunner and test?
-
-
 #TODO Consider testing on Fedora 42.
 
 
