@@ -195,39 +195,6 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 
 ---
 
-## Release to PyPI
-
-TODO
-    Test
-    Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
-
-To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
-
-```
-    indicator=indicatortest && \
-    venv=venv_build && \
-    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-    . ${venv}/bin/activate && \
-    python3 -m pip install pip twine && \
-    python3 -m twine upload --username __token__ release/wheel/dist_${indicator}/* && \
-    deactivate
-```
-
-which assumes the username `__token__` and prompts for the password (starts with `pypi-`) and uploads the `.whl` / `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
-
-References:
-- [https://twine.readthedocs.io/en/latest](https://twine.readthedocs.io/en/latest)
-
----
-
-## Install from PyPI
-
-To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the introduction above.
-
-Note that if installing over an existing install with the same version, will need to add `--force-reinstall` after `--upgrade` (which may be removed from a [future release](https://github.com/pypa/pip/issues/8238) of `pip`).
-
----
-
 ## Release to TestPyPI
 
 TODO
@@ -267,6 +234,39 @@ TODO
     deactivate && \
     $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
 ```
+
+---
+
+## Release to PyPI
+
+TODO
+    Test
+    Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
+
+To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
+
+```
+    indicator=indicatortest && \
+    venv=venv_build && \
+    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+    . ${venv}/bin/activate && \
+    python3 -m pip install pip twine && \
+    python3 -m twine upload --username __token__ release/wheel/dist_${indicator}/* && \
+    deactivate
+```
+
+which assumes the username `__token__` and prompts for the password (starts with `pypi-`) and uploads the `.whl` / `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
+
+References:
+- [https://twine.readthedocs.io/en/latest](https://twine.readthedocs.io/en/latest)
+
+---
+
+## Install from PyPI
+
+To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the introduction above.
+
+Note that if installing over an existing install with the same version, will need to add `--force-reinstall` after `--upgrade` (which may be removed from a [future release](https://github.com/pypa/pip/issues/8238) of `pip`).
 
 ---
 
