@@ -198,6 +198,8 @@ Maybe wlroots was not installed and/or Wayland on Ubuntu 20.04 is no good...
 ...I have a memory of being unable to switch to Wayland on Ubuntu 20.04
 but that could have been on the VM and not the desktop itself.
 So could check on the desktop, but also Ubuntu 22.04/24.04.
+I think possibly the issue was a Gnome bug that wl-paste/wl-copy crashes
+on Wayland Ubuntu 20.04
 
 https://github.com/CZ-NIC/run-or-raise 
 GNOME extension; maybe could be used but only works on GNOME presumably.
@@ -205,7 +207,7 @@ GNOME extension; maybe could be used but only works on GNOME presumably.
 https://github.com/ickyicky/window-calls
 GNOME extension; maybe could be used but only works on GNOME presumably.
 
-https://unix.stackexchange.com/questions/688583/focus-window-by-title-in-gnome-shell-41-under-wayland?rq=1
+https://unix.stackexchange.com/questions/688583/focus-window-by-title-in-gnome-shell-41-under-wayland
 https://github.com/lucaswerkmeister/activate-window-by-title
 
 https://wiki.python.org/moin/DbusExamples
