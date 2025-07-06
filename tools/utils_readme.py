@@ -523,10 +523,11 @@ def _get_uninstall_for_operating_system(
             "    count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && \\\n"
             "    deactivate && \\\n"
             f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
-            "    ```\n"
-            "    If no other indicators are installed, the virtual "  #TODO Could move this text to under the Uninstall
-            "environment will be deleted.\n\n" # heading (end of _get_install_uninstall()) and also mention that
-                                                # the $HOME/.config/{indicator} directory will not be removed.
+            "    ```\n\n"
+            f"    The configuration directory `$HOME/.config/{ indicator }` "
+            "will not be deleted.\n\n"
+            "    If no other indicators remain installed, the virtual "
+            "environment will be deleted.\n\n"
             "</details>\n\n" )
 
     return uninstall
