@@ -22,8 +22,6 @@
 import datetime
 import time
 
-from threading import Thread #TODO Hopefully can go.
-
 import gi
 
 gi.require_version( "Gdk", "3.0" )
@@ -290,15 +288,6 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.show_notification( _( "Error" ), message )
 
         else:
-#TODO Original
-            # self.process_run(
-            #     self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &" )
-
-            # Must be run in a thread otherwise all other actions will block.
-            command = self.get_start_command( uuid ).replace( "%VM%", uuid )
-            # Thread(
-            #     target = self.process_run,
-            #     args = ( command, ) ).start()
             self.process_run(
                 self.get_start_command( uuid ).replace( "%VM%", uuid ) + " &",
                 capture_output = False )

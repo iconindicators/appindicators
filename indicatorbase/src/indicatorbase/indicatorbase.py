@@ -3179,7 +3179,7 @@ class IndicatorBase( ABC ):
     def process_run(
         command,
         ignore_stderr_and_non_zero_return_code = False,
-        capture_output = True ): #TODO Not sure if this stays.
+        capture_output = True ):
         '''
         Executes the command, returning the tuple:
             stdout
@@ -3187,23 +3187,34 @@ class IndicatorBase( ABC ):
             return code
 
         On stderr, a non-zero return code, or exception, a log entry will be
-        made if a logger has been initialised.
+        made (where logging is available).
 
-        If ignore_stderr_and_non_zero_return_code is True and either stderr
-        or a non-zero return code results, no log entry will be made.
+        If ignore_stderr_and_non_zero_return_code is True and either stderr or
+        a non-zero return code results, no log entry will be made.
+        If ignore_stderr_and_non_zero_return_code is False and either stderr or
+        a non-zero return code results, a log entry will be made only if
+        capture_output is True.
+        On an exception, a log entry will be made.
+
+        If capture_output is True, stdout and stderr will be captured and
+        returned to the user, along with the return code.
+        On False, stdout and stderr will be set to None and returned to the user
+        along with the return code.
+        If an exception occurs, a log entry will be made.
         '''
 
         def log( command, stdout_, stderr_, return_code ):
             if IndicatorBase._LOGGING_INITIALISED:
-                IndicatorBase.get_logging().error( f"Error running: { command }" )
+#TODO Test this works
+                logging.error( f"Error running: { command }" )
                 if stdout_:
-                    IndicatorBase.get_logging().error( f"stdout: { stdout_ }" )
+                    logging.error( f"stdout: { stdout_ }" )
 
                 if stderr_:
-                    IndicatorBase.get_logging().error( f"stderr: { stderr_ }" )
+                    logging.error( f"stderr: { stderr_ }" )
 
                 if return_code != 0:
-                    IndicatorBase.get_logging().error( f"Return code: { return_code }" )
+                    logging.error( f"Return code: { return_code }" )
 
 
         try:
@@ -3213,7 +3224,7 @@ class IndicatorBase( ABC ):
                 subprocess.run(
                     command,
                     shell = True,
-                    capture_output = capture_output ) )  #TODO Not sure if the variable stays, or set back to True.
+                    capture_output = capture_output ) )
 
             if capture_output:
                 stdout_ = result.stdout.decode().strip()
@@ -3224,14 +3235,18 @@ class IndicatorBase( ABC ):
                     if stderr_ or return_code != 0:
                         log( command, stdout_, stderr_, return_code )
 
+            else:
+                stdout_ = None
+                stderr_ = None
+                return_code = result.returncode
+
         except subprocess.CalledProcessError as e:
             stdout_ = e.stdout.decode().strip()
             stderr_ = e.stderr.decode()
             return_code = e.returncode
             log( command, stdout_, stderr_, return_code )
 
-        if capture_output:
-            return stdout_, stderr_, return_code
+        return stdout_, stderr_, return_code
 
 
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):
