@@ -10,91 +10,6 @@ Otherwise just leave as is...and keep the entry in the changelog.
 What to do?
 
 
-## Update date in CHANGELOG.md
-For each indicator's CHANGELOG.md, at release time, update the release date in
-the latest entry to the date of release.
-
-
-## When indicatortest is released
-Post a note to
-  https://github.com/AyatanaIndicators/libayatana-appindicator/issues/76
-to help the guy out.
-
-
-## Update the PPA description at
-  https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
-with the following:
-
-This PPA no longer provides releases for indicators.
-Instead, for Ubuntu 20.04 and forward, all releases are made via pip (PyPI).
-
-Refer to the new URL for each indicator:
-
-indicator-fortune: https://pypi.org/project/indicatorfortune
-indicator-lunar: https://pypi.org/project/indicatorlunar
-indicator-on-this-day: https://pypi.org/project/indicatoronthisday
-indicator-ppa-download-statistics: https://pypi.org/project/indicatorppadownloadstatistics
-indicator-punycode: https://pypi.org/project/indicatorpunycode
-indicator-script-runner: https://pypi.org/project/indicatorscriptrunner
-indicator-stardate: https://pypi.org/project/indicatorstardate
-indicator-test: https://pypi.org/project/indicatortest
-indicator-tide: https://pypi.org/project/indicatortide
-indicator-virtual-box: https://pypi.org/project/indicatorvirtualbox
-
-Screenshots for the indicators can be found at https://askubuntu.com/q/30334/67335
-
-
-## For each indicator at
-  https://askubuntu.com/questions/30334/what-application-indicators-are-available?answertab=modifieddes
-update the URL at the top with the relevant URL at PyPI.
-
-Also update the indicator name (remove the hyphen from the name).
-
-  https://pypi.org/project/indicatorfortune/
-  https://pypi.org/project/indicatorlunar/
-  https://pypi.org/project/indicatoronthisday/
-  https://pypi.org/project/indicatorppadownloadstatistics/
-  https://pypi.org/project/indicatorpunycode/
-  https://pypi.org/project/indicatorscriptrunner/
-  https://pypi.org/project/indicatorstardate/
-  https://pypi.org/project/indicatortide/
-  https://pypi.org/project/indicatorvirtualbox/
-
-
-When indicators released to pypi, update description at
-  https://sourceforge.net/p/appindicators/admin/overview
-to read:
-
-Source code repository for:
- - indicatorfortune
- - indicatorlunar
- - indicatoronthisday
- - indicatorppadownloadstatistics
- - indicatorpunycode
- - indicatorscriptrunner
- - indicatorstardate
- - indicatortest
- - indicatortide
- - indicatorvirtualbox
-
-More details and screenshots:
- -  https://askubuntu.com/q/30334/67335
-
-Releases:
-- https://pypi.org/project/indicatorfortune
-- https://pypi.org/project/indicatorlunar
-- https://pypi.org/project/indicatoronthisday
-- https://pypi.org/project/indicatorppadownloadstatistics
-- https://pypi.org/project/indicatorpunycode
-- https://pypi.org/project/indicatorscriptrunner
-- https://pypi.org/project/indicatorstardate
-- https://pypi.org/project/indicatortest
-- https://pypi.org/project/indicatortide
-- https://pypi.org/project/indicatorvirtualbox
-
-
-# Long Term
-
 ## Consider Migration to GitHub
 
 I created a project on Sourceforge 
@@ -180,13 +95,99 @@ Consider renaming project to change the wrld to world?
 https://sourceforge.net/p/forge/site-support/new/
 
 
+## Update date in CHANGELOG.md
+For each indicator's CHANGELOG.md, at release time, update the release date in
+the latest entry to the date of release.
+
+
+## When indicatortest is released
+Post a note to
+  https://github.com/AyatanaIndicators/libayatana-appindicator/issues/76
+to help the guy out.
+
+
+## Update the PPA description at
+  https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
+with the following:
+
+This PPA no longer provides releases for indicators.
+Instead, for Ubuntu 20.04 and forward, all releases are made via pip (PyPI).
+
+Refer to the new URL for each indicator:
+
+indicator-fortune: https://pypi.org/project/indicatorfortune
+indicator-lunar: https://pypi.org/project/indicatorlunar
+indicator-on-this-day: https://pypi.org/project/indicatoronthisday
+indicator-ppa-download-statistics: https://pypi.org/project/indicatorppadownloadstatistics
+indicator-punycode: https://pypi.org/project/indicatorpunycode
+indicator-script-runner: https://pypi.org/project/indicatorscriptrunner
+indicator-stardate: https://pypi.org/project/indicatorstardate
+indicator-test: https://pypi.org/project/indicatortest
+indicator-tide: https://pypi.org/project/indicatortide
+indicator-virtual-box: https://pypi.org/project/indicatorvirtualbox
+
+Screenshots for the indicators can be found at https://askubuntu.com/q/30334/67335
+
+
+## For each indicator at
+  https://askubuntu.com/questions/30334/what-application-indicators-are-available?answertab=modifieddes
+update the URL at the top with the relevant URL at PyPI.
+
+Also update the indicator name (remove the hyphen from the name).
+
+  https://pypi.org/project/indicatorfortune/
+  https://pypi.org/project/indicatorlunar/
+  https://pypi.org/project/indicatoronthisday/
+  https://pypi.org/project/indicatorppadownloadstatistics/
+  https://pypi.org/project/indicatorpunycode/
+  https://pypi.org/project/indicatorscriptrunner/
+  https://pypi.org/project/indicatorstardate/
+  https://pypi.org/project/indicatortide/
+  https://pypi.org/project/indicatorvirtualbox/
+
+
+When indicators released to pypi, update description at
+  https://sourceforge.net/p/appindicators/admin/overview
+to read:
+
+Source code repository for:
+ - indicatorfortune
+ - indicatorlunar
+ - indicatoronthisday
+ - indicatorppadownloadstatistics
+ - indicatorpunycode
+ - indicatorscriptrunner
+ - indicatorstardate
+ - indicatortest
+ - indicatortide
+ - indicatorvirtualbox
+
+More details and screenshots:
+ -  https://askubuntu.com/q/30334/67335
+
+Releases:
+- https://pypi.org/project/indicatorfortune
+- https://pypi.org/project/indicatorlunar
+- https://pypi.org/project/indicatoronthisday
+- https://pypi.org/project/indicatorppadownloadstatistics
+- https://pypi.org/project/indicatorpunycode
+- https://pypi.org/project/indicatorscriptrunner
+- https://pypi.org/project/indicatorstardate
+- https://pypi.org/project/indicatortest
+- https://pypi.org/project/indicatortide
+- https://pypi.org/project/indicatorvirtualbox
+
+
+# Long Term
+
 ## Create non-symbolic icons
 Some distros/desktops do not utilise the GNOME symbolic icon mechanism.
 Determine which distros/desktops these are and if anything can be done.
 
 
 ## Replacement for wmctrl for indicatorvirtualbox on Wayland
-https://git.sr.ht/~brocellous/wlrctl is a work-in-progress wmctrl replacement.
+https://git.sr.ht/~brocellous/wlrctl
+is a work-in-progress wmctrl replacement.
 Tested wlrctl on Ubuntu 24.04 but does not work when attempting to access
 window information:
   error message: Foreign Toplevel Management interface not found!
