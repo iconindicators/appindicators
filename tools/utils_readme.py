@@ -196,14 +196,14 @@ def _get_install_uninstall(
             additional_text = (
                 f"3. Any `Python` scripts you add to `{ indicator }` may "
                 "require additional modules installed to the virtual "
-                f"environment at `{ utils.VENV_INSTALL }`.\n" )  #TODO Must be $HOME
+                f"environment at `{ utils.VENV_INSTALL }`.\n" )
 
         if _is_indicator( indicator, IndicatorName.INDICATORTIDE ):
             additional_text = (
                 "3. You will need to write a `Python` script to retrieve your "
                 "tidal data.  In addition, your `Python` script may require "
                 "additional modules installed to the virtual environment at "
-                f"`{ utils.VENV_INSTALL }`.\n" )  #TODO Must be $HOME
+                f"`{ utils.VENV_INSTALL }`.\n" )
 
         title = (
             "Installation / Updating\n"
@@ -211,7 +211,7 @@ def _get_install_uninstall(
             "Installation and updating follow the same process:\n"
             "1. Install operating system packages.\n"
             f"2. Install `{ indicator }` to a `Python3` virtual "
-            f"environment at `{ utils.VENV_INSTALL }`.\n"  #TODO Must be $HOME
+            f"environment at `{ utils.VENV_INSTALL }`.\n"
             f"{ additional_text }\n\n" )
 
     else:
@@ -434,7 +434,7 @@ def _get_installation_python_virtual_environment(
         "script, to the `Python3` virtual environment:\n"
         "    ```\n"
         f"    indicator={ indicator } && \\\n"
-        f"    venv={ utils.VENV_INSTALL } && \\\n"  #TODO Must be $HOME
+        f"    venv={ utils.VENV_INSTALL } && \\\n"
         f"    if [ ! -d ${{venv}} ]; then python3 -m venv ${{venv}}; fi && \\\n"
         f"    . ${{venv}}/bin/activate && \\\n"
         f"    python3 -m pip install --upgrade { pygobject } ${{indicator}} && \\\n"
@@ -454,7 +454,7 @@ def _get_installation_additional_python_modules(
     common = (
         "For example, to install the `requests` module:\n"
         "    ```\n"
-        f"    . { utils.VENV_INSTALL }/bin/activate && \\\n"  #TODO Must be $HOME
+        f"    . { utils.VENV_INSTALL }/bin/activate && \\\n"
         "    python3 -m pip install --upgrade requests && \\\n"
         "    deactivate\n"
         "    ```\n" )
@@ -508,7 +508,7 @@ def _get_uninstall_for_operating_system(
             "2. Uninstall the indicator from virtual environment:\n"
             "    ```\n"
             f"    indicator={ indicator } && \\\n"
-            f"    venv={ utils.VENV_INSTALL } && \\\n"  #TODO Must be $HOME
+            f"    venv={ utils.VENV_INSTALL } && \\\n"
             f"    $(ls -d ${{venv}}/lib/python3.* | head -1)/"
             f"site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n"
             f"    . ${{venv}}/bin/activate && \\\n"
