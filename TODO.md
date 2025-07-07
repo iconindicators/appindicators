@@ -93,6 +93,15 @@ Releases:
 - https://pypi.org/project/indicatorvirtualbox
 
 
+# Test on distros dropping X11 support
+If wmctrl is no longer available, will need a new entry for each distro so that
+wmctrl is not included in the install.
+  https://www.theregister.com/2025/06/12/ubuntu_2510_to_drop_x11/
+Fedora 43 is expected to drop X11; when released (Nov 2025), test!
+Ubuntu 25.10 is expected to drop X11; when released (Oct 2025), test!
+Ubuntu 26.04 is expected to drop X11; when released (Apr 2026), test!
+
+
 # Long Term
 
 ## Create non-symbolic icons
