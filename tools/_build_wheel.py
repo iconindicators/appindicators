@@ -962,8 +962,18 @@ def _package_source(
 def build_wheel(
     indicator ):
 
-    # message = _check_for_t_o_d_o_s( indicator ) #TODO Uncomment
     message = ""
+
+    # This checks for T_O_D_O_s in EVERY file, irrespective of the indicator(s)
+    # being built.
+    #
+    # Run a build with the check uncommented and if any T_O_D_O_s are reported,
+    # check they are benign or do not apply.
+    #
+    # If all is well, comment out and run the build again to generate the wheel.
+    #
+    # message = _check_for_t_o_d_o_s( indicator )
+
     if not message:
         directory_dist = (
             Path( '.' ) /
