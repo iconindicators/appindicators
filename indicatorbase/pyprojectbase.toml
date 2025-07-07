@@ -27,8 +27,15 @@ classifiers = [
   "Operating System :: POSIX :: Linux",
   "Programming Language :: Python :: 3.8" ]
 
-[project.urls]
-homepage = "https://appindicators.sourceforge.io"  #TODO This page/repository was deleted by SourceForge because I had not submitted code/releases.  Maybe think about Github instead (and even migrate Stardate System Tray and World Time System Tray too).  https://sourceforge.net/p/forge/site-support/26844/
+#TODO The repository URL below was deleted by SourceForge because I had not
+# uploaded code nor done a release.
+# https://sourceforge.net/p/forge/site-support/26844/
+# Despite the URL being reinstated, this is a concern.
+# For now, do not include a project URL.
+# In the future could use Github or Gitlab, including migrating both
+# Stardate System Tray and World Time System Tray.
+#[project.urls]
+#homepage = "https://appindicators.sourceforge.io"
 
 [tool.setuptools.packages.find]
 where = [ "src" ]
