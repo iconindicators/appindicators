@@ -25,6 +25,12 @@ References:
     https://stackoverflow.com/q/60779139/2156453
 '''
 
+
+#TODO Look at a new distro that is dropping X11 support.
+# Is wmctrl still available for install?
+# If not, need a new entry for this distro so that wmctrl is not included in the install.
+
+
 #TODO Consider testing on Fedora 42.
 
 
@@ -712,6 +718,12 @@ def _get_operating_system_dependencies_opensuse(
         "python3-devel",
         "typelib-1_0-AyatanaAppIndicator3-0_1" ]
 
+#TODO Do
+#   wl-clipboard
+#   wmctrl
+# need to be added for fortune/onthisday/punycode/test?
+# Cannot figure out what the default packages are for openSUSE Tumbleweed.
+
     if indicator == IndicatorName.INDICATORFORTUNE:
         dependencies.append( "fortune" )
 
@@ -857,12 +869,6 @@ def _get_limitations(
         IndicatorName.INDICATORONTHISDAY ):
         messages.append(
             "- `Manjaro 24`: No autostart.\n" )
-
-
-#TODO Is wl-clipboard needed for openSUSE?
-#
-# Not sure why I wrote the above...I guess check all distros under Wayland!
-
 
     message = ""
     if messages:
