@@ -155,30 +155,42 @@ def _create_ephemeris_stars(
 
 
 def build( out_path ):
-    ''' Called by the build wheel process. '''
-    if True: return "" #TODO Remove this line if including astroskyfield et al.
+    '''
+    Called by the build wheel process to build planets.bsp and stars.dat for use
+    by astroskyfield.
 
-    # The package numpy, which is used by
-    #   skyfield to create stars.dat
-    #   jplephem to create planets.bsp
-    # will not install on 32 bit.
-    #
-    # Skip the build (of planets.bsp/stars.dat) and return an empty message
-    # so that the build wheel process continues.
-    #
-    # However, emit a warning to the console!
+    Only do the build if astroskyfield is part of the release; otherwise skip.
+
+    Further, the build will only work on 64 bit (based on current understanding)
+    because the package numpy, which is used by
+        skyfield to create stars.dat
+        jplephem to create planets.bsp
+    will not install on 32 bit.
+
+    When running on 32 bit, skip building planets.bsp / stars.dat and return
+    an empty message so that the build wheel process continues.
+    However, emit a warning to the console!
+    '''
+
+    manifest_specific_dot_in = (
+        Path.cwd() / "indicatorlunar" / "MANIFESTspecific.in" )        
+
+    with open( manifest_specific_dot_in, 'r' ) as f:
+        content = f.read()
+
     message = ""
-    if not indicatorbase.IndicatorBase.is_64_bit_or_more():
-        data_path = Path( out_path ) / "data"
-        message = _initialise()
-        if not message:
-            message = _create_ephemeris_planets( data_path )
+    if "exclude src/indicatorlunar/astroskyfield.py" not in content:
+        if indicatorbase.IndicatorBase.is_64_bit_or_more():
+            data_path = Path( out_path ) / "data"
+            message = _initialise()
             if not message:
-                message = _create_ephemeris_stars( data_path )
+                message = _create_ephemeris_planets( data_path )
+                if not message:
+                    message = _create_ephemeris_stars( data_path )
 
-    else:
-        print(
-            "\n\nWARNING: THIS IS A 32 BIT OPERATING SYSTEM,\n"
-            "NEITHER PLANETS.BSP NOR STARS.DAT HAVE BEEN BUILT!\n\n" )
+        else:
+            print(
+                "\n\nWARNING: THIS IS A 32 BIT OPERATING SYSTEM,\n"
+                "NEITHER PLANETS.BSP NOR STARS.DAT HAVE BEEN BUILT!\n\n" )
 
     return message
