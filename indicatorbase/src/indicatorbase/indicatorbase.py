@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Go to sourceforget appindicator page and grab the summary dot points.
+
+
 '''
 Base class for application indicators.
 
@@ -228,7 +231,13 @@ class IndicatorBase( ABC ):
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
 
-        project_url = project_metadata.get_all( "Project-URL" )[ 0 ]
+#TODO Now that 
+#   [project.urls]
+#   homepage = "https://appindicators.sourceforge.io"
+# is commented out in pyprojectbase.toml
+# there is no project_url...so what to do?
+#        project_url = project_metadata.get_all( "Project-URL" )[ 0 ]
+        project_url = "homepage, http://www.fixme.com"
         self.website = project_url.split( ',' )[ 1 ].strip()
 
         self.play_sound_complete_command = (
