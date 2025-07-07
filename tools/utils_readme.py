@@ -29,6 +29,10 @@ References:
 #TODO Look at a new distro that is dropping X11 support.
 # Is wmctrl still available for install?
 # If not, need a new entry for this distro so that wmctrl is not included in the install.
+#   https://www.theregister.com/2025/06/12/ubuntu_2510_to_drop_x11/
+# Fedora 43 is expected to drop X11; when released (Nov 2025), test!
+# Ubuntu 25.10 is expected to drop X11; when released (Oct 2025), test!
+# Ubuntu 26.04 is expected to drop X11; when released (Apr 2026), test!
 
 
 #TODO Consider testing on Fedora 42.
