@@ -231,7 +231,7 @@ class IndicatorBase( ABC ):
         self.authors_and_emails = self.get_authors_emails( project_metadata )
         self.version = project_metadata[ "Version" ]
 
-#TODO Now that 
+#TODO Now that
 #   [project.urls]
 #   homepage = "https://appindicators.sourceforge.io"
 # is commented out in pyprojectbase.toml
@@ -470,65 +470,70 @@ class IndicatorBase( ABC ):
 
 
 #TODO This function is too long...
+#TODO Rename to _cleanup_existing...
     def _process_existing_dot_desktop_file_to_home_config_autostart(
         self,
         desktop_file_virtual_environment ):
+        '''
+        The .desktop may be an older version with
+            - an Exec without a sleep
+            - obsolete tags (such as X-GNOME-Autostart-Delay)
 
-        # The .desktop may be an older version with an Exec without a sleep,
-        # or tags no longer used such as X-GNOME-Autostart-Delay.
-        # Comment out unused tags and get the delay if present.
+        Comment out obsolete tags and retrieve the delay (if present).
+#TODO COmment here why we are getting the delay...
+        '''
+        with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
+            lines = f.readlines()
+
         output = ""
         delay = ""
         autostart_enabled_present = False
         exec_with_sleep_present = False
         terminal_present = False
         made_a_change = False
-        with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
-            for line in f:
-                starts_with_autostart_enabled = (
-                    line.startswith(
-                        IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ) )
+        for line in lines:
+            starts_with_autostart_enabled = (
+                line.startswith(
+                    IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ) )
 
-                starts_with_autostart_delay = (
-                    line.startswith(
-                        IndicatorBase._DOT_DESKTOP_AUTOSTART_DELAY + '=' ) )
+            starts_with_autostart_delay = (
+                line.startswith(
+                    IndicatorBase._DOT_DESKTOP_AUTOSTART_DELAY + '=' ) )
 
-                starts_with_desktop_exec = (
-                    line.startswith(
-                        IndicatorBase._DOT_DESKTOP_EXEC + '=' ) )
+            starts_with_desktop_exec = (
+                line.startswith( IndicatorBase._DOT_DESKTOP_EXEC + '=' ) )
 
-                starts_with_desktop_terminal = (
-                    line.startswith(
-                        IndicatorBase._DOT_DESKTOP_TERMINAL + '=' ) )
+            starts_with_desktop_terminal = (
+                line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL + '=' ) )
 
-                if starts_with_autostart_enabled:
+            if starts_with_autostart_enabled:
+                output += line
+                autostart_enabled_present = True
+
+            elif starts_with_autostart_delay:
+                # Does not work in Debian et al.
+                # Capture the delay and comment out the line.
+                delay = line.split( '=' )[ 1 ].strip()
+                output += '#' + line
+                made_a_change = True
+
+            elif starts_with_desktop_exec:
+                if "sleep" in line:
+                    # Assume to be part of the install and not user created.
                     output += line
-                    autostart_enabled_present = True
+                    exec_with_sleep_present = True
 
-                elif starts_with_autostart_delay:
-                    # Does not work in Debian et al.
-                    # Capture the delay and comment out the line.
-                    delay = line.split( '=' )[ 1 ].strip()
+                else:
+                    # Comment out and eventually replace with sleep version.
                     output += '#' + line
                     made_a_change = True
 
-                elif starts_with_desktop_exec:
-                    if "sleep" in line:
-                        # Assume to be part of the install and not user created.
-                        output += line
-                        exec_with_sleep_present = True
+            elif starts_with_desktop_terminal:
+                output += line
+                terminal_present = True
 
-                    else:
-                        # Comment out and eventually replace with sleep version.
-                        output += '#' + line
-                        made_a_change = True
-
-                elif starts_with_desktop_terminal:
-                    output += line
-                    terminal_present = True
-
-                else:
-                    output += line
+            else:
+                output += line  #TODO Is this adding blank lines?
 
         tags_missing = (
             not autostart_enabled_present
@@ -538,14 +543,22 @@ class IndicatorBase( ABC ):
             not terminal_present )
 
         if tags_missing:
-            # Extract the Exec (with sleep) line and X-GNOME-Autostart-enabled
-            # line from the original .desktop file (production or development).
-#TODO Why both with development?
-# This function only runs on released versions to handle old .desktop files, right?
+            # From the .desktop file (install or development), extract the
+            #    Exec (with sleep)
+            #    X-GNOME-Autostart-enabled
+            # and write into the .desktop in $HOME/.config/autostart
+#TODO Is the stuff below computed in the calling function?
+# If so, pass it in to this function.
             if desktop_file_virtual_environment.exists():
                 desktop_file_original = desktop_file_virtual_environment
 
             else:
+                print( 111 )
+                print( Path( __file__ ) )
+                print( Path( __file__ ).parent )
+                print( 222 )
+                #TODO This is the wrong path.
+                # Make sure it works under eclipse/geany but also when running in a terminal from source.
                 desktop_file_original = (
                     Path( __file__ ).parent /
                     "platform" /
@@ -553,26 +566,34 @@ class IndicatorBase( ABC ):
                     "indicatorbase.py.desktop" )
 
             with open( desktop_file_original, 'r', encoding = "utf-8" ) as f:
-                for line in f:
-                    if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
-                        if not autostart_enabled_present:
-                            output += line
-                            made_a_change = True
+                lines = f.readlines()
 
-                    elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
-                        if not exec_with_sleep_present:
-                            if delay:
-                                output += line.replace( "{indicator}", self.indicator_name ).replace( '0', delay )
-
-                            else:
-                                output += line.replace( "{indicator}", self.indicator_name )
-
+            for line in lines:
+                if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
+                    if not autostart_enabled_present:
+                        output += line
                         made_a_change = True
 
-                    elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL ):
-                        if not terminal_present:
-                            output += line
-                            made_a_change = True
+                elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
+                    if not exec_with_sleep_present:
+                        line_ = line.replace( "{indicator}", self.indicator_name )
+                        if delay:
+                            output += line_.replace( '0', delay )
+#TODO I think the above two lines replace the if/else below:
+                        '''
+                        if delay:
+                            output += line.replace( "{indicator}", self.indicator_name ).replace( '0', delay )
+
+                        else:
+                            output += line.replace( "{indicator}", self.indicator_name )
+                        '''
+
+                    made_a_change = True #TODO I think this needs one level of indent.
+
+                elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL ):
+                    if not terminal_present:
+                        output += line
+                        made_a_change = True
 
         if made_a_change:
             with open( self.desktop_file_user_home, 'w', encoding = "utf-8" ) as f:
@@ -584,9 +605,13 @@ class IndicatorBase( ABC ):
         desktop_file_virtual_environment,
         desktop_file ):
         '''
-        The .desktop file is not present in $HOME/.config/autostart
-        so copy from the virtual environment (when running in production)
-        or a .whl from the release directory (when running in development).
+        Copy the .desktop file from
+            $HOME/.local/venv_indicators (when running in production)
+        or
+            a .whl from the release directory (when running in development)
+        to $HOME/.config/autostart
+
+        On success, returns None; otherwise returns an error message.
         '''
         if desktop_file_virtual_environment.exists():
             shutil.copy(

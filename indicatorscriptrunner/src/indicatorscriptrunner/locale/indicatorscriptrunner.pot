@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorscriptrunner 1.0.25\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-04 16:07+1000\n"
+"POT-Creation-Date: 2025-07-07 21:15+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,33 +15,33 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicatorscriptrunner.py:47
+#: indicatorscriptrunner.py:45
 msgid "Indicator Script Runner"
 msgstr ""
 
-#: indicatorscriptrunner.py:110
+#: indicatorscriptrunner.py:108
 msgid ""
 "Runs a terminal command or script;\n"
 "optionally display results in the icon label."
 msgstr ""
 
-#: indicatorscriptrunner.py:209
+#: indicatorscriptrunner.py:207
 msgid "Cannot run script"
 msgstr ""
 
-#: indicatorscriptrunner.py:212
+#: indicatorscriptrunner.py:210
 msgid ""
 "Cannot run script as no terminal and/or terminal execution flag found; "
 "please install gnome-terminal."
 msgstr ""
 
-#: indicatorscriptrunner.py:226
+#: indicatorscriptrunner.py:224
 msgid ""
 "Cannot run script as qterminal incorrectly parses arguments; install gnome-"
 "terminal instead."
 msgstr ""
 
-#: indicatorscriptrunner.py:241
+#: indicatorscriptrunner.py:239
 msgid "...has completed."
 msgstr ""
 

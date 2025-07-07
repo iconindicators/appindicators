@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorbase 1.0.1\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-06 12:54+1000\n"
+"POT-Creation-Date: 2025-07-07 20:58+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,88 +15,88 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicatorbase.py:257
+#: indicatorbase.py:266
 msgid "Initialising..."
 msgstr ""
 
-#: indicatorbase.py:302
+#: indicatorbase.py:311
 msgid "Refer to the Preferences for details."
 msgstr ""
 
-#: indicatorbase.py:304
+#: indicatorbase.py:313
 #, python-brace-format
 msgid "New version of {0} available..."
 msgstr ""
 
-#: indicatorbase.py:760 indicatorbase.py:1085
+#: indicatorbase.py:769 indicatorbase.py:1094
 msgid "Preferences"
 msgstr ""
 
-#: indicatorbase.py:760
+#: indicatorbase.py:769
 msgid "About"
 msgstr ""
 
-#: indicatorbase.py:760
+#: indicatorbase.py:769
 msgid "Quit"
 msgstr ""
 
-#: indicatorbase.py:1014
+#: indicatorbase.py:1023
 msgid "translator-credits"
 msgstr ""
 
-#: indicatorbase.py:1020
+#: indicatorbase.py:1029
 msgid "Credits"
 msgstr ""
 
-#: indicatorbase.py:1025 indicatorbase.py:1034
+#: indicatorbase.py:1034 indicatorbase.py:1043
 msgid "View the"
 msgstr ""
 
-#: indicatorbase.py:1026
+#: indicatorbase.py:1035
 msgid "changelog"
 msgstr ""
 
-#: indicatorbase.py:1027 indicatorbase.py:1036
+#: indicatorbase.py:1036 indicatorbase.py:1045
 msgid "text file."
 msgstr ""
 
-#: indicatorbase.py:1035
+#: indicatorbase.py:1044
 msgid "error log"
 msgstr ""
 
-#: indicatorbase.py:1453
+#: indicatorbase.py:1462
 msgid "Autostart"
 msgstr ""
 
-#: indicatorbase.py:1454
+#: indicatorbase.py:1463
 msgid "Run the indicator automatically."
 msgstr ""
 
-#: indicatorbase.py:1462
+#: indicatorbase.py:1471
 msgid "Start up delay (seconds)."
 msgstr ""
 
-#: indicatorbase.py:1480
+#: indicatorbase.py:1489
 msgid "Check Latest Version"
 msgstr ""
 
-#: indicatorbase.py:1482
+#: indicatorbase.py:1491
 msgid "Check for the latest version of the indicator on start up."
 msgstr ""
 
-#: indicatorbase.py:1495
+#: indicatorbase.py:1504
 #, python-brace-format
 msgid "An update is available at <a href=\"{0}\">{1}</a>."
 msgstr ""
 
-#: indicatorbase.py:2254
+#: indicatorbase.py:2263
 msgid "Enabled"
 msgstr ""
 
-#: indicatorbase.py:2285
+#: indicatorbase.py:2294
 msgid "Add"
 msgstr ""
 
-#: indicatorbase.py:2286
+#: indicatorbase.py:2295
 msgid "Remove"
 msgstr ""
