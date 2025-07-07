@@ -723,7 +723,16 @@ def _get_operating_system_dependencies_opensuse(
 #   wmctrl
 # need to be added for fortune/onthisday/punycode/test?
 # Cannot figure out what the default packages are for openSUSE Tumbleweed.
-
+#   https://www.reddit.com/r/openSUSE/comments/1g3hwv2/how_do_i_list_explicitly_installed_packages_on/
+#   https://forums.opensuse.org/t/list-all-applications-installed-after-tumbleweed-os-install/140404/7
+#   https://www.cyberciti.biz/faq/list-all-installed-packages-on-opensuse-suse-linux/
+#
+# According to 
+#   zypper packages --userinstalled
+# and 
+#   zypper packages --autoinstalled
+# seems that wmctrl is autoinstalled whereas wl-clipboard is userinstalled...
+# so need to add wl-clipboard!
     if indicator == IndicatorName.INDICATORFORTUNE:
         dependencies.append( "fortune" )
 
