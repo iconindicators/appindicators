@@ -249,7 +249,8 @@ Reading
     https://setuptools.pypa.io/en/latest/userguide/datafiles.html#accessing-data-files-at-runtime
 it appears that data files which are part of the installation should be accessed
 via importlib.resources which is available since Python 3.10.
-Would only apply to locale and stars.dat / planets.bsp (for astroskyfield).
+Applies to locale (which works fine as is) and stars.dat / planets.bsp for
+astroskyfield.
 Consider this once Ubuntu 20.04 / Debian 11 (et al) are no longer supported.
 
 
