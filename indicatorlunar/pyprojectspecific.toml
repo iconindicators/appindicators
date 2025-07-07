@@ -6,15 +6,6 @@ version = "1.0.101"
 description = "Application indicator for the home astronomer."
 classifiers = [
   "Topic :: Scientific/Engineering :: Astronomy" ]
-#TODO If/when Skyfield is released, remove ephem from the dependencies below,
-# leaving only sgp4.
-#
-# In the Python PyPI install instructions, either ephem or skyfield
-# (with pandas/numpy) will be installed by checking (using bash trickery)
-# if 32 bit or 64 bit respectively.
-#
-# For Skyfield, specify pandas in the pip install instructions
-# (used by minor planets / comets).
 dependencies = [
   "ephem",
   "sgp4" ]

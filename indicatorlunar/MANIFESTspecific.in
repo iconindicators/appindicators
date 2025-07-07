@@ -1,9 +1,3 @@
-#TODO If astroskyfield is to be released:
-#   Remove the "exclude src/indicatorlunar/astroskyfield.py"
-#   Uncomment the includes for planets.bsp / stars.dat 
-#include src/indicatorlunar/data/planets.bsp
-#include src/indicatorlunar/data/stars.dat
-
 exclude src/indicatorlunar/astroskyfield.py
 exclude src/indicatorlunar/meteorshowertest.py
 

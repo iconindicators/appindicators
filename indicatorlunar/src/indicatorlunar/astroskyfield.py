@@ -103,6 +103,25 @@
 #TODO If astropyephem is dropped, remove from POTFILES.in
 
 
+#TODO If astroskyfield is released:
+# In MANIFESTspecific.in
+#     Remove the line
+#         exclude src/indicatorlunar/astroskyfield.py
+#     Add the lines 
+#         include src/indicatorlunar/data/planets.bsp
+#         include src/indicatorlunar/data/stars.dat
+#
+# In pyprojectspecific.toml
+#     Remove ephem from the dependencies, leaving only sgp4
+#
+# In the Python PyPI pip install instructions, using some bash trickery to
+# determine if 32 bit or 64 bit.
+# Can then either install
+#   ephem
+# or
+#   skyfield pandas
+
+
 #TODO Might be able to use new OMM method to load satellite data:
 #   https://github.com/skyfielders/python-skyfield/commit/9d4087bb2b8515b6441362fddff8bfe83142de6b
 

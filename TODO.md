@@ -296,3 +296,7 @@ Takes a Python project and converts to .deb/.rpm
 Does not yet support pyproject.toml
 
 Where to distribute the .deb/.rpm?  Does Sourceforge or Github allow this?
+
+
+# Consider add meteor shower information to indicatorlunar
+Already have some elementary code: meteorshower.py
