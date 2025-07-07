@@ -25,13 +25,6 @@ References:
     https://stackoverflow.com/q/60779139/2156453
 '''
 
-#TODO For indicatorlunar...
-# See astroskyfield.py for how to determine 32 bit versus 64 bit
-# and using that here to create extra couple of lines in the Python3 install
-# section to determine if 32 or 64 bit and then adjusting the install line
-# to include either ephem (32 bit) or skyfield (64 bit).
-
-
 #TODO Consider testing on Fedora 42.
 
 
