@@ -744,23 +744,6 @@ def _get_limitations(
 
     messages = [ ]
 
-#TODO I think this is no longer the case but test on all distros...
-    if _is_indicator(
-        indicator,
-        IndicatorName.INDICATORPUNYCODE ):
-        messages.append(
-            "- `Wayland`: Clipboard/Primary input and output function "
-            "intermittently at best; effectively unsupported.\n" )
-
-#TODO I think this is no longer the case but test on all distros...
-    if _is_indicator(
-        indicator,
-        IndicatorName.INDICATORFORTUNE,
-        IndicatorName.INDICATORONTHISDAY,
-        IndicatorName.INDICATORTEST ):
-        messages.append(
-            "- `Wayland`: Clipboard copy/paste is unsupported.\n" )
-
     if _is_indicator(
         indicator,
         IndicatorName.INDICATORTEST,
