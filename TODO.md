@@ -10,93 +10,6 @@ Otherwise just leave as is...and keep the entry in the changelog.
 What to do?
 
 
-## Consider Migration to GitHub
-
-I created a project on Sourceforge 
-    https://sourceforge.net/projects/appindicators/
-which was deleted because I had not (yet) added source code nor done a release.
-    https://sourceforge.net/p/forge/site-support/26844/
-The project was reinstated, but perhaps the indicators (source code) should
-be put onto GitHub instead (or somewhere else).
-If that is the case, also consider moving Stardate System Tray and World Time System Tray.
-
-Could also move to https://gitlab.freedesktop.org
-
-#### How to create a GitHub page for the project
-Create Github page, but unaffiliated with my username.
-This should be an organisation:
-    https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/creating-a-new-organization-from-scratch
-Call it perhaps appindicators and the repository appindicators.
-See more discussion below in stardatesystemtray/worldtimesystemtray.
-Check if appindicators is trade marked.
-If possible, put in a placeholder README saying this page will hold the source at some point.
-Can then add the URL to the pyproject.toml so it appears at PyPI.
-
-##### Importing an existing repository into git/github
-Include the history?
-http://esr.ibiblio.org/?p=6778
-http://www.catb.org/~esr/reposurgeon/repository-editing.html#conversion
-https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
-https://stackoverflow.com/questions/22931404/import-svn-repo-to-git-without-history
-https://stackoverflow.com/questions/43362551/import-svn-folder-structure-to-git-repo-without-history-users
-https://stackoverflow.com/questions/747075/how-to-git-svn-clone-the-last-n-revisions-from-a-subversion-repository
-https://stackoverflow.com/questions/79165/how-do-i-migrate-an-svn-repository-with-history-to-a-new-git-repository
-https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
-https://git-scm.com/docs/git-svn
-https://stackoverflow.com/questions/6695783/import-subversion-repository-into-git
-
-##### What about stardatesystemtray and worldtimesystemtray?
-Should these two projects also be under git/github?
-Perhaps the github organisation could be called indicators or icon-indicators or indicator-icons.
-For the Linux appindicators, call that repository appindicators or python-appindicators.
-For Windows stardatesystemtray and worldtimesystemtray, call the repository perhaps java-system-tray-icons.
-Need to look into what version of Java and/or Windows to support.
-Windows XP is no longer supported and neither is Java 6.
-So maybe look at supporting only Windows 10/11 (check for the EOL dates),
-along with the versions of Java supported for those versions of Windows.
-Consider also one or more versions prior to Windows 10 and whatever version of Java was last supported.
-
-Windows EOL
-	Vista 2017
-	7 2020
-	8 2016
-	8.1 2023
-	10 2025
-	11 ...?
-	
-Java EOL
-	1.6 2013
-	1.7 2015
-	8 2019...2026
-	9 2018
-	10 2018
-	11 2019...2027
-	12 2019
-	13 2020
-	14 2020
-	15 2021
-	16 2021
-	17 2024...2027
-	18 2022
-	19 2023
-	20 2023
-	21 2028...2029
-	22 2024
-	23 2025
-	24 2025
-	25 2030
-
-Downloaded Java for Windows 11; was recommended by the Oracle website to download Java 8.
-Installed Java 8.
-Installed Stardate System Tray.
-Installed World Time System Tray.
-Both work!
-Check if built for Java 6 or Java 8 or Java 11 and update each page's description.
-
-Consider renaming project to change the wrld to world?
-https://sourceforge.net/p/forge/site-support/new/
-
-
 ## Update date in CHANGELOG.md
 For each indicator's CHANGELOG.md, at release time, update the release date in
 the latest entry to the date of release.
@@ -213,6 +126,122 @@ https://github.com/lucaswerkmeister/activate-window-by-title
 https://wiki.python.org/moin/DbusExamples
 
 https://unix.stackexchange.com/questions/702236/how-to-list-all-object-paths-under-a-dbus-service-only-usign-dbus-command-line-u
+
+
+## Release astroskyfield for indicatorlunar
+
+There is still some work to be done to clean up and finalise astroskyfield
+in regards to satellites, comets, and minor planets.  For the most part,
+astroskyfield could be released as it runs accurately and fast enough on a good
+system.
+
+However, on the 32 bit laptop running Debian 12, I was unable to install both
+numpy and pandas, both required for skyfield.  I was able to achieve this on a
+virtual machine running 32 bit Debian 12 on a physical 64 bit host, so I don't
+know if there was a specific issue with the laptop installation or somehow
+the virtual machine installation seemed to be treated as 64 bit or something
+else again.
+
+When installing on the laptop I even pinned the versions of pandas/numpy back to
+quite old levels in an attempt to install what should be a 32 bit equivalent,
+but that didn't work.
+
+Until installing pandas/numpy on 32 bit is resolved and given astroskyfield
+still needs tidying up, defer the release of astroskyfield for now.
+
+One option is to clean up astroskyfield for release but release both
+astroskyfield and astropyphem.  The Python pip install instructions will have
+to include a bash command to determine if 32 bit (so install ephem) or 64 bit  
+(so install skyfield and pandas/numpy).  In indicatorlunar, internally switch
+between astropyephem and astroskyfield if on 32 bit or 64 bit respectively.
+
+
+## Consider Migration to GitHub
+
+I created a project on Sourceforge 
+    https://sourceforge.net/projects/appindicators/
+which was deleted because I had not (yet) added source code nor done a release.
+    https://sourceforge.net/p/forge/site-support/26844/
+The project was reinstated, but perhaps the indicators (source code) should
+be put onto GitHub instead (or somewhere else).
+If that is the case, also consider moving Stardate System Tray and
+World Time System Tray.
+
+Could also move to https://gitlab.freedesktop.org
+
+#### How to create a GitHub page for the project
+Create Github page, but unaffiliated with my username.
+This should be an organisation:
+    https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/creating-a-new-organization-from-scratch
+Call it perhaps appindicators and the repository appindicators.
+See more discussion below in stardatesystemtray/worldtimesystemtray.
+Check if appindicators is trade marked.
+If possible, put in a placeholder README saying this page will hold the source at some point.
+Can then add the URL to the pyproject.toml so it appears at PyPI.
+
+##### Importing an existing repository into git/github
+Include the history?
+http://esr.ibiblio.org/?p=6778
+http://www.catb.org/~esr/reposurgeon/repository-editing.html#conversion
+https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
+https://stackoverflow.com/questions/22931404/import-svn-repo-to-git-without-history
+https://stackoverflow.com/questions/43362551/import-svn-folder-structure-to-git-repo-without-history-users
+https://stackoverflow.com/questions/747075/how-to-git-svn-clone-the-last-n-revisions-from-a-subversion-repository
+https://stackoverflow.com/questions/79165/how-do-i-migrate-an-svn-repository-with-history-to-a-new-git-repository
+https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
+https://git-scm.com/docs/git-svn
+https://stackoverflow.com/questions/6695783/import-subversion-repository-into-git
+
+##### What about stardatesystemtray and worldtimesystemtray?
+Should these two projects also be under git/github?
+Perhaps the github organisation could be called indicators or icon-indicators or indicator-icons.
+For the Linux appindicators, call that repository appindicators or python-appindicators.
+For Windows stardatesystemtray and worldtimesystemtray, call the repository perhaps java-system-tray-icons.
+Need to look into what version of Java and/or Windows to support.
+Windows XP is no longer supported and neither is Java 6.
+So maybe look at supporting only Windows 10/11 (check for the EOL dates),
+along with the versions of Java supported for those versions of Windows.
+Consider also one or more versions prior to Windows 10 and whatever version of Java was last supported.
+
+Windows EOL
+	Vista 2017
+	7 2020
+	8 2016
+	8.1 2023
+	10 2025
+	11 ...?
+	
+Java EOL
+	1.6 2013
+	1.7 2015
+	8 2019...2026
+	9 2018
+	10 2018
+	11 2019...2027
+	12 2019
+	13 2020
+	14 2020
+	15 2021
+	16 2021
+	17 2024...2027
+	18 2022
+	19 2023
+	20 2023
+	21 2028...2029
+	22 2024
+	23 2025
+	24 2025
+	25 2030
+
+Downloaded Java for Windows 11; was recommended by the Oracle website to download Java 8.
+Installed Java 8.
+Installed Stardate System Tray.
+Installed World Time System Tray.
+Both work!
+Check if built for Java 6 or Java 8 or Java 11 and update each page's description.
+
+Consider renaming project to change the wrld to world?
+https://sourceforge.net/p/forge/site-support/new/
 
 
 ## Access Data at Runtime
