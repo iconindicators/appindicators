@@ -10,12 +10,9 @@ authors = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
 maintainers = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
-#TODO Does not build on Ubuntu 20.04;
-# for an actual release to upload to PyPI,
-# must uncomment and build on Debian 12+ (laptop is fine) or Ubuntu 22.04+
-#
-#TODO Build a wheel on the laptop and
-# see if that wheel will install on Ubuntu 20.04
+#TODO The license line below is unsupported on Ubuntu 20.04.
+# When building for a release to PyPI / TestPyPI,
+# uncomment the license line and build on Ubuntu 22.04+
 #license = "GPL-3.0-or-later"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -27,8 +24,8 @@ classifiers = [
   "Operating System :: POSIX :: Linux",
   "Programming Language :: Python :: 3.8" ]
 
-#TODO The repository URL below was deleted by SourceForge because I had not
-# uploaded code nor done a release.
+#TODO The repository URL specified below was deleted by SourceForge
+# because I had not uploaded code nor done a release.
 # https://sourceforge.net/p/forge/site-support/26844/
 # Despite the URL being reinstated, this is a concern.
 # For now, do not include a project URL.
