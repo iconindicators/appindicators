@@ -282,6 +282,13 @@ Additional indicators may be appended to the above command.
 
 ## Pylint
 
+
+TODO
+	Ideally use from pypi/pip rather than the OS version.
+	So not sure if a script should be written or what...
+    https://pypi.org/project/pylint/
+
+
 In a terminal, one directory **above** the source tree root (assumed to the directory `Indicators`):
 
 ```
