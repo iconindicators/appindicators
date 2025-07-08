@@ -210,6 +210,10 @@ class IndicatorBase( ABC ):
 # If moved to in Preferences (or wherever),
 # what happens if we get an error message?
 # Error message should only ever happen in dev.
+#
+# I suppose instead of returning an error message, just log the message and
+# carry on?  On error this means could not extract the .desktop file from the
+# .whl in the release directory whilst running under dev.
         error_message = self._initialise_desktop_file_in_user_home()
         if error_message:
             self._show_message_and_exit( error_message )
@@ -464,6 +468,9 @@ class IndicatorBase( ABC ):
         self.desktop_file_home_config_autostart = (
             home_config_autostart / desktop_file )
 
+#TODO This will resolve to a non-existant path/file when running under dev.
+# Either document that this is expected and is okay, or change the logic and/or
+# variable naming to make things explicit!
         desktop_file_production = (
             Path( __file__ ).parent / "platform" / "linux" / desktop_file )
 
