@@ -476,26 +476,6 @@ class IndicatorBase( ABC ):
 
         print( f"self.desktop_file_home_config_autostart {self.desktop_file_home_config_autostart}" ) #TODO
 
-        '''
-        if desktop file in home config autostart exists:
-            if desktop file in venv_indicators exists:
-                read desktop file
-
-            else:
-                read desktop file from wheel
-
-            upgrade home config autostart desktop file using read desktop file
-
-        else:
-            if desktop file in venv_indicators exists:
-                get desktop file
-
-            else:
-                get desktop file from wheel
-
-            copy desktop file to home config autostart
-        '''
-
         desktop_file_production = (
             Path( __file__ ).parent / "platform" / "linux" / desktop_file )
 
@@ -503,7 +483,9 @@ class IndicatorBase( ABC ):
 
         message = ""
         if self.desktop_file_home_config_autostart.exists():
+            print( "upgrade .desktop" ) #TODO
             if desktop_file_production.exists():
+                print( "Upgrade from production" ) #TODO
                 self._upgrade_desktop_file(
                     self.read_text_file( desktop_file_production ) )
 
@@ -514,22 +496,24 @@ class IndicatorBase( ABC ):
                         temporary_desktop_file.name ) )
 
                 if not message:
+                    print( "Upgrade from wheel" ) #TODO
                     self._upgrade_desktop_file(
                         self.read_text_file( temporary_desktop_file.name ) )
 
         else:
             if desktop_file_production.exists():
+                print( "copy .desktop from production" ) #TODO
                 shutil.copy(
                     desktop_file_production,
                     self.desktop_file_home_config_autostart )
 
             else:
+                print( "copy .desktop from release whl" ) #TODO
                 message = (
                     self._extract_desktop_file_from_wheel(
                         self.desktop_file_home_config_autostart ) )
 
         return message
-
 
 
 # Locate the .desktop file in either
@@ -574,6 +558,13 @@ class IndicatorBase( ABC ):
 
         Comment out obsolete tags, add missing tags and retrieve the delay.
         '''
+
+#TODO Testing
+        print( "_upgrade_desktop_file" )
+        return
+
+
+
         output = ""
         delay = ""
         autostart_enabled_present = False
