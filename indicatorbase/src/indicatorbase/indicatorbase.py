@@ -454,48 +454,45 @@ class IndicatorBase( ABC ):
         If the .desktop file is not present in $HOME/.config/autostart
         copy from $HOME/.local (production) or from source (development).
         '''
-        autostart_path = Path.home() / ".config" / "autostart"
-        autostart_path.mkdir( parents = True, exist_ok = True )
-        print( f"autostart_path {autostart_path}" ) #TODO
+        config_autostart = Path.home() / ".config" / "autostart"
+        config_autostart.mkdir( parents = True, exist_ok = True )
+        print( f"config_autostart {config_autostart}" ) #TODO
 
         desktop_file = self.indicator_name + ".py.desktop"
         print( f"desktop_file {desktop_file}" ) #TODO
 
-        self.desktop_file_user_home_config_autostart = (
-            autostart_path / desktop_file )
-        print( f"self.desktop_file_user_home_config_autostart {self.desktop_file_user_home_config_autostart}" ) #TODO
+        self.desktop_file_config_autostart = config_autostart / desktop_file
+        print( f"self.desktop_file_config_autostart {self.desktop_file_config_autostart}" ) #TODO
 
         desktop_file_virtual_environment = (
             Path( __file__ ).parent / "platform" / "linux" / desktop_file )
 
         print( f"desktop_file_virtual_environment {desktop_file_virtual_environment}" ) #TODO
         error_message = None
-        if self.desktop_file_user_home_config_autostart.is_file():
-            self._process_existing_dot_desktop_file_to_home_config_autostart(
-                desktop_file_virtual_environment )
+        if self.desktop_file_config_autostart.is_file():
+            self._upgrade_desktop_file( desktop_file_virtual_environment )
 
         else:
             error_message = (
-                self._copy_dot_desktop_file_to_home_config_autostart(
-                    desktop_file_virtual_environment, desktop_file ) )
+                self._copy_desktop_file_to_home_config_autostart(
+                    desktop_file_virtual_environment ) )
 
         return error_message
 
 
-#TODO This function is too long...
-#TODO Rename to _cleanup_existing...
-    def _process_existing_dot_desktop_file_to_home_config_autostart(
+#TODO This function is perhaps too long...
+    def _upgrade_desktop_file(
         self,
         desktop_file_virtual_environment ):
         '''
         The .desktop may be an older version with
             - an Exec without a sleep
-            - obsolete tags (such as X-GNOME-Autostart-Delay)
+            - obsolete tags, such as X-GNOME-Autostart-Delay
 
-        Comment out obsolete tags and retrieve the delay (if present).
+        Comment out obsolete tags and retrieve the delay, if present.
 #TODO COmment here why we are getting the delay...
         '''
-        with open( self.desktop_file_user_home_config_autostart, 'r', encoding = "utf-8" ) as f:
+        with open( self.desktop_file_config_autostart, 'r', encoding = "utf-8" ) as f:
             lines = f.readlines()
 
         output = ""
@@ -609,14 +606,13 @@ class IndicatorBase( ABC ):
                         made_a_change = True
 
         if made_a_change:
-            with open( self.desktop_file_user_home_config_autostart, 'w', encoding = "utf-8" ) as f:
+            with open( self.desktop_file_config_autostart, 'w', encoding = "utf-8" ) as f:
                 f.write( output )
 
 
-    def _copy_dot_desktop_file_to_home_config_autostart(
+    def _copy_desktop_file_to_home_config_autostart(
         self,
-        desktop_file_virtual_environment,
-        desktop_file ):
+        desktop_file_virtual_environment ):
         '''
         Copy the .desktop file from
             $HOME/.local/venv_indicators (when running in production)
@@ -629,7 +625,7 @@ class IndicatorBase( ABC ):
         if desktop_file_virtual_environment.exists():
             shutil.copy(
                 desktop_file_virtual_environment,
-                self.desktop_file_user_home_config_autostart )
+                self.desktop_file_config_autostart )
 
             error_message = None
 
@@ -641,8 +637,7 @@ class IndicatorBase( ABC ):
                 with ZipFile( wheel_in_release, 'r' ) as z:
                     desktop_file_in_wheel = (
                         self.indicator_name +
-                        "/platform/linux/" +
-                        desktop_file )
+                        f"/platform/linux/{ self.indicator_name }.py.desktop" )
 
                     if desktop_file_in_wheel in z.namelist():
                         desktop_file_in_tmp = (
@@ -650,7 +645,7 @@ class IndicatorBase( ABC ):
 
                         shutil.copy(
                             desktop_file_in_tmp,
-                            self.desktop_file_user_home_config_autostart )
+                            self.desktop_file_config_autostart )
 
                     else:
                         error_message = (
@@ -1499,7 +1494,7 @@ class IndicatorBase( ABC ):
     def create_preferences_common_widgets( self ):
         autostart = False
         delay = 0
-        with open( self.desktop_file_user_home_config_autostart, 'r', encoding = "utf-8" ) as f:
+        with open( self.desktop_file_config_autostart, 'r', encoding = "utf-8" ) as f:
             autostart_enable_equals_true = (
                 IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" )
 
@@ -1598,7 +1593,7 @@ class IndicatorBase( ABC ):
 # regardless of running in prod or dev.
 # Is this okay for when running in dev?
 # Should dev have its own version?  Sound messy...
-        with open( self.desktop_file_user_home_config_autostart, 'r', encoding = "utf-8" ) as f:
+        with open( self.desktop_file_config_autostart, 'r', encoding = "utf-8" ) as f:
             for line in f:
                 line_starts_with_dot_desktop_autostart_enabled = (
                     line.startswith(
@@ -1624,7 +1619,7 @@ class IndicatorBase( ABC ):
                 else:
                     output += line
 
-        with open( self.desktop_file_user_home_config_autostart, 'w', encoding = "utf-8" ) as f:
+        with open( self.desktop_file_config_autostart, 'w', encoding = "utf-8" ) as f:
             f.write( output )
 
 
