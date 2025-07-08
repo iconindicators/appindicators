@@ -1115,6 +1115,8 @@ class IndicatorBase( ABC ):
         self,
         menuitem ):
 
+#TODO Do the .desktop initialisation et al here?
+
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
 
