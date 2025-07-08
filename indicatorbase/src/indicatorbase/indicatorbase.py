@@ -626,6 +626,8 @@ class IndicatorBase( ABC ):
                         made_a_change = True
 
         if made_a_change:
+#TODO Compare the output of this function to the original file (before write out)
+# to ensure looks all formatted and similar, except for the expected changes.
             self.write_text_file( self.desktop_file_home_config_autostart, output )
 
 
