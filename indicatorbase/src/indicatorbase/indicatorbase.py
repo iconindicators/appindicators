@@ -20,11 +20,6 @@
 # Already deleted again...left another support message.
 
 
-#TODO Check that when a .desktop file is first copied to
-# $HOME/.config/autostart that the autostart is enabled or disabled.
-# Which should it be?
-
-
 '''
 Base class for application indicators.
 
@@ -431,7 +426,6 @@ class IndicatorBase( ABC ):
         return project_metadata, error_message
 
 
-#TODO Who calls and why?  Can this be called just once?
     @staticmethod
     def _get_wheel_in_release(
         indicator_name ):
@@ -452,8 +446,8 @@ class IndicatorBase( ABC ):
         return first_wheel, error_message
 
 
-#TODO I think extra lines are being added when .desktop is loaded up
-# and checked for needing an upgrade.
+#TODO I think I saw extra lines being added when .desktop is uppgraded.
+# Not sure if this happened on the laptop or desktop.
     def _initialise_desktop_file_in_user_home( self ):
         '''
         If the .desktop file is not present in $HOME/.config/autostart
@@ -514,9 +508,6 @@ class IndicatorBase( ABC ):
         return message
 
 
-#TODO Is there any other function which extracts a file from the wheel?
-#LIke getting project information?
-# If so, make a generic function.
     def _extract_desktop_file_from_wheel(
         self,
         destination ):
@@ -550,6 +541,7 @@ class IndicatorBase( ABC ):
         return error_message
 
 
+#TODO Give this a good test!
     def _upgrade_desktop_file(
         self,
         contents ):
