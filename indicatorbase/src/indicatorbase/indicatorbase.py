@@ -16,7 +16,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Go to sourceforget appindicator page and grab the summary dot points.
+#TODO Go to sourceforge appindicator page and grab the summary dot points.
+# Already deleted again...left another support message.
+
+
+#TODO Check for when there is different code for running in development versus
+# production.
+# Is it possible to make things read-only?
+# That is, running in development should not (ideally) alter anything in
+# production.
+
 
 
 '''
@@ -288,10 +297,13 @@ class IndicatorBase( ABC ):
         sys.exit( 1 )
 
 
+#TODO See where this is used...now that I can import indicatorbase
+# into scripts, maybe I don't need this function any more and instead
+# can use packaging.version (however that worked).
     @staticmethod
     def versiontuple( v ):
         # Ideally would use PyPI packaging.version requiring installation
-        # via pip
+        # via pip.
         #
         # However, some tools call IndicatorBase functions which requires
         # importing IndicatorBase, which pulls in packaging.version.
@@ -388,21 +400,21 @@ class IndicatorBase( ABC ):
     def get_project_metadata(
         indicator_name ):
         '''
-        Read in the project metadata,
-            either via pip if the indicator is installed,
-            or parsing a .whl in the release folder running under development.
+        Read the pyproject.toml metadata either
+            via pip (production)
+        or
+            parsing a .whl in the release folder (development).
 
         https://stackoverflow.com/q/75801738/2156453
         https://stackoverflow.com/q/76143042/2156453
         '''
         try:
-            # Obtain pyproject.toml information from pip.
+            # Start by looking in production...
             project_metadata = metadata.metadata( indicator_name )
             error_message = None
 
         except metadata.PackageNotFoundError:
-            # No pip information found; assume running in development;
-            # look for a .whl file in the release folder.
+            # No pip information found so try development...
             wheel_in_release, error_message = (
                 IndicatorBase._get_wheel_in_release( indicator_name ) )
 
@@ -410,11 +422,10 @@ class IndicatorBase( ABC ):
                 project_metadata = None
 
             else:
-                first_metadata = (
-                    next(
-                        metadata.distributions(
-                            path = [ wheel_in_release ] ), None ) )
+                metadata_distributions = (
+                    metadata.distributions( path = [ wheel_in_release ] ) )
 
+                first_metadata = next( metadata_distributions, None )
                 if first_metadata is None:
                     project_metadata = None
                     error_message = (
@@ -432,9 +443,12 @@ class IndicatorBase( ABC ):
         indicator_name ):
 
         error_message = None
-        path_release = Path( __file__ ).parent.parent.parent.parent
+
         path_wheel = (
-            path_release / "release" / "wheel" / f"dist_{ indicator_name }" )
+            Path( __file__ ).parent.parent.parent.parent /
+            "release" /
+            "wheel" /
+            f"dist_{ indicator_name }" )
 
         first_wheel = next( path_wheel.glob( "*.whl" ), None )
         if first_wheel is None:
@@ -447,17 +461,22 @@ class IndicatorBase( ABC ):
 #TODO Look at when autostart is enabled/disabled.
 # I think extra lines are being added.
 
+
     def _initialise_desktop_file_in_user_home( self ):
         autostart_path = Path.home() / ".config" / "autostart"
         autostart_path.mkdir( parents = True, exist_ok = True )
+        print( f"autostart_path {autostart_path}" ) #TODO
 
         desktop_file = self.indicator_name + ".py.desktop"
-        self.desktop_file_user_home = autostart_path / desktop_file
+        print( f"desktop_file {desktop_file}" ) #TODO
+        self.desktop_file_user_home_config_autostart = autostart_path / desktop_file
+        print( f"self.desktop_file_user_home_config_autostart {self.desktop_file_user_home_config_autostart}" ) #TODO
         desktop_file_virtual_environment = (
             Path( __file__ ).parent / "platform" / "linux" / desktop_file )
 
+        print( f"desktop_file_virtual_environment {desktop_file_virtual_environment}" ) #TODO
         error_message = None
-        if self.desktop_file_user_home.is_file():
+        if self.desktop_file_user_home_config_autostart.is_file():
             self._process_existing_dot_desktop_file_to_home_config_autostart(
                 desktop_file_virtual_environment )
 
@@ -482,7 +501,7 @@ class IndicatorBase( ABC ):
         Comment out obsolete tags and retrieve the delay (if present).
 #TODO COmment here why we are getting the delay...
         '''
-        with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
+        with open( self.desktop_file_user_home_config_autostart, 'r', encoding = "utf-8" ) as f:
             lines = f.readlines()
 
         output = ""
@@ -596,7 +615,7 @@ class IndicatorBase( ABC ):
                         made_a_change = True
 
         if made_a_change:
-            with open( self.desktop_file_user_home, 'w', encoding = "utf-8" ) as f:
+            with open( self.desktop_file_user_home_config_autostart, 'w', encoding = "utf-8" ) as f:
                 f.write( output )
 
 
@@ -608,15 +627,15 @@ class IndicatorBase( ABC ):
         Copy the .desktop file from
             $HOME/.local/venv_indicators (when running in production)
         or
-            a .whl from the release directory (when running in development)
-        to $HOME/.config/autostart
+            extract from a .whl in the release directory to
+            $HOME/.config/autostart (when running in development)
 
         On success, returns None; otherwise returns an error message.
         '''
         if desktop_file_virtual_environment.exists():
             shutil.copy(
                 desktop_file_virtual_environment,
-                self.desktop_file_user_home )
+                self.desktop_file_user_home_config_autostart )
 
             error_message = None
 
@@ -637,7 +656,7 @@ class IndicatorBase( ABC ):
 
                         shutil.copy(
                             desktop_file_in_tmp,
-                            self.desktop_file_user_home )
+                            self.desktop_file_user_home_config_autostart )
 
                     else:
                         error_message = (
@@ -673,15 +692,14 @@ class IndicatorBase( ABC ):
         '''
         Return the path to CHANGELOG.md.
 
-        First attempt to locate within the installed virtual environment.
+        Assume to be running in production and look there.
         On failure, resort to the development environment.
         '''
-
         changelog = Path( __file__ ).parent / "CHANGELOG.md"
-
+        print( f"changelog (prod) {changelog}")#TODO
         if not Path( changelog ).exists():
-            # Assume running in development.
             changelog = Path( sys.argv[ 0 ] ).parent / "CHANGELOG.md"
+            print( f"changelog (dev) {changelog}")#TODO
 
         return changelog
 
@@ -1467,7 +1485,7 @@ class IndicatorBase( ABC ):
     def create_preferences_common_widgets( self ):
         autostart = False
         delay = 0
-        with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
+        with open( self.desktop_file_user_home_config_autostart, 'r', encoding = "utf-8" ) as f:
             autostart_enable_equals_true = (
                 IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" )
 
@@ -2206,7 +2224,11 @@ class IndicatorBase( ABC ):
         self.check_latest_version = check_latest_version
 
         output = ""
-        with open( self.desktop_file_user_home, 'r', encoding = "utf-8" ) as f:
+#TODO This is ALWAYS reading from the .desktop file in $HOME/.config/autostart
+# regardless of running in prod or dev.
+# Is this okay for when running in dev?
+# Should dev have its own version?  Sound messy...
+        with open( self.desktop_file_user_home_config_autostart, 'r', encoding = "utf-8" ) as f:
             for line in f:
                 line_starts_with_dot_desktop_autostart_enabled = (
                     line.startswith(
@@ -2232,7 +2254,7 @@ class IndicatorBase( ABC ):
                 else:
                     output += line
 
-        with open( self.desktop_file_user_home, 'w', encoding = "utf-8" ) as f:
+        with open( self.desktop_file_user_home_config_autostart, 'w', encoding = "utf-8" ) as f:
             f.write( output )
 
 
