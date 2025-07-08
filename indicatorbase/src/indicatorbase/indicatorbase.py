@@ -206,16 +206,13 @@ class IndicatorBase( ABC ):
 
         self.indicator_name = IndicatorBase.INDICATOR_NAME
 
-#TODO See who uses project_metadata and maybe make is self.project_metadata
-# so that access to it (to get say version et al) is done when required.
-        project_metadata, error_message = (
+        self.project_metadata, error_message = (
             self.get_project_metadata( self.indicator_name ) )
 
         if error_message:
             self._show_message_and_exit( error_message )
 
-        self.version = project_metadata[ "Version" ]
-
+#TODO Unless needed to be done here, move to where needed.
         error_message = self._initialise_desktop_file_in_user_home()
         if error_message:
             self._show_message_and_exit( error_message )
@@ -235,28 +232,12 @@ class IndicatorBase( ABC ):
 
         IndicatorBase._LOGGING_INITIALISED = True
 
-#TODO Why run this here/now?  Can it be run later or when actually needed?
         self.current_desktop = (
             self.process_run( "echo $XDG_CURRENT_DESKTOP" )[ 0 ] )
 
-#TODO Why run this here/now?  Can it be run later or when actually needed?
-        self.session_type = (
-            self.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )
-
-#TODO Can be obtained on demand?
-        self.authors_and_emails = self.get_authors_emails( project_metadata )
-
-#TODO Now that
-#   [project.urls]
-#   homepage = "https://appindicators.sourceforge.io"
-# is commented out in pyprojectbase.toml
-# there is no project_url...so what to do?
-#        project_url = project_metadata.get_all( "Project-URL" )[ 0 ]
-        project_url = "homepage, http://www.fixme.com"
-        self.website = project_url.split( ',' )[ 1 ].strip()
-
-        self.play_sound_complete_command = (
-            self._get_play_sound_complete_command() )
+        # Initialised when required.
+        self.play_sound_complete_command = None
+        self.session_type = None
 
         self.lock_update = Lock()
         self.id_update = 0 # ID returned when scheduling an update.
@@ -324,6 +305,10 @@ class IndicatorBase( ABC ):
         return tuple( map( int, ( v.split( '.' ) ) ) )
 
 
+    def get_version( self ):
+        return self.project_metadata[ "Version" ]
+
+
     def _check_for_newer_version( self ):
         url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
         message = _( "Refer to the Preferences for details." )
@@ -337,7 +322,7 @@ class IndicatorBase( ABC ):
             version_pypi = (
                 self.versiontuple( data_json[ "info" ][ "version" ] ) )
 
-            if self.versiontuple( self.version ) < version_pypi:
+            if self.versiontuple( self.get_version() ) < version_pypi:
                 self.new_version_available = True
                 self.show_notification( summary, message )
 
@@ -1030,8 +1015,17 @@ class IndicatorBase( ABC ):
                     *functionandarguments[ 1 : ] )
 
 
-    def get_session_type( self ):
+    def _get_session_type( self ):
+        ''' Get the session type as required. ''' 
+        if self._session_type is None:
+            self.session_type = (
+                self.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )
+
         return self.session_type
+
+
+    def get_session_type( self ):
+        return self._get_session_type()
 
 
     def is_session_type_wayland( self ):
@@ -1052,10 +1046,22 @@ class IndicatorBase( ABC ):
         about_dialog = Gtk.AboutDialog()
         about_dialog.set_transient_for( menuitem.get_parent().get_parent() )
 
+#TODO Now that
+#   [project.urls]
+#   homepage = "https://appindicators.sourceforge.io"
+# is commented out in pyprojectbase.toml
+# there is no project_url...so what to do?
+# Either drop it, or figure out quickly a new URL/site.
+#        project_url = self.project_metadata.get_all( "Project-URL" )[ 0 ]
+        project_url = "homepage, http://www.fixme.com"
+        website = project_url.split( ',' )[ 1 ].strip()
+
+        authors_and_emails = self.get_authors_emails( self.project_metadata )
+
         authors_and_websites = [ ]
-        for author_and_email in self.authors_and_emails:
+        for author_and_email in authors_and_emails:
             authors_and_websites.append(
-                author_and_email[ 0 ] + " " + self.website )
+                author_and_email[ 0 ] + " " + website )
 
         about_dialog.set_authors( authors_and_websites )
         about_dialog.set_artists(
@@ -1067,7 +1073,7 @@ class IndicatorBase( ABC ):
 
         authors = [
             author_and_email[ 0 ]
-            for author_and_email in self.authors_and_emails ]
+            for author_and_email in authors_and_emails ]
 
         about_dialog.set_copyright(
             "Copyright \xa9 " +
@@ -1081,9 +1087,9 @@ class IndicatorBase( ABC ):
         about_dialog.set_logo_icon_name( self.get_icon_name() )
         about_dialog.set_program_name( self.indicator_name_human_readable )
         about_dialog.set_translator_credits( _( "translator-credits" ) )
-        about_dialog.set_version( self.version )
-        about_dialog.set_website( self.website )
-        about_dialog.set_website_label( self.website )
+        about_dialog.set_version( self.get_version() )
+        about_dialog.set_website( website )
+        about_dialog.set_website_label( website )
 
         if self.creditz:
             about_dialog.add_credit_section( _( "Credits" ), self.creditz )
@@ -1333,38 +1339,37 @@ class IndicatorBase( ABC ):
 
         If either pw-play / paplay or complete.oga are not present, return None.
         '''
-        play_sound_command = (
-            self.process_run(
-                "which pw-play",
-                ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
-
-        if len( play_sound_command ) == 0:
-            play_sound_command = (
+        if self.play_sound_complete_command is None:
+            command = (
                 self.process_run(
-                    "which paplay",
+                    "which pw-play",
                     ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
 
-            if len( play_sound_command ) == 0:
-                play_sound_command = None
-                self.get_logging().error(
-                    "Unable to locate pw-play nor paplay." )
+            if len( command ) == 0:
+                command = (
+                    self.process_run(
+                        "which paplay",
+                        ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
 
-        complete_oga = "/usr/share/sounds/freedesktop/stereo/complete.oga"
-        sound_complete = (
-            self.process_run(
-                f"ls { complete_oga }",
-                ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+                if len( command ) == 0:
+                    command = None
+                    self.get_logging().error(
+                        "Unable to locate pw-play nor paplay." )
 
-        if len( sound_complete ) == 0:
-            sound_complete = None
-            self.get_logging().error( f"Unable to locate { complete_oga }." )
+            complete_oga = "/usr/share/sounds/freedesktop/stereo/complete.oga"
+            file_ = (
+                self.process_run(
+                    f"ls { complete_oga }",
+                    ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
 
-        play_sound_complete_command = None
-        if play_sound_command and sound_complete:
-            play_sound_complete_command = (
-                f"{ play_sound_command } { sound_complete }" )
+            if len( file_ ) == 0:
+                file_ = None
+                self.get_logging().error( f"Could not find { complete_oga }." )
+    
+            if command and file_:
+                self.play_sound_complete_command = f"{ command } { file_ }"
 
-        return play_sound_complete_command
+        return self.play_sound_complete_command
 
 
     def get_play_sound_complete_command( self ):
@@ -1377,7 +1382,7 @@ class IndicatorBase( ABC ):
         or complete.oga is not found, None is returned
         and the underlying issue is logged.
         '''
-        return self.play_sound_complete_command
+        return self._get_play_sound_complete_command()
 
 
     def create_dialog(
@@ -2861,7 +2866,7 @@ class IndicatorBase( ABC ):
     def _save_config( self ):
         ''' Write a dictionary of user configuration to a JSON text file. '''
         config = self.save_config() # Call to implementation in indicator.
-        config[ IndicatorBase._CONFIG_VERSION ] = self.version
+        config[ IndicatorBase._CONFIG_VERSION ] = self.get_version()
         config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] = (
             self.check_latest_version )
 
