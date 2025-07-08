@@ -20,14 +20,6 @@
 # Already deleted again...left another support message.
 
 
-#TODO Check for when there is different code for running in development versus
-# production.
-# Is it possible to make things read-only?
-# That is, running in development should not (ideally) alter anything in
-# production.
-
-
-
 '''
 Base class for application indicators.
 
