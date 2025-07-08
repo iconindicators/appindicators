@@ -211,6 +211,10 @@ class IndicatorBase( ABC ):
             self._show_message_and_exit( error_message )
 
 #TODO Unless needed to be done here, move to where needed.
+# Maybe leave here; will need to happen eventually.
+# If moved to in Preferences (or wherever),
+# what happens if we get an error message?
+# Error message should only ever happen in dev.
         error_message = self._initialise_desktop_file_in_user_home()
         if error_message:
             self._show_message_and_exit( error_message )
@@ -450,12 +454,6 @@ class IndicatorBase( ABC ):
 
 #TODO I think extra lines are being added when .desktop is loaded up
 # and checked for needing an upgrade.
-#
-#TODO This is called in the constructor.
-# Perhaps instead, call when preferences are kicked off
-# because that's when it is actually used.
-# Then this function can check for the presence of the .desktop in
-# $HOME/.config/autostart and if not present, then do the rest of the stuff...
     def _initialise_desktop_file_in_user_home( self ):
         '''
         If the .desktop file is not present in $HOME/.config/autostart
@@ -516,33 +514,38 @@ class IndicatorBase( ABC ):
         return message
 
 
-# Locate the .desktop file in either
-#   $HOME/.local/venv_indicators/... (production)
-# or
-#   within the .whl in the release directory (development).
-
-        if not desktop_file.exists():
-            # When running in development, the path to the .desktop file will
-            # be a non-existant path.
-            # Extract the .desktop file from the .whl in the release directory.
-
-
-            pass
-
-        error_message = None
+#TODO Is there any other function which extracts a file from the wheel?
+#LIke getting project information?
+# If so, make a generic function.
+    def _extract_desktop_file_from_wheel(
+        self,
+        destination ):
         '''
-        if self.desktop_file_config_autostart.exists():
-            print( "Desktop file exists." ) #TODO
-            self._upgrade_desktop_file( desktop_file_virtual_environment )
+        Extract the .desktop file from a .whl in the release directory.
 
-        else:
-            print( "Copying desktop file..." ) #TODO
-            error_message = (
-                self._copy_desktop_file_to_home_config_autostart(
-                    desktop_file_virtual_environment ) )
-
-            print( "Copied desktop file." ) #TODO
+        On success, returns None; otherwise returns an error message.
         '''
+        print( "Extract desktop from whl." ) #TODO
+        wheel_in_release, error_message = (
+            self._get_wheel_in_release( self.indicator_name ) )
+
+        if wheel_in_release:
+            desktop_file_in_wheel = (
+                f"{ self.indicator_name }/platform/linux/{ self.indicator_name }.py.desktop" )
+
+            with ZipFile( wheel_in_release, 'r' ) as z:
+                if desktop_file_in_wheel in z.namelist():
+                    desktop_file_in_tmp = (
+                        z.extract( desktop_file_in_wheel, path = "/tmp" ) )
+
+                    shutil.copy( desktop_file_in_tmp, destination )
+
+                else:
+                    error_message = (
+                        f"Unable to locate { desktop_file_in_wheel } in "
+                        f"{ wheel_in_release.absolute() }." )
+
+            z.close()
 
         return error_message
 
@@ -558,13 +561,7 @@ class IndicatorBase( ABC ):
 
         Comment out obsolete tags, add missing tags and retrieve the delay.
         '''
-
-#TODO Testing
-        print( "_upgrade_desktop_file" )
-        return
-
-
-
+        print( "_upgrade_desktop_file" ) #TODO Test
         output = ""
         delay = ""
         autostart_enabled_present = False
@@ -643,99 +640,6 @@ class IndicatorBase( ABC ):
 
         if made_a_change:
             self.write_text_file( self.desktop_file_home_config_autostart, output )
-
-
-#TODO Is there any other function which extracts a file from the wheel?
-#LIke getting project information?
-# If so, make a generic function.
-    def _extract_desktop_file_from_wheel(
-        self,
-        destination ):
-        '''
-        Extract the .desktop file from a .whl in the release directory.
-
-        On success, returns None; otherwise returns an error message.
-        '''
-        print( "Extract desktop from whl." ) #TODO
-        wheel_in_release, error_message = (
-            self._get_wheel_in_release( self.indicator_name ) )
-
-        if wheel_in_release:
-            desktop_file_in_wheel = (
-                f"{ self.indicator_name }/platform/linux/{ self.indicator_name }.py.desktop" )
-
-            with ZipFile( wheel_in_release, 'r' ) as z:
-                if desktop_file_in_wheel in z.namelist():
-                    desktop_file_in_tmp = (
-                        z.extract( desktop_file_in_wheel, path = "/tmp" ) )
-
-                    shutil.copy( desktop_file_in_tmp, destination )
-
-                else:
-                    error_message = (
-                        f"Unable to locate { desktop_file_in_wheel } in "
-                        f"{ wheel_in_release.absolute() }." )
-
-            z.close()
-
-        return error_message
-
-
-#TODO Still needed?
-    def _copy_desktop_file_to_home_config_autostart(
-        self,
-        desktop_file_virtual_environment ):
-        '''
-        Copy the .desktop file from
-            $HOME/.local/venv_indicators (when running in production)
-        or
-            extract from a .whl in the release directory to
-            $HOME/.config/autostart (when running in development)
-
-        On success, returns None; otherwise returns an error message.
-        '''
-        print( f"desktop_file_virtual_environment {desktop_file_virtual_environment}")#TODO
-        if desktop_file_virtual_environment.exists():
-            # The file will only be present if running in production.
-            print( "Copy from venv." ) #TODO
-            shutil.copy(
-                desktop_file_virtual_environment,
-                self.desktop_file_home_config_autostart )
-
-            error_message = None
-
-        else:
-            # The desktop file could not be found so must be running in
-            # development.
-            #
-            # , there will be no desktop file present
-            # because the path will refer to indicator_name/platform... which
-            # does not exist.
-            print( "Get desktop from whl." ) #TODO
-            wheel_in_release, error_message = (
-                self._get_wheel_in_release( self.indicator_name ) )
-
-            if wheel_in_release:
-                desktop_file_in_wheel = (
-                    f"{ self.indicator_name }/platform/linux/{ self.indicator_name }.py.desktop" )
-
-                with ZipFile( wheel_in_release, 'r' ) as z:
-                    if desktop_file_in_wheel in z.namelist():
-                        desktop_file_in_tmp = (
-                            z.extract( desktop_file_in_wheel, path = "/tmp" ) )
-
-                        shutil.copy(
-                            desktop_file_in_tmp,
-                            self.desktop_file_home_config_autostart )
-
-                    else:
-                        error_message = (
-                            f"Unable to locate { desktop_file_in_wheel } in " +
-                            "{ wheel_in_release.absolute() }." )
-
-                z.close()
-
-        return error_message
 
 
     @staticmethod
