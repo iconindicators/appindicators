@@ -570,7 +570,7 @@ class IndicatorBase( ABC ):
 
     def _upgrade_desktop_file(
         self,
-        desktop_file_virtual_environment ):
+        contents ):
         '''
         The .desktop may be an older version with
             - an Exec without a sleep
@@ -631,22 +631,8 @@ class IndicatorBase( ABC ):
             #    X-GNOME-Autostart-enabled
             #    Terminal
             # and write into the .desktop in $HOME/.config/autostart
-            if desktop_file_virtual_environment.exists():
-                desktop_file_original = desktop_file_virtual_environment
-
-            else:
-#TODO Do not get from here...it will contain comments and unresolved {} tags.
-#Instead, get from whl.
-                desktop_file_original = (
-                    Path( __file__ ).parent.parent.parent.parent /
-                    "indicatorbase" /
-                    "src" /
-                    "indicatorbase" /
-                    "platform" /
-                    "linux" /
-                    "indicatorbase.py.desktop" )
-
-            lines = self.read_text_file( desktop_file_original )
+            # lines = self.read_text_file( desktop_file_original )
+            lines  = None#TODO Convert contents to lines.
             for line in lines:
                 if line.startswith( '#' ):
                     continue
