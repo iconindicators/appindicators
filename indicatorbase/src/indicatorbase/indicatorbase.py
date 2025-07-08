@@ -441,9 +441,9 @@ class IndicatorBase( ABC ):
         return first_wheel, error_message
 
 
-#TODO Look at when autostart is enabled/disabled.
-# I think extra lines are being added.
-
+#TODO I think extra lines are being added when .desktop is loaded up
+# and checked for needing an upgrade. 
+#
 #TODO This is called in the constructor.
 # Perhaps instead, call when preferences are kicked off
 # because that's when it is actually used.
@@ -480,7 +480,6 @@ class IndicatorBase( ABC ):
         return error_message
 
 
-#TODO This function is perhaps too long...
     def _upgrade_desktop_file(
         self,
         desktop_file_virtual_environment ):
@@ -488,9 +487,9 @@ class IndicatorBase( ABC ):
         The .desktop may be an older version with
             - an Exec without a sleep
             - obsolete tags, such as X-GNOME-Autostart-Delay
+            - missing tags since added
 
-        Comment out obsolete tags and retrieve the delay, if present.
-#TODO COmment here why we are getting the delay...
+        Comment out obsolete tags, add missing tags and retrieve the delay.
         '''
         output = ""
         delay = ""
@@ -498,33 +497,20 @@ class IndicatorBase( ABC ):
         exec_with_sleep_present = False
         terminal_present = False
         made_a_change = False
-        for line in self.read_text_file( self.desktop_file_config_autostart ):
-            starts_with_autostart_enabled = (
-                line.startswith(
-                    self._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ) )
-
-            starts_with_autostart_delay = (
-                line.startswith(
-                    self._DOT_DESKTOP_AUTOSTART_DELAY + '=' ) )
-
-            starts_with_desktop_exec = (
-                line.startswith( self._DOT_DESKTOP_EXEC + '=' ) )
-
-            starts_with_desktop_terminal = (
-                line.startswith( self._DOT_DESKTOP_TERMINAL + '=' ) )
-
-            if starts_with_autostart_enabled:
+        lines = self.read_text_file( self.desktop_file_config_autostart )
+        for line in lines:
+            if line.startswith( self._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ):
                 output += line
                 autostart_enabled_present = True
 
-            elif starts_with_autostart_delay:
+            elif line.startswith( self._DOT_DESKTOP_AUTOSTART_DELAY + '=' ):
                 # Does not work in Debian et al.
                 # Capture the delay and comment out the line.
                 delay = line.split( '=' )[ 1 ].strip()
                 output += '#' + line
                 made_a_change = True
 
-            elif starts_with_desktop_exec:
+            elif line.startswith( self._DOT_DESKTOP_EXEC + '=' ):
                 if "sleep" in line:
                     # Assume to be part of the install and not user created.
                     output += line
@@ -535,12 +521,12 @@ class IndicatorBase( ABC ):
                     output += '#' + line
                     made_a_change = True
 
-            elif starts_with_desktop_terminal:
+            elif line.startswith( self._DOT_DESKTOP_TERMINAL + '=' ):
                 output += line
                 terminal_present = True
 
             else:
-                output += line  #TODO Is this adding blank lines?
+                output += line
 
         tags_missing = (
             not autostart_enabled_present
@@ -550,30 +536,30 @@ class IndicatorBase( ABC ):
             not terminal_present )
 
         if tags_missing:
-            # From the .desktop file (install or development), extract the
+            # From the .desktop file, extract the
             #    Exec (with sleep)
             #    X-GNOME-Autostart-enabled
+            #    Terminal
             # and write into the .desktop in $HOME/.config/autostart
-#TODO Is the stuff below computed in the calling function?
-# If so, pass it in to this function.
             if desktop_file_virtual_environment.exists():
                 desktop_file_original = desktop_file_virtual_environment
 
             else:
-                print( 111 )
-                print( Path( __file__ ) )
-                print( Path( __file__ ).parent )
-                print( 222 )
-                #TODO This is the wrong path.
-                # Make sure it works under eclipse/geany but also when running in a terminal from source.
                 desktop_file_original = (
-                    Path( __file__ ).parent /
+                    Path( __file__ ).parent.parent.parent.parent /
+                    "indicatorbase" /
+                    "src" /
+                    "indicatorbase" /
                     "platform" /
                     "linux" /
                     "indicatorbase.py.desktop" )
 
-            for line in self.read_text_file( desktop_file_original ):
-                if line.startswith( self._DOT_DESKTOP_AUTOSTART_ENABLED ):
+            lines = self.read_text_file( desktop_file_original )
+            for line in lines:
+                if line.startswith( '#' ):
+                    continue
+
+                elif line.startswith( self._DOT_DESKTOP_AUTOSTART_ENABLED ):
                     if not autostart_enabled_present:
                         output += line
                         made_a_change = True
@@ -583,16 +569,8 @@ class IndicatorBase( ABC ):
                         line_ = line.replace( "{indicator}", self.indicator_name )
                         if delay:
                             output += line_.replace( '0', delay )
-#TODO I think the above two lines replace the if/else below:
-                        '''
-                        if delay:
-                            output += line.replace( "{indicator}", self.indicator_name ).replace( '0', delay )
 
-                        else:
-                            output += line.replace( "{indicator}", self.indicator_name )
-                        '''
-
-                    made_a_change = True #TODO I think this needs one level of indent.
+                        made_a_change = True
 
                 elif line.startswith( self._DOT_DESKTOP_TERMINAL ):
                     if not terminal_present:
@@ -600,8 +578,7 @@ class IndicatorBase( ABC ):
                         made_a_change = True
 
         if made_a_change:
-            with open( self.desktop_file_config_autostart, 'w', encoding = "utf-8" ) as f:
-                f.write( output )
+            self.write_text_file( self.desktop_file_config_autostart, output )
 
 
     def _copy_desktop_file_to_home_config_autostart(
@@ -3239,11 +3216,25 @@ class IndicatorBase( ABC ):
     @staticmethod
     def read_text_file(
         file_ ):
-
+        '''
+        TODO document
+        '''
         with open( file_, 'r', encoding = "utf-8" ) as f:
             lines = f.readlines()
 
         return lines
+
+
+#TODO See where else this could be used...perhaps even extended.
+    @staticmethod
+    def write_text_file(
+        file_,
+        text ):
+        '''
+        TODO document
+        '''
+        with open( file_, 'w', encoding = "utf-8" ) as f:
+            f.write( text )
 
 
     @staticmethod
