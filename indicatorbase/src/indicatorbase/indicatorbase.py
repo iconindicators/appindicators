@@ -20,6 +20,11 @@
 # Already deleted again...left another support message.
 
 
+#TODO Check that when a .desktop file is first copied to
+# $HOME/.config/autostart that the autostart is enabled or disabled.
+# Which should it be?
+
+
 '''
 Base class for application indicators.
 
@@ -56,6 +61,7 @@ import signal
 import socket
 import subprocess
 import sys
+import tempfile
 import threading
 import webbrowser
 
@@ -443,7 +449,7 @@ class IndicatorBase( ABC ):
 
 
 #TODO I think extra lines are being added when .desktop is loaded up
-# and checked for needing an upgrade. 
+# and checked for needing an upgrade.
 #
 #TODO This is called in the constructor.
 # Perhaps instead, call when preferences are kicked off
@@ -490,39 +496,26 @@ class IndicatorBase( ABC ):
             copy desktop file to home config autostart
         '''
 
-        # In production, the .desktop file location is 
-        #   $HOME/.local/venv_indicators/...
         desktop_file_production = (
             Path( __file__ ).parent / "platform" / "linux" / desktop_file )
 
         print( f"desktop_file_production {desktop_file_production}" ) #TODO
 
-        import tempfile
-        temporary_desktop_file = tempfile.NamedTemporaryFile()
-        print( 111 )
-        print( temporary_desktop_file.name )
-        print( 777 )
-        self._extract_desktop_file_from_wheel(
-            temporary_desktop_file.name )
-        contents = self.read_text_file( temporary_desktop_file.name )
-        print( contents )
-        print( 888 )
-        
-        
-        if True:return
+        message = ""
         if self.desktop_file_home_config_autostart.exists():
             if desktop_file_production.exists():
-                contents = self.read_text_file( desktop_file_production )
+                self._upgrade_desktop_file(
+                    self.read_text_file( desktop_file_production ) )
 
             else:
                 temporary_desktop_file = tempfile.NamedTemporaryFile()
-                self._extract_desktop_file_from_wheel(
-                    temporary_desktop_file.name )
-#TODO Check return
+                message = (
+                    self._extract_desktop_file_from_wheel(
+                        temporary_desktop_file.name ) )
 
-                contents = self.read_text_file( temporary_desktop_file.name )
-
-            self._upgrade_desktop_file( contents )
+                if not message:
+                    self._upgrade_desktop_file(
+                        self.read_text_file( temporary_desktop_file.name ) )
 
         else:
             if desktop_file_production.exists():
@@ -531,9 +524,11 @@ class IndicatorBase( ABC ):
                     self.desktop_file_home_config_autostart )
 
             else:
-                self._extract_desktop_file_from_wheel(
-                    self.desktop_file_home_config_autostart )
-#TODO Check return
+                message = (
+                    self._extract_desktop_file_from_wheel(
+                        self.desktop_file_home_config_autostart ) )
+
+        return message
 
 
 
@@ -547,7 +542,7 @@ class IndicatorBase( ABC ):
             # be a non-existant path.
             # Extract the .desktop file from the .whl in the release directory.
 
-            
+
             pass
 
         error_message = None
@@ -724,7 +719,7 @@ class IndicatorBase( ABC ):
             #
             # , there will be no desktop file present
             # because the path will refer to indicator_name/platform... which
-            # does not exist. 
+            # does not exist.
             print( "Get desktop from whl." ) #TODO
             wheel_in_release, error_message = (
                 self._get_wheel_in_release( self.indicator_name ) )
@@ -1098,7 +1093,7 @@ class IndicatorBase( ABC ):
 
 
     def _get_session_type( self ):
-        ''' Get the session type as required. ''' 
+        ''' Get the session type as required. '''
         if self.session_type is None:
             self.session_type = (
                 self.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )
@@ -1447,7 +1442,7 @@ class IndicatorBase( ABC ):
             if len( file_ ) == 0:
                 file_ = None
                 self.get_logging().error( f"Could not find { complete_oga }." )
-    
+
             if command and file_:
                 self.play_sound_complete_command = f"{ command } { file_ }"
 
