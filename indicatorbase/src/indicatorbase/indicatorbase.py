@@ -421,6 +421,7 @@ class IndicatorBase( ABC ):
         return project_metadata, error_message
 
 
+#TODO Who calls and why?  Can this be called just once?
     @staticmethod
     def _get_wheel_in_release(
         indicator_name ):
@@ -452,29 +453,105 @@ class IndicatorBase( ABC ):
     def _initialise_desktop_file_in_user_home( self ):
         '''
         If the .desktop file is not present in $HOME/.config/autostart
-        copy from $HOME/.local/venv_indicators.
+        copy from
+            $HOME/.local/venv_indicators (production)
+        or
+            release/wheel/dist_{indicator}/*.whl
         '''
-        config_autostart = Path.home() / ".config" / "autostart"
-        config_autostart.mkdir( parents = True, exist_ok = True )
-        print( f"config_autostart {config_autostart}" ) #TODO
+        home_config_autostart = Path.home() / ".config" / "autostart"
+        home_config_autostart.mkdir( parents = True, exist_ok = True )
+        print( f"home_config_autostart {home_config_autostart}" ) #TODO
 
         desktop_file = self.indicator_name + ".py.desktop"
         print( f"desktop_file {desktop_file}" ) #TODO
 
-        self.desktop_file_config_autostart = config_autostart / desktop_file
-        print( f"self.desktop_file_config_autostart {self.desktop_file_config_autostart}" ) #TODO
+        self.desktop_file_home_config_autostart = (
+            home_config_autostart / desktop_file )
 
-#TODO This will be correct in prod, wrong in dev...so when to fix this?  Now or later?
-        # This will resolve to either
-        #   the path to the .desktop file in the production environment located
-        #   at $HOME/.local/venv_indicators/..
-        # or
-        #   a non-existant path in the development environment.
-        desktop_file_virtual_environment = (
+        print( f"self.desktop_file_home_config_autostart {self.desktop_file_home_config_autostart}" ) #TODO
+
+        '''
+        if desktop file in home config autostart exists:
+            if desktop file in venv_indicators exists:
+                read desktop file
+
+            else:
+                read desktop file from wheel
+
+            upgrade home config autostart desktop file using read desktop file
+
+        else:
+            if desktop file in venv_indicators exists:
+                get desktop file
+
+            else:
+                get desktop file from wheel
+
+            copy desktop file to home config autostart
+        '''
+
+        # In production, the .desktop file location is 
+        #   $HOME/.local/venv_indicators/...
+        desktop_file_production = (
             Path( __file__ ).parent / "platform" / "linux" / desktop_file )
-        print( f"desktop_file_virtual_environment {desktop_file_virtual_environment}" ) #TODO
+
+        print( f"desktop_file_production {desktop_file_production}" ) #TODO
+
+        import tempfile
+        temporary_desktop_file = tempfile.NamedTemporaryFile()
+        print( 111 )
+        print( temporary_desktop_file.name )
+        print( 777 )
+        self._extract_desktop_file_from_wheel(
+            temporary_desktop_file.name )
+        contents = self.read_text_file( temporary_desktop_file.name )
+        print( contents )
+        print( 888 )
+        
+        
+        if True:return
+        if self.desktop_file_home_config_autostart.exists():
+            if desktop_file_production.exists():
+                contents = self.read_text_file( desktop_file_production )
+
+            else:
+                temporary_desktop_file = tempfile.NamedTemporaryFile()
+                self._extract_desktop_file_from_wheel(
+                    temporary_desktop_file.name )
+#TODO Check return
+
+                contents = self.read_text_file( temporary_desktop_file.name )
+
+            self._upgrade_desktop_file( contents )
+
+        else:
+            if desktop_file_production.exists():
+                shutil.copy(
+                    desktop_file_production,
+                    self.desktop_file_home_config_autostart )
+
+            else:
+                self._extract_desktop_file_from_wheel(
+                    self.desktop_file_home_config_autostart )
+#TODO Check return
+
+
+
+# Locate the .desktop file in either
+#   $HOME/.local/venv_indicators/... (production)
+# or
+#   within the .whl in the release directory (development).
+
+        if not desktop_file.exists():
+            # When running in development, the path to the .desktop file will
+            # be a non-existant path.
+            # Extract the .desktop file from the .whl in the release directory.
+
+            
+            pass
 
         error_message = None
+        '''
         if self.desktop_file_config_autostart.exists():
             print( "Desktop file exists." ) #TODO
             self._upgrade_desktop_file( desktop_file_virtual_environment )
@@ -486,6 +563,7 @@ class IndicatorBase( ABC ):
                     desktop_file_virtual_environment ) )
 
             print( "Copied desktop file." ) #TODO
+        '''
 
         return error_message
 
@@ -507,7 +585,7 @@ class IndicatorBase( ABC ):
         exec_with_sleep_present = False
         terminal_present = False
         made_a_change = False
-        lines = self.read_text_file( self.desktop_file_config_autostart )
+        lines = self.read_text_file( self.desktop_file_home_config_autostart )
         for line in lines:
             if line.startswith( self._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ):
                 output += line
@@ -592,9 +670,46 @@ class IndicatorBase( ABC ):
                         made_a_change = True
 
         if made_a_change:
-            self.write_text_file( self.desktop_file_config_autostart, output )
+            self.write_text_file( self.desktop_file_home_config_autostart, output )
 
 
+#TODO Is there any other function which extracts a file from the wheel?
+#LIke getting project information?
+# If so, make a generic function.
+    def _extract_desktop_file_from_wheel(
+        self,
+        destination ):
+        '''
+        Extract the .desktop file from a .whl in the release directory.
+
+        On success, returns None; otherwise returns an error message.
+        '''
+        print( "Extract desktop from whl." ) #TODO
+        wheel_in_release, error_message = (
+            self._get_wheel_in_release( self.indicator_name ) )
+
+        if wheel_in_release:
+            desktop_file_in_wheel = (
+                f"{ self.indicator_name }/platform/linux/{ self.indicator_name }.py.desktop" )
+
+            with ZipFile( wheel_in_release, 'r' ) as z:
+                if desktop_file_in_wheel in z.namelist():
+                    desktop_file_in_tmp = (
+                        z.extract( desktop_file_in_wheel, path = "/tmp" ) )
+
+                    shutil.copy( desktop_file_in_tmp, destination )
+
+                else:
+                    error_message = (
+                        f"Unable to locate { desktop_file_in_wheel } in "
+                        f"{ wheel_in_release.absolute() }." )
+
+            z.close()
+
+        return error_message
+
+
+#TODO Still needed?
     def _copy_desktop_file_to_home_config_autostart(
         self,
         desktop_file_virtual_environment ):
@@ -613,7 +728,7 @@ class IndicatorBase( ABC ):
             print( "Copy from venv." ) #TODO
             shutil.copy(
                 desktop_file_virtual_environment,
-                self.desktop_file_config_autostart )
+                self.desktop_file_home_config_autostart )
 
             error_message = None
 
@@ -639,7 +754,7 @@ class IndicatorBase( ABC ):
 
                         shutil.copy(
                             desktop_file_in_tmp,
-                            self.desktop_file_config_autostart )
+                            self.desktop_file_home_config_autostart )
 
                     else:
                         error_message = (
@@ -1488,7 +1603,7 @@ class IndicatorBase( ABC ):
     def create_preferences_common_widgets( self ):
         autostart = False
         delay = 0
-        with open( self.desktop_file_config_autostart, 'r', encoding = "utf-8" ) as f:
+        with open( self.desktop_file_home_config_autostart, 'r', encoding = "utf-8" ) as f:
             autostart_enable_equals_true = (
                 self._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" )
 
@@ -1587,7 +1702,7 @@ class IndicatorBase( ABC ):
 # regardless of running in prod or dev.
 # Is this okay for when running in dev?
 # Should dev have its own version?  Sound messy...
-        with open( self.desktop_file_config_autostart, 'r', encoding = "utf-8" ) as f:
+        with open( self.desktop_file_home_config_autostart, 'r', encoding = "utf-8" ) as f:
             for line in f:
                 line_starts_with_dot_desktop_autostart_enabled = (
                     line.startswith(
@@ -1613,7 +1728,7 @@ class IndicatorBase( ABC ):
                 else:
                     output += line
 
-        with open( self.desktop_file_config_autostart, 'w', encoding = "utf-8" ) as f:
+        with open( self.desktop_file_home_config_autostart, 'w', encoding = "utf-8" ) as f:
             f.write( output )
 
 
