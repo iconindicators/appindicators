@@ -360,7 +360,7 @@ class IndicatorLunar( IndicatorBase ):
                 utc_now,
                 self.comet_orbital_element_data,
                 IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME,
-                IndicatorBase.EXTENSION_TEXT,
+                self.EXTENSION_TEXT,
                 IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
                 self.download_count_comet,
                 self.next_download_time_comet,
@@ -383,7 +383,7 @@ class IndicatorLunar( IndicatorBase ):
                 utc_now,
                 self.minor_planet_orbital_element_data,
                 IndicatorLunar.MINOR_PLANET_CACHE_ORBITAL_ELEMENT_BASENAME,
-                IndicatorBase.EXTENSION_TEXT,
+                self.EXTENSION_TEXT,
                 IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
                 self.download_count_minor_planet,
                 self.next_download_time_minor_planet,
@@ -407,7 +407,7 @@ class IndicatorLunar( IndicatorBase ):
                 utc_now,
                 self.minor_planet_apparent_magnitude_data,
                 IndicatorLunar.MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME,
-                IndicatorBase.EXTENSION_TEXT,
+                self.EXTENSION_TEXT,
                 IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
                 self.download_count_apparent_magnitude,
                 self.next_download_time_apparent_magnitude,
@@ -762,7 +762,7 @@ class IndicatorLunar( IndicatorBase ):
             self.write_cache_text(
                 svg_icon_text,
                 IndicatorLunar.ICON_CACHE_BASENAME,
-                IndicatorBase.EXTENSION_SVG_SYMBOLIC ) )
+                self.EXTENSION_SVG_SYMBOLIC ) )
 
         self.set_icon( str( icon_path ) )
 
@@ -819,7 +819,7 @@ class IndicatorLunar( IndicatorBase ):
                     None,
                     None ),
                 IndicatorLunar.ICON_CACHE_BASENAME,
-                IndicatorBase.EXTENSION_SVG_SYMBOLIC ) )
+                self.EXTENSION_SVG_SYMBOLIC ) )
 
 
     def notification_satellites( self ):
@@ -2046,7 +2046,7 @@ class IndicatorLunar( IndicatorBase ):
         dialog ):
 
         notebook = Gtk.Notebook()
-        notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
+        notebook.set_margin_bottom( self.INDENT_WIDGET_TOP )
 
         page_icon = 0
         page_menu = 1
@@ -2188,7 +2188,7 @@ class IndicatorLunar( IndicatorBase ):
                         False ),
                     (   spinner_magnitude,
                         False ) ),
-                    margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
+                    margin_top = self.INDENT_WIDGET_TOP / 2,
                     margin_left = 5 ),
             0, 2, 1, 1 )
 
@@ -2196,7 +2196,7 @@ class IndicatorLunar( IndicatorBase ):
             self.create_checkbutton(
                 _( "Add new minor planets" ),
                 tooltip_text = _( "All minor planets are automatically added." ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
+                margin_top = self.INDENT_WIDGET_TOP / 2,
                 active = self.minor_planets_add_new ) )
 
         grid.attach( minor_planets_add_new_checkbutton, 0, 3, 1, 1 )
@@ -2205,7 +2205,7 @@ class IndicatorLunar( IndicatorBase ):
             self.create_checkbutton(
                 _( "Add new comets" ),
                 tooltip_text = _( "All comets are automatically added." ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
+                margin_top = self.INDENT_WIDGET_TOP / 2,
                 active = self.comets_add_new ) )
 
         grid.attach( comets_add_new_checkbutton, 0, 4, 1, 1 )
@@ -2214,7 +2214,7 @@ class IndicatorLunar( IndicatorBase ):
             self.create_checkbutton(
                 _( "Add new satellites" ),
                 tooltip_text = _( "All satellites are automatically added." ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
+                margin_top = self.INDENT_WIDGET_TOP / 2,
                 active = self.satellites_add_new ) )
 
         grid.attach( satellites_add_new_checkbox, 0, 5, 1, 1 )
@@ -2227,7 +2227,7 @@ class IndicatorLunar( IndicatorBase ):
                     "by rise date/time.\n\n" +
                     "Otherwise, satellites are sorted\n" +
                     "by Name then Number." ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
+                margin_top = self.INDENT_WIDGET_TOP / 2,
                 active = self.satellites_sort_by_date_time ) )
 
         grid.attach( sort_satellites_by_date_time_checkbutton, 0, 6, 1, 1 )
@@ -2265,7 +2265,7 @@ class IndicatorLunar( IndicatorBase ):
                     (
                         spinner_satellite_limit_end,
                         False ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2,
+                margin_top = self.INDENT_WIDGET_TOP / 2,
                 margin_left = 5 ),
             0, 7, 1, 1 )
 
@@ -2563,7 +2563,7 @@ class IndicatorLunar( IndicatorBase ):
                 True ) )
 
         show_werewolf_warning_checkbox.set_margin_top(
-            IndicatorBase.INDENT_WIDGET_TOP )
+            self.INDENT_WIDGET_TOP )
 
         notebook.append_page( grid, Gtk.Label.new( _( "Notifications" ) ) )
 
@@ -2588,7 +2588,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "City" ) ), False ),
                     ( city, False ) ),
-                    margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2 ),
+                    margin_top = self.INDENT_WIDGET_TOP / 2 ),
             0, 0, 1, 1 )
 
         latitude = (
@@ -2602,7 +2602,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Latitude" ) ), False ),
                     ( latitude, False ) ),
-                    margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2 ),
+                    margin_top = self.INDENT_WIDGET_TOP / 2 ),
             0, 1, 1, 1 )
 
         longitude = (
@@ -2616,7 +2616,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Longitude" ) ), False ),
                     ( longitude, False ) ),
-                    margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2 ),
+                    margin_top = self.INDENT_WIDGET_TOP / 2 ),
             0, 2, 1, 1 )
 
         elevation = (
@@ -2629,7 +2629,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Elevation" ) ), False ),
                     ( elevation, False ) ),
-                    margin_top = IndicatorBase.INDENT_WIDGET_TOP / 2 ),
+                    margin_top = self.INDENT_WIDGET_TOP / 2 ),
             0, 3, 1, 1 )
 
         city.connect(
@@ -3162,7 +3162,7 @@ class IndicatorLunar( IndicatorBase ):
                     ( Gtk.Label.new( summary_label ), False ),
                     ( summary_text_entry, True ) ),
                     sensitive = checkbutton.get_active(),
-                    margin_left = IndicatorBase.INDENT_WIDGET_LEFT ) )
+                    margin_left = self.INDENT_WIDGET_LEFT ) )
 
         grid.attach( box, 0, grid_start_index + 1, 1, 1 )
 
@@ -3180,7 +3180,7 @@ class IndicatorLunar( IndicatorBase ):
                     ( Gtk.Label.new( message_label ), False ),
                     ( self.create_scrolledwindow( message_text_view ), True ) ),
                 sensitive = checkbutton.get_active(),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT ) )
+                margin_left = self.INDENT_WIDGET_LEFT ) )
 
         grid.attach( box, 0, grid_start_index + 2, 1, 1 )
 

@@ -226,8 +226,8 @@ class IndicatorFortune( IndicatorBase ):
                     ( Gtk.STOCK_CLOSE, Gtk.ResponseType.CLOSE ),
                 default_size =
                     (
-                        IndicatorBase.DIALOG_DEFAULT_WIDTH,
-                        IndicatorBase.DIALOG_DEFAULT_HEIGHT ) ) )
+                        self.DIALOG_DEFAULT_WIDTH,
+                        self.DIALOG_DEFAULT_HEIGHT ) ) )
 
         dialog.show_all()
         dialog.run()
@@ -241,7 +241,7 @@ class IndicatorFortune( IndicatorBase ):
         dialog ):
 
         notebook = Gtk.Notebook()
-        notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
+        notebook.set_margin_bottom( self.INDENT_WIDGET_TOP )
 
         # Fortunes.
         file_filter = Gtk.FileFilter()
@@ -296,7 +296,7 @@ class IndicatorFortune( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Notification summary" ) ), False ),
                     ( notification_summary, True ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                margin_top = self.INDENT_WIDGET_TOP ),
             0, 1, 1, 1 )
 
         spinner_character_count = (
@@ -317,7 +317,7 @@ class IndicatorFortune( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Message character limit" ) ), False ),
                     ( spinner_character_count, False ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                margin_top = self.INDENT_WIDGET_TOP ),
             0, 2, 1, 1 )
 
         label = Gtk.Label.new( _( "Middle mouse click of the icon" ) )
@@ -325,7 +325,7 @@ class IndicatorFortune( IndicatorBase ):
         grid.attach(
             self.create_box(
                 ( ( label, False ), ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                margin_top = self.INDENT_WIDGET_TOP ),
             0, 3, 1, 1 )
 
         active_ = (
@@ -337,7 +337,7 @@ class IndicatorFortune( IndicatorBase ):
             self.create_radiobutton(
                 None,
                 _( "Show a new fortune" ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = active_ ) )
 
         grid.attach( radio_middle_mouse_click_new_fortune, 0, 4, 1, 1 )
@@ -352,7 +352,7 @@ class IndicatorFortune( IndicatorBase ):
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,
                 _( "Copy current fortune to clipboard" ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = active_ ) )
 
         if self.is_clipboard_supported():
@@ -368,7 +368,7 @@ class IndicatorFortune( IndicatorBase ):
             self.create_radiobutton(
                 radio_middle_mouse_click_new_fortune,
                 _( "Show current fortune" ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = active_ ) )
 
         grid.attach( radio_middle_mouse_click_show_last_fortune, 0, row, 1, 1 )

@@ -269,7 +269,7 @@ class IndicatorTide( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Path and filename" ) ), False ),
                     ( user_script_path_and_filename, True ) ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT ),
+                margin_left = self.INDENT_WIDGET_LEFT ),
             0, 1, 1, 1 )
 
         user_script_class_name = (
@@ -287,14 +287,14 @@ class IndicatorTide( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Class name" ) ), False ),
                     ( user_script_class_name, True ) ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT ),
+                margin_left = self.INDENT_WIDGET_LEFT ),
                 0, 2, 1, 1 )
 
         show_as_submenus_checkbutton = (
             self.create_checkbutton(
                 _( "Show as submenus" ),
                 tooltip_text = _( "Show each day's tides in a submenu." ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
+                margin_top = self.INDENT_WIDGET_TOP,
                 active = self.show_as_submenus ) )
 
         grid.attach( show_as_submenus_checkbutton, 0, 3, 1, 1 )
@@ -304,7 +304,7 @@ class IndicatorTide( IndicatorBase ):
                 _( "Except first day" ),
                 tooltip_text = _( "Show the first day's tide in full." ),
                 sensitive = show_as_submenus_checkbutton.get_active(),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = self.show_as_submenus_except_first_day ) )
 
         grid.attach( show_as_submenus_except_first_day_checkbutton, 0, 4, 1, 1 )

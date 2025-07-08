@@ -307,7 +307,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         dialog ):
 
         notebook = Gtk.Notebook()
-        notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
+        notebook.set_margin_bottom( self.INDENT_WIDGET_TOP )
 
         # Calendars.
         grid, store = (
@@ -374,7 +374,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             grid.attach(
                 self.create_box(
                     ( ( Gtk.Label.new( _( "On event click" ) ), False ), ),
-                    margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                    margin_top = self.INDENT_WIDGET_TOP ),
                 0, row, 1, 1 )
 
             row += 1
@@ -383,7 +383,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 self.create_radiobutton(
                     None,
                     _( "Copy event to clipboard" ),
-                    margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                    margin_left = self.INDENT_WIDGET_LEFT,
                     active = self.copy_to_clipboard ) )
 
             grid.attach( radio_copy_to_clipboard, 0, row, 1, 1 )
@@ -393,7 +393,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 self.create_radiobutton(
                     radio_copy_to_clipboard,
                     _( "Search using URL" ),
-                    margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                    margin_left = self.INDENT_WIDGET_LEFT,
                     active = not self.copy_to_clipboard ) )
 
             grid.attach( radio_internet_search, 0, row, 1, 1 )
@@ -402,7 +402,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             grid.attach( search_engine_entry, 0, row, 1, 1 )
             search_engine_entry.set_hexpand( True )
             search_engine_entry.set_margin_left(
-                IndicatorBase.INDENT_WIDGET_LEFT * 2 ),
+                self.INDENT_WIDGET_LEFT * 2 ),
 
             row += 1
 
@@ -427,7 +427,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             grid.attach(
                 self.create_box(
                     ( ( label, False ), ),
-                    margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                    margin_top = self.INDENT_WIDGET_TOP ),
                 0, row, 1, 1 )
 
             row += 1
@@ -435,7 +435,7 @@ class IndicatorOnThisDay( IndicatorBase ):
             grid.attach( search_engine_entry, 0, row, 1, 1 )
             search_engine_entry.set_hexpand( True )
             search_engine_entry.set_margin_left(
-                IndicatorBase.INDENT_WIDGET_LEFT )
+                self.INDENT_WIDGET_LEFT )
 
             row += 1
 
@@ -445,7 +445,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 tooltip_text = _(
                     "On startup or when saving preferences,\n" +
                     "show a notification for each of today's events." ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
+                margin_top = self.INDENT_WIDGET_TOP,
                 active = self.notify ) )
 
         grid.attach( notify_checkbutton, 0, row, 1, 1 )

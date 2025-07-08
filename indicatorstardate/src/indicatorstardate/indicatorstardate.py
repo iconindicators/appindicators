@@ -176,7 +176,7 @@ class IndicatorStardate( IndicatorBase ):
                 _( "Show ISSUE" ),
                 tooltip_text = _( "Show the ISSUE of the stardate 'classic'." ),
                 sensitive = show_classic_checkbutton.get_active(),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = self.show_issue ) )
 
         grid.attach( show_issue_checkbutton, 0, 1, 1, 1 )
@@ -189,7 +189,7 @@ class IndicatorStardate( IndicatorBase ):
                     +
                     "with leading zeros." ),
                 sensitive = show_classic_checkbutton.get_active(),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = self.pad_integer ) )
 
         grid.attach( pad_integer_checkbutton, 0, 2, 1, 1 )

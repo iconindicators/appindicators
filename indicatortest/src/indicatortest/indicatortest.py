@@ -247,7 +247,7 @@ class IndicatorTest( IndicatorBase ):
                             self.write_cache_text(
                                 self._get_third_quarter_svg_icon_text(),
                                 IndicatorTest.CACHE_ICON_BASENAME,
-                                IndicatorBase.EXTENSION_SVG_SYMBOLIC ) ) ), ),
+                                self.EXTENSION_SVG_SYMBOLIC ) ) ), ),
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(

@@ -372,7 +372,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         dialog ):
 
         notebook = Gtk.Notebook()
-        notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
+        notebook.set_margin_bottom( self.INDENT_WIDGET_TOP )
 
         # Scripts.
         grid = self.create_grid()
@@ -422,26 +422,26 @@ class IndicatorScriptRunner( IndicatorBase ):
                     None,
                     script.get_name(),
                     script.get_command(),
-                    IndicatorBase.SYMBOL_TICK if script.get_play_sound()
+                    self.SYMBOL_TICK if script.get_play_sound()
                     else None,
-                    IndicatorBase.SYMBOL_TICK if script.get_show_notification()
+                    self.SYMBOL_TICK if script.get_show_notification()
                     else None,
-                    IndicatorBase.SYMBOL_TICK if isinstance( script, Background )
+                    self.SYMBOL_TICK if isinstance( script, Background )
                     else None,
-                    IndicatorBase.SYMBOL_DASH if isinstance( script, Background )
+                    self.SYMBOL_DASH if isinstance( script, Background )
                     else (
-                        IndicatorBase.SYMBOL_TICK if script.get_terminal_open()
+                        self.SYMBOL_TICK if script.get_terminal_open()
                         else None
                     ),
                     None if isinstance( script, Background )
                     else str( script.get_default() ),
                     str( script.get_interval_in_minutes() )
                     if isinstance( script, Background )
-                    else IndicatorBase.SYMBOL_DASH,
+                    else self.SYMBOL_DASH,
                     (
-                        IndicatorBase.SYMBOL_TICK if script.get_force_update()
+                        self.SYMBOL_TICK if script.get_force_update()
                         else None )
-                    if isinstance( script, Background ) else IndicatorBase.SYMBOL_DASH ]
+                    if isinstance( script, Background ) else self.SYMBOL_DASH ]
 
                 treestore.append( parent, row )
 
@@ -563,7 +563,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         copy_.set_sensitive( len( treestore ) )
         remove.set_sensitive( len( treestore ) )
 
-        box.set_margin_top( IndicatorBase.INDENT_WIDGET_TOP )
+        box.set_margin_top( self.INDENT_WIDGET_TOP )
         grid.attach( box, 0, 31, 1, 1 )
 
         send_command_to_log_checkbutton = (
@@ -591,7 +591,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_radiobutton(
                 None,
                 _( "In sub-menus" ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = self.show_scripts_in_submenus ) )
 
         grid.attach( radio_show_scripts_submenu, 0, 1, 1, 1 )
@@ -600,7 +600,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.create_radiobutton(
                 radio_show_scripts_submenu,
                 _( "Indented by group" ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = not self.show_scripts_in_submenus ) )
 
         grid.attach( radio_show_scripts_indented, 0, 2, 1, 1 )
@@ -613,7 +613,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "Otherwise, script names are indented\n" +
                     "within their respective group." ),
                 sensitive = not self.show_scripts_in_submenus,
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 2,
+                margin_left = self.INDENT_WIDGET_LEFT * 2,
                 active = self.hide_groups ) )
 
         radio_show_scripts_indented.connect(
@@ -753,15 +753,15 @@ class IndicatorScriptRunner( IndicatorBase ):
                     sound = (
                         row[ IndicatorScriptRunner.COLUMN_MODEL_SOUND ]
                         ==
-                        IndicatorBase.SYMBOL_TICK )
+                        self.SYMBOL_TICK )
 
                     notification = (
                         row[ IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ]
                         ==
-                        IndicatorBase.SYMBOL_TICK )
+                        self.SYMBOL_TICK )
 
                     background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
-                    if background == IndicatorBase.SYMBOL_TICK:
+                    if background == self.SYMBOL_TICK:
                         script = (
                             Background(
                                 group,
@@ -772,7 +772,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ],
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ]
                                 ==
-                                IndicatorBase.SYMBOL_TICK ) )
+                                self.SYMBOL_TICK ) )
 
                     else:
                         script = (
@@ -784,7 +784,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                                 notification,
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ]
                                 ==
-                                IndicatorBase.SYMBOL_TICK,
+                                self.SYMBOL_TICK,
                                 row[ IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ]
                                 ==
                                 "True" ) )
@@ -825,7 +825,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         group = row[ IndicatorScriptRunner.COLUMN_MODEL_GROUP ]
         if group is None:
             background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
-            show = background == IndicatorBase.SYMBOL_TICK
+            show = background == self.SYMBOL_TICK
 
         else:
             show = False
@@ -833,7 +833,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             while iter_scripts:
                 row = model[ iter_scripts ]
                 background = row[ IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ]
-                if background == IndicatorBase.SYMBOL_TICK:
+                if background == self.SYMBOL_TICK:
                     show = True
                     break
 
@@ -986,7 +986,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Group Name" ) ), False ),
                     ( group_entry, True ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                margin_top = self.INDENT_WIDGET_TOP ),
             0, 0, 1, 1 )
 
         dialog = (
@@ -1069,7 +1069,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Name" ) ), False ),
                     ( script_name_entry, True ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                margin_top = self.INDENT_WIDGET_TOP ),
             0, 1, 1, 1 )
 
         dialog = (
@@ -1329,7 +1329,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Group" ) ), False ),
                     ( group_entry, True ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                margin_top = self.INDENT_WIDGET_TOP ),
             0, 0, 1, 1 )
 
         dialog = (
@@ -1382,7 +1382,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                             iter_scripts,
                             IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
 
-                    if background == IndicatorBase.SYMBOL_TICK:
+                    if background == self.SYMBOL_TICK:
                         script = (
                             model.get_value(
                                 iter_scripts,
@@ -1477,13 +1477,13 @@ class IndicatorScriptRunner( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Name" ) ), False ),
                     ( name_entry, True ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                margin_top = self.INDENT_WIDGET_TOP ),
             0, 1, 1, 1 )
 
         grid.attach(
             self.create_box(
                 ( ( Gtk.Label.new( _( "Command" ) ), False ), ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                margin_top = self.INDENT_WIDGET_TOP ),
             0, 2, 1, 1 )
 
         command_text_view = (
@@ -1507,7 +1507,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 model.get_value(
                     iter_script, IndicatorScriptRunner.COLUMN_MODEL_SOUND ) )
 
-            active = sound == IndicatorBase.SYMBOL_TICK
+            active = sound == self.SYMBOL_TICK
 
         sound_checkbutton = (
             self.create_checkbutton(
@@ -1528,7 +1528,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     iter_script,
                     IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ) )
 
-            active = notification == IndicatorBase.SYMBOL_TICK
+            active = notification == self.SYMBOL_TICK
 
         notification_checkbutton = (
             self.create_checkbutton(
@@ -1549,7 +1549,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     iter_script,
                     IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
 
-            is_background = background == IndicatorBase.SYMBOL_TICK
+            is_background = background == self.SYMBOL_TICK
 
         script_non_background_radio = (
             self.create_radiobutton(
@@ -1571,7 +1571,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         iter_script,
                         IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ) )
 
-                active = terminal == IndicatorBase.SYMBOL_TICK
+                active = terminal == self.SYMBOL_TICK
 
         terminal_checkbutton = (
             self.create_checkbutton(
@@ -1579,7 +1579,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 tooltip_text = _(
                     "Leave the terminal open on script completion." ),
                 sensitive = not is_background,
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = active ) )
 
         grid.attach( terminal_checkbutton, 0, 16, 1, 1 )
@@ -1606,7 +1606,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "click of the indicator icon.\n\n" +
                     "Not supported on all desktops." ),
                 sensitive = not is_background,
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = active ) )
 
         grid.attach( default_script_checkbutton, 0, 17, 1, 1 )
@@ -1645,7 +1645,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     ( Gtk.Label.new( _( "Interval" ) ), False ),
                     ( interval_spinner, False ) ),
                 sensitive = is_background,
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT * 2 ) )
+                margin_left = self.INDENT_WIDGET_LEFT * 2 ) )
 
         grid.attach( label_and_interval_spinner_box, 0, 19, 1, 1 )
 
@@ -1657,7 +1657,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                         iter_script,
                         IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) )
 
-                active = force_update == IndicatorBase.SYMBOL_TICK
+                active = force_update == self.SYMBOL_TICK
 
         force_update_checkbutton = (
             self.create_checkbutton(
@@ -1671,7 +1671,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "be run on the next update of ANY script,\n" +
                     "if the script returned a non-empty message." ),
                 sensitive = is_background,
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = active ) )
 
         grid.attach( force_update_checkbutton, 0, 20, 1, 1 )
@@ -1761,7 +1761,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                             iter_script,
                             IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND )
                         ==
-                        IndicatorBase.SYMBOL_TICK )
+                        self.SYMBOL_TICK )
 
                     iter_group = model.iter_parent( iter_script )
                     if model.iter_n_children( iter_group ) == 1:
@@ -1821,26 +1821,26 @@ class IndicatorScriptRunner( IndicatorBase ):
                     None,
                     name_,
                     self.get_textview_text( command_text_view ).strip(),
-                    IndicatorBase.SYMBOL_TICK if sound_checkbutton.get_active()
+                    self.SYMBOL_TICK if sound_checkbutton.get_active()
                     else None,
-                    IndicatorBase.SYMBOL_TICK if notification_checkbutton.get_active()
+                    self.SYMBOL_TICK if notification_checkbutton.get_active()
                     else None,
-                    IndicatorBase.SYMBOL_TICK if script_background_radio.get_active()
+                    self.SYMBOL_TICK if script_background_radio.get_active()
                     else None,
-                    IndicatorBase.SYMBOL_DASH if script_background_radio.get_active()
+                    self.SYMBOL_DASH if script_background_radio.get_active()
                     else (
-                        IndicatorBase.SYMBOL_TICK if terminal_checkbutton.get_active()
+                        self.SYMBOL_TICK if terminal_checkbutton.get_active()
                         else None
                     ),
-                    IndicatorBase.SYMBOL_DASH if script_background_radio.get_active()
+                    self.SYMBOL_DASH if script_background_radio.get_active()
                     else str( default_script_checkbutton.get_active() ),
                     str( interval_spinner.get_value_as_int() )
                     if script_background_radio.get_active()
-                    else IndicatorBase.SYMBOL_DASH,
+                    else self.SYMBOL_DASH,
                     (
-                        IndicatorBase.SYMBOL_TICK if force_update_checkbutton.get_active()
+                        self.SYMBOL_TICK if force_update_checkbutton.get_active()
                         else None )
-                    if script_background_radio.get_active() else IndicatorBase.SYMBOL_DASH ]
+                    if script_background_radio.get_active() else self.SYMBOL_DASH ]
 
                 iter_select = model.append( parent, row )
 

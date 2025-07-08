@@ -392,7 +392,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         dialog ):
 
         notebook = Gtk.Notebook()
-        notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
+        notebook.set_margin_bottom( self.INDENT_WIDGET_TOP )
 
         # PPAs.
         grid = self.create_grid()
@@ -484,7 +484,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             self.create_checkbutton(
                 _( "Sort by download" ),
                 tooltip_text = _( "Sort by download count within each PPA." ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
+                margin_top = self.INDENT_WIDGET_TOP,
                 active = self.sort_by_download ) )
 
         grid.attach( sort_by_download_checkbutton, 0, 1, 1, 1 )
@@ -509,7 +509,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 (
                     ( label, False ),
                     ( spinner, False ) ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT ),
+                margin_left = self.INDENT_WIDGET_LEFT ),
             0, 2, 1, 1 )
 
         sort_by_download_checkbutton.connect(
@@ -524,7 +524,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 _( "Low bandwidth" ),
                 tooltip_text = _(
                     "Enable if your internet connection is slow." ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
+                margin_top = self.INDENT_WIDGET_TOP,
                 active = self.low_bandwidth ) )
 
         grid.attach( low_bandwidth_checkbutton, 0, 3, 1, 1 )

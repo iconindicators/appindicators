@@ -545,7 +545,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         dialog ):
 
         notebook = Gtk.Notebook()
-        notebook.set_margin_bottom( IndicatorBase.INDENT_WIDGET_TOP )
+        notebook.set_margin_bottom( self.INDENT_WIDGET_TOP )
 
         # Group name (remaining data is empty).
         #   or
@@ -690,7 +690,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Refresh interval (minutes)" ) ), False ),
                     ( spinner_refresh_interval, False ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                margin_top = self.INDENT_WIDGET_TOP ),
             0, row, 1, 1 )
 
         row += 1
@@ -710,7 +710,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Startup delay (seconds)" ) ), False ),
                     ( spinner_delay, False ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                margin_top = self.INDENT_WIDGET_TOP ),
             0, row, 1, 1 )
 
         row += 1

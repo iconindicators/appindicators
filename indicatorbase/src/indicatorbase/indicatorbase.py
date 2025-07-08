@@ -492,29 +492,26 @@ class IndicatorBase( ABC ):
         Comment out obsolete tags and retrieve the delay, if present.
 #TODO COmment here why we are getting the delay...
         '''
-        with open( self.desktop_file_config_autostart, 'r', encoding = "utf-8" ) as f:
-            lines = f.readlines()
-
         output = ""
         delay = ""
         autostart_enabled_present = False
         exec_with_sleep_present = False
         terminal_present = False
         made_a_change = False
-        for line in lines:
+        for line in self.read_text_file( self.desktop_file_config_autostart ):
             starts_with_autostart_enabled = (
                 line.startswith(
-                    IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ) )
+                    self._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ) )
 
             starts_with_autostart_delay = (
                 line.startswith(
-                    IndicatorBase._DOT_DESKTOP_AUTOSTART_DELAY + '=' ) )
+                    self._DOT_DESKTOP_AUTOSTART_DELAY + '=' ) )
 
             starts_with_desktop_exec = (
-                line.startswith( IndicatorBase._DOT_DESKTOP_EXEC + '=' ) )
+                line.startswith( self._DOT_DESKTOP_EXEC + '=' ) )
 
             starts_with_desktop_terminal = (
-                line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL + '=' ) )
+                line.startswith( self._DOT_DESKTOP_TERMINAL + '=' ) )
 
             if starts_with_autostart_enabled:
                 output += line
@@ -575,16 +572,13 @@ class IndicatorBase( ABC ):
                     "linux" /
                     "indicatorbase.py.desktop" )
 
-            with open( desktop_file_original, 'r', encoding = "utf-8" ) as f:
-                lines = f.readlines()
-
-            for line in lines:
-                if line.startswith( IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ):
+            for line in self.read_text_file( desktop_file_original ):
+                if line.startswith( self._DOT_DESKTOP_AUTOSTART_ENABLED ):
                     if not autostart_enabled_present:
                         output += line
                         made_a_change = True
 
-                elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
+                elif line.startswith( self._DOT_DESKTOP_EXEC ):
                     if not exec_with_sleep_present:
                         line_ = line.replace( "{indicator}", self.indicator_name )
                         if delay:
@@ -600,7 +594,7 @@ class IndicatorBase( ABC ):
 
                     made_a_change = True #TODO I think this needs one level of indent.
 
-                elif line.startswith( IndicatorBase._DOT_DESKTOP_TERMINAL ):
+                elif line.startswith( self._DOT_DESKTOP_TERMINAL ):
                     if not terminal_present:
                         output += line
                         made_a_change = True
@@ -757,7 +751,7 @@ class IndicatorBase( ABC ):
 
         else:
             self.request_update(
-                IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
+                self._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
 
 
     @abstractmethod
@@ -1004,7 +998,7 @@ class IndicatorBase( ABC ):
 
     def _get_session_type( self ):
         ''' Get the session type as required. ''' 
-        if self._session_type is None:
+        if self.session_type is None:
             self.session_type = (
                 self.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )
 
@@ -1016,11 +1010,11 @@ class IndicatorBase( ABC ):
 
 
     def is_session_type_wayland( self ):
-        return self.get_session_type() == IndicatorBase.SESSION_TYPE_WAYLAND
+        return self.get_session_type() == self.SESSION_TYPE_WAYLAND
 
 
     def is_session_type_x11( self ):
-        return self.get_session_type() == IndicatorBase.SESSION_TYPE_X11
+        return self.get_session_type() == self.SESSION_TYPE_X11
 
 
     def _on_about(
@@ -1496,14 +1490,14 @@ class IndicatorBase( ABC ):
         delay = 0
         with open( self.desktop_file_config_autostart, 'r', encoding = "utf-8" ) as f:
             autostart_enable_equals_true = (
-                IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" )
+                self._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" )
 
             for line in f:
                 if line.startswith( autostart_enable_equals_true ):
                     autostart = True
 
                 starts_with_dot_desktop_exec = (
-                    line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ) )
+                    line.startswith( self._DOT_DESKTOP_EXEC ) )
 
                 if starts_with_dot_desktop_exec and "sleep" in line:
                     delay = int(
@@ -1534,7 +1528,7 @@ class IndicatorBase( ABC ):
                 (
                     ( autostart_checkbox, False ),
                     ( autostart_spinner, False ) ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ) )
+                margin_top = self.INDENT_WIDGET_TOP ) )
 
         latest_version_checkbox = (
             self.create_checkbutton(
@@ -1547,7 +1541,7 @@ class IndicatorBase( ABC ):
         box_latest_version = (
             self.create_box(
                 ( ( latest_version_checkbox, False ), ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP ) )
+                margin_top = self.INDENT_WIDGET_TOP ) )
 
         if self.new_version_available and self.check_latest_version:
             url = f"https://pypi.org/project/{ self.indicator_name }"
@@ -1597,16 +1591,16 @@ class IndicatorBase( ABC ):
             for line in f:
                 line_starts_with_dot_desktop_autostart_enabled = (
                     line.startswith(
-                        IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ) )
+                        self._DOT_DESKTOP_AUTOSTART_ENABLED ) )
 
                 if line_starts_with_dot_desktop_autostart_enabled:
                     output += (
-                        IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED +
+                        self._DOT_DESKTOP_AUTOSTART_ENABLED +
                         '=' +
                         str( is_set ).lower() +
                         '\n' )
 
-                elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
+                elif line.startswith( self._DOT_DESKTOP_EXEC ):
                     parts = line.split( "sleep" )
                     right = parts[ 1 ].split( "&&" )[ 1 ]
                     output += (
@@ -1724,20 +1718,20 @@ class IndicatorBase( ABC ):
         '''
         indent_amount = "      "
         indent_small = (
-            self.get_current_desktop() == IndicatorBase._DESKTOP_KDE )
+            self.get_current_desktop() == self._DESKTOP_KDE )
 
         if indent_small:
             indent_amount = "   "
 
         detatched_submenus = (
-            self.get_current_desktop() == IndicatorBase._DESKTOP_BUDGIE_GNOME or
-            self.get_current_desktop() == IndicatorBase._DESKTOP_ICEWM or
-            self.get_current_desktop() == IndicatorBase._DESKTOP_KDE or
-            self.get_current_desktop() == IndicatorBase._DESKTOP_LXQT or
-            self.get_current_desktop() == IndicatorBase._DESKTOP_MATE or
-            self.get_current_desktop() == IndicatorBase._DESKTOP_UNITY7 or
-            self.get_current_desktop() == IndicatorBase._DESKTOP_X_CINNAMON or
-            self.get_current_desktop() == IndicatorBase._DESKTOP_XFCE )
+            self.get_current_desktop() == self._DESKTOP_BUDGIE_GNOME or
+            self.get_current_desktop() == self._DESKTOP_ICEWM or
+            self.get_current_desktop() == self._DESKTOP_KDE or
+            self.get_current_desktop() == self._DESKTOP_LXQT or
+            self.get_current_desktop() == self._DESKTOP_MATE or
+            self.get_current_desktop() == self._DESKTOP_UNITY7 or
+            self.get_current_desktop() == self._DESKTOP_X_CINNAMON or
+            self.get_current_desktop() == self._DESKTOP_XFCE )
 
         if detatched_submenus:
             indent_amount = indent_amount * indent[ 1 ]
@@ -2665,9 +2659,9 @@ class IndicatorBase( ABC ):
         label/tooltip.
         '''
         label_or_tooltip_update_unsupported = (
-            self.get_current_desktop() == IndicatorBase._DESKTOP_ICEWM
+            self.get_current_desktop() == self._DESKTOP_ICEWM
             or
-            self.get_current_desktop() == IndicatorBase._DESKTOP_LXQT )
+            self.get_current_desktop() == self._DESKTOP_LXQT )
 
         return not label_or_tooltip_update_unsupported
 
@@ -2675,7 +2669,7 @@ class IndicatorBase( ABC ):
     def _is_icon_update_supported( self ):
         ''' Lubuntu 20.04/22.04 does not support updating of icon once set. '''
         icon_update_unsupported = (
-            self.get_current_desktop() == IndicatorBase._DESKTOP_LXQT )
+            self.get_current_desktop() == self._DESKTOP_LXQT )
 
         return not icon_update_unsupported
 
@@ -2705,7 +2699,7 @@ class IndicatorBase( ABC ):
         '''
         terminal = None
         execution_flag = None
-        for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
+        for _terminal, _execution_flag in self._TERMINALS_AND_EXECUTION_FLAGS:
             terminal = (
                 self.process_run(
                     "which " + _terminal,
@@ -2761,9 +2755,10 @@ class IndicatorBase( ABC ):
 
     def _load_config( self ):
         ''' Read a dictionary of configuration from a JSON text file. '''
+
         config_file = (
             self._get_config_directory() /
-            ( self.indicator_name + IndicatorBase._EXTENSION_JSON ) )
+            ( self.indicator_name + self._EXTENSION_JSON ) )
 
         self._copy_config_to_new_directory( config_file )
 
@@ -2776,11 +2771,11 @@ class IndicatorBase( ABC ):
 
         self.load_config( config ) # Call to implementation in indicator.
 
-        if IndicatorBase._CONFIG_CHECK_LATEST_VERSION not in config:
-            config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] = False
+        if self._CONFIG_CHECK_LATEST_VERSION not in config:
+            config[ self._CONFIG_CHECK_LATEST_VERSION ] = False
 
         self.check_latest_version = (
-            config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] )
+            config[ self._CONFIG_CHECK_LATEST_VERSION ] )
 
 
     def _copy_config_to_new_directory(
@@ -2824,7 +2819,7 @@ class IndicatorBase( ABC ):
 
         In this case, return a dummy version of "0.0.0"
         '''
-        return config.get( IndicatorBase._CONFIG_VERSION, "0.0.0" )
+        return config.get( self._CONFIG_VERSION, "0.0.0" )
 
 
     def request_save_config(
@@ -2842,7 +2837,7 @@ class IndicatorBase( ABC ):
 
         else:
             self.request_save_config(
-                IndicatorBase._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
+                self._UPDATE_PERIOD_IN_SECONDS_DEFAULT )
 
 
     @abstractmethod
@@ -2853,13 +2848,13 @@ class IndicatorBase( ABC ):
     def _save_config( self ):
         ''' Write a dictionary of user configuration to a JSON text file. '''
         config = self.save_config() # Call to implementation in indicator.
-        config[ IndicatorBase._CONFIG_VERSION ] = self.get_version()
-        config[ IndicatorBase._CONFIG_CHECK_LATEST_VERSION ] = (
+        config[ self._CONFIG_VERSION ] = self.get_version()
+        config[ self._CONFIG_CHECK_LATEST_VERSION ] = (
             self.check_latest_version )
 
         config_file = (
             self._get_config_directory() /
-            ( self.indicator_name + IndicatorBase._EXTENSION_JSON ) )
+            ( self.indicator_name + self._EXTENSION_JSON ) )
 
         with open( config_file, 'w', encoding = "utf-8" ) as f_out:
             f_out.write( json.dumps( config ) )
@@ -2925,7 +2920,7 @@ class IndicatorBase( ABC ):
             expiry = (
                 datetime.datetime.strptime(
                     date_time_component,
-                    IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) )
+                    self._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) )
 
             expiry = expiry.replace( tzinfo = datetime.timezone.utc )
 
@@ -2942,7 +2937,7 @@ class IndicatorBase( ABC ):
         '''
         now_as_string = (
             datetime.datetime.now().strftime(
-                IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) )
+                self._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) )
 
         filename = basename + now_as_string + extension
 
@@ -3024,7 +3019,7 @@ class IndicatorBase( ABC ):
                     file_date_time = (
                         datetime.datetime.strptime(
                             date_time,
-                            IndicatorBase._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) )
+                            self._CACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSS ) )
 
                     if file_date_time < cache_maximum_age_date_time:
                         file_.unlink()
@@ -3238,6 +3233,17 @@ class IndicatorBase( ABC ):
         directory = Path.home() / user_base_directory / application_base_directory
         directory.mkdir( parents = True, exist_ok = True )
         return directory
+
+
+#TODO See where else this could be used...perhaps even extended.
+    @staticmethod
+    def read_text_file(
+        file_ ):
+
+        with open( file_, 'r', encoding = "utf-8" ) as f:
+            lines = f.readlines()
+
+        return lines
 
 
     @staticmethod

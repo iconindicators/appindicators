@@ -281,7 +281,7 @@ class IndicatorPunycode( IndicatorBase ):
                 _( "Clipboard" ),
                 tooltip_text = _(
                     "Input is taken from the clipboard." ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = self.input_clipboard ) )
 
         if self.is_clipboard_supported():
@@ -294,7 +294,7 @@ class IndicatorPunycode( IndicatorBase ):
                 _( "Primary" ),
                 tooltip_text = _(
                     "Input is taken from the currently selected text." ),
-                margin_left = IndicatorBase.INDENT_WIDGET_LEFT,
+                margin_left = self.INDENT_WIDGET_LEFT,
                 active = not self.input_clipboard ) )
 
         if self.is_clipboard_supported():
@@ -309,7 +309,7 @@ class IndicatorPunycode( IndicatorBase ):
                     "to both the clipboard and primary.\n\n"
                     "Otherwise the converted text is sent\n"
                     "only to the input source." ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
+                margin_top = self.INDENT_WIDGET_TOP,
                 active = self.output_both ) )
 
         if self.is_clipboard_supported():
@@ -322,7 +322,7 @@ class IndicatorPunycode( IndicatorBase ):
                 tooltip_text = _(
                     "If checked, the output text will not\n"
                     "contain any path/query (if present)." ),
-                margin_top = IndicatorBase.INDENT_WIDGET_TOP,
+                margin_top = self.INDENT_WIDGET_TOP,
                 active = self.drop_path_query ) )
 
         if self.is_clipboard_supported():
@@ -347,7 +347,7 @@ class IndicatorPunycode( IndicatorBase ):
                     (
                         ( Gtk.Label.new( _( "Maximum results" ) ), False ),
                         ( results_amount_spinner, False ) ),
-                    margin_top = IndicatorBase.INDENT_WIDGET_TOP ),
+                    margin_top = self.INDENT_WIDGET_TOP ),
                 0, row, 1, 1 )
 
             row += 1
