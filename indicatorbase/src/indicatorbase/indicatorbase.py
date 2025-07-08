@@ -206,11 +206,15 @@ class IndicatorBase( ABC ):
 
         self.indicator_name = IndicatorBase.INDICATOR_NAME
 
+#TODO See who uses project_metadata and maybe make is self.project_metadata
+# so that access to it (to get say version et al) is done when required.
         project_metadata, error_message = (
             self.get_project_metadata( self.indicator_name ) )
 
         if error_message:
             self._show_message_and_exit( error_message )
+
+        self.version = project_metadata[ "Version" ]
 
         error_message = self._initialise_desktop_file_in_user_home()
         if error_message:
@@ -231,14 +235,16 @@ class IndicatorBase( ABC ):
 
         IndicatorBase._LOGGING_INITIALISED = True
 
+#TODO Why run this here/now?  Can it be run later or when actually needed?
         self.current_desktop = (
             self.process_run( "echo $XDG_CURRENT_DESKTOP" )[ 0 ] )
 
+#TODO Why run this here/now?  Can it be run later or when actually needed?
         self.session_type = (
             self.process_run( "echo $XDG_SESSION_TYPE" )[ 0 ] )
 
+#TODO Can be obtained on demand?
         self.authors_and_emails = self.get_authors_emails( project_metadata )
-        self.version = project_metadata[ "Version" ]
 
 #TODO Now that
 #   [project.urls]
@@ -461,16 +467,27 @@ class IndicatorBase( ABC ):
 #TODO Look at when autostart is enabled/disabled.
 # I think extra lines are being added.
 
-
+#TODO This is called in the constructor.
+# Perhaps instead, call when preferences are kicked off
+# because that's when it is actually used.
+# Then this function can check for the presence of the .desktop in
+# $HOME/.config/autostart and if not present, then do the rest of the stuff...
     def _initialise_desktop_file_in_user_home( self ):
+        '''
+        If the .desktop file is not present in $HOME/.config/autostart
+        copy from $HOME/.local (production) or from source (development).
+        '''
         autostart_path = Path.home() / ".config" / "autostart"
         autostart_path.mkdir( parents = True, exist_ok = True )
         print( f"autostart_path {autostart_path}" ) #TODO
 
         desktop_file = self.indicator_name + ".py.desktop"
         print( f"desktop_file {desktop_file}" ) #TODO
-        self.desktop_file_user_home_config_autostart = autostart_path / desktop_file
+
+        self.desktop_file_user_home_config_autostart = (
+            autostart_path / desktop_file )
         print( f"self.desktop_file_user_home_config_autostart {self.desktop_file_user_home_config_autostart}" ) #TODO
+
         desktop_file_virtual_environment = (
             Path( __file__ ).parent / "platform" / "linux" / desktop_file )
 
@@ -1571,6 +1588,49 @@ class IndicatorBase( ABC ):
             box )
 
 
+    def set_preferences_common_attributes(
+        self,
+        is_set,
+        delay,
+        check_latest_version ):
+
+        self.check_latest_version = check_latest_version
+
+        output = ""
+#TODO This is ALWAYS reading from the .desktop file in $HOME/.config/autostart
+# regardless of running in prod or dev.
+# Is this okay for when running in dev?
+# Should dev have its own version?  Sound messy...
+        with open( self.desktop_file_user_home_config_autostart, 'r', encoding = "utf-8" ) as f:
+            for line in f:
+                line_starts_with_dot_desktop_autostart_enabled = (
+                    line.startswith(
+                        IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ) )
+
+                if line_starts_with_dot_desktop_autostart_enabled:
+                    output += (
+                        IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED +
+                        '=' +
+                        str( is_set ).lower() +
+                        '\n' )
+
+                elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
+                    parts = line.split( "sleep" )
+                    right = parts[ 1 ].split( "&&" )[ 1 ]
+                    output += (
+                        parts[ 0 ] +
+                        "sleep " + str( delay ) +
+                        " &&" +
+                        right +
+                        '\n' )
+
+                else:
+                    output += line
+
+        with open( self.desktop_file_user_home_config_autostart, 'w', encoding = "utf-8" ) as f:
+            f.write( output )
+
+
     def create_and_append_menuitem(
         self,
         menu,
@@ -2213,49 +2273,6 @@ class IndicatorBase( ABC ):
         dialog.set_transient_for( parent )
         dialog.set_filename( filename )
         return dialog
-
-
-    def set_preferences_common_attributes(
-        self,
-        is_set,
-        delay,
-        check_latest_version ):
-
-        self.check_latest_version = check_latest_version
-
-        output = ""
-#TODO This is ALWAYS reading from the .desktop file in $HOME/.config/autostart
-# regardless of running in prod or dev.
-# Is this okay for when running in dev?
-# Should dev have its own version?  Sound messy...
-        with open( self.desktop_file_user_home_config_autostart, 'r', encoding = "utf-8" ) as f:
-            for line in f:
-                line_starts_with_dot_desktop_autostart_enabled = (
-                    line.startswith(
-                        IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED ) )
-
-                if line_starts_with_dot_desktop_autostart_enabled:
-                    output += (
-                        IndicatorBase._DOT_DESKTOP_AUTOSTART_ENABLED +
-                        '=' +
-                        str( is_set ).lower() +
-                        '\n' )
-
-                elif line.startswith( IndicatorBase._DOT_DESKTOP_EXEC ):
-                    parts = line.split( "sleep" )
-                    right = parts[ 1 ].split( "&&" )[ 1 ]
-                    output += (
-                        parts[ 0 ] +
-                        "sleep " + str( delay ) +
-                        " &&" +
-                        right +
-                        '\n' )
-
-                else:
-                    output += line
-
-        with open( self.desktop_file_user_home_config_autostart, 'w', encoding = "utf-8" ) as f:
-            f.write( output )
 
 
     def _create_fortune_or_calendar_preferences_panel(
