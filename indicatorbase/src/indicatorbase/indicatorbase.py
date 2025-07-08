@@ -452,7 +452,7 @@ class IndicatorBase( ABC ):
     def _initialise_desktop_file_in_user_home( self ):
         '''
         If the .desktop file is not present in $HOME/.config/autostart
-        copy from $HOME/.local (production) or from source (development).
+        copy from $HOME/.local/venv_indicators.
         '''
         config_autostart = Path.home() / ".config" / "autostart"
         config_autostart.mkdir( parents = True, exist_ok = True )
@@ -464,18 +464,28 @@ class IndicatorBase( ABC ):
         self.desktop_file_config_autostart = config_autostart / desktop_file
         print( f"self.desktop_file_config_autostart {self.desktop_file_config_autostart}" ) #TODO
 
+#TODO This will be correct in prod, wrong in dev...so when to fix this?  Now or later?
+        # This will resolve to either
+        #   the path to the .desktop file in the production environment located
+        #   at $HOME/.local/venv_indicators/..
+        # or
+        #   a non-existant path in the development environment.
         desktop_file_virtual_environment = (
             Path( __file__ ).parent / "platform" / "linux" / desktop_file )
-
         print( f"desktop_file_virtual_environment {desktop_file_virtual_environment}" ) #TODO
+
         error_message = None
-        if self.desktop_file_config_autostart.is_file():
+        if self.desktop_file_config_autostart.exists():
+            print( "Desktop file exists." ) #TODO
             self._upgrade_desktop_file( desktop_file_virtual_environment )
 
         else:
+            print( "Copying desktop file..." ) #TODO
             error_message = (
                 self._copy_desktop_file_to_home_config_autostart(
                     desktop_file_virtual_environment ) )
+
+            print( "Copied desktop file." ) #TODO
 
         return error_message
 
@@ -535,6 +545,8 @@ class IndicatorBase( ABC ):
             or
             not terminal_present )
 
+        print( f"tags: {tags_missing}" ) #TODO
+
         if tags_missing:
             # From the .desktop file, extract the
             #    Exec (with sleep)
@@ -545,6 +557,8 @@ class IndicatorBase( ABC ):
                 desktop_file_original = desktop_file_virtual_environment
 
             else:
+#TODO Do not get from here...it will contain comments and unresolved {} tags.
+#Instead, get from whl.
                 desktop_file_original = (
                     Path( __file__ ).parent.parent.parent.parent /
                     "indicatorbase" /
@@ -593,7 +607,10 @@ class IndicatorBase( ABC ):
 
         On success, returns None; otherwise returns an error message.
         '''
+        print( f"desktop_file_virtual_environment {desktop_file_virtual_environment}")#TODO
         if desktop_file_virtual_environment.exists():
+            # The file will only be present if running in production.
+            print( "Copy from venv." ) #TODO
             shutil.copy(
                 desktop_file_virtual_environment,
                 self.desktop_file_config_autostart )
@@ -601,15 +618,21 @@ class IndicatorBase( ABC ):
             error_message = None
 
         else:
+            # The desktop file could not be found so must be running in
+            # development.
+            #
+            # , there will be no desktop file present
+            # because the path will refer to indicator_name/platform... which
+            # does not exist. 
+            print( "Get desktop from whl." ) #TODO
             wheel_in_release, error_message = (
                 self._get_wheel_in_release( self.indicator_name ) )
 
             if wheel_in_release:
-                with ZipFile( wheel_in_release, 'r' ) as z:
-                    desktop_file_in_wheel = (
-                        self.indicator_name +
-                        f"/platform/linux/{ self.indicator_name }.py.desktop" )
+                desktop_file_in_wheel = (
+                    f"{ self.indicator_name }/platform/linux/{ self.indicator_name }.py.desktop" )
 
+                with ZipFile( wheel_in_release, 'r' ) as z:
                     if desktop_file_in_wheel in z.namelist():
                         desktop_file_in_tmp = (
                             z.extract( desktop_file_in_wheel, path = "/tmp" ) )
