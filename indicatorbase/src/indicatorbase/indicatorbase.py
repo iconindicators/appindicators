@@ -458,26 +458,18 @@ class IndicatorBase( ABC ):
         '''
         home_config_autostart = Path.home() / ".config" / "autostart"
         home_config_autostart.mkdir( parents = True, exist_ok = True )
-        print( f"home_config_autostart {home_config_autostart}" ) #TODO
 
         desktop_file = self.indicator_name + ".py.desktop"
-        print( f"desktop_file {desktop_file}" ) #TODO
 
         self.desktop_file_home_config_autostart = (
             home_config_autostart / desktop_file )
 
-        print( f"self.desktop_file_home_config_autostart {self.desktop_file_home_config_autostart}" ) #TODO
-
         desktop_file_production = (
             Path( __file__ ).parent / "platform" / "linux" / desktop_file )
 
-        print( f"desktop_file_production {desktop_file_production}" ) #TODO
-
         message = ""
         if self.desktop_file_home_config_autostart.exists():
-            print( "upgrade .desktop" ) #TODO
             if desktop_file_production.exists():
-                print( "Upgrade from production" ) #TODO
                 self._upgrade_desktop_file(
                     self.read_text_file( desktop_file_production ) )
 
@@ -488,19 +480,16 @@ class IndicatorBase( ABC ):
                         temporary_desktop_file.name ) )
 
                 if not message:
-                    print( "Upgrade from wheel" ) #TODO
                     self._upgrade_desktop_file(
                         self.read_text_file( temporary_desktop_file.name ) )
 
         else:
             if desktop_file_production.exists():
-                print( "copy .desktop from production" ) #TODO
                 shutil.copy(
                     desktop_file_production,
                     self.desktop_file_home_config_autostart )
 
             else:
-                print( "copy .desktop from release whl" ) #TODO
                 message = (
                     self._extract_desktop_file_from_wheel(
                         self.desktop_file_home_config_autostart ) )
@@ -516,7 +505,6 @@ class IndicatorBase( ABC ):
 
         On success, returns None; otherwise returns an error message.
         '''
-        print( "Extract desktop from whl." ) #TODO
         wheel_in_release, error_message = (
             self._get_wheel_in_release( self.indicator_name ) )
 
@@ -661,6 +649,8 @@ class IndicatorBase( ABC ):
         Assume to be running in production and look there.
         On failure, resort to the development environment.
         '''
+#TODO Got some prints below...don't know why.
+# Check who calls this function, when/where/why...
         changelog = Path( __file__ ).parent / "CHANGELOG.md"
         print( f"changelog (prod) {changelog}")#TODO
         if not Path( changelog ).exists():
@@ -1566,10 +1556,6 @@ class IndicatorBase( ABC ):
         self.check_latest_version = check_latest_version
 
         output = ""
-#TODO This is ALWAYS reading from the .desktop file in $HOME/.config/autostart
-# regardless of running in prod or dev.
-# Is this okay for when running in dev?
-# Should dev have its own version?  Sound messy...
         with open( self.desktop_file_home_config_autostart, 'r', encoding = "utf-8" ) as f:
             for line in f:
                 line_starts_with_dot_desktop_autostart_enabled = (
