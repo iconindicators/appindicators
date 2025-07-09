@@ -147,10 +147,10 @@ def _create_update_pot(
                     original += line
 
             new = ""
-            with open( pot_file_new, 'r', encoding = "utf-8" ) as f:
-                for line in f:
-                    if "POT-Creation-Date" not in line:
-                        new += line
+            lines = indicatorbase.IndicatorBase.read_text_file( pot_file_new )
+            for line in lines:
+                if "POT-Creation-Date" not in line:
+                    new += line
 
             if original == new:
                 os.remove( pot_file_new )
