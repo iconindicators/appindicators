@@ -682,21 +682,6 @@ def _get_name_categories_comments_from_indicator(
     categories = ""
     comments = ""
     message = ""
-    with open( indicator_source, 'r', encoding = "utf-8" ) as f:
-        for line in f:
-            if re.search( r"INDICATOR_NAME_HUMAN_READABLE = _\( ", line ):
-                name = parse( line )
-
-            if re.search( r"INDICATOR_CATEGORIES = ", line ):
-                categories = parse( line )
-
-            if re.search( r"comments = _\(", line ):
-                comments = parse( line )
-
-    print( name )
-    print( categories )
-    print( comments )
-
     lines = indicatorbase.IndicatorBase.read_text_file( indicator_source)
     for line in lines:
         if re.search( r"INDICATOR_NAME_HUMAN_READABLE = _\( ", line ):
@@ -707,12 +692,6 @@ def _get_name_categories_comments_from_indicator(
 
         if re.search( r"comments = _\(", line ):
             comments = parse( line )
-
-    print( name )
-    print( categories )
-    print( comments )
-
-
 
     if name == "":
         message += f"ERROR: Unable to obtain 'indicator_name' from \n\t{ indicator_source }\n"
