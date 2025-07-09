@@ -623,11 +623,10 @@ def _get_version_in_changelog_markdown(
     changelog_markdown ):
 
     version = ""
-    with open( changelog_markdown, 'r', encoding = "utf-8" ) as f:
-        for line in f.readlines():
-            if line.startswith( "## v" ):
-                version = line.split( ' ' )[ 1 ][ 1 : ]
-                break
+    lines = indicatorbase.IndicatorBase.read_text_file( changelog_markdown )
+    for line in lines:
+        if line.startswith( "## v" ):
+            version = line.split( ' ' )[ 1 ][ 1 : ]
 
     return version
 
