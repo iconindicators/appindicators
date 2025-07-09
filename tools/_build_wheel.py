@@ -196,9 +196,10 @@ def _create_po(
     if return_code == 0:
         message = stderr_
 
-        with open( po_file_original, 'r', encoding = "utf-8" ) as r:
-            text = (
-                r.read().
+        lines = indicatorbase.IndicatorBase.read_text_file( po_file_original )
+        content = ''.join( lines )
+        text = (
+            content.
                 replace(
                     f"Portable Object Template for { indicator }",
                     f"<English language name for { lingua_code }> translation for { indicator }" ).
