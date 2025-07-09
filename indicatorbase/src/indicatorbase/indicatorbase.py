@@ -678,18 +678,18 @@ class IndicatorBase( ABC ):
         CHANGELOG.md otherwise retrieves the most recent year.
         '''
         year = ""
-        with open( changelog_markdown, 'r', encoding = "utf-8" ) as f:
-            lines = f.readlines()
-            if first_year:
-                lines = reversed( lines )
 
-            for line in lines:
-                if line.startswith( "## v" ):
-                    left_parenthesis = line.find( '(' )
-                    year = (
-                        line[ left_parenthesis + 1 : left_parenthesis + 1 + 4 ] )
+        lines = IndicatorBase.read_text_file( changelog_markdown )
+        if first_year:
+            lines = reversed( lines )
 
-                    break
+        for line in lines:
+            if line.startswith( "## v" ):
+                left_parenthesis = line.find( '(' )
+                year = (
+                    line[ left_parenthesis + 1 : left_parenthesis + 1 + 4 ] )
+
+                break
 
         return year
 
