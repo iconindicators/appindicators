@@ -142,7 +142,6 @@ class DataProviderOrbitalElement( DataProvider ):
 
         if json_:
             minor_planets = json_[ "data" ][ "query_closest_orbelements" ]
-
             with open( filename, 'w', encoding = "utf-8" ) as f:
                 for minor_planet in minor_planets:
                     minor_planet_ = minor_planet[ "minorplanet" ]
@@ -380,18 +379,55 @@ class DataProviderOrbitalElement( DataProvider ):
                 valid_indices = [
                     8, 14, 20, 26, 36, 37, 47, 48, 58, 59, 69, 70, 80, 92, 104, 105, 107, 117, 123, 127, 137, 142, 146, 150, 161, 166 ] # Ignore 132.
 
+
+            print( 000 )
+            print( f"{filename}")
             with open( filename, 'r', encoding = "utf-8" ) as f:
                 for line in f.read().splitlines():
                     keep = True
                     for i in valid_indices:
-                        if len( line [ i - 1 ].strip() ) > 0:
+                        if len( line[ i - 1 ].strip() ) > 0:
                             keep = False
                             break
 
                     if keep:
+                        # print( line )
                         name = line[ name_start - 1 : name_end - 1 + 1 ].strip()
-                        oe = OrbitalElement( name, line, orbital_element_data_type )
+                        oe = OrbitalElement( name, line.rstrip(), orbital_element_data_type )
                         oe_data[ oe.get_name().upper() ] = oe
+
+            x = oe_data
+            oe_data = { }
+
+            print( 111 )
+
+            lines = IndicatorBase.read_text_file( filename )
+            for line in lines:
+                line_ = line.rstrip()
+                keep = True
+                for i in valid_indices:
+                    if len( line_[ i - 1 ].strip() ) > 0:
+                        keep = False
+                        break
+
+                if keep:
+                    # print( line )
+                    name = line_[ name_start - 1 : name_end - 1 + 1 ].strip()
+                    oe = OrbitalElement( name, line_, orbital_element_data_type )
+                    oe_data[ oe.get_name().upper() ] = oe
+
+            print( 222 )
+            print( x )
+            print(333)
+            print( oe_data)
+            print( 444)
+            print( x == oe_data )
+            print( 555)
+            print( set( x.keys() ) - set( oe_data.keys() ) )
+            print( 666 )
+            print( set( oe_data.keys() ) - set( x.keys() ) )
+            print( 777 )
+
 
         elif is_xephem_data:
             lines = IndicatorBase.read_text_file( filename )
