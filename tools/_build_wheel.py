@@ -51,10 +51,12 @@ def _get_linguas_codes(
     indicator ):
 
     linguas_codes = [ ]
-    with open( _get_linguas( indicator ), 'r', encoding = "utf-8" ) as f:
-        for line in f:
-            if not line.startswith( '#' ):
-                linguas_codes = line.split()
+
+    file_ = _get_linguas( indicator )
+    lines = indicatorbase.IndicatorBase.read_text_file( file_ )
+    for line in lines:
+        if not line.startswith( '#' ):
+            linguas_codes = line.split()
 
     return linguas_codes
 
@@ -116,17 +118,22 @@ def _create_update_pot(
             f"-o { pot_file_new }" ) )
 
     if return_code == 0:
-        with open( pot_file_new, 'r', encoding = "utf-8" ) as r:
-            text = (
-                r.read().
+        lines = indicatorbase.IndicatorBase.read_text_file( pot_file_new )
+        content = ''.join( lines )
+        text = (
+            content.
                 replace(
                     "SOME DESCRIPTIVE TITLE",
                     f"Portable Object Template for { indicator }" ).
-                replace( f"YEAR { authors_emails[ 0 ][ 0 ] }", copyright_ ).
+                replace(
+                    f"YEAR { authors_emails[ 0 ][ 0 ] }",
+                    copyright_ ).
                 replace(
                     "FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.\n#\n#, fuzzy",
                     "FIRST AUTHOR <EMAIL@ADDRESS>, YEAR."  ).
-                replace( "CHARSET", "UTF-8" ) )
+                replace(
+                    "CHARSET",
+                    "UTF-8" ) )
 
         with open( pot_file_new, 'w', encoding = "utf-8" ) as w:
             w.write( text )
