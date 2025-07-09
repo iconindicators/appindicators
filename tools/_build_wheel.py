@@ -506,10 +506,11 @@ def _check_for_t_o_d_o_s(
     message = ""
     for path in paths:
         for file_type in file_types:
-            for file in ( Path( '.' ) / path ).resolve().rglob( file_type ):
-                with open( file, 'r', encoding = "utf-8" ) as f:
-                    if t_o_d_o in f.read().lower():
-                        message += f"\t{ file }\n"
+            for file_ in ( Path( '.' ) / path ).resolve().rglob( file_type ):
+                lines = indicatorbase.IndicatorBase.read_text_file( file_ )
+                if t_o_d_o in ''.join( lines ).lower():
+                    message += f"\t{ file_ }\n"
+
     if message:
         message = f"Found one or more { t_o_d_o.upper() }s:\n" + message
 
