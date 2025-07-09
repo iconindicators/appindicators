@@ -1594,8 +1594,7 @@ class IndicatorBase( ABC ):
             else:
                 output += line
 
-        with open( self.desktop_file_home_config_autostart, 'w', encoding = "utf-8" ) as f:
-            f.write( output )
+        self.write_text_file( self.desktop_file_home_config_autostart, output )
 
 
     def create_and_append_menuitem(
