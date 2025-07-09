@@ -1472,20 +1472,21 @@ class IndicatorBase( ABC ):
     def create_preferences_common_widgets( self ):
         autostart = False
         delay = 0
-        with open( self.desktop_file_home_config_autostart, 'r', encoding = "utf-8" ) as f:
-            autostart_enable_equals_true = (
-                self._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" )
 
-            for line in f:
-                if line.startswith( autostart_enable_equals_true ):
-                    autostart = True
+        autostart_enable_equals_true = (
+            self._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" )
 
-                starts_with_dot_desktop_exec = (
-                    line.startswith( self._DOT_DESKTOP_EXEC ) )
+        lines = self.read_text_file( self.desktop_file_home_config_autostart )
+        for line in lines:
+            if line.startswith( autostart_enable_equals_true ):
+                autostart = True
 
-                if starts_with_dot_desktop_exec and "sleep" in line:
-                    delay = int(
-                        line.split( "sleep" )[ 1 ].split( "&&" )[ 0 ].strip() )
+            starts_with_dot_desktop_exec = (
+                line.startswith( self._DOT_DESKTOP_EXEC ) )
+
+            if starts_with_dot_desktop_exec and "sleep" in line:
+                delay = int(
+                    line.split( "sleep" )[ 1 ].split( "&&" )[ 0 ].strip() )
 
         autostart_checkbox = (
             self.create_checkbutton(
