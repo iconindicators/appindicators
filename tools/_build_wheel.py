@@ -784,12 +784,7 @@ def _create_scripts_for_linux(
         destination_script_name ):
 
         source = indicatorbase_platform_linux_path / source_script_name
-        with open( source, 'r', encoding = "utf-8" ) as f:
-            text = f.read()
-
-        x = text
         text = ''.join( indicatorbase.IndicatorBase.read_text_file( source ) )
-        print( x == text )
 
         destination = directory_platform_linux / destination_script_name
         with open( destination, 'w', encoding = "utf-8" ) as f:
