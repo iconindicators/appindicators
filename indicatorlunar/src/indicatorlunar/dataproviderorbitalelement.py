@@ -394,32 +394,33 @@ class DataProviderOrbitalElement( DataProvider ):
                         oe_data[ oe.get_name().upper() ] = oe
 
         elif is_xephem_data:
-            with open( filename, 'r', encoding = "utf-8" ) as f:
-                for line in f.read().splitlines():
-                    if not line.startswith( '{' ):
-                        # Sometimes the COBS download emits an error message
-                        # of the form:
-                        #   {
-                        #       "code": "400",
-                        #       "message": "Invalid integer value provided in the parameter.",
-                        #       "moreInfo": "invalid literal for int() with base 10: 'false'",
-                        #       "signature":
-                        #       {
-                        #           "source": "COBS Query API",
-                        #           "version": "1.3",
-                        #           "date": "2024 May"
-                        #       }
-                        #   }
-                        #
-                        # In this event, keep the download file as is for bug
-                        # tracking if needed, but skip loading the data as
-                        # there is no data to load.
-                        #
-                        # When the cache becomes stale, a fresh and hopefully
-                        # successful download will occur.
-                        name = line[ : line.find( ',' ) ].strip()
-                        oe = OrbitalElement( name, line, orbital_element_data_type )
-                        oe_data[ oe.get_name().upper() ] = oe
+            lines = IndicatorBase.read_text_file( filename )
+            for line in lines:
+                line_ = line.strip()
+                if not line_.startswith( '{' ):
+                    # Sometimes the COBS download emits an error message
+                    # of the form:
+                    #   {
+                    #       "code": "400",
+                    #       "message": "Invalid integer value provided in the parameter.",
+                    #       "moreInfo": "invalid literal for int() with base 10: 'false'",
+                    #       "signature":
+                    #       {
+                    #           "source": "COBS Query API",
+                    #           "version": "1.3",
+                    #           "date": "2024 May"
+                    #       }
+                    #   }
+                    #
+                    # In this event, keep the download file as is for bug
+                    # tracking if needed, but skip loading the data as
+                    # there is no data to load.
+                    #
+                    # When the cache becomes stale, a fresh and hopefully
+                    # successful download will occur.
+                    name = line_[ : line_.find( ',' ) ].strip()
+                    oe = OrbitalElement( name, line_, orbital_element_data_type )
+                    oe_data[ oe.get_name().upper() ] = oe
 
         else:
             oe_data = { }
