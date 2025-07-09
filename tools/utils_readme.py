@@ -56,9 +56,15 @@ References:
 
 import datetime
 import re
+import sys
 
 from enum import auto, Enum
 from pathlib import Path
+
+if "../" not in sys.path:
+    sys.path.insert( 0, "../" )
+
+from indicatorbase.src.indicatorbase import indicatorbase
 
 from . import utils
 
@@ -120,21 +126,18 @@ def _get_introduction(
     indicator ):
 
     pattern_tag = re.compile( r".*comments = _\(.*" )
+    filename = indicator + '/src/' + indicator + '/' + indicator + ".py"
+    lines = indicatorbase.IndicatorBase.read_text_file( filename )
+    for line in lines:
+        matches = pattern_tag.search( line )
+        if matches:
+            # Remove \n and drop ending.
+            comments = matches.group().split( "\"" )[ 1 ].replace( '\\n', ' ' )[ 0 : -1 ]
 
-    filename = (
-        indicator + '/src/' + indicator + '/' + indicator + ".py" )
+            # Lower case leading character.
+            comments = comments[ 0 ].lower() + comments[ 1 : ]
 
-    with open( filename, encoding = "utf-8" ) as f_in:
-        for line in f_in:
-            matches = pattern_tag.search( line )
-            if matches:
-                # Remove \n and drop ending.
-                comments = matches.group().split( "\"" )[ 1 ].replace( '\\n', ' ' )[ 0 : -1 ]
-
-                # Lower case leading character.
-                comments = comments[ 0 ].lower() + comments[ 1 : ]
-
-                break
+            break
 
     introduction = (
         f"`{ indicator }` { comments } on "
