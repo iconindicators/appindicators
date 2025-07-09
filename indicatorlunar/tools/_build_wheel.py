@@ -175,8 +175,10 @@ def build( out_path ):
     manifest_specific_dot_in = (
         Path.cwd() / "indicatorlunar" / "MANIFESTspecific.in" )        
 
-    with open( manifest_specific_dot_in, 'r' ) as f:
-        content = f.read()
+    content = (
+        indicatorbase.IndicatorBase.read_text_file( manifest_specific_dot_in ) )
+
+    content = ''.join( content )
 
     message = ""
     if "exclude src/indicatorlunar/astroskyfield.py" not in content:
