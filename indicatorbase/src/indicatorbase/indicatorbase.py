@@ -3125,12 +3125,7 @@ class IndicatorBase( ABC ):
     def _read_cache_text(
         self,
         cache_file ):
-        text = ""
-        if cache_file.is_file():
-            with open( cache_file, 'r', encoding = "utf-8" ) as f_in:
-                text = f_in.read()
-
-        return text
+        return ''.join( self.read_text_file( cache_file ) )
 
 
     def write_cache_text_without_timestamp(
