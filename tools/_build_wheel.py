@@ -141,10 +141,10 @@ def _create_update_pot(
         if pot_file_new.endswith( ".new.pot" ):
             pot_file_original = f"{ locale_directory / indicator }.pot"
             original = ""
-            with open( pot_file_original, 'r', encoding = "utf-8" ) as f:
-                for line in f:
-                    if "POT-Creation-Date" not in line:
-                        original += line
+            lines = indicatorbase.IndicatorBase.read_text_file( pot_file_original )
+            for line in lines:
+                if "POT-Creation-Date" not in line:
+                    original += line
 
             new = ""
             with open( pot_file_new, 'r', encoding = "utf-8" ) as f:
