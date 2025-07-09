@@ -243,23 +243,22 @@ def _update_po(
     # On error, report back to the user.
     message = ""
     if return_code == 0:
-        with open( po_file_new, 'r', encoding = "utf-8" ) as r:
-            new = r.read()
+        lines = indicatorbase.IndicatorBase.read_text_file( po_file_new )
+        new = ''.join( lines )
+        new = (
+            re.sub(
+                r"Copyright \(C\).*",
+                f"Copyright (C) { copyright_ }.",
+                new ) )
 
-            new = (
-                re.sub(
-                    r"Copyright \(C\).*",
-                    f"Copyright (C) { copyright_ }.",
-                    new ) )
+        new = (
+            re.sub(
+                "Project-Id-Version.*",
+                f"Project-Id-Version: { indicator } { version }\\\\n\"",
+                new ) )
 
-            new = (
-                re.sub(
-                    "Project-Id-Version.*",
-                    f"Project-Id-Version: { indicator } { version }\\\\n\"",
-                    new ) )
-
-            with open( po_file_new, 'w', encoding = "utf-8" ) as w:
-                w.write( new )
+        with open( po_file_new, 'w', encoding = "utf-8" ) as w:
+            w.write( new )
 
         if filecmp.cmp( po_file_original, po_file_new ):
             os.remove( po_file_new )
