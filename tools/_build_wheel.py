@@ -824,8 +824,8 @@ def _create_symbolic_icons(
     hicolor_icons = list( ( Path( '.' ) / directory_icons ).glob( "*.svg" ) )
 
     for hicolor_icon in hicolor_icons:
-        with open( hicolor_icon, 'r', encoding = "utf-8" ) as f:
-            symbolic_svg = f.read()
+        symbolic_svg = (
+            ''.join( indicatorbase.IndicatorBase.read_text_file( hicolor_icon ) ) )
 
         for regular_expression in regular_expressions:
             symbolic_svg = (
