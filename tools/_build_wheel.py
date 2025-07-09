@@ -594,8 +594,10 @@ def _create_manifest_dot_in(
     indicatorbase_manifest_in = (
         Path( '.' ) / "indicatorbase" / "MANIFESTbase.in" )
 
-    with open( indicatorbase_manifest_in, 'r', encoding = "utf-8" ) as f:
-        manifest_text = f.read().replace( "{indicator}", indicator )
+    content = (
+        indicatorbase.IndicatorBase.read_text_file( indicatorbase_manifest_in ) )
+
+    manifest_text = ''.join( content ).replace( "{indicator}", indicator )
 
     indicator_manifest_in = (
         Path( '.' ) / indicator / "MANIFESTspecific.in" )
