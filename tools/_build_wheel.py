@@ -603,8 +603,10 @@ def _create_manifest_dot_in(
         Path( '.' ) / indicator / "MANIFESTspecific.in" )
 
     if Path( indicator_manifest_in ).exists():
-        with open( indicator_manifest_in, 'r', encoding = "utf-8" ) as f:
-            manifest_text += f.read().replace( "{indicator}", indicator )
+        content = (
+            indicatorbase.IndicatorBase.read_text_file( indicator_manifest_in ) )
+
+        manifest_text += ''.join( content ).replace( "{indicator}", indicator )
 
     release_manifest_in = directory_out / indicator / "MANIFEST.in"
     with open( release_manifest_in, 'w', encoding = "utf-8" ) as f:
