@@ -724,10 +724,14 @@ def _create_dot_desktop(
         "indicatorbase.py.desktop" )
 
     dot_desktop_text = ""
-    with open( indicatorbase_dot_desktop_path, 'r', encoding = "utf-8" ) as f:
-        while line := f.readline():
-            if not line.startswith( '#' ):
-                dot_desktop_text += line
+
+    lines = (
+        indicatorbase.IndicatorBase.read_text_file(
+            indicatorbase_dot_desktop_path ) )
+
+    for line in lines:
+        if not line.startswith( '#' ):
+            dot_desktop_text += line
 
     names = name
     for language, name_ in names_from_po_files.items():
