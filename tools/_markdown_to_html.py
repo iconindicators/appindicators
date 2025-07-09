@@ -22,11 +22,18 @@ Utility for converting markdown to html.
     *** NOT TO BE RUN DIRECTLY ***
 '''
 
+import sys
 
 from readme_renderer.markdown import render # Installed by the calling script.
 
+if "../" not in sys.path:
+    sys.path.insert( 0, "../" )
+
+from indicatorbase.src.indicatorbase import indicatorbase
+
 
 def markdown_to_html( markdown, html ):
-    with open( markdown, encoding = "utf-8" ) as f_in:
-        with open( html, 'w', encoding = "utf-8" ) as f_out:
-            f_out.write( render( f_in.read(), variant = "CommonMark" ) )
+    content = ''.join( indicatorbase.IndicatorBase.read_text_file( markdown ) )
+    content_rendered = render( content, variant = "CommonMark" )
+    with open( html, 'w', encoding = "utf-8" ) as f_out:
+        f_out.write( content_rendered )
