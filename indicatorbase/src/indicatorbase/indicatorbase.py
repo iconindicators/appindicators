@@ -539,7 +539,7 @@ class IndicatorBase( ABC ):
 #TODO Give this a good test!
     def _upgrade_desktop_file(
         self,
-        contents ):
+        contents ):  #TODO Something is wrong...this is not being used!
         '''
         The .desktop may be an older version with
             - an Exec without a sleep
