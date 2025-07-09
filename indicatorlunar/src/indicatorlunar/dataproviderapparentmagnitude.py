@@ -165,13 +165,14 @@ class DataProviderApparentMagnitude( DataProvider ):
         Otherwise, returns an empty dictionary and may write to the log.
         '''
         am_data = { }
-        with open( filename, 'r', encoding = "utf-8" ) as f:
-            for line in f.read().splitlines():
-                last_comma = line.rfind( ',' )
-                name = line[ 0 : last_comma ]
-                apparent_magnitude = line[ last_comma + 1 : ]
-                am = ApparentMagnitude( name, apparent_magnitude )
-                am_data[ am.get_name().upper() ] = am
+        lines = IndicatorBase.read_text_file( filename )
+        for line in lines:
+            line_ = line.strip()
+            last_comma = line_.rfind( ',' )
+            name = line_[ 0 : last_comma ]
+            apparent_magnitude = line_[ last_comma + 1 : ]
+            am = ApparentMagnitude( name, apparent_magnitude )
+            am_data[ am.get_name().upper() ] = am
 
         return am_data
 
