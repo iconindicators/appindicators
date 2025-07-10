@@ -611,6 +611,10 @@ def _create_manifest_dot_in(
     with open( release_manifest_in, 'w', encoding = "utf-8" ) as f:
         f.write( manifest_text + '\n' )
 
+    indicatorbase.IndicatorBase.write_text_file(
+        release_manifest_in,
+        manifest_text + '\n' )
+
     _chmod(
         release_manifest_in,
         stat.S_IRUSR | stat.S_IWUSR,
