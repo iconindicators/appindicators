@@ -25,6 +25,11 @@ from . import utils
 if __name__ == "__main__":
     # To enable any disabled check below, comment out that line.
     command = (
+        "for dirs in indicator*; do "
+        "if [ -L $dirs/src/$dirs/indicatorbase.py ] ; "
+        "then rm $dirs/src/$dirs/indicatorbase.py ; fi ; "
+        "done && "
+
         "python3 -m pylint "
         "--disable=line-too-long "
         "--disable=missing-function-docstring "
@@ -49,10 +54,22 @@ if __name__ == "__main__":
         "--disable=unused-variable "
         "--disable=fixme "
         "--recursive=y "
-        "--ignore=release,venv_build,venv_run,indicatorfortune/src/indicator/fortune/indicatorbase.py "
+        "--ignore=release,venv_build,venv_run "
         "../Indicators "
-        "--output=pylint.txt ; "
-        "sort --output=pylint.txt -t ':' --key=4,4 --key=1,1 --key=2,2n pylint.txt" )
+        "--output=pylint.txt && "
+
+        "sort --output=pylint.txt -t ':' --key=4,4 --key=1,1 --key=2,2n pylint.txt && "
+
+        "for dirs in indicator*; do "
+        "if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; "
+        "then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py "
+        "$dirs/src/$dirs/indicatorbase.py; fi ; "
+        "done" )
+
+    print(command)
+    if True:
+        import sys
+        sys.exit()
 
     modules_to_install = [
         "pylint" ]
