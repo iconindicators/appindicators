@@ -118,31 +118,30 @@ class DataProviderApparentMagnitude( DataProvider ):
 
         if json_:
             minor_planets = json_[ "data" ][ "minorplanet" ]
+            content = ""
+            for minor_planet in minor_planets:
+                asteroid_number = minor_planet[ "ast_number" ]
+                if asteroid_number is None:
+                    continue # Not all minor planets have a number.
 
-            #TODO Can this be changed to use IndicatorBase.write_text_file()?
-            with open( filename, 'w', encoding = "utf-8" ) as f:
-                for minor_planet in minor_planets:
-                    asteroid_number = minor_planet[ "ast_number" ]
-                    if asteroid_number is None:
-                        continue # Not all minor planets have a number.
+                if minor_planet[ "designameByIdDesignationName" ] is None:
+                    continue # Not all minor planets have names.
 
-                    if minor_planet[ "designameByIdDesignationName" ] is None:
-                        continue # Not all minor planets have names.
+                designation_name = (
+                    minor_planet[ "designameByIdDesignationName" ][ "str_designame" ] )
 
-                    designation_name = (
-                        minor_planet[ "designameByIdDesignationName" ][ "str_designame" ] )
+                apparent_magnitude = (
+                    str( minor_planet[ "ephemeris" ][ 0 ][ "v_mag" ] ) )
 
-                    apparent_magnitude = (
-                        str( minor_planet[ "ephemeris" ][ 0 ][ "v_mag" ] ) )
+                content += (
+                    str( asteroid_number ) +
+                    ' ' +
+                    designation_name +
+                    ',' +
+                    apparent_magnitude +
+                    '\n' )
 
-                    f.write(
-                        str( asteroid_number ) +
-                        ' ' +
-                        designation_name +
-                        ',' +
-                        apparent_magnitude +
-                        '\n' )
-
+            IndicatorBase.write_text_file( filename, content )
             downloaded = True
 
         else:
