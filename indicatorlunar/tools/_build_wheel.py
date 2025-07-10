@@ -152,6 +152,20 @@ def _create_ephemeris_stars(
     else:
         message = f"Cannot locate { hip_main_dat }"
 
+
+    content = ""
+    with open( hip_main_dat, 'r' ) as f:
+        for line in f:
+            # HIP is located at bytes 9 - 14
+            #    http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
+            hip = int( line[ 9 - 1 : 14 - 1 + 1 ].strip() )
+            if hip in hips:
+                content += line
+    
+    indicatorbase.IndicatorBase.write_text_file(
+        data_path / "stars2.dat",
+        content )
+
     return message
 
 
