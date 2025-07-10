@@ -138,6 +138,7 @@ def _create_ephemeris_stars(
         # at run-time, the import will fail.
         from skyfield.api import load
 
+#TODO Find the source file in skyfield or an issue as a reference.
         hips = [ star[ 1 ] for star in AstroBase.STARS ]
         with load.open( str( hip_main_dat ), 'r' ) as f_in:
             with open( data_path / "stars.dat", 'w' ) as f_out:  #TODO why is this not wb?
