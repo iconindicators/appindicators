@@ -3136,12 +3136,8 @@ class IndicatorBase( ABC ):
 
         text: The text to write.
         filename: The name of the file.
-
-        Returns filename written on success; None otherwise.
         '''
-        return (
-            self._write_cache_text(
-                text, self.get_cache_directory() / filename ) )
+        self.write_text_file( filename, text )
 
 
     def write_cache_text(
@@ -3163,21 +3159,10 @@ class IndicatorBase( ABC ):
         The text will be written to the cache directory using the pattern
             ~/.cache/applicationBaseDirectory/basenameCACHE_DATE_TIME_FORMAT_YYYYMMDDHHMMSSextension
 
-        Returns filename written on success; None otherwise.
+        Returns the full path to the written file.
         '''
         file_ = self.get_cache_filename_with_timestamp( basename, extension )
-        return self._write_cache_text( text, file_ )
-
-
-    def _write_cache_text(
-        self,
-        text,
-        cache_file ):
-
-        with open( cache_file, 'w', encoding = "utf-8" ) as f_out:
-            f_out.write( text )
-
-        return cache_file
+        return self.write_text_file( file_, text )
 
 
     def get_cache_directory( self ):
