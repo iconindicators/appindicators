@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+import indicatorfortune
 
 
 # This program is free software: you can redistribute it and/or modify
@@ -135,8 +136,7 @@ def _create_update_pot(
                     "CHARSET",
                     "UTF-8" ) )
 
-        with open( pot_file_new, 'w', encoding = "utf-8" ) as w:
-            w.write( text )
+        indicatorbase.IndicatorBase.write_text_file( pot_file_new, text )
 
         if pot_file_new.endswith( ".new.pot" ):
             pot_file_original = f"{ locale_directory / indicator }.pot"
@@ -213,8 +213,7 @@ def _create_po(
                     "Language-Team: none",
                     f"Language-Team: <English language name for { lingua_code }>" ) )
 
-        with open( po_file_original, 'w', encoding = "utf-8" ) as w:
-            w.write( text )
+        indicatorbase.IndicatorBase.write_text_file( po_file_original, text )
 
         message += "\nYOU MUST UPDATE LINES 1, 4, 11, 12."
 
