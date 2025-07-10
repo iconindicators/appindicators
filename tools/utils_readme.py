@@ -904,11 +904,14 @@ def create_readme(
 
     Path( directory ).mkdir( parents = True, exist_ok = True )
 
-    #TODO Can this be changed to use IndicatorBase.write_text_file()?
-    with open( Path( directory, "README.md" ), 'w', encoding = "utf-8" ) as f:
-        f.write( _get_introduction( indicator ) )
-        f.write( _get_install_uninstall( indicator ) )
-        f.write( _get_usage( indicator, indicator_human_readable ) )
-        f.write( _get_limitations( indicator ) )
-        f.write( _get_install_uninstall( indicator, install = False ) )
-        f.write( _get_license( authors_emails, start_year ) )
+    content = (
+        _get_introduction( indicator ) +
+        _get_install_uninstall( indicator ) +
+        _get_usage( indicator, indicator_human_readable ) +
+        _get_limitations( indicator ) +
+        _get_install_uninstall( indicator, install = False ) +
+        _get_license( authors_emails, start_year ) )
+
+    indicatorbase.IndicatorBase.write_text_file(
+        Path( directory, "README.md" ),
+        content )
