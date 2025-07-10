@@ -282,56 +282,13 @@ Additional indicators may be appended to the above command.
 
 ## Pylint
 
-
-TODO
-	Ideally use from pypi/pip rather than the OS version.
-	So not sure if a script should be written or what...
-    https://pypi.org/project/pylint/
-
-
-In a terminal, one directory **above** the source tree root (assumed to the directory `Indicators`):
+To run `Pylint` over the entire project:
 
 ```
-    pylint \
-    --recursive=y \
-    --ignore=release,venv_build,venv_run \
-    Indicators \
-    --output=pylint.txt ; \
-    sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2n pylint.txt
+    python3 -m tools.pylint
 ```
 
-As above, but with several checks disabled:
-
-```
-    pylint \
-    --disable=line-too-long \
-    --disable=missing-function-docstring \
-    --disable=too-many-lines \
-    --disable=wrong-import-position \
-    --disable=import-error \
-    --disable=undefined-variable \
-    --disable=no-name-in-module \
-    --disable=no-member \
-    --disable=too-many-instance-attributes \
-    --disable=too-many-branches \
-    --disable=too-many-arguments \
-    --disable=too-many-locals \
-    --disable=too-many-statements \
-    --disable=too-many-boolean-expressions \
-    --disable=too-many-nested-blocks \
-    --disable=attribute-defined-outside-init \
-    --disable=unused-argument \
-    --disable=f-string-without-interpolation \
-    --disable=too-few-public-methods \
-    --disable=too-many-public-methods \
-    --disable=unused-variable \
-    --disable=fixme \
-    --recursive=y \
-    --ignore=release,venv_build,venv_run \
-    Indicators \
-    --output=pylint.txt ; \
-    sort --output=pylint.txt -t ":" --key=4,4 --key=1,1 --key=2,2n pylint.txt
-```
+Several checks have been omitted by default, which can be enabled by editing the script.
 
 ---
 

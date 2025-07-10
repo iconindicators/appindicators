@@ -16,15 +16,39 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-''' Run Pylint '''
+''' Run Pylint, with several checks disabled. '''
 
 
 from . import utils
 
 
 if __name__ == "__main__":
+    # To enable any disabled check below, comment out that line.
     command = (
-        "python3 -m pylint --recursive=y --ignore=release,venv_build,venv_run "
+        "python3 -m pylint "
+        "--disable=line-too-long "
+        "--disable=missing-function-docstring "
+        "--disable=too-many-lines "
+        "--disable=wrong-import-position "
+        "--disable=import-error "
+        "--disable=undefined-variable "
+        "--disable=no-name-in-module "
+        "--disable=no-member "
+        "--disable=too-many-instance-attributes "
+        "--disable=too-many-branches "
+        "--disable=too-many-arguments "
+        "--disable=too-many-locals "
+        "--disable=too-many-statements "
+        "--disable=too-many-boolean-expressions "
+        "--disable=too-many-nested-blocks "
+        "--disable=attribute-defined-outside-init "
+        "--disable=unused-argument "
+        "--disable=f-string-without-interpolation "
+        "--disable=too-few-public-methods "
+        "--disable=too-many-public-methods "
+        "--disable=unused-variable "
+        "--disable=fixme "
+        "--recursive=y --ignore=release,venv_build,venv_run "
         "../Indicators --output=pylint.txt ; "
         "sort --output=pylint.txt -t ':' --key=4,4 --key=1,1 --key=2,2n pylint.txt" )
 
