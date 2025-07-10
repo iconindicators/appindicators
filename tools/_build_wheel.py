@@ -608,8 +608,6 @@ def _create_manifest_dot_in(
         manifest_text += ''.join( content ).replace( "{indicator}", indicator )
 
     release_manifest_in = directory_out / indicator / "MANIFEST.in"
-    with open( release_manifest_in, 'w', encoding = "utf-8" ) as f:
-        f.write( manifest_text + '\n' )
 
     indicatorbase.IndicatorBase.write_text_file(
         release_manifest_in,
@@ -759,8 +757,9 @@ def _create_dot_desktop(
     indicator_dot_desktop_path = (
         directory_platform_linux / ( indicator + ".py.desktop" ) )
 
-    with open( indicator_dot_desktop_path, 'w', encoding = "utf-8" ) as f:
-        f.write( dot_desktop_text + '\n' )
+    indicatorbase.IndicatorBase.write_text_file(
+        indicator_dot_desktop_path,
+        dot_desktop_text + '\n' )
 
     _chmod(
         indicator_dot_desktop_path,
@@ -792,8 +791,8 @@ def _create_scripts_for_linux(
         text = text.replace( "{venv_indicators}", utils.VENV_INSTALL )
 
         destination = directory_platform_linux / destination_script_name
-        with open( destination, 'w', encoding = "utf-8" ) as f:
-            f.write( text + '\n' )
+
+        indicatorbase.IndicatorBase.write_text_file( destination, text + '\n' )
 
         _chmod(
             destination,
@@ -841,8 +840,9 @@ def _create_symbolic_icons(
             hicolor_icon.parent /
             ( str( hicolor_icon.stem ) + "-symbolic.svg" ) )
 
-        with open( symbolic_icon, 'w', encoding = "utf-8" ) as f:
-            f.write( symbolic_svg )
+        indicatorbase.IndicatorBase.write_text_file(
+            symbolic_icon,
+            symbolic_svg )
 
 
 def _package_source(
