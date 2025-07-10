@@ -3161,8 +3161,19 @@ class IndicatorBase( ABC ):
 
         Returns the full path to the written file.
         '''
+#TODO Run lunar
+# The print below happens twice with same filename...how????        
+# This happens because the timestamp's resolution is one second.
+# That means a call to cache the icon and a call to cache the full moon icon
+# will get the same timestamp.
+# By coincidence, if showing a full moon icon, this will not be a problem.
+#
+# But best look for all uses of timestamp and see what's happening...
+#...is there one call and another close by that could create two equal timestamps?
         file_ = self.get_cache_filename_with_timestamp( basename, extension )
-        return self.write_text_file( file_, text )
+        print( file_ )
+        self.write_text_file( file_, text )
+        return file_
 
 
     def get_cache_directory( self ):
