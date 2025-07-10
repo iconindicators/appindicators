@@ -140,7 +140,7 @@ def _create_ephemeris_stars(
 
         hips = [ star[ 1 ] for star in AstroBase.STARS ]
         with load.open( str( hip_main_dat ), 'r' ) as f_in:
-            with open( data_path / "stars.dat", 'w' ) as f_out:
+            with open( data_path / "stars.dat", 'w' ) as f_out:  #TODO why is this not wb?
                 for line in f_in:
                     # HIP is located at bytes 9 - 14
                     #    http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
