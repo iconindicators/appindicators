@@ -3225,9 +3225,7 @@ class IndicatorBase( ABC ):
     def write_text_file(
         file_,
         text ):
-        '''
-        TODO document
-        '''
+        ''' Write text to a file. '''
         with open( file_, 'w', encoding = "utf-8" ) as f:
             f.write( text )
 
