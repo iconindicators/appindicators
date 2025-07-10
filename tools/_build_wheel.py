@@ -575,9 +575,9 @@ def _create_pyproject_dot_toml(
             config_indicator.get( "project", "dependencies" ) )
 
     out_pyproject_toml = directory_out / indicator / "pyproject.toml"
-    with open( out_pyproject_toml, 'w', encoding = "utf-8" ) as f:
-        config_indicatorbase.write( f ) #TODO Is this correct?  Maybe f.write( config_indicatorbase) ???
 
+    with open( out_pyproject_toml, 'w', encoding = "utf-8" ) as f:
+        config_indicatorbase.write( f )
 
     _chmod(
         out_pyproject_toml,
