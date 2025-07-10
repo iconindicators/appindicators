@@ -364,6 +364,24 @@ class DataProviderOrbitalElement( DataProvider ):
                 OrbitalElement.DataType.XEPHEM_COMET,
                 OrbitalElement.DataType.XEPHEM_MINOR_PLANET } )
 
+        # Sometimes the COBS download emits an error message of the form:
+        #   {
+        #       "code": "400",
+        #       "message": "Invalid integer value provided in the parameter.",
+        #       "moreInfo": "invalid literal for int() with base 10: 'false'",
+        #       "signature":
+        #       {
+        #           "source": "COBS Query API",
+        #           "version": "1.3",
+        #           "date": "2024 May"
+        #       }
+        #   }
+        #
+        # In this event, keep the download file as is for bug tracking,
+        # but skip loading the data as there is no data to load.
+        #
+        # When the cache becomes stale, a new download will occur, hopefully
+        # successful.
         if is_skyfield_data:
             if orbital_element_data_type == OrbitalElement.DataType.SKYFIELD_COMET:
                 # https://minorplanetcenter.net/iau/info/CometOrbitFormat.html
@@ -382,6 +400,9 @@ class DataProviderOrbitalElement( DataProvider ):
             lines = IndicatorBase.read_text_file( filename )
             for line in lines:
                 line_ = line.rstrip()
+                if line_.startswith( '{' ):
+                    break
+
                 keep = True
                 for i in valid_indices:
                     if len( line_[ i - 1 ].strip() ) > 0:
@@ -397,35 +418,12 @@ class DataProviderOrbitalElement( DataProvider ):
             lines = IndicatorBase.read_text_file( filename )
             for line in lines:
                 line_ = line.strip()
-                if not line_.startswith( '{' ):
-#TODO Do I need the above check also for above in Skyfield data?
-# But, this error only occurs for data from COBS (so comets only).
-# So if checking above in Skyfield, only applies to comets...but I think
-# should be safe to do the check in the same way as it seems to be fine here
-# for xephem data reading in comet and minor planet data.
-                    # Sometimes the COBS download emits an error message
-                    # of the form:
-                    #   {
-                    #       "code": "400",
-                    #       "message": "Invalid integer value provided in the parameter.",
-                    #       "moreInfo": "invalid literal for int() with base 10: 'false'",
-                    #       "signature":
-                    #       {
-                    #           "source": "COBS Query API",
-                    #           "version": "1.3",
-                    #           "date": "2024 May"
-                    #       }
-                    #   }
-                    #
-                    # In this event, keep the download file as is for bug
-                    # tracking if needed, but skip loading the data as
-                    # there is no data to load.
-                    #
-                    # When the cache becomes stale, a fresh and hopefully
-                    # successful download will occur.
-                    name = line_[ : line_.find( ',' ) ].strip()
-                    oe = OrbitalElement( name, line_, orbital_element_data_type )
-                    oe_data[ oe.get_name().upper() ] = oe
+                if line_.startswith( '{' ):
+                    break
+
+                name = line_[ : line_.find( ',' ) ].strip()
+                oe = OrbitalElement( name, line_, orbital_element_data_type )
+                oe_data[ oe.get_name().upper() ] = oe
 
         else:
             oe_data = { }
