@@ -803,6 +803,11 @@ class IndicatorLunar( IndicatorBase ):
                 # The summary text cannot be empty (at least on Unity).
                 summary = " "
 
+            # If the phase is full moon, the icon created here for the
+            # notification will have likely have the same cache file timestamp
+            # as the icon already created for display for the indicator icon.
+            #
+            # This is not an issue as the icons will be identical (full circle).
             self.show_notification(
                 summary,
                 self.werewolf_warning_message,
