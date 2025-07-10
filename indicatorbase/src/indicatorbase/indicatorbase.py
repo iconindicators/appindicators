@@ -2713,8 +2713,7 @@ class IndicatorBase( ABC ):
         downloaded = False
         try:
             with urlopen( url, timeout = IndicatorBase.TIMEOUT_IN_SECONDS ) as f_in:
-                with open( filename, 'w', encoding = "utf-8" ) as f_out:
-                    f_out.write( f_in.read().decode() )
+                IndicatorBase.write_text_file( filename, f_in.read().decode() )
 
             downloaded = True
 
@@ -3206,7 +3205,6 @@ class IndicatorBase( ABC ):
         return lines
 
 
-#TODO See where else this could be used...perhaps even extended.
     @staticmethod
     def write_text_file(
         file_,
