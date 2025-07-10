@@ -45,8 +45,10 @@ from indicatorlunar.src.indicatorlunar.astrobase import AstroBase
 
 
 '''
-The source ephemeris for planets (.bsp) and stars (.dat)
-which must be present at
+The source ephemeris for
+    planets (.bsp)
+    stars (.dat)
+must be present at
     indicatorlunar/src/indicatorlunar/data
 
 Sources:
@@ -66,8 +68,7 @@ def _initialise():
         utils.python_run(
             "",
             utils.VENV_BUILD,
-            "jplephem",
-            "skyfield" ) )
+            "jplephem" ) )
 
     if stderr_:
         message = stderr_
@@ -94,7 +95,6 @@ def _create_ephemeris_planets(
         https://github.com/skyfielders/python-skyfield/issues/531
     '''
     message = ""
-
     in_bsp = data_path / IN_BSP
     if in_bsp.exists():
         years_from_today = 10
@@ -127,44 +127,28 @@ def _create_ephemeris_planets(
 
 def _create_ephemeris_stars(
     data_path ):
-    ''' Create a star ephemeris for astroskyfield. '''
+    '''
+    Create a star ephemeris for astroskyfield.
+    '''
     message = ""
     hip_main_dat = data_path / HIP_MAIN_DAT
     if hip_main_dat.exists():
-
-        # Must import this here rather than the top.
-        #
-        # If the virtual environment does not have skyfield installed
-        # at run-time, the import will fail.
-        from skyfield.api import load
-
-#TODO Find the source file in skyfield or an issue as a reference.
+        content = ""
         hips = [ star[ 1 ] for star in AstroBase.STARS ]
-        with load.open( str( hip_main_dat ), 'r' ) as f_in:
-            with open( data_path / "stars.dat", 'w' ) as f_out:  #TODO why is this not wb?
-                for line in f_in:
-                    # HIP is located at bytes 9 - 14
-                    #    http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
-                    hip = int( line[ 9 - 1 : 14 - 1 + 1 ].strip() )
-                    if hip in hips:
-                        f_out.write( line )
+        with open( hip_main_dat, 'r' ) as f:
+            for line in f:
+                # HIP is located at bytes 9 - 14
+                #    http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
+                hip = int( line[ 9 - 1 : 14 - 1 + 1 ].strip() )
+                if hip in hips:
+                    content += line
+        
+        indicatorbase.IndicatorBase.write_text_file(
+            data_path / "stars.dat",
+            content )
 
     else:
         message = f"Cannot locate { hip_main_dat }"
-
-
-    content = ""
-    with open( hip_main_dat, 'r' ) as f:
-        for line in f:
-            # HIP is located at bytes 9 - 14
-            #    http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
-            hip = int( line[ 9 - 1 : 14 - 1 + 1 ].strip() )
-            if hip in hips:
-                content += line
-    
-    indicatorbase.IndicatorBase.write_text_file(
-        data_path / "stars2.dat",
-        content )
 
     return message
 
