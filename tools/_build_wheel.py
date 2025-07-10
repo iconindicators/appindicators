@@ -576,7 +576,8 @@ def _create_pyproject_dot_toml(
 
     out_pyproject_toml = directory_out / indicator / "pyproject.toml"
     with open( out_pyproject_toml, 'w', encoding = "utf-8" ) as f:
-        config_indicatorbase.write( f )
+        config_indicatorbase.write( f ) #TODO Is this correct?  Maybe f.write( config_indicatorbase) ???
+
 
     _chmod(
         out_pyproject_toml,
@@ -785,11 +786,11 @@ def _create_scripts_for_linux(
 
         source = indicatorbase_platform_linux_path / source_script_name
         text = ''.join( indicatorbase.IndicatorBase.read_text_file( source ) )
+        text = text.replace( "{indicator}", indicator )
+        text = text.replace( "{venv_indicators}", utils.VENV_INSTALL )
 
         destination = directory_platform_linux / destination_script_name
         with open( destination, 'w', encoding = "utf-8" ) as f:
-            text = text.replace( "{indicator}", indicator )
-            text = text.replace( "{venv_indicators}", utils.VENV_INSTALL )
             f.write( text + '\n' )
 
         _chmod(

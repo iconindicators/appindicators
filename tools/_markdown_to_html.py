@@ -35,5 +35,6 @@ from indicatorbase.src.indicatorbase import indicatorbase
 def markdown_to_html( markdown, html ):
     content = ''.join( indicatorbase.IndicatorBase.read_text_file( markdown ) )
     content_rendered = render( content, variant = "CommonMark" )
+    #TODO Can this be changed to use IndicatorBase.write_text_file()?
     with open( html, 'w', encoding = "utf-8" ) as f_out:
         f_out.write( content_rendered )

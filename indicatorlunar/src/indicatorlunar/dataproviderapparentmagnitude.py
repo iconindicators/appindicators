@@ -119,6 +119,7 @@ class DataProviderApparentMagnitude( DataProvider ):
         if json_:
             minor_planets = json_[ "data" ][ "minorplanet" ]
 
+            #TODO Can this be changed to use IndicatorBase.write_text_file()?
             with open( filename, 'w', encoding = "utf-8" ) as f:
                 for minor_planet in minor_planets:
                     asteroid_number = minor_planet[ "ast_number" ]
