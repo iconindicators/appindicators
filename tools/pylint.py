@@ -48,8 +48,10 @@ if __name__ == "__main__":
         "--disable=too-many-public-methods "
         "--disable=unused-variable "
         "--disable=fixme "
-        "--recursive=y --ignore=release,venv_build,venv_run "
-        "../Indicators --output=pylint.txt ; "
+        "--recursive=y "
+        "--ignore=release,venv_build,venv_run,indicatorfortune/src/indicator/fortune/indicatorbase.py "
+        "../Indicators "
+        "--output=pylint.txt ; "
         "sort --output=pylint.txt -t ':' --key=4,4 --key=1,1 --key=2,2n pylint.txt" )
 
     modules_to_install = [

@@ -142,7 +142,7 @@ def _create_ephemeris_stars(
                 hip = int( line[ 9 - 1 : 14 - 1 + 1 ].strip() )
                 if hip in hips:
                     content += line
-        
+
         indicatorbase.IndicatorBase.write_text_file(
             data_path / "stars.dat",
             content )
@@ -172,7 +172,7 @@ def build( out_path ):
     '''
 
     manifest_specific_dot_in = (
-        Path.cwd() / "indicatorlunar" / "MANIFESTspecific.in" )        
+        Path.cwd() / "indicatorlunar" / "MANIFESTspecific.in" )
 
     content = (
         indicatorbase.IndicatorBase.read_text_file( manifest_specific_dot_in ) )
