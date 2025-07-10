@@ -94,7 +94,7 @@
 # 15 : 159
 #
 # Compare with PyEphem at around 2 to 3 seconds (even up to magnitude 15).
- 
+
 
 #TODO If/when astroskyfield is included, add astroskyfield.py to
 # locale/POTFILES.in.
@@ -107,7 +107,7 @@
 # In MANIFESTspecific.in
 #     Remove the line
 #         exclude src/indicatorlunar/astroskyfield.py
-#     Add the lines 
+#     Add the lines
 #         include src/indicatorlunar/data/planets.bsp
 #         include src/indicatorlunar/data/stars.dat
 #
