@@ -23,13 +23,14 @@ from . import utils
 
 
 if __name__ == "__main__":
-    # To enable any disabled check below, comment out that line.
     command = (
+        # Remove symbolic links to indicatorbase.py to avoid duplicates.
         "for dirs in indicator*; do "
         "if [ -L $dirs/src/$dirs/indicatorbase.py ] ; "
         "then rm $dirs/src/$dirs/indicatorbase.py ; fi ; "
         "done && "
 
+        # Comment out any line below to enable the check.
         "python3 -m pylint "
         "--disable=line-too-long "
         "--disable=missing-function-docstring "
@@ -58,14 +59,17 @@ if __name__ == "__main__":
         "../Indicators "
         "--output=pylint.txt && "
 
+        #TODO Not sure if this is still needed.
         "sort --output=pylint.txt -t ':' --key=4,4 --key=1,1 --key=2,2n pylint.txt && "
 
+        # Reinstate symbolic links to indicatorbase.py.
         "for dirs in indicator*; do "
         "if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; "
         "then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py "
         "$dirs/src/$dirs/indicatorbase.py; fi ; "
         "done" )
 
+    #TODO There is an issue ; need to run the whole thing bit by bit to isolate.
     print(command)
     if True:
         import sys
