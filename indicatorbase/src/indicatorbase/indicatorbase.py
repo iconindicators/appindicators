@@ -3210,13 +3210,10 @@ class IndicatorBase( ABC ):
         return directory
 
 
-#TODO See where else this could be used...perhaps even extended.
     @staticmethod
     def read_text_file(
         file_ ):
-        '''
-        TODO document
-        '''
+        ''' Read a text file and return a list of lines. '''
         with open( file_, 'r', encoding = "utf-8" ) as f:
             lines = f.readlines()
 
