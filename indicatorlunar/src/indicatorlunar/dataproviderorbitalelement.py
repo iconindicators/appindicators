@@ -271,6 +271,155 @@ class DataProviderOrbitalElement( DataProvider ):
 
                         f.write( ''.join( components )  + '\n' )
 
+
+
+
+
+
+
+
+
+            content = ""
+            for minor_planet in minor_planets:
+                minor_planet_ = minor_planet[ "minorplanet" ]
+
+                asteroid_number = minor_planet_[ "ast_number" ]
+                if asteroid_number is None:
+                    continue
+
+                if minor_planet_[ "designameByIdDesignationName" ] is None:
+                    continue
+
+                designation_name = (
+                    minor_planet_[ "designameByIdDesignationName" ][ "str_designame" ] )
+
+                designation = str( asteroid_number ) + ' ' + designation_name
+
+                absolute_magnitude = str( minor_planet_[ 'h' ] )
+
+                # The slope parameter is hard coded; typically does not vary
+                # much and is not used to calculate apparent magnitude.
+                slope_parameter = "0.15"
+
+                mean_anomaly_epoch = str( minor_planet[ 'm' ] )
+                argument_perihelion = str( minor_planet[ "peri" ] )
+                longitude_ascending_node = str( minor_planet[ "node" ] )
+                inclination_to_ecliptic = str( minor_planet[ 'i' ] )
+                orbital_eccentricity = str( minor_planet[ 'e' ] )
+                semimajor_axis = str( minor_planet[ 'a' ] )
+
+                # XEphem has three formats for minor planets
+                # based on the value of the eccentricity ( < 1, == 1, > 1 ):
+                #   https://xephem.github.io/XEphem/Site/help/xephem.html#mozTocId468501
+                # When the eccentricity is >= 1, the format is the same and
+                # requires date of epoch of perihelion, which does not
+                # appear to be present in the Lowell data.
+                # After checking both the Minor Planet Center's MPCORB.DAT
+                # and Lowell's astorb.dat, there are no bodies for which
+                # the eccentricity is >= 1.0
+                # Therefore this should not be a problem of concern;
+                # however, filter out such bodies just to be safe!
+                if float( orbital_eccentricity ) >= 1.0:
+                    logging.error( "Body with eccentricity >= 1.0:" )
+                    logging.error( f"\t { str( minor_planet ) }" )
+                    continue
+
+                xephem_minor_planet = (
+                    orbital_element_data_type
+                    ==
+                    OrbitalElement.DataType.XEPHEM_MINOR_PLANET )
+
+                if xephem_minor_planet:
+                    components = [
+                        designation,
+                        'e',
+                        inclination_to_ecliptic,
+                        longitude_ascending_node,
+                        argument_perihelion,
+                        semimajor_axis,
+                        '0',
+                        orbital_eccentricity,
+                        mean_anomaly_epoch,
+                        minor_planet[ "epoch" ][ 5 : 7 ]
+                        +
+                        '/'
+                        +
+                        minor_planet[ "epoch" ][ 8 : 10 ]
+                        +
+                        '/'
+                        +
+                        minor_planet[ "epoch" ][ 0 : 4 ],
+                        "2000.0",
+                        absolute_magnitude,
+                        slope_parameter ]
+
+                    content += ''.join( components )  + '\n'
+
+                else: # OrbitalElement.DataType.SKYFIELD_MINOR_PLANET
+                    components = [
+                        ' ' * 7, # number or designation packed
+                        ' ', # 8
+                        str( round( float( absolute_magnitude ), 2 ) ).rjust( 5 ),
+                        ' ', # 14
+                        str( round( float( slope_parameter ), 2 ) ).rjust( 5 ),
+                        ' ', # 20
+                        DataProviderOrbitalElement.get_packed_date(
+                            minor_planet[ "epoch" ][ 0 : 4 ],
+                            minor_planet[ "epoch" ][ 5 : 7 ],
+                            minor_planet[ "epoch" ][ 8 : 10 ] ).rjust( 5 ),
+                        ' ', # 26
+                        str( round( float( mean_anomaly_epoch ), 5 ) ).rjust( 9 ),
+                        ' ' * 2, # 36, 37
+                        str( round( float( argument_perihelion ), 5 ) ).rjust( 9 ),
+                        ' ' * 2, # 47, 48
+                        str( round( float( longitude_ascending_node ), 5 ) ).rjust( 9 ),
+                        ' ' * 2, # 58, 59
+                        str( round( float( inclination_to_ecliptic ), 5 ) ).rjust( 9 ),
+                        ' ' * 2, # 69, 70
+                        str( round( float( orbital_eccentricity ), 7 ) ).rjust( 9 ),
+                        ' ', # 80
+                        ' ' * 11, # mean daily motion
+                        ' ', # 92
+                        str( round( float( semimajor_axis ), 7 ) ).rjust( 11 ),
+                        ' ' * 2, # 104, 105
+                        ' ', # uncertainty parameter
+                        ' ', # 107
+                        ' ' * 9, # reference
+                        ' ', # 117
+                        ' ' * 5, # observations
+                        ' ', # 123
+                        ' ' * 3, # oppositions
+                        ' ', # 127
+                        ' ' * ( 4 + 1 + 4 ), # multiple/single oppositions
+                        ' ', # 137
+                        ' ' * 4, # rms residual
+                        ' ', # 142
+                        ' ' * 3, # coarse indicator of perturbers
+                        ' ', # 146
+                        ' ' * 3, # precise indicator of perturbers
+                        ' ', # 150
+                        ' ' * 10, # computer name
+                        ' ', # 161
+                        ' ' * 4, # hexdigit flags
+                        ' ', # 166
+                        designation.ljust( 194 - 167 + 1 ),
+                        ' ' * 8 ] # date last observation
+
+                    content += ''.join( components )  + '\n'
+#TODO This is producing wrong results...!
+            IndicatorBase.write_text_file( str( filename ) + 'xxxxx', content )
+
+
+
+
+
+
+
+
+
+
+
+
             downloaded = True
 
         else:
