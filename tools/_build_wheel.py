@@ -256,8 +256,7 @@ def _update_po(
                 f"Project-Id-Version: { indicator } { version }\\\\n\"",
                 new ) )
 
-        with open( po_file_new, 'w', encoding = "utf-8" ) as w:
-            w.write( new )
+        indicatorbase.IndicatorBase.write_text_file( po_file_new, new )
 
         if filecmp.cmp( po_file_original, po_file_new ):
             os.remove( po_file_new )
