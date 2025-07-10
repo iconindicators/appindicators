@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import indicatorfortune
 
 
 # This program is free software: you can redistribute it and/or modify
