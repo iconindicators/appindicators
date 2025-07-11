@@ -895,7 +895,7 @@ def _get_license(
         f"Copyright { start_year }-{ end_year } { ', '.join( authors ) }.\n" )
 
 
-def create_readme(
+def build_readme(
     directory,
     indicator,
     indicator_human_readable,

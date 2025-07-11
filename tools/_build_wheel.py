@@ -920,7 +920,7 @@ def _package_source(
                 directory_indicator ) )
 
     if not message:
-        utils_readme.create_readme(
+        utils_readme.build_readme(
             directory_indicator,
             indicator,
             name,
