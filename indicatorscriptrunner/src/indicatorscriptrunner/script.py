@@ -54,22 +54,39 @@ class Info( ABC ):
 
 
     def get_group( self ):
+        '''
+        Return the script's group.
+        '''
         return self.group
 
 
     def get_name( self ):
+        '''
+        Return the script's name.
+        '''
         return self.name
 
 
     def get_command( self ):
+        '''
+        Return the script's command.
+        '''
         return self.command
 
 
     def get_play_sound( self ):
+        '''
+        Return True if a sound is to be played after this script's execution;
+        False otherwise.
+        '''
         return self.play_sound
 
 
     def get_show_notification( self ):
+        '''
+        Return True is a notification is to be shown after this script's
+        execution; False otherwise.
+        '''
         return self.show_notification
 
 
@@ -169,10 +186,17 @@ class Background( Info ):
 
 
     def get_interval_in_minutes( self ):
+        '''
+        Return the interval in minutes for this script.
+        '''
         return int( self.interval_in_minutes )
 
 
     def get_force_update( self ):
+        '''
+        Returns True if this script will update on the next update for any
+        background script; False otherwise.
+        '''
         return self.force_update
 
 
@@ -233,10 +257,17 @@ class NonBackground( Info ):
 
 
     def get_terminal_open( self ):
+        '''
+        Returns True if the terminal is to remain open after this script's
+        execution; False otherwise.
+        '''
         return self.terminal_open
 
 
     def get_default( self ):
+        '''
+        Returns True if this script is the default script; False otherwise.
+        '''
         return self.default
 
 

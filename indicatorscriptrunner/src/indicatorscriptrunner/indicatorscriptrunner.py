@@ -111,10 +111,12 @@ class IndicatorScriptRunner( IndicatorBase ):
     def update(
         self,
         menu ):
-
+        '''
+        Refresh the indicator.
+        '''
         today = datetime.datetime.now()
-        self.update_menu( menu )
-        self.update_background_scripts( today )
+        self._update_menu( menu )
+        self._update_background_scripts( today )
         self.set_label_or_tooltip( self.process_tags() )
 
         # Calculate next update; default to well into the future.
@@ -127,7 +129,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 and
                 self.background_script_next_update_time[ key ] < next_update
                 and
-                self.is_background_script_in_indicator_text( script ) )
+                self._is_background_script_in_indicator_text( script ) )
 
             if is_background_and_update_due_and_in_indicator_text:
                 next_update = self.background_script_next_update_time[ key ]
@@ -138,7 +140,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         return 60 if next_update_in_seconds < 60 else next_update_in_seconds
 
 
-    def update_menu(
+    def _update_menu(
         self,
         menu ):
 
@@ -151,7 +153,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 self.create_and_append_menuitem(
                     menu, group ).set_submenu( submenu )
 
-                self.add_scripts_to_menu(
+                self._add_scripts_to_menu(
                     scripts_by_group[ group ], submenu, indent = ( 1, 0 ) )
 
         else:
@@ -163,7 +165,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 for script in sorted_scripts_by_name:
                     if isinstance( script, NonBackground ):
-                        self.add_scripts_to_menu(
+                        self._add_scripts_to_menu(
                             [ script ], menu, indent = ( 0, 0 ) )
 
             else:
@@ -172,11 +174,11 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 for group in sorted( scripts_by_group.keys(), key = str.lower ):
                     self.create_and_append_menuitem( menu, group )
-                    self.add_scripts_to_menu(
+                    self._add_scripts_to_menu(
                         scripts_by_group[ group ], menu, indent = ( 1, 1 ) )
 
 
-    def add_scripts_to_menu(
+    def _add_scripts_to_menu(
         self,
         scripts,
         menu,
@@ -190,14 +192,14 @@ class IndicatorScriptRunner( IndicatorBase ):
                     script.get_name(),
                     activate_functionandarguments = (
                         lambda menuitem, script = script: # script = script for lambda late binding.
-                            self.on_script_menuitem( script ), ),
+                            self._on_script_menuitem( script ), ),
                     indent = indent ) )
 
             if script.get_default():
                 self.set_secondary_activate_target( menuitem )
 
 
-    def on_script_menuitem(
+    def _on_script_menuitem(
         self,
         script ):
 
@@ -256,7 +258,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             self.process_run( command + " &" )
 
 
-    def update_background_scripts(
+    def _update_background_scripts(
         self,
         now ):
 
@@ -265,7 +267,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             script_is_background_and_in_indicator_text = (
                 isinstance( script, Background )
                 and
-                self.is_background_script_in_indicator_text( script ) )
+                self._is_background_script_in_indicator_text( script ) )
 
             if script_is_background_and_in_indicator_text:
                 key = self._create_key( script.get_group(), script.get_name() )
@@ -335,6 +337,10 @@ class IndicatorScriptRunner( IndicatorBase ):
 
 
     def process_tags( self ):
+        '''
+        Fpr each tag in the indicator label, execute the corresppnding script
+        and replace the tag with the script's output.
+        '''
         indicator_text_processed = self.indicator_text
         for script in self.scripts:
             key = self._create_key( script.get_group(), script.get_name() )
@@ -370,7 +376,9 @@ class IndicatorScriptRunner( IndicatorBase ):
     def on_preferences(
         self,
         dialog ):
-
+        '''
+        Display preferences.
+        '''
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( self.INDENT_WIDGET_TOP )
 
@@ -807,7 +815,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             # Reset all background scripts; could/should try and determine which
             # script changed and only reset those...just brute force reset all!
-            self.initialise_background_scripts()
+            self._initialise_background_scripts()
 
         return response_type
 
@@ -943,7 +951,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         self,
         button_copy,
         treeview ):
-
+        '''
+        Copy a script or a group (and all scripts within the group).
+        '''
         model, iter_ = treeview.get_selection().get_selected()
         name = (
             model.get_value( iter_, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
@@ -1137,7 +1147,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         command_text_view,
         button_copy,
         entry_indicator_text ):
-
+        '''
+        Remove a script or a group (and all scripts within the group).
+        '''
         model, iter_ = treeview.get_selection().get_selected()
         name = (
             model.get_value(
@@ -1284,7 +1296,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         treepath,
         treeviewcolumn,
         entry_indicator_text ):
-
+        '''
+        Edit a script or a group.
+        '''
         model, iter_ = treeview.get_selection().get_selected()
         name = (
             model.get_value( iter_, IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
@@ -1412,7 +1426,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         treeview,
         button_copy,
         button_remove ):
-
+        '''
+        Add a script.
+        '''
         model, iter_ = treeview.get_selection().get_selected()
         group = None
         if iter_:
@@ -1911,7 +1927,9 @@ class IndicatorScriptRunner( IndicatorBase ):
         scripts,
         non_background = True,
         background = True ):
-
+        '''
+        Returns a dictionary of all scripts, keyed by group.
+        '''
         scripts_by_group = { }
         for script in scripts:
             script_is_non_background_and_want_non_background = (
@@ -1988,7 +2006,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "[" + new_tag + "]" if new_tag else "" ) )
 
 
-    def initialise_background_scripts( self ):
+    def _initialise_background_scripts( self ):
         '''
         Each time a background script is run, cache the result.
 
@@ -2017,7 +2035,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         return group + "::" + name
 
 
-    def is_background_script_in_indicator_text(
+    def _is_background_script_in_indicator_text(
         self,
         script ):
 
@@ -2029,7 +2047,9 @@ class IndicatorScriptRunner( IndicatorBase ):
     def load_config(
         self,
         config ):
-
+        '''
+        Load configuration.
+        '''
         self.hide_groups = (
             config.get( IndicatorScriptRunner.CONFIG_HIDE_GROUPS, False ) )
 
@@ -2166,10 +2186,13 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             self.request_save_config( 1 )
 
-        self.initialise_background_scripts()
+        self._initialise_background_scripts()
 
 
     def save_config( self ):
+        '''
+        Save configuration.
+        '''
         scripts_background = [ ]
         scripts_non_background = [ ]
         for script in self.scripts:
