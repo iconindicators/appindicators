@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorppadownloadstatistics 1.0.81\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-04 11:18+1000\n"
+"POT-Creation-Date: 2025-07-11 19:34+1000\n"
 "PO-Revision-Date: 2024-07-09 00:24+1100\n"
 "Last-Translator: Pavel Rehak <pavel-rehak@email.cz>\n"
 "Language: cs\n"
@@ -43,68 +43,68 @@ msgstr "(žádné uveřejněné binární soubory)"
 msgid "Displays the total downloads of PPAs."
 msgstr "Zobrazuje celkový počet stažení z PPA repozitářů."
 
-#: indicatorppadownloadstatistics.py:408
+#: indicatorppadownloadstatistics.py:409
 msgid "Double click to edit a PPA."
 msgstr "Dvoujklikem začnete upravovat PPA repozitář."
 
-#: indicatorppadownloadstatistics.py:409
+#: indicatorppadownloadstatistics.py:410
 msgid "Remove the selected PPA."
 msgstr "Odstranit vybraný PPA repozitář."
 
-#: indicatorppadownloadstatistics.py:415 indicatorppadownloadstatistics.py:667
+#: indicatorppadownloadstatistics.py:416 indicatorppadownloadstatistics.py:668
 #, fuzzy
 msgid "User"
 msgstr "Uživatel PPA"
 
-#: indicatorppadownloadstatistics.py:416 indicatorppadownloadstatistics.py:697
+#: indicatorppadownloadstatistics.py:417 indicatorppadownloadstatistics.py:698
 #, fuzzy
 msgid "Name"
 msgstr "Název PPA"
 
-#: indicatorppadownloadstatistics.py:417 indicatorppadownloadstatistics.py:727
+#: indicatorppadownloadstatistics.py:418 indicatorppadownloadstatistics.py:728
 msgid "Filter"
 msgstr "Filtr"
 
-#: indicatorppadownloadstatistics.py:441
+#: indicatorppadownloadstatistics.py:442
 msgid "Add"
 msgstr "Přidat"
 
-#: indicatorppadownloadstatistics.py:442
+#: indicatorppadownloadstatistics.py:443
 msgid "Remove"
 msgstr "Odstranit"
 
-#: indicatorppadownloadstatistics.py:444
+#: indicatorppadownloadstatistics.py:445
 msgid "Add a new PPA."
 msgstr "Přidat nový PPA repozitář."
 
-#: indicatorppadownloadstatistics.py:468
+#: indicatorppadownloadstatistics.py:469
 msgid "PPAs"
 msgstr "PPA repozitáře"
 
-#: indicatorppadownloadstatistics.py:475
+#: indicatorppadownloadstatistics.py:476
 msgid "Show PPAs as submenus"
 msgstr "Zobrazit PPA repozitáře jako podmenu"
 
-#: indicatorppadownloadstatistics.py:477
+#: indicatorppadownloadstatistics.py:478
 msgid ""
 "The download statistics for each PPA\n"
 "are shown in a separate submenu."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:485
+#: indicatorppadownloadstatistics.py:486
 msgid "Sort by download"
 msgstr "Řadit podle počtu stažení"
 
-#: indicatorppadownloadstatistics.py:486
+#: indicatorppadownloadstatistics.py:487
 msgid "Sort by download count within each PPA."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:492
+#: indicatorppadownloadstatistics.py:493
 #, fuzzy
 msgid "Clip amount"
 msgstr "Počet zobrazených řádků"
 
-#: indicatorppadownloadstatistics.py:502
+#: indicatorppadownloadstatistics.py:503
 msgid ""
 "Limit the number of entries\n"
 "when sorting by download.\n"
@@ -112,23 +112,23 @@ msgid ""
 "A value of zero will not clip."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:524
+#: indicatorppadownloadstatistics.py:525
 msgid "Low bandwidth"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:526
+#: indicatorppadownloadstatistics.py:527
 msgid "Enable if your internet connection is slow."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:537
+#: indicatorppadownloadstatistics.py:538
 msgid "General"
 msgstr "Obecné"
 
-#: indicatorppadownloadstatistics.py:615
+#: indicatorppadownloadstatistics.py:616
 msgid "Remove the selected PPA?"
 msgstr "Odstranit vybraný PPA repozitář?"
 
-#: indicatorppadownloadstatistics.py:743
+#: indicatorppadownloadstatistics.py:744
 msgid ""
 "Each line of plain text is compared\n"
 "against the name of each built package,\n"
@@ -143,37 +143,37 @@ msgid ""
 "network requests."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:760
+#: indicatorppadownloadstatistics.py:761
 msgid "Edit PPA"
 msgstr "Upravit PPA repozitář"
 
-#: indicatorppadownloadstatistics.py:762
+#: indicatorppadownloadstatistics.py:763
 msgid "Add PPA"
 msgstr "Přidat PPA repozitář"
 
-#: indicatorppadownloadstatistics.py:782
+#: indicatorppadownloadstatistics.py:783
 #, fuzzy
 msgid "User cannot be empty."
 msgstr "Uživatel PPA nemůže zůstat nevyplněný."
 
-#: indicatorppadownloadstatistics.py:787
+#: indicatorppadownloadstatistics.py:788
 #, fuzzy
 msgid "Name cannot be empty."
 msgstr "Název PPA repozitáře nemůže zůstat nevyplněný."
 
-#: indicatorppadownloadstatistics.py:807
+#: indicatorppadownloadstatistics.py:808
 msgid "User and name already in use!"
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:823
+#: indicatorppadownloadstatistics.py:824
 msgid "Filter text may not contain duplicates."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:835
+#: indicatorppadownloadstatistics.py:836
 msgid "Filter text may not contain spaces."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:956
+#: indicatorppadownloadstatistics.py:957
 msgid ""
 "No PPAs are present.\n"
 "\n"

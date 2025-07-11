@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatoronthisday 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-04 11:18+1000\n"
+"POT-Creation-Date: 2025-07-11 19:34+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -116,20 +116,20 @@ msgstr ""
 msgid "Search using URL"
 msgstr ""
 
-#: indicatoronthisday.py:425
+#: indicatoronthisday.py:424
 msgid "On event click, search using URL"
 msgstr ""
 
-#: indicatoronthisday.py:444
+#: indicatoronthisday.py:442
 msgid "Notify"
 msgstr ""
 
-#: indicatoronthisday.py:446
+#: indicatoronthisday.py:444
 msgid ""
 "On startup or when saving preferences,\n"
 "show a notification for each of today's events."
 msgstr ""
 
-#: indicatoronthisday.py:459
+#: indicatoronthisday.py:457
 msgid "General"
 msgstr ""

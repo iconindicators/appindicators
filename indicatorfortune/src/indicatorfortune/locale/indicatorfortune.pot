@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorfortune 1.0.44\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-04 11:18+1000\n"
+"POT-Creation-Date: 2025-07-11 19:34+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -53,75 +53,75 @@ msgstr ""
 msgid "Ensure enabled fortunes contain data!"
 msgstr ""
 
-#: indicatorfortune.py:171
+#: indicatorfortune.py:173
 msgid "No enabled fortunes have a valid location!"
 msgstr ""
 
-#: indicatorfortune.py:174
+#: indicatorfortune.py:176
 msgid "No fortunes are enabled!"
 msgstr ""
 
-#: indicatorfortune.py:223
+#: indicatorfortune.py:229
 msgid "Fortune History for Session"
 msgstr ""
 
-#: indicatorfortune.py:258
+#: indicatorfortune.py:264
 msgid "Fortune"
 msgstr ""
 
-#: indicatorfortune.py:259
+#: indicatorfortune.py:265
 msgid "Double click to edit a fortune."
 msgstr ""
 
-#: indicatorfortune.py:260
+#: indicatorfortune.py:266
 msgid "Choose a fortune .dat file"
 msgstr ""
 
-#: indicatorfortune.py:261
+#: indicatorfortune.py:267
 msgid "This fortune already exists!"
 msgstr ""
 
-#: indicatorfortune.py:262
+#: indicatorfortune.py:268
 msgid "This is a system fortune and cannot be modified."
 msgstr ""
 
-#: indicatorfortune.py:263
+#: indicatorfortune.py:269
 msgid "Add a new fortune."
 msgstr ""
 
-#: indicatorfortune.py:264
+#: indicatorfortune.py:270
 msgid "Remove the selected fortune."
 msgstr ""
 
-#: indicatorfortune.py:265
+#: indicatorfortune.py:271
 msgid "This is a system fortune and cannot be removed."
 msgstr ""
 
-#: indicatorfortune.py:266
+#: indicatorfortune.py:272
 msgid "Remove the selected fortune?"
 msgstr ""
 
-#: indicatorfortune.py:269
+#: indicatorfortune.py:275
 msgid "Fortunes"
 msgstr ""
 
-#: indicatorfortune.py:279
+#: indicatorfortune.py:285
 msgid "How often a fortune is displayed."
 msgstr ""
 
-#: indicatorfortune.py:281
+#: indicatorfortune.py:287
 msgid "Refresh interval (minutes)"
 msgstr ""
 
-#: indicatorfortune.py:292
+#: indicatorfortune.py:298
 msgid "The summary text for the notification."
 msgstr ""
 
-#: indicatorfortune.py:297
+#: indicatorfortune.py:303
 msgid "Notification summary"
 msgstr ""
 
-#: indicatorfortune.py:308
+#: indicatorfortune.py:314
 msgid ""
 "If the fortune exceeds the limit,\n"
 "a new fortune is created.\n"
@@ -132,26 +132,26 @@ msgid ""
 "'fortune' program."
 msgstr ""
 
-#: indicatorfortune.py:318
+#: indicatorfortune.py:324
 msgid "Message character limit"
 msgstr ""
 
-#: indicatorfortune.py:323
+#: indicatorfortune.py:329
 msgid "Middle mouse click of the icon"
 msgstr ""
 
-#: indicatorfortune.py:339
+#: indicatorfortune.py:345
 msgid "Show a new fortune"
 msgstr ""
 
-#: indicatorfortune.py:354
+#: indicatorfortune.py:360
 msgid "Copy current fortune to clipboard"
 msgstr ""
 
-#: indicatorfortune.py:370
+#: indicatorfortune.py:376
 msgid "Show current fortune"
 msgstr ""
 
-#: indicatorfortune.py:382
+#: indicatorfortune.py:388
 msgid "General"
 msgstr ""
