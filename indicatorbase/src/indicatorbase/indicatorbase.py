@@ -290,6 +290,9 @@ class IndicatorBase( ABC ):
 # can use packaging.version (however that worked).
     @staticmethod
     def versiontuple( v ):
+        '''
+        TODO Add docstring
+        '''
         # Ideally would use PyPI packaging.version requiring installation
         # via pip.
         #
@@ -307,6 +310,9 @@ class IndicatorBase( ABC ):
 
 
     def get_version( self ):
+        '''
+        TODO Add docstring
+        '''
         return self.project_metadata[ "Version" ]
 
 
@@ -938,7 +944,9 @@ class IndicatorBase( ABC ):
     def set_secondary_activate_target(
         self,
         menuitem ):
-
+        '''
+        TODO Add docstring
+        '''
         self.secondary_activate_target = menuitem
 
 
@@ -993,14 +1001,23 @@ class IndicatorBase( ABC ):
 
 
     def get_session_type( self ):
+        '''
+        TODO Add docstring
+        '''
         return self._get_session_type()
 
 
     def is_session_type_wayland( self ):
+        '''
+        TODO Add docstring
+        '''
         return self.get_session_type() == self.SESSION_TYPE_WAYLAND
 
 
     def is_session_type_x11( self ):
+        '''
+        TODO Add docstring
+        '''
         return self.get_session_type() == self.SESSION_TYPE_X11
 
 
@@ -1148,7 +1165,9 @@ class IndicatorBase( ABC ):
     def set_menu_sensitivity(
         self,
         toggle ):
-
+        '''
+        TODO Add docstring
+        '''
         menuitems = self.indicator.get_menu().get_children()
         # On the first update, the menu only contains the "initialising"
         # menu item, so ignore.
@@ -1364,7 +1383,9 @@ class IndicatorBase( ABC ):
             Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
             Gtk.STOCK_OK, Gtk.ResponseType.OK ),
         default_size = None ):
-
+        '''
+        TODO Add docstring
+        '''
         dialog = (
             Gtk.Dialog(
                 title,
@@ -1390,7 +1411,9 @@ class IndicatorBase( ABC ):
         parent_widget,
         message,
         title = None ):
-
+        '''
+        TODO Add docstring
+        '''
         return (
             self._show_dialog(
                 parent_widget,
@@ -1405,7 +1428,9 @@ class IndicatorBase( ABC ):
         parent_widget,
         message,
         title = None ):
-
+        '''
+        TODO Add docstring
+        '''
         return (
             self._show_dialog(
                 parent_widget,
@@ -1421,7 +1446,9 @@ class IndicatorBase( ABC ):
         message,
         title = None,
         message_type = Gtk.MessageType.ERROR ):
-
+        '''
+        TODO Add docstring
+        '''
         return (
             self._show_dialog(
                 parent_widget,
@@ -1477,7 +1504,9 @@ class IndicatorBase( ABC ):
     def create_preferences_common_widgets( self ):
         autostart = False
         delay = 0
-
+        '''
+        TODO Add docstring
+        '''
         autostart_enable_equals_true = (
             self._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" )
 
@@ -1569,7 +1598,9 @@ class IndicatorBase( ABC ):
         is_set,
         delay,
         check_latest_version ):
-
+        '''
+        TODO Add docstring
+        '''
         self.check_latest_version = check_latest_version
 
         output = ""
@@ -1728,6 +1759,9 @@ class IndicatorBase( ABC ):
 
 
     def get_on_click_menuitem_open_browser_function( self ):
+        '''
+        TODO Add docstring
+        '''
         return lambda menuitem: webbrowser.open( menuitem.get_name() )
 
 
@@ -1760,6 +1794,9 @@ class IndicatorBase( ABC ):
 
 
     def create_grid( self ):
+        '''
+        TODO Add docstring
+        '''
         spacing = 10
         grid = Gtk.Grid()
         grid.set_column_spacing( spacing )
@@ -1774,7 +1811,9 @@ class IndicatorBase( ABC ):
     def create_scrolledwindow(
         self,
         widget ):
-
+        '''
+        TODO Add docstring
+        '''
         scrolledwindow = Gtk.ScrolledWindow()
         scrolledwindow.set_hexpand( True )
         scrolledwindow.set_vexpand( True )
@@ -1792,7 +1831,9 @@ class IndicatorBase( ABC ):
         orientation = Gtk.Orientation.HORIZONTAL,
         halign = Gtk.Align.FILL,
         homogeneous = False ):
-
+        '''
+        TODO Add docstring
+        '''
         box = Gtk.Box( spacing = spacing, orientation = orientation )
         box.set_sensitive( sensitive )
         box.set_margin_top( margin_top )
@@ -1813,7 +1854,9 @@ class IndicatorBase( ABC ):
         labels,
         tooltip_texts,
         clicked_functionandarguments ):
-
+        '''
+        TODO Add docstring
+        '''
         buttons_and_expands = [ ]
         z = zip( labels, tooltip_texts, clicked_functionandarguments )
         for label, tooltip_text, clicked_functionandargument in z:
@@ -1847,7 +1890,9 @@ class IndicatorBase( ABC ):
         margin_left = 0,
         editable = True,
         make_longer = False ):
-
+        '''
+        TODO Add docstring
+        '''
         entry = Gtk.Entry()
         self._set_widget_common_attributes(
             entry,
@@ -1872,7 +1917,9 @@ class IndicatorBase( ABC ):
         tooltip_text = "",
         active = -1,
         editable = False ):
-
+        '''
+        TODO Add docstring
+        '''
         if editable:
             comboboxtext = Gtk.ComboBoxText.new_with_entry()
 
@@ -1893,7 +1940,9 @@ class IndicatorBase( ABC ):
         tooltip_text = "",
         editable = True,
         wrap_mode = Gtk.WrapMode.WORD ):
-
+        '''
+        TODO Add docstring
+        '''
         textview = Gtk.TextView()
         textview.get_buffer().set_text( text )
         textview.set_tooltip_text( tooltip_text )
@@ -1940,7 +1989,9 @@ class IndicatorBase( ABC ):
         sensitive = True,
         margin_top = 0,
         margin_left = 0 ):
-
+        '''
+        TODO Add docstring
+        '''
         spinner = Gtk.SpinButton()
         self._set_widget_common_attributes(
             spinner,
@@ -1966,7 +2017,9 @@ class IndicatorBase( ABC ):
         margin_top = 0,
         margin_left = 0,
         active = True ):
-
+        '''
+        TODO Add docstring
+        '''
         checkbutton = Gtk.CheckButton.new_with_label( label )
         self._set_widget_common_attributes(
             checkbutton,
@@ -1988,7 +2041,9 @@ class IndicatorBase( ABC ):
         margin_top = 0,
         margin_left = 0,
         active = True ):
-
+        '''
+        TODO Add docstring
+        '''
         radiobutton = (
             Gtk.RadioButton.new_with_label_from_widget(
                 radio_group_member, label ) )
@@ -2188,6 +2243,9 @@ class IndicatorBase( ABC ):
         self,
         store,
         model_column_id ):
+        '''
+        TODO Add docstring
+        '''
 
         def on_checkbox(
             cell_renderer_toggle,
@@ -2225,7 +2283,9 @@ class IndicatorBase( ABC ):
         filename,
         action = Gtk.FileChooserAction.OPEN,
         file_filter = None ):
-
+        '''
+        TODO Add docstring
+        '''
         dialog = (
             Gtk.FileChooserDialog(
                 title = title,
@@ -2625,7 +2685,9 @@ class IndicatorBase( ABC ):
     def is_number(
         self,
         number_as_string ):
-
+        '''
+        TODO Add docstring
+        '''
         try:
             float( number_as_string )
             return True
@@ -2635,6 +2697,9 @@ class IndicatorBase( ABC ):
 
 
     def get_current_desktop( self ):
+        '''
+        TODO Add docstring
+        '''
         return self.current_desktop
 
 
@@ -2733,7 +2798,9 @@ class IndicatorBase( ABC ):
     def load_config(
         self,
         config ):
-
+        '''
+        Not implemented!
+        '''
         raise NotImplementedError()
 
 
@@ -2809,7 +2876,9 @@ class IndicatorBase( ABC ):
     def request_save_config(
         self,
         delay = 0 ):
-
+        '''
+        TODO Add docstring
+        '''
         if self.lock_save_config.acquire( blocking = False ):
             if self.id_save_config > 0:
                 GLib.source_remove( self.id_save_config )
@@ -2826,6 +2895,9 @@ class IndicatorBase( ABC ):
 
     @abstractmethod
     def save_config( self ):
+        '''
+        Not implemented!
+        '''
         raise NotImplementedError()
 
 
