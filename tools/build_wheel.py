@@ -44,7 +44,6 @@ if __name__ == "__main__":
 
         modules_to_install = [
             "build",
-            "pip",
             "polib",
             utils.get_pygobject(),
             "readme_renderer[md]" ]

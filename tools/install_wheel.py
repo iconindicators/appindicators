@@ -41,7 +41,6 @@ if __name__ == "__main__":
             f"site-packages/{ indicator }/platform/linux/install.sh" )
 
         modules_to_install = [
-            "pip",
             utils.get_pygobject(),
             f"$(ls -d { utils.RELEASE_DIRECTORY }/wheel/dist_{ indicator }/{ indicator }*.whl | head -1)" ]
 

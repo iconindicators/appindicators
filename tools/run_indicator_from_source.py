@@ -65,7 +65,6 @@ if __name__ == "__main__":
         "cd ../.." )
 
     modules_to_install = [
-        "pip",
         f"{ utils.get_pygobject() }" ]
 
     if indicator in indicator_to_dependencies:
