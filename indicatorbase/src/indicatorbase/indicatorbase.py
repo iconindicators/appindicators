@@ -337,7 +337,7 @@ class IndicatorBase( ABC ):
         logging_ = None ):
 #TODO Who calls this and passes in logging?
 # Maybe don't need to pass in logging...see process_run.
-#Maybe also search for log/logging to see if this happens elsewhere.        
+#Maybe also search for log/logging to see if this happens elsewhere.
         '''
         Retrieves the JSON content from a URL.
 
@@ -3264,7 +3264,7 @@ class IndicatorBase( ABC ):
             result = (
                 # Don't want check = True as that throws an exception for
                 # grep when grep finds no result and returns a code of 1.
-#TODO According to 
+#TODO According to
 # indicatorbase/src/indicatorbase/indicatorbase.py:3265:16: W1510: 'subprocess.run' used without explicitly defining the value for 'check'. (subprocess-run-check)
 # Need to put in check True or False....
                 subprocess.run(
