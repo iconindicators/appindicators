@@ -991,7 +991,9 @@ def _package_source(
 
 def build_wheel(
     indicator ):
-
+    '''
+    Build the wheel for the indicator.
+    '''
     message = ""
 
     # This checks for T_O_D_O_s in EVERY file, irrespective of the indicator(s)

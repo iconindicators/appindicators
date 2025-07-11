@@ -901,7 +901,9 @@ def build_readme(
     indicator_human_readable,
     authors_emails,
     start_year ):
-
+    '''
+    Build the README.md file for the indicator.
+    '''
     Path( directory ).mkdir( parents = True, exist_ok = True )
 
     content = (
