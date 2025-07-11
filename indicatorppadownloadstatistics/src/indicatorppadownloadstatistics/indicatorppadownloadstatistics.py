@@ -197,6 +197,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         elif ppa.get_status() == PPA.Status.FILTERED:
             message = IndicatorPPADownloadStatistics.MESSAGE_FILTERED
 
+        else:
+            raise ValueError( f"Unknown status: { ppa.get_status() }" )
+
         return message
 
 
