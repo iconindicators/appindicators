@@ -25,30 +25,9 @@ from . import utils
 
 
 if __name__ == "__main__":
-    current_working_directory = Path.cwd()
-    markdown = str( current_working_directory / "README.md" )
-    html = str( current_working_directory / "README.html" )
-    command = (
-        "python3 -c \"import tools._markdown_to_html; "
-        "tools._markdown_to_html.markdown_to_html( "
-        f"\\\"{ markdown }\\\", \\\"{ html }\\\" )\"" )
-
-#TODO Thinking about using this new version as opposed to running the above
-# to then call a script which uses Python...just call the tool itself!
-#
-# Original command line version from README.md:
-#
-#     venv=$HOME/.local/venv_indicators && \
-#     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-#     . ${venv}/bin/activate && \
-#     python3 -m pip install readme_renderer[md] && \
-#     python3 -m readme_renderer README.md -o README.html && \
-#     deactivate
-
     command = "python3 -m readme_renderer README.md -o README.html"
 
     modules_to_install = [
-        "pip",
         "readme_renderer[md]" ]
 
     result = (
@@ -59,4 +38,4 @@ if __name__ == "__main__":
 
     utils.print_stdout_stderr_return_code( *result )
     if result[ 2 ] == 0: # Return code of zero; all is well.
-        print( f"\nCreated { html }" )
+        print( f"\nCreated { Path.cwd() / 'README.html' }" )
