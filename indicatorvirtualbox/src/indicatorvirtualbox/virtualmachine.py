@@ -35,10 +35,16 @@ class VirtualMachine():
 
 
     def get_name( self ):
+        '''
+        Return the name of this virtual machine.
+        '''
         return self.name
 
 
     def get_uuid( self ):
+        '''
+        Return the UUID of this virtual machine.
+        '''
         return self.uuid
 
 
@@ -74,17 +80,25 @@ class Group():
 
 
     def get_name( self ):
+        '''
+        Return the mame of this group.
+        '''
         return self.name
 
 
     def add_item(
         self,
         virtual_machine_or_group ):
-
+        '''
+        Add virtual machine or group to this group.
+        '''
         self.items.append( virtual_machine_or_group )
 
 
     def get_items( self ):
+        '''
+        Return the items within this group.
+        '''
         return self.items
 
 
@@ -116,7 +130,9 @@ class Group():
     def sort(
         items,
         sort_groups_and_virtual_machines_equally = False ):
-
+        '''
+        Sort virtual machines and groups.
+        '''
         if sort_groups_and_virtual_machines_equally:
             sorted_items = (
                 sorted(
