@@ -33,12 +33,12 @@ import shutil
 import stat
 import sys
 
-import polib # Installed by the calling script.
-
 from pathlib import Path
 
 if "../" not in sys.path:
     sys.path.insert( 0, "../" )
+
+import polib # Installed by the calling script.
 
 from indicatorbase.src.indicatorbase import indicatorbase
 
