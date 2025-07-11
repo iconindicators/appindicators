@@ -815,7 +815,7 @@ class IndicatorBase( ABC ):
 
             menu.prepend( Gtk.MenuItem.new_with_label( label ) )
 
-        time_to_update = ( datetime.datetime.now() - update_start )
+        time_to_update = datetime.datetime.now() - update_start
         minutes, seconds = divmod( time_to_update.seconds, 60 )
         hours, minutes = divmod( minutes, 60 )
         milliseconds = round( time_to_update.microseconds / 1000, 0 )
