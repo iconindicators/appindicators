@@ -701,7 +701,9 @@ class IndicatorLunar( IndicatorBase ):
         self,
         menu,
         utc_now ):
-
+        '''
+        Update the entire menu, sub-menu by sub-menu.
+        '''
         self._update_menu_moon( menu )
         self._update_menu_sun( menu )
         self._update_menu_planets_minor_planets_comets_stars(
