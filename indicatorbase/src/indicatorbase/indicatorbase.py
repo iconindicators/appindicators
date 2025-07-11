@@ -930,6 +930,9 @@ class IndicatorBase( ABC ):
         summary,
         message,
         icon = None ):
+        '''
+        TODO Add docstring
+        '''
 
         _icon = icon
         if icon is None:
@@ -1131,7 +1134,9 @@ class IndicatorBase( ABC ):
     def on_preferences(
         self,
         dialog ):
-
+        '''
+        Not implemented!
+        '''
         raise NotImplementedError()
 
 
@@ -1187,7 +1192,9 @@ class IndicatorBase( ABC ):
 
     @staticmethod
     def is_calendar_supported():
-        ''' The calendar package is unavailable on some distributions. '''
+        '''
+        The calendar package is unavailable on some distributions.
+        '''
         etc_os_release = IndicatorBase.get_etc_os_release()
         is_manjaro = "NAME=\"Manjaro Linux\"" in etc_os_release
         is_opensuse_tumbleweed = (
@@ -1502,11 +1509,12 @@ class IndicatorBase( ABC ):
 
 
     def create_preferences_common_widgets( self ):
-        autostart = False
-        delay = 0
         '''
         TODO Add docstring
         '''
+        autostart = False
+        delay = 0
+
         autostart_enable_equals_true = (
             self._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" )
 
