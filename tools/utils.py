@@ -30,18 +30,18 @@ if "../" not in sys.path:
 from indicatorbase.src.indicatorbase import indicatorbase
 
 
-''' The directory of a .whl release. '''
+# The directory of a .whl release.
 RELEASE_DIRECTORY = "release"
 
-''' The virtual environment used when building the wheel et al. '''
+# The virtual environment used when building the wheel et al.
 VENV_BUILD = "venv_build"
 
 
-''' The virtual environment used when running an indicator. '''
+# The virtual environment used when running an indicator.
 VENV_RUN = "venv_run"
 
 
-''' The virtual environment into which indicators are installed. '''
+# The virtual environment into which indicators are installed.
 VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 

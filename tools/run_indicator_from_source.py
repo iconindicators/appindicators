@@ -31,11 +31,8 @@ from indicatorbase.src.indicatorbase import indicatorbase
 from . import utils
 
 
-'''
-Only indicatorlunar uses Python3 packages outside the standard library.
-Further, select some packages based upon running on 64 bit (or more).
-'''
 is_64_bit_or_more = indicatorbase.IndicatorBase.is_64_bit_or_more()
+
 indicator_to_dependencies = {
     "indicatorlunar" :
         list( compress(
