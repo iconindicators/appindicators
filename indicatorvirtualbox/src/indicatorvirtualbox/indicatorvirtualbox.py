@@ -100,12 +100,12 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self.auto_start_required = False
                 self.auto_start_virtual_machines( virtual_machines )
 
-        self._build_menu( menu, vboxmanage_installed, virtual_machines )
+        self.build_menu( menu, vboxmanage_installed, virtual_machines )
 
         return int( 60 * self.refresh_interval_in_minutes )
 
 
-    def _build_menu(
+    def build_menu(
         self,
         menu,
         vboxmanage_installed,
