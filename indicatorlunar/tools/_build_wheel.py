@@ -44,20 +44,18 @@ gettext.install( "indicatorlunar.tools._build_wheel" )
 from indicatorlunar.src.indicatorlunar.astrobase import AstroBase
 
 
-'''
-The source ephemeris for
-    planets (.bsp)
-    stars (.dat)
-must be present at
-    indicatorlunar/src/indicatorlunar/data
-
-Sources:
-    bsp:
-        https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
-
-    hip_main.dat:
-        https://cdsarc.cds.unistra.fr/ftp/cats/I/239/hip_main.dat
-'''
+# The source ephemeris for
+#     planets (.bsp)
+#     stars (.dat)
+# must be present at
+#     indicatorlunar/src/indicatorlunar/data
+#
+# Sources:
+#     bsp:
+#         https://naif.jpl.nasa.gov/pub/naif/generic_kernels/spk/planets
+#
+#     hip_main.dat:
+#         https://cdsarc.cds.unistra.fr/ftp/cats/I/239/hip_main.dat
 IN_BSP = "de442s.bsp"
 HIP_MAIN_DAT = "hip_main.dat"
 
