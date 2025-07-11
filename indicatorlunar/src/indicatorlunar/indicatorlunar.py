@@ -1231,6 +1231,9 @@ class IndicatorLunar( IndicatorBase ):
 
                 menuitem_name_function = get_menuitem_name_for_star
 
+            else:
+                raise ValueError( f"Unknown body_type: { body_type }" )
+
             return menuitem_name_function
 
 
