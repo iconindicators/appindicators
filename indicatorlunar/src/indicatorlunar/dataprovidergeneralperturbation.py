@@ -34,23 +34,18 @@ class DataProviderGeneralPerturbation( DataProvider ):
 
     @staticmethod
     def download(
-        filename,
-        logging ):
+        filename ):
         '''
         Download general perturbation data from Celestrak and save to the
         given filename.
         '''
-        return (
-            IndicatorBase.download(
-                "https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=xml",
-                filename,
-                logging ) )
+        url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=visual&FORMAT=xml"
+        return IndicatorBase.download( url, filename )
 
 
     @staticmethod
     def load(
-        filename,
-        logging ):
+        filename ):
         '''
         Load general perturbation data from the given filename.
 

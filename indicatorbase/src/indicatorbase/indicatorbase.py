@@ -322,11 +322,7 @@ class IndicatorBase( ABC ):
         summary = _(
             "New version of {0} available..." ).format( self.indicator_name )
 
-        data_json, error_network, error_timeout = (
-            self.get_json(
-                url,
-                logging_ = self.get_logging() ) )
-
+        data_json, error_network, error_timeout = self.get_json( url )
         if data_json:
             version_pypi = (
                 self.versiontuple( data_json[ "info" ][ "version" ] ) )
@@ -339,11 +335,7 @@ class IndicatorBase( ABC ):
     @staticmethod
     def get_json(
         url,
-        data = None,
-        logging_ = None ):
-#TODO Who calls this and passes in logging?
-# Maybe don't need to pass in logging...see process_run.
-#Maybe also search for log/logging to see if this happens elsewhere.
+        data = None ):
         '''
         Retrieves the JSON content from a URL.
 
@@ -382,17 +374,17 @@ class IndicatorBase( ABC ):
             else:
                 error_network = True
 
-            if logging_:
-                logging_.error( f"Problem with { url }" )
-                logging_.exception( e )
+            if IndicatorBase._LOGGING_INITIALISED:
+                logging.error( f"Problem with { url }" )
+                logging.exception( e )
 
             json_ = None
 
         except socket.timeout as e:
             error_timeout = True
-            if logging_:
-                logging_.error( f"Problem with { url }" )
-                logging_.exception( e )
+            if IndicatorBase._LOGGING_INITIALISED:
+                logging.error( f"Problem with { url }" )
+                logging.exception( e )
 
             json_ = None
 
@@ -2791,8 +2783,7 @@ class IndicatorBase( ABC ):
     @staticmethod
     def download(
         url,
-        filename,
-        logging_ ):
+        filename ):
         ''' Download the contents of the given URL and save to file. '''
         downloaded = False
         try:
@@ -2802,8 +2793,9 @@ class IndicatorBase( ABC ):
             downloaded = True
 
         except URLError as e:
-            logging_.error( "Error downloading from " + str( url ) )
-            logging_.exception( e )
+            if IndicatorBase._LOGGING_INITIALISED:
+                logging.error( "Error downloading from " + str( url ) )
+                logging.exception( e )
 
         return downloaded
 

@@ -365,7 +365,7 @@ class IndicatorLunar( IndicatorBase ):
                 self.download_count_comet,
                 self.next_download_time_comet,
                 DataProviderOrbitalElement.download,
-                [
+                [ #TODO Can these be tuples?
                     IndicatorLunar.COMET_DATA_TYPE,
                     IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ],
                 DataProviderOrbitalElement.load,
@@ -467,7 +467,6 @@ class IndicatorLunar( IndicatorBase ):
                 download_successful = (
                     download_data_function(
                         download_data_filename,
-                        self.get_logging(),
                         *download_data_additional_arguments ) )
 
                 if download_successful:
@@ -480,7 +479,6 @@ class IndicatorLunar( IndicatorBase ):
                     fresh_data = (
                         load_data_function(
                             download_data_filename,
-                            self.get_logging(),
                             *load_data_additional_arguments ) )
 
                 else:
@@ -499,7 +497,6 @@ class IndicatorLunar( IndicatorBase ):
                 fresh_data = (
                     load_data_function(
                         self.get_cache_newest_filename( cache_basename ),
-                        self.get_logging(),
                         *load_data_additional_arguments ) )
 
         return fresh_data, download_count, next_download_time
@@ -1240,9 +1237,7 @@ class IndicatorLunar( IndicatorBase ):
         def comet_on_click_function(
             menuitem ):
             json_, error_network, error_timeout = (
-                self.get_json(
-                    menuitem.get_name(),
-                    logging = self.get_logging() ) )
+                self.get_json( menuitem.get_name() ) )
 
             if json_:
                 webbrowser.open(

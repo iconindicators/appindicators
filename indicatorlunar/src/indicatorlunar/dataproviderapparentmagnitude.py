@@ -36,7 +36,6 @@ class DataProviderApparentMagnitude( DataProvider ):
     @staticmethod
     def download(
         filename,
-        logging,
         is_comet,
         apparent_magnitude_maximum ):
         '''
@@ -52,7 +51,7 @@ class DataProviderApparentMagnitude( DataProvider ):
         else:
             downloaded = (
                 DataProviderApparentMagnitude._download_from_lowell(
-                    filename, logging, apparent_magnitude_maximum ) )
+                    filename, apparent_magnitude_maximum ) )
 
         return downloaded
 
@@ -60,7 +59,6 @@ class DataProviderApparentMagnitude( DataProvider ):
     @staticmethod
     def _download_from_lowell(
         filename,
-        logging,
         apparent_magnitude_maximum ):
         '''
         Download apparent magnitude data for minor planets from Lowell Minor
@@ -113,10 +111,11 @@ class DataProviderApparentMagnitude( DataProvider ):
         json_, error_network, error_timeout = (
             IndicatorBase.get_json(
                 url,
-                data = data,
-                logging = logging ) )
+                data = data ) )
 
+        downloaded = False
         if json_:
+            downloaded = True
             minor_planets = json_[ "data" ][ "minorplanet" ]
             content = ""
             for minor_planet in minor_planets:
@@ -142,19 +141,13 @@ class DataProviderApparentMagnitude( DataProvider ):
                     '\n' )
 
             IndicatorBase.write_text_file( filename, content )
-            downloaded = True
-
-        else:
-            downloaded = False
-            logging.error( "Unable to retrieve apparent magnitude data " )
 
         return downloaded
 
 
     @staticmethod
     def load(
-        filename,
-        logging ):
+        filename ):
         '''
         Load apparent magnitude data from the given filename.
 

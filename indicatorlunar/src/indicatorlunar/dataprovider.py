@@ -35,7 +35,6 @@ class DataProvider( ABC ):
     @abstractmethod
     def download(
         filename,
-        logging,
         *args ):
         '''
         Download data and save to file.
@@ -49,7 +48,6 @@ class DataProvider( ABC ):
     @abstractmethod
     def load(
         filename,
-        logging,
         *args ):
         '''
         Load data from file and return in a dictionary.
