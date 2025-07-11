@@ -30,36 +30,35 @@ if __name__ == "__main__":
         "then rm $dirs/src/$dirs/indicatorbase.py ; fi ; "
         "done && "
 
-        # Comment out any line below to enable the check.
+        # Uncomment any line below to disable the check.
         "python3 -m pylint "
-        "--disable=line-too-long "
-        "--disable=missing-function-docstring "
-        "--disable=too-many-lines "
-        "--disable=wrong-import-position "
-        "--disable=import-error "
-        "--disable=undefined-variable "
-        "--disable=no-name-in-module "
-        "--disable=no-member "
-        "--disable=too-many-instance-attributes "
-        "--disable=too-many-branches "
-        "--disable=too-many-arguments "
-        "--disable=too-many-locals "
-        "--disable=too-many-statements "
-        "--disable=too-many-boolean-expressions "
-        "--disable=too-many-nested-blocks "
-        "--disable=attribute-defined-outside-init "
-        "--disable=unused-argument "
-        "--disable=f-string-without-interpolation "
-        "--disable=too-few-public-methods "
-        "--disable=too-many-public-methods "
-        "--disable=unused-variable "
-        "--disable=fixme "
+        # "--disable=line-too-long "
+        # "--disable=missing-function-docstring "
+        # "--disable=too-many-lines "
+        # "--disable=wrong-import-position "
+        # "--disable=import-error "
+        # "--disable=undefined-variable "
+        # "--disable=no-name-in-module "
+        # "--disable=no-member "
+        # "--disable=too-many-instance-attributes "
+        # "--disable=too-many-branches "
+        # "--disable=too-many-arguments "
+        # "--disable=too-many-locals "
+        # "--disable=too-many-statements "
+        # "--disable=too-many-boolean-expressions "
+        # "--disable=too-many-nested-blocks "
+        # "--disable=attribute-defined-outside-init "
+        # "--disable=unused-argument "
+        # "--disable=f-string-without-interpolation "
+        # "--disable=too-few-public-methods "
+        # "--disable=too-many-public-methods "
+        # "--disable=unused-variable "
+        # "--disable=fixme "
         "--recursive=y "
         "--ignore=release,venv_build,venv_run "
         "../Indicators "
-        "--output=pylint.txt && "
+        "--output=pylint.txt ; " # Must be ; not && otherwise will stop.
 
-        #TODO Not sure if this is still needed.
         "sort --output=pylint.txt -t ':' --key=4,4 --key=1,1 --key=2,2n pylint.txt && "
 
         # Reinstate symbolic links to indicatorbase.py.
@@ -68,12 +67,6 @@ if __name__ == "__main__":
         "then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py "
         "$dirs/src/$dirs/indicatorbase.py; fi ; "
         "done" )
-
-    #TODO There is an issue ; need to run the whole thing bit by bit to isolate.
-    print(command)
-    if True:
-        import sys
-        sys.exit()
 
     modules_to_install = [
         "pylint" ]
