@@ -209,9 +209,6 @@ class DataProviderOrbitalElement( DataProvider ):
             # Therefore this should not be a problem of concern; however,
             # filter out such bodies just to be safe!
             if float( orbital_eccentricity ) >= 1.0:
-#TODO Logging is good, but maybe can only print if the logging is dropped?
-                # logging.error( "Body with eccentricity >= 1.0:" )
-                # logging.error( f"\t { str( minor_planet ) }" )
                 continue
 
             content += (
