@@ -154,9 +154,11 @@ class IndicatorFortune( IndicatorBase ):
                     break
 
                 if len( fortune_ ) <= self.skip_fortune_character_count:
-                    history = (
-                        self.read_cache_text_without_timestamp(
-                            IndicatorFortune.HISTORY_FILE ) )
+                    history = ""
+                    if self.cache_file_exists( IndicatorFortune.HISTORY_FILE ):
+                        history = (
+                            self.read_cache_text_without_timestamp(
+                                IndicatorFortune.HISTORY_FILE ) )
 
                     message = fortune_
                     summary = self.notification_summary
@@ -203,11 +205,15 @@ class IndicatorFortune( IndicatorBase ):
 
         self.set_menu_sensitivity( False )
 
+        text = ""
+        if self.cache_file_exists( IndicatorFortune.HISTORY_FILE ):
+            text = (
+                self.read_cache_text_without_timestamp(
+                    IndicatorFortune.HISTORY_FILE ) )
+
         textview = (
             self.create_textview(
-                text =
-                    self.read_cache_text_without_timestamp(
-                        IndicatorFortune.HISTORY_FILE ),
+                text = text,
                 editable = False ) )
 
         textview.connect( "size-allocate", textview_changed )

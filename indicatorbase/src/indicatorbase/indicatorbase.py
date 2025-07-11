@@ -3162,6 +3162,15 @@ class IndicatorBase( ABC ):
         return file_
 
 
+    def cache_file_exists(
+        self,
+        filename ):
+        '''
+        Return True if the file exists in the cache; False otherwise.
+        '''
+        return ( self.get_cache_directory() / filename ).exists()
+
+
     def read_cache_text_without_timestamp(
         self,
         filename ):
