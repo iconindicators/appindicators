@@ -523,12 +523,18 @@ class AstroBase( ABC ):
     @staticmethod
     def get_star_hip(
         star ):
+        '''
+        Return the HIP for the given star.
+        '''
         return AstroBase._get_star_row( star )[ AstroBase._STARS_INDEX_HIP ]
 
 
     @staticmethod
     def get_star_name_translation(
         star ):
+        '''
+        Return the name translation for the given star.
+        '''
         row = AstroBase._get_star_row( star )
         return row[ AstroBase._STARS_INDEX_NAME_TRANSLATION ]
 
@@ -536,22 +542,34 @@ class AstroBase( ABC ):
     @staticmethod
     def get_star_tag_translation(
         star ):
+        '''
+        Return the tag translation for the given star.
+        '''
         row = AstroBase._get_star_row( star )
         return row[ AstroBase._STARS_INDEX_TAG_TRANSLATION ]
 
 
     @staticmethod
     def get_star_names():
+        '''
+        Return the list of star names.
+        '''
         return [ i[ AstroBase._STARS_INDEX_NAME ] for i in AstroBase.STARS ]
 
 
     @staticmethod
     def get_star_hips():
+        '''
+        Return the list of star HIPs.
+        '''
         return [ i[ AstroBase._STARS_INDEX_HIP ] for i in AstroBase.STARS ]
 
 
     @staticmethod
     def get_star_tag_translations():
+        '''
+        Return the translations for each star's tag.
+        '''
         return [
             i[ AstroBase._STARS_INDEX_TAG_TRANSLATION ]
             for i in AstroBase.STARS ]

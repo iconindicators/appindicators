@@ -541,14 +541,23 @@ class OrbitalElement():
 
 
     def get_name( self ):
+        '''
+        Return the name of this orbital element.
+        '''
         return self.name
 
 
     def get_data( self ):
+        '''
+        Return the data for this orbital element.
+        '''
         return self.data
 
 
     def get_data_type( self ):
+        '''
+        Return the data type for this orbital element.
+        '''
         return self.data_type
 
 

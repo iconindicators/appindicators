@@ -248,11 +248,11 @@ class IndicatorLunar( IndicatorBase ):
         self.icon_satellite = (
             self.get_icon_name().replace( "-symbolic", "satellite-symbolic" ) )
 
-        self.flush_the_cache()
-        self.initialise_download_counts_and_cache_date_times()
+        self._flush_the_cache()
+        self._initialise_download_counts_and_cache_date_times()
 
 
-    def flush_the_cache( self ):
+    def _flush_the_cache( self ):
         self.flush_cache(
             IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME,
             IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS )
@@ -274,7 +274,7 @@ class IndicatorLunar( IndicatorBase ):
             IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS )
 
 
-    def initialise_download_counts_and_cache_date_times( self ):
+    def _initialise_download_counts_and_cache_date_times( self ):
         self.download_count_apparent_magnitude = 0
         self.download_count_comet = 0
         self.download_count_minor_planet = 0
@@ -290,7 +290,9 @@ class IndicatorLunar( IndicatorBase ):
     def update(
         self,
         menu ):
-
+        '''
+        Refresh the indicator.
+        '''
         utc_now = datetime.datetime.now( datetime.timezone.utc )
 
         # Update comet minor planet and satellite cached data.
@@ -334,22 +336,25 @@ class IndicatorLunar( IndicatorBase ):
             menu.append( Gtk.SeparatorMenuItem() )
 
         self.update_menu( menu, utc_now )
-        self.set_label_or_tooltip( self.process_tags() )
+        self.set_label_or_tooltip( self._process_tags() )
 
         self.update_icon()
 
         if self.show_werewolf_warning:
-            self.notification_full_moon()
+            self._notification_full_moon()
 
         if self.show_satellite_notification:
             self.notification_satellites()
 
-        return self.get_next_update_time_in_seconds()
+        return self._get_next_update_time_in_seconds()
 
 
     def update_data(
         self,
         utc_now ):
+        '''
+        Download data for comets, minor planets and satellites.
+        '''
 
         # Update comet data.
         (
@@ -372,7 +377,7 @@ class IndicatorLunar( IndicatorBase ):
                 ( IndicatorLunar.COMET_DATA_TYPE, ) ) )
 
         if self.comets_add_new:
-            self.add_new_bodies( self.comet_orbital_element_data, self.comets )
+            self._add_new_bodies( self.comet_orbital_element_data, self.comets )
 
         # Update minor planet data.
         (
@@ -395,7 +400,7 @@ class IndicatorLunar( IndicatorBase ):
                 ( IndicatorLunar.MINOR_PLANET_DATA_TYPE, ) ) )
 
         if self.minor_planets_add_new:
-            self.add_new_bodies(
+            self._add_new_bodies(
                 self.minor_planet_orbital_element_data, self.minor_planets )
 
         # Update minor planet apparent magnitudes.
@@ -435,7 +440,7 @@ class IndicatorLunar( IndicatorBase ):
                 ( ) ) )
 
         if self.satellites_add_new:
-            self.add_new_bodies(
+            self._add_new_bodies(
                 self.satellite_general_perturbation_data, self.satellites )
 
 
@@ -523,7 +528,7 @@ class IndicatorLunar( IndicatorBase ):
         return next_download_time
 
 
-    def add_new_bodies(
+    def _add_new_bodies(
         self,
         data,
         bodies ):
@@ -533,7 +538,7 @@ class IndicatorLunar( IndicatorBase ):
                 bodies.append( body )
 
 
-    def process_tags( self ):
+    def _process_tags( self ):
         '''
         Process text containing pairs of [ ], optionally surrounded by { },
         used for display in the indicator's label.
@@ -566,7 +571,7 @@ class IndicatorLunar( IndicatorBase ):
 
             if tag in processed_text:
                 data = (
-                    self.format_data(
+                    self._format_data(
                         key[ IndicatorLunar.DATA_INDEX_DATA_NAME ],
                         self.data[ key ] ) )
 
@@ -627,7 +632,7 @@ class IndicatorLunar( IndicatorBase ):
         return processed_text
 
 
-    def get_next_update_time_in_seconds( self ):
+    def _get_next_update_time_in_seconds( self ):
         date_times = [ ]
         for key in self.data:
             data_name = key[ IndicatorLunar.DATA_INDEX_DATA_NAME ]
@@ -697,30 +702,30 @@ class IndicatorLunar( IndicatorBase ):
         menu,
         utc_now ):
 
-        self.update_menu_moon( menu )
-        self.update_menu_sun( menu )
-        self.update_menu_planets_minor_planets_comets_stars(
+        self._update_menu_moon( menu )
+        self._update_menu_sun( menu )
+        self._update_menu_planets_minor_planets_comets_stars(
             menu,
             _( "Planets" ),
             self.planets,
             None,
             IndicatorLunar.astro_backend.BodyType.PLANET )
 
-        self.update_menu_planets_minor_planets_comets_stars(
+        self._update_menu_planets_minor_planets_comets_stars(
             menu,
             _( "Minor Planets" ),
             self.minor_planets,
             self.minor_planet_orbital_element_data,
             IndicatorLunar.astro_backend.BodyType.MINOR_PLANET )
 
-        self.update_menu_planets_minor_planets_comets_stars(
+        self._update_menu_planets_minor_planets_comets_stars(
             menu,
             _( "Comets" ),
             self.comets,
             self.comet_orbital_element_data,
             IndicatorLunar.astro_backend.BodyType.COMET )
 
-        self.update_menu_planets_minor_planets_comets_stars(
+        self._update_menu_planets_minor_planets_comets_stars(
             menu,
             _( "Stars" ),
             self.stars,
@@ -764,7 +769,7 @@ class IndicatorLunar( IndicatorBase ):
         self.set_icon( str( icon_path ) )
 
 
-    def notification_full_moon( self ):
+    def _notification_full_moon( self ):
         utc_now = datetime.datetime.now( datetime.timezone.utc )
         key = (
             IndicatorLunar.astro_backend.BodyType.MOON,
@@ -808,12 +813,12 @@ class IndicatorLunar( IndicatorBase ):
             self.show_notification(
                 summary,
                 self.werewolf_warning_message,
-                icon = self.create_full_moon_icon() )
+                icon = self._create_full_moon_icon() )
 
             self.last_full_moon_notfication = utc_now
 
 
-    def create_full_moon_icon( self ):
+    def _create_full_moon_icon( self ):
         return (
             self.write_cache_text(
                 self.get_svg_icon_text(
@@ -866,28 +871,28 @@ class IndicatorLunar( IndicatorBase ):
         key = ( IndicatorLunar.astro_backend.BodyType.SATELLITE, number )
 
         rise_time = (
-            self.format_data(
+            self._format_data(
                 IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME,
                 self.data[
                     key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ],
                 IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
 
         rise_azimuth = (
-            self.format_data(
+            self._format_data(
                 IndicatorLunar.astro_backend.DATA_TAG_RISE_AZIMUTH,
                 self.data[
                     key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_AZIMUTH, ) ],
                 IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
 
         set_time = (
-            self.format_data(
+            self._format_data(
                 IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME,
                 self.data[
                     key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ],
                 IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
 
         set_azimuth = (
-            self.format_data(
+            self._format_data(
                 IndicatorLunar.astro_backend.DATA_TAG_SET_AZIMUTH,
                 self.data[
                     key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_AZIMUTH, ) ],
@@ -945,7 +950,7 @@ class IndicatorLunar( IndicatorBase ):
         self.show_notification( summary, message, icon = self.icon_satellite )
 
 
-    def update_menu_moon(
+    def _update_menu_moon(
         self,
         menu ):
 
@@ -970,7 +975,7 @@ class IndicatorLunar( IndicatorBase ):
             self.create_and_append_menuitem(
                 submenu,
                 _( "Phase: " ) +
-                self.format_data(
+                self._format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_PHASE,
                     self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_PHASE, ) ] ),
                 name = IndicatorLunar.SEARCH_URL_MOON,
@@ -1008,7 +1013,7 @@ class IndicatorLunar( IndicatorBase ):
 
             for date_time, display_text, key in phases_sorted_by_date:
                 formatted_data = (
-                    self.format_data(
+                    self._format_data(
                         key[ IndicatorLunar.DATA_INDEX_DATA_NAME ],
                         self.data[ key ] ) )
 
@@ -1029,7 +1034,7 @@ class IndicatorLunar( IndicatorBase ):
                 IndicatorLunar.SEARCH_URL_MOON )
 
 
-    def update_menu_sun(
+    def _update_menu_sun(
         self,
         menu ):
 
@@ -1053,14 +1058,14 @@ class IndicatorLunar( IndicatorBase ):
 
             equinox_label = (
                 _( "Equinox: " ) +
-                self.format_data(
+                self._format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_EQUINOX,
                     self.data[
                         key + ( IndicatorLunar.astro_backend.DATA_TAG_EQUINOX, ) ] ) )
 
             solstice_label = (
                 _( "Solstice: " ) +
-                self.format_data(
+                self._format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE,
                     self.data[
                         key + ( IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE, ) ] ) )
@@ -1132,7 +1137,7 @@ class IndicatorLunar( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Date/Time: " ) +
-            self.format_data(
+            self._format_data(
                 IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME,
                 self.data[
                     key +( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
@@ -1144,7 +1149,7 @@ class IndicatorLunar( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Type: " ) +
-            self.format_data(
+            self._format_data(
                 IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_TYPE,
                 self.data[
                     key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_TYPE, ) ] ),
@@ -1160,13 +1165,13 @@ class IndicatorLunar( IndicatorBase ):
         # For solar eclipses, Skyfield uses the same NASA Eclipse data.
         if key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE, ) in self.data:
             latitude = (
-                self.format_data(
+                self._format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE,
                     self.data[
                         key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE, ) ] ) )
 
             longitude = (
-                self.format_data(
+                self._format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LONGITUDE,
                     self.data[
                         key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LONGITUDE, ) ] ) )
@@ -1180,7 +1185,7 @@ class IndicatorLunar( IndicatorBase ):
                 indent = ( 2, 1 ) )
 
 
-    def update_menu_planets_minor_planets_comets_stars(
+    def _update_menu_planets_minor_planets_comets_stars(
         self,
         menu,
         menu_label,
@@ -1538,7 +1543,7 @@ class IndicatorLunar( IndicatorBase ):
             self.create_and_append_menuitem(
                 menu,
                 _( "Rise: " ) +
-                self.format_data(
+                self._format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME,
                     self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] ),
                 name = menuitem_name,
@@ -1549,7 +1554,7 @@ class IndicatorLunar( IndicatorBase ):
             self.create_and_append_menuitem(
                 menu,
                 _( "Azimuth: " ) +
-                self.format_data(
+                self._format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH,
                     self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH, ) ] ),
                 name = menuitem_name,
@@ -1559,7 +1564,7 @@ class IndicatorLunar( IndicatorBase ):
             self.create_and_append_menuitem(
                 menu,
                 _( "Altitude: " ) +
-                self.format_data(
+                self._format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_ALTITUDE,
                     self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_ALTITUDE, ) ] ),
                 name = menuitem_name,
@@ -1570,7 +1575,7 @@ class IndicatorLunar( IndicatorBase ):
                 self.create_and_append_menuitem(
                     menu,
                     _( "Set: " ) +
-                    self.format_data(
+                    self._format_data(
                         IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME,
                         self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] ),
                     name = menuitem_name,
@@ -1740,7 +1745,7 @@ class IndicatorLunar( IndicatorBase ):
 
             if len( info ) == 3: # Satellite yet to rise.
                 data = (
-                    self.format_data(
+                    self._format_data(
                         IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME,
                         info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] ) )
 
@@ -1754,7 +1759,7 @@ class IndicatorLunar( IndicatorBase ):
 
             elif len( info ) == 4: # Circumpolar (always up).
                 data = (
-                    self.format_data(
+                    self._format_data(
                         IndicatorLunar.astro_backend.DATA_TAG_AZIMUTH,
                         info[ IndicatorLunar.SATELLITE_MENU_AZIMUTH ] ) )
 
@@ -1767,7 +1772,7 @@ class IndicatorLunar( IndicatorBase ):
                 indent = ( 2, 1 ) )
 
                 data = (
-                    self.format_data(
+                    self._format_data(
                         IndicatorLunar.astro_backend.DATA_TAG_ALTITUDE,
                         info[ IndicatorLunar.SATELLITE_MENU_ALTITUDE ] ) )
 
@@ -1789,7 +1794,7 @@ class IndicatorLunar( IndicatorBase ):
                 indent = ( 2, 1 ) )
 
                 data = (
-                    self.format_data(
+                    self._format_data(
                         IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME,
                         info[ IndicatorLunar.SATELLITE_MENU_RISE_DATE_TIME ] ) )
 
@@ -1802,7 +1807,7 @@ class IndicatorLunar( IndicatorBase ):
                 indent = ( 3, 2 ) )
 
                 data = (
-                    self.format_data(
+                    self._format_data(
                         IndicatorLunar.astro_backend.DATA_TAG_RISE_AZIMUTH,
                         info[ IndicatorLunar.SATELLITE_MENU_RISE_AZIMUTH ] ) )
 
@@ -1823,7 +1828,7 @@ class IndicatorLunar( IndicatorBase ):
                 indent = ( 2, 1 ) )
 
                 data = (
-                    self.format_data(
+                    self._format_data(
                         IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME,
                         info[ IndicatorLunar.SATELLITE_MENU_SET_DATE_TIME ] ) )
 
@@ -1836,7 +1841,7 @@ class IndicatorLunar( IndicatorBase ):
                 indent = ( 3, 2 ) )
 
                 data = (
-                    self.format_data(
+                    self._format_data(
                         IndicatorLunar.astro_backend.DATA_TAG_SET_AZIMUTH,
                         info[ IndicatorLunar.SATELLITE_MENU_SET_AZIMUTH ] ) )
 
@@ -1854,7 +1859,7 @@ class IndicatorLunar( IndicatorBase ):
         submenu.remove( separator )
 
 
-    def format_data(
+    def _format_data(
         self,
         data_tag,
         data,
@@ -2051,7 +2056,9 @@ class IndicatorLunar( IndicatorBase ):
     def on_preferences(
         self,
         dialog ):
-
+        '''
+        Display preferences.
+        '''
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( self.INDENT_WIDGET_TOP )
 
@@ -2116,10 +2123,10 @@ class IndicatorLunar( IndicatorBase ):
 
         # Tag, translated tag, value.
         display_tags_store = Gtk.ListStore( str, str, str )
-        self.initialise_display_tags_store( display_tags_store )
+        self._initialise_display_tags_store( display_tags_store )
 
         indicator_text.set_text(
-            self.translate_text_using_tags(
+            self._translate_text_using_tags(
                 display_tags_store,
                 True,
                 self.indicator_text ) ) # Translate tags into local language.
@@ -2145,7 +2152,7 @@ class IndicatorLunar( IndicatorBase ):
                 tooltip_text = _(
                     "Double click to add a tag to the icon text." ),
                 rowactivatedfunctionandarguments = (
-                    self.on_tags_values_double_click,
+                    self._on_tags_values_double_click,
                     column_model_translated_tag,
                     indicator_text ) ) )
 
@@ -2295,7 +2302,7 @@ class IndicatorLunar( IndicatorBase ):
                 IndicatorLunar.astro_backend.PLANET_NAMES_TRANSLATIONS[ planet_name ] ] )
 
         scrolledwindow_planets = (
-            self.create_natural_body_treeview_within_scrolledwindow(
+            self._create_natural_body_treeview_within_scrolledwindow(
                 planet_store,
                 _( "Planets" ),
                 _(
@@ -2331,7 +2338,7 @@ class IndicatorLunar( IndicatorBase ):
                 "was completely filtered by magnitude." ) )
 
         scrolledwindow_minor_planets = (
-            self.create_natural_body_treeview_within_scrolledwindow(
+            self._create_natural_body_treeview_within_scrolledwindow(
                 minor_planet_store,
                 _( "Minor Planets" ),
                 tooltip,
@@ -2348,7 +2355,7 @@ class IndicatorLunar( IndicatorBase ):
                 self.comet_orbital_element_data[ comet ].get_name() ] )
 
         scrolledwindow_comets = (
-            self.create_natural_body_treeview_within_scrolledwindow(
+            self._create_natural_body_treeview_within_scrolledwindow(
                 comet_store,
                 _( "Comets" ),
                 _(
@@ -2377,7 +2384,7 @@ class IndicatorLunar( IndicatorBase ):
             star_store.append( star )
 
         scrolledwindow_stars = (
-            self.create_natural_body_treeview_within_scrolledwindow(
+            self._create_natural_body_treeview_within_scrolledwindow(
                 star_store,
                 _( "Stars" ),
                 _(
@@ -2471,7 +2478,7 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     satellite_view_column_hide_show,
                     (
-                        self.on_columnheader,
+                        self._on_columnheader,
                         satellite_store,
                         satellite_model_column_hide_show ), ), ) ) )
 
@@ -2496,13 +2503,13 @@ class IndicatorLunar( IndicatorBase ):
             satellite_tag_translations.append( item )
 
         message_text = (
-            self.translate_text_using_tags(
+            self._translate_text_using_tags(
                 satellite_tag_translations,
                 True,
                 self.satellite_notification_message ) )
 
         summary_text = (
-            self.translate_text_using_tags(
+            self._translate_text_using_tags(
                 satellite_tag_translations,
                 True,
                 self.satellite_notification_summary ) )
@@ -2535,7 +2542,7 @@ class IndicatorLunar( IndicatorBase ):
             tooltip_common )
 
         show_satellite_notification_checkbox, satellite_notification_summary_text, satellite_notification_message_text = (
-            self.create_notification_panel(
+            self._create_notification_panel(
                 grid,
                 0,
                 _( "Satellite rise" ),
@@ -2552,7 +2559,7 @@ class IndicatorLunar( IndicatorBase ):
                 False ) )
 
         show_werewolf_warning_checkbox, werewolf_notification_summary_text, werewolf_notification_message_text = (
-            self.create_notification_panel(
+            self._create_notification_panel(
                 grid,
                 4,
                 _( "Werewolf warning" ),
@@ -2640,7 +2647,7 @@ class IndicatorLunar( IndicatorBase ):
             0, 3, 1, 1 )
 
         city.connect(
-            "changed", self.on_city_changed, latitude, longitude, elevation )
+            "changed", self._on_city_changed, latitude, longitude, elevation )
 
         city.set_active( cities.index( self.city ) )
 
@@ -2743,7 +2750,7 @@ class IndicatorLunar( IndicatorBase ):
                 continue
 
             self.indicator_text = (
-                self.translate_text_using_tags(
+                self._translate_text_using_tags(
                     display_tags_store, False, indicator_text.get_text() ) )
 
             self.indicator_text_separator = indicator_text_separator.get_text()
@@ -2828,13 +2835,13 @@ class IndicatorLunar( IndicatorBase ):
                 self.satellite_previous_notifications = { }
 
             self.satellite_notification_summary = (
-                self.translate_text_using_tags(
+                self._translate_text_using_tags(
                     satellite_tag_translations,
                     False,
                     satellite_notification_summary_text.get_text() ) )
 
             self.satellite_notification_message = (
-                self.translate_text_using_tags(
+                self._translate_text_using_tags(
                     satellite_tag_translations,
                     False,
                     self.get_textview_text(
@@ -2864,7 +2871,7 @@ class IndicatorLunar( IndicatorBase ):
         return response_type
 
 
-    def initialise_display_tags_store(
+    def _initialise_display_tags_store(
         self,
         display_tags_store ):
 
@@ -2899,7 +2906,7 @@ class IndicatorLunar( IndicatorBase ):
                     value = ""
                     key = ( body_type, body_tag, data_tag )
                     if key in self.data:
-                        value = self.format_data( data_tag, self.data[ key ] )
+                        value = self._format_data( data_tag, self.data[ key ] )
                         display_tags_store.append( [
                             body_tag + " " + data_tag, translated_tag, value ] )
 
@@ -2935,7 +2942,7 @@ class IndicatorLunar( IndicatorBase ):
                         key = ( body_type, body_tag, data_tag )
                         if key in self.data:
                             value = (
-                                self.format_data( data_tag, self.data[ key ] ) )
+                                self._format_data( data_tag, self.data[ key ] ) )
                             display_tags_store.append( [
                                 body_tag + " " + data_tag, translated_tag, value ] )
 
@@ -2971,7 +2978,7 @@ class IndicatorLunar( IndicatorBase ):
                         key = ( body_type, body_tag, data_tag )
                         if key in self.data:
                             value = (
-                                self.format_data( data_tag, self.data[ key ] ) )
+                                self._format_data( data_tag, self.data[ key ] ) )
                             display_tags_store.append( [
                                 body_tag + " " + data_tag, translated_tag, value ] )
 
@@ -3011,12 +3018,12 @@ class IndicatorLunar( IndicatorBase ):
                         data_tag )
 
                     if key in self.data:
-                        value = self.format_data( data_tag, self.data[ key ] )
+                        value = self._format_data( data_tag, self.data[ key ] )
                         display_tags_store.append( [
                             body_tag + " " + data_tag, translated_tag, value ] )
 
 
-    def translate_text_using_tags(
+    def _translate_text_using_tags(
         self,
         tags_list_store,
         original_to_local,
@@ -3056,7 +3063,7 @@ class IndicatorLunar( IndicatorBase ):
         return translated_text
 
 
-    def on_tags_values_double_click(
+    def _on_tags_values_double_click(
         self,
         tree,
         path,
@@ -3071,7 +3078,7 @@ class IndicatorLunar( IndicatorBase ):
             indicator_textentry.get_position() )
 
 
-    def create_natural_body_treeview_within_scrolledwindow(
+    def _create_natural_body_treeview_within_scrolledwindow(
         self,
         treemodel,
         title,
@@ -3104,14 +3111,14 @@ class IndicatorLunar( IndicatorBase ):
                 (
                     natural_body_view_column_hide_show,
                     (
-                        self.on_columnheader,
+                        self._on_columnheader,
                         treemodel,
                         natural_body_model_column_hide_show ), ), ) ) )
 
         return scrolledwindow
 
 
-    def on_columnheader(
+    def _on_columnheader(
         self,
         treeviewcolumn,
         datastore,
@@ -3133,7 +3140,7 @@ class IndicatorLunar( IndicatorBase ):
             datastore[ i ][ datastore_column_hide_show ] = value
 
 
-    def create_notification_panel(
+    def _create_notification_panel(
         self,
         grid,
         grid_start_index,
@@ -3199,7 +3206,7 @@ class IndicatorLunar( IndicatorBase ):
                 tooltip_text = test_button_tooltip,
                 sensitive = checkbutton.get_active(),
                 clicked_functionandarguments = (
-                    self.on_test_notification_clicked,
+                    self._on_test_notification_clicked,
                     summary_text_entry,
                     message_text_view,
                     is_moon_notification ) ) )
@@ -3212,7 +3219,7 @@ class IndicatorLunar( IndicatorBase ):
         return checkbutton, summary_text_entry, message_text_view
 
 
-    def on_test_notification_clicked(
+    def _on_test_notification_clicked(
         self,
         button,
         summary_entry,
@@ -3223,7 +3230,7 @@ class IndicatorLunar( IndicatorBase ):
         message = self.get_textview_text( message_text_view )
 
         if is_moon_notification:
-            icon = self.create_full_moon_icon()
+            icon = self._create_full_moon_icon()
 
         else:
 
@@ -3286,7 +3293,7 @@ class IndicatorLunar( IndicatorBase ):
         self.show_notification( summary, message, icon = icon )
 
 
-    def on_city_changed(
+    def _on_city_changed(
         self,
         combobox,
         latitude,
@@ -3304,6 +3311,9 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def get_default_city( self ):
+        '''
+        Get the default city based on the system's timezone.
+        '''
         command_timedatectl = "timedatectl show | grep Timezone"
         timezone = (
             self.process_run(
@@ -3338,7 +3348,9 @@ class IndicatorLunar( IndicatorBase ):
     def load_config(
         self,
         config ):
-
+        '''
+        Load configuration.
+        '''
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME )
         if self.city is None:
             self.city = self.get_default_city()
@@ -3435,6 +3447,9 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def save_config( self ):
+        '''
+        Save configuration.
+        '''
         if self.comets_add_new:
             comets = [ ]
 

@@ -353,7 +353,9 @@ class AstroSkyfield( AstroBase ):
         minor_planet_apparent_magnitude_data,
         apparent_magnitude_maximum,
         logging ):
-
+        '''
+        Calculate the rise/set/az/alt for all bodies.
+        '''
         data = { }
 
         timescale = load.timescale( builtin = True ) #TODO Was "timeScale =" so hopefully the rename to timescale does not clash with load.timescale.
@@ -477,18 +479,26 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def get_cities():
+        '''
+        Return the list of sorted cities.
+        '''
         return sorted( AstroSkyfield._city_data.keys(), key = locale.strxfrm )
 
 
     @staticmethod
     def get_credit():
+        '''
+        Return rhe credit.
+        '''
         return "Skyfield https://github.com/skyfielders/python-skyfield"
 
 
     @staticmethod
     def get_latitude_longitude_elevation(
         city ):
-
+        '''
+        Return the city's latitude, longitude and elevation.
+        '''
         city_ = AstroSkyfield._city_data.get( city )
 
         return (
@@ -499,6 +509,9 @@ class AstroSkyfield( AstroBase ):
 
     @staticmethod
     def get_version():
+        '''
+        Return the version.
+        '''
         return skyfield.__version__
 
 

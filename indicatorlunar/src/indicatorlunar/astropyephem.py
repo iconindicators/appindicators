@@ -74,7 +74,9 @@ class AstroPyEphem( AstroBase ):
         minor_planet_apparent_magnitude_data,
         apparent_magnitude_maximum,
         logging ):
-
+        '''
+        Calculate the rise/set/az/alt for all bodies.
+        '''
         data = { }
 
         # PyEphem date/time is NOT timezone aware.
@@ -137,18 +139,26 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def get_cities():
+        '''
+        Return the list of sorted cities.
+        '''
         return sorted( _city_data.keys(), key = locale.strxfrm )
 
 
     @staticmethod
     def get_credit():
+        '''
+        Return rhe credit.
+        '''
         return "PyEphem https://github.com/brandon-rhodes/pyephem"
 
 
     @staticmethod
     def get_latitude_longitude_elevation(
         city ):
-
+        '''
+        Return the city's latitude, longitude and elevation.
+        '''
         city_ = _city_data.get( city )
 
         return (
@@ -159,6 +169,9 @@ class AstroPyEphem( AstroBase ):
 
     @staticmethod
     def get_version():
+        '''
+        Return the version.
+        '''
         return ephem.__version__
 
 

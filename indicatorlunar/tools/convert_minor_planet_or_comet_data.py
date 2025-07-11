@@ -381,6 +381,9 @@ def convert(
     option,
     in_file,
     out_file ):
+    '''
+    Convert the incoming data based on the option:
+    '''
 
     def process(
         f_in,

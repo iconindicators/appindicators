@@ -108,18 +108,30 @@ class GeneralPerturbation():
 
 
     def get_name( self ):
+        '''
+        Return the name.
+        '''
         return self.name
 
 
     def get_number( self ):
+        '''
+        Return the number.
+        '''
         return self.number
 
 
     def get_international_designator( self ):
+        '''
+        Return the international designator.
+        '''
         return self.satellite_record.intldesg
 
 
     def get_satellite_record( self ):
+        '''
+        Return the satellite record.
+        '''
         return self.satellite_record
 
 

@@ -183,10 +183,16 @@ class ApparentMagnitude():
 
 
     def get_name( self ):
+        '''
+        Return the name.
+        '''
         return self.name
 
 
     def get_apparent_magnitude( self ):
+        '''
+        Return the apparent magnitude.
+        '''
         return self.apparent_magnitude
 
 
