@@ -61,7 +61,7 @@ class IndicatorTest( IndicatorBase ):
             debug = True )
 
         self.request_mouse_wheel_scroll_events(
-            ( self.on_mouse_wheel_scroll, ) )
+            ( self._on_mouse_wheel_scroll, ) )
 
         self.flush_cache(
             IndicatorTest.CACHE_ICON_BASENAME,
@@ -71,12 +71,14 @@ class IndicatorTest( IndicatorBase ):
     def update(
         self,
         menu ):
-
+        '''
+        Refresh the indicator.
+        '''
         self._build_menu( menu )
         self.set_label_or_tooltip( IndicatorTest.LABEL )
 
 
-    def on_mouse_wheel_scroll(
+    def _on_mouse_wheel_scroll(
         self,
         indicator,
         delta,
@@ -476,7 +478,9 @@ class IndicatorTest( IndicatorBase ):
     def on_preferences(
         self,
         dialog ):
-
+        '''
+        Display preferences.
+        '''
         grid = self.create_grid()
 
         x_checkbutton = (
@@ -553,11 +557,16 @@ class IndicatorTest( IndicatorBase ):
     def load_config(
         self,
         config ):
-
+        '''
+        Load configuration.
+        '''
         self.x = config.get( IndicatorTest.CONFIG_X, True )
 
 
     def save_config( self ):
+        '''
+        Save configuration.
+        '''
         return {
             IndicatorTest.CONFIG_X : self.x
         }

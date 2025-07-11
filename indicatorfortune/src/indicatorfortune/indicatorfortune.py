@@ -82,16 +82,14 @@ class IndicatorFortune( IndicatorBase ):
         '''
         self.refresh_fortune()
         self.show_fortune()
-        self.build_menu( menu )
+        self._build_menu( menu )
         return int( self.refresh_interval_in_minutes ) * 60
 
 
-    def build_menu(
+    def _build_menu(
         self,
         menu ):
-        '''
-        Build menu.
-        '''
+
         self.create_and_append_menuitem(
             menu,
             _( "New Fortune" ),

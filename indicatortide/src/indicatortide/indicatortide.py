@@ -90,7 +90,7 @@ class IndicatorTide( IndicatorBase ):
                 tidal_readings = (
                     klazz.get_tide_data( logging = self.get_logging() ) )
 
-                self.build_menu( menu, tidal_readings )
+                self._build_menu( menu, tidal_readings )
 
             except FileNotFoundError:
                 label = _( "User script could not be found!" )
@@ -126,10 +126,8 @@ class IndicatorTide( IndicatorBase ):
         return ( five_minutes_after_midnight - today ).total_seconds()
 
 
-    def build_menu( self, menu, tidal_readings ):
-        '''
-        Build menu.
-        '''
+    def _build_menu( self, menu, tidal_readings ):
+
         indent = ( 0, 0 )
         self.port_name = tidal_readings[ 0 ].get_location()
         if self.port_name:

@@ -54,7 +54,7 @@ class IndicatorStardate( IndicatorBase ):
                 "Wikipedia::Stardate https://en.wikipedia.org/wiki/Stardate" ] )
 
         self.request_mouse_wheel_scroll_events(
-            ( self.on_mouse_wheel_scroll, ) )
+            ( self._on_mouse_wheel_scroll, ) )
 
         self.save_config_timer_id = None
 
@@ -62,7 +62,9 @@ class IndicatorStardate( IndicatorBase ):
     def update(
         self,
         menu ):
-
+        '''
+        Refresh the indicator.
+        '''
         utc_now = datetime.datetime.now( datetime.timezone.utc )
         if self.show_classic:
             stardate_issue, stardate_integer, stardate_fraction = (
@@ -94,7 +96,7 @@ class IndicatorStardate( IndicatorBase ):
         return number_of_seconds_to_next_update
 
 
-    def on_mouse_wheel_scroll(
+    def _on_mouse_wheel_scroll(
         self,
         indicator,
         delta,
@@ -156,7 +158,9 @@ class IndicatorStardate( IndicatorBase ):
     def on_preferences(
         self,
         dialog ):
-
+        '''
+        Display preferences.
+        '''
         grid = self.create_grid()
 
         show_classic_checkbutton = (
@@ -226,7 +230,9 @@ class IndicatorStardate( IndicatorBase ):
     def load_config(
         self,
         config ):
-
+        '''
+        Load configuration.
+        '''
         self.pad_integer = (
             config.get( IndicatorStardate.CONFIG_PAD_INTEGER, True ) )
 
@@ -238,6 +244,9 @@ class IndicatorStardate( IndicatorBase ):
 
 
     def save_config( self ):
+        '''
+        Save configuration.
+        '''
         self.save_config_timer_id = None # Reset the timer ID.
 
         return {
