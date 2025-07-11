@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorpunycode 1.0.16\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-04 11:18+1000\n"
+"POT-Creation-Date: 2025-07-12 00:14+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,68 +23,68 @@ msgstr ""
 msgid "Converts domain names between Unicode and ASCII."
 msgstr ""
 
-#: indicatorpunycode.py:68
+#: indicatorpunycode.py:70
 msgid "Convert"
 msgstr ""
 
-#: indicatorpunycode.py:78
+#: indicatorpunycode.py:80
 msgid "Unicode:  "
 msgstr ""
 
-#: indicatorpunycode.py:86
+#: indicatorpunycode.py:88
 msgid "ASCII:  "
 msgstr ""
 
-#: indicatorpunycode.py:93
+#: indicatorpunycode.py:95
 msgid "Clipboard is unsupported for your session type."
 msgstr ""
 
-#: indicatorpunycode.py:96
+#: indicatorpunycode.py:98
 #, python-brace-format
 msgid "{0} is inoperative..."
 msgstr ""
 
-#: indicatorpunycode.py:103
+#: indicatorpunycode.py:105
 msgid "Nothing to convert..."
 msgstr ""
 
-#: indicatorpunycode.py:108
+#: indicatorpunycode.py:110
 msgid "No text is in the clipboard."
 msgstr ""
 
-#: indicatorpunycode.py:117
+#: indicatorpunycode.py:119
 msgid "No text is highlighted/selected."
 msgstr ""
 
-#: indicatorpunycode.py:143
+#: indicatorpunycode.py:145
 msgid "Unable to convert..."
 msgstr ""
 
-#: indicatorpunycode.py:273
+#: indicatorpunycode.py:277
 msgid "Input source"
 msgstr ""
 
-#: indicatorpunycode.py:281
+#: indicatorpunycode.py:285
 msgid "Clipboard"
 msgstr ""
 
-#: indicatorpunycode.py:283
+#: indicatorpunycode.py:287
 msgid "Input is taken from the clipboard."
 msgstr ""
 
-#: indicatorpunycode.py:294
+#: indicatorpunycode.py:298
 msgid "Primary"
 msgstr ""
 
-#: indicatorpunycode.py:296
+#: indicatorpunycode.py:300
 msgid "Input is taken from the currently selected text."
 msgstr ""
 
-#: indicatorpunycode.py:306
+#: indicatorpunycode.py:310
 msgid "Output to clipboard and primary"
 msgstr ""
 
-#: indicatorpunycode.py:308
+#: indicatorpunycode.py:312
 msgid ""
 "If checked, the converted text is sent\n"
 "to both the clipboard and primary.\n"
@@ -93,17 +93,17 @@ msgid ""
 "only to the input source."
 msgstr ""
 
-#: indicatorpunycode.py:321
+#: indicatorpunycode.py:325
 msgid "Drop path/query in output"
 msgstr ""
 
-#: indicatorpunycode.py:323
+#: indicatorpunycode.py:327
 msgid ""
 "If checked, the output text will not\n"
 "contain any path/query (if present)."
 msgstr ""
 
-#: indicatorpunycode.py:338
+#: indicatorpunycode.py:342
 msgid ""
 "The number of most recent\n"
 "results to show in the menu.\n"
@@ -113,6 +113,6 @@ msgid ""
 "the result to the output."
 msgstr ""
 
-#: indicatorpunycode.py:348
+#: indicatorpunycode.py:352
 msgid "Maximum results"
 msgstr ""

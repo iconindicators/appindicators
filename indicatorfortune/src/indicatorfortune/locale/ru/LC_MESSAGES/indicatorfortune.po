@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorfortune 1.0.44\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-11 19:34+1000\n"
+"POT-Creation-Date: 2025-07-12 00:13+1000\n"
 "PO-Revision-Date: 2024-07-09 16:04+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -14,8 +14,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: indicatorfortune.py:41
 msgid "Indicator Fortune"
@@ -34,105 +34,105 @@ msgstr ""
 "Вызывает программу 'fortune', показывающую изречения в виде всплывающих "
 "сообщений."
 
-#: indicatorfortune.py:93
+#: indicatorfortune.py:95
 msgid "New Fortune"
 msgstr "Новое изречение"
 
-#: indicatorfortune.py:104
+#: indicatorfortune.py:106
 msgid "Copy Last Fortune"
 msgstr "Скопировать последнее"
 
-#: indicatorfortune.py:116
+#: indicatorfortune.py:118
 msgid "Show Last Fortune"
 msgstr "Показать последнее"
 
-#: indicatorfortune.py:128
+#: indicatorfortune.py:130
 msgid "History"
 msgstr "История"
 
-#: indicatorfortune.py:147
+#: indicatorfortune.py:152
 msgid "WARNING. . ."
 msgstr "ПРЕДУПРЕЖДЕНИЕ. . ."
 
-#: indicatorfortune.py:153
+#: indicatorfortune.py:158
 #, fuzzy
 msgid "Ensure enabled fortunes contain data!"
 msgstr "Убедитесь в правильности формата файлов включённых изречений!"
 
-#: indicatorfortune.py:173
+#: indicatorfortune.py:178
 msgid "No enabled fortunes have a valid location!"
 msgstr "Неверно заданы пути у включённых файлов изречений!"
 
-#: indicatorfortune.py:176
+#: indicatorfortune.py:181
 msgid "No fortunes are enabled!"
 msgstr ""
 
-#: indicatorfortune.py:229
+#: indicatorfortune.py:244
 msgid "Fortune History for Session"
 msgstr "История изречений"
 
-#: indicatorfortune.py:264
+#: indicatorfortune.py:281
 #, fuzzy
 msgid "Fortune"
 msgstr "Файлы изречений"
 
-#: indicatorfortune.py:265
+#: indicatorfortune.py:282
 msgid "Double click to edit a fortune."
 msgstr ""
 
-#: indicatorfortune.py:266
+#: indicatorfortune.py:283
 msgid "Choose a fortune .dat file"
 msgstr "Выберите файл .dat с изречениями"
 
-#: indicatorfortune.py:267
+#: indicatorfortune.py:284
 msgid "This fortune already exists!"
 msgstr ""
 
-#: indicatorfortune.py:268
+#: indicatorfortune.py:285
 #, fuzzy
 msgid "This is a system fortune and cannot be modified."
 msgstr "Стандартный файл с изречениями не может быть удалён."
 
-#: indicatorfortune.py:269
+#: indicatorfortune.py:286
 #, fuzzy
 msgid "Add a new fortune."
 msgstr "Добавить новые изречения."
 
-#: indicatorfortune.py:270
+#: indicatorfortune.py:287
 #, fuzzy
 msgid "Remove the selected fortune."
 msgstr "Удалить выбранный элемент?"
 
-#: indicatorfortune.py:271
+#: indicatorfortune.py:288
 #, fuzzy
 msgid "This is a system fortune and cannot be removed."
 msgstr "Стандартный файл с изречениями не может быть удалён."
 
-#: indicatorfortune.py:272
+#: indicatorfortune.py:289
 msgid "Remove the selected fortune?"
 msgstr "Удалить выбранный элемент?"
 
-#: indicatorfortune.py:275
+#: indicatorfortune.py:292
 msgid "Fortunes"
 msgstr "Файлы изречений"
 
-#: indicatorfortune.py:285
+#: indicatorfortune.py:302
 msgid "How often a fortune is displayed."
 msgstr "Насколько часто показываются изречения."
 
-#: indicatorfortune.py:287
+#: indicatorfortune.py:304
 msgid "Refresh interval (minutes)"
 msgstr "Интервал обновления (в минутах)"
 
-#: indicatorfortune.py:298
+#: indicatorfortune.py:315
 msgid "The summary text for the notification."
 msgstr "Текст заголовка всплывающего сообщения."
 
-#: indicatorfortune.py:303
+#: indicatorfortune.py:320
 msgid "Notification summary"
 msgstr "Заголовок сообщения"
 
-#: indicatorfortune.py:314
+#: indicatorfortune.py:331
 msgid ""
 "If the fortune exceeds the limit,\n"
 "a new fortune is created.\n"
@@ -150,27 +150,27 @@ msgstr ""
 "будут отброшены, что вызовет чрезмерное\n"
 "обращение к программе 'fortune'."
 
-#: indicatorfortune.py:324
+#: indicatorfortune.py:341
 msgid "Message character limit"
 msgstr "Лимит количества символов"
 
-#: indicatorfortune.py:329
+#: indicatorfortune.py:346
 msgid "Middle mouse click of the icon"
 msgstr "Щелчок средней кнопкой мыши по значку"
 
-#: indicatorfortune.py:345
+#: indicatorfortune.py:362
 msgid "Show a new fortune"
 msgstr "Показать новое изречение"
 
-#: indicatorfortune.py:360
+#: indicatorfortune.py:377
 msgid "Copy current fortune to clipboard"
 msgstr "Скопировать последнее изречение в буфер"
 
-#: indicatorfortune.py:376
+#: indicatorfortune.py:393
 msgid "Show current fortune"
 msgstr "Показать последнее изречение"
 
-#: indicatorfortune.py:388
+#: indicatorfortune.py:405
 msgid "General"
 msgstr "Общие"
 
