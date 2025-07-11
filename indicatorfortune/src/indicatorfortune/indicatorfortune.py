@@ -77,7 +77,9 @@ class IndicatorFortune( IndicatorBase ):
     def update(
         self,
         menu ):
-
+        '''
+        Refresh the indicator and build the menu.
+        '''
         self.refresh_fortune()
         self.show_fortune()
         self.build_menu( menu )
@@ -87,7 +89,9 @@ class IndicatorFortune( IndicatorBase ):
     def build_menu(
         self,
         menu ):
-
+        '''
+        Build menu.
+        '''
         self.create_and_append_menuitem(
             menu,
             _( "New Fortune" ),
@@ -131,6 +135,9 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def refresh_fortune( self ):
+        '''
+        Refresh fortune.
+        '''
         locations = [ ]
         at_least_one_fortune_is_enabled = False
         for location, enabled in self.fortunes:
@@ -184,11 +191,17 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def refresh_and_show_fortune( self ):
+        '''
+        Refresh fortune and show.
+        '''
         self.refresh_fortune()
         self.show_fortune()
 
 
     def show_history( self ):
+        '''
+        Show previous fortunes.
+        '''
 
         def textview_changed(
             textview,
@@ -245,7 +258,9 @@ class IndicatorFortune( IndicatorBase ):
     def on_preferences(
         self,
         dialog ):
-
+        '''
+        Display preferences.
+        '''
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( self.INDENT_WIDGET_TOP )
 
@@ -530,7 +545,9 @@ class IndicatorFortune( IndicatorBase ):
     def load_config(
         self,
         config ):
-
+        '''
+        Load configuration.
+        '''
         self.fortunes = config.get( IndicatorFortune.CONFIG_FORTUNES, [ ] )
 
         self.notification_summary = (
@@ -581,6 +598,9 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def save_config( self ):
+        '''
+        Save configuratin.
+        '''
         return {
             IndicatorFortune.CONFIG_FORTUNES: self.fortunes,
 

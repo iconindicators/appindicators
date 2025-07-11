@@ -42,10 +42,16 @@ class Fortune():
 
 
     def get_message( self ):
+        '''
+        Return the fortune message.
+        '''
         return self.message
 
 
     def get_summary( self ):
+        '''
+        Return the fortune summary.
+        '''
         return self.summary
 
 
