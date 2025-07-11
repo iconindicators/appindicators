@@ -50,25 +50,39 @@ class PublishedBinary():
 
 
     def get_name( self ):
+        '''
+        Return the name of this published binary.
+        '''
         return self.name
 
 
     def get_version( self ):
+        '''
+        Return the version of this published binary.
+        '''
         return self.version
 
 
     def get_architecture( self ):
+        '''
+        Return the architecture of this published binary.
+        '''
         return self.architecture
 
 
     def get_download_count( self ):
+        '''
+        Return the download count of this published binary.
+        '''
         return self.download_count
 
 
     def set_download_count(
         self,
         count ):
-
+        '''
+        Set the download count of this published binary.
+        '''
         self.download_count = count
 
 
@@ -163,28 +177,41 @@ class PPA():
 
 
     def get_status( self ):
+        '''
+        Return the status of this PPA.
+        '''
         return self.status
 
 
     def set_status(
         self,
         status ):
-
+        '''
+        Set the status of this PPA.
+        '''
         self.status = status
         if not status == PPA.Status.OK:
             self.published_binaries = [ ]
 
 
     def get_user( self ):
+        '''
+        Return the PPA's user.
+        '''
         return self.user
 
 
     def get_name( self ):
+        '''
+        Return the PPA's name.
+        '''
         return self.name
 
 
     def get_filters( self ):
-        ''' Returns the list of filter strings. '''
+        '''
+        Return the list of filter strings.
+        '''
         return self.filters
 
 
@@ -199,30 +226,46 @@ class PPA():
 
 
     def is_filter_empty( self ):
-        ''' Returns True when the filter is set to [ "" ]. '''
+        '''
+        Return True when if filter is set to [ "" ].
+        '''
         return len( self.filters ) == 1 and self.filters[ 0 ] == ''
 
 
     def get_descriptor( self ):
+        '''
+        Return the PPA's descriptor.
+        '''
         return self.user + ' | ' + self.name
 
 
     def add_published_binary(
         self,
         published_binary ):
-
+        '''
+        Add the published binary to this PPA.
+        '''
         self.published_binaries.append( published_binary )
 
 
     def has_published_binaries( self ):
+        '''
+        Return True if this PPA has published binaries; False otherwise.
+        '''
         return len( self.published_binaries ) > 0
 
 
     def get_published_binaries( self ):
+        '''
+        Return the published binaries for this PPA.
+        '''
         return self.published_binaries
 
 
     def flush_published_binaries( self ):
+        '''
+        Flush publised binaries from this PPA.
+        '''
         self.published_binaries = [ ]
 
 

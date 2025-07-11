@@ -75,7 +75,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def update(
         self,
         menu ):
-
+        '''
+        Refresh the indicator.
+        '''
         if self.preferences_changed:
             # One or more PPAs were modified in the Preferences;
             # download only those PPAs.
@@ -391,7 +393,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def on_preferences(
         self,
         dialog ):
-
+        '''
+        Display preferences.
+        '''
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( self.INDENT_WIDGET_TOP )
 
@@ -432,7 +436,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 default_sort_func = self._ppa_sort,
                 tooltip_text = treeview_tooltip if len( store ) else "",
                 rowactivatedfunctionandarguments = (
-                    self.on_ppa_double_click, ) ) )
+                    self._on_ppa_double_click, ) ) )
 
         grid.attach( scrolledwindow, 0, 0, 1, 1 )
 
@@ -446,11 +450,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     remove_tooltip if len( store ) else "" ),
                 (
                     None,
-                    ( self.on_ppa_remove, treeview ) ) ) )
+                    ( self._on_ppa_remove, treeview ) ) ) )
 
         add.connect(
             "clicked",
-            self.on_ppa_add,
+            self._on_ppa_add,
             treeview,
             treeview_tooltip,
             remove,
@@ -606,7 +610,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                     IndicatorPPADownloadStatistics.COLUMN_NAME ) ) )
 
 
-    def on_ppa_remove(
+    def _on_ppa_remove(
         self,
         button,
         treeview ):
@@ -636,7 +640,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 model.remove( iter_ )
 
 
-    def on_ppa_add(
+    def _on_ppa_add(
         self,
         button_add,
         treeview,
@@ -644,7 +648,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         button_remove,
         button_remove_tooltip ):
 
-        self.on_ppa_double_click( treeview, None, None )
+        self._on_ppa_double_click( treeview, None, None )
 
         if len( treeview.get_model() ):
             treeview.set_sensitive( True )
@@ -653,12 +657,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
             button_remove.set_tooltip_text( button_remove_tooltip )
 
 
-    def on_ppa_double_click(
+    def _on_ppa_double_click(
         self,
         treeview,
         row_number,
         treeviewcolumn ):
-
         model, iter_ = treeview.get_selection().get_selected()
         first_ppa = len( model ) == 0
         adding_ppa = row_number is None
@@ -908,7 +911,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
     def load_config(
         self,
         config ):
-
+        '''
+        Load configuration.
+        '''
         self.low_bandwidth = (
             config.get(
                 IndicatorPPADownloadStatistics.CONFIG_LOW_BANDWIDTH,
@@ -974,6 +979,9 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
 
     def save_config( self ):
+        '''
+        Save configuration.
+        '''
         ppas = [ ]
         for ppa in self.ppas:
             ppas.append( [
