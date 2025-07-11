@@ -311,7 +311,7 @@ class IndicatorBase( ABC ):
 
     def get_version( self ):
         '''
-        TODO Add docstring
+        Return the version from the project metadata (pyproject.toml).
         '''
         return self.project_metadata[ "Version" ]
 
@@ -931,9 +931,9 @@ class IndicatorBase( ABC ):
         message,
         icon = None ):
         '''
-        TODO Add docstring
+        Shows an on-screen notification.
+        If the icon is None, the indicator icon is shown.
         '''
-
         _icon = icon
         if icon is None:
             _icon = self.get_icon_name()
@@ -948,7 +948,8 @@ class IndicatorBase( ABC ):
         self,
         menuitem ):
         '''
-        TODO Add docstring
+        Assign the secondary activation target, typically mouse middle button
+        click, to the menuitem.
         '''
         self.secondary_activate_target = menuitem
 
@@ -1005,21 +1006,21 @@ class IndicatorBase( ABC ):
 
     def get_session_type( self ):
         '''
-        TODO Add docstring
+        Return the session type.
         '''
         return self._get_session_type()
 
 
     def is_session_type_wayland( self ):
         '''
-        TODO Add docstring
+        Return True if running under Wayland.
         '''
         return self.get_session_type() == self.SESSION_TYPE_WAYLAND
 
 
     def is_session_type_x11( self ):
         '''
-        TODO Add docstring
+        Return True if running under X11.
         '''
         return self.get_session_type() == self.SESSION_TYPE_X11
 
@@ -1171,7 +1172,8 @@ class IndicatorBase( ABC ):
         self,
         toggle ):
         '''
-        TODO Add docstring
+        Set the sensitivity of the menu (and all menuitems) as per the value of
+        toggle (either True or False). 
         '''
         menuitems = self.indicator.get_menu().get_children()
         # On the first update, the menu only contains the "initialising"
@@ -1391,7 +1393,7 @@ class IndicatorBase( ABC ):
             Gtk.STOCK_OK, Gtk.ResponseType.OK ),
         default_size = None ):
         '''
-        TODO Add docstring
+        Create a dialog.
         '''
         dialog = (
             Gtk.Dialog(
@@ -1419,7 +1421,7 @@ class IndicatorBase( ABC ):
         message,
         title = None ):
         '''
-        TODO Add docstring
+        Show and ok/cancel dialog.
         '''
         return (
             self._show_dialog(
@@ -1436,7 +1438,7 @@ class IndicatorBase( ABC ):
         message,
         title = None ):
         '''
-        TODO Add docstring
+        Show a yes/no dialog.
         '''
         return (
             self._show_dialog(
@@ -1454,7 +1456,7 @@ class IndicatorBase( ABC ):
         title = None,
         message_type = Gtk.MessageType.ERROR ):
         '''
-        TODO Add docstring
+        Show an ok dialog.
         '''
         return (
             self._show_dialog(
@@ -1510,7 +1512,8 @@ class IndicatorBase( ABC ):
 
     def create_preferences_common_widgets( self ):
         '''
-        TODO Add docstring
+        Create the widgets common to all indicators for display in the
+        Preferences dialog.
         '''
         autostart = False
         delay = 0
@@ -1607,7 +1610,7 @@ class IndicatorBase( ABC ):
         delay,
         check_latest_version ):
         '''
-        TODO Add docstring
+        Set the values for the preferences common to all indicators.
         '''
         self.check_latest_version = check_latest_version
 
@@ -1768,7 +1771,7 @@ class IndicatorBase( ABC ):
 
     def get_on_click_menuitem_open_browser_function( self ):
         '''
-        TODO Add docstring
+        Return open webbrowswer function for when a menu item is clicked.
         '''
         return lambda menuitem: webbrowser.open( menuitem.get_name() )
 
@@ -1803,7 +1806,7 @@ class IndicatorBase( ABC ):
 
     def create_grid( self ):
         '''
-        TODO Add docstring
+        Return a widget grid.
         '''
         spacing = 10
         grid = Gtk.Grid()
@@ -1820,7 +1823,7 @@ class IndicatorBase( ABC ):
         self,
         widget ):
         '''
-        TODO Add docstring
+        Return a scrolled window encapsulating the widget.
         '''
         scrolledwindow = Gtk.ScrolledWindow()
         scrolledwindow.set_hexpand( True )
@@ -1840,7 +1843,7 @@ class IndicatorBase( ABC ):
         halign = Gtk.Align.FILL,
         homogeneous = False ):
         '''
-        TODO Add docstring
+        Return a box.
         '''
         box = Gtk.Box( spacing = spacing, orientation = orientation )
         box.set_sensitive( sensitive )
@@ -1863,7 +1866,10 @@ class IndicatorBase( ABC ):
         tooltip_texts,
         clicked_functionandarguments ):
         '''
-        TODO Add docstring
+        Return a box created with labels, corresponding tooltips and functions
+        with arguments.
+        
+        The labels, tooltips and function/arguments must be tuples of equal size.
         '''
         buttons_and_expands = [ ]
         z = zip( labels, tooltip_texts, clicked_functionandarguments )
@@ -1899,7 +1905,7 @@ class IndicatorBase( ABC ):
         editable = True,
         make_longer = False ):
         '''
-        TODO Add docstring
+        Return an entry.
         '''
         entry = Gtk.Entry()
         self._set_widget_common_attributes(
@@ -1926,7 +1932,7 @@ class IndicatorBase( ABC ):
         active = -1,
         editable = False ):
         '''
-        TODO Add docstring
+        Return a comboboxtext.
         '''
         if editable:
             comboboxtext = Gtk.ComboBoxText.new_with_entry()
@@ -1949,7 +1955,7 @@ class IndicatorBase( ABC ):
         editable = True,
         wrap_mode = Gtk.WrapMode.WORD ):
         '''
-        TODO Add docstring
+        Return a treeview.
         '''
         textview = Gtk.TextView()
         textview.get_buffer().set_text( text )
@@ -1998,7 +2004,7 @@ class IndicatorBase( ABC ):
         margin_top = 0,
         margin_left = 0 ):
         '''
-        TODO Add docstring
+        Return a spinbutton.
         '''
         spinner = Gtk.SpinButton()
         self._set_widget_common_attributes(
@@ -2026,7 +2032,7 @@ class IndicatorBase( ABC ):
         margin_left = 0,
         active = True ):
         '''
-        TODO Add docstring
+        Return a checkbutton.
         '''
         checkbutton = Gtk.CheckButton.new_with_label( label )
         self._set_widget_common_attributes(
@@ -2050,7 +2056,7 @@ class IndicatorBase( ABC ):
         margin_left = 0,
         active = True ):
         '''
-        TODO Add docstring
+        Return a radiobutton.
         '''
         radiobutton = (
             Gtk.RadioButton.new_with_label_from_widget(
@@ -2252,7 +2258,7 @@ class IndicatorBase( ABC ):
         store,
         model_column_id ):
         '''
-        TODO Add docstring
+        Return a cell renderer toggle containg a checkbox used with a treeview.
         '''
 
         def on_checkbox(
@@ -2292,7 +2298,7 @@ class IndicatorBase( ABC ):
         action = Gtk.FileChooserAction.OPEN,
         file_filter = None ):
         '''
-        TODO Add docstring
+        Return a filechooser dialog.
         '''
         dialog = (
             Gtk.FileChooserDialog(
@@ -2694,7 +2700,7 @@ class IndicatorBase( ABC ):
         self,
         number_as_string ):
         '''
-        TODO Add docstring
+        Return True if the number as a string is float; False otherwise.
         '''
         try:
             float( number_as_string )
@@ -2706,7 +2712,7 @@ class IndicatorBase( ABC ):
 
     def get_current_desktop( self ):
         '''
-        TODO Add docstring
+        Return the current desktop.
         '''
         return self.current_desktop
 
@@ -2885,7 +2891,7 @@ class IndicatorBase( ABC ):
         self,
         delay = 0 ):
         '''
-        TODO Add docstring
+        Kicks off a config save with optional delay in seconds.
         '''
         if self.lock_save_config.acquire( blocking = False ):
             if self.id_save_config > 0:
