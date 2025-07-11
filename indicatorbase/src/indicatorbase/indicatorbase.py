@@ -332,7 +332,10 @@ class IndicatorBase( ABC ):
     def get_json(
         url,
         data = None,
-        logging = None ):
+        logging_ = None ):
+#TODO Who calls this and passes in logging?
+# Maybe don't need to pass in logging...see process_run.
+#Maybe also search for log/logging to see if this happens elsewhere.        
         '''
         Retrieves the JSON content from a URL.
 
@@ -371,17 +374,17 @@ class IndicatorBase( ABC ):
             else:
                 error_network = True
 
-            if logging:
-                logging.error( f"Problem with { url }" )
-                logging.exception( e )
+            if logging_:
+                logging_.error( f"Problem with { url }" )
+                logging_.exception( e )
 
             json_ = None
 
         except socket.timeout as e:
             error_timeout = True
-            if logging:
-                logging.error( f"Problem with { url }" )
-                logging.exception( e )
+            if logging_:
+                logging_.error( f"Problem with { url }" )
+                logging_.exception( e )
 
             json_ = None
 
