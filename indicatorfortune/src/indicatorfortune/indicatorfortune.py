@@ -78,7 +78,7 @@ class IndicatorFortune( IndicatorBase ):
         self,
         menu ):
         '''
-        Refresh the indicator and build the menu.
+        Refresh the indicator.
         '''
         self.refresh_fortune()
         self.show_fortune()

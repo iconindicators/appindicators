@@ -86,7 +86,9 @@ class IndicatorVirtualBox( IndicatorBase ):
     def update(
         self,
         menu ):
-
+        '''
+        Refresh the indicator.
+        '''
         virtual_machines = [ ]
         vboxmanage_installed = self.is_vboxmanage_installed()
         if vboxmanage_installed:
@@ -108,7 +110,9 @@ class IndicatorVirtualBox( IndicatorBase ):
         menu,
         vboxmanage_installed,
         virtual_machines ):
-
+        '''
+        Build menu.
+        '''
         if vboxmanage_installed:
             if virtual_machines:
                 running_names, running_uuids = (
@@ -223,7 +227,9 @@ class IndicatorVirtualBox( IndicatorBase ):
     def auto_start_virtual_machines(
         self,
         virtual_machines ):
-
+        '''
+        Start each of the virtual machines.
+        '''
         virtual_machines_for_autostart = (
             self._get_virtual_machines_for_autostart( virtual_machines ) )
 
@@ -271,7 +277,9 @@ class IndicatorVirtualBox( IndicatorBase ):
     def start_virtual_machine(
         self,
         uuid ):
-
+        '''
+        Start the virtual machine identified by UUID.
+        '''
         command = f"VBoxManage list vms | grep { uuid }"
         virtual_machines = (
             self.process_run(
@@ -297,7 +305,11 @@ class IndicatorVirtualBox( IndicatorBase ):
         self,
         virtual_machine_name,
         delay_in_seconds = 0 ):
+        '''
+        Bring the virtual machine window to front.
 
+        Only works on X11 as Wayland has no such mechanism at present.
+        '''
         if self.is_session_type_x11():
             all_windows = self.process_run( "wmctrl -l" )[ 0 ]
             matches = [ ]
@@ -356,7 +368,12 @@ class IndicatorVirtualBox( IndicatorBase ):
         indicator,
         delta,
         scroll_direction ):
+        '''
+        When the mouse wheel is scrolled, cycle through each running virtual
+        machine and bring to front.
 
+        Only works on X11 as Wayland has no such mechanism at present.
+        '''
         running_names, running_uuids = self.get_running_virtual_machines()
         if running_uuids:
             if self.scroll_uuid is None or self.scroll_uuid not in running_uuids:
@@ -385,6 +402,9 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def on_launch_virtual_box_manager( self ):
+        '''
+        Launch the VirtualBox Manager user interface.
+        '''
 
         def start_virtualbox_manager():
             self.process_run(
@@ -447,7 +467,10 @@ class IndicatorVirtualBox( IndicatorBase ):
     def is_virtual_machine_running(
         self,
         uuid ):
-
+        '''
+        Return True if the virtual machine identified by UUID is running;
+        False otherwise.
+        '''
         virtual_machines_running = (
             self.process_run(
                 "VBoxManage list runningvms | grep " + uuid,
@@ -457,6 +480,9 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def get_virtual_machines( self ):
+        '''
+        Get all virtual machines registered via VBoxManage.
+        '''
 
         def add_virtual_machine(
             start_group,
@@ -504,6 +530,9 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def is_vboxmanage_installed( self ):
+        '''
+        Return True if VBoxManage is installed; False otherwise.
+        '''
         which_vboxmanage = (
             self.process_run(
                 "which VBoxManage",
@@ -515,7 +544,9 @@ class IndicatorVirtualBox( IndicatorBase ):
     def get_start_command(
         self,
         uuid ):
-
+        '''
+        Return the start command for the UUID.
+        '''
         start_command = (
             IndicatorVirtualBox.VIRTUAL_MACHINE_STARTUP_COMMAND_DEFAULT )
 
@@ -530,7 +561,9 @@ class IndicatorVirtualBox( IndicatorBase ):
     def is_autostart(
         self,
         uuid ):
-
+        '''
+        Return True if autostart is checked; False otherwise.
+        '''
         autostart = False
         if uuid in self.virtual_machine_preferences:
             preferences = self.virtual_machine_preferences[ uuid ]
@@ -543,7 +576,9 @@ class IndicatorVirtualBox( IndicatorBase ):
     def on_preferences(
         self,
         dialog ):
-
+        '''
+        Display preferences.
+        '''
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( self.INDENT_WIDGET_TOP )
 
@@ -805,7 +840,9 @@ class IndicatorVirtualBox( IndicatorBase ):
         text_new,
         model,
         dialog ):
-
+        '''
+        Obtain the start command and add back into the model.
+        '''
         start_command = text_new.strip()
         if len( start_command ) == 0:
             start_command = (
@@ -858,7 +895,9 @@ class IndicatorVirtualBox( IndicatorBase ):
     def load_config(
         self,
         config ):
-
+        '''
+        Load configuration.
+        '''
         self.delay_between_autostart_in_seconds = (
             config.get(
                 IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS,
@@ -894,6 +933,9 @@ class IndicatorVirtualBox( IndicatorBase ):
 
 
     def save_config( self ):
+        '''
+        Save configuration.
+        '''
         return {
             IndicatorVirtualBox.CONFIG_DELAY_BETWEEN_AUTO_START_IN_SECONDS:
                 self.delay_between_autostart_in_seconds,
