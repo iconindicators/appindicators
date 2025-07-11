@@ -16,9 +16,10 @@
 #
 # Contacted regina.rudawska@esa.int and waiting to hear back.
 # Reply from Regina:
-#    The IAU MDC is complete list of known showers. 
-#    The data provided there is delivered to MDC by authors and present the mean solutions of each shower. 
-#    If you are interested in meteor showers predictions, 
+#    The IAU MDC is complete list of known showers.
+#    The data provided there is delivered to MDC by authors and present the
+#    mean solutions of each shower.
+#    If you are interested in meteor showers predictions,
 #    then you might have a look International Meteor Organization page
 #    where they annually publish calendar: https://www.imo.net/resources/calendar.
 #
