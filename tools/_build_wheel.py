@@ -42,7 +42,6 @@ if "../" not in sys.path:
 
 from indicatorbase.src.indicatorbase import indicatorbase
 
-from . import _markdown_to_html
 from . import utils
 from . import utils_readme
 
@@ -439,6 +438,21 @@ def _get_msgstr_from_po(
             break
 
     return msgstr
+
+
+def _markdown_to_html():
+    stdout_, stderr_, return_code = (
+        utils.python_run(
+            "python3 -m tools.markdown_to_html",
+            utils.VENV_BUILD ) )
+
+    if return_code == 0:
+        message = ""
+
+    else:
+        message = _get_message( stderr_, return_code )
+
+    return message
 
 
 def _get_translated_names_and_comments_from_po_files(
@@ -913,10 +927,9 @@ def _package_source(
             authors,
             start_year )
 
-        _markdown_to_html.markdown_to_html(
-            f"{ directory_dist }/{ indicator }/README.md",
-            f"{ directory_dist }/{ indicator }/src/{ indicator }/README.html" )
+        message = _markdown_to_html()
 
+    if not message:
         directory_indicator_locale = (
             Path( '.' ) / directory_indicator / "src" / indicator / "locale" )
 
