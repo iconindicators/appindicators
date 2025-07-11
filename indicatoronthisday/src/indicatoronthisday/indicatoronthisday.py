@@ -97,9 +97,11 @@ class IndicatorOnThisDay( IndicatorBase ):
     def update(
         self,
         menu ):
-
+        '''
+        Refresh the indicator.
+        '''
         events = self.get_events()
-        self.build_menu( menu, events )
+        self._build_menu( menu, events )
 
         # Set next update just after midnight.
         today = datetime.now()
@@ -138,7 +140,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 time.sleep( 3 )
 
 
-    def build_menu(
+    def _build_menu(
         self,
         menu,
         events ):
@@ -155,7 +157,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                     break
 
                 event_date = (
-                    self.remove_leading_zero_from_date( event.get_date() ) )
+                    self._remove_leading_zero_from_date( event.get_date() ) )
 
                 self.create_and_append_menuitem( menu, event_date )
 
@@ -203,7 +205,7 @@ class IndicatorOnThisDay( IndicatorBase ):
                 break
 
 
-    def remove_leading_zero_from_date(
+    def _remove_leading_zero_from_date(
         self,
         date_ ):
 
@@ -218,8 +220,10 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def get_events( self ):
-        # Write the path of each calendar file to a temporary file;
-        # only need to call calendar once.
+        '''
+        Write the path of each calendar file to a temporary file;
+        only need to call calendar once.
+        '''
         content = ""
         at_least_one_calendar_is_enabled = False
         for calendar, enabled in self.calendars:
@@ -305,7 +309,9 @@ class IndicatorOnThisDay( IndicatorBase ):
     def on_preferences(
         self,
         dialog ):
-
+        '''
+        Display preferences.
+        '''
         notebook = Gtk.Notebook()
         notebook.set_margin_bottom( self.INDENT_WIDGET_TOP )
 
@@ -407,14 +413,14 @@ class IndicatorOnThisDay( IndicatorBase ):
 
             radio_copy_to_clipboard.connect(
                 "toggled",
-                self.on_event_click_radio,
+                self._on_event_click_radio,
                 radio_copy_to_clipboard,
                 radio_internet_search,
                 search_engine_entry )
 
             radio_internet_search.connect(
                 "toggled",
-                self.on_event_click_radio,
+                self._on_event_click_radio,
                 radio_copy_to_clipboard,
                 radio_internet_search,
                 search_engine_entry )
@@ -487,7 +493,7 @@ class IndicatorOnThisDay( IndicatorBase ):
         return response_type
 
 
-    def on_event_click_radio(
+    def _on_event_click_radio(
         self,
         source,
         radio_copy_to_clipboard,
@@ -558,7 +564,9 @@ class IndicatorOnThisDay( IndicatorBase ):
     def load_config(
         self,
         config ):
-
+        '''
+        Load configuration.
+        '''
         system_calendar_default = self.get_system_calendar_default()
         self.calendars = (
             config.get(
@@ -596,6 +604,9 @@ class IndicatorOnThisDay( IndicatorBase ):
 
 
     def save_config( self ):
+        '''
+        Save configuration.
+        '''
         return {
             IndicatorOnThisDay.CONFIG_CALENDARS:
                 self.calendars,

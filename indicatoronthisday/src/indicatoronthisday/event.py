@@ -37,10 +37,16 @@ class Event():
 
 
     def get_date( self ):
+        '''
+        Return the date for this event.
+        '''
         return self.date
 
 
     def get_description( self ):
+        '''
+        Return the description for this event.
+        '''
         return self.description
 
 
