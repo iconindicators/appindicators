@@ -317,7 +317,9 @@ class IndicatorBase( ABC ):
             "New version of {0} available..." ).format( self.indicator_name )
 
         data_json, error_network, error_timeout = (
-            self.get_json( url, logging = self.get_logging() ) )
+            self.get_json(
+                url,
+                logging_ = self.get_logging() ) )
 
         if data_json:
             version_pypi = (
@@ -3262,6 +3264,9 @@ class IndicatorBase( ABC ):
             result = (
                 # Don't want check = True as that throws an exception for
                 # grep when grep finds no result and returns a code of 1.
+#TODO According to 
+# indicatorbase/src/indicatorbase/indicatorbase.py:3265:16: W1510: 'subprocess.run' used without explicitly defining the value for 'check'. (subprocess-run-check)
+# Need to put in check True or False....
                 subprocess.run(
                     command,
                     shell = True,
