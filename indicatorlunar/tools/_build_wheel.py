@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 
@@ -135,7 +135,7 @@ def _create_ephemeris_stars(
     if hip_main_dat.exists():
         content = ""
         hips = [ star[ 1 ] for star in AstroBase.STARS ]
-        with open( hip_main_dat, 'r' ) as f:
+        with open( hip_main_dat, 'r', encoding = "utf-8" ) as f:
             for line in f:
                 # HIP is located at bytes 9 - 14
                 #    http://cdsarc.u-strasbg.fr/ftp/cats/I/239/ReadMe
