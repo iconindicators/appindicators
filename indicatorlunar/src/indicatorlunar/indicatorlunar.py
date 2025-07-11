@@ -736,11 +736,16 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def update_icon( self ):
-        # Ideally overwrite the icon with the same name each time.
-        # Due to a bug, the icon name must change between calls to set the icon.
-        # So change the name each time incorporating the current date/time.
-        #    https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
-        #    https://askubuntu.com/q/490634/67335
+        '''
+        Refresh the icon.
+
+        Ideally overwrite the icon with the same name each time.
+        Due to a bug, the icon name must change between calls to set the icon.
+        Therefore, on each update incorporate timestamp into the filename.
+
+        https://bugs.launchpad.net/ubuntu/+source/libappindicator/+bug/1337620
+        https://askubuntu.com/q/490634/67335
+        '''
         key = (
             IndicatorLunar.astro_backend.BodyType.MOON,
             IndicatorLunar.astro_backend.NAME_TAG_MOON )
@@ -830,6 +835,10 @@ class IndicatorLunar( IndicatorBase ):
 
 
     def notification_satellites( self ):
+        '''
+        If a satellite is about to rise above the horizon and will be visible,
+        notify.
+        '''
         index_number = 0
         index_rise_time = 1
         satellite_current_notifications = [ ]

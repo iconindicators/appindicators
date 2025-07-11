@@ -184,8 +184,12 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def show_fortune( self ):
+        '''
+        Show the current fortune in the on-screen notification.
+        '''
         self.show_notification(
-            self.fortune.get_summary(), self.fortune.get_message() )
+            self.fortune.get_summary(),
+            self.fortune.get_message() )
 
 
     def refresh_and_show_fortune( self ):

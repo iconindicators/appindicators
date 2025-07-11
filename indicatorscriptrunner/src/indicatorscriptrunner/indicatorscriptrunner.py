@@ -1956,6 +1956,9 @@ class IndicatorScriptRunner( IndicatorBase ):
     def dump_treestore(
         self,
         model ):
+        '''
+        Keep Pylint happy!
+        '''
 
         def dump_treestore_( model, treepath, iter_, dump ):
             for i in list( range( 11 ) ):
