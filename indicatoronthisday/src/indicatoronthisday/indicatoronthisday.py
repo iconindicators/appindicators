@@ -434,8 +434,7 @@ class IndicatorOnThisDay( IndicatorBase ):
 
             grid.attach( search_engine_entry, 0, row, 1, 1 )
             search_engine_entry.set_hexpand( True )
-            search_engine_entry.set_margin_left(
-                self.INDENT_WIDGET_LEFT )
+            search_engine_entry.set_margin_left( self.INDENT_WIDGET_LEFT )
 
             row += 1
 
