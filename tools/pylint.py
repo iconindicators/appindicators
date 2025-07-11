@@ -49,7 +49,7 @@ if __name__ == "__main__":
         "--disable=too-many-lines "
         "--disable=too-many-locals "
         # "--disable=too-many-nested-blocks "
-        "--disable=too-many-positional-arguments "  #TODO This works on Debian 12...hopefully also on Ubntu 20.04 so check.
+        # "--disable=too-many-positional-arguments " # Does not work on Ubuntu 20.04
         "--disable=too-many-public-methods "
         "--disable=too-many-statements "
         "--disable=undefined-variable "
