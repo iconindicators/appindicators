@@ -211,7 +211,10 @@ def get_arguments(
     argument_nargs = None,
     formatter_class = argparse.ArgumentDefaultsHelpFormatter ):
     '''
-    TODO
+    Creates an argument parser from a tuple of argument names and returns the
+    result of parsing the arguments.
+
+    Associated help and nargs may also be provided as same length tuples.
     '''
     if argument_helps is None:
         argument_helps = { }
