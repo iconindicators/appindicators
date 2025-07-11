@@ -91,6 +91,9 @@ _stardate_rates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
 
 
 def get_version():
+    '''
+    Return the version.
+    '''
     return "Version 6.0 (2024-06-11)"
 
 
