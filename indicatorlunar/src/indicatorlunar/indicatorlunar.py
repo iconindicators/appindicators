@@ -365,11 +365,11 @@ class IndicatorLunar( IndicatorBase ):
                 self.download_count_comet,
                 self.next_download_time_comet,
                 DataProviderOrbitalElement.download,
-                [ #TODO Can these be tuples?
+                (
                     IndicatorLunar.COMET_DATA_TYPE,
-                    IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ],
+                    IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ),
                 DataProviderOrbitalElement.load,
-                [ IndicatorLunar.COMET_DATA_TYPE ] ) )
+                ( IndicatorLunar.COMET_DATA_TYPE, ) ) )
 
         if self.comets_add_new:
             self.add_new_bodies( self.comet_orbital_element_data, self.comets )
@@ -388,11 +388,11 @@ class IndicatorLunar( IndicatorBase ):
                 self.download_count_minor_planet,
                 self.next_download_time_minor_planet,
                 DataProviderOrbitalElement.download,
-                [
+                (
                     IndicatorLunar.MINOR_PLANET_DATA_TYPE,
-                    IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ],
+                    IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ),
                 DataProviderOrbitalElement.load,
-                [ IndicatorLunar.MINOR_PLANET_DATA_TYPE ] ) )
+                ( IndicatorLunar.MINOR_PLANET_DATA_TYPE, ) ) )
 
         if self.minor_planets_add_new:
             self.add_new_bodies(
@@ -412,9 +412,9 @@ class IndicatorLunar( IndicatorBase ):
                 self.download_count_apparent_magnitude,
                 self.next_download_time_apparent_magnitude,
                 DataProviderApparentMagnitude.download,
-                [ False, IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ],
+                ( False, IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ),
                 DataProviderApparentMagnitude.load,
-                [ ] ) )
+                ( ) ) )
 
         # Update satellite data.
         (
@@ -430,9 +430,9 @@ class IndicatorLunar( IndicatorBase ):
                 self.download_count_satellite,
                 self.next_download_time_satellite,
                 DataProviderGeneralPerturbation.download,
-                [ ],
+                ( ),
                 DataProviderGeneralPerturbation.load,
-                [ ] ) )
+                ( ) ) )
 
         if self.satellites_add_new:
             self.add_new_bodies(
