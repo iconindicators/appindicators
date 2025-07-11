@@ -3264,11 +3264,12 @@ class IndicatorBase( ABC ):
             result = (
                 # Don't want check = True as that throws an exception for
                 # grep when grep finds no result and returns a code of 1.
-#TODO According to
-# indicatorbase/src/indicatorbase/indicatorbase.py:3265:16: W1510: 'subprocess.run' used without explicitly defining the value for 'check'. (subprocess-run-check)
-# Need to put in check True or False....
+                #
+                # Despite check = False by default, Pylint complains if
+                # check = False is not set explicitly.
                 subprocess.run(
                     command,
+                    check = False,
                     shell = True,
                     capture_output = capture_output ) )
 
