@@ -424,7 +424,7 @@ def _get_installation_python_virtual_environment(
 
     pygobject = "PyGObject"
     if pygobject_needs_to_be_pinned:
-        pygobject = "PyGObject\<=3.50.0"
+        pygobject = r"PyGObject\<=3.50.0"
 
     message = (
         f"Install `{ indicator }`, including icons, .desktop and run "
