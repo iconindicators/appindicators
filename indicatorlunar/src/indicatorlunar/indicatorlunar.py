@@ -1292,6 +1292,10 @@ class IndicatorLunar( IndicatorBase ):
 
                 display_name_function = get_display_name_for_star
 
+            else:
+                raise ValueError(
+                    f"Unknown display_name_function: { display_name_function }" )
+
             return display_name_function
 
 
