@@ -137,7 +137,7 @@ def python_run(
     if sys.prefix == sys.base_prefix:
         commands.append( f". { venv_directory }/bin/activate" )
 
-    if len( modules_to_install ):
+    if modules_to_install:
         commands.append(
             "python3 -m pip install --upgrade"
             f"{ ' --force-reinstall' if force_reinstall else '' } "
