@@ -55,7 +55,7 @@ if __name__ == "__main__":
         # "--disable=unused-variable "
         # "--disable=fixme "
         "--recursive=y "
-        "--ignore=release,venv_build,venv_run "
+        "--ignore=release,venv_build,venv_run,meteorshowertest.py "
         "../Indicators "
         "--output=pylint.txt ; " # Must be ; not && otherwise will stop.
 
