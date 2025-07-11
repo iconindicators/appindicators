@@ -17,9 +17,9 @@
 
 
 '''
-Utility for building a Python3 wheel.
+Create a Python3 wheel.
 
-  *** NOT TO BE RUN DIRECTLY ***
+Requires polib to be installed by the calling script.
 '''
 
 

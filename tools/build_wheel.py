@@ -39,8 +39,8 @@ if __name__ == "__main__":
 
     for indicator in indicators_to_process:
         command = (
-            "python3 -c \"import tools._build_wheel; "
-            f"tools._build_wheel.build_wheel( \\\"{ indicator }\\\" )\"" )
+            "python3 -c \"import tools.utils_build; "
+            f"tools.utils_build.build_wheel( \\\"{ indicator }\\\" )\"" )
 
         modules_to_install = [
             "build",
