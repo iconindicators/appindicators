@@ -612,7 +612,7 @@ class IndicatorBase( ABC ):
                 if line.startswith( '#' ):
                     continue
 
-                elif line.startswith( self._DOT_DESKTOP_AUTOSTART_ENABLED ):
+                if line.startswith( self._DOT_DESKTOP_AUTOSTART_ENABLED ):
                     if not autostart_enabled_present:
                         output += line
                         made_a_change = True
