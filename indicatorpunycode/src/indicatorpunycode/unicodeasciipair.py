@@ -32,10 +32,16 @@ class UnicodeAsciiPair():
 
 
     def get_ascii( self ):
+        '''
+        Return the ASCII for this pair.
+        '''
         return self.ascii
 
 
     def get_unicode( self ):
+        '''
+        Return the Unicode for this pair.
+        '''
         return self.unicode
 
 

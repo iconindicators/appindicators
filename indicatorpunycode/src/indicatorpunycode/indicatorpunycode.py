@@ -61,13 +61,15 @@ class IndicatorPunycode( IndicatorBase ):
     def update(
         self,
         menu ):
-
+        '''
+        Refresh the indicator.
+        '''
         if self.is_clipboard_supported():
             self.create_and_append_menuitem(
                 menu,
                 _( "Convert" ),
                 activate_functionandarguments = (
-                    lambda menuitem: self.on_convert(), ),
+                    lambda menuitem: self._on_convert(), ),
                 is_secondary_activate_target = True )
 
             for pairs in self.unicode_ascii_pairs:
@@ -99,7 +101,7 @@ class IndicatorPunycode( IndicatorBase ):
             self.show_notification( summary, message )
 
 
-    def on_convert( self ):
+    def _on_convert( self ):
         summary =_( "Nothing to convert..." )
         if self.input_clipboard:
             text = self.copy_from_clipboard()
@@ -263,7 +265,9 @@ class IndicatorPunycode( IndicatorBase ):
     def on_preferences(
         self,
         dialog ):
-
+        '''
+        Display preferences.
+        '''
         grid = self.create_grid()
 
         row = 0
@@ -381,7 +385,9 @@ class IndicatorPunycode( IndicatorBase ):
     def load_config(
         self,
         config ):
-
+        '''
+        Load configuration.
+        '''
         self.drop_path_query = (
             config.get( IndicatorPunycode.CONFIG_DROP_PATH_QUERY, False ) )
 
@@ -396,6 +402,9 @@ class IndicatorPunycode( IndicatorBase ):
 
 
     def save_config( self ):
+        '''
+        Save configuration.
+        '''
         return {
             IndicatorPunycode.CONFIG_DROP_PATH_QUERY:
                 self.drop_path_query,
