@@ -3227,7 +3227,7 @@ class IndicatorBase( ABC ):
         text: The text to write.
         filename: The name of the file.
         '''
-        self.write_text_file( filename, text )
+        self.write_text_file( self.get_cache_directory() / filename, text )
 
 
     def write_cache_text(
