@@ -55,6 +55,9 @@ class IndicatorTide( IndicatorBase ):
 
 
     def update( self, menu ):
+        '''
+        Refresh the indicator.
+        '''
         no_user_script_path = self.user_script_path_and_filename == ""
         no_user_script_name = self.user_script_class_name == ""
         if no_user_script_path and no_user_script_name:
@@ -124,6 +127,9 @@ class IndicatorTide( IndicatorBase ):
 
 
     def build_menu( self, menu, tidal_readings ):
+        '''
+        Build menu.
+        '''
         indent = ( 0, 0 )
         self.port_name = tidal_readings[ 0 ].get_location()
         if self.port_name:
@@ -251,6 +257,9 @@ class IndicatorTide( IndicatorBase ):
 
 
     def on_preferences( self, dialog ):
+        '''
+        Display preferences.
+        '''
         grid = self.create_grid()
 
         grid.attach(
@@ -377,6 +386,9 @@ class IndicatorTide( IndicatorBase ):
 
 
     def load_config( self, config ):
+        '''
+        Load configuration.
+        '''
         self.show_as_submenus = (
             config.get(
                 IndicatorTide.CONFIG_SHOW_AS_SUBMENUS,
@@ -399,6 +411,9 @@ class IndicatorTide( IndicatorBase ):
 
 
     def save_config( self ):
+        '''
+        Save configuration.
+        '''
         return {
             IndicatorTide.CONFIG_SHOW_AS_SUBMENUS:
                 self.show_as_submenus,

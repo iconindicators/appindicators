@@ -40,28 +40,44 @@ class Reading():
 
 
     def get_date( self ):
+        '''
+        Return the date of the tidal reading.
+        '''
         return self.date
 
 
     def get_time( self ):
+        '''
+        Return the time of the tidal reading.
+        '''
         return self.time
 
 
     def get_location( self ):
+        '''
+        Return the location of the tidal reading.
+        '''
         return self.location
 
 
     def is_high( self ):
-        ''' Returns true if tide is high; false otherwise. '''
+        '''
+        Return True if tide is high; False otherwise.
+        '''
         return self._is_high
 
 
     def get_level( self ):
-        ''' Returns the level of this tide. '''
+        '''
+        Return the level for the tidal reading.
+        '''
         return self.level
 
 
     def get_url( self ):
+        '''
+        Return the URL for the tidal reading.
+        '''
         return self.url
 
 
