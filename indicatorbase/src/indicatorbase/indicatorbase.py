@@ -16,10 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Go to sourceforge appindicator page and grab the summary dot points.
-# Already deleted again...left another support message.
-
-
 '''
 Base class for application indicators.
 
