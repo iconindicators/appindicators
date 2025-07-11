@@ -33,6 +33,20 @@ if __name__ == "__main__":
         "tools._markdown_to_html.markdown_to_html( "
         f"\\\"{ markdown }\\\", \\\"{ html }\\\" )\"" )
 
+#TODO Thinking about using this new version as opposed to running the above
+# to then call a script which uses Python...just call the tool itself!
+#
+# Original command line version from README.md:
+#
+#     venv=$HOME/.local/venv_indicators && \
+#     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+#     . ${venv}/bin/activate && \
+#     python3 -m pip install readme_renderer[md] && \
+#     python3 -m readme_renderer README.md -o README.html && \
+#     deactivate
+
+    command = "python3 -m readme_renderer README.md -o README.html"
+
     modules_to_install = [
         "pip",
         "readme_renderer[md]" ]
