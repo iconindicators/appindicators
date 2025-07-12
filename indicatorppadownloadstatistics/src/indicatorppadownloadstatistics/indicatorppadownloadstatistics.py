@@ -866,14 +866,15 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         self,
         ppas,
         filters ):
-
-        # In version 1.0.81, PPAs changed from
-        #   user | name | series | architecture
-        # to
-        #   user | name | filter
-        # and filters which had the format
-        #   user | name | series | architecture | filter text
-        # no longer exist.
+        '''
+        In version 1.0.81, PPAs changed from
+            user | name | series | architecture
+        to
+            user | name | filter
+        and filters which had the format
+            user | name | series | architecture | filter text
+        no longer exist.
+        '''
         for ppa in ppas:
             user = ppa[ IndicatorPPADownloadStatistics.COLUMN_USER ]
             name = ppa[ IndicatorPPADownloadStatistics.COLUMN_NAME ]
@@ -899,9 +900,7 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
 
                     else:
                         ppa.set_filters(
-                            list(
-                                set(
-                                    filter_text + ppa.get_filters() ) ) )
+                            list( set( filter_text + ppa.get_filters() ) ) )
 
                     break
 
@@ -935,14 +934,11 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
                 5 ) )
 
         ppas = config.get( IndicatorPPADownloadStatistics.CONFIG_PPAS, [ ] )
-        self.ppas = [ ]
 
         version_from_config = (
             self.versiontuple( self.get_version_from_config( config ) ) )
 
-#TODO onthisday does a check against 0.0.0 
-# Need to do the same here? 
-# Check to see if need to guard against version 0.0.0
+        self.ppas = [ ]
         if version_from_config < self.versiontuple( "1.0.81" ):
             self._upgrade_1_0_81( ppas, config.get( "filters", [ ] ) )
 
