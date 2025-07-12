@@ -82,6 +82,9 @@ except ValueError:
     gi.require_version( "Notify", "0.8" )
 from gi.repository import Notify
 
+gi.require_version( "Pango", "1.0" )
+from gi.repository import Pango
+
 try:
     gi.require_version( "AyatanaAppIndicator3", "0.1" )
     from gi.repository import AyatanaAppIndicator3 as AppIndicator
@@ -1150,7 +1153,7 @@ class IndicatorBase( ABC ):
         toggle ):
         '''
         Set the sensitivity of the menu (and all menuitems) as per the value of
-        toggle (either True or False). 
+        toggle (either True or False).
         '''
         menuitems = self.indicator.get_menu().get_children()
         # On the first update, the menu only contains the "initialising"
@@ -1845,7 +1848,7 @@ class IndicatorBase( ABC ):
         '''
         Return a box created with labels, corresponding tooltips and functions
         with arguments.
-        
+
         The labels, tooltips and function/arguments must be tuples of equal size.
         '''
         buttons_and_expands = [ ]
@@ -2323,7 +2326,11 @@ class IndicatorBase( ABC ):
 
         store = Gtk.ListStore( str, bool ) # Fortune/calendar path; enabled.
         for location, enabled in user_fortunes_or_calendars:
-            store.append( [ location, enabled ] )
+            if Path( location ).exists():
+                store.append( [ location, enabled ] )
+
+            else:
+                store.append( [ location, False ] )
 
         # Ensure the system fortunes/calendars are present in the list of
         # fortunes/calendars, not just those selected/defined by the user.
@@ -2341,6 +2348,8 @@ class IndicatorBase( ABC ):
             column_id_fortune_or_calendar_file,
             Gtk.SortType.ASCENDING )
 
+        renderer_column_name_text = Gtk.CellRendererText()
+
         treeview, scrolledwindow = (
             self.create_treeview_within_scrolledwindow(
                 store,
@@ -2349,7 +2358,7 @@ class IndicatorBase( ABC ):
                     _( "Enabled" ) ),
                 (
                     (
-                        Gtk.CellRendererText(),
+                        renderer_column_name_text,
                         "text",
                         column_id_fortune_or_calendar_file ),
                     (
@@ -2360,6 +2369,13 @@ class IndicatorBase( ABC ):
                         column_id_fortune_or_calendar_enabled ) ),
                 alignments_columnviewids = (
                     ( 0.5, column_id_fortune_or_calendar_enabled ), ),
+                celldatafunctionandarguments_renderers_columnviewids = (
+                    (
+                        (
+                            self._fortune_or_calendar_column_name_renderer,
+                            column_id_fortune_or_calendar_file ),
+                        renderer_column_name_text,
+                        column_id_fortune_or_calendar_file ), ),
                 tooltip_text = treeview_tool_tip if len( store ) else "",
                 rowactivatedfunctionandarguments =
                     (
@@ -2419,6 +2435,27 @@ class IndicatorBase( ABC ):
         grid.attach( box, 0, 1, 1, 1 )
 
         return grid, store
+
+
+    def _fortune_or_calendar_column_name_renderer(
+        self,
+        tree_column,
+        cell_renderer,
+        model,
+        iter_,
+        column_id_fortune_or_calendar_file ):
+        '''
+        Render a fortune/calendar italic if the underlying file does not exist.
+        '''
+        file_ = model.get_value( iter_, column_id_fortune_or_calendar_file )
+
+        value = (
+            Pango.Style.NORMAL
+            if Path( file_ ).exists()
+            else
+            Pango.Style.ITALIC )
+
+        cell_renderer.set_property( "style", value )
 
 
     def _on_fortune_or_calendar_remove(

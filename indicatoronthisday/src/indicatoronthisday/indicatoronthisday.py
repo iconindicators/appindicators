@@ -16,13 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-
-#TODO What happens if a calendar is in the .json but does not exist?
-# Similar issue to fortune?
-# Show calendar in the preferences but uncheck it.
-# If checked, verify.
-
-
 '''
 Application indicator which displays calendar events.
 
@@ -236,22 +229,23 @@ class IndicatorOnThisDay( IndicatorBase ):
         for calendar, enabled in self.calendars:
             if enabled:
                 at_least_one_calendar_is_enabled = True
-                if Path( calendar ).is_file():
+                if Path( calendar ).exists():
                     content += "#include <" + calendar + ">\n"
 
         events_grouped_by_date = [ ]
         if content:
             events_grouped_by_date = self._get_events( content )
 
-        elif at_least_one_calendar_is_enabled:
-            self.show_notification(
-                _( "Warning" ),
-                _( "No enabled calendars have a valid location!" ) )
-
         else:
-            self.show_notification(
-                _( "Warning" ),
-                _( "No calendars are enabled!" ) )
+            if at_least_one_calendar_is_enabled:
+                self.show_notification(
+                    _( "Warning" ),
+                    _( "No enabled calendars have a valid location!" ) )
+
+            else:
+                self.show_notification(
+                    _( "Warning" ),
+                    _( "No calendars are enabled!" ) )
 
         return events_grouped_by_date
 
@@ -331,7 +325,10 @@ class IndicatorOnThisDay( IndicatorBase ):
                 IndicatorOnThisDay.COLUMN_CALENDAR_FILE,
                 IndicatorOnThisDay.COLUMN_ENABLED,
                 _( "Calendar" ),
-                _( "Double click to edit a calendar." ),
+                _(
+                    "Double click to edit a calendar.\n\n"
+                    "Calendars which cannot be found\n"
+                    "are shown in italics." ),
                 _( "Choose a calendar file" ),
                 _( "This calendar already exists!" ),
                 _( "This is a system calendar and cannot be modified." ),

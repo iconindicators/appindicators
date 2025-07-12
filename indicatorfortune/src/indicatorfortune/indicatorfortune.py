@@ -19,16 +19,6 @@
 ''' Application indicator which displays fortunes. '''
 
 
-#TODO There is a fortune "/home/bernard/myfortunes/art.dat"
-# which does not exist.
-# But it is in the .json so it is loaded up.
-# But in the preferences, although it is displayed, which is good,
-# it is also checked which is bad.
-# So need to check if a fortune is present.
-# What happens if I check the fortune when unchekced?
-# Need to verify if the file is present?
-
-
 import fnmatch
 import os
 
@@ -151,13 +141,9 @@ class IndicatorFortune( IndicatorBase ):
         for location, enabled in self.fortunes:
             if enabled:
                 at_least_one_fortune_is_enabled = True
-                if Path( location ).is_file():
+                if Path( location ).exists():
                     locations.append(
                         " '" + location.replace( ".dat", "" ) + "' " )
-
-                else:
-                    self.get_logging().error(
-                        f"Cannot locate fortune path { location }" )
 
         summary = _( "WARNING. . ." )
         if locations:
@@ -184,11 +170,12 @@ class IndicatorFortune( IndicatorBase ):
 
                     break
 
-        elif at_least_one_fortune_is_enabled:
-            message = _( "No enabled fortunes have a valid location!" )
-
         else:
-            message = _( "No fortunes are enabled!" )
+            if at_least_one_fortune_is_enabled:
+                message = _( "No enabled fortunes have a valid location!" )
+
+            else:
+                message = _( "No fortunes are enabled!" )
 
         self.fortune = Fortune( message, summary )
 
@@ -289,7 +276,10 @@ class IndicatorFortune( IndicatorBase ):
                 IndicatorFortune.COLUMN_FORTUNE_FILE,
                 IndicatorFortune.COLUMN_ENABLED,
                 _( "Fortune" ),
-                _( "Double click to edit a fortune." ),
+                _(
+                    "Double click to edit a fortune.\n\n"
+                    "Fortunes which cannot be found\n"
+                    "are shown in italics." ),
                 _( "Choose a fortune .dat file" ),
                 _( "This fortune already exists!" ),
                 _( "This is a system fortune and cannot be modified." ),
