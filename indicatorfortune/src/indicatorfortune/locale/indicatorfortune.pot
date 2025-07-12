@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorfortune 1.0.44\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-12 00:13+1000\n"
+"POT-Creation-Date: 2025-07-12 22:48+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,32 +45,36 @@ msgstr ""
 msgid "History"
 msgstr ""
 
-#: indicatorfortune.py:152
+#: indicatorfortune.py:148
 msgid "WARNING. . ."
 msgstr ""
 
-#: indicatorfortune.py:158
+#: indicatorfortune.py:154
 msgid "Ensure enabled fortunes contain data!"
 msgstr ""
 
-#: indicatorfortune.py:178
+#: indicatorfortune.py:175
 msgid "No enabled fortunes have a valid location!"
 msgstr ""
 
-#: indicatorfortune.py:181
+#: indicatorfortune.py:178
 msgid "No fortunes are enabled!"
 msgstr ""
 
-#: indicatorfortune.py:244
+#: indicatorfortune.py:241
 msgid "Fortune History for Session"
 msgstr ""
 
-#: indicatorfortune.py:281
+#: indicatorfortune.py:278
 msgid "Fortune"
 msgstr ""
 
-#: indicatorfortune.py:282
-msgid "Double click to edit a fortune."
+#: indicatorfortune.py:280
+msgid ""
+"Double click to edit a fortune.\n"
+"\n"
+"Fortunes which cannot be found\n"
+"are shown in italics."
 msgstr ""
 
 #: indicatorfortune.py:283
