@@ -585,22 +585,6 @@ class IndicatorOnThisDay( IndicatorBase ):
             if self.calendars != [ [ system_calendar_default, True ] ]:
                 self._upgrade_1_0_17()
 
-
-        # version_0_0_0 = self.versiontuple( "0.0.0" )
-        # version_1_0_17 = self.versiontuple( "1.0.17" )
-        #
-        # if version_from_config == version_0_0_0:
-        #     pass # No version, so no .json found OR very old .json containing no version.
-
-
-
-#TODO Check to see if need to guard against version 0.0.0
-        # if version_0_0_0 < version_from_config < version_1_0_17:
-        #     self._upgrade_1_0_17()
-
-        # if version_from_config < version_1_0_17:
-        #     self._upgrade_1_0_17()
-
         self.copy_to_clipboard = (
             config.get(
                 IndicatorOnThisDay.CONFIG_COPY_TO_CLIPBOARD,
