@@ -16,6 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+
+#TODO What happens if a calendar is in the .json but does not exist?
+# Similar issue to fortune?
+# Show calendar in the preferences but uncheck it.
+# If checked, verify.
+
+
 '''
 Application indicator which displays calendar events.
 
