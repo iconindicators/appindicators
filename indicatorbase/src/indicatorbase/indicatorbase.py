@@ -206,10 +206,9 @@ class IndicatorBase( ABC ):
 
         error_message = self._initialise_desktop_file_in_user_home()
         if error_message:
-            # In the unlikely event an error message is returned,
-            # it will ONLY be when running in developement and
-            # the .desktop file was unable to be extracted from
-            # the .whl in the release directory.
+            # An error message will only arise when running in development and
+            # the .desktop file could not be extracted from the .whl in the
+            # release directory.
             self._show_message_and_exit( error_message )
 
         self.indicator_name_human_readable = indicator_name_human_readable
