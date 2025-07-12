@@ -281,28 +281,18 @@ class IndicatorBase( ABC ):
         sys.exit( 1 )
 
 
-#TODO See where this is used...now that I can import indicatorbase
-# into scripts, maybe I don't need this function any more and instead
-# can use packaging.version (however that worked).
     @staticmethod
-    def versiontuple( v ):
+    def versiontuple( version_x_y_z ):
         '''
-        TODO Add docstring
+        Version numbers for all indicators are well behaved,
+        following a numerical format of x.y.z and always increasing.
+
+        Rather than using the external library packaging.version,
+        parse the input string version_x_y_z and return a three element tuple.
+
+        https://stackoverflow.com/a/11887825/2156453
         '''
-        # Ideally would use PyPI packaging.version requiring installation
-        # via pip.
-        #
-        # However, some tools call IndicatorBase functions which requires
-        # importing IndicatorBase, which pulls in packaging.version.
-        #
-        # Unfortunately this requires packaging.version to be already
-        # present in the tools venv_build virtual environment,
-        # but the virtual environment will not exist on the first call to
-        # any tool.
-        #
-        # Instead, use the function below, taken from
-        #   https://stackoverflow.com/a/11887825/2156453
-        return tuple( map( int, ( v.split( '.' ) ) ) )
+        return tuple( map( int, ( version_x_y_z.split( '.' ) ) ) )
 
 
     def get_version( self ):
@@ -320,8 +310,7 @@ class IndicatorBase( ABC ):
 
         data_json, error_network, error_timeout = self.get_json( url )
         if data_json:
-            version_pypi = (
-                self.versiontuple( data_json[ "info" ][ "version" ] ) )
+            version_pypi = self.versiontuple( data_json[ "info" ][ "version" ] )
 
             if self.versiontuple( self.get_version() ) < version_pypi:
                 self.new_version_available = True
@@ -2866,11 +2855,12 @@ class IndicatorBase( ABC ):
         '''
         Return the version from the config file.
 
-        If the user has never modified their preferences, or, the user is
-        running an older version of the indicator which contains no version
-        number in the .json, there will be no version number.
+        If the user has never modified their preferences, or,
+        the user is running an older version of the indicator
+        which contains no version number in the .json,
+        there will be no version number.
 
-        In this case, return a dummy version of "0.0.0"
+        In this case, return a version of "0.0.0"
         '''
         return config.get( self._CONFIG_VERSION, "0.0.0" )
 

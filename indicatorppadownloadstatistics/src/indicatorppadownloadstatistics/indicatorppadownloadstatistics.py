@@ -940,6 +940,8 @@ class IndicatorPPADownloadStatistics( IndicatorBase ):
         version_from_config = (
             self.versiontuple( self.get_version_from_config( config ) ) )
 
+#TODO onthisday does a check against 0.0.0 
+# Need to do the same here? 
         if version_from_config < self.versiontuple( "1.0.81" ):
             self._upgrade_1_0_81( ppas, config.get( "filters", [ ] ) )
 
