@@ -562,6 +562,7 @@ class IndicatorFortune( IndicatorBase ):
 
 #TODO onthisday does a check against 0.0.0 
 # Need to do the same here? 
+# Check to see if need to guard against version 0.0.0
         if version_from_config < self.versiontuple( "1.0.44" ):
             self._upgrade_1_0_44()
 

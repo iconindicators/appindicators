@@ -576,9 +576,11 @@ class IndicatorOnThisDay( IndicatorBase ):
 
         version_0_0_0 = self.versiontuple( "0.0.0" )
         version_1_0_17 = self.versiontuple( "1.0.17" )
+
         version_from_config = (
             self.versiontuple( self.get_version_from_config( config ) ) )
 
+#TODO Check to see if need to guard against version 0.0.0
         if version_0_0_0 < version_from_config < version_1_0_17:
             self._upgrade_1_0_17()
 
