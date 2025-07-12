@@ -860,14 +860,18 @@ class IndicatorScriptRunner( IndicatorBase ):
         '''
         Render a script name bold if that script is non-background and default.
         '''
-        cell_renderer.set_property( "weight", Pango.Weight.NORMAL )
-
         default = (
             model.get_value(
-                iter_, IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) )
+                iter_,
+                IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) )
 
-        if default == "True":
-            cell_renderer.set_property( "weight", Pango.Weight.BOLD )
+        value = (
+            Pango.Weight.BOLD
+            if default == "True"
+            else
+            Pango.Weight.NORMAL )
+
+        cell_renderer.set_property( "weight", value )
 
 
     def _script_sort(
