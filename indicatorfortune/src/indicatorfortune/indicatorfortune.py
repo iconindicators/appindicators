@@ -19,6 +19,16 @@
 ''' Application indicator which displays fortunes. '''
 
 
+#TODO There is a fortune "/home/bernard/myfortunes/art.dat"
+# which does not exist.
+# But it is in the .json so it is loaded up.
+# But in the preferences, although it is displayed, which is good,
+# it is also checked which is bad.
+# So need to check if a fortune is present.
+# What happens if I check the fortune when unchekced?
+# Need to verify if the file is present?
+
+
 import fnmatch
 import os
 
@@ -504,29 +514,40 @@ class IndicatorFortune( IndicatorBase ):
 
 
     def _upgrade_1_0_44( self ):
-        if self.fortunes:
-            # Prior to 1.0.44, fortunes were specified as a directory of .dat
-            # files, or as a single .dat file.
-            #
-            # Fortunes are now specified only as a single .dat file.
-            #
-            # Any fortune specified as a directory must be converted to
-            # individual their respective .dat files within.
-            fortunes = [ ]
-            for fortune in self.fortunes:
-                path = Path( fortune[ 0 ] )
-                if path.is_dir():
-                    walk_generator = os.walk( path )
-                    for root, directories, filenames in walk_generator:
-                        for filename in fnmatch.filter( filenames, "*.dat" ):
-                            fortunes.append( [
-                                str( Path( root ).joinpath( filename ) ),
-                                fortune[ 1 ] ] )
+        # Prior to 1.0.44, fortunes were specified as a directory of .dat files,
+        # or as a single .dat file.
+        #
+        # Fortunes are now specified only as a single .dat file.
+        #
+        # Any fortune specified as a directory must be converted to individual
+        # their respective .dat files within.
+        fortunes = [ ]
+        for fortune in self.fortunes:
+            path = Path( fortune[ 0 ] )
+            if path.is_dir():
+                walk_generator = os.walk( path )
+                for root, directories, filenames in walk_generator:
+                    for filename in fnmatch.filter( filenames, "*.dat" ):
+                        fortunes.append( [
+                            str( Path( root ).joinpath( filename ) ),
+                            fortune[ 1 ] ] )
 
-                else:
-                    fortunes.append( fortune )
+            else:
+                fortunes.append( fortune )
 
-            self.fortunes = fortunes
+        # Ensure no duplicates...
+        # It is possible to have added a directory (containing .dat files)
+        # and added a single .dat file which happens to be in the directory.
+        self.fortunes = [ ]
+        for fortune in fortunes:
+            duplicate = False
+            for fortune_ in self.fortunes:
+                if fortune[ 0 ] == fortune_[ 0 ]:
+                    duplicate = True
+                    break
+
+            if not duplicate:
+                self.fortunes.append( fortune )
 
         if self.notification_summary == "":
             # Prior to 1.0.44 it was possible for the user to set an empty
@@ -550,7 +571,12 @@ class IndicatorFortune( IndicatorBase ):
         '''
         Load configuration.
         '''
-        self.fortunes = config.get( IndicatorFortune.CONFIG_FORTUNES, [ ] )
+        system_fortune_default = self.get_system_fortune_default()
+        self.fortunes = (
+            config.get(
+                IndicatorFortune.CONFIG_FORTUNES,
+                [ [ system_fortune_default, True ] ] if system_fortune_default
+                else [ ] ) )
 
         self.notification_summary = (
             config.get(
@@ -560,19 +586,14 @@ class IndicatorFortune( IndicatorBase ):
         version_from_config = (
             self.versiontuple( self.get_version_from_config( config ) ) )
 
-#TODO onthisday does a check against 0.0.0 
-# Need to do the same here? 
-# Check to see if need to guard against version 0.0.0
         if version_from_config < self.versiontuple( "1.0.44" ):
-            self._upgrade_1_0_44()
-
-        if len( self.fortunes ) == 0:
-            system_fortune_default = self.get_system_fortune_default()
-            if system_fortune_default:
-                self.fortunes = [ [ system_fortune_default, True ] ]
-
-            else:
-                self.fortunes = [ ]
+            # If there were no fortunes in the config,
+            # the fortunes are set to the the default fortune
+            # and so no upgrade is required.
+            #
+            # Otherwise, upgrade the old format of fortunes...
+            if self.fortunes != [ [ system_fortune_default, True ] ]:
+                self._upgrade_1_0_44()
 
         self.middle_mouse_click_on_icon = (
             config.get(
