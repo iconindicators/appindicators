@@ -204,17 +204,12 @@ class IndicatorBase( ABC ):
         if error_message:
             self._show_message_and_exit( error_message )
 
-#TODO Unless needed to be done here, move to where needed.
-# Maybe leave here; will need to happen eventually.
-# If moved to in Preferences (or wherever),
-# what happens if we get an error message?
-# Error message should only ever happen in dev.
-#
-# I suppose instead of returning an error message, just log the message and
-# carry on?  On error this means could not extract the .desktop file from the
-# .whl in the release directory whilst running under dev.
         error_message = self._initialise_desktop_file_in_user_home()
         if error_message:
+            # In the unlikely event an error message is returned,
+            # it will ONLY be when running in developement and
+            # the .desktop file was unable to be extracted from
+            # the .whl in the release directory.
             self._show_message_and_exit( error_message )
 
         self.indicator_name_human_readable = indicator_name_human_readable
@@ -1124,8 +1119,6 @@ class IndicatorBase( ABC ):
     def _on_preferences(
         self,
         menuitem ):
-
-#TODO Do the .desktop initialisation et al here?
 
         self.set_menu_sensitivity( False )
         self.indicator.set_secondary_activate_target( None )
