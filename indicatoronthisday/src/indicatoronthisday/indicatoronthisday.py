@@ -551,12 +551,11 @@ class IndicatorOnThisDay( IndicatorBase ):
         # Prior to 1.0.17, calendars were saved as a list of paths.
         # Convert to new format where each calendar path is stored with a
         # corresponding boolean (whether the calendar is enabled or not).
-        if self.calendars:
-            calendars = [ ]
-            for calendar in self.calendars:
-                calendars.append( [ calendar, True ] )
+        calendars = [ ]
+        for calendar in self.calendars:
+            calendars.append( [ calendar, True ] )
 
-            self.calendars = calendars
+        self.calendars = calendars
 
         self.request_save_config( 1 )
 
@@ -574,15 +573,33 @@ class IndicatorOnThisDay( IndicatorBase ):
                 [ [ system_calendar_default, True ] ] if system_calendar_default
                 else [ ] ) )
 
-        version_0_0_0 = self.versiontuple( "0.0.0" )
-        version_1_0_17 = self.versiontuple( "1.0.17" )
-
         version_from_config = (
             self.versiontuple( self.get_version_from_config( config ) ) )
 
+        if version_from_config < self.versiontuple( "1.0.17" ):
+            # If there were no calendars in the config,
+            # the calendars are set to the the default calendar
+            # and so no upgrade is required.
+            #
+            # Otherwise, upgrade the old format of calendars...
+            if self.calendars != [ [ system_calendar_default, True ] ]:
+                self._upgrade_1_0_17()
+
+
+        # version_0_0_0 = self.versiontuple( "0.0.0" )
+        # version_1_0_17 = self.versiontuple( "1.0.17" )
+        #
+        # if version_from_config == version_0_0_0:
+        #     pass # No version, so no .json found OR very old .json containing no version.
+
+
+
 #TODO Check to see if need to guard against version 0.0.0
-        if version_0_0_0 < version_from_config < version_1_0_17:
-            self._upgrade_1_0_17()
+        # if version_0_0_0 < version_from_config < version_1_0_17:
+        #     self._upgrade_1_0_17()
+
+        # if version_from_config < version_1_0_17:
+        #     self._upgrade_1_0_17()
 
         self.copy_to_clipboard = (
             config.get(
