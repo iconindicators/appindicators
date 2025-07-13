@@ -136,6 +136,12 @@ https://wiki.python.org/moin/DbusExamples
 
 https://unix.stackexchange.com/questions/702236/how-to-list-all-object-paths-under-a-dbus-service-only-usign-dbus-command-line-u
 
+https://unix.stackexchange.com/questions/656729/wmctrl-like-tool-or-alternative-for-kde-wayland
+https://unix.stackexchange.com/questions/684461/fedora-36-wmctrl-does-not-work-at-all
+https://unix.stackexchange.com/questions/706477/is-there-a-way-to-get-list-of-windows-on-kde-wayland
+https://bbs.archlinux.org/viewtopic.php?id=306439
+https://github.com/jinliu/kdotool
+
 
 ## Release astroskyfield for indicatorlunar
 
