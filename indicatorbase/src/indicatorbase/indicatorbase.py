@@ -21,12 +21,6 @@
 # to see if anything is printed to the console.
 
 
-#TODO Look at 
-#  .config/indicatoronthisday DOES NOT LOAD SO NEED TO DEBUG
-# and see if there is any issue.
-# May be a red herring...
-
-
 '''
 Base class for application indicators.
 

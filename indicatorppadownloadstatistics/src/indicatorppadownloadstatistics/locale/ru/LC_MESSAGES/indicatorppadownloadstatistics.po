@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorppadownloadstatistics 1.0.81\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-12 22:49+1000\n"
+"POT-Creation-Date: 2025-07-13 20:20+1000\n"
 "PO-Revision-Date: 2025-03-14 16:55+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -192,7 +192,7 @@ msgstr ""
 msgid "Filter text may not contain spaces."
 msgstr ""
 
-#: indicatorppadownloadstatistics.py:965
+#: indicatorppadownloadstatistics.py:961
 msgid ""
 "No PPAs are present.\n"
 "\n"
