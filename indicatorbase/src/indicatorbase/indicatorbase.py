@@ -150,9 +150,7 @@ class IndicatorBase( ABC ):
     INDENT_WIDGET_LEFT = 25
     INDENT_WIDGET_TOP = 10
 
-    # Commands such as wmctrl and the clipboard do not function under Wayland.
-    # Need a way to determine whether running under Wayland versus X11.
-    # Values are the result of calling
+    # Result of calling
     #   echo $XDG_SESSION_TYPE
     SESSION_TYPE_WAYLAND = "wayland"
     SESSION_TYPE_X11 = "x11"
