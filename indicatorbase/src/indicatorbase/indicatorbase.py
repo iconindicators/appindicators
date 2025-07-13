@@ -23,6 +23,22 @@
 
 #TODO Figure out the correct setup for the run configuration under Eclipse
 # and up README.md accordingly.
+#
+# Have tried under working directory, other:
+#  ${workspace_loc:Indicators}
+#  ${workspace_loc:Indicators/indicatortest}
+#  ${workspace_loc:Indicators/indicatortest/src}
+# and all work!
+#
+# I suspect that to reflect running in production, in which each indicatory is
+# contained within a directory and is run by changing to above that directory
+# and then 
+#   python3 -m indicatortest.indicatortest
+# that the working directory should be 'other' with value
+#  ${workspace_loc:Indicators/indicatortest/src}
+# as this directory is one above the directory which contains the indicator.
+#
+# Test with other indicators, which access the file system, etc.
 
 
 '''
