@@ -413,32 +413,32 @@ class IndicatorBase( ABC ):
         return project_metadata, error_message
 
 
-#TODO I think I saw extra lines being added when .desktop is uppgraded.
-# Not sure if this happened on the laptop or desktop.
     def _initialise_desktop_file_in_user_home( self ):
         '''
         If the .desktop file is not present in $HOME/.config/autostart
         copy from
-            $HOME/.local/venv_indicators (production)
-        or
+            $HOME/.local/venv_indicators
+        when running in production, or copy from
             release/wheel/dist_{indicator}/*.whl
+        when running in development.
         '''
-        home_config_autostart = Path.home() / ".config" / "autostart"
+        home_config_autostart = self._get_home_config_autostart()
         home_config_autostart.mkdir( parents = True, exist_ok = True )
 
-        desktop_file = self.indicator_name + ".py.desktop"
+        desktop_file_in_home_config_autostart = self._get_desktop_file_in_home_config_autostart()
 
-        self.desktop_file_home_config_autostart = (
-            home_config_autostart / desktop_file )
-
-#TODO This will resolve to a non-existant path/file when running under dev.
-# Either document that this is expected and is okay, or change the logic and/or
-# variable naming to make things explicit!
+        # When running in production, this resolves to the .desktop file within
+        # the installation from PyPI.
+        #
+        # When running in development, this resolves to a non-existant path.
+        #
+        # Use this difference to discriminate running in production versus
+        # development.
         desktop_file_production = (
-            Path( __file__ ).parent / "platform" / "linux" / desktop_file )
+            Path( __file__ ).parent / "platform" / "linux" / self._get_desktop_file() )
 
         message = ""
-        if self.desktop_file_home_config_autostart.exists():
+        if desktop_file_in_home_config_autostart.exists():
             if desktop_file_production.exists():
                 self._upgrade_desktop_file(
                     self.read_text_file( desktop_file_production ) )
@@ -457,14 +457,31 @@ class IndicatorBase( ABC ):
             if desktop_file_production.exists():
                 shutil.copy(
                     desktop_file_production,
-                    self.desktop_file_home_config_autostart )
+                    desktop_file_in_home_config_autostart )
 
             else:
                 message = (
                     self._extract_desktop_file_from_wheel(
-                        self.desktop_file_home_config_autostart ) )
+                        desktop_file_in_home_config_autostart ) )
 
         return message
+
+
+#TODO Unsure if this stays 
+    @staticmethod
+    def _get_home_config_autostart():
+        return Path.home() / ".config" / "autostart"
+
+
+#TODO Unsure if this stays 
+    def _get_desktop_file( self ):
+        return self.indicator_name + ".py.desktop"
+
+
+#TODO Unsure if this stays 
+    def _get_desktop_file_in_home_config_autostart( self ):
+        desktop_file = self.indicator_name + ".py.desktop"
+        return IndicatorBase._get_home_config_autostart() / desktop_file
 
 
     def _extract_desktop_file_from_wheel(
@@ -480,7 +497,7 @@ class IndicatorBase( ABC ):
 
         if wheel_in_release:
             desktop_file_in_wheel = (
-                f"{ self.indicator_name }/platform/linux/{ self.indicator_name }.py.desktop" )
+                f"{ self.indicator_name }/platform/linux/{ self._get_desktop_file() }" )
 
             with ZipFile( wheel_in_release, 'r' ) as z:
                 if desktop_file_in_wheel in z.namelist():
@@ -519,7 +536,8 @@ class IndicatorBase( ABC ):
         return first_wheel, error_message
 
 
-#TODO Give this a good test!
+#TODO I think I saw extra lines being added when .desktop is uppgraded.
+# Not sure if this happened on the laptop or desktop.
     def _upgrade_desktop_file(
         self,
         contents ):  #TODO Something is wrong...this is not being used!
@@ -538,7 +556,7 @@ class IndicatorBase( ABC ):
         exec_with_sleep_present = False
         terminal_present = False
         made_a_change = False
-        lines = self.read_text_file( self.desktop_file_home_config_autostart ) #TODO why not pass this path in?
+        lines = self.read_text_file( self._get_desktop_file_in_home_config_autostart() )
         for line in lines:
             if line.startswith( self._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ):
                 output += line
@@ -611,7 +629,9 @@ class IndicatorBase( ABC ):
         if made_a_change:
 #TODO Compare the output of this function to the original file (before write out)
 # to ensure looks all formatted and similar, except for the expected changes.
-            self.write_text_file( self.desktop_file_home_config_autostart, output ) #TODO why not pass this path in?
+            self.write_text_file(
+                self._get_desktop_file_in_home_config_autostart(),
+                output )
 
 
     @staticmethod
@@ -1488,12 +1508,12 @@ class IndicatorBase( ABC ):
         autostart = False
         delay = 0
 
-        autostart_enable_equals_true = (
-            self._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" )
+        lines = (
+            self.read_text_file(
+                self._get_desktop_file_in_home_config_autostart() ) )
 
-        lines = self.read_text_file( self.desktop_file_home_config_autostart ) #TODO Does this path need to be a self. ?  Why not generate it as needed?
         for line in lines:
-            if line.startswith( autostart_enable_equals_true ):
+            if line.startswith( self._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" ):
                 autostart = True
 
             starts_with_dot_desktop_exec = (
@@ -1585,7 +1605,10 @@ class IndicatorBase( ABC ):
         self.check_latest_version = check_latest_version
 
         output = ""
-        lines = self.read_text_file( self.desktop_file_home_config_autostart )#TODO Does this path need to be a self. ?  Why not generate it as needed?
+        lines = (
+            self.read_text_file(
+                self._get_desktop_file_in_home_config_autostart() ) )
+
         for line in lines:
             line_starts_with_dot_desktop_autostart_enabled = (
                 line.startswith(
@@ -1611,7 +1634,9 @@ class IndicatorBase( ABC ):
             else:
                 output += line
 
-        self.write_text_file( self.desktop_file_home_config_autostart, output )#TODO Does this path need to be a self. ?  Why not generate it as needed?
+        self.write_text_file(
+            self._get_desktop_file_in_home_config_autostart(),
+            output )
 
 
     def create_and_append_menuitem(
