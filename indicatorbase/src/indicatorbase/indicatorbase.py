@@ -16,6 +16,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Run each indicator under Eclipse,
+# testing all functionality,
+# to see if anything is printed to the console.
+
+
+#TODO Figure out the correct setup for the run configuration under Eclipse
+# and up README.md accordingly.
+
+
 '''
 Base class for application indicators.
 
@@ -444,6 +453,9 @@ class IndicatorBase( ABC ):
         message = ""
         if desktop_file_in_home_config_autostart.exists():
             if desktop_file_production.exists():
+                #TODO Test this clause...
+                # hopefully can do so by running under Eclipse but will have to
+                # directly specify the path to the desktop file in production.
                 self._upgrade_desktop_file_in_home_config_autostart(
                     self.read_text_file( desktop_file_production ) )
 
@@ -454,6 +466,7 @@ class IndicatorBase( ABC ):
                         temporary_desktop_file.name ) )
 
                 if message is None:
+                    #TODO Test this clause
                     self._upgrade_desktop_file_in_home_config_autostart(
                         self.read_text_file( temporary_desktop_file.name ) )
 
@@ -555,7 +568,6 @@ class IndicatorBase( ABC ):
 
         Comment out obsolete tags, add missing tags and retrieve the delay.
         '''
-        print( "_upgrade_desktop_file_in_home_config_autostart" ) #TODO Test
         output = ""
         delay = ""
         autostart_enabled_present = False
@@ -603,8 +615,6 @@ class IndicatorBase( ABC ):
             not exec_with_sleep_present
             or
             not terminal_present )
-
-        print( f"tags: {tags_missing}" ) #TODO
 
         if tags_missing:
             # From the .desktop file, either from the production installation
