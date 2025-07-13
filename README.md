@@ -288,7 +288,7 @@ To run `Pylint` over the entire project:
     python3 -m tools.pylint
 ```
 
-Several checks have been omitted by default, which can be enabled by editing the script.
+Several checks have been disabled; re-enable by editing the script.
 
 ---
 

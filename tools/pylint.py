@@ -30,7 +30,7 @@ if __name__ == "__main__":
         "then rm $dirs/src/$dirs/indicatorbase.py ; fi ; "
         "done && "
 
-        # Uncomment any line below to disable the check.
+        # Any check may be enabled/disabled by appropriate commenting.
         "python3 -m pylint "
         "--disable=attribute-defined-outside-init "
         # "--disable=f-string-without-interpolation "
