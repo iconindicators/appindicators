@@ -1027,14 +1027,7 @@ class IndicatorBase( ABC ):
         about_dialog = Gtk.AboutDialog()
         about_dialog.set_transient_for( menuitem.get_parent().get_parent() )
 
-#TODO Now that
-#   [project.urls]
-#   homepage = "https://appindicators.sourceforge.io"
-# is commented out in pyprojectbase.toml
-# there is no project_url...so what to do?
-# Either drop it, or figure out quickly a new URL/site.
-#        project_url = self.project_metadata.get_all( "Project-URL" )[ 0 ]
-        project_url = "homepage, http://www.fixme.com"
+        project_url = self.project_metadata.get_all( "Project-URL" )[ 0 ]
         website = project_url.split( ',' )[ 1 ].strip()
 
         authors_and_emails = self.get_authors_emails( self.project_metadata )
