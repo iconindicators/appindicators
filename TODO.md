@@ -123,7 +123,7 @@ So could check on the desktop, but also Ubuntu 22.04/24.04.
 I think possibly the issue was a Gnome bug that wl-paste/wl-copy crashes
 on Wayland Ubuntu 20.04
 
-https://github.com/CZ-NIC/run-or-raise 
+https://github.com/CZ-NIC/run-or-raise
 GNOME extension; maybe could be used but only works on GNOME presumably.
 
 https://github.com/ickyicky/window-calls
@@ -166,14 +166,14 @@ still needs tidying up, defer the release of astroskyfield for now.
 
 One option is to clean up astroskyfield for release but release both
 astroskyfield and astropyphem.  The Python pip install instructions will have
-to include a bash command to determine if 32 bit (so install ephem) or 64 bit  
+to include a bash command to determine if 32 bit (so install ephem) or 64 bit
 (so install skyfield and pandas/numpy).  In indicatorlunar, internally switch
 between astropyephem and astroskyfield if on 32 bit or 64 bit respectively.
 
 
 ## Consider Migration to GitHub
 
-I created a project on Sourceforge 
+I created a project on Sourceforge
     https://sourceforge.net/projects/appindicators/
 which was deleted because I had not (yet) added source code nor done a release.
     https://sourceforge.net/p/forge/site-support/26844/
@@ -209,51 +209,57 @@ https://stackoverflow.com/questions/6695783/import-subversion-repository-into-gi
 
 ##### What about stardatesystemtray and worldtimesystemtray?
 Should these two projects also be under git/github?
-Perhaps the github organisation could be called indicators or icon-indicators or indicator-icons.
-For the Linux appindicators, call that repository appindicators or python-appindicators.
-For Windows stardatesystemtray and worldtimesystemtray, call the repository perhaps java-system-tray-icons.
+Perhaps the github organisation could be called indicators or icon-indicators or
+indicator-icons.
+For the Linux appindicators, call that repository appindicators or
+python-appindicators.
+For Windows stardatesystemtray and worldtimesystemtray, call the repository
+perhaps java-system-tray-icons.
 Need to look into what version of Java and/or Windows to support.
 Windows XP is no longer supported and neither is Java 6.
 So maybe look at supporting only Windows 10/11 (check for the EOL dates),
 along with the versions of Java supported for those versions of Windows.
-Consider also one or more versions prior to Windows 10 and whatever version of Java was last supported.
+Consider also one or more versions prior to Windows 10 and whatever version of
+Java was last supported.
 
 Windows EOL
-	Vista 2017
-	7 2020
-	8 2016
-	8.1 2023
-	10 2025
-	11 ...?
-	
-Java EOL
-	1.6 2013
-	1.7 2015
-	8 2019...2026
-	9 2018
-	10 2018
-	11 2019...2027
-	12 2019
-	13 2020
-	14 2020
-	15 2021
-	16 2021
-	17 2024...2027
-	18 2022
-	19 2023
-	20 2023
-	21 2028...2029
-	22 2024
-	23 2025
-	24 2025
-	25 2030
+    Vista 2017
+    7 2020
+    8 2016
+    8.1 2023
+    10 2025
+    11 ...?
 
-Downloaded Java for Windows 11; was recommended by the Oracle website to download Java 8.
+Java EOL
+    1.6 2013
+    1.7 2015
+    8 2019...2026
+    9 2018
+    10 2018
+    11 2019...2027
+    12 2019
+    13 2020
+    14 2020
+    15 2021
+    16 2021
+    17 2024...2027
+    18 2022
+    19 2023
+    20 2023
+    21 2028...2029
+    22 2024
+    23 2025
+    24 2025
+    25 2030
+
+Downloaded Java for Windows 11; was recommended by the Oracle website to
+download Java 8.
 Installed Java 8.
 Installed Stardate System Tray.
 Installed World Time System Tray.
 Both work!
-Check if built for Java 6 or Java 8 or Java 11 and update each page's description.
+Check if built for Java 6 or Java 8 or Java 11 and update each page's
+description.
 
 Consider renaming project to change the wrld to world?
 https://sourceforge.net/p/forge/site-support/new/
@@ -288,7 +294,7 @@ An end-user installs an indicator by:
 Consider either building a .deb/.rpm or even adding to each major distro's
 package repository.
 
-I read on Debian's documentation for getting a package into the repository 
+I read on Debian's documentation for getting a package into the repository
 requires that there must be a "need" for the package.
 So it is possible some but not all indicators are accepted.
 No point in that; all or nothing.
