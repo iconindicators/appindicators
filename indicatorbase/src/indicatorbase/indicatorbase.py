@@ -151,7 +151,7 @@ class IndicatorBase( ABC ):
     INDENT_WIDGET_TOP = 10
 
     # Commands such as wmctrl and the clipboard do not function under Wayland.
-    # Need a way to determine whether running under Wayland versus x11.
+    # Need a way to determine whether running under Wayland versus X11.
     # Values are the result of calling
     #   echo $XDG_SESSION_TYPE
     SESSION_TYPE_WAYLAND = "wayland"
@@ -415,26 +415,6 @@ class IndicatorBase( ABC ):
         return project_metadata, error_message
 
 
-    @staticmethod
-    def _get_wheel_in_release(
-        indicator_name ):
-
-        error_message = None
-
-        path_wheel = (
-            Path( __file__ ).parent.parent.parent.parent /
-            "release" /
-            "wheel" /
-            f"dist_{ indicator_name }" )
-
-        first_wheel = next( path_wheel.glob( "*.whl" ), None )
-        if first_wheel is None:
-            error_message = (
-                f"Unable to locate a .whl in { path_wheel.absolute() }" )
-
-        return first_wheel, error_message
-
-
 #TODO I think I saw extra lines being added when .desktop is uppgraded.
 # Not sure if this happened on the laptop or desktop.
     def _initialise_desktop_file_in_user_home( self ):
@@ -521,6 +501,26 @@ class IndicatorBase( ABC ):
         return error_message
 
 
+    @staticmethod
+    def _get_wheel_in_release(
+        indicator_name ):
+
+        error_message = None
+
+        path_wheel = (
+            Path( __file__ ).parent.parent.parent.parent /
+            "release" /
+            "wheel" /
+            f"dist_{ indicator_name }" )
+
+        first_wheel = next( path_wheel.glob( "*.whl" ), None )
+        if first_wheel is None:
+            error_message = (
+                f"Unable to locate a .whl in { path_wheel.absolute() }" )
+
+        return first_wheel, error_message
+
+
 #TODO Give this a good test!
     def _upgrade_desktop_file(
         self,
@@ -540,7 +540,7 @@ class IndicatorBase( ABC ):
         exec_with_sleep_present = False
         terminal_present = False
         made_a_change = False
-        lines = self.read_text_file( self.desktop_file_home_config_autostart )
+        lines = self.read_text_file( self.desktop_file_home_config_autostart ) #TODO why not pass this path in?
         for line in lines:
             if line.startswith( self._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ):
                 output += line
@@ -613,7 +613,7 @@ class IndicatorBase( ABC ):
         if made_a_change:
 #TODO Compare the output of this function to the original file (before write out)
 # to ensure looks all formatted and similar, except for the expected changes.
-            self.write_text_file( self.desktop_file_home_config_autostart, output )
+            self.write_text_file( self.desktop_file_home_config_autostart, output ) #TODO why not pass this path in?
 
 
     @staticmethod
@@ -1493,7 +1493,7 @@ class IndicatorBase( ABC ):
         autostart_enable_equals_true = (
             self._DOT_DESKTOP_AUTOSTART_ENABLED + "=true" )
 
-        lines = self.read_text_file( self.desktop_file_home_config_autostart )
+        lines = self.read_text_file( self.desktop_file_home_config_autostart ) #TODO Does this path need to be a self. ?  Why not generate it as needed?
         for line in lines:
             if line.startswith( autostart_enable_equals_true ):
                 autostart = True
@@ -1587,7 +1587,7 @@ class IndicatorBase( ABC ):
         self.check_latest_version = check_latest_version
 
         output = ""
-        lines = self.read_text_file( self.desktop_file_home_config_autostart )
+        lines = self.read_text_file( self.desktop_file_home_config_autostart )#TODO Does this path need to be a self. ?  Why not generate it as needed?
         for line in lines:
             line_starts_with_dot_desktop_autostart_enabled = (
                 line.startswith(
@@ -1613,7 +1613,7 @@ class IndicatorBase( ABC ):
             else:
                 output += line
 
-        self.write_text_file( self.desktop_file_home_config_autostart, output )
+        self.write_text_file( self.desktop_file_home_config_autostart, output )#TODO Does this path need to be a self. ?  Why not generate it as needed?
 
 
     def create_and_append_menuitem(
