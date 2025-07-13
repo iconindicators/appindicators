@@ -191,7 +191,8 @@ This should be an organisation:
 Call it perhaps appindicators and the repository appindicators.
 See more discussion below in stardatesystemtray/worldtimesystemtray.
 Check if appindicators is trade marked.
-If possible, put in a placeholder README saying this page will hold the source at some point.
+If possible, put in a placeholder README saying this page will hold the source
+at some point.
 Can then add the URL to the pyproject.toml so it appears at PyPI.
 
 ##### Importing an existing repository into git/github
@@ -263,6 +264,16 @@ description.
 
 Consider renaming project to change the wrld to world?
 https://sourceforge.net/p/forge/site-support/new/
+
+#### Created GitHub Orgainisation
+
+Organisation name is iconindicators
+https://github.com/iconindicators
+
+Now need to either create or import repositories for each of
+ - appindicators
+ - stardatesystemtray
+ - worldtimesystemtray
 
 
 ## Access Data at Runtime
