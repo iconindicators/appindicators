@@ -265,6 +265,23 @@ description.
 Consider renaming project to change the wrld to world?
 https://sourceforge.net/p/forge/site-support/new/
 
+
+#### Joda Time
+https://www.joda.org/joda-time/
+Consider if the minimum version of Java is 8 then use
+Java 8 date/time library (whatever that is) as suggested
+on the Joda Time homepage.
+See stardatesystemtray/src/TrayIcon.java
+
+https://stackoverflow.com/questions/74994050/converting-joda-datetime-to-javatime
+https://www.securecodewarrior.com/article/migrating-joda-time-to-java-time
+https://blog.joda.org/2014/11/converting-from-joda-time-to-javatime.html
+https://stackoverflow.com/questions/35043788/migrate-from-joda-time-library-to-java-time-java-8
+https://stackoverflow.com/questions/45348503/joda-time-to-java-8-conversion
+https://stackoverflow.com/questions/73472548/converting-from-joda-to-java-time
+https://docs.openrewrite.org/recipes/java/migrate/joda/jodatimerecipe
+
+
 #### Created GitHub Orgainisation
 
 Organisation name is iconindicators
