@@ -104,6 +104,121 @@ Ubuntu 26.04 is expected to drop X11; when released (Apr 2026), test!
 
 # Long Term
 
+## Migration to GitHub
+
+Created an organisation:
+
+  https://github.com/iconindicators
+
+Created a respository for the Python3 appindicators:
+
+  https://github.com/iconindicators/appindicators
+
+Import Subversion to GitHub; include commit history?
+
+  https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
+  https://git-scm.com/book/ms/v2/Git-and-Other-Systems-Migrating-to-Git
+  http://esr.ibiblio.org/?p=6778
+  http://www.catb.org/~esr/reposurgeon/repository-editing.html#conversion
+  https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
+  https://stackoverflow.com/questions/22931404/import-svn-repo-to-git-without-history
+  https://stackoverflow.com/questions/43362551/import-svn-folder-structure-to-git-repo-without-history-users
+  https://stackoverflow.com/questions/747075/how-to-git-svn-clone-the-last-n-revisions-from-a-subversion-repository
+  https://stackoverflow.com/questions/79165/how-do-i-migrate-an-svn-repository-with-history-to-a-new-git-repository
+  https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
+  https://git-scm.com/docs/git-svn
+  https://stackoverflow.com/questions/6695783/import-subversion-repository-into-git
+
+
+#### Migrate Sourceforge projects
+
+Need to create a repository for each stardatesystemtray and worldtimesystemtray
+on GitHub, perhaps:
+
+  https://github.com/iconindicators/stardatesystemtray
+  https://github.com/iconindicators/worldtimesystemtray
+
+Need to import from SourceForge
+
+  https://sourceforge.net/projects/stardatesystray
+  https://sourceforge.net/projects/wrldtimesystray
+
+into GitHub repositories; include commit history?
+
+When done, need to at least leave a note on the SourceForge pages
+and/or remove code.
+
+Can the issues be migrated?
+
+Need to look into what version of Java and/or Windows to support.
+Windows XP is no longer supported and neither is Java 6.
+So maybe look at supporting only Windows 10/11 (check for the EOL dates),
+along with the versions of Java supported for those versions of Windows.
+Consider also one or more versions prior to Windows 10 and whatever version of
+Java was last supported.
+
+Windows EOL
+    Vista 2017
+    7 2020
+    8 2016
+    8.1 2023
+    10 2025
+    11 ...?
+
+Java EOL
+    1.6 2013
+    1.7 2015
+    8 2019...2026
+    9 2018
+    10 2018
+    11 2019...2027
+    12 2019
+    13 2020
+    14 2020
+    15 2021
+    16 2021
+    17 2024...2027
+    18 2022
+    19 2023
+    20 2023
+    21 2028...2029
+    22 2024
+    23 2025
+    24 2025
+    25 2030
+
+Downloaded Java for Windows 11; was recommended by the Oracle website to
+download Java 8.
+Installed Java 8.
+Installed Stardate System Tray.
+Installed World Time System Tray.
+Both work!
+
+
+#### Joda Time
+
+According to 
+  https://www.joda.org/joda-time
+if Java 8 or better is used, consider using standard Java library instead of
+Joda Time.
+
+Need to see if the required libraries (the chronologies) are available in Java 8
+and if so, look at migrating.
+
+Perhaps could even move to Java 11.
+
+The file in question is 
+  stardatesystemtray/src/TrayIcon.java
+
+  https://stackoverflow.com/questions/74994050/converting-joda-datetime-to-javatime
+  https://www.securecodewarrior.com/article/migrating-joda-time-to-java-time
+  https://blog.joda.org/2014/11/converting-from-joda-time-to-javatime.html
+  https://stackoverflow.com/questions/35043788/migrate-from-joda-time-library-to-java-time-java-8
+  https://stackoverflow.com/questions/45348503/joda-time-to-java-8-conversion
+  https://stackoverflow.com/questions/73472548/converting-from-joda-to-java-time
+  https://docs.openrewrite.org/recipes/java/migrate/joda/jodatimerecipe
+
+
 ## Create non-symbolic icons
 Some distros/desktops do not utilise the GNOME symbolic icon mechanism.
 Determine which distros/desktops these are and if anything can be done.
@@ -169,131 +284,6 @@ astroskyfield and astropyphem.  The Python pip install instructions will have
 to include a bash command to determine if 32 bit (so install ephem) or 64 bit
 (so install skyfield and pandas/numpy).  In indicatorlunar, internally switch
 between astropyephem and astroskyfield if on 32 bit or 64 bit respectively.
-
-
-## Consider Migration to GitHub
-
-I created a project on Sourceforge
-    https://sourceforge.net/projects/appindicators/
-which was deleted because I had not (yet) added source code nor done a release.
-    https://sourceforge.net/p/forge/site-support/26844/
-The project was reinstated, but perhaps the indicators (source code) should
-be put onto GitHub instead (or somewhere else).
-If that is the case, also consider moving Stardate System Tray and
-World Time System Tray.
-
-Could also move to https://gitlab.freedesktop.org
-
-#### How to create a GitHub page for the project
-Create Github page, but unaffiliated with my username.
-This should be an organisation:
-    https://docs.github.com/en/organizations/collaborating-with-groups-in-organizations/creating-a-new-organization-from-scratch
-Call it perhaps appindicators and the repository appindicators.
-See more discussion below in stardatesystemtray/worldtimesystemtray.
-Check if appindicators is trade marked.
-If possible, put in a placeholder README saying this page will hold the source
-at some point.
-Can then add the URL to the pyproject.toml so it appears at PyPI.
-
-##### Importing an existing repository into git/github
-Include the history?
-http://esr.ibiblio.org/?p=6778
-http://www.catb.org/~esr/reposurgeon/repository-editing.html#conversion
-https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
-https://stackoverflow.com/questions/22931404/import-svn-repo-to-git-without-history
-https://stackoverflow.com/questions/43362551/import-svn-folder-structure-to-git-repo-without-history-users
-https://stackoverflow.com/questions/747075/how-to-git-svn-clone-the-last-n-revisions-from-a-subversion-repository
-https://stackoverflow.com/questions/79165/how-do-i-migrate-an-svn-repository-with-history-to-a-new-git-repository
-https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
-https://git-scm.com/docs/git-svn
-https://stackoverflow.com/questions/6695783/import-subversion-repository-into-git
-
-##### What about stardatesystemtray and worldtimesystemtray?
-Should these two projects also be under git/github?
-Perhaps the github organisation could be called indicators or icon-indicators or
-indicator-icons.
-For the Linux appindicators, call that repository appindicators or
-python-appindicators.
-For Windows stardatesystemtray and worldtimesystemtray, call the repository
-perhaps java-system-tray-icons.
-Need to look into what version of Java and/or Windows to support.
-Windows XP is no longer supported and neither is Java 6.
-So maybe look at supporting only Windows 10/11 (check for the EOL dates),
-along with the versions of Java supported for those versions of Windows.
-Consider also one or more versions prior to Windows 10 and whatever version of
-Java was last supported.
-
-Windows EOL
-    Vista 2017
-    7 2020
-    8 2016
-    8.1 2023
-    10 2025
-    11 ...?
-
-Java EOL
-    1.6 2013
-    1.7 2015
-    8 2019...2026
-    9 2018
-    10 2018
-    11 2019...2027
-    12 2019
-    13 2020
-    14 2020
-    15 2021
-    16 2021
-    17 2024...2027
-    18 2022
-    19 2023
-    20 2023
-    21 2028...2029
-    22 2024
-    23 2025
-    24 2025
-    25 2030
-
-Downloaded Java for Windows 11; was recommended by the Oracle website to
-download Java 8.
-Installed Java 8.
-Installed Stardate System Tray.
-Installed World Time System Tray.
-Both work!
-Check if built for Java 6 or Java 8 or Java 11 and update each page's
-description.
-
-Consider renaming project to change the wrld to world?
-https://sourceforge.net/p/forge/site-support/new/
-
-
-#### Joda Time
-https://www.joda.org/joda-time/
-Consider if the minimum version of Java is 8 then use
-Java 8 date/time library (whatever that is) as suggested
-on the Joda Time homepage.
-See stardatesystemtray/src/TrayIcon.java
-
-https://stackoverflow.com/questions/74994050/converting-joda-datetime-to-javatime
-https://www.securecodewarrior.com/article/migrating-joda-time-to-java-time
-https://blog.joda.org/2014/11/converting-from-joda-time-to-javatime.html
-https://stackoverflow.com/questions/35043788/migrate-from-joda-time-library-to-java-time-java-8
-https://stackoverflow.com/questions/45348503/joda-time-to-java-8-conversion
-https://stackoverflow.com/questions/73472548/converting-from-joda-to-java-time
-https://docs.openrewrite.org/recipes/java/migrate/joda/jodatimerecipe
-
-
-#### Created GitHub Orgainisation
-
-Organisation name is iconindicators
-https://github.com/iconindicators
-
-Now need to either create or import repositories for each of
- - appindicators
- - stardatesystemtray
- - worldtimesystemtray
-
-https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
-https://git-scm.com/book/ms/v2/Git-and-Other-Systems-Migrating-to-Git
 
 
 ## Access Data at Runtime
