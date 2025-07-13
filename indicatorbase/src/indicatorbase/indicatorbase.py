@@ -467,21 +467,17 @@ class IndicatorBase( ABC ):
         return message
 
 
-#TODO Unsure if this stays 
     @staticmethod
     def _get_home_config_autostart():
         return Path.home() / ".config" / "autostart"
 
 
-#TODO Unsure if this stays 
     def _get_desktop_file( self ):
         return self.indicator_name + ".py.desktop"
 
 
-#TODO Unsure if this stays 
     def _get_desktop_file_in_home_config_autostart( self ):
-        desktop_file = self.indicator_name + ".py.desktop"
-        return IndicatorBase._get_home_config_autostart() / desktop_file
+        return IndicatorBase._get_home_config_autostart() / self._get_desktop_file()
 
 
     def _extract_desktop_file_from_wheel(
