@@ -275,6 +275,9 @@ Now need to either create or import repositories for each of
  - stardatesystemtray
  - worldtimesystemtray
 
+https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
+https://git-scm.com/book/ms/v2/Git-and-Other-Systems-Migrating-to-Git
+
 
 ## Access Data at Runtime
 Reading
