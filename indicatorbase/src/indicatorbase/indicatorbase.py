@@ -453,9 +453,6 @@ class IndicatorBase( ABC ):
         message = ""
         if desktop_file_in_home_config_autostart.exists():
             if desktop_file_production.exists():
-                #TODO Test this clause...
-                # hopefully can do so by running under Eclipse but will have to
-                # directly specify the path to the desktop file in production.
                 self._upgrade_desktop_file_in_home_config_autostart(
                     self.read_text_file( desktop_file_production ) )
 
@@ -466,7 +463,6 @@ class IndicatorBase( ABC ):
                         temporary_desktop_file.name ) )
 
                 if message is None:
-                    #TODO Test this clause
                     self._upgrade_desktop_file_in_home_config_autostart(
                         self.read_text_file( temporary_desktop_file.name ) )
 
