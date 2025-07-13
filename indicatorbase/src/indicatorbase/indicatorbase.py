@@ -565,6 +565,7 @@ class IndicatorBase( ABC ):
 
         Comment out obsolete tags, add missing tags and retrieve the delay.
         '''
+        print( "upgrading .desktop")#TODO Test.
         output = ""
         delay = ""
         autostart_enabled_present = False
