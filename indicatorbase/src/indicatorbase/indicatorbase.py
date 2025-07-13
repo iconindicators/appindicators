@@ -550,6 +550,10 @@ class IndicatorBase( ABC ):
 
 #TODO I think I saw extra lines being added when .desktop is upgraded.
 # Not sure if this happened on the laptop or desktop.
+#
+# Have tested this and cannot reproduce on Desktop.
+#
+# Try on the laptop.
     def _upgrade_desktop_file_in_home_config_autostart(
         self,
         contents_of_desktop_file_in_production_or_wheel ):
