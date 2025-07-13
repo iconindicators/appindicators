@@ -100,12 +100,12 @@ class IndicatorVirtualBox( IndicatorBase ):
                 self.auto_start_required = False
                 self.auto_start_virtual_machines( virtual_machines )
 
-        self.build_menu( menu, vboxmanage_installed, virtual_machines )
+        self._build_menu( menu, vboxmanage_installed, virtual_machines )
 
         return int( 60 * self.refresh_interval_in_minutes )
 
 
-    def build_menu(
+    def _build_menu(
         self,
         menu,
         vboxmanage_installed,
@@ -116,7 +116,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 running_names, running_uuids = (
                     self.get_running_virtual_machines() )
 
-                self._build_menu(
+                self._build_menu_for_items(
                     menu, virtual_machines,
                     ( 0, 0 ),
                     running_uuids )
@@ -135,7 +135,7 @@ class IndicatorVirtualBox( IndicatorBase ):
                 menu, '(' + IndicatorVirtualBox.MESSAGE_NOT_INSTALLED  + ')' )
 
 
-    def _build_menu(
+    def _build_menu_for_items(
         self,
         menu,
         items,
@@ -149,7 +149,7 @@ class IndicatorVirtualBox( IndicatorBase ):
 
         for item in sorted_items:
             if isinstance( item, Group ):
-                self._build_menu(
+                self._build_menu_for_items(
                     self._add_group_to_menu( menu, item, indent ),
                     item.get_items(),
                     ( indent[ 0 ] + 1, indent[ 1 ] + 1 ),
