@@ -425,22 +425,26 @@ class IndicatorBase( ABC ):
         home_config_autostart = self._get_home_config_autostart()
         home_config_autostart.mkdir( parents = True, exist_ok = True )
 
-        desktop_file_in_home_config_autostart = self._get_desktop_file_in_home_config_autostart()
+        desktop_file_in_home_config_autostart = (
+            self._get_desktop_file_in_home_config_autostart() )
 
-        # When running in production, this resolves to the .desktop file within
-        # the installation from PyPI.
+        # When running in production, this resolves to the .desktop file
+        # within the installation from PyPI.
         #
         # When running in development, this resolves to a non-existant path.
         #
         # Use this difference to discriminate running in production versus
         # development.
         desktop_file_production = (
-            Path( __file__ ).parent / "platform" / "linux" / self._get_desktop_file() )
+            Path( __file__ ).parent /
+            "platform" /
+            "linux" /
+            self._get_desktop_file() )
 
         message = ""
         if desktop_file_in_home_config_autostart.exists():
             if desktop_file_production.exists():
-                self._upgrade_desktop_file(
+                self._upgrade_desktop_file_in_home_config_autostart(
                     self.read_text_file( desktop_file_production ) )
 
             else:
@@ -449,8 +453,8 @@ class IndicatorBase( ABC ):
                     self._extract_desktop_file_from_wheel(
                         temporary_desktop_file.name ) )
 
-                if not message:
-                    self._upgrade_desktop_file(
+                if message is None:
+                    self._upgrade_desktop_file_in_home_config_autostart(
                         self.read_text_file( temporary_desktop_file.name ) )
 
         else:
@@ -477,7 +481,9 @@ class IndicatorBase( ABC ):
 
 
     def _get_desktop_file_in_home_config_autostart( self ):
-        return IndicatorBase._get_home_config_autostart() / self._get_desktop_file()
+        return (
+            IndicatorBase._get_home_config_autostart() /
+            self._get_desktop_file() )
 
 
     def _extract_desktop_file_from_wheel(
@@ -493,7 +499,8 @@ class IndicatorBase( ABC ):
 
         if wheel_in_release:
             desktop_file_in_wheel = (
-                f"{ self.indicator_name }/platform/linux/{ self._get_desktop_file() }" )
+                f"{ self.indicator_name }/platform/linux/"
+                f"{ self._get_desktop_file() }" )
 
             with ZipFile( wheel_in_release, 'r' ) as z:
                 if desktop_file_in_wheel in z.namelist():
@@ -532,11 +539,14 @@ class IndicatorBase( ABC ):
         return first_wheel, error_message
 
 
-#TODO I think I saw extra lines being added when .desktop is uppgraded.
+#TODO I think I saw extra lines being added when .desktop is upgraded.
 # Not sure if this happened on the laptop or desktop.
-    def _upgrade_desktop_file(
+#
+#TODO Compare the output of this function to the original file (before write out)
+# to ensure looks all formatted and similar, except for the expected changes.
+    def _upgrade_desktop_file_in_home_config_autostart(
         self,
-        contents ):  #TODO Something is wrong...this is not being used!
+        contents_of_desktop_file_in_production_or_wheel ):
         '''
         The .desktop may be an older version with
             - an Exec without a sleep
@@ -545,14 +555,18 @@ class IndicatorBase( ABC ):
 
         Comment out obsolete tags, add missing tags and retrieve the delay.
         '''
-        print( "_upgrade_desktop_file" ) #TODO Test
+        print( "_upgrade_desktop_file_in_home_config_autostart" ) #TODO Test
         output = ""
         delay = ""
         autostart_enabled_present = False
         exec_with_sleep_present = False
         terminal_present = False
         made_a_change = False
-        lines = self.read_text_file( self._get_desktop_file_in_home_config_autostart() )
+
+        lines = (
+            self.read_text_file(
+                self._get_desktop_file_in_home_config_autostart() ) )
+
         for line in lines:
             if line.startswith( self._DOT_DESKTOP_AUTOSTART_ENABLED + '=' ):
                 output += line
@@ -593,14 +607,13 @@ class IndicatorBase( ABC ):
         print( f"tags: {tags_missing}" ) #TODO
 
         if tags_missing:
-            # From the .desktop file, extract the
+            # From the .desktop file, either from the production installation
+            # directory, or the development release .whl, extract the
             #    Exec (with sleep)
             #    X-GNOME-Autostart-enabled
             #    Terminal
-            # and write into the .desktop in $HOME/.config/autostart
-            # lines = self.read_text_file( desktop_file_original )
-            lines  = None#TODO Convert contents to lines.
-            for line in lines:
+            # and update the .desktop in $HOME/.config/autostart
+            for line in contents_of_desktop_file_in_production_or_wheel:
                 if line.startswith( '#' ):
                     continue
 
@@ -623,8 +636,6 @@ class IndicatorBase( ABC ):
                         made_a_change = True
 
         if made_a_change:
-#TODO Compare the output of this function to the original file (before write out)
-# to ensure looks all formatted and similar, except for the expected changes.
             self.write_text_file(
                 self._get_desktop_file_in_home_config_autostart(),
                 output )
@@ -657,13 +668,9 @@ class IndicatorBase( ABC ):
         Assume to be running in production and look there.
         On failure, resort to the development environment.
         '''
-#TODO Got some prints below...don't know why.
-# Check who calls this function, when/where/why...
         changelog = Path( __file__ ).parent / "CHANGELOG.md"
-        print( f"changelog (prod) {changelog}")#TODO
         if not Path( changelog ).exists():
             changelog = Path( sys.argv[ 0 ] ).parent / "CHANGELOG.md"
-            print( f"changelog (dev) {changelog}")#TODO
 
         return changelog
 
