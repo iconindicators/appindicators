@@ -2359,7 +2359,6 @@ class IndicatorBase( ABC ):
         return dialog
 
 
-#TODO possibly static
     def _create_fortune_or_calendar_preferences_panel(
         self,
         dialog,
