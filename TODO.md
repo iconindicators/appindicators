@@ -1,5 +1,17 @@
 # Immediate
 
+## README.md
+
+Given there is now a GitHub repository for appindicators,
+will need a README.md for the repository.
+
+Make a basic README.md which describes the project, listing all indicators
+and mention that the installation is via PyPI and see instructions there.
+
+Then rename the README.md in this project to something else, maybe to something
+like DEVELOPERS.md
+
+
 ## No autostart on Kubuntu and Manjaro
 Given there is no autostart on Kubuntu 24.04 and Manjaro 24.04.7,
 should the autostart checkbox and delay spinner be hidden?
