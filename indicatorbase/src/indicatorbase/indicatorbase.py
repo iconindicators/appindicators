@@ -1398,7 +1398,6 @@ class IndicatorBase( ABC ):
             if command and file_:
                 self.play_sound_complete_command = f"{ command } { file_ }"
 
-#TODO Why does this return a self. ???
         return self.play_sound_complete_command
 
 
