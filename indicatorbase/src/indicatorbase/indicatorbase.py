@@ -1334,9 +1334,8 @@ class IndicatorBase( ABC ):
                 primary_received_callback_function )
 
 
-#TODO Can be static
+    @staticmethod
     def _clipboard_primary_text_received_function(
-        self,
         clipboard,
         text,
         primary_received_callback_function ):
@@ -1363,7 +1362,7 @@ class IndicatorBase( ABC ):
 
         Determine if complete.oga is present; if not log.
 
-        If pw-play / paplay are present, return the path to that excutable.
+        If pw-play / paplay are present, return the path to that executable.
         If complete.oga is present, return the path to the file.
 
         If either pw-play / paplay or complete.oga are not present, return None.
