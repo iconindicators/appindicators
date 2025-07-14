@@ -1,24 +1,3 @@
-# AppIndicators for Ubuntu et al...
-
-
-## Introduction
-
-This project contains application indicators written in `Python3` for `Ubuntu 20.04` or similar:
-- `indicatorfortune` - [https://pypi.org/project/indicatorfortune](https://pypi.org/project/indicatorfortune)
-- `indicatorlunar` - [https://pypi.org/project/indicatorlunar](https://pypi.org/project/indicatorlunar)
-- `indicatoronthisday` - [https://pypi.org/project/indicatoronthisday](https://pypi.org/project/indicatoronthisday)
-- `indicatorppadownloadstatistics` - [https://pypi.org/project/indicatorppadownloadstatistics](https://pypi.org/project/indicatorppadownloadstatistics)
-- `indicatorpunycode` - [https://pypi.org/project/indicatorpunycode](https://pypi.org/project/indicatorpunycode)
-- `indicatorscriptrunner` - [https://pypi.org/project/indicatorscriptrunner](https://pypi.org/project/indicatorscriptrunner)
-- `indicatorstardate` - [https://pypi.org/project/indicatorstardate](https://pypi.org/project/indicatorstardate)
-- `indicatortest` - [https://pypi.org/project/indicatortest](https://pypi.org/project/indicatortest)
-- `indicatortide` - [https://pypi.org/project/indicatortide](https://pypi.org/project/indicatortide)
-- `indicatorvirtualbox` - [https://pypi.org/project/indicatorvirtualbox](https://pypi.org/project/indicatorvirtualbox)
-
-Each indicator shares the common code `indicatorbase`.
-
----
-
 ## Build an Indicator's Wheel
 
 To build a wheel for `indicatortest` from the root of the source tree:
@@ -299,11 +278,3 @@ Several checks have been disabled; re-enable by editing the script.
 ```
 
 Any `markdown` document may be converted to `html` using the same script.
-
----
-
-## License
-
-This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.
-
-Copyright 2012-2025 Bernard Giannetti.
