@@ -846,9 +846,8 @@ class IndicatorBase( ABC ):
         return False
 
 
-#TODO Can be static
+    @staticmethod
     def _add_debug_information_to_menu(
-        self,
         menu,
         update_start,
         next_update_in_seconds ):
@@ -1139,9 +1138,8 @@ class IndicatorBase( ABC ):
             self.secondary_activate_target )
 
 
-#TODO Can be static
+    @staticmethod
     def _add_hyperlink_label(
-        self,
         about_dialog,
         file_path,
         left_text,
@@ -1400,6 +1398,7 @@ class IndicatorBase( ABC ):
             if command and file_:
                 self.play_sound_complete_command = f"{ command } { file_ }"
 
+#TODO Why does this return a self. ???
         return self.play_sound_complete_command
 
 
@@ -1807,17 +1806,16 @@ class IndicatorBase( ABC ):
         return indent_amount
 
 
-#TODO Can be static
-    def get_on_click_menuitem_open_browser_function( self ):
+    @staticmethod
+    def get_on_click_menuitem_open_browser_function():
         '''
         Return open webbrowswer function for when a menu item is clicked.
         '''
         return lambda menuitem: webbrowser.open( menuitem.get_name() )
 
 
-#TODO Canbe static
+    @staticmethod
     def get_textview_text(
-        self,
         textview ):
         '''
         Takes a Gtk.TextView and returns the containing text, avoiding the
@@ -1831,9 +1829,8 @@ class IndicatorBase( ABC ):
                 True ) )
 
 
-#TODO Can be staic
+    @staticmethod
     def on_radio_or_checkbox(
-        self,
         radio_or_checkbox,
         sense,
         *widgets ):
@@ -1845,8 +1842,8 @@ class IndicatorBase( ABC ):
             widget.set_sensitive( sense and radio_or_checkbox.get_active() )
 
 
-#TODO Can be static
-    def create_grid( self ):
+    @staticmethod
+    def create_grid():
         '''
         Return a widget grid.
         '''
@@ -1861,9 +1858,8 @@ class IndicatorBase( ABC ):
         return grid
 
 
-#TODO Static
+    @staticmethod
     def create_scrolledwindow(
-        self,
         widget ):
         '''
         Return a scrolled window encapsulating the widget.
@@ -1875,9 +1871,8 @@ class IndicatorBase( ABC ):
         return scrolledwindow
 
 
-#TODO static
+    @staticmethod
     def create_box(
-        self,
         widgets_and_expands,
         sensitive = True,
         margin_top = 0,
@@ -1904,9 +1899,8 @@ class IndicatorBase( ABC ):
         return box
 
 
-#TODO static
+    @staticmethod
     def create_buttons_in_box(
-        self,
         labels,
         tooltip_texts,
         clicked_functionandarguments ):
@@ -1920,7 +1914,7 @@ class IndicatorBase( ABC ):
         z = zip( labels, tooltip_texts, clicked_functionandarguments )
         for label, tooltip_text, clicked_functionandargument in z:
             button = (
-                self.create_button(
+                IndicatorBase.create_button(
                     label,
                     tooltip_text = tooltip_text,
                     clicked_functionandarguments =
@@ -1933,16 +1927,15 @@ class IndicatorBase( ABC ):
             for button_and_expand in buttons_and_expands ]
 
         return (
-            self.create_box(
+            IndicatorBase.create_box(
                 tuple( buttons_and_expands ),
                 halign = Gtk.Align.CENTER,
                 homogeneous = True ),
             *buttons )
 
 
-#TODO static
+    @staticmethod
     def create_entry(
-        self,
         text,
         tooltip_text = "",
         sensitive = True,
@@ -1954,7 +1947,7 @@ class IndicatorBase( ABC ):
         Return an entry.
         '''
         entry = Gtk.Entry()
-        self._set_widget_common_attributes(
+        IndicatorBase._set_widget_common_attributes(
             entry,
             tooltip_text = tooltip_text,
             sensitive = sensitive,
@@ -1971,9 +1964,8 @@ class IndicatorBase( ABC ):
         return entry
 
 
-#TODO static
+    @staticmethod
     def create_comboboxtext(
-        self,
         data,
         tooltip_text = "",
         active = -1,
@@ -1995,9 +1987,8 @@ class IndicatorBase( ABC ):
         return comboboxtext
 
 
-#TODO static
+    @staticmethod
     def create_textview(
-        self,
         text = "",
         tooltip_text = "",
         editable = True,
@@ -2013,9 +2004,8 @@ class IndicatorBase( ABC ):
         return textview
 
 
-#TODO static
+    @staticmethod
     def create_button(
-        self,
         label,
         tooltip_text = "",
         sensitive = True,
@@ -2028,7 +2018,7 @@ class IndicatorBase( ABC ):
             https://stackoverflow.com/a/6289656/2156453
        '''
         button = Gtk.Button.new_with_label( label )
-        self._set_widget_common_attributes(
+        IndicatorBase._set_widget_common_attributes(
             button,
             tooltip_text = tooltip_text,
             sensitive = sensitive,
@@ -2041,9 +2031,8 @@ class IndicatorBase( ABC ):
         return button
 
 
-#TODO static
+    @staticmethod
     def create_spinbutton(
-        self,
         value,
         lower,
         upper,
@@ -2057,7 +2046,7 @@ class IndicatorBase( ABC ):
         Return a spinbutton.
         '''
         spinner = Gtk.SpinButton()
-        self._set_widget_common_attributes(
+        IndicatorBase._set_widget_common_attributes(
             spinner,
             tooltip_text = tooltip_text,
             sensitive = sensitive,
@@ -2073,9 +2062,8 @@ class IndicatorBase( ABC ):
         return spinner
 
 
-#TODO static
+    @staticmethod
     def create_checkbutton(
-        self,
         label,
         tooltip_text = "",
         sensitive = True,
@@ -2086,7 +2074,7 @@ class IndicatorBase( ABC ):
         Return a checkbutton.
         '''
         checkbutton = Gtk.CheckButton.new_with_label( label )
-        self._set_widget_common_attributes(
+        IndicatorBase._set_widget_common_attributes(
             checkbutton,
             tooltip_text = tooltip_text,
             sensitive = sensitive,
@@ -2097,9 +2085,8 @@ class IndicatorBase( ABC ):
         return checkbutton
 
 
-#TODO static
+    @staticmethod
     def create_radiobutton(
-        self,
         radio_group_member,
         label,
         tooltip_text = "",
@@ -2114,7 +2101,7 @@ class IndicatorBase( ABC ):
             Gtk.RadioButton.new_with_label_from_widget(
                 radio_group_member, label ) )
 
-        self._set_widget_common_attributes(
+        IndicatorBase._set_widget_common_attributes(
             radiobutton,
             tooltip_text = tooltip_text,
             sensitive = sensitive,
@@ -2125,9 +2112,8 @@ class IndicatorBase( ABC ):
         return radiobutton
 
 
-#TODO static
+    @staticmethod
     def _set_widget_common_attributes(
-        self,
         widget,
         tooltip_text = "",
         sensitive = True,
@@ -2140,9 +2126,8 @@ class IndicatorBase( ABC ):
         widget.set_margin_left( margin_left )
 
 
-#TODO static
+    @staticmethod
     def create_treeview_within_scrolledwindow(
-        self,
         treemodel,
         titles,
         renderers_attributes_columnmodelids,
@@ -2307,9 +2292,8 @@ class IndicatorBase( ABC ):
         return treeview, scrolledwindow
 
 
+    @staticmethod
     def create_cell_renderer_toggle_for_checkbox_within_treeview(
-#TODO static
-        self,
         store,
         model_column_id ):
         '''
@@ -2345,9 +2329,8 @@ class IndicatorBase( ABC ):
         return cell_renderer_toggle
 
 
-#TODO static
+    @staticmethod
     def create_filechooser_dialog(
-        self,
         title,
         parent,
         filename,
@@ -2514,9 +2497,8 @@ class IndicatorBase( ABC ):
         return grid, store
 
 
-#TODO static
+    @staticmethod
     def _fortune_or_calendar_column_name_renderer(
-        self,
         tree_column,
         cell_renderer,
         model,
@@ -2834,9 +2816,8 @@ class IndicatorBase( ABC ):
         return not icon_update_unsupported
 
 
-#TODO static
+    @staticmethod
     def is_qterminal_and_broken(
-        self,
         terminal ):
         '''
         As a result of
@@ -2853,17 +2834,18 @@ class IndicatorBase( ABC ):
         return is_qterminal_and_broken_
 
 
-#TODO static
-    def get_terminal_and_execution_flag( self ):
+    @staticmethod
+    def get_terminal_and_execution_flag():
         '''
         Return the full path and name of the executable for the current terminal
         and the corresponding execution flag; None otherwise.
         '''
+        print( 'here')
         terminal = None
         execution_flag = None
-        for _terminal, _execution_flag in self._TERMINALS_AND_EXECUTION_FLAGS:
+        for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
             terminal = (
-                self.process_run(
+                IndicatorBase.process_run(
                     "which " + _terminal,
                     ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
 
@@ -3372,7 +3354,7 @@ class IndicatorBase( ABC ):
         return self._get_user_directory( ".cache", self.indicator_name )
 
 
-#TODO static 
+#TODO static
 # check all who call this...
     def _get_user_directory(
         self,
