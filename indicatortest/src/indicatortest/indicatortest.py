@@ -16,6 +16,16 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO On laptop under wayland playing with clipboard, got these log messages:
+#
+#  2025-07-14 19:28:19,267 - root - ERROR - Error running: wl-paste --primary
+#  2025-07-14 19:28:19,267 - root - ERROR - stderr: No selection
+#  2025-07-14 19:28:19,268 - root - ERROR - Return code: 1
+#  2025-07-14 19:31:59,843 - root - ERROR - Error running: wl-paste --primary
+#  2025-07-14 19:31:59,843 - root - ERROR - stderr: No selection
+#  2025-07-14 19:31:59,844 - root - ERROR - Return code: 1
+
+
 ''' Application indicator to test stuff. '''
 
 
@@ -84,7 +94,7 @@ class IndicatorTest( IndicatorBase ):
         delta,
         scroll_direction ):
         '''
-        Change the indicator label to the current 
+        Change the indicator label to the current
         '''
         self.set_label_or_tooltip( self._get_current_time() )
         print( "Mouse wheel is scrolling..." )
