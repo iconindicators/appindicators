@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-''' Convert the project README.md to README.html '''
+''' Convert a file in markdown to html. '''
 
 
 from pathlib import Path
@@ -25,17 +25,29 @@ from . import utils
 
 
 if __name__ == "__main__":
-    command = "python3 -m readme_renderer README.md -o README.html"
+    arguments = (
+        utils.get_arguments(
+            "Convert a file in markdown to html.",
+            ( "markdown", ) ) )
 
-    modules_to_install = [
-        "readme_renderer[md]" ]
+    f_in = Path( arguments.markdown )
+    if f_in.is_file():
+        f_out = f_in.parent / ( f_in.stem + ".html" )
 
-    result = (
-        utils.python_run(
-            command,
-            utils.VENV_BUILD,
-            *modules_to_install ) )
+        command = f"python3 -m readme_renderer { f_in } -o { f_out }"
 
-    utils.print_stdout_stderr_return_code( *result )
-    if result[ 2 ] == 0: # Return code of zero; all is well.
-        print( f"\nCreated { Path.cwd() / 'README.html' }" )
+        modules_to_install = [
+            "readme_renderer[md]" ]
+
+        result = (
+            utils.python_run(
+                command,
+                utils.VENV_BUILD,
+                *modules_to_install ) )
+
+        utils.print_stdout_stderr_return_code( *result )
+        if result[ 2 ] == 0: # Return code of zero; all is well.
+            print( f"\nCreated { f_out }" )
+
+    else:
+        print( f"{ f_in } is not a file." )
