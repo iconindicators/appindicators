@@ -21,6 +21,18 @@
 # to see if anything is printed to the console.
 
 
+#TODO Testing
+#
+#   Functional
+#       Ensure all buttons clicked, checked and so on.
+#
+#   User acceptance
+#       Does the indicator behave/achieve as an end user expects?
+#
+#   Install/Uninstall
+#       Check install and uninstall and run
+
+
 '''
 Base class for application indicators.
 
