@@ -295,8 +295,10 @@ Several checks have been disabled; re-enable by editing the script.
 ## Convert this Document from MD to HTML
 
 ```
-    python3 -m tools.markdown_to_html
+    python3 -m tools.markdown_to_html DEVELOPERS.md
 ```
+
+TODO Add something here about using the above script to convert any .md file.
 
 ---
 
