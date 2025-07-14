@@ -1325,6 +1325,9 @@ class IndicatorBase( ABC ):
             #
             # Shield the user from having to know about Wayland or X11 by
             # wrapping wl-clipboard within a callback function.
+            #
+            # Have found that text selected in Geany will throw an exception
+            # and log when copied to primary.
             primary_received_callback_function(
                 self.process_run( "wl-paste --primary" )[ 0 ] )
 
@@ -2833,7 +2836,6 @@ class IndicatorBase( ABC ):
         Return the full path and name of the executable for the current terminal
         and the corresponding execution flag; None otherwise.
         '''
-        print( 'here')
         terminal = None
         execution_flag = None
         for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
