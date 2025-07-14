@@ -11,6 +11,11 @@ and mention that the installation is via PyPI and see instructions there.
 Then rename the README.md in this project to something else, maybe to something
 like DEVELOPERS.md
 
+What about the markdown_to_html.py script?
+Maybe needs to change to take an input parameter?
+Or otherwise, remove and add the conversion instructions
+back in to the DEVELOPERS.md
+
 
 ## No autostart on Kubuntu and Manjaro
 Given there is no autostart on Kubuntu 24.04 and Manjaro 24.04.7,
