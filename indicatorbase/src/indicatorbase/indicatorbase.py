@@ -16,6 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Fedora 38
+# When installing the wheel, getting an error:
+#   Did not find CMake
+#   Error Dependency 'girepository-2.0' is required but not found.
+# Is this because 38 is EOL?
+
+
 #TODO Run each indicator under Eclipse,
 # testing all functionality,
 # to see if anything is printed to the console.
