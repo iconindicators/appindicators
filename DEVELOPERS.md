@@ -298,7 +298,7 @@ Several checks have been disabled; re-enable by editing the script.
     python3 -m tools.markdown_to_html DEVELOPERS.md
 ```
 
-TODO Add something here about using the above script to convert any .md file.
+Any `markdown` document may be converted to `html` using the same script.
 
 ---
 
