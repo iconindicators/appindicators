@@ -2518,7 +2518,6 @@ class IndicatorBase( ABC ):
         cell_renderer.set_property( "style", value )
 
 
-#TODO possibly static
     def _on_fortune_or_calendar_remove(
         self,
         button,
@@ -2572,7 +2571,6 @@ class IndicatorBase( ABC ):
                         model_sort.convert_iter_to_child_iter( iter_sort ) )
 
 
-#TODO possibly static
     def _on_fortune_or_calendar_add(
         self,
         button,
@@ -2606,7 +2604,6 @@ class IndicatorBase( ABC ):
             button_remove.set_tooltip_text( message_fortune_or_calendar_remove )
 
 
-#TODO possiblystatic
     def _on_fortune_or_calendar_double_click(
         self,
         treeview,
@@ -2647,7 +2644,6 @@ class IndicatorBase( ABC ):
                 file_filter )
 
 
-#TODO possibly static
     def _on_fortune_or_calendar_double_click_internal(
         self,
         treeview,
