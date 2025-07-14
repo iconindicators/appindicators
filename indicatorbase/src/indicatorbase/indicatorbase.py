@@ -3354,10 +3354,8 @@ class IndicatorBase( ABC ):
         return self._get_user_directory( ".cache", self.indicator_name )
 
 
-#TODO static
-# check all who call this...
+    @staticmethod
     def _get_user_directory(
-        self,
         user_base_directory,
         application_base_directory ):
         '''
