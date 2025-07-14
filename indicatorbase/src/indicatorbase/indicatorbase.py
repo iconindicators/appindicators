@@ -846,6 +846,7 @@ class IndicatorBase( ABC ):
         return False
 
 
+#TODO Can be static
     def _add_debug_information_to_menu(
         self,
         menu,
@@ -1138,6 +1139,7 @@ class IndicatorBase( ABC ):
             self.secondary_activate_target )
 
 
+#TODO Can be static
     def _add_hyperlink_label(
         self,
         about_dialog,
@@ -1334,6 +1336,7 @@ class IndicatorBase( ABC ):
                 primary_received_callback_function )
 
 
+#TODO Can be static
     def _clipboard_primary_text_received_function(
         self,
         clipboard,
@@ -1804,6 +1807,7 @@ class IndicatorBase( ABC ):
         return indent_amount
 
 
+#TODO Can be static
     def get_on_click_menuitem_open_browser_function( self ):
         '''
         Return open webbrowswer function for when a menu item is clicked.
@@ -1811,6 +1815,7 @@ class IndicatorBase( ABC ):
         return lambda menuitem: webbrowser.open( menuitem.get_name() )
 
 
+#TODO Canbe static
     def get_textview_text(
         self,
         textview ):
@@ -1826,6 +1831,7 @@ class IndicatorBase( ABC ):
                 True ) )
 
 
+#TODO Can be staic
     def on_radio_or_checkbox(
         self,
         radio_or_checkbox,
@@ -1839,6 +1845,7 @@ class IndicatorBase( ABC ):
             widget.set_sensitive( sense and radio_or_checkbox.get_active() )
 
 
+#TODO Can be static
     def create_grid( self ):
         '''
         Return a widget grid.
@@ -1854,6 +1861,7 @@ class IndicatorBase( ABC ):
         return grid
 
 
+#TODO Static
     def create_scrolledwindow(
         self,
         widget ):
@@ -1867,6 +1875,7 @@ class IndicatorBase( ABC ):
         return scrolledwindow
 
 
+#TODO static
     def create_box(
         self,
         widgets_and_expands,
@@ -1895,6 +1904,7 @@ class IndicatorBase( ABC ):
         return box
 
 
+#TODO static
     def create_buttons_in_box(
         self,
         labels,
@@ -1930,6 +1940,7 @@ class IndicatorBase( ABC ):
             *buttons )
 
 
+#TODO static
     def create_entry(
         self,
         text,
@@ -1960,6 +1971,7 @@ class IndicatorBase( ABC ):
         return entry
 
 
+#TODO static
     def create_comboboxtext(
         self,
         data,
@@ -1983,6 +1995,7 @@ class IndicatorBase( ABC ):
         return comboboxtext
 
 
+#TODO static
     def create_textview(
         self,
         text = "",
@@ -2000,6 +2013,7 @@ class IndicatorBase( ABC ):
         return textview
 
 
+#TODO static
     def create_button(
         self,
         label,
@@ -2027,6 +2041,7 @@ class IndicatorBase( ABC ):
         return button
 
 
+#TODO static
     def create_spinbutton(
         self,
         value,
@@ -2058,6 +2073,7 @@ class IndicatorBase( ABC ):
         return spinner
 
 
+#TODO static
     def create_checkbutton(
         self,
         label,
@@ -2081,6 +2097,7 @@ class IndicatorBase( ABC ):
         return checkbutton
 
 
+#TODO static
     def create_radiobutton(
         self,
         radio_group_member,
@@ -2108,6 +2125,7 @@ class IndicatorBase( ABC ):
         return radiobutton
 
 
+#TODO static
     def _set_widget_common_attributes(
         self,
         widget,
@@ -2122,6 +2140,7 @@ class IndicatorBase( ABC ):
         widget.set_margin_left( margin_left )
 
 
+#TODO static
     def create_treeview_within_scrolledwindow(
         self,
         treemodel,
@@ -2289,6 +2308,7 @@ class IndicatorBase( ABC ):
 
 
     def create_cell_renderer_toggle_for_checkbox_within_treeview(
+#TODO static
         self,
         store,
         model_column_id ):
@@ -2325,6 +2345,7 @@ class IndicatorBase( ABC ):
         return cell_renderer_toggle
 
 
+#TODO static
     def create_filechooser_dialog(
         self,
         title,
@@ -2355,6 +2376,7 @@ class IndicatorBase( ABC ):
         return dialog
 
 
+#TODO possibly static
     def _create_fortune_or_calendar_preferences_panel(
         self,
         dialog,
@@ -2492,6 +2514,7 @@ class IndicatorBase( ABC ):
         return grid, store
 
 
+#TODO static
     def _fortune_or_calendar_column_name_renderer(
         self,
         tree_column,
@@ -2513,6 +2536,7 @@ class IndicatorBase( ABC ):
         cell_renderer.set_property( "style", value )
 
 
+#TODO possibly static
     def _on_fortune_or_calendar_remove(
         self,
         button,
@@ -2566,6 +2590,7 @@ class IndicatorBase( ABC ):
                         model_sort.convert_iter_to_child_iter( iter_sort ) )
 
 
+#TODO possibly static
     def _on_fortune_or_calendar_add(
         self,
         button,
@@ -2599,6 +2624,7 @@ class IndicatorBase( ABC ):
             button_remove.set_tooltip_text( message_fortune_or_calendar_remove )
 
 
+#TODO possiblystatic
     def _on_fortune_or_calendar_double_click(
         self,
         treeview,
@@ -2639,6 +2665,7 @@ class IndicatorBase( ABC ):
                 file_filter )
 
 
+#TODO possibly static
     def _on_fortune_or_calendar_double_click_internal(
         self,
         treeview,
@@ -2765,8 +2792,8 @@ class IndicatorBase( ABC ):
         return logging
 
 
+    @staticmethod
     def is_number(
-        self,
         number_as_string ):
         '''
         Return True if the number as a string is float; False otherwise.
@@ -2807,6 +2834,7 @@ class IndicatorBase( ABC ):
         return not icon_update_unsupported
 
 
+#TODO static
     def is_qterminal_and_broken(
         self,
         terminal ):
@@ -2825,6 +2853,7 @@ class IndicatorBase( ABC ):
         return is_qterminal_and_broken_
 
 
+#TODO static
     def get_terminal_and_execution_flag( self ):
         '''
         Return the full path and name of the executable for the current terminal
@@ -3343,6 +3372,8 @@ class IndicatorBase( ABC ):
         return self._get_user_directory( ".cache", self.indicator_name )
 
 
+#TODO static 
+# check all who call this...
     def _get_user_directory(
         self,
         user_base_directory,
