@@ -1328,6 +1328,13 @@ class IndicatorBase( ABC ):
             #
             # Have found that text selected in Geany will throw an exception
             # and log when copied to primary.
+#TODO Check this on the laptop on wayland.
+# Run indicatortest, then in Geany, select some text,
+# then Clipboard -> Copy from Primary
+# Should get a log file...but what text is returned to the
+# primary callback function?
+# May have to capture the whole result and then check if there is anything
+# in [ 1 ] or [ 2 ] and if so, pass back None.
             primary_received_callback_function(
                 self.process_run( "wl-paste --primary" )[ 0 ] )
 
