@@ -61,7 +61,7 @@ class IndicatorTest( IndicatorBase ):
             debug = True )
 
         self.request_mouse_wheel_scroll_events(
-            ( self._on_mouse_wheel_scroll, ) )
+            ( self.on_mouse_wheel_scroll, ) )
 
         self.flush_cache(
             IndicatorTest.CACHE_ICON_BASENAME,
@@ -78,12 +78,14 @@ class IndicatorTest( IndicatorBase ):
         self.set_label_or_tooltip( IndicatorTest.LABEL )
 
 
-    def _on_mouse_wheel_scroll(
+    def on_mouse_wheel_scroll(
         self,
         indicator,
         delta,
         scroll_direction ):
-
+        '''
+        Change the indicator label to the current 
+        '''
         self.set_label_or_tooltip( self._get_current_time() )
         print( "Mouse wheel is scrolling..." )
 

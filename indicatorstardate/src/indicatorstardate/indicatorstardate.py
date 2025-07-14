@@ -54,7 +54,7 @@ class IndicatorStardate( IndicatorBase ):
                 "Wikipedia::Stardate https://en.wikipedia.org/wiki/Stardate" ] )
 
         self.request_mouse_wheel_scroll_events(
-            ( self._on_mouse_wheel_scroll, ) )
+            ( self.on_mouse_wheel_scroll, ) )
 
         self.save_config_timer_id = None
 
@@ -96,15 +96,17 @@ class IndicatorStardate( IndicatorBase ):
         return number_of_seconds_to_next_update
 
 
-    def _on_mouse_wheel_scroll(
+    def on_mouse_wheel_scroll(
         self,
         indicator,
         delta,
         scroll_direction ):
+        '''
+        Cycle through all combinations of display options of the stardate.
 
-        # Cycle through all combinations of options for display of the stardate.
-        # If showing a 'classic' stardate and padding is not required,
-        # ignore the padding option.
+        If showing a 'classic' stardate and padding is not required,
+        ignore the padding option.
+        '''
         if self.show_classic:
             stardate_issue, stardate_integer, stardate_fraction = (
                 stardate.get_stardate_classic(
