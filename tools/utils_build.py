@@ -440,13 +440,23 @@ def _get_msgstr_from_po(
     return msgstr
 
 
-def _markdown_to_html():
+def _markdown_to_html(
+    directory_release,
+    indicator ):
+
+    readme_md = directory_release / indicator / "README.md"
+    command = f"python3 -m tools.markdown_to_html { readme_md }"
+
     stdout_, stderr_, return_code = (
         utils.python_run(
-            "python3 -m tools.markdown_to_html",
+            command,
             utils.VENV_BUILD ) )
 
     if return_code == 0:
+        readme_html = Path( readme_md.parent / "README.html" )
+        readme_html.rename(
+            readme_html.parent / "src" / indicator / "README.html" )
+
         message = ""
 
     else:
@@ -927,7 +937,7 @@ def _package_source(
             authors,
             start_year )
 
-        message = _markdown_to_html()
+        message = _markdown_to_html( directory_dist, indicator )
 
     if not message:
         directory_indicator_locale = (
