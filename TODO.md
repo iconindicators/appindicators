@@ -94,17 +94,17 @@ Releases:
 
 
 # Test on distros dropping X11 support
-If wmctrl is no longer available, will need a new entry for each distro so that
-wmctrl is not included in the install.
+If wmctrl is no longer available in a given distro's packages,
+will need a new entry in the installation instructions dropping wmctrl.
   https://www.theregister.com/2025/06/12/ubuntu_2510_to_drop_x11/
-Fedora 43 is expected to drop X11; when released (Nov 2025), test!
-Ubuntu 25.10 is expected to drop X11; when released (Oct 2025), test!
-Ubuntu 26.04 is expected to drop X11; when released (Apr 2026), test!
+Fedora 43 is expected to drop X11; when released (Nov 2025)
+Ubuntu 25.10 is expected to drop X11; when released (Oct 2025)
+Ubuntu 26.04 is expected to drop X11; when released (Apr 2026)
 
 
 # Long Term
 
-## Migration to GitHub
+## Migration of Indicators from Subversion to GitHub
 
 Created an organisation:
 
@@ -130,7 +130,7 @@ Import Subversion to GitHub; include commit history?
   https://stackoverflow.com/questions/6695783/import-subversion-repository-into-git
 
 
-#### Migrate Sourceforge projects
+## Migration of Sourceforge projects to GitHub
 
 Need to create a repository for each stardatesystemtray and worldtimesystemtray
 on GitHub, perhaps:
@@ -195,7 +195,7 @@ Installed World Time System Tray.
 Both work!
 
 
-#### Joda Time
+## Swap Joda Time for Java 8 or Better
 
 According to 
   https://www.joda.org/joda-time
@@ -331,5 +331,5 @@ Does not yet support pyproject.toml
 Where to distribute the .deb/.rpm?  Does Sourceforge or Github allow this?
 
 
-# Consider add meteor shower information to indicatorlunar
+## Add meteor shower information to indicatorlunar
 Already have some elementary code: meteorshower.py
