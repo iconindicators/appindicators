@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO On wayland, test copy of menu item to clipboard.
+
+
 '''
 Application indicator which displays calendar events.
 
