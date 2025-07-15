@@ -90,12 +90,12 @@ class IndicatorLunar( IndicatorBase ):
     CONFIG_WEREWOLF_WARNING_MESSAGE = "werewolfWarningMessage"
     CONFIG_WEREWOLF_WARNING_SUMMARY = "werewolfWarningSummary"
 
-    CREDIT = [
+    CREDIT = sorted( [
         astro_backend.get_credit(),
         "Comet Observation Database https://cobs.si",
         "Fred Espenak NASA/GSFC Emeritus https://eclipse.gsfc.nasa.gov",
         "Lowell Minor Planet Services https://asteroid.lowell.edu",
-        "Celestrak https://celestrak.org" ]
+        "Celestrak https://celestrak.org" ] )
 
     DATA_INDEX_BODY_TYPE = 0
     DATA_INDEX_BODY_NAME = 1
