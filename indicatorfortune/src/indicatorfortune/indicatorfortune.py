@@ -16,9 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO On wayland, test copy current fortune to clipboard.
-
-
 ''' Application indicator which displays fortunes. '''
 
 
