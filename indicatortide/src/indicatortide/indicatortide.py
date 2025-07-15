@@ -115,13 +115,11 @@ class IndicatorTide( IndicatorBase ):
                 menu.append( Gtk.MenuItem.new_with_label( label ) )
                 self.show_notification( summary, message )
 
-        # Update a little after midnight;
-        # guess as to when the user's data source will update.
+        # Assume the data source updates at midnight...
         today = datetime.datetime.now()
+        tomorrow = today + datetime.timedelta( days = 1 )
         five_minutes_after_midnight = (
-            today +
-            datetime.timedelta(
-                days = 1 ) ).replace( hour = 0, minute = 5, second = 0 )
+            tomorrow.replace( hour = 0, minute = 5, second = 0 ) )
 
         return ( five_minutes_after_midnight - today ).total_seconds()
 
