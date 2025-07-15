@@ -24,10 +24,10 @@ import datetime
 from . import stardate
 
 
-print( f"Stardate API version: { stardate.get_version() }\n" )
+print( f"Stardate API version: { stardate.get_version() }" )
 
 utc_now = datetime.datetime.now( datetime.timezone.utc )
-print( f"UTC now: { utc_now }\n" )
+print( f"UTC now: { utc_now }" )
 
 stardate_issue, stardate_integer, stardate_fraction = (
     stardate.get_stardate_classic( utc_now ) )
@@ -54,8 +54,7 @@ utc_now_from_stardate_classic = (
         stardate_integer,
         stardate_fraction ) )
 
-print(
-    f"UTC now from 'classic' Stardate: { utc_now_from_stardate_classic }\n" )
+print( f"UTC now from 'classic' Stardate: { utc_now_from_stardate_classic }" )
 
 stardate_integer, stardate_fraction = (
     stardate.get_stardate_2009_revised( utc_now ) )
@@ -81,5 +80,4 @@ utc_now_from_stardate_2009 = (
         stardate_integer,
         stardate_fraction ) )
 
-print(
-    f"UTC now from '2009 Revised' Stardate: { utc_now_from_stardate_2009 } " )
+print( f"UTC now from '2009 Revised' Stardate: { utc_now_from_stardate_2009 }" )
