@@ -72,6 +72,8 @@ Run `Geany` then:
         Execute: cd /home/bernard/Programming/Indicators/%e/src ; /home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.%e"
 ```
 
+NOTE: Because of %e variable above, running any of the `tools` is not possible, nor any other non-indicator code, such as `example.py` in `indicatorstardate`.
+
 **Project Setup**
 
 ```
@@ -84,8 +86,6 @@ Run `Geany` then:
 The indicator should now run via `Build > Execute` or `F5`.
 
 NOTE: If editing `README.md` or any `markdown` document under `Geany`, using two spaces to insert an empty line may not work as `Geany` removes trailing spaces by default.
-
-NOTE: May be possible to run the `tools` scripts within `Geany`; however this has not been investigated.
 
 References:
 
