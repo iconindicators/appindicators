@@ -1320,14 +1320,15 @@ class IndicatorBase( ABC ):
             # GTK interacts with the X11 clipboard via a user callback
             # function to receive the selection.
             #
-            # Under Wayland, there is no equivalent.
-            # Rather, the package wl-clipboard is called via a terminal.
+            # Under Wayland, there is no equivalent callback and instead,
+            # wl-paste is called via a terminal.
             #
             # Shield the user from having to know about Wayland or X11 by
-            # wrapping wl-clipboard within a callback function.
+            # wrapping wl-paste within a callback function.
             #
-            # Have found that text selected in Geany will throw an exception
-            # and log when copied to primary.
+            # Have found that text selected in Geany and calling
+            #   wl-paste --primary
+            # will throw an exception and is logged.
             stdout_, stderr_, return_code = (
                 self.process_run( "wl-paste --primary" ) )
 
