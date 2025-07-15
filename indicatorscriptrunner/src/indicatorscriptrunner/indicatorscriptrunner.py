@@ -1485,6 +1485,432 @@ class IndicatorScriptRunner( IndicatorBase ):
                 (
                     ( Gtk.Label.new( _( "Group" ) ), False ),
                     ( group_combo, True ) ) ),
+            0, 0, 3, 1 )
+
+        name_entry = (
+            self.create_entry(
+                "" if add else name,
+                tooltip_text = _( "The name of the script." ) ) )
+
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Name" ) ), False ),
+                    ( name_entry, True ) ),
+                margin_top = self.INDENT_WIDGET_TOP ),
+            0, 1, 3, 1 )
+
+        grid.attach(
+            self.create_box(
+                ( ( Gtk.Label.new( _( "Command" ) ), False ), ),
+                margin_top = self.INDENT_WIDGET_TOP ),
+            0, 2, 3, 1 )
+
+        command_text_view = (
+            self.create_textview(
+                text =
+                    "" if add else
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_COMMAND_HIDDEN ),
+                tooltip_text = _(
+                    "The terminal script/command, along with any arguments." ) ) )
+
+        grid.attach(
+            self.create_box(
+                ( ( self.create_scrolledwindow( command_text_view ), True ), ) ),
+            0, 3, 3, 10 )
+
+        active = False
+        if not add:
+            sound = (
+                model.get_value(
+                    iter_script, IndicatorScriptRunner.COLUMN_MODEL_SOUND ) )
+
+            active = sound == self.SYMBOL_TICK
+
+        sound_checkbutton = (
+            self.create_checkbutton(
+                _( "Play sound" ),
+                tooltip_text = _(
+                    "For non-background scripts, play a sound\n" +
+                    "on script completion.\n\n" +
+                    "For background scripts, play a sound\n" +
+                    "only if the script returns non-empty text." ),
+                active = active ) )
+
+        grid.attach( sound_checkbutton, 0, 13, 3, 1 )
+
+        active = False
+        if not add:
+            notification = (
+                model.get_value(
+                    iter_script,
+                    IndicatorScriptRunner.COLUMN_MODEL_NOTIFICATION ) )
+
+            active = notification == self.SYMBOL_TICK
+
+        notification_checkbutton = (
+            self.create_checkbutton(
+                _( "Show notification" ),
+                tooltip_text = _(
+                    "For non-background scripts, show a\n" +
+                    "notification on script completion.\n\n" +
+                    "For background scripts, show a notification\n" +
+                    "only if the script returns non-empty text." ),
+                active = active ) )
+
+        grid.attach( notification_checkbutton, 0, 14, 3, 1 )
+
+#        grid.attach( Gtk.Separator.new( Gtk.Orientation.HORIZONTAL ), 0, 15, 3, 1 )
+        grid.attach( Gtk.Label( "" ), 0, 15, 3, 1 )
+
+        is_background = False
+        if not add:
+            background = (
+                model.get_value(
+                    iter_script,
+                    IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+
+            is_background = background == self.SYMBOL_TICK
+
+        script_non_background_radio = (
+            self.create_radiobutton(
+                None,
+                _( "Non-background" ),
+                tooltip_text = _(
+                    "Non-background scripts are displayed\n" +
+                    "in the menu and run when the user\n" +
+                    "clicks on the corresponding menu item." ),
+                active = not is_background ) )
+
+        grid.attach( script_non_background_radio, 0, 16, 1, 1 )
+
+        active = False
+        if not add:
+            if not is_background:
+                terminal = (
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_TERMINAL ) )
+
+                active = terminal == self.SYMBOL_TICK
+
+        terminal_checkbutton = (
+            self.create_checkbutton(
+                _( "Leave terminal open" ),
+                tooltip_text = _(
+                    "Leave the terminal open on script completion." ),
+                sensitive = not is_background,
+                margin_left = self.INDENT_WIDGET_LEFT,
+                active = active ) )
+
+        grid.attach( terminal_checkbutton, 0, 17, 1, 1 )
+
+        active = False
+        if not add:
+            if is_background:
+                active = False
+
+            else:
+                default = (
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN ) )
+
+                active = default == "True"
+
+        default_script_checkbutton = (
+            self.create_checkbutton(
+                _( "Default script" ),
+                tooltip_text = _(
+                    "One script may be set as default\n" +
+                    "which is run on a middle mouse\n" +
+                    "click of the indicator icon.\n\n" +
+                    "Not supported on all desktops." ),
+                sensitive = not is_background,
+                margin_left = self.INDENT_WIDGET_LEFT,
+                active = active ) )
+
+        grid.attach( default_script_checkbutton, 0, 18, 1, 1 )
+
+        grid.attach( Gtk.Separator.new( Gtk.Orientation.VERTICAL ), 1, 16, 1, 3 )
+
+        script_background_radio = (
+            self.create_radiobutton(
+                script_non_background_radio,
+                _( "Background" ),
+                tooltip_text = _(
+                    "A background script, added to the icon text,\n" +
+                    "will be run at the interval specified.\n\n" +
+                    "A background script must return a string,\n" +
+                    "which may be empty.\n\n" +
+                    "Any exception will be logged to a file in\n" +
+                    "the user's home directory and the script's\n" +
+                    "tag will remain in the icon text." ),
+                active = is_background ) )
+
+        grid.attach( script_background_radio, 2, 16, 1, 1 )
+
+        interval_spinner = (
+            self.create_spinbutton(
+                int(
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_INTERVAL ) )
+                if is_background else 60,
+                1,
+                10000,
+                page_increment = 100,
+                tooltip_text = _( "Interval, in minutes, between runs." ) ) )
+
+        label_and_interval_spinner_box = (
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Interval" ) ), False ),
+                    ( interval_spinner, False ) ),
+                sensitive = is_background,
+                margin_left = self.INDENT_WIDGET_LEFT * 2 ) )
+
+        grid.attach( label_and_interval_spinner_box, 2, 17, 1, 1 )
+
+        active = False
+        if not add:
+            if is_background:
+                force_update = (
+                    model.get_value(
+                        iter_script,
+                        IndicatorScriptRunner.COLUMN_MODEL_FORCE_UPDATE ) )
+
+                active = force_update == self.SYMBOL_TICK
+
+        force_update_checkbutton = (
+            self.create_checkbutton(
+                _( "Force update" ),
+                tooltip_text = _(
+                    "Useful for a script which generally returns\n" +
+                    "an empty string, but on occasion returns\n" +
+                    "a message, say, when new mail has arrived,\n" +
+                    "or a log file is present.\n\n" +
+                    "When force update is enabled, the script will\n" +
+                    "be run on the next update of ANY script,\n" +
+                    "if the script returned a non-empty message." ),
+                sensitive = is_background,
+                margin_left = self.INDENT_WIDGET_LEFT,
+                active = active ) )
+
+        grid.attach( force_update_checkbutton, 2, 18, 1, 1 )
+
+        script_non_background_radio.connect(
+            "toggled",
+            self.on_radio_or_checkbox,
+            True,
+            terminal_checkbutton,
+            default_script_checkbutton )
+
+        script_non_background_radio.connect(
+            "toggled",
+            self.on_radio_or_checkbox,
+            False,
+            label_and_interval_spinner_box,
+            force_update_checkbutton )
+
+        script_background_radio.connect(
+            "toggled",
+            self.on_radio_or_checkbox,
+            True,
+            label_and_interval_spinner_box,
+            force_update_checkbutton )
+
+        script_background_radio.connect(
+            "toggled",
+            self.on_radio_or_checkbox,
+            False,
+            terminal_checkbutton,
+            default_script_checkbutton )
+
+        dialog = (
+            self.create_dialog(
+                treeview,
+                _( "Add Script" ) if add else _( "Edit Script" ),
+                content_widget = grid ) )
+
+        iter_select = None
+        old_tag_new_tag_pairs = ( )
+        while True:
+            dialog.show_all()
+            if dialog.run() == Gtk.ResponseType.OK:
+                group_ = group_combo.get_active_text().strip()
+                if group_ == "":
+                    self.show_dialog_ok(
+                        dialog, _( "The group cannot be empty." ) )
+
+                    group_combo.grab_focus()
+                    continue
+
+                name_ = name_entry.get_text().strip()
+                if name_ == "":
+                    self.show_dialog_ok(
+                        dialog, _( "The name cannot be empty." ) )
+
+                    name_entry.grab_focus()
+                    continue
+
+                command_ = self.get_textview_text( command_text_view ).strip()
+                if command_ == "":
+                    self.show_dialog_ok(
+                        dialog, _( "The command cannot be empty." ) )
+
+                    command_text_view.grab_focus()
+                    continue
+
+                script_exists = self._get_iter_to_script( group_, name_, model )
+                message = _(
+                    "A script of the same group and name already exists." )
+
+                if add:
+                    if script_exists:
+                        self.show_dialog_ok( dialog, message )
+                        group_combo.grab_focus()
+                        continue
+
+                else:
+                    if ( group != group_ or name != name_ ) and script_exists:
+                        self.show_dialog_ok( dialog, message )
+                        group_combo.grab_focus()
+                        continue
+
+                if not add:
+                    was_background = (
+                        model.get_value(
+                            iter_script,
+                            IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND )
+                        ==
+                        self.SYMBOL_TICK )
+
+                    iter_group = model.iter_parent( iter_script )
+                    if model.iter_n_children( iter_group ) == 1:
+                        model.remove( iter_group )
+                        groups.remove( group )
+
+                    else:
+                        model.remove( iter_script )
+
+                    if was_background:
+                        update_indicator_text = (
+                            not script_background_radio.get_active()
+                            or
+                            ( group != group_ or name != name_ ) )
+
+                        if update_indicator_text:
+                            old_tag_new_tag_pairs = (
+                                (
+                                    self._create_key( group, name ),
+                                    self._create_key( group_, name_ ) ), )
+
+                is_non_background_and_default = (
+                    script_non_background_radio.get_active()
+                    and
+                    default_script_checkbutton.get_active() )
+
+                if is_non_background_and_default:
+
+                    def remove_default( model, path, iter_ ):
+                        name = (
+                            model.get_value(
+                                iter_,
+                                IndicatorScriptRunner.COLUMN_MODEL_NAME ) )
+
+                        background = (
+                            model.get_value(
+                                iter_,
+                                IndicatorScriptRunner.COLUMN_MODEL_BACKGROUND ) )
+
+                        if name and background is None:
+                            model.set_value(
+                                iter_,
+                                IndicatorScriptRunner.COLUMN_MODEL_DEFAULT_HIDDEN,
+                                "False" )
+
+                    model.foreach( remove_default )
+
+                if group_ not in groups:
+                    row = [ group_, group_, None, None, None, None, None, None, None, None, None ]
+                    parent = model.append( None, row )
+
+                else:
+                    parent = self._get_iter_to_group( group_, model )
+
+                row = [
+                    group_,
+                    None,
+                    name_,
+                    self.get_textview_text( command_text_view ).strip(),
+                    self.SYMBOL_TICK if sound_checkbutton.get_active()
+                    else None,
+                    self.SYMBOL_TICK if notification_checkbutton.get_active()
+                    else None,
+                    self.SYMBOL_TICK if script_background_radio.get_active()
+                    else None,
+                    self.SYMBOL_DASH if script_background_radio.get_active()
+                    else (
+                        self.SYMBOL_TICK if terminal_checkbutton.get_active()
+                        else None
+                    ),
+                    self.SYMBOL_DASH if script_background_radio.get_active()
+                    else str( default_script_checkbutton.get_active() ),
+                    str( interval_spinner.get_value_as_int() )
+                    if script_background_radio.get_active()
+                    else self.SYMBOL_DASH,
+                    (
+                        self.SYMBOL_TICK if force_update_checkbutton.get_active()
+                        else None )
+                    if script_background_radio.get_active() else self.SYMBOL_DASH ]
+
+                iter_select = model.append( parent, row )
+
+            break
+
+        dialog.destroy()
+
+        print( self.dump_treestore( model ) )
+
+        return iter_select, old_tag_new_tag_pairs
+
+
+#TODO Original
+    '''
+    def _on_edit_script(
+        self,
+        treeview,
+        model,
+        iter_script,
+        group,
+        name,
+        groups ):
+
+        add = name is None
+
+        index = -1
+        if groups:
+            index = groups.index( group )
+
+        group_combo = (
+            self.create_comboboxtext(
+                groups,
+                tooltip_text = _(
+                    "The group to which the script belongs.\n\n" +
+                    "Choose an existing group or enter a new one." ),
+                active = index,
+                editable = True ) )
+
+        grid = self.create_grid()
+
+        grid.attach(
+            self.create_box(
+                (
+                    ( Gtk.Label.new( _( "Group" ) ), False ),
+                    ( group_combo, True ) ) ),
             0, 0, 1, 1 )
 
         name_entry = (
@@ -1871,6 +2297,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         print( self.dump_treestore( model ) )
 
         return iter_select, old_tag_new_tag_pairs
+    '''
 
 
     def _get_iter_to_group(
