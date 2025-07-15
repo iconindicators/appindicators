@@ -2,9 +2,9 @@
 
 ## v1.0.25 (2024-09-04)
 
-- User may now copy a group, includig all scripts within the group.
-- User may now edit a group's name.
-- User may now remove a group and all scripts within the group.
+- Groups may now be copied, includig all scripts within the group.
+- Group names may now be changed.
+- Groups (and all scripts within) may now be removed.
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhauled to adhere to the pyproject.toml standard.

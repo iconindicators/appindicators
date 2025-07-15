@@ -6,7 +6,7 @@
 - Removed the preference to combine PPAs.
   - Published binaries of the same name/version and are architecture independant are identical (the download count is the same for each published binary).  Consequently, only the first published binary is displayed.
   - Published binaries of the same name/version and are architecture specific are unique for each architecture.
-- Each published binary displays the name, version and if architecture specific, the architecture, otherwise blank, followed by the download count.
+- Each published binary displays the name, version and, if architecture specific, the architecture, otherwise blank, followed by the download count.
 - When updating preferences, only PPAs which have been modified are updated.
 - Preference to show PPAs in submenus defaults to False.
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.

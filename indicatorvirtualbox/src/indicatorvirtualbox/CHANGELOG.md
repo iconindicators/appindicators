@@ -4,8 +4,9 @@
 
 - Can now edit a virtual machine's autostart and start command in place in the Preferences.
 - Preference to show groups in submenus defaults to True.
-- Under Wayland, as wmctrl is not implemented, it is not possible to use the mouse wheel scroll to bring running VMs to the front.
-- A mouse middle button click on the indicator icon launches VirtualBox™ Manager.  Under X11, using wmctrl, if VirtualBox™ Manager is already running, VirtualBox™ Manager will be brought to the front.  Under Wayland, as wmctrl is not implemented, each click will result in a new instance of VirtualBox™ Manager.
+- At present, wmctrl (or an equivalent) under Wayland is unavailalbe, so it is not possible to mouse wheel scroll to bring running VMs to the front.
+- Under X11, a mouse middle button click on the indicator icon launches VirtualBox™ Manager if not already running;
+otherwise using wmctrl, VirtualBox™ Manager will be brought to the front.  Under Wayland, this is not possible and so each click will result in a new instance of VirtualBox™ Manager.
 - Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhauled to adhere to the pyproject.toml standard.
