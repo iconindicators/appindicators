@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Test on wayland.
+
+
 '''
 Application indicator which converts domain names between Unicode and ASCII.
 '''
