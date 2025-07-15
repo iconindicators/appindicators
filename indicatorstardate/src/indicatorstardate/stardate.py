@@ -38,8 +38,8 @@ time line:
                  46 BC       2162-01-04    2283-10-05
 
 From 6000 BC up to 46 BC, the Egyptian-developed calendar was used.
-Initially based on counting lunar cycles, it was eventually changed to a solar
-calendar.
+Initially based on counting lunar cycles, it was eventually changed
+to a solar calendar.
 
 Between 46 BC to 1582 AD, the Julian calendar was used.
 This was the first calendar to introduce the "leap year".
@@ -51,13 +51,13 @@ In 2162, stardates were developed by Starfleet.
 Stardate [0]0000.0 commenced on midnight 2162/1/4.
 The stardate rate from this date to 2270/1/26 was 5 units per day.
 
-Between 2270/1/26 and 2283/10/5 ([19]7340.0 and [19]7840.0, respectively)
+Between 2270/1/26 ( [19]7340.0 ) and 2283/10/5 ( [19]7840.0 ),
 the rate changes to 0.1 units per day.
 
-Between 2283/10/5 to 2323/1/1 ([19]7840.0 and [20]5006.0, respectively),
+Between 2283/10/5 ( [19]7840.0 ), to 2323/1/1 ( [20]5006.0 ),
 the rate changes to 0.5 units per day.
 
-From 2323/1/1 ([20]5006.0) the rate changed to 1000 units per mean solar year.
+From 2323/1/1 ( [20]5006.0 ) the rate changed to 1000 units per mean solar year.
 Also, stardate [20]5006.0 becomes [21]00000.0.
 
 
@@ -74,8 +74,10 @@ import math
 
 # The Gregorian dates which reflect the start date for each rate in the
 # 'classic' stardate era.
+#
 # For example, an index of 3 (Gregorian date of 2283/10/5) corresponds to
 # the rate of 0.5 stardate units per day.
+#
 # The month is one-based (January = 1).
 tzinfo_ = datetime.timezone( datetime.timedelta( hours = 0 ) )
 _gregorian_dates = [
