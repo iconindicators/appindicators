@@ -16,16 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Fedora 38
-# When installing the wheel, getting an error:
-#   Did not find CMake
-#   Error Dependency 'girepository-2.0' is required but not found.
-# Is this because 38 is EOL?
-
-
-#TODO Run each indicator under Eclipse,
-# testing all functionality,
-# to see if anything is printed to the console.
+#TODO Testing done on...
+# Debian 11 / 12
+# Fedora 38 / 39 - Install of PyGObject fails due to no CMAKE (suspect EOL)
+# Fedora 40 / 41
+# Kubuntu 22.04 / 24.04
+#
+# Maybe remove Fedora 38 / 39 from install instructions?
 
 
 #TODO Testing
@@ -1369,8 +1366,13 @@ class IndicatorBase( ABC ):
 
     def _get_play_sound_complete_command( self ):
         '''
-        Determine if pw-play is present, and if not, then paplay.
+        Determine if paplay is present and if not, then pw-play.
         If neither, then log.
+
+        Originally looked for pw-play before paplay as pw-play is newer,
+        but found on Kubuntu 22.04 that pw-play results in an error:
+            stream mode 34 error: no mode available
+            remote error: id=3 seq:6 res:-2 (No such file or directory): no mode available
 
         Determine if complete.oga is present; if not log.
 
