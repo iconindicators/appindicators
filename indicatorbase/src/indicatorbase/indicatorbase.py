@@ -16,14 +16,36 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Find every static method in all code...ensure there is no self.
+
+
+#TODO Candidates for removal of VM from backup after testing...
+# EOL Dates:
+#   Fedora 38 2024 05
+#   Debian 11 2024 08
+#   Fedora 39 2024 11
+#   Kubuntu 22.04 2025 04
+#   Linux Mint 20 2025 04
+#   Lubuntu 22.04 2025 04
+#   Fedora 40 2025 05
+#   Ubuntu Unity 22.04 2025 04
+#   Manjaro 24 now replaced by 25
+
+
 #TODO Testing done on...
 # Debian 11 / 12
 # Fedora 38 / 39 - Install of PyGObject fails due to no CMAKE (suspect EOL)
 # Fedora 40 / 41
 # Kubuntu 22.04 / 24.04
-# Linux Mint 20 Cinnamon
+# Linux Mint 20 / 21 / 22 Cinnamon
+# Lubuntu 22.04 / 24.04
 
-# Maybe remove Fedora 38 / 39 from install instructions?
+
+#TODO Test on Linux Mint 20 first, then delete, then 21.
+# 21 is NOT backed up.
+
+
+#TODO Maybe remove Fedora 38 / 39 from install instructions?
 
 
 #TODO Testing
@@ -47,23 +69,6 @@
 # Check that autostart still does not function.
 # In messages to user about Manjaro, maybe change "Manjaro 24" to just
 # "Manjaro" or "Manjaro 24/25".
-
-
-#TODO Test on Linux Mint 20 first, then delete, then 21.
-# 21 is NOT backed up.
-
-
-#TODO Candidates for removal of VM from backup after testing...
-# EOL Dates:
-#   Fedora 38 2024 05
-#   Debian 11 2024 08
-#   Fedora 39 2024 11
-#   Kubuntu 22.04 2025 04
-#   Linux Mint 20 2025 04
-#   Lubuntu 22.04 2025 04
-#   Fedora 40 2025 05
-#   Ubuntu Unity 22.04 2025 04
-#   Manjaro 24 now replaced by 25
 
 
 '''
@@ -2834,7 +2839,7 @@ class IndicatorBase( ABC ):
         '''
         is_qterminal_and_broken_ = False
         if "qterminal" in terminal:
-            qterminal_version = self.process_run( "qterminal --version" )[ 0 ]
+            qterminal_version = IndicatorBase.process_run( "qterminal --version" )[ 0 ]
             is_qterminal_and_broken_ = qterminal_version < "1.2.0"
 
         return is_qterminal_and_broken_
