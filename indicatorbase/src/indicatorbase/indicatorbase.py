@@ -16,6 +16,37 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Manjaro 25.0.
+# Check that autostart still does not function.
+# Each time I run Manjaro it seems reset, as in nothing is installed!!!
+
+
+#TODO When running indicator on Manjaro 25
+# got a deprecation warning about using libayatana-appindicator
+# as it is deprecated and to use libayatana-appindicator-glib
+# But there is no package for that...I guess the deprecation message
+# is quite early and package managers for ALL distros are slow to upgrade.
+#
+# Not an issue right now...just keep an eye on this.
+
+
+#TODO Manjaro 25
+# No tooltip unlike 24
+# No calendar.
+
+
+#TODO Manjaro 25
+# In indicatortest running a terminal command, the command works but get
+# a log message (which you also get if just running the command in a terminal
+# outside the indiator):
+#    QLayout: Cannot add a null widget to QHBoxLayout
+# Everything else works...so maybe just ignore but document somewhere.
+
+
+#TODO Manjaro 25.0.
+# Eventually add   MANJARO_25 = auto()
+
+
 #TODO Check all distros for pw-play and if it works.
 # If so, remove pulseaudioutils from install?
 # Maybe that is still needed?
@@ -60,14 +91,6 @@
 #
 #   Install/Uninstall
 #       Check install and uninstall and run
-
-
-#TODO Consider testing on Manjaro 25.0.
-#    MANJARO_25 = auto()
-# Check that calendar still does not exist.
-# Check that autostart still does not function.
-# In messages to user about Manjaro, maybe change "Manjaro 24" to just
-# "Manjaro" or "Manjaro 24/25".
 
 
 '''
