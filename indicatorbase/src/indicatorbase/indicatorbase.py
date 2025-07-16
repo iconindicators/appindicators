@@ -16,10 +16,24 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Check all distros for pw-play and if it works.
+# If so, remove pulseaudioutils from install?
+# Maybe that is still needed?
+# So uninstall perhaps and see if pw-play still works.
+#
+# Not needed to be installed on Fedora 42.
+
+
+#TODO On Fedora 42 the mouse wheel scroll does not work.
+# The mouse wheel scroll used to work according to other users, 
+# but broke after a recent update.
+# Wait for another system update and try again.
+
+
 #TODO Testing done on...
 # Debian 11 / 12
 # Fedora 38 / 39 - Install of PyGObject fails due to no CMAKE (suspect EOL)
-# Fedora 40 / 41
+# Fedora 40 / 41 / 42
 # Kubuntu 22.04 / 24.04
 # Linux Mint 20 / 21 / 22 Cinnamon
 # Lubuntu 22.04 / 24.04
@@ -46,9 +60,6 @@
 #
 #   Install/Uninstall
 #       Check install and uninstall and run
-
-
-#TODO Consider testing on Fedora 42.
 
 
 #TODO Consider testing on Manjaro 25.0.
@@ -177,6 +188,7 @@ class IndicatorBase( ABC ):
         [ "konsole", "-e" ],
         [ "lxterminal", "-e" ],
         [ "mate-terminal", "-x" ],
+        [ "ptyxis", "--" ],
         [ "qterminal", "-e" ],
         [ "tilix", "-e" ],
         [ "xfce4-terminal", "-x" ] ] )
