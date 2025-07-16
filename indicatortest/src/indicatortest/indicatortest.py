@@ -205,21 +205,26 @@ class IndicatorTest( IndicatorBase ):
 
         terminal, execution_flag = self.get_terminal_and_execution_flag()
 
-        self.create_and_append_menuitem(
-            submenu,
-            _( "Terminal: " ) + _( "Unknown terminal!" )
-            if terminal is None
-            else
-            str( terminal ),
-            indent = ( 2, 0 ) )
 
-        self.create_and_append_menuitem(
-            submenu,
-            _( "Execution flag: " ) + _( "Unknown terminal!" )
-            if terminal is None
-            else
-            str( execution_flag ),
-            indent = ( 2, 0 ) )
+        label = (
+            _( "Terminal: " ) +
+            (
+                _( "Unknown terminal!" )
+                if terminal is None
+                else
+                str( terminal ) ) )
+
+        self.create_and_append_menuitem( submenu, label, indent = ( 2, 0 ) )
+
+        label = (
+            _( "Execution flag: " ) +
+            (
+                _( "Unknown terminal!" )
+                if terminal is None
+                else
+                str( execution_flag ) ) )
+
+        self.create_and_append_menuitem( submenu, label, indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
             menu,
