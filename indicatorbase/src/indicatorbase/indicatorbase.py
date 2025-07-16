@@ -39,13 +39,17 @@
 # Kubuntu 22.04 / 24.04
 # Linux Mint 20 / 21 / 22 Cinnamon
 # Lubuntu 22.04 / 24.04
-
-
-#TODO Test on Linux Mint 20 first, then delete, then 21.
-# 21 is NOT backed up.
+# Manjaro 24.0.7
+# openSUSE Tumbleweed
+# Ubuntu 22.04 / 24.04
+# Ubuntu Budgie 24.04
+# Ubuntu MATE 24.04
+# Ubuntu Unity 22.04 / 24.04
+# Xubuntu 24.04
 
 
 #TODO Maybe remove Fedora 38 / 39 from install instructions?
+# If so, check any references in the limitations section.
 
 
 #TODO Testing
