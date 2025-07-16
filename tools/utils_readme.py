@@ -49,6 +49,8 @@ class OperatingSystem( Enum ):
     # FEDORA_38 = auto()
     # FEDORA_39 = auto()
     FEDORA_40 = auto()
+    FEDORA_41 = auto()
+    FEDORA_42 = auto()
     KUBUNTU_2204 = auto()
     KUBUNTU_2404 = auto()
     LINUX_MINT_CINNAMON_20 = auto()
@@ -212,7 +214,9 @@ def _get_install_uninstall(
         function(
             {
                 # OperatingSystem.FEDORA_39,
-                OperatingSystem.FEDORA_40 },
+                OperatingSystem.FEDORA_40,
+                OperatingSystem.FEDORA_41,
+                OperatingSystem.FEDORA_42 },
             indicator,
             command_fedora,
             _get_operating_system_dependencies_fedora ) +
@@ -343,6 +347,8 @@ def _get_extension(
         # { OperatingSystem.FEDORA_38 }.issubset( operating_systems ) or
         # { OperatingSystem.FEDORA_39 }.issubset( operating_systems ) or
         { OperatingSystem.FEDORA_40 }.issubset( operating_systems ) or
+        { OperatingSystem.FEDORA_41 }.issubset( operating_systems ) or
+        { OperatingSystem.FEDORA_42 }.issubset( operating_systems ) or
         { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
         { OperatingSystem.OPENSUSE_TUMBLEWEED }.issubset( operating_systems ) )
 
@@ -626,7 +632,9 @@ def _get_operating_system_dependencies_fedora(
 
     needs_pulseaudio = (
         # { OperatingSystem.FEDORA_39 }.issubset( operating_systems ) or
-        { OperatingSystem.FEDORA_40 }.issubset( operating_systems ) )
+        { OperatingSystem.FEDORA_40 }.issubset( operating_systems ) or
+        { OperatingSystem.FEDORA_41 }.issubset( operating_systems ) or
+        { OperatingSystem.FEDORA_42 }.issubset( operating_systems ) )
 
     if indicator == IndicatorName.INDICATORSCRIPTRUNNER:
         if needs_pulseaudio:
