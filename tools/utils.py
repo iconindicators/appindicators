@@ -176,6 +176,9 @@ def print_stdout_stderr_return_code(
     '''
     if return_code == 0:
         print( stdout_ )
+        if stderr_:
+            # Warnings may be printed to stderr despite a return code of 0.
+            print( stderr_ )
 
     else:
         print( f"\n\nstderr:\n{ stderr_ }" )
