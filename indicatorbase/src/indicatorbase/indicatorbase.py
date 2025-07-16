@@ -21,7 +21,8 @@
 # Fedora 38 / 39 - Install of PyGObject fails due to no CMAKE (suspect EOL)
 # Fedora 40 / 41
 # Kubuntu 22.04 / 24.04
-#
+# Linux Mint 20 Cinnamon
+
 # Maybe remove Fedora 38 / 39 from install instructions?
 
 
@@ -1367,12 +1368,10 @@ class IndicatorBase( ABC ):
     def _get_play_sound_complete_command( self ):
         '''
         Determine if paplay is present and if not, then pw-play.
-        If neither, then log.
+        If neither are present, log.
 
-        Originally looked for pw-play before paplay as pw-play is newer,
-        but found on Kubuntu 22.04 that pw-play results in an error:
-            stream mode 34 error: no mode available
-            remote error: id=3 seq:6 res:-2 (No such file or directory): no mode available
+        Have found on Kubuntu 22.04 et al that pw-play is unstable,
+        so look look for paplay before pw-play.
 
         Determine if complete.oga is present; if not log.
 
@@ -1384,13 +1383,13 @@ class IndicatorBase( ABC ):
         if self.play_sound_complete_command is None:
             command = (
                 self.process_run(
-                    "which pw-play",
+                    "which paplay",
                     ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
 
             if len( command ) == 0:
                 command = (
                     self.process_run(
-                        "which paplay",
+                        "which pw-play",
                         ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
 
                 if len( command ) == 0:
