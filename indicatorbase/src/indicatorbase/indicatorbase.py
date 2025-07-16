@@ -16,22 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Find every static method in all code...ensure there is no self.
-
-
-#TODO Candidates for removal of VM from backup after testing...
-# EOL Dates:
-#   Fedora 38 2024 05
-#   Debian 11 2024 08
-#   Fedora 39 2024 11
-#   Kubuntu 22.04 2025 04
-#   Linux Mint 20 2025 04
-#   Lubuntu 22.04 2025 04
-#   Fedora 40 2025 05
-#   Ubuntu Unity 22.04 2025 04
-#   Manjaro 24 now replaced by 25
-
-
 #TODO Testing done on...
 # Debian 11 / 12
 # Fedora 38 / 39 - Install of PyGObject fails due to no CMAKE (suspect EOL)
@@ -48,8 +32,8 @@
 # Xubuntu 24.04
 
 
-#TODO Maybe remove Fedora 38 / 39 from install instructions?
-# If so, check any references in the limitations section.
+#TODO Remove Fedora 38 / 39 from install instructions.
+# Check any references in the limitations section.
 
 
 #TODO Testing
@@ -67,7 +51,7 @@
 #TODO Consider testing on Fedora 42.
 
 
-#TODO Consider testing on newest Manjaro.
+#TODO Consider testing on Manjaro 25.0.
 #    MANJARO_25 = auto()
 # Check that calendar still does not exist.
 # Check that autostart still does not function.
