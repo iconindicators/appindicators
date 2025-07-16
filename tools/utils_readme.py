@@ -45,8 +45,9 @@ class OperatingSystem( Enum ):
     ''' Supported operating systems. '''
     DEBIAN_11 = auto()
     DEBIAN_12 = auto()
-    FEDORA_38 = auto()
-    FEDORA_39 = auto()
+#TODO Remove all 38 and 39 references AFTER 41 has been tested.
+    # FEDORA_38 = auto()
+    # FEDORA_39 = auto()
     FEDORA_40 = auto()
     KUBUNTU_2204 = auto()
     KUBUNTU_2404 = auto()
@@ -202,15 +203,15 @@ def _get_install_uninstall(
             command_debian,
             _get_operating_system_dependencies_debian ) +
 
-        function(
-            { OperatingSystem.FEDORA_38 },
-            indicator,
-            command_fedora,
-            _get_operating_system_dependencies_fedora ) +
+        # function(
+        #     { OperatingSystem.FEDORA_38 },
+        #     indicator,
+        #     command_fedora,
+        #     _get_operating_system_dependencies_fedora ) +
 
         function(
             {
-                OperatingSystem.FEDORA_39,
+                # OperatingSystem.FEDORA_39,
                 OperatingSystem.FEDORA_40 },
             indicator,
             command_fedora,
@@ -339,8 +340,8 @@ def _get_extension(
             "    ```\n" )
 
     needs_extension = (
-        { OperatingSystem.FEDORA_38 }.issubset( operating_systems ) or
-        { OperatingSystem.FEDORA_39 }.issubset( operating_systems ) or
+        # { OperatingSystem.FEDORA_38 }.issubset( operating_systems ) or
+        # { OperatingSystem.FEDORA_39 }.issubset( operating_systems ) or
         { OperatingSystem.FEDORA_40 }.issubset( operating_systems ) or
         { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
         { OperatingSystem.OPENSUSE_TUMBLEWEED }.issubset( operating_systems ) )
@@ -624,7 +625,7 @@ def _get_operating_system_dependencies_fedora(
         dependencies.append( "wl-clipboard" )
 
     needs_pulseaudio = (
-        { OperatingSystem.FEDORA_39 }.issubset( operating_systems ) or
+        # { OperatingSystem.FEDORA_39 }.issubset( operating_systems ) or
         { OperatingSystem.FEDORA_40 }.issubset( operating_systems ) )
 
     if indicator == IndicatorName.INDICATORSCRIPTRUNNER:
