@@ -56,6 +56,7 @@ class OperatingSystem( Enum ):
     LUBUNTU_2204 = auto()
     LUBUNTU_2404 = auto()
     MANJARO_24 = auto()
+    MANJARO_25 = auto()
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2004 = auto()
     UBUNTU_2204 = auto()
@@ -205,14 +206,22 @@ def _get_install_uninstall(
         function(
             {
                 OperatingSystem.FEDORA_40,
-                OperatingSystem.FEDORA_41,
+                OperatingSystem.FEDORA_41 },
+            indicator,
+            command_fedora,
+            _get_operating_system_dependencies_fedora ) +
+
+        function(
+            {
                 OperatingSystem.FEDORA_42 },
             indicator,
             command_fedora,
             _get_operating_system_dependencies_fedora ) +
 
         function(
-            { OperatingSystem.MANJARO_24 },
+            {
+                OperatingSystem.MANJARO_24,
+                OperatingSystem.MANJARO_25 },
             indicator,
             "sudo pacman -S --noconfirm"
             if install else
@@ -261,6 +270,7 @@ def _os_has_no_calendar( operating_systems ):
     '''
     return (
         { OperatingSystem.MANJARO_24 }.issubset( operating_systems ) or
+        { OperatingSystem.MANJARO_25 }.issubset( operating_systems ) or
         { OperatingSystem.OPENSUSE_TUMBLEWEED }.issubset( operating_systems ) )
 
 
@@ -618,10 +628,10 @@ def _get_operating_system_dependencies_fedora(
     if indicator == IndicatorName.INDICATORPUNYCODE:
         dependencies.append( "wl-clipboard" )
 
+    # Fedora 42 uses pw-play so pulseaudio is not required.
     needs_pulseaudio = (
         { OperatingSystem.FEDORA_40 }.issubset( operating_systems ) or
-        { OperatingSystem.FEDORA_41 }.issubset( operating_systems ) or
-        { OperatingSystem.FEDORA_42 }.issubset( operating_systems ) )
+        { OperatingSystem.FEDORA_41 }.issubset( operating_systems ) )
 
     if indicator == IndicatorName.INDICATORSCRIPTRUNNER:
         if needs_pulseaudio:
@@ -734,6 +744,7 @@ def _get_limitations(
     # Kubuntu 22.04     KDE     No mouse wheel scroll.
     # Kubuntu 24.04     KDE     No mouse wheel scroll.
     # Manjaro 24.0.7    KDE     No mouse wheel scroll.
+    # Manjaro 25.0.5    KDE     No mouse wheel scroll.
     if _is_indicator(
         indicator,
         IndicatorName.INDICATORSTARDATE,
@@ -750,6 +761,7 @@ def _get_limitations(
     # Lubuntu 22.04         LXQt        No label; tooltip is indicator filename.
     # Lubuntu 24.04         LXQt        No label; tooltip is indicator filename.
     # Manjaro 24.0.7        KDE         Tooltip in lieu of label.
+    # Manjaro 25.0.5        KDE         No label/tooltip.
     # openSUSE Tumbleweed   ICEWM       No label/tooltip.
     # Xubuntu 24.04         XFCE        Tooltip in lieu of label.
     if _is_indicator(
@@ -760,7 +772,7 @@ def _get_limitations(
         IndicatorName.INDICATORTEST ):
         messages.append(
             "- `KDE`: The icon label is unsupported; "
-            "the icon tooltip is used in lieu.\n" )
+            "the icon tooltip is used in lieu where available.\n" )
         messages.append(
             "- `X-Cinnamon`: The icon label is unsupported; "
             "the icon tooltip is used in lieu.\n" )
@@ -801,12 +813,15 @@ def _get_limitations(
             "Install `gnome-terminal` as a workaround.\n" )
 
     # Manjaro 24            No `calendar` command.
+    # Manjaro 25            No `calendar` command.
     # openSUSE Tumbleweed   No `calendar` command.
     if _is_indicator(
         indicator,
         IndicatorName.INDICATORTEST ):
         messages.append(
             "- `Manjaro 24`: Does not contain the `calendar` command.\n" )
+        messages.append(
+            "- `Manjaro 25`: Does not contain the `calendar` command.\n" )
         messages.append(
             "- `openSUSE Tumbleweed`: Does not contain the `calendar` command.\n" )
 
@@ -828,7 +843,8 @@ def _get_limitations(
     messages.append(
         "- `Kubuntu 24.04`: No autostart.\n" )
 
-    # Manjaro 24.04.7   No autostart.
+    # Manjaro 24.0.7   No autostart.
+    # Manjaro 25.0.5   No autostart.
     # As indicatoronthisday is unsupported on Manjaro (and openSUSE) as there
     # is no calendar package, only flag that that autostart does not work for
     # all the indicators other than indicatoronthisday.
@@ -837,6 +853,8 @@ def _get_limitations(
         IndicatorName.INDICATORONTHISDAY ):
         messages.append(
             "- `Manjaro 24`: No autostart.\n" )
+        messages.append(
+            "- `Manjaro 25`: No autostart.\n" )
 
     message = ""
     if messages:

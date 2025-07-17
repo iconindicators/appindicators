@@ -1,6 +1,6 @@
 # Immediate
 
-## No autostart on Kubuntu and Manjaro
+### No autostart on Kubuntu and Manjaro
 Given there is no autostart on Kubuntu 24.04 and Manjaro 24.04.7,
 should the autostart checkbox and delay spinner be hidden?
 If some fix through an OS update appears in the meantime,
@@ -10,18 +10,18 @@ Otherwise just leave as is...and keep the entry in the changelog.
 What to do?
 
 
-## Update date in CHANGELOG.md
+### Update date in CHANGELOG.md
 For each indicator's CHANGELOG.md, at release time, update the release date in
 the latest entry to the date of release.
 
 
-## When indicatortest is released
+### When indicatortest is released
 Post a note to
   https://github.com/AyatanaIndicators/libayatana-appindicator/issues/76
 to help the guy out.
 
 
-## Update the PPA description at
+### Update the PPA description at
   https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
 with the following:
 
@@ -44,7 +44,7 @@ indicator-virtual-box: https://pypi.org/project/indicatorvirtualbox
 Screenshots for the indicators can be found at https://askubuntu.com/q/30334/67335
 
 
-## For each indicator at
+### For each indicator at
   https://askubuntu.com/questions/30334/what-application-indicators-are-available?answertab=modifieddes
 update the URL at the top with the relevant URL at PyPI.
 
@@ -93,7 +93,7 @@ Releases:
 - https://pypi.org/project/indicatorvirtualbox
 
 
-# Test on distros dropping X11 support
+### Test on distros dropping X11 support
 If wmctrl is no longer available in a given distro's packages,
 will need a new entry in the installation instructions dropping wmctrl.
   https://www.theregister.com/2025/06/12/ubuntu_2510_to_drop_x11/
@@ -104,7 +104,20 @@ Ubuntu 26.04 is expected to drop X11; when released (Apr 2026)
 
 # Long Term
 
-## Migration of Indicators from Subversion to GitHub
+### Deprecation of libayatana-appindicator
+When running indicator on Manjaro 25 got a deprecation warning that
+libayatana-appindicator is deprecated and to use libayatana-appindicator-glib
+instead.
+
+However, there is no package for that and some internet searching suggests
+that perhaps the deprecation message is quite early and package managers
+for ALL distros are yet to upgrade.
+
+Will need to eventually swap over each distro as it is released with
+libayatana-appindicator-glib and update the install instructions.
+
+
+### Migration of Indicators from Subversion to GitHub
 
 Created an organisation:
 
@@ -130,7 +143,7 @@ Import Subversion to GitHub; include commit history?
   https://stackoverflow.com/questions/6695783/import-subversion-repository-into-git
 
 
-## Migration of Sourceforge projects to GitHub
+### Migration of Sourceforge projects to GitHub
 
 Need to create a repository for each stardatesystemtray and worldtimesystemtray
 on GitHub, perhaps:
@@ -195,7 +208,7 @@ Installed World Time System Tray.
 Both work!
 
 
-## Swap Joda Time for Java 8 or Better
+### Swap Joda Time for Java 8 or Better
 
 According to 
   https://www.joda.org/joda-time
@@ -219,12 +232,12 @@ The file in question is
   https://docs.openrewrite.org/recipes/java/migrate/joda/jodatimerecipe
 
 
-## Create non-symbolic icons
+### Create non-symbolic icons
 Some distros/desktops do not utilise the GNOME symbolic icon mechanism.
 Determine which distros/desktops these are and if anything can be done.
 
 
-## Replacement for wmctrl for indicatorvirtualbox on Wayland
+### Replacement for wmctrl for indicatorvirtualbox on Wayland
 https://git.sr.ht/~brocellous/wlrctl
 https://launchpad.net/ubuntu/+source/wlroots
 is a work-in-progress wmctrl replacement.
@@ -258,7 +271,7 @@ https://bbs.archlinux.org/viewtopic.php?id=306439
 https://github.com/jinliu/kdotool
 
 
-## Release astroskyfield for indicatorlunar
+### Release astroskyfield for indicatorlunar
 
 There is still some work to be done to clean up and finalise astroskyfield
 in regards to satellites, comets, and minor planets.  For the most part,
@@ -286,7 +299,7 @@ to include a bash command to determine if 32 bit (so install ephem) or 64 bit
 between astropyephem and astroskyfield if on 32 bit or 64 bit respectively.
 
 
-## Access Data at Runtime
+### Access Data at Runtime
 Reading
     https://setuptools.pypa.io/en/latest/userguide/datafiles.html#accessing-data-files-at-runtime
 it appears that data files which are part of the installation should be accessed
@@ -296,13 +309,13 @@ astroskyfield.
 Consider this once Ubuntu 20.04 / Debian 11 (et al) are no longer supported.
 
 
-## Migrate to GTK4
+### Migrate to GTK4
 May need to continue to run as GTK3 simulataneously.
 - https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159
 - https://stackoverflow.com/questions/73006299/unable-to-get-application-icons-to-display-with-gtk4-under-ubuntu
 
 
-## Installation other than via PyPI
+### Installation other than via PyPI
 Current implementation builds a self-contained wheel uploaded to PyPI.
 
 An end-user installs an indicator by:
@@ -331,5 +344,5 @@ Does not yet support pyproject.toml
 Where to distribute the .deb/.rpm?  Does Sourceforge or Github allow this?
 
 
-## Add meteor shower information to indicatorlunar
+### Add meteor shower information to indicatorlunar
 Already have some elementary code: meteorshower.py

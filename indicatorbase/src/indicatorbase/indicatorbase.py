@@ -19,20 +19,7 @@
 #TODO Manjaro 25.0.
 # Check that autostart still does not function.
 # Each time I run Manjaro it seems reset, as in nothing is installed!!!
-
-
-#TODO When running indicator on Manjaro 25
-# got a deprecation warning about using libayatana-appindicator
-# as it is deprecated and to use libayatana-appindicator-glib
-# But there is no package for that...I guess the deprecation message
-# is quite early and package managers for ALL distros are slow to upgrade.
-#
-# Not an issue right now...just keep an eye on this.
-
-
-#TODO Manjaro 25
-# No tooltip unlike 24
-# No calendar.
+# Go back to the backup and try that.
 
 
 #TODO Manjaro 25
@@ -43,24 +30,6 @@
 # Everything else works...so maybe just ignore but document somewhere.
 
 
-#TODO Manjaro 25.0.
-# Eventually add   MANJARO_25 = auto()
-
-
-#TODO Check all distros for pw-play and if it works.
-# If so, remove pulseaudioutils from install?
-# Maybe that is still needed?
-# So uninstall perhaps and see if pw-play still works.
-#
-# Not needed to be installed on Fedora 42.
-
-
-#TODO On Fedora 42 the mouse wheel scroll does not work.
-# The mouse wheel scroll used to work according to other users, 
-# but broke after a recent update.
-# Wait for another system update and try again.
-
-
 #TODO Testing done on...
 # Debian 11 / 12
 # Fedora 38 / 39 - Install of PyGObject fails due to no CMAKE (suspect EOL)
@@ -69,16 +38,13 @@
 # Linux Mint 20 / 21 / 22 Cinnamon
 # Lubuntu 22.04 / 24.04
 # Manjaro 24.0.7
+# Manjaro 25.0.5
 # openSUSE Tumbleweed
 # Ubuntu 22.04 / 24.04
 # Ubuntu Budgie 24.04
 # Ubuntu MATE 24.04
 # Ubuntu Unity 22.04 / 24.04
 # Xubuntu 24.04
-
-
-#TODO Remove Fedora 38 / 39 from install instructions.
-# Check any references in the limitations section.
 
 
 #TODO Testing
