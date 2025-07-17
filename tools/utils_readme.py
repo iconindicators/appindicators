@@ -267,7 +267,13 @@ def _get_install_uninstall(
                 OperatingSystem.XUBUNTU_2404 },
             indicator,
             command_debian,
-            _get_operating_system_dependencies_debian ) )
+            _get_operating_system_dependencies_debian ) +
+
+        function(
+            [],
+            indicator,
+            command_debian,
+            _get_operating_system_dependencies_debianNEW ) )
 
 
 def _os_has_no_calendar( operating_systems ):
@@ -609,6 +615,104 @@ def _get_operating_system_dependencies_debian(
         dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
+
+
+def _get_operating_system_dependencies_debianNEW(
+    indicator ):
+
+    def get_dependencies(
+        operating_systems,
+        indicator,
+        dependencies ):
+
+        needs_gnome_shell_extension_appindicator = (
+            { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
+            { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) )
+
+        if needs_gnome_shell_extension_appindicator:
+            dependencies.append( "gnome-shell-extension-appindicator" )
+
+        if indicator == IndicatorName.INDICATORFORTUNE:
+            dependencies.append( "fortune-mod" )
+            dependencies.append( "fortunes" )
+            dependencies.append( "wl-clipboard" )
+
+        needs_calendar = (
+            { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
+            { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) or
+            { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
+            { OperatingSystem.KUBUNTU_2404 }.issubset( operating_systems ) or
+            { OperatingSystem.LINUX_MINT_CINNAMON_21 }.issubset( operating_systems ) or
+            { OperatingSystem.LINUX_MINT_CINNAMON_22 }.issubset( operating_systems ) or
+            { OperatingSystem.LUBUNTU_2204 }.issubset( operating_systems ) or
+            { OperatingSystem.LUBUNTU_2404 }.issubset( operating_systems ) or
+            { OperatingSystem.UBUNTU_2204 }.issubset( operating_systems ) or
+            { OperatingSystem.UBUNTU_2404 }.issubset( operating_systems ) or
+            { OperatingSystem.UBUNTU_BUDGIE_2404 }.issubset( operating_systems ) or
+            { OperatingSystem.UBUNTU_MATE_2404 }.issubset( operating_systems ) or
+            { OperatingSystem.UBUNTU_UNITY_2204 }.issubset( operating_systems ) or
+            { OperatingSystem.UBUNTU_UNITY_2404 }.issubset( operating_systems ) or
+            { OperatingSystem.XUBUNTU_2404 }.issubset( operating_systems ) )
+    
+        if indicator == IndicatorName.INDICATORONTHISDAY:
+            dependencies.append( "wl-clipboard" )
+            if needs_calendar:
+                dependencies.append( "calendar" )
+    
+        if indicator == IndicatorName.INDICATORPUNYCODE:
+            dependencies.append( "wl-clipboard" )
+    
+        if indicator == IndicatorName.INDICATORSCRIPTRUNNER:
+            dependencies.append( "libnotify-bin" )
+            dependencies.append( "pulseaudio-utils" )
+    
+        if indicator == IndicatorName.INDICATORTEST:
+            dependencies.append( "fortune-mod" )
+            dependencies.append( "fortunes" )
+            dependencies.append( "libnotify-bin" )
+            dependencies.append( "pulseaudio-utils" )
+            dependencies.append( "wl-clipboard" )
+            dependencies.append( "wmctrl" )
+            if needs_calendar:
+                dependencies.append( "calendar" )
+    
+        if indicator == IndicatorName.INDICATORVIRTUALBOX:
+            dependencies.append( "wmctrl" )
+
+
+    dependencies_common = [
+        "gir1.2-ayatanaappindicator3-0.1",
+        "libcairo2-dev",
+        "libgirepository1.0-dev",
+        "python3-pip",
+        "python3-venv" ]
+
+    operating_systems_groups = {
+        {
+            OperatingSystem.DEBIAN_11,
+            OperatingSystem.DEBIAN_12 },
+        {
+            OperatingSystem.LINUX_MINT_CINNAMON_20,
+            OperatingSystem.UBUNTU_2004 },
+        {
+            OperatingSystem.KUBUNTU_2204,
+            OperatingSystem.KUBUNTU_2404,
+            OperatingSystem.LINUX_MINT_CINNAMON_21,
+            OperatingSystem.LINUX_MINT_CINNAMON_22,
+            OperatingSystem.LUBUNTU_2204,
+            OperatingSystem.LUBUNTU_2404,
+            OperatingSystem.UBUNTU_2204,
+            OperatingSystem.UBUNTU_2404,
+            OperatingSystem.UBUNTU_BUDGIE_2404,
+            OperatingSystem.UBUNTU_MATE_2404,
+            OperatingSystem.UBUNTU_UNITY_2204,
+            OperatingSystem.UBUNTU_UNITY_2404,
+            OperatingSystem.XUBUNTU_2404 } }
+
+    dependencies = ""
+    for operating_systems in operating_systems_groups:
+        dependencies += get_dependencies( operating_systems, indicator, dependencies_common )
+        dependencies = ' '.join( sorted( dependencies ) )
 
 
 def _get_operating_system_dependencies_fedora(
