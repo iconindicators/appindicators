@@ -244,6 +244,12 @@ def _get_install_uninstall(
             command_debian,
             _get_operating_system_dependencies_debian ) +
 
+#TODO I don't like how this function needs to know that the operating system
+# dependencies have differences across Debian type distros and
+# have to make multiple function calls.
+# Is it possible to have the debian function determine/sort all the variants
+# and group so that there is ONE function call here (similarly for all other
+# main distros)?
         function(
             {
                 OperatingSystem.KUBUNTU_2204,
