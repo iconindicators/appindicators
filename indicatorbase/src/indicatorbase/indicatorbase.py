@@ -16,20 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Manjaro 25.0.
-# Check that autostart still does not function.
-# Each time I run Manjaro it seems reset, as in nothing is installed!!!
-# Go back to the backup and try that.
-
-
-#TODO Manjaro 25
-# In indicatortest running a terminal command, the command works but get
-# a log message (which you also get if just running the command in a terminal
-# outside the indiator):
-#    QLayout: Cannot add a null widget to QHBoxLayout
-# Everything else works...so maybe just ignore but document somewhere.
-
-
 #TODO Testing done on...
 # Debian 11 / 12
 # Fedora 38 / 39 - Install of PyGObject fails due to no CMAKE (suspect EOL)
