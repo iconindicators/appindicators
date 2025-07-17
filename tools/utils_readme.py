@@ -16,6 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Look for all == with enums.
+# I think that is wrong and need to use the .value or .name instead.
+
+
 '''
 Create a README.md for an indicator.
 
@@ -93,6 +97,19 @@ def _is_indicator(
             break
 
     return is_indicator
+
+
+def _is_operating_system(
+    operating_system,
+    *operating_systems ):
+
+    is_operating_system = False
+    for operating_system_ in operating_systems:
+        if operating_system == operating_system_:
+            is_operating_system = True
+            break
+
+    return is_operating_system
 
 
 def _get_introduction(
@@ -267,13 +284,85 @@ def _get_install_uninstall(
                 OperatingSystem.XUBUNTU_2404 },
             indicator,
             command_debian,
-            _get_operating_system_dependencies_debian ) +
+            _get_operating_system_dependencies_debian ) )
 
-        function(
-            [],
-            indicator,
-            command_debian,
-            _get_operating_system_dependencies_debianNEW ) )
+
+def _get_operating_system_dependencies(
+    indicator ):
+
+    dependencies = { }
+
+    dependencies.update(
+        _get_operating_system_dependencies_debianNEW( indicator ) )
+
+    '''
+    function(
+        {
+            OperatingSystem.FEDORA_40,
+            OperatingSystem.FEDORA_41 },
+        indicator,
+        command_fedora,
+        _get_operating_system_dependencies_fedora ) +
+
+    function(
+        {
+            OperatingSystem.FEDORA_42 },
+        indicator,
+        command_fedora,
+        _get_operating_system_dependencies_fedora ) +
+
+    function(
+        {
+            OperatingSystem.MANJARO_24,
+            OperatingSystem.MANJARO_25 },
+        indicator,
+        "sudo pacman -S --noconfirm"
+        if install else
+        "sudo pacman -R --noconfirm",
+        _get_operating_system_dependencies_manjaro ) +
+
+    function(
+        { OperatingSystem.OPENSUSE_TUMBLEWEED },
+        indicator,
+        "sudo zypper install -y"
+        if install else
+        "sudo zypper remove -y",
+        _get_operating_system_dependencies_opensuse ) +
+
+    function(
+        {
+            OperatingSystem.LINUX_MINT_CINNAMON_20,
+            OperatingSystem.UBUNTU_2004 },
+        indicator,
+        command_debian,
+        _get_operating_system_dependencies_debian ) +
+
+#TODO I don't like how this function needs to know that the operating system
+# dependencies have differences across Debian type distros and
+# have to make multiple function calls.
+# Is it possible to have the debian function determine/sort all the variants
+# and group so that there is ONE function call here (similarly for all other
+# main distros)?
+    function(
+        {
+            OperatingSystem.KUBUNTU_2204,
+            OperatingSystem.KUBUNTU_2404,
+            OperatingSystem.LINUX_MINT_CINNAMON_21,
+            OperatingSystem.LINUX_MINT_CINNAMON_22,
+            OperatingSystem.LUBUNTU_2204,
+            OperatingSystem.LUBUNTU_2404,
+            OperatingSystem.UBUNTU_2204,
+            OperatingSystem.UBUNTU_2404,
+            OperatingSystem.UBUNTU_BUDGIE_2404,
+            OperatingSystem.UBUNTU_MATE_2404,
+            OperatingSystem.UBUNTU_UNITY_2204,
+            OperatingSystem.UBUNTU_UNITY_2404,
+            OperatingSystem.XUBUNTU_2404 },
+        indicator,
+        command_debian,
+        _get_operating_system_dependencies_debian ) +
+    '''
+    return dependencies
 
 
 def _os_has_no_calendar( operating_systems ):
@@ -589,19 +678,19 @@ def _get_operating_system_dependencies_debian(
         { OperatingSystem.UBUNTU_UNITY_2404 }.issubset( operating_systems ) or
         { OperatingSystem.XUBUNTU_2404 }.issubset( operating_systems ) )
 
-    if indicator == IndicatorName.INDICATORONTHISDAY:
+    if _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
         dependencies.append( "wl-clipboard" )
         if needs_calendar:
             dependencies.append( "calendar" )
 
-    if indicator == IndicatorName.INDICATORPUNYCODE:
+    if _is_indicator( indicator, IndicatorName.INDICATORPUNYCODE ):
         dependencies.append( "wl-clipboard" )
 
-    if indicator == IndicatorName.INDICATORSCRIPTRUNNER:
+    if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
         dependencies.append( "libnotify-bin" )
         dependencies.append( "pulseaudio-utils" )
 
-    if indicator == IndicatorName.INDICATORTEST:
+    if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
         dependencies.append( "fortune-mod" )
         dependencies.append( "fortunes" )
         dependencies.append( "libnotify-bin" )
@@ -611,7 +700,7 @@ def _get_operating_system_dependencies_debian(
         if needs_calendar:
             dependencies.append( "calendar" )
 
-    if indicator == IndicatorName.INDICATORVIRTUALBOX:
+    if _is_indicator( indicator, IndicatorName.INDICATORVIRTUALBOX ):
         dependencies.append( "wmctrl" )
 
     return ' '.join( sorted( dependencies ) )
@@ -620,65 +709,24 @@ def _get_operating_system_dependencies_debian(
 def _get_operating_system_dependencies_debianNEW(
     indicator ):
 
-    def get_dependencies(
-        operating_systems,
-        indicator,
-        dependencies ):
-
-        needs_gnome_shell_extension_appindicator = (
-            { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
-            { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) )
-
-        if needs_gnome_shell_extension_appindicator:
-            dependencies.append( "gnome-shell-extension-appindicator" )
-
-        if indicator == IndicatorName.INDICATORFORTUNE:
-            dependencies.append( "fortune-mod" )
-            dependencies.append( "fortunes" )
-            dependencies.append( "wl-clipboard" )
-
-        needs_calendar = (
-            { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
-            { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) or
-            { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
-            { OperatingSystem.KUBUNTU_2404 }.issubset( operating_systems ) or
-            { OperatingSystem.LINUX_MINT_CINNAMON_21 }.issubset( operating_systems ) or
-            { OperatingSystem.LINUX_MINT_CINNAMON_22 }.issubset( operating_systems ) or
-            { OperatingSystem.LUBUNTU_2204 }.issubset( operating_systems ) or
-            { OperatingSystem.LUBUNTU_2404 }.issubset( operating_systems ) or
-            { OperatingSystem.UBUNTU_2204 }.issubset( operating_systems ) or
-            { OperatingSystem.UBUNTU_2404 }.issubset( operating_systems ) or
-            { OperatingSystem.UBUNTU_BUDGIE_2404 }.issubset( operating_systems ) or
-            { OperatingSystem.UBUNTU_MATE_2404 }.issubset( operating_systems ) or
-            { OperatingSystem.UBUNTU_UNITY_2204 }.issubset( operating_systems ) or
-            { OperatingSystem.UBUNTU_UNITY_2404 }.issubset( operating_systems ) or
-            { OperatingSystem.XUBUNTU_2404 }.issubset( operating_systems ) )
-    
-        if indicator == IndicatorName.INDICATORONTHISDAY:
-            dependencies.append( "wl-clipboard" )
-            if needs_calendar:
-                dependencies.append( "calendar" )
-    
-        if indicator == IndicatorName.INDICATORPUNYCODE:
-            dependencies.append( "wl-clipboard" )
-    
-        if indicator == IndicatorName.INDICATORSCRIPTRUNNER:
-            dependencies.append( "libnotify-bin" )
-            dependencies.append( "pulseaudio-utils" )
-    
-        if indicator == IndicatorName.INDICATORTEST:
-            dependencies.append( "fortune-mod" )
-            dependencies.append( "fortunes" )
-            dependencies.append( "libnotify-bin" )
-            dependencies.append( "pulseaudio-utils" )
-            dependencies.append( "wl-clipboard" )
-            dependencies.append( "wmctrl" )
-            if needs_calendar:
-                dependencies.append( "calendar" )
-    
-        if indicator == IndicatorName.INDICATORVIRTUALBOX:
-            dependencies.append( "wmctrl" )
-
+    operating_systems = {
+        OperatingSystem.DEBIAN_11,
+        OperatingSystem.DEBIAN_12,
+        OperatingSystem.KUBUNTU_2204,
+        OperatingSystem.KUBUNTU_2404,
+        OperatingSystem.LINUX_MINT_CINNAMON_20,
+        OperatingSystem.LINUX_MINT_CINNAMON_21,
+        OperatingSystem.LINUX_MINT_CINNAMON_22,
+        OperatingSystem.LUBUNTU_2204,
+        OperatingSystem.LUBUNTU_2404,
+        OperatingSystem.UBUNTU_2004,
+        OperatingSystem.UBUNTU_2204,
+        OperatingSystem.UBUNTU_2404,
+        OperatingSystem.UBUNTU_BUDGIE_2404,
+        OperatingSystem.UBUNTU_MATE_2404,
+        OperatingSystem.UBUNTU_UNITY_2204,
+        OperatingSystem.UBUNTU_UNITY_2404,
+        OperatingSystem.XUBUNTU_2404 }
 
     dependencies_common = [
         "gir1.2-ayatanaappindicator3-0.1",
@@ -687,32 +735,80 @@ def _get_operating_system_dependencies_debianNEW(
         "python3-pip",
         "python3-venv" ]
 
-    operating_systems_groups = {
-        {
-            OperatingSystem.DEBIAN_11,
-            OperatingSystem.DEBIAN_12 },
-        {
-            OperatingSystem.LINUX_MINT_CINNAMON_20,
-            OperatingSystem.UBUNTU_2004 },
-        {
-            OperatingSystem.KUBUNTU_2204,
-            OperatingSystem.KUBUNTU_2404,
-            OperatingSystem.LINUX_MINT_CINNAMON_21,
-            OperatingSystem.LINUX_MINT_CINNAMON_22,
-            OperatingSystem.LUBUNTU_2204,
-            OperatingSystem.LUBUNTU_2404,
-            OperatingSystem.UBUNTU_2204,
-            OperatingSystem.UBUNTU_2404,
-            OperatingSystem.UBUNTU_BUDGIE_2404,
-            OperatingSystem.UBUNTU_MATE_2404,
-            OperatingSystem.UBUNTU_UNITY_2204,
-            OperatingSystem.UBUNTU_UNITY_2404,
-            OperatingSystem.XUBUNTU_2404 } }
+    dependencies = { }
+    for operating_system in operating_systems:
+        dependencies[ operating_system ] = dependencies_common[ : ]
 
-    dependencies = ""
-    for operating_systems in operating_systems_groups:
-        dependencies += get_dependencies( operating_systems, indicator, dependencies_common )
-        dependencies = ' '.join( sorted( dependencies ) )
+        needs_gnome_shell_extension_appindicator = (
+            _is_operating_system(
+                operating_system,
+                OperatingSystem.DEBIAN_11,
+                OperatingSystem.DEBIAN_12 ) )
+
+        if needs_gnome_shell_extension_appindicator:
+            dependencies[ operating_system ].extend( [
+                "gnome-shell-extension-appindicator" ] )
+
+        needs_calendar = (
+            _is_operating_system(
+                operating_system,
+                OperatingSystem.DEBIAN_11,
+                OperatingSystem.DEBIAN_12,
+                OperatingSystem.KUBUNTU_2204,
+                OperatingSystem.KUBUNTU_2404,
+                OperatingSystem.LINUX_MINT_CINNAMON_21,
+                OperatingSystem.LINUX_MINT_CINNAMON_22,
+                OperatingSystem.LUBUNTU_2204,
+                OperatingSystem.LUBUNTU_2404,
+                OperatingSystem.UBUNTU_2204,
+                OperatingSystem.UBUNTU_2404,
+                OperatingSystem.UBUNTU_BUDGIE_2404,
+                OperatingSystem.UBUNTU_MATE_2404,
+                OperatingSystem.UBUNTU_UNITY_2204,
+                OperatingSystem.UBUNTU_UNITY_2404,
+                OperatingSystem.XUBUNTU_2404 ) )
+
+        if _is_indicator( indicator, IndicatorName.INDICATORFORTUNE ):
+            dependencies[ operating_system ].extend( [
+                "fortune-mod",
+                "fortunes",
+                "wl-clipboard" ] )
+
+        if _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
+            dependencies[ operating_system ].extend( [
+                "wl-clipboard" ] )
+
+            if needs_calendar:
+                dependencies[ operating_system ].extend( [
+                    "calendar" ] )
+
+        if _is_indicator( indicator, IndicatorName.INDICATORPUNYCODE ):
+            dependencies[ operating_system ].extend( [
+                "wl-clipboard" ] )
+
+        if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
+            dependencies[ operating_system ].extend( [
+                "libnotify-bin",
+                "pulseaudio-utils" ] )
+
+        if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
+            dependencies[ operating_system ].extend( [
+                "fortune-mod",
+                "fortunes",
+                "libnotify-bin",
+                "pulseaudio-utils",
+                "wl-clipboard",
+                "wmctrl" ] )
+
+            if needs_calendar:
+                dependencies[ operating_system ].extend( [
+                    "calendar" ] )
+
+        if _is_indicator( indicator, IndicatorName.INDICATORVIRTUALBOX ):
+            dependencies[ operating_system ].extend( [
+                "wmctrl" ] )
+
+    return dependencies
 
 
 def _get_operating_system_dependencies_fedora(
@@ -1001,6 +1097,31 @@ def build_readme(
     Build the README.md file for the indicator.
     '''
     Path( directory ).mkdir( parents = True, exist_ok = True )
+
+    operating_system_dependencies = _get_operating_system_dependencies( indicator )
+    print( 111111111111111111111111111111111111 )
+    for operating_system, dependencies in operating_system_dependencies.items():
+        print( operating_system )
+        print( ' '.join( sorted( dependencies ) ) )
+        print()
+    print( 222222222222222222222222222222222222 )
+
+    # a = [ 1, 2, 3 ]
+    # b = { }
+    # b[ 'x' ] = a[ : ]
+    # b[ 'x' ].extend( 's' )
+
+    # b[ 'y' ] = a[ : ]
+    # b[ 'y' ].extend( 't' )
+
+    # b[ 'z' ] = a[ : ]
+    # b[ 'z' ].extend( 'u' )
+
+
+    # print( b )
+
+    import sys
+    sys.exit()
 
     content = (
         _get_introduction( indicator ) +
