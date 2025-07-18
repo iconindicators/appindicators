@@ -176,6 +176,7 @@ def _is_operating_system_debian_based(
     for operating_system_ in OPERATING_SYSTEMS_DEBIAN_BASED:
         if operating_system == operating_system_:
             is_debian_based = True
+            print( operating_system )#TODO Test
             break
 
     return is_debian_based
@@ -365,10 +366,9 @@ def _get_install_uninstall(
 
 
 def _get_install(
-    indicator,
-    operating_system_dependencies ):
+    indicator ):
 
-    title = (
+    content = (
         "Installation / Updating\n"
         "-----------------------\n\n"
         "Installation and updating follow the same process:\n"
@@ -376,28 +376,59 @@ def _get_install(
         f"2. Install `{ indicator }` to a `Python3` virtual "
         f"environment at `{ utils.VENV_INSTALL }`.\n" )
 
-    additional_text = ""
     if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
-        additional_text = (
+        content += (
             f"3. Any `Python` scripts you add to `{ indicator }` may "
             "require additional modules installed to the virtual "
             f"environment at `{ utils.VENV_INSTALL }`.\n" )
 
     if _is_indicator( indicator, IndicatorName.INDICATORTIDE ):
-        additional_text = (
+        content += (
             "3. You will need to write a `Python` script to retrieve your "
             "tidal data.  In addition, your `Python` script may require "
             "additional modules installed to the virtual environment at "
             f"`{ utils.VENV_INSTALL }`.\n" )
 
-#TODO Check how this looks for when there is additional text such as
-# script runner and tide, versus any other indicator.
-    # content = f"{ title }{ additional_text }\n"
+    print( content ) #TODO Testing
 
-    install_operating_system_to_packages = (
-        _get_install_operating_system_packages( operating_system_dependencies ) )
+    install_command_debian = "sudo apt-get -y install "
+    install_command_fedora = "sudo dnf -y install "
+    install_command_manjaro = "sudo pacman -S --noconfirm "
+    install_command_opensuse = "sudo zypper install -y "
 
     operating_system_to_contents = { }
+    for operating_system in OperatingSystem:
+        if _is_operating_system_debian_based( operating_system ):
+            install_command = install_command_debian
+            operating_system_dependencies = (
+                _get_operating_system_dependencies_debianNEWNEW(
+                    indicator,
+                    operating_system ) )
+
+
+        operating_system_to_contents[ operating_system ] = (
+            "1. Install operating system packages:\n\n"
+            "    ```\n"
+            f"    { install_command }"
+            f"{ ' '.join( sorted( operating_system_dependencies ) ) }\n"
+            "    ```\n\n" )
+
+        print( operating_system )
+        print( '\t' + operating_system_to_contents[ operating_system ] ) #TODO Testing
+        print()
+
+#TODO Do the python venv here
+
+        extension = _get_extensionNEW( operating_system )
+        if extension:
+            #TODO Tidy up wording below...
+            operating_system_to_contents[ operating_system ] += (
+                "3. Install extension blah...:\n\n"
+                "    ```\n"
+                f"    { extension }\n"
+                "    ```\n\n" )
+
+    '''
     for operating_system in install_operating_system_to_packages:
         operating_system_to_contents[ operating_system ] = (
             # "<details>"
@@ -432,6 +463,7 @@ def _get_install(
         content += operating_system_to_contents[ operating_system ]
 
     return content
+    '''
 
 
 def _get_install_operating_system_packages(
@@ -624,6 +656,44 @@ def _get_extension(
         extension = (
             "Install the `GNOME Shell` "
             "`AppIndicator and KStatusNotifierItem Support` "
+            f"[extension]({ url }).\n\n" )
+
+    return extension
+
+
+def _get_extensionNEW(
+    operating_system ):
+
+    extension = ''
+
+    needs_extension = (
+        _is_operating_system(
+            operating_system,
+            OperatingSystem.DEBIAN_11,
+            OperatingSystem.DEBIAN_12 ) )
+
+    if needs_extension:
+        extension = (
+            "For the `appindicator` extension to take effect, log out / in "
+            "(or restart) and in a terminal run:\n"
+            "    ```\n"
+            "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
+            "    ```\n" )
+
+    needs_extension = (
+        _is_operating_system(
+            operating_system,
+            OperatingSystem.FEDORA_40,
+            OperatingSystem.FEDORA_41.
+            OperatingSystem.FEDORA_42,
+            OperatingSystem.KUBUNTU_2204,
+            OperatingSystem.OPENSUSE_TUMBLEWEED ) )
+
+    if needs_extension:
+        url = "https://extensions.gnome.org/extension/615/appindicator-support"
+        extension = (
+            "Install the "
+            "`GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
             f"[extension]({ url }).\n\n" )
 
     return extension
@@ -1052,9 +1122,10 @@ def _get_operating_system_dependencies_debianNEW(
 
 
 def _get_operating_system_dependencies_debianNEWNEW(
-    indicator ):
+    indicator,
+    operating_system ):
 
-    dependencies_common = [
+    dependencies = [
         "gir1.2-ayatanaappindicator3-0.1",
         "libcairo2-dev",
         "libgirepository1.0-dev",  #TODO I think need to move this out of here
@@ -1067,7 +1138,6 @@ def _get_operating_system_dependencies_debianNEWNEW(
     # dependencies[ operating_system ] = dependencies_common[ : ]
 #TODO Ensure the code below makes a full copy of the common above.
 # If not, use the code above.
-    dependencies = dependencies_common[ ]
 
     needs_gnome_shell_extension_appindicator = (
         _is_operating_system(
@@ -1076,7 +1146,7 @@ def _get_operating_system_dependencies_debianNEWNEW(
             OperatingSystem.DEBIAN_12 ) )
 
     if needs_gnome_shell_extension_appindicator:
-        dependencies[ operating_system ].extend( [
+        dependencies.extend( [
             "gnome-shell-extension-appindicator" ] )
 
     needs_calendar = (
@@ -1099,30 +1169,30 @@ def _get_operating_system_dependencies_debianNEWNEW(
             OperatingSystem.XUBUNTU_2404 ) )
 
     if _is_indicator( indicator, IndicatorName.INDICATORFORTUNE ):
-        dependencies[ operating_system ].extend( [
+        dependencies.extend( [
             "fortune-mod",
             "fortunes",
             "wl-clipboard" ] )
 
     if _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
-        dependencies[ operating_system ].extend( [
+        dependencies.extend( [
             "wl-clipboard" ] )
 
         if needs_calendar:
-            dependencies[ operating_system ].extend( [
+            dependencies.extend( [
                 "calendar" ] )
 
     if _is_indicator( indicator, IndicatorName.INDICATORPUNYCODE ):
-        dependencies[ operating_system ].extend( [
+        dependencies.extend( [
             "wl-clipboard" ] )
 
     if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
-        dependencies[ operating_system ].extend( [
+        dependencies.extend( [
             "libnotify-bin",
             "pulseaudio-utils" ] )
 
     if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
-        dependencies[ operating_system ].extend( [
+        dependencies.extend( [
             "fortune-mod",
             "fortunes",
             "libnotify-bin",
@@ -1131,15 +1201,12 @@ def _get_operating_system_dependencies_debianNEWNEW(
             "wmctrl" ] )
 
         if needs_calendar:
-            dependencies[ operating_system ].extend( [
+            dependencies.extend( [
                 "calendar" ] )
 
     if _is_indicator( indicator, IndicatorName.INDICATORVIRTUALBOX ):
-        dependencies[ operating_system ].extend( [
+        dependencies.extend( [
             "wmctrl" ] )
-
-#TODO Sort here or at the caller level?
-    dependencies[ operating_system ].sort()
 
     return dependencies
 
@@ -1434,13 +1501,13 @@ def build_readme(
 
 
     print( 111111111111111111111111111111111111 )
-    operating_system_dependencies = (
-        _get_operating_system_dependencies( indicator ) )
+    # operating_system_dependencies = (
+        # _get_operating_system_dependencies( indicator ) )
 
-    sorted_operating_systems = (
-        sorted(
-            operating_system_dependencies.keys(),
-            key = lambda key_: key_.name ) )
+    # sorted_operating_systems = (
+        # sorted(
+            # operating_system_dependencies.keys(),
+            # key = lambda key_: key_.name ) )
 
     # for operating_system in sorted_operating_systems:
     #     print( operating_system.name )
@@ -1450,8 +1517,8 @@ def build_readme(
 
     print( 222222222222222222222222222222222222 )
 
-    install_operating_system_packages = (
-        _get_install_operating_system_packages( operating_system_dependencies ) )
+    # install_operating_system_packages = (
+        # _get_install_operating_system_packages( operating_system_dependencies ) )
 
     # for operating_system in sorted_operating_systems:
     #     print( operating_system.name )
@@ -1461,7 +1528,7 @@ def build_readme(
     print( 3333333333333333333333333333333333333 )
 
 
-    print( _get_install( indicator, operating_system_dependencies ) )
+    _get_install( indicator )
 
     print( 4444444444444444444444444444444444444)
 
