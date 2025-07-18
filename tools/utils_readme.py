@@ -392,8 +392,46 @@ def _get_install(
 
 #TODO Check how this looks for when there is additional text such as
 # script runner and tide, versus any other indicator.
-    return f"{ title }{ additional_text }\n"
+    # content = f"{ title }{ additional_text }\n"
 
+    install_operating_system_to_packages = (
+        _get_install_operating_system_packages( operating_system_dependencies ) )
+
+    operating_system_to_contents = { }
+    for operating_system in install_operating_system_to_packages:
+        operating_system_to_contents[ operating_system ] = (
+            # "<details>"
+            # f"<summary><b>{ summary }</b></summary>\n\n"
+
+            "1. Install operating system packages:\n\n"
+            "    ```\n"
+            f"    { install_operating_system_to_packages[ operating_system ] }\n"
+            "    ```\n\n" )
+            # f"    { _get_extension( operating_systems ) }\n\n" )
+
+        # print( operating_system.name )
+        # print( '\t' + ' '.join( sorted( operating_system_dependencies[ operating_system ] ) ) )
+        # print( '\t' + ' '.join( operating_system_dependencies[ operating_system ] ) )
+        # print()
+
+    content = f"{ title }{ additional_text }\n"
+
+    #TODO Ultimately don't want sorted by OS;
+    # want to group each OS full install text
+    # matched against all others.
+    # Group OS's with identical install text,
+    # sort the OS in each group,
+    # then write out by sorting according to first in each group.
+    sorted_operating_systems = (
+        sorted(
+            install_operating_system_to_packages.keys(),
+            key = lambda key_: key_.name ) )
+
+    for operating_system in sorted_operating_systems:
+        content += f"{ operating_system }\n"
+        content += operating_system_to_contents[ operating_system ]
+
+    return content
 
 
 def _get_install_operating_system_packages(
@@ -594,6 +632,70 @@ def _get_extension(
 def _get_installation_python_virtual_environment(
     indicator,
     operating_systems ):
+
+#TODO Need to ensure that the correct libgirepository 1 or 2 is in the packages
+# section.
+#
+# For below, consider Ubuntu 24 to use libgirep 2
+    # On Debian based distributions, the latest version of PyGObject requires
+    # libgirepository-2.0-dev which is only available on Debian 13+ and
+    # Ubuntu 24.04+.
+    #
+    # Ubuntu 24.04 has both libgirepository-2.0-dev and libgirepository1.0-dev
+    # and things seem to work just fine with libgirepository1.0-dev.
+    #
+    # Consequently, For Debian 11/12 and Ubuntu 20.04/22.04/24.04 PyGObject is
+    # pinned to 3.50.0 which is compatible with libgirepository1.0-dev.
+    #
+    # This issue does not seem to affect Fedora, Manjaro nor openSUSE.
+    #
+    # References:
+    #   https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
+    #   https://pygobject.gnome.org/getting_started.html
+    #   https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
+    pygobject_needs_to_be_pinned = (
+        { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
+        { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) or
+        { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.KUBUNTU_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.LINUX_MINT_CINNAMON_20 }.issubset( operating_systems ) or
+        { OperatingSystem.LINUX_MINT_CINNAMON_21 }.issubset( operating_systems ) or
+        { OperatingSystem.LINUX_MINT_CINNAMON_22 }.issubset( operating_systems ) or
+        { OperatingSystem.LUBUNTU_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.LUBUNTU_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_2004 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_BUDGIE_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_MATE_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_UNITY_2204 }.issubset( operating_systems ) or
+        { OperatingSystem.UBUNTU_UNITY_2404 }.issubset( operating_systems ) or
+        { OperatingSystem.XUBUNTU_2404 }.issubset( operating_systems ) )
+
+    pygobject = "PyGObject"
+    if pygobject_needs_to_be_pinned:
+        pygobject = r"PyGObject\<=3.50.0"
+
+    message = (
+        f"Install `{ indicator }`, including icons, .desktop and run "
+        "script, to the `Python3` virtual environment:\n"
+        "    ```\n"
+        f"    indicator={ indicator } && \\\n"
+        f"    venv={ utils.VENV_INSTALL } && \\\n"
+        f"    if [ ! -d ${{venv}} ]; then python3 -m venv ${{venv}}; fi && \\\n"
+        f"    . ${{venv}}/bin/activate && \\\n"
+        f"    python3 -m pip install --upgrade { pygobject } ${{indicator}} && \\\n"
+        "    deactivate && \\\n"
+        f"    . $(ls -d ${{venv}}/lib/python3.* | head -1)/"
+        f"site-packages/${{indicator}}/platform/linux/install.sh\n"
+        "    ```\n" )
+
+    return message
+
+
+def _get_installation_python_virtual_environmentNEW(
+    indicator,
+    operating_system ):
 
 #TODO Need to ensure that the correct libgirepository 1 or 2 is in the packages
 # section.
@@ -949,6 +1051,99 @@ def _get_operating_system_dependencies_debianNEW(
     return dependencies
 
 
+def _get_operating_system_dependencies_debianNEWNEW(
+    indicator ):
+
+    dependencies_common = [
+        "gir1.2-ayatanaappindicator3-0.1",
+        "libcairo2-dev",
+        "libgirepository1.0-dev",  #TODO I think need to move this out of here
+        # as it will not apply for Debian 13 and Ubuntu 26.04 and possibly
+        # 24.04 as they want version 2
+        "python3-pip",
+        "python3-venv" ]
+
+    # dependencies = { }
+    # dependencies[ operating_system ] = dependencies_common[ : ]
+#TODO Ensure the code below makes a full copy of the common above.
+# If not, use the code above.
+    dependencies = dependencies_common[ ]
+
+    needs_gnome_shell_extension_appindicator = (
+        _is_operating_system(
+            operating_system,
+            OperatingSystem.DEBIAN_11,
+            OperatingSystem.DEBIAN_12 ) )
+
+    if needs_gnome_shell_extension_appindicator:
+        dependencies[ operating_system ].extend( [
+            "gnome-shell-extension-appindicator" ] )
+
+    needs_calendar = (
+        _is_operating_system(
+            operating_system,
+            OperatingSystem.DEBIAN_11,
+            OperatingSystem.DEBIAN_12,
+            OperatingSystem.KUBUNTU_2204,
+            OperatingSystem.KUBUNTU_2404,
+            OperatingSystem.LINUX_MINT_CINNAMON_21,
+            OperatingSystem.LINUX_MINT_CINNAMON_22,
+            OperatingSystem.LUBUNTU_2204,
+            OperatingSystem.LUBUNTU_2404,
+            OperatingSystem.UBUNTU_2204,
+            OperatingSystem.UBUNTU_2404,
+            OperatingSystem.UBUNTU_BUDGIE_2404,
+            OperatingSystem.UBUNTU_MATE_2404,
+            OperatingSystem.UBUNTU_UNITY_2204,
+            OperatingSystem.UBUNTU_UNITY_2404,
+            OperatingSystem.XUBUNTU_2404 ) )
+
+    if _is_indicator( indicator, IndicatorName.INDICATORFORTUNE ):
+        dependencies[ operating_system ].extend( [
+            "fortune-mod",
+            "fortunes",
+            "wl-clipboard" ] )
+
+    if _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
+        dependencies[ operating_system ].extend( [
+            "wl-clipboard" ] )
+
+        if needs_calendar:
+            dependencies[ operating_system ].extend( [
+                "calendar" ] )
+
+    if _is_indicator( indicator, IndicatorName.INDICATORPUNYCODE ):
+        dependencies[ operating_system ].extend( [
+            "wl-clipboard" ] )
+
+    if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
+        dependencies[ operating_system ].extend( [
+            "libnotify-bin",
+            "pulseaudio-utils" ] )
+
+    if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
+        dependencies[ operating_system ].extend( [
+            "fortune-mod",
+            "fortunes",
+            "libnotify-bin",
+            "pulseaudio-utils",
+            "wl-clipboard",
+            "wmctrl" ] )
+
+        if needs_calendar:
+            dependencies[ operating_system ].extend( [
+                "calendar" ] )
+
+    if _is_indicator( indicator, IndicatorName.INDICATORVIRTUALBOX ):
+        dependencies[ operating_system ].extend( [
+            "wmctrl" ] )
+
+#TODO Sort here or at the caller level?
+    dependencies[ operating_system ].sort()
+
+    return dependencies
+
+
 def _get_operating_system_dependencies_fedora(
     operating_systems,
     indicator ):
@@ -1257,7 +1452,7 @@ def build_readme(
 
     install_operating_system_packages = (
         _get_install_operating_system_packages( operating_system_dependencies ) )
-    
+
     # for operating_system in sorted_operating_systems:
     #     print( operating_system.name )
     #     print( '\t' + install_operating_system_packages[ operating_system ] )
@@ -1267,7 +1462,7 @@ def build_readme(
 
 
     print( _get_install( indicator, operating_system_dependencies ) )
-    
+
     print( 4444444444444444444444444444444444444)
 
     sys.exit()
