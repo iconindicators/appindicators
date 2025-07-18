@@ -20,6 +20,24 @@
 # I think that is wrong and need to use the .value or .name instead.
 
 
+#TODO When creating the install section, ideally group by operating systems
+# with same package list.
+#
+# However for Debian family, may not be accurate.
+# Could have same package list but Debian needs the extension installed
+# whereas Ubuntu does not.
+# So cannot use ONLY the package list to group.
+
+
+#TODO I think the extra bit for installing the extension, depending on each
+# operating system, might go better as a point 3 instead?
+# Would then need in the intro to make a note about some OS's need a third
+# step for the extension or whatever.
+
+
+#TODO In the uninstall, what about remove/uninstall of gnome extension?
+
+
 '''
 Create a README.md for an indicator.
 
@@ -72,6 +90,23 @@ class OperatingSystem( Enum ):
     XUBUNTU_2404 = auto()
 
 
+
+
+OPERATING_SYSTEMS_FEDORA_BASED = (
+    OperatingSystem.FEDORA_40,
+    OperatingSystem.FEDORA_41,
+    OperatingSystem.FEDORA_42 )
+
+
+OPERATING_SYSTEMS_MANJARO_BASED = (
+    OperatingSystem.MANJARO_24,
+    OperatingSystem.MANJARO_25 )
+
+
+OPERATING_SYSTEMS_OPENSUSE_BASED = (
+    OperatingSystem.OPENSUSE_TUMBLEWEED )
+
+
 class IndicatorName( Enum ):
     ''' Indicators. '''
     INDICATORFORTUNE = auto()
@@ -90,6 +125,7 @@ def _is_indicator(
     indicator,
     *indicators ):
 
+#TODO Can I use the subset way?
     is_indicator = False
     for indicator_ in indicators:
         if indicator == indicator_.name.lower():
@@ -103,6 +139,7 @@ def _is_operating_system(
     operating_system,
     *operating_systems ):
 
+#TODO Can I use the subset way?
     is_operating_system = False
     for operating_system_ in operating_systems:
         if operating_system == operating_system_:
@@ -110,6 +147,38 @@ def _is_operating_system(
             break
 
     return is_operating_system
+
+
+def _is_operating_system_debian_based(
+    operating_system ):
+
+    OPERATING_SYSTEMS_DEBIAN_BASED = (
+        OperatingSystem.DEBIAN_11,
+        OperatingSystem.DEBIAN_12,
+        OperatingSystem.KUBUNTU_2204,
+        OperatingSystem.KUBUNTU_2404,
+        OperatingSystem.LINUX_MINT_CINNAMON_20,
+        OperatingSystem.LINUX_MINT_CINNAMON_21,
+        OperatingSystem.LINUX_MINT_CINNAMON_22,
+        OperatingSystem.LUBUNTU_2204,
+        OperatingSystem.LUBUNTU_2404,
+        OperatingSystem.UBUNTU_2004,
+        OperatingSystem.UBUNTU_2204,
+        OperatingSystem.UBUNTU_2404,
+        OperatingSystem.UBUNTU_BUDGIE_2404,
+        OperatingSystem.UBUNTU_MATE_2404,
+        OperatingSystem.UBUNTU_UNITY_2204,
+        OperatingSystem.UBUNTU_UNITY_2404,
+        OperatingSystem.XUBUNTU_2404 )
+
+#TODO Can the subset be used here?
+    is_debian_based = False
+    for operating_system_ in OPERATING_SYSTEMS_DEBIAN_BASED:
+        if operating_system == operating_system_:
+            is_debian_based = True
+            break
+
+    return is_debian_based
 
 
 def _get_introduction(
@@ -137,8 +206,8 @@ def _get_introduction(
     #
     # For indicatoronthisday, drop references to openSUSE/Manjaro.
     #
-    # Keep indicatortest as `calendar` is only a small part of the overall
-    # functionality.
+    # For indicatortest, the calendar test is hidden and the remainder of the
+    # indicator works, so leave in the reference to openSUSE/Manjaro.
     if not _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
         introduction += ", `openSUSE`, `Manjaro`"
 
@@ -158,14 +227,14 @@ def _get_introduction(
 def _get_indicator_names_sans_current(
     indicator ):
 
-    indicators = [
-        str( x )
-        for x in Path( '.' ).iterdir()
-        if x.is_dir() and str( x ).startswith( "indicator" ) ]
+    indicators = [ ]
+    for indicator_name in IndicatorName:
+        indicator_name_ = indicator_name.name.lower()
+        if indicator == indicator_name_:
+            continue
 
-    indicators.remove( indicator )
-    indicators.remove( "indicatorbase" )
-    indicators.sort()
+        indicators.append( indicator_name_ )
+
     return indicators
 
 
@@ -285,6 +354,67 @@ def _get_install_uninstall(
             indicator,
             command_debian,
             _get_operating_system_dependencies_debian ) )
+
+
+
+
+
+
+
+
+
+
+def _get_install(
+    indicator,
+    operating_system_dependencies ):
+
+    title = (
+        "Installation / Updating\n"
+        "-----------------------\n\n"
+        "Installation and updating follow the same process:\n"
+        "1. Install operating system packages.\n"
+        f"2. Install `{ indicator }` to a `Python3` virtual "
+        f"environment at `{ utils.VENV_INSTALL }`.\n" )
+
+    additional_text = ""
+    if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
+        additional_text = (
+            f"3. Any `Python` scripts you add to `{ indicator }` may "
+            "require additional modules installed to the virtual "
+            f"environment at `{ utils.VENV_INSTALL }`.\n" )
+
+    if _is_indicator( indicator, IndicatorName.INDICATORTIDE ):
+        additional_text = (
+            "3. You will need to write a `Python` script to retrieve your "
+            "tidal data.  In addition, your `Python` script may require "
+            "additional modules installed to the virtual environment at "
+            f"`{ utils.VENV_INSTALL }`.\n" )
+
+#TODO Check how this looks for when there is additional text such as
+# script runner and tide, versus any other indicator.
+    return f"{ title }{ additional_text }\n"
+
+
+
+def _get_install_operating_system_packages(
+    operating_system_dependencies ):
+
+    operating_system_packages = { }
+
+    command_debian = "sudo apt-get -y install "
+    command_fedora = "sudo dnf -y install "
+    command_manjaro = "sudo pacman -S --noconfirm "
+    command_opensuse = "sudo zypper install -y "
+
+    for operating_system in operating_system_dependencies:
+        if _is_operating_system_debian_based( operating_system ):
+            command = command_debian
+
+        operating_system_packages[ operating_system ] = (
+            command +
+            ' '.join( operating_system_dependencies[ operating_system ] ) )
+
+    return operating_system_packages
 
 
 def _get_operating_system_dependencies(
@@ -465,6 +595,10 @@ def _get_installation_python_virtual_environment(
     indicator,
     operating_systems ):
 
+#TODO Need to ensure that the correct libgirepository 1 or 2 is in the packages
+# section.
+#
+# For below, consider Ubuntu 24 to use libgirep 2
     # On Debian based distributions, the latest version of PyGObject requires
     # libgirepository-2.0-dev which is only available on Debian 13+ and
     # Ubuntu 24.04+.
@@ -731,7 +865,9 @@ def _get_operating_system_dependencies_debianNEW(
     dependencies_common = [
         "gir1.2-ayatanaappindicator3-0.1",
         "libcairo2-dev",
-        "libgirepository1.0-dev",
+        "libgirepository1.0-dev",  #TODO I think need to move this out of here
+        # as it will not apply for Debian 13 and Ubuntu 26.04 and possible 24.04
+        # as they want version 2
         "python3-pip",
         "python3-venv" ]
 
@@ -807,6 +943,8 @@ def _get_operating_system_dependencies_debianNEW(
         if _is_indicator( indicator, IndicatorName.INDICATORVIRTUALBOX ):
             dependencies[ operating_system ].extend( [
                 "wmctrl" ] )
+
+        dependencies[ operating_system ].sort()
 
     return dependencies
 
@@ -1098,30 +1236,43 @@ def build_readme(
     '''
     Path( directory ).mkdir( parents = True, exist_ok = True )
 
-    operating_system_dependencies = _get_operating_system_dependencies( indicator )
+
+
     print( 111111111111111111111111111111111111 )
-    for operating_system, dependencies in operating_system_dependencies.items():
-        print( operating_system )
-        print( ' '.join( sorted( dependencies ) ) )
-        print()
+    operating_system_dependencies = (
+        _get_operating_system_dependencies( indicator ) )
+
+    sorted_operating_systems = (
+        sorted(
+            operating_system_dependencies.keys(),
+            key = lambda key_: key_.name ) )
+
+    # for operating_system in sorted_operating_systems:
+    #     print( operating_system.name )
+    #     # print( '\t' + ' '.join( sorted( operating_system_dependencies[ operating_system ] ) ) )
+    #     print( '\t' + ' '.join( operating_system_dependencies[ operating_system ] ) )
+    #     print()
+
     print( 222222222222222222222222222222222222 )
 
-    # a = [ 1, 2, 3 ]
-    # b = { }
-    # b[ 'x' ] = a[ : ]
-    # b[ 'x' ].extend( 's' )
+    install_operating_system_packages = (
+        _get_install_operating_system_packages( operating_system_dependencies ) )
+    
+    # for operating_system in sorted_operating_systems:
+    #     print( operating_system.name )
+    #     print( '\t' + install_operating_system_packages[ operating_system ] )
+    #     print()
 
-    # b[ 'y' ] = a[ : ]
-    # b[ 'y' ].extend( 't' )
-
-    # b[ 'z' ] = a[ : ]
-    # b[ 'z' ].extend( 'u' )
+    print( 3333333333333333333333333333333333333 )
 
 
-    # print( b )
+    print( _get_install( indicator, operating_system_dependencies ) )
+    
+    print( 4444444444444444444444444444444444444)
 
-    import sys
     sys.exit()
+
+
 
     content = (
         _get_introduction( indicator ) +
