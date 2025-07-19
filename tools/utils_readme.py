@@ -143,6 +143,10 @@ class IndicatorName( Enum ):
 
 
 #TODO Maybe this goes
+# Might have to stay...unless a way exists
+# to compare a lower case string to the enum in a list?
+#
+# Maybe this function internally though can be re-written?
 def _is_indicator(
     indicator,
     *indicators ):
@@ -338,14 +342,6 @@ def _get_install_uninstall(
             _get_operating_system_dependencies_debian ) )
 
 
-
-
-
-
-
-
-
-
 def _get_install(
     indicator ):
 
@@ -414,27 +410,6 @@ def _get_install(
             operating_system_to_content[ operating_system ] += (
                 f"3. { extension }\n\n" )
 
-#TODO Should the bits below for scriptrunner/tide, be mentioned in the
-# top level summary (as a summary)?
-#
-# Regardless, where to put the specifics about installing additional modules
-# into the venv?
-#
-# After the venv section.  Or after the last point (2 or 3)?
-    # if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
-    #     content += (
-    #         f"3. Any `Python` scripts you add to `{ indicator }` may "
-    #         "require additional modules installed to the virtual "
-    #         f"environment at `{ utils.VENV_INSTALL }`.\n" )
-    #
-    # if _is_indicator( indicator, IndicatorName.INDICATORTIDE ):
-    #     content += (
-    #         "3. You will need to write a `Python` script to retrieve your "
-    #         "tidal data.  In addition, your `Python` script may require "
-    #         "additional modules installed to the virtual environment at "
-
-    #         f"`{ utils.VENV_INSTALL }`.\n" )
-
     rev_dict = {}
 
     # Find all keys with same value, group and swap grouped keys with values.
@@ -456,7 +431,7 @@ def _get_install(
     # Swap sorted, grouped values with keys.
     for key, value in rev_dict.items():
         rev_rev_dict.setdefault( value, set() ).add( key )
-    
+
     # print( rev_rev_dict.keys() )
     # print()
     # print()
@@ -1340,6 +1315,42 @@ def _get_usage(
         f"```. $HOME/.local/bin/{ indicator }.sh```\n\n" )
 
 
+def _get_usageNEW(
+    indicator,
+    indicator_human_readable ):
+
+    usage = (
+        "Usage\n"
+        "-----\n\n"
+
+        f"To run `{ indicator }`, press the `Super` key to show the "
+        "applications overlay (or similar), type "
+        f"`{ indicator_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Removes the ™ from VirtualBox™.
+        "into the search bar and the icon should be present for you to select.  "
+        "If the icon does not appear, or appears as generic or broken, you may have to "
+        "log out / in (or restart).\n\n"
+        "Alternatively, to run from the terminal:\n\n"
+        f"```. $HOME/.local/bin/{ indicator }.sh```\n" )
+
+#TODO I think for all { indicator }.issubset I will need a function
+# because indicator is a lower case string and not an enum,
+# whereas for operating system, it is already an enum. 
+    if { indicator }.issubset( { IndicatorName.INDICATORSCRIPTRUNNER } ):
+        usage += (
+            f"Any `Python3` scripts you add to `{ indicator }` may require "
+            "additional modules installed to the virtual environment at "
+            f"`{ utils.VENV_INSTALL }`.\n" )
+
+    if { indicator }.issubset( { IndicatorName.INDICATORTIDE } ):
+        usage += (
+            "You will need to write a `Python3` script to retrieve your tidal "
+            "data.  In addition, your `Python` script may require additional "
+            "modules installed to the virtual environment at "
+            f"`{ utils.VENV_INSTALL }`.\n" )
+
+    return usage + '\n'
+
+
 def _get_limitations(
     indicator ):
 
@@ -1507,10 +1518,11 @@ def build_readme(
     content = (
         _get_introduction( indicator ) +
         _get_install( indicator ) +
-        # _get_install_uninstall( indicator ) +
-        _get_usage( indicator, indicator_human_readable ) +
+        # _get_install_uninstall( indicator ) +  #TODO Eventually goes
+        # _get_usage( indicator, indicator_human_readable ) +#TODO Eventually goes 
+        _get_usageNEW( indicator, indicator_human_readable ) +
         _get_limitations( indicator ) +
-        # _get_install_uninstall( indicator, install = False ) +
+        # _get_install_uninstall( indicator, install = False ) + #TODO Eventually replaced
         _get_license( authors_emails, start_year ) )
 
     indicatorbase.IndicatorBase.write_text_file(
