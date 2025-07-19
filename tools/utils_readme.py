@@ -376,6 +376,14 @@ def _get_install(
         f"2. Install `{ indicator }` to a `Python3` virtual "
         f"environment at `{ utils.VENV_INSTALL }`.\n" )
 
+#TODO Maybe get the extension here and if not empty,
+# add a 3. and mention about the extension.
+#
+# But then for the bits below for scriptrunner/tide,
+# how to mention this?  As a general note here in the summary?
+#
+# Or maybe after the python venv section?
+
     if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
         content += (
             f"3. Any `Python` scripts you add to `{ indicator }` may "
@@ -405,6 +413,8 @@ def _get_install(
                     indicator,
                     operating_system ) )
 
+        #TODO elif fedora, manjaro, openSUSE.
+        # Maybe throw a value error or similar on the else.
 
         operating_system_to_contents[ operating_system ] = (
             "1. Install operating system packages:\n\n"
@@ -413,11 +423,10 @@ def _get_install(
             f"{ ' '.join( sorted( operating_system_dependencies ) ) }\n"
             "    ```\n\n" )
 
-        print( operating_system )
-        print( '\t' + operating_system_to_contents[ operating_system ] ) #TODO Testing
-        print()
-
-#TODO Do the python venv here
+        operating_system_to_contents[ operating_system ] += (
+            _get_installation_python_virtual_environmentNEW(
+                indicator,
+                operating_system ) )
 
         extension = _get_extensionNEW( operating_system )
         if extension:
@@ -427,6 +436,12 @@ def _get_install(
                 "    ```\n"
                 f"    { extension }\n"
                 "    ```\n\n" )
+
+        print( operating_system )
+        print( '\t' + operating_system_to_contents[ operating_system ] ) #TODO Testing
+        print()
+
+
 
     '''
     for operating_system in install_operating_system_to_packages:
@@ -666,6 +681,7 @@ def _get_extensionNEW(
 
     extension = ''
 
+#TODO Check this list.
     needs_extension = (
         _is_operating_system(
             operating_system,
@@ -680,11 +696,12 @@ def _get_extensionNEW(
             "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
             "    ```\n" )
 
+#TODO Check this list.
     needs_extension = (
         _is_operating_system(
             operating_system,
             OperatingSystem.FEDORA_40,
-            OperatingSystem.FEDORA_41.
+            OperatingSystem.FEDORA_41,
             OperatingSystem.FEDORA_42,
             OperatingSystem.KUBUNTU_2204,
             OperatingSystem.OPENSUSE_TUMBLEWEED ) )
@@ -787,30 +804,32 @@ def _get_installation_python_virtual_environmentNEW(
     #   https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
     #   https://pygobject.gnome.org/getting_started.html
     #   https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
-    pygobject_needs_to_be_pinned = (
-        { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
-        { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) or
-        { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.KUBUNTU_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.LINUX_MINT_CINNAMON_20 }.issubset( operating_systems ) or
-        { OperatingSystem.LINUX_MINT_CINNAMON_21 }.issubset( operating_systems ) or
-        { OperatingSystem.LINUX_MINT_CINNAMON_22 }.issubset( operating_systems ) or
-        { OperatingSystem.LUBUNTU_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.LUBUNTU_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_2004 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_BUDGIE_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_MATE_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_UNITY_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_UNITY_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.XUBUNTU_2404 }.issubset( operating_systems ) )
+    pygobject_pinned_to_3_50_0 = (
+        _is_operating_system(
+            operating_system,
+            OperatingSystem.DEBIAN_11,
+            OperatingSystem.DEBIAN_12,
+            OperatingSystem.KUBUNTU_2204,
+            OperatingSystem.KUBUNTU_2404,
+            OperatingSystem.LINUX_MINT_CINNAMON_20,
+            OperatingSystem.LINUX_MINT_CINNAMON_21,
+            OperatingSystem.LINUX_MINT_CINNAMON_22,
+            OperatingSystem.LUBUNTU_2204,
+            OperatingSystem.LUBUNTU_2404,
+            OperatingSystem.UBUNTU_2004,
+            OperatingSystem.UBUNTU_2204,
+            OperatingSystem.UBUNTU_2404,
+            OperatingSystem.UBUNTU_BUDGIE_2404,
+            OperatingSystem.UBUNTU_MATE_2404,
+            OperatingSystem.UBUNTU_UNITY_2204,
+            OperatingSystem.UBUNTU_UNITY_2404,
+            OperatingSystem.XUBUNTU_2404 ) )
 
     pygobject = "PyGObject"
-    if pygobject_needs_to_be_pinned:
+    if pygobject_pinned_to_3_50_0:
         pygobject = r"PyGObject\<=3.50.0"
 
-    message = (
+    return (
         f"Install `{ indicator }`, including icons, .desktop and run "
         "script, to the `Python3` virtual environment:\n"
         "    ```\n"
@@ -823,8 +842,6 @@ def _get_installation_python_virtual_environmentNEW(
         f"    . $(ls -d ${{venv}}/lib/python3.* | head -1)/"
         f"site-packages/${{indicator}}/platform/linux/install.sh\n"
         "    ```\n" )
-
-    return message
 
 
 def _get_installation_additional_python_modules(
