@@ -1030,20 +1030,21 @@ def build_wheel(
 
         message = _package_source( directory_dist, indicator )
 
-    if not message:
-        command = (
-            "python3 -m build --outdir "
-            f"{ directory_dist } { directory_dist / indicator }" )
-
-        stdout_, stderr_, return_code = (
-            indicatorbase.IndicatorBase.process_run( command ) )
-
-        message = ""
-        if return_code == 0:
-            message = stdout_
-
-        else:
-            message = _get_message( stderr_, return_code )
+#TODO Uncomment
+    # if not message:
+    #     command = (
+    #         "python3 -m build --outdir "
+    #         f"{ directory_dist } { directory_dist / indicator }" )
+    #
+    #     stdout_, stderr_, return_code = (
+    #         indicatorbase.IndicatorBase.process_run( command ) )
+    #
+    #     message = ""
+    #     if return_code == 0:
+    #         message = stdout_
+    #
+    #     else:
+    #         message = _get_message( stderr_, return_code )
 
 # TODO Uncomment
 #    shutil.rmtree( directory_dist / indicator )

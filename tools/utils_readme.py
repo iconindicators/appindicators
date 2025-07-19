@@ -16,6 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Why is Kubuntu 22.04 on its own?
+
+
 #TODO Look for all == with enums.
 # I think that is wrong and need to use the .value or .name instead.
 
@@ -90,21 +93,39 @@ class OperatingSystem( Enum ):
     XUBUNTU_2404 = auto()
 
 
+OPERATING_SYSTEMS_DEBIAN_BASED = {
+    OperatingSystem.DEBIAN_11,
+    OperatingSystem.DEBIAN_12,
+    OperatingSystem.KUBUNTU_2204,
+    OperatingSystem.KUBUNTU_2404,
+    OperatingSystem.LINUX_MINT_CINNAMON_20,
+    OperatingSystem.LINUX_MINT_CINNAMON_21,
+    OperatingSystem.LINUX_MINT_CINNAMON_22,
+    OperatingSystem.LUBUNTU_2204,
+    OperatingSystem.LUBUNTU_2404,
+    OperatingSystem.UBUNTU_2004,
+    OperatingSystem.UBUNTU_2204,
+    OperatingSystem.UBUNTU_2404,
+    OperatingSystem.UBUNTU_BUDGIE_2404,
+    OperatingSystem.UBUNTU_MATE_2404,
+    OperatingSystem.UBUNTU_UNITY_2204,
+    OperatingSystem.UBUNTU_UNITY_2404,
+    OperatingSystem.XUBUNTU_2404 }
 
 
-OPERATING_SYSTEMS_FEDORA_BASED = (
+OPERATING_SYSTEMS_FEDORA_BASED = {
     OperatingSystem.FEDORA_40,
     OperatingSystem.FEDORA_41,
-    OperatingSystem.FEDORA_42 )
+    OperatingSystem.FEDORA_42 }
 
 
-OPERATING_SYSTEMS_MANJARO_BASED = (
+OPERATING_SYSTEMS_MANJARO_BASED = {
     OperatingSystem.MANJARO_24,
-    OperatingSystem.MANJARO_25 )
+    OperatingSystem.MANJARO_25 }
 
 
-OPERATING_SYSTEMS_OPENSUSE_BASED = (
-    OperatingSystem.OPENSUSE_TUMBLEWEED )
+OPERATING_SYSTEMS_OPENSUSE_BASED = {
+    OperatingSystem.OPENSUSE_TUMBLEWEED }
 
 
 class IndicatorName( Enum ):
@@ -121,65 +142,25 @@ class IndicatorName( Enum ):
     INDICATORVIRTUALBOX = auto()
 
 
+#TODO Maybe this goes
 def _is_indicator(
     indicator,
     *indicators ):
 
-#TODO Can I use the subset way?
-    is_indicator = False
-    for indicator_ in indicators:
-        if indicator == indicator_.name.lower():
-            is_indicator = True
-            break
+    return { indicator }.issubset( { *indicators } )
 
-    return is_indicator
-
-
+#TODO Maybe this goes
 def _is_operating_system(
     operating_system,
     *operating_systems ):
 
-#TODO Can I use the subset way?
-    is_operating_system = False
-    for operating_system_ in operating_systems:
-        if operating_system == operating_system_:
-            is_operating_system = True
-            break
-
-    return is_operating_system
+    return { operating_system }.issubset( { *operating_systems } )
 
 
 def _is_operating_system_debian_based(
     operating_system ):
 
-    OPERATING_SYSTEMS_DEBIAN_BASED = (
-        OperatingSystem.DEBIAN_11,
-        OperatingSystem.DEBIAN_12,
-        OperatingSystem.KUBUNTU_2204,
-        OperatingSystem.KUBUNTU_2404,
-        OperatingSystem.LINUX_MINT_CINNAMON_20,
-        OperatingSystem.LINUX_MINT_CINNAMON_21,
-        OperatingSystem.LINUX_MINT_CINNAMON_22,
-        OperatingSystem.LUBUNTU_2204,
-        OperatingSystem.LUBUNTU_2404,
-        OperatingSystem.UBUNTU_2004,
-        OperatingSystem.UBUNTU_2204,
-        OperatingSystem.UBUNTU_2404,
-        OperatingSystem.UBUNTU_BUDGIE_2404,
-        OperatingSystem.UBUNTU_MATE_2404,
-        OperatingSystem.UBUNTU_UNITY_2204,
-        OperatingSystem.UBUNTU_UNITY_2404,
-        OperatingSystem.XUBUNTU_2404 )
-
-#TODO Can the subset be used here?
-    is_debian_based = False
-    for operating_system_ in OPERATING_SYSTEMS_DEBIAN_BASED:
-        if operating_system == operating_system_:
-            is_debian_based = True
-            print( operating_system )#TODO Test
-            break
-
-    return is_debian_based
+    return { operating_system }.issubset( OPERATING_SYSTEMS_DEBIAN_BASED )
 
 
 def _get_introduction(
@@ -374,111 +355,127 @@ def _get_install(
         "Installation and updating follow the same process:\n"
         "1. Install operating system packages.\n"
         f"2. Install `{ indicator }` to a `Python3` virtual "
-        f"environment at `{ utils.VENV_INSTALL }`.\n" )
+        f"environment at `{ utils.VENV_INSTALL }`.\n"
+        "3. Some distributions require an extension.\n" )
 
-#TODO Maybe get the extension here and if not empty,
-# add a 3. and mention about the extension.
-#
-# But then for the bits below for scriptrunner/tide,
-# how to mention this?  As a general note here in the summary?
-#
-# Or maybe after the python venv section?
-
-    if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
-        content += (
-            f"3. Any `Python` scripts you add to `{ indicator }` may "
-            "require additional modules installed to the virtual "
-            f"environment at `{ utils.VENV_INSTALL }`.\n" )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORTIDE ):
-        content += (
-            "3. You will need to write a `Python` script to retrieve your "
-            "tidal data.  In addition, your `Python` script may require "
-            "additional modules installed to the virtual environment at "
-            f"`{ utils.VENV_INSTALL }`.\n" )
-
-    print( content ) #TODO Testing
-
-    install_command_debian = "sudo apt-get -y install "
-    install_command_fedora = "sudo dnf -y install "
-    install_command_manjaro = "sudo pacman -S --noconfirm "
-    install_command_opensuse = "sudo zypper install -y "
-
-    operating_system_to_contents = { }
+    operating_system_to_content = { }
     for operating_system in OperatingSystem:
-        if _is_operating_system_debian_based( operating_system ):
-            install_command = install_command_debian
-            operating_system_dependencies = (
-                _get_operating_system_dependencies_debianNEWNEW(
+#TODO This set of if/elif can go into a function called
+#    _get_operating_system_packages( indicator, operating_system, is_install ) 
+# and is called here and in a similar function for creating the uninstall.
+        if { operating_system }.issubset( OPERATING_SYSTEMS_DEBIAN_BASED ):
+            install_command = "sudo apt-get -y install "
+            operating_system_packages = (
+                _get_operating_system_packages_debian(
                     indicator,
                     operating_system ) )
 
-        #TODO elif fedora, manjaro, openSUSE.
-        # Maybe throw a value error or similar on the else.
+        elif { operating_system }.issubset( OPERATING_SYSTEMS_FEDORA_BASED ):
+            install_command = "sudo dnf -y install "
+            # operating_system_packages = (
+            #     _get_operating_system_packages_fedora(
+            #         indicator,
+            #         operating_system ) )
 
-        operating_system_to_contents[ operating_system ] = (
+        elif { operating_system }.issubset( OPERATING_SYSTEMS_MANJARO_BASED ):
+            install_command = "sudo pacman -S --noconfirm "
+            # operating_system_packages = (
+            #     _get_operating_system_packages_manjaro(
+            #         indicator,
+            #         operating_system ) )
+
+        elif { operating_system }.issubset( OPERATING_SYSTEMS_OPENSUSE_BASED ):
+            install_command = "sudo zypper install -y "
+            # operating_system_packages = (
+            #     _get_operating_system_packages_opensuse(
+            #         indicator,
+            #         operating_system ) )
+
+        else:
+            raise ValueError( f"Unknown operating system : { operating_system }" )
+
+        operating_system_to_content[ operating_system ] = (
             "1. Install operating system packages:\n\n"
             "    ```\n"
             f"    { install_command }"
-            f"{ ' '.join( sorted( operating_system_dependencies ) ) }\n"
+            f"{ ' '.join( sorted( operating_system_packages ) ) }\n"
             "    ```\n\n" )
 
-        operating_system_to_contents[ operating_system ] += (
-            _get_installation_python_virtual_environmentNEW(
+        python = (
+            _get_python_virtual_environment_installation(
                 indicator,
                 operating_system ) )
 
+        operating_system_to_content[ operating_system ] += (
+            f"2. { python }" ) #TODO Why is this highlighted?
+
         extension = _get_extensionNEW( operating_system )
         if extension:
-            #TODO Tidy up wording below...
-            operating_system_to_contents[ operating_system ] += (
-                "3. Install extension blah...:\n\n"
-                "    ```\n"
-                f"    { extension }\n"
-                "    ```\n\n" )
+            operating_system_to_content[ operating_system ] += (
+                f"3. { extension }\n\n" )
 
-        print( operating_system )
-        print( '\t' + operating_system_to_contents[ operating_system ] ) #TODO Testing
-        print()
+#TODO Should the bits below for scriptrunner/tide, be mentioned in the
+# top level summary (as a summary)?
+#
+# Regardless, where to put the specifics about installing additional modules
+# into the venv?
+#
+# After the venv section.  Or after the last point (2 or 3)?
+    # if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
+    #     content += (
+    #         f"3. Any `Python` scripts you add to `{ indicator }` may "
+    #         "require additional modules installed to the virtual "
+    #         f"environment at `{ utils.VENV_INSTALL }`.\n" )
+    #
+    # if _is_indicator( indicator, IndicatorName.INDICATORTIDE ):
+    #     content += (
+    #         "3. You will need to write a `Python` script to retrieve your "
+    #         "tidal data.  In addition, your `Python` script may require "
+    #         "additional modules installed to the virtual environment at "
 
+    #         f"`{ utils.VENV_INSTALL }`.\n" )
 
+    rev_dict = {}
 
-    '''
-    for operating_system in install_operating_system_to_packages:
-        operating_system_to_contents[ operating_system ] = (
-            # "<details>"
-            # f"<summary><b>{ summary }</b></summary>\n\n"
+    # Find all keys with same value, group and swap grouped keys with values.
+    for key, value in operating_system_to_content.items():
+        rev_dict.setdefault( value, set() ).add( key )
 
-            "1. Install operating system packages:\n\n"
-            "    ```\n"
-            f"    { install_operating_system_to_packages[ operating_system ] }\n"
-            "    ```\n\n" )
-            # f"    { _get_extension( operating_systems ) }\n\n" )
+    # print( rev_dict.values() )
+    # print()
 
-        # print( operating_system.name )
-        # print( '\t' + ' '.join( sorted( operating_system_dependencies[ operating_system ] ) ) )
-        # print( '\t' + ' '.join( operating_system_dependencies[ operating_system ] ) )
+    # Sort grouped values.
+    for key, value in rev_dict.items():
+        rev_dict[ key ] = tuple( sorted( value, key = lambda key_: key_.name ) )
+    
+    # print( rev_dict.values() )
+    # print()
+
+    rev_rev_dict = {}
+
+    # Swap sorted, grouped values with keys.
+    for key, value in rev_dict.items():
+        rev_rev_dict.setdefault( value, set() ).add( key )
+    
+    # print( rev_rev_dict.keys() )
+    # print()
+    # print()
+
+    for key in sorted( rev_rev_dict.keys(), key = lambda key_: key_[ 0 ].name ):
+        # print( key )
+        # print()
+        # print( operating_system_to_content[ key[ 0 ] ] )
+        # print()
         # print()
 
-    content = f"{ title }{ additional_text }\n"
-
-    #TODO Ultimately don't want sorted by OS;
-    # want to group each OS full install text
-    # matched against all others.
-    # Group OS's with identical install text,
-    # sort the OS in each group,
-    # then write out by sorting according to first in each group.
-    sorted_operating_systems = (
-        sorted(
-            install_operating_system_to_packages.keys(),
-            key = lambda key_: key_.name ) )
-
-    for operating_system in sorted_operating_systems:
-        content += f"{ operating_system }\n"
-        content += operating_system_to_contents[ operating_system ]
+        print( str( key ))
+        content += (        
+            "<details>"
+            f"<summary><b>{ _get_summary( key ) }</b></summary>\n\n"
+            f"{operating_system_to_content[ key[ 0 ] ] }"
+            "</details>\n\n" )
 
     return content
-    '''
 
 
 def _get_install_operating_system_packages(
@@ -679,16 +676,15 @@ def _get_extension(
 def _get_extensionNEW(
     operating_system ):
 
-    extension = ''
+    extension = ""
 
 #TODO Check this list.
-    needs_extension = (
-        _is_operating_system(
-            operating_system,
+    if (
+        { operating_system }.issubset( {
             OperatingSystem.DEBIAN_11,
-            OperatingSystem.DEBIAN_12 ) )
+            OperatingSystem.DEBIAN_12 } ) ):
 
-    if needs_extension:
+        print
         extension = (
             "For the `appindicator` extension to take effect, log out / in "
             "(or restart) and in a terminal run:\n"
@@ -696,17 +692,15 @@ def _get_extensionNEW(
             "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
             "    ```\n" )
 
-#TODO Check this list.
-    needs_extension = (
-        _is_operating_system(
-            operating_system,
+#TODO Check this list
+    if (
+        { operating_system }.issubset( {
             OperatingSystem.FEDORA_40,
             OperatingSystem.FEDORA_41,
             OperatingSystem.FEDORA_42,
             OperatingSystem.KUBUNTU_2204,
-            OperatingSystem.OPENSUSE_TUMBLEWEED ) )
+            OperatingSystem.OPENSUSE_TUMBLEWEED } ) ):
 
-    if needs_extension:
         url = "https://extensions.gnome.org/extension/615/appindicator-support"
         extension = (
             "Install the "
@@ -780,7 +774,7 @@ def _get_installation_python_virtual_environment(
     return message
 
 
-def _get_installation_python_virtual_environmentNEW(
+def _get_python_virtual_environment_installation(
     indicator,
     operating_system ):
 
@@ -805,8 +799,7 @@ def _get_installation_python_virtual_environmentNEW(
     #   https://pygobject.gnome.org/getting_started.html
     #   https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
     pygobject_pinned_to_3_50_0 = (
-        _is_operating_system(
-            operating_system,
+        { operating_system }.issubset( {
             OperatingSystem.DEBIAN_11,
             OperatingSystem.DEBIAN_12,
             OperatingSystem.KUBUNTU_2204,
@@ -823,12 +816,13 @@ def _get_installation_python_virtual_environmentNEW(
             OperatingSystem.UBUNTU_MATE_2404,
             OperatingSystem.UBUNTU_UNITY_2204,
             OperatingSystem.UBUNTU_UNITY_2404,
-            OperatingSystem.XUBUNTU_2404 ) )
+            OperatingSystem.XUBUNTU_2404 } ) )
 
     pygobject = "PyGObject"
     if pygobject_pinned_to_3_50_0:
         pygobject = r"PyGObject\<=3.50.0"
 
+#TODO SHould all this text be here or just return the pygobject part?
     return (
         f"Install `{ indicator }`, including icons, .desktop and run "
         "script, to the `Python3` virtual environment:\n"
@@ -1138,11 +1132,11 @@ def _get_operating_system_dependencies_debianNEW(
     return dependencies
 
 
-def _get_operating_system_dependencies_debianNEWNEW(
+def _get_operating_system_packages_debian(
     indicator,
     operating_system ):
 
-    dependencies = [
+    packages = [
         "gir1.2-ayatanaappindicator3-0.1",
         "libcairo2-dev",
         "libgirepository1.0-dev",  #TODO I think need to move this out of here
@@ -1157,18 +1151,15 @@ def _get_operating_system_dependencies_debianNEWNEW(
 # If not, use the code above.
 
     needs_gnome_shell_extension_appindicator = (
-        _is_operating_system(
-            operating_system,
+        { operating_system }.issubset( {
             OperatingSystem.DEBIAN_11,
-            OperatingSystem.DEBIAN_12 ) )
+            OperatingSystem.DEBIAN_12 } ) )
 
     if needs_gnome_shell_extension_appindicator:
-        dependencies.extend( [
-            "gnome-shell-extension-appindicator" ] )
+        packages.append( "gnome-shell-extension-appindicator" )
 
     needs_calendar = (
-        _is_operating_system(
-            operating_system,
+        { operating_system }.issubset( {
             OperatingSystem.DEBIAN_11,
             OperatingSystem.DEBIAN_12,
             OperatingSystem.KUBUNTU_2204,
@@ -1183,49 +1174,46 @@ def _get_operating_system_dependencies_debianNEWNEW(
             OperatingSystem.UBUNTU_MATE_2404,
             OperatingSystem.UBUNTU_UNITY_2204,
             OperatingSystem.UBUNTU_UNITY_2404,
-            OperatingSystem.XUBUNTU_2404 ) )
+            OperatingSystem.XUBUNTU_2404 } ) )
 
-    if _is_indicator( indicator, IndicatorName.INDICATORFORTUNE ):
-        dependencies.extend( [
-            "fortune-mod",
-            "fortunes",
-            "wl-clipboard" ] )
+    if { indicator }.issubset( { IndicatorName.INDICATORFORTUNE } ):
+        packages.append( "fortune-mod" )
+        packages.append( "fortunes" )
+        packages.append( "wl-clipboard" )
 
-    if _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
-        dependencies.extend( [
-            "wl-clipboard" ] )
+    if { indicator }.issubset( { IndicatorName.INDICATORFORTUNE } ):
+        packages.append( "fortune-mod" )
+        packages.append( "fortunes" )
+        packages.append( "wl-clipboard" )
 
-        if needs_calendar:
-            dependencies.extend( [
-                "calendar" ] )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORPUNYCODE ):
-        dependencies.extend( [
-            "wl-clipboard" ] )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
-        dependencies.extend( [
-            "libnotify-bin",
-            "pulseaudio-utils" ] )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
-        dependencies.extend( [
-            "fortune-mod",
-            "fortunes",
-            "libnotify-bin",
-            "pulseaudio-utils",
-            "wl-clipboard",
-            "wmctrl" ] )
+    if { indicator }.issubset( { IndicatorName.INDICATORONTHISDAY } ):
+        packages.append( "wl-clipboard" )
 
         if needs_calendar:
-            dependencies.extend( [
-                "calendar" ] )
+            packages.append( "calendar" )
 
-    if _is_indicator( indicator, IndicatorName.INDICATORVIRTUALBOX ):
-        dependencies.extend( [
-            "wmctrl" ] )
+    if { indicator }.issubset( { IndicatorName.INDICATORPUNYCODE } ):
+        packages.append( "wl-clipboard" )
 
-    return dependencies
+    if { indicator }.issubset( { IndicatorName.INDICATORSCRIPTRUNNER } ):
+        packages.append( "libnotify-bin" )
+        packages.append( "pulseaudio-utils" )
+
+    if { indicator }.issubset( { IndicatorName.INDICATORTEST } ):
+        packages.append( "fortune-mod" )
+        packages.append( "fortunes" )
+        packages.append( "libnotify-bin" )
+        packages.append( "pulseaudio-utils" )
+        packages.append( "wl-clipboard" )
+        packages.append( "wmctrl" )
+
+        if needs_calendar:
+            packages.append( "calendar" )
+
+    if { indicator }.issubset( { IndicatorName.INDICATORVIRTUALBOX } ):
+        packages.append( "wmctrl" )
+
+    return packages
 
 
 def _get_operating_system_dependencies_fedora(
@@ -1516,51 +1504,30 @@ def build_readme(
     Path( directory ).mkdir( parents = True, exist_ok = True )
 
 
-
-    print( 111111111111111111111111111111111111 )
-    # operating_system_dependencies = (
-        # _get_operating_system_dependencies( indicator ) )
-
-    # sorted_operating_systems = (
-        # sorted(
-            # operating_system_dependencies.keys(),
-            # key = lambda key_: key_.name ) )
-
-    # for operating_system in sorted_operating_systems:
-    #     print( operating_system.name )
-    #     # print( '\t' + ' '.join( sorted( operating_system_dependencies[ operating_system ] ) ) )
-    #     print( '\t' + ' '.join( operating_system_dependencies[ operating_system ] ) )
-    #     print()
-
-    print( 222222222222222222222222222222222222 )
-
-    # install_operating_system_packages = (
-        # _get_install_operating_system_packages( operating_system_dependencies ) )
-
-    # for operating_system in sorted_operating_systems:
-    #     print( operating_system.name )
-    #     print( '\t' + install_operating_system_packages[ operating_system ] )
-    #     print()
-
-    print( 3333333333333333333333333333333333333 )
-
-
-    _get_install( indicator )
-
-    print( 4444444444444444444444444444444444444)
-
-    sys.exit()
-
-
-
     content = (
         _get_introduction( indicator ) +
-        _get_install_uninstall( indicator ) +
+        _get_install( indicator ) +
+        # _get_install_uninstall( indicator ) +
         _get_usage( indicator, indicator_human_readable ) +
         _get_limitations( indicator ) +
-        _get_install_uninstall( indicator, install = False ) +
+        # _get_install_uninstall( indicator, install = False ) +
         _get_license( authors_emails, start_year ) )
 
     indicatorbase.IndicatorBase.write_text_file(
         Path( directory, "README.md" ),
         content )
+
+
+    # sys.exit()
+
+    # content = (
+    #     _get_introduction( indicator ) +
+    #     _get_install_uninstall( indicator ) +
+    #     _get_usage( indicator, indicator_human_readable ) +
+    #     _get_limitations( indicator ) +
+    #     _get_install_uninstall( indicator, install = False ) +
+    #     _get_license( authors_emails, start_year ) )
+    #
+    # indicatorbase.IndicatorBase.write_text_file(
+    #     Path( directory, "README.md" ),
+    #     content )
