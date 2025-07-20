@@ -194,7 +194,164 @@ def _get_introduction(
     return introduction
 
 
+def _get_install_uninstall(
+    indicator,
+    content_top,
+    content_install_operating_system_packages,
+    install_uninstall_command_debian,
+    install_uninstall_command_fedora,
+    install_uninstall_command_manjaro,
+    install_uninstall_command_opensuse,
+    get_python_virtual_environment_install_uninstall_function,
+    get_extension_install_uninstall_function ):
+
+    content = content_top
+
+    operating_system_to_content = { }
+    for operating_system in OperatingSystem:
+        if _is_operating_system( operating_system, *OPERATING_SYSTEMS_DEBIAN_BASED ):
+            install_uninstall_command = install_uninstall_command_debian + ' '
+            _get_operating_system_packages_function = _get_operating_system_packages_debian
+
+        elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_FEDORA_BASED ):
+            install_uninstall_command = install_uninstall_command_fedora + ' '
+            _get_operating_system_packages_function = _get_operating_system_packages_fedora
+
+        elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_MANJARO_BASED ):
+            install_uninstall_command = install_uninstall_command_manjaro + ' '
+            _get_operating_system_packages_function = _get_operating_system_packages_manjaro
+
+        elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_OPENSUSE_BASED ):
+            install_uninstall_command = install_uninstall_command_opensuse + ' '
+            _get_operating_system_packages_function = _get_operating_system_packages_opensuse
+
+        else:
+            raise ValueError( f"Unknown operating system : { operating_system }" )
+
+        operating_system_packages = (
+            _get_operating_system_packages_function(
+                indicator,
+                operating_system ) )
+
+        operating_system_to_content[ operating_system ] = (
+            f"{ content_install_operating_system_packages }"
+            "    ```\n"
+            f"    { install_uninstall_command }"
+            f"{ ' '.join( sorted( operating_system_packages ) ) }\n"
+            "    ```\n\n" )
+
+        python_install_uninstall = (
+            get_python_virtual_environment_install_uninstall_function(
+                indicator,
+                operating_system ) )
+
+        operating_system_to_content[ operating_system ] += (
+            f"2. { python_install_uninstall }" )
+
+        extension = get_extension_install_uninstall_function( operating_system )
+        if extension:
+            operating_system_to_content[ operating_system ] += (
+                f"3. { extension }\n\n" )
+
+    rev_dict = {}
+
+    # Find all keys with same value, group and swap grouped keys with values.
+    for key, value in operating_system_to_content.items():
+        rev_dict.setdefault( value, set() ).add( key )
+
+    # print( rev_dict.values() )
+    # print()
+
+    # Sort grouped values.
+    for key, value in rev_dict.items():
+        rev_dict[ key ] = tuple( sorted( value, key = lambda key_: key_.name ) )
+
+    # print( rev_dict.values() )
+    # print()
+
+    rev_rev_dict = {}
+
+    # Swap sorted, grouped values with keys.
+    for key, value in rev_dict.items():
+        rev_rev_dict.setdefault( value, set() ).add( key )
+
+    # print( rev_rev_dict.keys() )
+    # print()
+    # print()
+
+    for key in sorted( rev_rev_dict.keys(), key = lambda key_: key_[ 0 ].name ):
+        # print( key )
+        # print()
+        # print( operating_system_to_content[ key[ 0 ] ] )
+        # print()
+        # print()
+
+        # print( str( key ))
+        content += (
+            "<details>"
+            f"<summary><b>{ _get_summary( key ) }</b></summary>\n\n"
+            f"{operating_system_to_content[ key[ 0 ] ] }"
+            "</details>\n\n" )
+
+    return content
+
+
 def _get_install(
+    indicator ):
+
+    return (
+        _get_install_uninstall(
+            indicator,
+
+            "Installation / Updating\n"
+            "-----------------------\n\n"
+            "Installation and updating follow the same process:\n"
+            "1. Install operating system packages.\n"
+            f"2. Install `{ indicator }` to a `Python3` virtual "
+            f"environment at `{ utils.VENV_INSTALL }`.\n"
+            "3. Some distributions require an extension.\n",
+
+            "1. Install operating system packages:\n\n",
+
+            "sudo apt-get -y install",
+
+            "sudo dnf -y install",
+
+            "sudo pacman -S --noconfirm",
+
+            "sudo zypper install -y",
+            
+             _get_python_virtual_environment_install,
+
+             _get_extension_install )  )
+
+
+def _get_uninstall(
+    indicator ):
+
+    return (
+        _get_install_uninstall(
+            indicator,
+
+            "Uninstall\n"
+            "---------\n\n",
+
+            "1. Uninstall operating system packages:\n\n",
+
+            "sudo apt-get -y remove",
+            
+            "sudo dnf -y remove",
+
+            "sudo pacman -R --noconfirm",
+
+            "sudo zypper remove -y",
+             
+             _get_python_virtual_environment_uninstall,
+
+             _get_extension_uninstall ) )
+
+
+def _get_installORIG(
     indicator ):
 
     content = (
@@ -257,7 +414,7 @@ def _get_install(
         operating_system_to_content[ operating_system ] += (
             f"2. { python_install }" )
 
-        extension = _get_extension( operating_system )
+        extension = _get_extension_install( operating_system )
         if extension:
             operating_system_to_content[ operating_system ] += (
                 f"3. { extension }\n\n" )
@@ -305,7 +462,7 @@ def _get_install(
     return content
 
 
-def _get_uninstall(
+def _get_uninstallORIG(
     indicator ):
 
     content = (
@@ -356,7 +513,7 @@ def _get_uninstall(
             "    ```\n\n" )
 
         operating_system_to_content[ operating_system ] += (
-            f"2. { _get_python_virtual_environment_removal( indicator ) }" )
+            f"2. { _get_python_virtual_environment_uninstall( indicator ) }" )
 
 #TODO Not sure about keep extension installed or uninstall...
 # Ideally, an extension which was installed should be uninstalled.
@@ -364,7 +521,7 @@ def _get_uninstall(
 # In reality, perhaps unwise to try to specify how to do this as it
 # depends on the distribution and version of the distribution.
 # Leave the extension in place; should not present a major drama!
-        # extension = _get_extension( operating_system )
+        # extension = _get_extension_uninstall( operating_system )
         # if extension:
         #     operating_system_to_content[ operating_system ] += (
         #         f"3. { extension }\n\n" )
@@ -412,7 +569,7 @@ def _get_uninstall(
     return content
 
 
-def _get_extension(
+def _get_extension_install(
     operating_system ):
 
     extension = ""
@@ -446,6 +603,13 @@ def _get_extension(
             f"[extension]({ url }).\n\n" )
 
     return extension
+
+
+def _get_extension_uninstall(
+    operating_system ):
+
+    return "" #TODO Should write something...
+
 
 
 def _get_python_virtual_environment_install(
@@ -513,8 +677,9 @@ def _get_python_virtual_environment_install(
         "    ```\n" )
 
 
-def _get_python_virtual_environment_removal(
-    indicator ):
+def _get_python_virtual_environment_uninstall(
+    indicator,
+    operating_system ):
 
     return (
         "2. Uninstall the indicator from the `Python3` virtual environment:\n"
