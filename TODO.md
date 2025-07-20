@@ -1,5 +1,13 @@
 # Immediate
 
+### Debian 13 / Ubuntu 26.04
+
+When these versions are released, will likely have to switch to
+libgirepository-2.0-dev and so changes need to be made in:
+ - build_wheel
+ - utils_readme
+
+
 ### No autostart on Kubuntu and Manjaro
 Given there is no autostart on Kubuntu 24.04 and Manjaro 24.04.7,
 should the autostart checkbox and delay spinner be hidden?
@@ -210,7 +218,7 @@ Both work!
 
 ### Swap Joda Time for Java 8 or Better
 
-According to 
+According to
   https://www.joda.org/joda-time
 if Java 8 or better is used, consider using standard Java library instead of
 Joda Time.
@@ -220,7 +228,7 @@ and if so, look at migrating.
 
 Perhaps could even move to Java 11.
 
-The file in question is 
+The file in question is
   stardatesystemtray/src/TrayIcon.java
 
   https://stackoverflow.com/questions/74994050/converting-joda-datetime-to-javatime

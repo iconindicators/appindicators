@@ -16,9 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Compare all code against original /home/bernard/utils_readme.py
-
-
 '''
 Create a README.md for an indicator.
 
@@ -26,6 +23,7 @@ References:
     https://pygobject.gnome.org/getting_started.html
     https://stackoverflow.com/q/70508775/2156453
     https://stackoverflow.com/q/60779139/2156453
+    https://stackoverflow.com/a/61164149/2156453
 '''
 
 
@@ -204,6 +202,17 @@ def _get_install_uninstall(
 
     operating_system_to_content = { }
     for operating_system in OperatingSystem:
+        if (
+            _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY )
+            and
+            _is_operating_system(
+                operating_system,
+                OperatingSystem.MANJARO_24,
+                OperatingSystem.MANJARO_25,
+                OperatingSystem.OPENSUSE_TUMBLEWEED ) ):
+
+            continue
+
         if _is_operating_system( operating_system, *OPERATING_SYSTEMS_DEBIAN_BASED ):
             install_uninstall_command = install_uninstall_command_debian
             _get_operating_system_packages_function = _get_operating_system_packages_debian
@@ -253,30 +262,29 @@ def _get_install_uninstall(
     for operating_system, content in operating_system_to_content.items():
         content_to_operating_systems.setdefault( content, set() ).add( operating_system )
 
-    # Sort within each group of operating systems.
+    # Sort within each of the groups.
     for content, operating_systems in content_to_operating_systems.items():
         content_to_operating_systems[ content ] = (
             tuple( sorted( operating_systems, key = lambda key_: key_.name ) ) )
 
-    # Swap content with sorted groups of operating systems.
+    # Swap content with sorted groups.
     operating_systems_to_content = { }
     for content, operating_systems in content_to_operating_systems.items():
         operating_systems_to_content.setdefault( operating_systems, set() ).add( content )
 
-    content = content_heading
-
-    # Generate content for group of operating systems,
-    # sorted by the first operating system of each group.
     operating_system_groups = (
         sorted(
             operating_systems_to_content.keys(),
             key = lambda key_: key_[ 0 ].name ) )
 
+    content = content_heading
     for operating_systems in operating_system_groups:
+        # The content is contained within a set as a result of the key/value
+        # swap, so extract from the set before use.
         content += (
             "<details>"
             f"<summary><b>{ _get_summary( operating_systems ) }</b></summary>\n\n"
-            f"{ operating_system_to_content[ operating_systems[ 0 ] ] }"  #TODO I dn't understand the zero here.
+            f"{ operating_systems_to_content[ operating_systems ].pop() }"
             "</details>\n\n" )
 
     return content
@@ -298,7 +306,7 @@ def _get_install(
             "sudo dnf -y install",
             "sudo pacman -S --noconfirm",
             "sudo zypper install -y",
-            
+
              _get_python_virtual_environment_install,
 
              _get_extension_install )  )
@@ -330,27 +338,23 @@ def _get_python_virtual_environment_install(
     indicator,
     operating_system ):
 
-#TODO Need to ensure that the correct libgirepository 1 or 2 is in the packages
-# section.
-#
-# For below, consider Ubuntu 24 to use libgirep 2
-    # On Debian based distributions, the latest version of PyGObject requires
+    # On Debian based distributions, PyGObject 3.51.0+ requires
     # libgirepository-2.0-dev which is only available on Debian 13+ and
     # Ubuntu 24.04+.
     #
-    # Ubuntu 24.04 has both libgirepository-2.0-dev and libgirepository1.0-dev
-    # and things seem to work just fine with libgirepository1.0-dev.
+    # Ubuntu 24.04 has both libgirepository-2.0-dev and libgirepository1.0-dev,
+    # so run with libgirepository1.0-dev.
     #
-    # Consequently, For Debian 11/12 and Ubuntu 20.04/22.04/24.04 PyGObject is
-    # pinned to 3.50.0 which is compatible with libgirepository1.0-dev.
+    # Therefore, for Debian 11/12 and Ubuntu 20.04/22.04/24.04 pin PyGObject
+    # to 3.50.0 which is compatible with libgirepository1.0-dev.
     #
     # This issue does not seem to affect Fedora, Manjaro nor openSUSE.
     #
     # References:
     #   https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
-    #   https://pygobject.gnome.org/getting_started.html
     #   https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
-    pygobject_pinned_to_3_50_0 = (
+    pygobject = "PyGObject"
+    if (
         _is_operating_system(
             operating_system,
             OperatingSystem.DEBIAN_11,
@@ -369,10 +373,8 @@ def _get_python_virtual_environment_install(
             OperatingSystem.UBUNTU_MATE_2404,
             OperatingSystem.UBUNTU_UNITY_2204,
             OperatingSystem.UBUNTU_UNITY_2404,
-            OperatingSystem.XUBUNTU_2404 ) )
+            OperatingSystem.XUBUNTU_2404 ) ):
 
-    pygobject = "PyGObject"
-    if pygobject_pinned_to_3_50_0:
         pygobject = r"PyGObject\<=3.50.0"
 
     return (
@@ -422,7 +424,6 @@ def _get_extension_install(
 
     extension = ""
 
-#TODO Check this list.
     if (
         { operating_system }.issubset( {
             OperatingSystem.DEBIAN_11,
@@ -435,7 +436,6 @@ def _get_extension_install(
             "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
             "    ```\n\n" )
 
-#TODO Check this list
     if (
         { operating_system }.issubset( {
             OperatingSystem.FEDORA_40,
@@ -456,7 +456,7 @@ def _get_extension_install(
 def _get_extension_uninstall(
     operating_system ):
 
-    return "" #TODO Should write something...
+    return "" #TODO Should write something...but what?
 
 
 def _get_summary(
@@ -475,7 +475,8 @@ def _get_summary(
                         ' ' + part[ 0 : 2 ] + '.' + part[ 2 : ] )
 
                 else:
-                    print( f"UNHANDLED PART '{ part }' for OPERATING SYSTEM '{ operating_system }'" )
+                    raise ValueError(
+                        f"Unhandled part '{ part }' for operating system '{ operating_system }'" )
 
             else:
                 if human_readable_operating_system.endswith( "Manjaro" ):
@@ -503,19 +504,15 @@ def _get_operating_system_packages_debian(
     packages = [
         "gir1.2-ayatanaappindicator3-0.1",
         "libcairo2-dev",
-        "libgirepository1.0-dev",  #TODO I think need to move this out of here
-        # as it will not apply for Debian 13 and Ubuntu 26.04 and possibly
-        # 24.04 as they want version 2
+        "libgirepository1.0-dev",
         "python3-pip",
         "python3-venv" ]
 
-    needs_gnome_shell_extension_appindicator = (
+    if (
         _is_operating_system(
             operating_system,
             OperatingSystem.DEBIAN_11,
-            OperatingSystem.DEBIAN_12 ) )
-
-    if needs_gnome_shell_extension_appindicator:
+            OperatingSystem.DEBIAN_12 ) ):
         packages.append( "gnome-shell-extension-appindicator" )
 
     needs_calendar = (
