@@ -193,7 +193,7 @@ def _get_introduction(
 
 def _get_install_uninstall(
     indicator,
-    content_top,
+    content_heading,
     content_install_uninstall_operating_system_packages,
     install_uninstall_command_debian,
     install_uninstall_command_fedora,
@@ -202,7 +202,7 @@ def _get_install_uninstall(
     get_python_virtual_environment_install_uninstall_function,
     get_extension_install_uninstall_function ):
 
-    content = content_top
+    content = content_heading
 
     operating_system_to_content = { }
     for operating_system in OperatingSystem:
@@ -231,7 +231,7 @@ def _get_install_uninstall(
                 operating_system ) )
 
         operating_system_to_content[ operating_system ] = (
-            f"{ content_install_uninstall_operating_system_packages }"
+            f"1. { content_install_uninstall_operating_system_packages }"
             "    ```\n"
             f"    { install_uninstall_command + ' ' }"
             f"{ ' '.join( sorted( operating_system_packages ) ) }\n"
@@ -248,7 +248,7 @@ def _get_install_uninstall(
         extension = get_extension_install_uninstall_function( operating_system )
         if extension:
             operating_system_to_content[ operating_system ] += (
-                f"3. { extension }\n\n" )
+                f"3. { extension }" )
 
     rev_dict = {}
 
@@ -287,7 +287,7 @@ def _get_install_uninstall(
         content += (
             "<details>"
             f"<summary><b>{ _get_summary( key ) }</b></summary>\n\n"
-            f"{operating_system_to_content[ key[ 0 ] ] }"
+            f"{ operating_system_to_content[ key[ 0 ] ] }"
             "</details>\n\n" )
 
     return content
@@ -301,14 +301,9 @@ def _get_install(
             indicator,
 
             "Installation / Updating\n"
-            "-----------------------\n\n"
-            "Installation and updating follow the same process:\n"
-            "1. Install operating system packages.\n"
-            f"2. Install `{ indicator }` to a `Python3` virtual "
-            f"environment at `{ utils.VENV_INSTALL }`.\n"
-            "3. Some distributions require an extension.\n",
+            "------------------------\n\n",
 
-            "1. Install operating system packages:\n\n",
+            "Install operating system packages:\n\n",
 
             "sudo apt-get -y install",
 
@@ -333,16 +328,16 @@ def _get_uninstall(
             "Uninstall\n"
             "---------\n\n",
 
-            "1. Uninstall operating system packages:\n\n",
+            "Uninstall operating system packages:\n\n",
 
             "sudo apt-get -y remove",
-            
+
             "sudo dnf -y remove",
 
             "sudo pacman -R --noconfirm",
 
             "sudo zypper remove -y",
-             
+
              _get_python_virtual_environment_uninstall,
 
              _get_extension_uninstall ) )
@@ -398,8 +393,9 @@ def _get_python_virtual_environment_install(
         pygobject = r"PyGObject\<=3.50.0"
 
     return (
-        f"Install `{ indicator }`, including icons, .desktop and run "
-        "script, to the `Python3` virtual environment:\n"
+        f"Create a `Python3` virtual environment at `{ utils.VENV_INSTALL }` "
+        f"and install `{ indicator }`, including icons, .desktop and run "
+        " script:\n"
         "    ```\n"
         f"    indicator={ indicator } && \\\n"
         f"    venv={ utils.VENV_INSTALL } && \\\n"
@@ -417,7 +413,8 @@ def _get_python_virtual_environment_uninstall(
     operating_system ):
 
     return (
-        "Uninstall the indicator from the `Python3` virtual environment:\n"
+        "Uninstall the indicator from the `Python3` virtual environment, "
+        "including icons, .desktop and run script:\n"
         "    ```\n"
         f"    indicator={ indicator } && \\\n"
         f"    venv={ utils.VENV_INSTALL } && \\\n"
@@ -429,7 +426,6 @@ def _get_python_virtual_environment_uninstall(
         "    deactivate && \\\n"
         f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
         "    ```\n\n"
-#TODO I think this text should be a new section called content_bottom
         f"    The configuration directory `$HOME/.config/{ indicator }` "
         "will not be deleted.\n\n"
         f"    The cache directory `$HOME/.cache/{ indicator }` "
@@ -454,7 +450,7 @@ def _get_extension_install(
             "(or restart) and in a terminal run:\n"
             "    ```\n"
             "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
-            "    ```\n" )
+            "    ```\n\n" )
 
 #TODO Check this list
     if (
