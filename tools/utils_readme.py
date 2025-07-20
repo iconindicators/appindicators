@@ -19,9 +19,6 @@
 #TODO Compare all code against original /home/bernard/utils_readme.py
 
 
-#TODO In the uninstall, what about remove/uninstall of extension (when was installed)?
-
-
 '''
 Create a README.md for an indicator.
 
@@ -197,7 +194,7 @@ def _get_introduction(
 def _get_install_uninstall(
     indicator,
     content_top,
-    content_install_operating_system_packages,
+    content_install_uninstall_operating_system_packages,
     install_uninstall_command_debian,
     install_uninstall_command_fedora,
     install_uninstall_command_manjaro,
@@ -210,19 +207,19 @@ def _get_install_uninstall(
     operating_system_to_content = { }
     for operating_system in OperatingSystem:
         if _is_operating_system( operating_system, *OPERATING_SYSTEMS_DEBIAN_BASED ):
-            install_uninstall_command = install_uninstall_command_debian + ' '
+            install_uninstall_command = install_uninstall_command_debian
             _get_operating_system_packages_function = _get_operating_system_packages_debian
 
         elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_FEDORA_BASED ):
-            install_uninstall_command = install_uninstall_command_fedora + ' '
+            install_uninstall_command = install_uninstall_command_fedora
             _get_operating_system_packages_function = _get_operating_system_packages_fedora
 
         elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_MANJARO_BASED ):
-            install_uninstall_command = install_uninstall_command_manjaro + ' '
+            install_uninstall_command = install_uninstall_command_manjaro
             _get_operating_system_packages_function = _get_operating_system_packages_manjaro
 
         elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_OPENSUSE_BASED ):
-            install_uninstall_command = install_uninstall_command_opensuse + ' '
+            install_uninstall_command = install_uninstall_command_opensuse
             _get_operating_system_packages_function = _get_operating_system_packages_opensuse
 
         else:
@@ -234,9 +231,9 @@ def _get_install_uninstall(
                 operating_system ) )
 
         operating_system_to_content[ operating_system ] = (
-            f"{ content_install_operating_system_packages }"
+            f"{ content_install_uninstall_operating_system_packages }"
             "    ```\n"
-            f"    { install_uninstall_command }"
+            f"    { install_uninstall_command + ' ' }"
             f"{ ' '.join( sorted( operating_system_packages ) ) }\n"
             "    ```\n\n" )
 
@@ -351,267 +348,6 @@ def _get_uninstall(
              _get_extension_uninstall ) )
 
 
-def _get_installORIG(
-    indicator ):
-
-    content = (
-        "Installation / Updating\n"
-        "-----------------------\n\n"
-        "Installation and updating follow the same process:\n"
-        "1. Install operating system packages.\n"
-        f"2. Install `{ indicator }` to a `Python3` virtual "
-        f"environment at `{ utils.VENV_INSTALL }`.\n"
-        "3. Some distributions require an extension.\n" )
-
-    operating_system_to_content = { }
-    for operating_system in OperatingSystem:
-#TODO This set of if/elif can go into a function called
-#    _get_operating_system_packages( indicator, operating_system, is_install )
-# and is called here and in a similar function for creating the uninstall.
-        if _is_operating_system( operating_system, *OPERATING_SYSTEMS_DEBIAN_BASED ):
-            install_command = "sudo apt-get -y install "
-            operating_system_packages = (
-                _get_operating_system_packages_debian(
-                    indicator,
-                    operating_system ) )
-
-        elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_FEDORA_BASED ):
-            install_command = "sudo dnf -y install "
-            operating_system_packages = (
-                _get_operating_system_packages_fedora(
-                    indicator,
-                    operating_system ) )
-
-        elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_MANJARO_BASED ):
-            install_command = "sudo pacman -S --noconfirm "
-            operating_system_packages = (
-                _get_operating_system_packages_manjaro(
-                    indicator,
-                    operating_system ) )
-
-        elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_OPENSUSE_BASED ):
-            install_command = "sudo zypper install -y "
-            operating_system_packages = (
-                _get_operating_system_packages_opensuse(
-                    indicator,
-                    operating_system ) )
-
-        else:
-            raise ValueError( f"Unknown operating system : { operating_system }" )
-
-        operating_system_to_content[ operating_system ] = (
-            "1. Install operating system packages:\n\n"
-            "    ```\n"
-            f"    { install_command }"
-            f"{ ' '.join( sorted( operating_system_packages ) ) }\n"
-            "    ```\n\n" )
-
-        python_install = (
-            _get_python_virtual_environment_install(
-                indicator,
-                operating_system ) )
-
-        operating_system_to_content[ operating_system ] += (
-            f"2. { python_install }" )
-
-        extension = _get_extension_install( operating_system )
-        if extension:
-            operating_system_to_content[ operating_system ] += (
-                f"3. { extension }\n\n" )
-
-    rev_dict = {}
-
-    # Find all keys with same value, group and swap grouped keys with values.
-    for key, value in operating_system_to_content.items():
-        rev_dict.setdefault( value, set() ).add( key )
-
-    # print( rev_dict.values() )
-    # print()
-
-    # Sort grouped values.
-    for key, value in rev_dict.items():
-        rev_dict[ key ] = tuple( sorted( value, key = lambda key_: key_.name ) )
-
-    # print( rev_dict.values() )
-    # print()
-
-    rev_rev_dict = {}
-
-    # Swap sorted, grouped values with keys.
-    for key, value in rev_dict.items():
-        rev_rev_dict.setdefault( value, set() ).add( key )
-
-    # print( rev_rev_dict.keys() )
-    # print()
-    # print()
-
-    for key in sorted( rev_rev_dict.keys(), key = lambda key_: key_[ 0 ].name ):
-        # print( key )
-        # print()
-        # print( operating_system_to_content[ key[ 0 ] ] )
-        # print()
-        # print()
-
-        # print( str( key ))
-        content += (
-            "<details>"
-            f"<summary><b>{ _get_summary( key ) }</b></summary>\n\n"
-            f"{operating_system_to_content[ key[ 0 ] ] }"
-            "</details>\n\n" )
-
-    return content
-
-
-def _get_uninstallORIG(
-    indicator ):
-
-    content = (
-        "Uninstall\n"
-        "---------\n\n" )
-
-    operating_system_to_content = { }
-    for operating_system in OperatingSystem:
-#TODO This set of if/elif can go into a function called
-#    _get_operating_system_packages( indicator, operating_system, is_install )
-# and is called here and in a similar function for creating the uninstall.
-        if _is_operating_system( operating_system, *OPERATING_SYSTEMS_DEBIAN_BASED ):
-            uninstall_command = "sudo apt-get -y remove "
-            operating_system_packages = (
-                _get_operating_system_packages_debian(
-                    indicator,
-                    operating_system ) )
-
-        elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_FEDORA_BASED ):
-            uninstall_command = "sudo dnf -y remove "
-            operating_system_packages = (
-                _get_operating_system_packages_fedora(
-                    indicator,
-                    operating_system ) )
-
-        elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_MANJARO_BASED ):
-            uninstall_command = "sudo pacman -R --noconfirm "
-            operating_system_packages = (
-                _get_operating_system_packages_manjaro(
-                    indicator,
-                    operating_system ) )
-
-        elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_OPENSUSE_BASED ):
-            uninstall_command = "sudo zypper remove -y "
-            operating_system_packages = (
-                _get_operating_system_packages_opensuse(
-                    indicator,
-                    operating_system ) )
-
-        else:
-            raise ValueError( f"Unknown operating system : { operating_system }" )
-
-        operating_system_to_content[ operating_system ] = (
-            "1. Uninstall operating system packages:\n\n"
-            "    ```\n"
-            f"    { uninstall_command }"
-            f"{ ' '.join( sorted( operating_system_packages ) ) }\n"
-            "    ```\n\n" )
-
-        operating_system_to_content[ operating_system ] += (
-            f"2. { _get_python_virtual_environment_uninstall( indicator ) }" )
-
-#TODO Not sure about keep extension installed or uninstall...
-# Ideally, an extension which was installed should be uninstalled.
-#
-# In reality, perhaps unwise to try to specify how to do this as it
-# depends on the distribution and version of the distribution.
-# Leave the extension in place; should not present a major drama!
-        # extension = _get_extension_uninstall( operating_system )
-        # if extension:
-        #     operating_system_to_content[ operating_system ] += (
-        #         f"3. { extension }\n\n" )
-
-    rev_dict = {}
-
-    # Find all keys with same value, group and swap grouped keys with values.
-    for key, value in operating_system_to_content.items():
-        rev_dict.setdefault( value, set() ).add( key )
-
-    # print( rev_dict.values() )
-    # print()
-
-    # Sort grouped values.
-    for key, value in rev_dict.items():
-        rev_dict[ key ] = tuple( sorted( value, key = lambda key_: key_.name ) )
-
-    # print( rev_dict.values() )
-    # print()
-
-    rev_rev_dict = {}
-
-    # Swap sorted, grouped values with keys.
-    for key, value in rev_dict.items():
-        rev_rev_dict.setdefault( value, set() ).add( key )
-
-    # print( rev_rev_dict.keys() )
-    # print()
-    # print()
-
-    for key in sorted( rev_rev_dict.keys(), key = lambda key_: key_[ 0 ].name ):
-        # print( key )
-        # print()
-        # print( operating_system_to_content[ key[ 0 ] ] )
-        # print()
-        # print()
-
-        # print( str( key ))
-        content += (
-            "<details>"
-            f"<summary><b>{ _get_summary( key ) }</b></summary>\n\n"
-            f"{operating_system_to_content[ key[ 0 ] ] }"
-            "</details>\n\n" )
-
-    return content
-
-
-def _get_extension_install(
-    operating_system ):
-
-    extension = ""
-
-#TODO Check this list.
-    if (
-        { operating_system }.issubset( {
-            OperatingSystem.DEBIAN_11,
-            OperatingSystem.DEBIAN_12 } ) ):
-
-        extension = (
-            "For the `appindicator` extension to take effect, log out / in "
-            "(or restart) and in a terminal run:\n"
-            "    ```\n"
-            "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
-            "    ```\n" )
-
-#TODO Check this list
-    if (
-        { operating_system }.issubset( {
-            OperatingSystem.FEDORA_40,
-            OperatingSystem.FEDORA_41,
-            OperatingSystem.FEDORA_42,
-            OperatingSystem.KUBUNTU_2204,
-            OperatingSystem.OPENSUSE_TUMBLEWEED } ) ):
-
-        url = "https://extensions.gnome.org/extension/615/appindicator-support"
-        extension = (
-            "Install the "
-            "`GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
-            f"[extension]({ url }).\n\n" )
-
-    return extension
-
-
-def _get_extension_uninstall(
-    operating_system ):
-
-    return "" #TODO Should write something...
-
-
-
 def _get_python_virtual_environment_install(
     indicator,
     operating_system ):
@@ -661,7 +397,6 @@ def _get_python_virtual_environment_install(
     if pygobject_pinned_to_3_50_0:
         pygobject = r"PyGObject\<=3.50.0"
 
-#TODO SHould all this text be here or just return the pygobject part?
     return (
         f"Install `{ indicator }`, including icons, .desktop and run "
         "script, to the `Python3` virtual environment:\n"
@@ -682,7 +417,7 @@ def _get_python_virtual_environment_uninstall(
     operating_system ):
 
     return (
-        "2. Uninstall the indicator from the `Python3` virtual environment:\n"
+        "Uninstall the indicator from the `Python3` virtual environment:\n"
         "    ```\n"
         f"    indicator={ indicator } && \\\n"
         f"    venv={ utils.VENV_INSTALL } && \\\n"
@@ -694,12 +429,55 @@ def _get_python_virtual_environment_uninstall(
         "    deactivate && \\\n"
         f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
         "    ```\n\n"
+#TODO I think this text should be a new section called content_bottom
         f"    The configuration directory `$HOME/.config/{ indicator }` "
         "will not be deleted.\n\n"
         f"    The cache directory `$HOME/.cache/{ indicator }` "
         "will be deleted.\n\n"
         "    If no other indicators remain installed, the virtual "
         "environment will be deleted.\n\n" )
+
+
+def _get_extension_install(
+    operating_system ):
+
+    extension = ""
+
+#TODO Check this list.
+    if (
+        { operating_system }.issubset( {
+            OperatingSystem.DEBIAN_11,
+            OperatingSystem.DEBIAN_12 } ) ):
+
+        extension = (
+            "For the `appindicator` extension to take effect, log out / in "
+            "(or restart) and in a terminal run:\n"
+            "    ```\n"
+            "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
+            "    ```\n" )
+
+#TODO Check this list
+    if (
+        { operating_system }.issubset( {
+            OperatingSystem.FEDORA_40,
+            OperatingSystem.FEDORA_41,
+            OperatingSystem.FEDORA_42,
+            OperatingSystem.KUBUNTU_2204,
+            OperatingSystem.OPENSUSE_TUMBLEWEED } ) ):
+
+        url = "https://extensions.gnome.org/extension/615/appindicator-support"
+        extension = (
+            "Install the "
+            "`GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
+            f"[extension]({ url }).\n\n" )
+
+    return extension
+
+
+def _get_extension_uninstall(
+    operating_system ):
+
+    return "" #TODO Should write something...
 
 
 def _get_summary(
