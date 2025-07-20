@@ -202,8 +202,6 @@ def _get_install_uninstall(
     get_python_virtual_environment_install_uninstall_function,
     get_extension_install_uninstall_function ):
 
-    content = content_heading
-
     operating_system_to_content = { }
     for operating_system in OperatingSystem:
         if _is_operating_system( operating_system, *OPERATING_SYSTEMS_DEBIAN_BASED ):
@@ -250,44 +248,35 @@ def _get_install_uninstall(
             operating_system_to_content[ operating_system ] += (
                 f"3. { extension }" )
 
-    rev_dict = {}
+    # Group by operating systems with identical content.
+    content_to_operating_systems = { }
+    for operating_system, content in operating_system_to_content.items():
+        content_to_operating_systems.setdefault( content, set() ).add( operating_system )
 
-    # Find all keys with same value, group and swap grouped keys with values.
-    for key, value in operating_system_to_content.items():
-        rev_dict.setdefault( value, set() ).add( key )
+    # Sort within each group of operating systems.
+    for content, operating_systems in content_to_operating_systems.items():
+        content_to_operating_systems[ content ] = (
+            tuple( sorted( operating_systems, key = lambda key_: key_.name ) ) )
 
-    # print( rev_dict.values() )
-    # print()
+    # Swap content with sorted groups of operating systems.
+    operating_systems_to_content = { }
+    for content, operating_systems in content_to_operating_systems.items():
+        operating_systems_to_content.setdefault( operating_systems, set() ).add( content )
 
-    # Sort grouped values.
-    for key, value in rev_dict.items():
-        rev_dict[ key ] = tuple( sorted( value, key = lambda key_: key_.name ) )
+    content = content_heading
 
-    # print( rev_dict.values() )
-    # print()
+    # Generate content for group of operating systems,
+    # sorted by the first operating system of each group.
+    operating_system_groups = (
+        sorted(
+            operating_systems_to_content.keys(),
+            key = lambda key_: key_[ 0 ].name ) )
 
-    rev_rev_dict = {}
-
-    # Swap sorted, grouped values with keys.
-    for key, value in rev_dict.items():
-        rev_rev_dict.setdefault( value, set() ).add( key )
-
-    # print( rev_rev_dict.keys() )
-    # print()
-    # print()
-
-    for key in sorted( rev_rev_dict.keys(), key = lambda key_: key_[ 0 ].name ):
-        # print( key )
-        # print()
-        # print( operating_system_to_content[ key[ 0 ] ] )
-        # print()
-        # print()
-
-        # print( str( key ))
+    for operating_systems in operating_system_groups:
         content += (
             "<details>"
-            f"<summary><b>{ _get_summary( key ) }</b></summary>\n\n"
-            f"{ operating_system_to_content[ key[ 0 ] ] }"
+            f"<summary><b>{ _get_summary( operating_systems ) }</b></summary>\n\n"
+            f"{ operating_system_to_content[ operating_systems[ 0 ] ] }"  #TODO I dn't understand the zero here.
             "</details>\n\n" )
 
     return content
