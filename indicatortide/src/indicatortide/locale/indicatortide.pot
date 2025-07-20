@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatortide 1.0.30\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-12 00:14+1000\n"
+"POT-Creation-Date: 2025-07-20 00:58+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -55,29 +55,29 @@ msgstr ""
 msgid "You must implement the function 'get_tide_data()'."
 msgstr ""
 
-#: indicatortide.py:169 indicatortide.py:212
+#: indicatortide.py:167 indicatortide.py:210
 msgid "HIGH"
 msgstr ""
 
-#: indicatortide.py:169 indicatortide.py:212
+#: indicatortide.py:167 indicatortide.py:210
 msgid "LOW"
 msgstr ""
 
-#: indicatortide.py:265
+#: indicatortide.py:263
 msgid "User Script"
 msgstr ""
 
-#: indicatortide.py:272
+#: indicatortide.py:270
 msgid ""
 "Full path and filename\n"
 "of user's Python3 script."
 msgstr ""
 
-#: indicatortide.py:277
+#: indicatortide.py:275
 msgid "Path and filename"
 msgstr ""
 
-#: indicatortide.py:286
+#: indicatortide.py:284
 msgid ""
 "Class name within the user script\n"
 "which must contain the function\n"
@@ -88,34 +88,34 @@ msgid ""
 "the tidal data."
 msgstr ""
 
-#: indicatortide.py:295
+#: indicatortide.py:293
 msgid "Class name"
 msgstr ""
 
-#: indicatortide.py:302
+#: indicatortide.py:300
 msgid "Show as submenus"
 msgstr ""
 
-#: indicatortide.py:303
+#: indicatortide.py:301
 msgid "Show each day's tides in a submenu."
 msgstr ""
 
-#: indicatortide.py:311
+#: indicatortide.py:309
 msgid "Except first day"
 msgstr ""
 
-#: indicatortide.py:312
+#: indicatortide.py:310
 msgid "Show the first day's tide in full."
 msgstr ""
 
-#: indicatortide.py:347
+#: indicatortide.py:345
 msgid "The user script path/filename cannot be found."
 msgstr ""
 
-#: indicatortide.py:357
+#: indicatortide.py:355
 msgid "The user script path/filename cannot be empty."
 msgstr ""
 
-#: indicatortide.py:365
+#: indicatortide.py:363
 msgid "The user script class name cannot be empty."
 msgstr ""

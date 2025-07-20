@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatortide 1.0.30\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-12 00:14+1000\n"
+"POT-Creation-Date: 2025-07-20 00:58+1000\n"
 "PO-Revision-Date: 2025-03-14 18:28+1100\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -14,8 +14,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: indicatortide.py:40
 msgid "Indicator Tide"
@@ -60,31 +60,31 @@ msgstr ""
 msgid "You must implement the function 'get_tide_data()'."
 msgstr ""
 
-#: indicatortide.py:169 indicatortide.py:212
+#: indicatortide.py:167 indicatortide.py:210
 msgid "HIGH"
 msgstr "ПРИЛИВ"
 
-#: indicatortide.py:169 indicatortide.py:212
+#: indicatortide.py:167 indicatortide.py:210
 msgid "LOW"
 msgstr "ОТЛИВ"
 
-#: indicatortide.py:265
+#: indicatortide.py:263
 #, fuzzy
 msgid "User Script"
 msgstr "Пользовательский сценарий"
 
-#: indicatortide.py:272
+#: indicatortide.py:270
 #, fuzzy
 msgid ""
 "Full path and filename\n"
 "of user's Python3 script."
 msgstr "Полный путь и имя файла пользовательского сценария Python3."
 
-#: indicatortide.py:277
+#: indicatortide.py:275
 msgid "Path and filename"
 msgstr ""
 
-#: indicatortide.py:286
+#: indicatortide.py:284
 #, fuzzy
 msgid ""
 "Class name within the user script\n"
@@ -102,35 +102,35 @@ msgstr ""
 "\n"
 "разработанную пользователем, для полученияданных о приливах."
 
-#: indicatortide.py:295
+#: indicatortide.py:293
 msgid "Class name"
 msgstr ""
 
-#: indicatortide.py:302
+#: indicatortide.py:300
 msgid "Show as submenus"
 msgstr "Отображать подменю"
 
-#: indicatortide.py:303
+#: indicatortide.py:301
 msgid "Show each day's tides in a submenu."
 msgstr "Отображать приливы каждого дня в виде подменю."
 
-#: indicatortide.py:311
+#: indicatortide.py:309
 msgid "Except first day"
 msgstr "Кроме первого дня"
 
-#: indicatortide.py:312
+#: indicatortide.py:310
 msgid "Show the first day's tide in full."
 msgstr "Отображать приливы первого дня полностью."
 
-#: indicatortide.py:347
+#: indicatortide.py:345
 msgid "The user script path/filename cannot be found."
 msgstr "Пользовательский сценарий с заданным именем не найден."
 
-#: indicatortide.py:357
+#: indicatortide.py:355
 msgid "The user script path/filename cannot be empty."
 msgstr "Имя пользовательского сценария не может быть пустым."
 
-#: indicatortide.py:365
+#: indicatortide.py:363
 msgid "The user script class name cannot be empty."
 msgstr "Имя класса в пользовательском сценарии не может быть пустым."
 

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorscriptrunner 1.0.25\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-12 22:50+1000\n"
+"POT-Creation-Date: 2025-07-20 00:58+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,7 +95,7 @@ msgstr ""
 msgid "Notification"
 msgstr ""
 
-#: indicatorscriptrunner.py:468 indicatorscriptrunner.py:1637
+#: indicatorscriptrunner.py:468 indicatorscriptrunner.py:1643
 msgid "Background"
 msgstr ""
 
@@ -104,7 +104,7 @@ msgid "Terminal"
 msgstr ""
 
 #: indicatorscriptrunner.py:470 indicatorscriptrunner.py:673
-#: indicatorscriptrunner.py:1665
+#: indicatorscriptrunner.py:1671
 msgid "Interval"
 msgstr ""
 
@@ -222,7 +222,7 @@ msgid "Copy Group"
 msgstr ""
 
 #: indicatorscriptrunner.py:1020 indicatorscriptrunner.py:1103
-#: indicatorscriptrunner.py:1368 indicatorscriptrunner.py:1741
+#: indicatorscriptrunner.py:1368 indicatorscriptrunner.py:1747
 msgid "The group cannot be empty."
 msgstr ""
 
@@ -238,7 +238,7 @@ msgstr ""
 msgid "Copy Script"
 msgstr ""
 
-#: indicatorscriptrunner.py:1112 indicatorscriptrunner.py:1749
+#: indicatorscriptrunner.py:1112 indicatorscriptrunner.py:1755
 msgid "The name cannot be empty."
 msgstr ""
 
@@ -297,30 +297,30 @@ msgid ""
 "only if the script returns non-empty text."
 msgstr ""
 
-#: indicatorscriptrunner.py:1577
+#: indicatorscriptrunner.py:1580
 msgid "Non-background"
 msgstr ""
 
-#: indicatorscriptrunner.py:1579
+#: indicatorscriptrunner.py:1582
 msgid ""
 "Non-background scripts are displayed\n"
 "in the menu and run when the user\n"
 "clicks on the corresponding menu item."
 msgstr ""
 
-#: indicatorscriptrunner.py:1598
+#: indicatorscriptrunner.py:1601
 msgid "Leave terminal open"
 msgstr ""
 
-#: indicatorscriptrunner.py:1600
+#: indicatorscriptrunner.py:1603
 msgid "Leave the terminal open on script completion."
 msgstr ""
 
-#: indicatorscriptrunner.py:1622
+#: indicatorscriptrunner.py:1625
 msgid "Default script"
 msgstr ""
 
-#: indicatorscriptrunner.py:1624
+#: indicatorscriptrunner.py:1627
 msgid ""
 "One script may be set as default\n"
 "which is run on a middle mouse\n"
@@ -329,7 +329,7 @@ msgid ""
 "Not supported on all desktops."
 msgstr ""
 
-#: indicatorscriptrunner.py:1639
+#: indicatorscriptrunner.py:1645
 msgid ""
 "A background script, added to the icon text,\n"
 "will be run at the interval specified.\n"
@@ -342,15 +342,15 @@ msgid ""
 "tag will remain in the icon text."
 msgstr ""
 
-#: indicatorscriptrunner.py:1660
+#: indicatorscriptrunner.py:1666
 msgid "Interval, in minutes, between runs."
 msgstr ""
 
-#: indicatorscriptrunner.py:1684
+#: indicatorscriptrunner.py:1690
 msgid "Force update"
 msgstr ""
 
-#: indicatorscriptrunner.py:1686
+#: indicatorscriptrunner.py:1692
 msgid ""
 "Useful for a script which generally returns\n"
 "an empty string, but on occasion returns\n"
@@ -362,23 +362,23 @@ msgid ""
 "if the script returned a non-empty message."
 msgstr ""
 
-#: indicatorscriptrunner.py:1730
+#: indicatorscriptrunner.py:1736
 msgid "Add Script"
 msgstr ""
 
-#: indicatorscriptrunner.py:1730
+#: indicatorscriptrunner.py:1736
 msgid "Edit Script"
 msgstr ""
 
-#: indicatorscriptrunner.py:1757
+#: indicatorscriptrunner.py:1763
 msgid "The command cannot be empty."
 msgstr ""
 
-#: indicatorscriptrunner.py:1764
+#: indicatorscriptrunner.py:1770
 msgid "A script of the same group and name already exists."
 msgstr ""
 
-#: indicatorscriptrunner.py:2116
+#: indicatorscriptrunner.py:2122
 msgid ""
 "No scripts are present.\n"
 "\n"

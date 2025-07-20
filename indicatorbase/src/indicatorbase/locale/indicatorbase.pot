@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorbase 1.0.1\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-14 15:43+1000\n"
+"POT-Creation-Date: 2025-07-19 22:15+1000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,52 +15,52 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: indicatorbase.py:299
+#: indicatorbase.py:284
 msgid "Initialising..."
 msgstr ""
 
-#: indicatorbase.py:347
+#: indicatorbase.py:332
 msgid "Refer to the Preferences for details."
 msgstr ""
 
-#: indicatorbase.py:349
+#: indicatorbase.py:334
 #, python-brace-format
 msgid "New version of {0} available..."
 msgstr ""
 
-#: indicatorbase.py:820 indicatorbase.py:1176
+#: indicatorbase.py:805 indicatorbase.py:1161
 msgid "Preferences"
 msgstr ""
 
-#: indicatorbase.py:820
+#: indicatorbase.py:805
 msgid "About"
 msgstr ""
 
-#: indicatorbase.py:820
+#: indicatorbase.py:805
 msgid "Quit"
 msgstr ""
 
-#: indicatorbase.py:1103
+#: indicatorbase.py:1088
 msgid "translator-credits"
 msgstr ""
 
-#: indicatorbase.py:1109
+#: indicatorbase.py:1094
 msgid "Credits"
 msgstr ""
 
-#: indicatorbase.py:1114 indicatorbase.py:1123
+#: indicatorbase.py:1099 indicatorbase.py:1108
 msgid "View the"
 msgstr ""
 
-#: indicatorbase.py:1115
+#: indicatorbase.py:1100
 msgid "changelog"
 msgstr ""
 
-#: indicatorbase.py:1116 indicatorbase.py:1125
+#: indicatorbase.py:1101 indicatorbase.py:1110
 msgid "text file."
 msgstr ""
 
-#: indicatorbase.py:1124
+#: indicatorbase.py:1109
 msgid "error log"
 msgstr ""
 
@@ -89,14 +89,14 @@ msgstr ""
 msgid "An update is available at <a href=\"{0}\">{1}</a>."
 msgstr ""
 
-#: indicatorbase.py:2406
+#: indicatorbase.py:2408
 msgid "Enabled"
 msgstr ""
 
-#: indicatorbase.py:2444
+#: indicatorbase.py:2446
 msgid "Add"
 msgstr ""
 
-#: indicatorbase.py:2445
+#: indicatorbase.py:2447
 msgid "Remove"
 msgstr ""
