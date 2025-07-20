@@ -16,29 +16,10 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Why is Kubuntu 22.04 on its own?
+#TODO Compare all code against original /home/bernard/utils_readme.py
 
 
-#TODO Look for all == with enums.
-# I think that is wrong and need to use the .value or .name instead.
-
-
-#TODO When creating the install section, ideally group by operating systems
-# with same package list.
-#
-# However for Debian family, may not be accurate.
-# Could have same package list but Debian needs the extension installed
-# whereas Ubuntu does not.
-# So cannot use ONLY the package list to group.
-
-
-#TODO I think the extra bit for installing the extension, depending on each
-# operating system, might go better as a point 3 instead?
-# Would then need in the intro to make a note about some OS's need a third
-# step for the extension or whatever.
-
-
-#TODO In the uninstall, what about remove/uninstall of gnome extension?
+#TODO In the uninstall, what about remove/uninstall of extension (when was installed)?
 
 
 '''
@@ -149,7 +130,6 @@ def _is_indicator(
     return { IndicatorName[ indicator.upper() ] }.issubset( { *indicators } )
 
 
-#TODO Maybe this goes
 def _is_operating_system(
     operating_system,
     *operating_systems ):
@@ -157,10 +137,19 @@ def _is_operating_system(
     return { operating_system }.issubset( { *operating_systems } )
 
 
-def _is_operating_system_debian_based(
-    operating_system ):
+def _get_indicator_names_sans_current(
+    indicator ):
 
-    return { operating_system }.issubset( OPERATING_SYSTEMS_DEBIAN_BASED )
+    indicator_as_enum = IndicatorName[ indicator.upper() ]
+
+    indicators = [ ]
+    for indicator_name in IndicatorName:
+        if indicator_name == indicator_as_enum:
+            continue
+
+        indicators.append( indicator_name.name.lower() )
+
+    return indicators
 
 
 def _get_introduction(
@@ -203,139 +192,6 @@ def _get_introduction(
     introduction += '\n'
 
     return introduction
-
-
-def _get_indicator_names_sans_current(
-    indicator ):
-
-    indicator_as_enum = IndicatorName[ indicator.upper() ]
-
-    indicators = [ ]
-    for indicator_name in IndicatorName:
-        if indicator_name == indicator_as_enum:
-            continue
-
-        indicators.append( indicator_name.name.lower() )
-
-    return indicators
-
-
-def _get_install_uninstall(
-    indicator,
-    install = True ):
-
-    if install:
-        function = _get_install_for_operating_system
-        command_debian = "sudo apt-get -y install"
-        command_fedora = "sudo dnf -y install"
-
-        additional_text = ""
-        if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
-            additional_text = (
-                f"3. Any `Python` scripts you add to `{ indicator }` may "
-                "require additional modules installed to the virtual "
-                f"environment at `{ utils.VENV_INSTALL }`.\n" )
-
-        if _is_indicator( indicator, IndicatorName.INDICATORTIDE ):
-            additional_text = (
-                "3. You will need to write a `Python` script to retrieve your "
-                "tidal data.  In addition, your `Python` script may require "
-                "additional modules installed to the virtual environment at "
-                f"`{ utils.VENV_INSTALL }`.\n" )
-
-        title = (
-            "Installation / Updating\n"
-            "-----------------------\n\n"
-            "Installation and updating follow the same process:\n"
-            "1. Install operating system packages.\n"
-            f"2. Install `{ indicator }` to a `Python3` virtual "
-            f"environment at `{ utils.VENV_INSTALL }`.\n"
-            f"{ additional_text }\n\n" )
-
-    else:
-        function = _get_uninstall_for_operating_system
-        command_debian = "sudo apt-get -y remove"
-        command_fedora = "sudo dnf -y remove"
-        title = (
-            "Uninstall\n"
-            "---------\n\n" )
-
-    return (
-        title +
-
-        function(
-            {
-                OperatingSystem.DEBIAN_11,
-                OperatingSystem.DEBIAN_12 },
-            indicator,
-            command_debian,
-            _get_operating_system_dependencies_debian ) +
-
-        function(
-            {
-                OperatingSystem.FEDORA_40,
-                OperatingSystem.FEDORA_41 },
-            indicator,
-            command_fedora,
-            _get_operating_system_dependencies_fedora ) +
-
-        function(
-            {
-                OperatingSystem.FEDORA_42 },
-            indicator,
-            command_fedora,
-            _get_operating_system_dependencies_fedora ) +
-
-        function(
-            {
-                OperatingSystem.MANJARO_24,
-                OperatingSystem.MANJARO_25 },
-            indicator,
-            "sudo pacman -S --noconfirm"
-            if install else
-            "sudo pacman -R --noconfirm",
-            _get_operating_system_dependencies_manjaro ) +
-
-        function(
-            { OperatingSystem.OPENSUSE_TUMBLEWEED },
-            indicator,
-            "sudo zypper install -y"
-            if install else
-            "sudo zypper remove -y",
-            _get_operating_system_dependencies_opensuse ) +
-
-        function(
-            {
-                OperatingSystem.LINUX_MINT_CINNAMON_20,
-                OperatingSystem.UBUNTU_2004 },
-            indicator,
-            command_debian,
-            _get_operating_system_dependencies_debian ) +
-
-#TODO I don't like how this function needs to know that the operating system
-# dependencies have differences across Debian type distros and
-# have to make multiple function calls.
-# Is it possible to have the debian function determine/sort all the variants
-# and group so that there is ONE function call here (similarly for all other
-# main distros)?
-        function(
-            {
-                OperatingSystem.KUBUNTU_2204,
-                OperatingSystem.KUBUNTU_2404,
-                OperatingSystem.LINUX_MINT_CINNAMON_21,
-                OperatingSystem.LINUX_MINT_CINNAMON_22,
-                OperatingSystem.LUBUNTU_2204,
-                OperatingSystem.LUBUNTU_2404,
-                OperatingSystem.UBUNTU_2204,
-                OperatingSystem.UBUNTU_2404,
-                OperatingSystem.UBUNTU_BUDGIE_2404,
-                OperatingSystem.UBUNTU_MATE_2404,
-                OperatingSystem.UBUNTU_UNITY_2204,
-                OperatingSystem.UBUNTU_UNITY_2404,
-                OperatingSystem.XUBUNTU_2404 },
-            indicator,
-            command_debian,
-            _get_operating_system_dependencies_debian ) )
 
 
 def _get_install(
@@ -393,15 +249,15 @@ def _get_install(
             f"{ ' '.join( sorted( operating_system_packages ) ) }\n"
             "    ```\n\n" )
 
-        python = (
-            _get_python_virtual_environment_installation(
+        python_install = (
+            _get_python_virtual_environment_install(
                 indicator,
                 operating_system ) )
 
         operating_system_to_content[ operating_system ] += (
-            f"2. { python }" ) #TODO Why is this highlighted?
+            f"2. { python_install }" )
 
-        extension = _get_extensionNEW( operating_system )
+        extension = _get_extension( operating_system )
         if extension:
             operating_system_to_content[ operating_system ] += (
                 f"3. { extension }\n\n" )
@@ -439,7 +295,7 @@ def _get_install(
         # print()
         # print()
 
-        print( str( key ))
+        # print( str( key ))
         content += (
             "<details>"
             f"<summary><b>{ _get_summary( key ) }</b></summary>\n\n"
@@ -449,202 +305,114 @@ def _get_install(
     return content
 
 
-def _get_install_operating_system_packages(
-    operating_system_dependencies ):
-
-    operating_system_packages = { }
-
-    command_debian = "sudo apt-get -y install "
-    command_fedora = "sudo dnf -y install "
-    command_manjaro = "sudo pacman -S --noconfirm "
-    command_opensuse = "sudo zypper install -y "
-
-    for operating_system in operating_system_dependencies:
-        if _is_operating_system_debian_based( operating_system ):
-            command = command_debian
-
-        operating_system_packages[ operating_system ] = (
-            command +
-            ' '.join( operating_system_dependencies[ operating_system ] ) )
-
-    return operating_system_packages
-
-
-def _get_operating_system_dependencies(
+def _get_uninstall(
     indicator ):
 
-    dependencies = { }
+    content = (
+        "Uninstall\n"
+        "---------\n\n" )
 
-    dependencies.update(
-        _get_operating_system_dependencies_debianNEW( indicator ) )
+    operating_system_to_content = { }
+    for operating_system in OperatingSystem:
+#TODO This set of if/elif can go into a function called
+#    _get_operating_system_packages( indicator, operating_system, is_install )
+# and is called here and in a similar function for creating the uninstall.
+        if _is_operating_system( operating_system, *OPERATING_SYSTEMS_DEBIAN_BASED ):
+            uninstall_command = "sudo apt-get -y remove "
+            operating_system_packages = (
+                _get_operating_system_packages_debian(
+                    indicator,
+                    operating_system ) )
 
-    '''
-    function(
-        {
-            OperatingSystem.FEDORA_40,
-            OperatingSystem.FEDORA_41 },
-        indicator,
-        command_fedora,
-        _get_operating_system_dependencies_fedora ) +
+        elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_FEDORA_BASED ):
+            uninstall_command = "sudo dnf -y remove "
+            operating_system_packages = (
+                _get_operating_system_packages_fedora(
+                    indicator,
+                    operating_system ) )
 
-    function(
-        {
-            OperatingSystem.FEDORA_42 },
-        indicator,
-        command_fedora,
-        _get_operating_system_dependencies_fedora ) +
+        elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_MANJARO_BASED ):
+            uninstall_command = "sudo pacman -R --noconfirm "
+            operating_system_packages = (
+                _get_operating_system_packages_manjaro(
+                    indicator,
+                    operating_system ) )
 
-    function(
-        {
-            OperatingSystem.MANJARO_24,
-            OperatingSystem.MANJARO_25 },
-        indicator,
-        "sudo pacman -S --noconfirm"
-        if install else
-        "sudo pacman -R --noconfirm",
-        _get_operating_system_dependencies_manjaro ) +
+        elif _is_operating_system( operating_system, *OPERATING_SYSTEMS_OPENSUSE_BASED ):
+            uninstall_command = "sudo zypper remove -y "
+            operating_system_packages = (
+                _get_operating_system_packages_opensuse(
+                    indicator,
+                    operating_system ) )
 
-    function(
-        { OperatingSystem.OPENSUSE_TUMBLEWEED },
-        indicator,
-        "sudo zypper install -y"
-        if install else
-        "sudo zypper remove -y",
-        _get_operating_system_dependencies_opensuse ) +
+        else:
+            raise ValueError( f"Unknown operating system : { operating_system }" )
 
-    function(
-        {
-            OperatingSystem.LINUX_MINT_CINNAMON_20,
-            OperatingSystem.UBUNTU_2004 },
-        indicator,
-        command_debian,
-        _get_operating_system_dependencies_debian ) +
+        operating_system_to_content[ operating_system ] = (
+            "1. Uninstall operating system packages:\n\n"
+            "    ```\n"
+            f"    { uninstall_command }"
+            f"{ ' '.join( sorted( operating_system_packages ) ) }\n"
+            "    ```\n\n" )
 
-#TODO I don't like how this function needs to know that the operating system
-# dependencies have differences across Debian type distros and
-# have to make multiple function calls.
-# Is it possible to have the debian function determine/sort all the variants
-# and group so that there is ONE function call here (similarly for all other
-# main distros)?
-    function(
-        {
-            OperatingSystem.KUBUNTU_2204,
-            OperatingSystem.KUBUNTU_2404,
-            OperatingSystem.LINUX_MINT_CINNAMON_21,
-            OperatingSystem.LINUX_MINT_CINNAMON_22,
-            OperatingSystem.LUBUNTU_2204,
-            OperatingSystem.LUBUNTU_2404,
-            OperatingSystem.UBUNTU_2204,
-            OperatingSystem.UBUNTU_2404,
-            OperatingSystem.UBUNTU_BUDGIE_2404,
-            OperatingSystem.UBUNTU_MATE_2404,
-            OperatingSystem.UBUNTU_UNITY_2204,
-            OperatingSystem.UBUNTU_UNITY_2404,
-            OperatingSystem.XUBUNTU_2404 },
-        indicator,
-        command_debian,
-        _get_operating_system_dependencies_debian ) +
-    '''
-    return dependencies
+        operating_system_to_content[ operating_system ] += (
+            f"2. { _get_python_virtual_environment_removal( indicator ) }" )
 
+#TODO Not sure about keep extension installed or uninstall...
+# Ideally, an extension which was installed should be uninstalled.
+#
+# In reality, perhaps unwise to try to specify how to do this as it
+# depends on the distribution and version of the distribution.
+# Leave the extension in place; should not present a major drama!
+        # extension = _get_extension( operating_system )
+        # if extension:
+        #     operating_system_to_content[ operating_system ] += (
+        #         f"3. { extension }\n\n" )
 
-def _os_has_no_calendar( operating_systems ):
-    '''
-    openSUSE Tumbleweed and Manjaro do not contain the package 'calendar'.
-    '''
-    return (
-        { OperatingSystem.MANJARO_24 }.issubset( operating_systems ) or
-        { OperatingSystem.MANJARO_25 }.issubset( operating_systems ) or
-        { OperatingSystem.OPENSUSE_TUMBLEWEED }.issubset( operating_systems ) )
+    rev_dict = {}
 
+    # Find all keys with same value, group and swap grouped keys with values.
+    for key, value in operating_system_to_content.items():
+        rev_dict.setdefault( value, set() ).add( key )
 
-def _get_install_for_operating_system(
-    operating_systems,
-    indicator,
-    install_command,
-    _get_operating_system_dependencies_function ):
+    # print( rev_dict.values() )
+    # print()
 
-    calendar_vital_to_indicator = (
-        _is_indicator(
-            indicator,
-            IndicatorName.INDICATORONTHISDAY ) )
+    # Sort grouped values.
+    for key, value in rev_dict.items():
+        rev_dict[ key ] = tuple( sorted( value, key = lambda key_: key_.name ) )
 
-    if calendar_vital_to_indicator and _os_has_no_calendar( operating_systems ):
-        installation = ''
+    # print( rev_dict.values() )
+    # print()
 
-    else:
-        summary = _get_summary( operating_systems )
+    rev_rev_dict = {}
 
-        # Installing operating system packages:
-        #   https://stackoverflow.com/a/61164149/2156453
-        #   https://pygobject.gnome.org/getting_started.html
-        operating_system_dependencies = (
-            _get_operating_system_dependencies_function(
-                operating_systems,
-                IndicatorName[ indicator.upper() ] ) )
+    # Swap sorted, grouped values with keys.
+    for key, value in rev_dict.items():
+        rev_rev_dict.setdefault( value, set() ).add( key )
 
-        installation = (
+    # print( rev_rev_dict.keys() )
+    # print()
+    # print()
+
+    for key in sorted( rev_rev_dict.keys(), key = lambda key_: key_[ 0 ].name ):
+        # print( key )
+        # print()
+        # print( operating_system_to_content[ key[ 0 ] ] )
+        # print()
+        # print()
+
+        # print( str( key ))
+        content += (
             "<details>"
-            f"<summary><b>{ summary }</b></summary>\n\n"
+            f"<summary><b>{ _get_summary( key ) }</b></summary>\n\n"
+            f"{operating_system_to_content[ key[ 0 ] ] }"
+            "</details>\n\n" )
 
-            "1. Install operating system packages:\n\n"
-            "    ```\n"
-            f"    { install_command } { operating_system_dependencies }\n"
-            "    ```\n"
-            f"    { _get_extension( operating_systems ) }\n\n" )
-
-        python_virtual_environment = (
-            _get_installation_python_virtual_environment(
-                indicator, operating_systems ) )
-
-        installation += f"2. { python_virtual_environment }"
-
-        additional_python_modules = (
-            _get_installation_additional_python_modules( indicator ) )
-
-        if additional_python_modules:
-            installation += f"3. { additional_python_modules }"
-
-        installation += "</details>\n\n"
-
-    return installation
+    return content
 
 
 def _get_extension(
-    operating_systems ):
-
-    extension = ''
-
-    needs_extension = (
-        { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
-        { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) )
-
-    if needs_extension:
-        extension = (
-            "For the `appindicator` extension to take effect, log out / in "
-            "(or restart) and in a terminal run:\n"
-            "    ```\n"
-            "    gnome-extensions enable ubuntu-appindicators@ubuntu.com\n"
-            "    ```\n" )
-
-    needs_extension = (
-        { OperatingSystem.FEDORA_40 }.issubset( operating_systems ) or
-        { OperatingSystem.FEDORA_41 }.issubset( operating_systems ) or
-        { OperatingSystem.FEDORA_42 }.issubset( operating_systems ) or
-        { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.OPENSUSE_TUMBLEWEED }.issubset( operating_systems ) )
-
-    if needs_extension:
-        url = "https://extensions.gnome.org/extension/615/appindicator-support"
-        extension = (
-            "Install the `GNOME Shell` "
-            "`AppIndicator and KStatusNotifierItem Support` "
-            f"[extension]({ url }).\n\n" )
-
-    return extension
-
-
-def _get_extensionNEW(
     operating_system ):
 
     extension = ""
@@ -655,7 +423,6 @@ def _get_extensionNEW(
             OperatingSystem.DEBIAN_11,
             OperatingSystem.DEBIAN_12 } ) ):
 
-        print
         extension = (
             "For the `appindicator` extension to take effect, log out / in "
             "(or restart) and in a terminal run:\n"
@@ -681,71 +448,7 @@ def _get_extensionNEW(
     return extension
 
 
-def _get_installation_python_virtual_environment(
-    indicator,
-    operating_systems ):
-
-#TODO Need to ensure that the correct libgirepository 1 or 2 is in the packages
-# section.
-#
-# For below, consider Ubuntu 24 to use libgirep 2
-    # On Debian based distributions, the latest version of PyGObject requires
-    # libgirepository-2.0-dev which is only available on Debian 13+ and
-    # Ubuntu 24.04+.
-    #
-    # Ubuntu 24.04 has both libgirepository-2.0-dev and libgirepository1.0-dev
-    # and things seem to work just fine with libgirepository1.0-dev.
-    #
-    # Consequently, For Debian 11/12 and Ubuntu 20.04/22.04/24.04 PyGObject is
-    # pinned to 3.50.0 which is compatible with libgirepository1.0-dev.
-    #
-    # This issue does not seem to affect Fedora, Manjaro nor openSUSE.
-    #
-    # References:
-    #   https://gitlab.gnome.org/GNOME/pygobject/-/blob/main/NEWS
-    #   https://pygobject.gnome.org/getting_started.html
-    #   https://github.com/beeware/toga/issues/3143#issuecomment-2727905226
-    pygobject_needs_to_be_pinned = (
-        { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
-        { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) or
-        { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.KUBUNTU_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.LINUX_MINT_CINNAMON_20 }.issubset( operating_systems ) or
-        { OperatingSystem.LINUX_MINT_CINNAMON_21 }.issubset( operating_systems ) or
-        { OperatingSystem.LINUX_MINT_CINNAMON_22 }.issubset( operating_systems ) or
-        { OperatingSystem.LUBUNTU_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.LUBUNTU_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_2004 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_BUDGIE_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_MATE_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_UNITY_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_UNITY_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.XUBUNTU_2404 }.issubset( operating_systems ) )
-
-    pygobject = "PyGObject"
-    if pygobject_needs_to_be_pinned:
-        pygobject = r"PyGObject\<=3.50.0"
-
-    message = (
-        f"Install `{ indicator }`, including icons, .desktop and run "
-        "script, to the `Python3` virtual environment:\n"
-        "    ```\n"
-        f"    indicator={ indicator } && \\\n"
-        f"    venv={ utils.VENV_INSTALL } && \\\n"
-        f"    if [ ! -d ${{venv}} ]; then python3 -m venv ${{venv}}; fi && \\\n"
-        f"    . ${{venv}}/bin/activate && \\\n"
-        f"    python3 -m pip install --upgrade { pygobject } ${{indicator}} && \\\n"
-        "    deactivate && \\\n"
-        f"    . $(ls -d ${{venv}}/lib/python3.* | head -1)/"
-        f"site-packages/${{indicator}}/platform/linux/install.sh\n"
-        "    ```\n" )
-
-    return message
-
-
-def _get_python_virtual_environment_installation(
+def _get_python_virtual_environment_install(
     indicator,
     operating_system ):
 
@@ -810,84 +513,28 @@ def _get_python_virtual_environment_installation(
         "    ```\n" )
 
 
-def _get_installation_additional_python_modules(
+def _get_python_virtual_environment_removal(
     indicator ):
 
-    message = ''
-
-    common = (
-        "For example, to install the `requests` module:\n"
+    return (
+        "2. Uninstall the indicator from the `Python3` virtual environment:\n"
         "    ```\n"
-        f"    . { utils.VENV_INSTALL }/bin/activate && \\\n"
-        "    python3 -m pip install --upgrade requests && \\\n"
-        "    deactivate\n"
-        "    ```\n" )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
-        message += (
-            f"If you have added any `Python` scripts to `{ indicator }`, "
-            f"you may need to install additional `Python` modules. { common }" )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORTIDE ):
-        message += (
-            "Your `Python` script which retrieves tidal data may require "
-            f"additional `Python` modules. { common }" )
-
-    return message
-
-
-def _get_uninstall_for_operating_system(
-    operating_systems,
-    indicator,
-    uninstall_command,
-    _get_operating_system_dependencies_function ):
-
-    calendar_vital_to_indicator = (
-        _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ) )
-
-    if calendar_vital_to_indicator and _os_has_no_calendar( operating_systems ):
-        uninstall = ''
-
-    else:
-        summary = _get_summary( operating_systems )
-
-        operating_system_dependencies = (
-            _get_operating_system_dependencies_function(
-                operating_systems, IndicatorName[ indicator.upper() ] ) )
-
-        # Ideally, an extension which was installed should be uninstalled.
-        #
-        # In reality, perhaps unwise to try to specify how to do this as it
-        # depends on the distribution and version of the distribution.
-        # Leave the extension in place; should not present a major drama!
-        uninstall = (
-            "<details>"
-            f"<summary><b>{ summary }</b></summary>\n\n"
-
-            "1. Uninstall operating system packages:\n\n"
-            "    ```\n"
-            f"    { uninstall_command } { operating_system_dependencies }\n"
-            "    ```\n\n"
-
-            "2. Uninstall the indicator from virtual environment:\n"
-            "    ```\n"
-            f"    indicator={ indicator } && \\\n"
-            f"    venv={ utils.VENV_INSTALL } && \\\n"
-            f"    $(ls -d ${{venv}}/lib/python3.* | head -1)/"
-            f"site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n"
-            f"    . ${{venv}}/bin/activate && \\\n"
-            f"    python3 -m pip uninstall --yes ${{indicator}} && \\\n"
-            "    count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && \\\n"
-            "    deactivate && \\\n"
-            f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
-            "    ```\n\n"
-            f"    The configuration directory `$HOME/.config/{ indicator }` "
-            "will not be deleted.\n\n"
-            "    If no other indicators remain installed, the virtual "
-            "environment will be deleted.\n\n"
-            "</details>\n\n" )
-
-    return uninstall
+        f"    indicator={ indicator } && \\\n"
+        f"    venv={ utils.VENV_INSTALL } && \\\n"
+        f"    $(ls -d ${{venv}}/lib/python3.* | head -1)/"
+        f"site-packages/${{indicator}}/platform/linux/uninstall.sh && \\\n"
+        f"    . ${{venv}}/bin/activate && \\\n"
+        f"    python3 -m pip uninstall --yes ${{indicator}} && \\\n"
+        "    count=$(python3 -m pip --disable-pip-version-check list | grep -o \"indicator\" | wc -l) && \\\n"
+        "    deactivate && \\\n"
+        f"    if [ \"$count\" -eq \"0\" ]; then rm -f -r ${{venv}}; fi \n"
+        "    ```\n\n"
+        f"    The configuration directory `$HOME/.config/{ indicator }` "
+        "will not be deleted.\n\n"
+        f"    The cache directory `$HOME/.cache/{ indicator }` "
+        "will be deleted.\n\n"
+        "    If no other indicators remain installed, the virtual "
+        "environment will be deleted.\n\n" )
 
 
 def _get_summary(
@@ -925,183 +572,6 @@ def _get_summary(
         summary.append( human_readable_operating_system.strip() )
 
     return " | ".join( sorted( summary ) )
-
-
-def _get_operating_system_dependencies_debian(
-    operating_systems,
-    indicator ):
-
-    dependencies = [
-        "gir1.2-ayatanaappindicator3-0.1",
-        "libcairo2-dev",
-        "libgirepository1.0-dev",
-        "python3-pip",
-        "python3-venv" ]
-
-    needs_gnome_shell_extension_appindicator = (
-        { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
-        { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) )
-
-    if needs_gnome_shell_extension_appindicator:
-        dependencies.append( "gnome-shell-extension-appindicator" )
-
-    if indicator == IndicatorName.INDICATORFORTUNE:
-        dependencies.append( "fortune-mod" )
-        dependencies.append( "fortunes" )
-        dependencies.append( "wl-clipboard" )
-
-    needs_calendar = (
-        { OperatingSystem.DEBIAN_11 }.issubset( operating_systems ) or
-        { OperatingSystem.DEBIAN_12 }.issubset( operating_systems ) or
-        { OperatingSystem.KUBUNTU_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.KUBUNTU_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.LINUX_MINT_CINNAMON_21 }.issubset( operating_systems ) or
-        { OperatingSystem.LINUX_MINT_CINNAMON_22 }.issubset( operating_systems ) or
-        { OperatingSystem.LUBUNTU_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.LUBUNTU_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_BUDGIE_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_MATE_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_UNITY_2204 }.issubset( operating_systems ) or
-        { OperatingSystem.UBUNTU_UNITY_2404 }.issubset( operating_systems ) or
-        { OperatingSystem.XUBUNTU_2404 }.issubset( operating_systems ) )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
-        dependencies.append( "wl-clipboard" )
-        if needs_calendar:
-            dependencies.append( "calendar" )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORPUNYCODE ):
-        dependencies.append( "wl-clipboard" )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
-        dependencies.append( "libnotify-bin" )
-        dependencies.append( "pulseaudio-utils" )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
-        dependencies.append( "fortune-mod" )
-        dependencies.append( "fortunes" )
-        dependencies.append( "libnotify-bin" )
-        dependencies.append( "pulseaudio-utils" )
-        dependencies.append( "wl-clipboard" )
-        dependencies.append( "wmctrl" )
-        if needs_calendar:
-            dependencies.append( "calendar" )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORVIRTUALBOX ):
-        dependencies.append( "wmctrl" )
-
-    return ' '.join( sorted( dependencies ) )
-
-
-def _get_operating_system_dependencies_debianNEW(
-    indicator ):
-
-    operating_systems = {
-        OperatingSystem.DEBIAN_11,
-        OperatingSystem.DEBIAN_12,
-        OperatingSystem.KUBUNTU_2204,
-        OperatingSystem.KUBUNTU_2404,
-        OperatingSystem.LINUX_MINT_CINNAMON_20,
-        OperatingSystem.LINUX_MINT_CINNAMON_21,
-        OperatingSystem.LINUX_MINT_CINNAMON_22,
-        OperatingSystem.LUBUNTU_2204,
-        OperatingSystem.LUBUNTU_2404,
-        OperatingSystem.UBUNTU_2004,
-        OperatingSystem.UBUNTU_2204,
-        OperatingSystem.UBUNTU_2404,
-        OperatingSystem.UBUNTU_BUDGIE_2404,
-        OperatingSystem.UBUNTU_MATE_2404,
-        OperatingSystem.UBUNTU_UNITY_2204,
-        OperatingSystem.UBUNTU_UNITY_2404,
-        OperatingSystem.XUBUNTU_2404 }
-
-    dependencies_common = [
-        "gir1.2-ayatanaappindicator3-0.1",
-        "libcairo2-dev",
-        "libgirepository1.0-dev",  #TODO I think need to move this out of here
-        # as it will not apply for Debian 13 and Ubuntu 26.04 and possible 24.04
-        # as they want version 2
-        "python3-pip",
-        "python3-venv" ]
-
-    dependencies = { }
-    for operating_system in operating_systems:
-        dependencies[ operating_system ] = dependencies_common[ : ]
-
-        needs_gnome_shell_extension_appindicator = (
-            _is_operating_system(
-                operating_system,
-                OperatingSystem.DEBIAN_11,
-                OperatingSystem.DEBIAN_12 ) )
-
-        if needs_gnome_shell_extension_appindicator:
-            dependencies[ operating_system ].extend( [
-                "gnome-shell-extension-appindicator" ] )
-
-        needs_calendar = (
-            _is_operating_system(
-                operating_system,
-                OperatingSystem.DEBIAN_11,
-                OperatingSystem.DEBIAN_12,
-                OperatingSystem.KUBUNTU_2204,
-                OperatingSystem.KUBUNTU_2404,
-                OperatingSystem.LINUX_MINT_CINNAMON_21,
-                OperatingSystem.LINUX_MINT_CINNAMON_22,
-                OperatingSystem.LUBUNTU_2204,
-                OperatingSystem.LUBUNTU_2404,
-                OperatingSystem.UBUNTU_2204,
-                OperatingSystem.UBUNTU_2404,
-                OperatingSystem.UBUNTU_BUDGIE_2404,
-                OperatingSystem.UBUNTU_MATE_2404,
-                OperatingSystem.UBUNTU_UNITY_2204,
-                OperatingSystem.UBUNTU_UNITY_2404,
-                OperatingSystem.XUBUNTU_2404 ) )
-
-        if _is_indicator( indicator, IndicatorName.INDICATORFORTUNE ):
-            dependencies[ operating_system ].extend( [
-                "fortune-mod",
-                "fortunes",
-                "wl-clipboard" ] )
-
-        if _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
-            dependencies[ operating_system ].extend( [
-                "wl-clipboard" ] )
-
-            if needs_calendar:
-                dependencies[ operating_system ].extend( [
-                    "calendar" ] )
-
-        if _is_indicator( indicator, IndicatorName.INDICATORPUNYCODE ):
-            dependencies[ operating_system ].extend( [
-                "wl-clipboard" ] )
-
-        if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
-            dependencies[ operating_system ].extend( [
-                "libnotify-bin",
-                "pulseaudio-utils" ] )
-
-        if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
-            dependencies[ operating_system ].extend( [
-                "fortune-mod",
-                "fortunes",
-                "libnotify-bin",
-                "pulseaudio-utils",
-                "wl-clipboard",
-                "wmctrl" ] )
-
-            if needs_calendar:
-                dependencies[ operating_system ].extend( [
-                    "calendar" ] )
-
-        if _is_indicator( indicator, IndicatorName.INDICATORVIRTUALBOX ):
-            dependencies[ operating_system ].extend( [
-                "wmctrl" ] )
-
-        dependencies[ operating_system ].sort()
-
-    return dependencies
 
 
 def _get_operating_system_packages_debian(
@@ -1229,53 +699,6 @@ def _get_operating_system_packages_fedora(
     return packages
 
 
-def _get_operating_system_dependencies_fedora(
-    operating_systems,
-    indicator ):
-
-    dependencies = [
-        "cairo-gobject-devel",
-        "gcc",
-        "gobject-introspection-devel",
-        "libappindicator-gtk3",
-        "python3-devel",
-        "python3-pip" ]
-
-    if indicator == IndicatorName.INDICATORFORTUNE:
-        dependencies.append( "fortune-mod" )
-        dependencies.append( "wl-clipboard" )
-
-    if indicator == IndicatorName.INDICATORONTHISDAY:
-        dependencies.append( "calendar" )
-        dependencies.append( "wl-clipboard" )
-
-    if indicator == IndicatorName.INDICATORPUNYCODE:
-        dependencies.append( "wl-clipboard" )
-
-    # Fedora 42 uses pw-play so pulseaudio is not required.
-    needs_pulseaudio = (
-        { OperatingSystem.FEDORA_40 }.issubset( operating_systems ) or
-        { OperatingSystem.FEDORA_41 }.issubset( operating_systems ) )
-
-    if indicator == IndicatorName.INDICATORSCRIPTRUNNER:
-        if needs_pulseaudio:
-            dependencies.append( "pulseaudio-utils" )
-
-    if indicator == IndicatorName.INDICATORTEST:
-        dependencies.append( "calendar" )
-        dependencies.append( "fortune-mod" )
-        dependencies.append( "wl-clipboard" )
-        dependencies.append( "wmctrl" )
-
-        if needs_pulseaudio:
-            dependencies.append( "pulseaudio-utils" )
-
-    if indicator == IndicatorName.INDICATORVIRTUALBOX:
-        dependencies.append( "wmctrl" )
-
-    return ' '.join( sorted( dependencies ) )
-
-
 def _get_operating_system_packages_manjaro(
     indicator,
     operating_system ):
@@ -1335,55 +758,13 @@ def _get_operating_system_packages_opensuse(
     return packages
 
 
-def _get_operating_system_dependencies_opensuse(
-    operating_systems,
-    indicator ):
-
-    dependencies = [
-        "cairo-devel",
-        "gcc",
-        "gobject-introspection-devel",
-        "python3-devel",
-        "typelib-1_0-AyatanaAppIndicator3-0_1" ]
-
-    if indicator == IndicatorName.INDICATORFORTUNE:
-        dependencies.append( "fortune" )
-        dependencies.append( "wl-clipboard" )
-
-    if indicator == IndicatorName.INDICATORONTHISDAY:
-        dependencies.append( "wl-clipboard" )
-
-    if indicator == IndicatorName.INDICATORPUNYCODE:
-        dependencies.append( "wl-clipboard" )
-
-    if indicator == IndicatorName.INDICATORTEST:
-        dependencies.append( "fortune" )
-        dependencies.append( "wl-clipboard" )
-
-    return ' '.join( sorted( dependencies ) )
-
-
 def _get_usage(
     indicator,
     indicator_human_readable ):
 
-    return (
-        "Usage\n"
-        "-----\n\n"
-
-        f"To run `{ indicator }`, press the `Super` key to show the "
-        "applications overlay (or similar), type "
-        f"`{ indicator_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Removes the ™ from VirtualBox™.
-        "into the search bar and the icon should be present for you to select.  "
-        "If the icon does not appear, or appears as generic or broken, you may have to "
-        "log out / in (or restart).\n\n"
-        "Alternatively, to run from the terminal:\n\n"
-        f"```. $HOME/.local/bin/{ indicator }.sh```\n\n" )
-
-
-def _get_usageNEW(
-    indicator,
-    indicator_human_readable ):
+    # Remove the ™ from VirtualBox™.
+    indicator_human_readable_cleaned = (
+        indicator_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) )
 
     usage = (
         "Usage\n"
@@ -1391,24 +772,24 @@ def _get_usageNEW(
 
         f"To run `{ indicator }`, press the `Super` key to show the "
         "applications overlay (or similar), type "
-        f"`{ indicator_human_readable.split( ' ', 1 )[ 1 ].lower().replace( '™', '' ) }` " # Removes the ™ from VirtualBox™.
-        "into the search bar and the icon should be present for you to select.  "
-        "If the icon does not appear, or appears as generic or broken, you may have to "
-        "log out / in (or restart).\n\n"
+        f"`{ indicator_human_readable_cleaned }` into the search bar and the "
+        "icon should be present for you to select.  "
+        "If the icon does not appear, or appears as generic or broken, you may "
+        "have to log out / in (or restart).\n\n"
         "Alternatively, to run from the terminal:\n\n"
         f"```. $HOME/.local/bin/{ indicator }.sh```\n\n" )
 
     if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
         usage += (
-            f"Any `Python3` scripts you add to `{ indicator }` may require "
-            "additional modules installed to the virtual environment at "
-            f"`{ utils.VENV_INSTALL }`.\n\n" )
+            f"Note that any `Python3` scripts you add to `{ indicator }` may "
+            "require additional modules installed to the virtual environment at"
+            f" `{ utils.VENV_INSTALL }`.\n\n" )
 
     if _is_indicator( indicator, IndicatorName.INDICATORTIDE ):
         usage += (
-            "You will need to write a `Python3` script to retrieve your tidal "
-            "data.  In addition, your `Python` script may require additional "
-            "modules installed to the virtual environment at "
+            "Note that you will need to write a `Python3` script to retrieve "
+            "your tidal data.  In addition, your `Python` script may require "
+            "additional modules installed to the virtual environment at "
             f"`{ utils.VENV_INSTALL }`.\n\n" )
 
     return usage
@@ -1588,25 +969,11 @@ def build_readme(
     content = (
         _get_introduction( indicator ) +
         _get_install( indicator ) +
-        # _get_install_uninstall( indicator ) +  #TODO Eventually goes
-        # _get_usage( indicator, indicator_human_readable ) +#TODO Eventually goes
-        _get_usageNEW( indicator, indicator_human_readable ) +
+        _get_usage( indicator, indicator_human_readable ) +
         _get_limitations( indicator ) +
-        # _get_install_uninstall( indicator, install = False ) + #TODO Eventually replaced
+        _get_uninstall( indicator ) +
         _get_license( authors_emails, start_year ) )
 
     indicatorbase.IndicatorBase.write_text_file(
         Path( directory, "README.md" ),
         content )
-
-    # content = (
-    #     _get_introduction( indicator ) +
-    #     _get_install_uninstall( indicator ) +
-    #     _get_usage( indicator, indicator_human_readable ) +
-    #     _get_limitations( indicator ) +
-    #     _get_install_uninstall( indicator, install = False ) +
-    #     _get_license( authors_emails, start_year ) )
-    #
-    # indicatorbase.IndicatorBase.write_text_file(
-    #     Path( directory, "README.md" ),
-    #     content )
