@@ -306,11 +306,8 @@ def _get_install(
             "Install operating system packages:\n\n",
 
             "sudo apt-get -y install",
-
             "sudo dnf -y install",
-
             "sudo pacman -S --noconfirm",
-
             "sudo zypper install -y",
             
              _get_python_virtual_environment_install,
@@ -331,11 +328,8 @@ def _get_uninstall(
             "Uninstall operating system packages:\n\n",
 
             "sudo apt-get -y remove",
-
             "sudo dnf -y remove",
-
             "sudo pacman -R --noconfirm",
-
             "sudo zypper remove -y",
 
              _get_python_virtual_environment_uninstall,
