@@ -1,6 +1,6 @@
 ## Build an Indicator's Wheel
 
-To build a wheel for `indicatortest` from the root of the source tree:
+To build a wheel for `indicatortest`, at the root of the source tree:
 
 ```
     python3 -m tools.build_wheel indicatortest
@@ -9,6 +9,35 @@ To build a wheel for `indicatortest` from the root of the source tree:
 which creates a virtual environment `venv_build`, updates locale files `.pot` / `.po` and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`.
 
 Additional indicators may be appended to the above command.
+
+---
+
+## Run an Indicator (from within the source tree)
+
+**Prerequisite:** the indicator's `.whl` must be built.
+
+To run `indicatortest`:
+
+```
+    python3 -m tools.run_indicator_from_source indicatortest
+```
+
+The virtual environment `venv_run` will be created.
+
+Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` [page](https://pypi.org/project/indicatortest).
+
+Additional indicators may be appended to the above command.
+
+If the indicator has not previously been installed to `$HOME/.local/venv_indicators`, the icon and locale will be absent.
+
+As part of running the indicator, a symbolic link to `indicatorbase.py` is created for all indicators.  To remove:
+
+```
+    for dirs in indicator*; do \
+    if [ -L $dirs/src/$dirs/indicatorbase.py ]; \
+    then rm $dirs/src/$dirs/indicatorbase.py; fi ; \
+    done;
+```
 
 ---
 
@@ -26,135 +55,7 @@ The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_in
 
 Additional indicators may be appended to the above command.
 
-Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the introduction above.
-
----
-
-## Run an Indicator (from within the source tree)
-
-**Prerequisite:** the indicator's `.whl` must be built.
-
-To run a `indicatortest`:
-
-```
-    python3 -m tools.run_indicator_from_source indicatortest
-```
-
-A virtual environment will be created at `venv_run`.
-
-Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` page listed in the introduction above.
-
-Additional indicators may be appended to the above command.
-
-If the indicator has not previously been installed to `$HOME/.local/venv_indicators`, the icon and locale will be absent.
-
-As part of running the indicator, a symbolic link to `indicatorbase.py` is created for all indicators.  To remove:
-
-```
-    for dirs in indicator*; do \
-    if [ -L $dirs/src/$dirs/indicatorbase.py ]; \
-    then rm $dirs/src/$dirs/indicatorbase.py; fi ; \
-    done;
-```
-
----
-
-## Development under Geany
-
-**Prerequisite:** the indicator's `.whl` must be built and run within the source tree.
-
-**Geany Setup**
-
-Run `Geany` then:
-
-```
-    Build > Set Build Commands > Execute Commands
-        Execute: cd /home/bernard/Programming/Indicators/%e/src ; /home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.%e"
-```
-
-NOTE: Because of %e variable above, running any of the `tools` is not possible, nor any other non-indicator code, such as `example.py` in `indicatorstardate`.
-
-**Project Setup**
-
-```
-    Project > New
-        Name: Indicators
-        Filename: /home/bernard/Programming/Indicators/project.geany
-        Basepath: /home/bernard/Programming/Indicators
-```
-
-The indicator should now run via `Build > Execute` or `F5`.
-
-NOTE: If editing `README.md` or any `markdown` document under `Geany`, using two spaces to insert an empty line may not work as `Geany` removes trailing spaces by default.
-
-References:
-
-- [https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment](https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment)
-- [https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide](https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide)
-
----
-
-## Development under Eclipse
-
-**Prerequisite:** the indicator's `.whl` must be built and run within the source tree.
-
-**Eclipse Setup**
-
-Run `Eclipse` and install [Liclipse](https://www.liclipse.com/) via the update site.
-
-Create a `Python` interpreter which uses `venv_run`:
-
-```
-    Window > Preferences
-        PyDev > Python Interpreter
-            New > Browse for python/pypy exe
-                Browse to venv_run/bin/python3
-                Interpreter Name: python3 venv_run
-                Check site-packages within venv_run
-
-        PyDev > Run
-            Check Launch modules with 'python -m mod.name'
-```
-
-**Project Setup**
-
-```
-    File > New > PyDev Project
-        Project Name: Indicators
-        Use default: Uncheck
-        Directory: /home/bernard/Programming/Indicators
-        Interpreter Name: python3 venv_run
-        Finish
-```
-
-**Run Indicator**
-
-```
-    Right click on indicatortest.py
-        Run As > Python Run
-```
-
-which should fail, then:
-
-```
-    Run > Run Configurations
-        Python Run: Indicators.indicatortest
-            Arguments
-                Working Directory:
-                    Other: ${workspace_loc:Indicators/indicatortest/src}
-            Interpreter
-                Interpreter: python3 venv_run
-```
-
-Repeat for each indicator, or as each indicator is run.
-
-**Run Tool**
-
-Under `Run Configurations...` for the tool, ensure that `Working Directory` is set to `Default` and the `Python` interpreter is set to `python3`.
-
-References:
-
-- [https://www.pydev.org/manual_101_interpreter.html](https://www.pydev.org/manual_101_interpreter.html)
+Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` [page](https://pypi.org/project/indicatortest).
 
 ---
 
@@ -268,6 +169,105 @@ To run `Pylint` over the entire project:
 ```
 
 Several checks have been disabled; re-enable by editing the script.
+
+---
+
+## Development under Geany
+
+**Prerequisite:** the indicator's `.whl` must be built and run within the source tree.
+
+**Geany Setup**
+
+Run `Geany` then:
+
+```
+    Build > Set Build Commands > Execute Commands
+        Execute: cd /home/bernard/Programming/Indicators/%e/src ; /home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.%e"
+```
+
+NOTE: Because of `%e` variable above, running any of the `tools` is not possible, nor any other non-indicator code, such as `example.py` in `indicatorstardate`.
+
+**Project Setup**
+
+```
+    Project > New
+        Name: Indicators
+        Filename: /home/bernard/Programming/Indicators/project.geany
+        Basepath: /home/bernard/Programming/Indicators
+```
+
+The indicator should now run via `Build > Execute` or `F5`.
+
+NOTE: If editing `README.md` or any `markdown` document under `Geany`, using two spaces to insert an empty line may not work as `Geany` removes trailing spaces by default.
+
+References:
+
+- [https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment](https://stackoverflow.com/questions/42013705/using-geany-with-python-virtual-environment)
+- [https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide](https://stackoverflow.com/questions/23951042/append-new-pythonpath-permanently-in-geany-ide)
+
+---
+
+## Development under Eclipse
+
+**Prerequisite:** the indicator's `.whl` must be built and run within the source tree.
+
+**Eclipse Setup**
+
+Run `Eclipse` and install [Liclipse](https://www.liclipse.com/) via the update site.
+
+Create a `Python` interpreter which uses `venv_run`:
+
+```
+    Window > Preferences
+        PyDev > Python Interpreter
+            New > Browse for python/pypy exe
+                Browse to venv_run/bin/python3
+                Interpreter Name: python3 venv_run
+                Check site-packages within venv_run
+
+        PyDev > Run
+            Check Launch modules with 'python -m mod.name'
+```
+
+**Project Setup**
+
+```
+    File > New > PyDev Project
+        Project Name: Indicators
+        Use default: Uncheck
+        Directory: /home/bernard/Programming/Indicators
+        Interpreter Name: python3 venv_run
+        Finish
+```
+
+**Run Indicator**
+
+```
+    Right click on indicatortest.py
+        Run As > Python Run
+```
+
+which should fail, then:
+
+```
+    Run > Run Configurations
+        Python Run: Indicators.indicatortest
+            Arguments
+                Working Directory:
+                    Other: ${workspace_loc:Indicators/indicatortest/src}
+            Interpreter
+                Interpreter: python3 venv_run
+```
+
+Repeat for each indicator, or as each indicator is run.
+
+**Run Tool**
+
+Under `Run Configurations...` for the tool, ensure that `Working Directory` is set to `Default` and the `Python` interpreter is set to `python3`.
+
+References:
+
+- [https://www.pydev.org/manual_101_interpreter.html](https://www.pydev.org/manual_101_interpreter.html)
 
 ---
 
