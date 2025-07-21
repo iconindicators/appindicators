@@ -33,6 +33,7 @@ import shutil
 import stat
 import sys
 
+from importlib.metadata import version
 from pathlib import Path
 
 if "../" not in sys.path:
@@ -502,8 +503,40 @@ def _get_translated_names_and_comments_from_po_files(
     return names_from_po_files, comments_from_po_files
 
 
+def _check_setuptools():
+    '''
+    PEP 639 allows the license to be specified in the pyproject.toml
+    as its own field.
+
+    This only works in setuptools 77.0.3 and later.
+
+    Ensure the build is on a suitable version.
+
+    https://peps.python.org/pep-0621/#license
+    https://packaging.python.org/en/latest/guides/writing-pyproject-toml
+    '''
+
+    setuptools_installed_version = (
+        indicatorbase.IndicatorBase.versiontuple( version( "setuptools" ) ) )
+
+    setuptools_support_for_pep_639 = (
+        indicatorbase.IndicatorBase.versiontuple( "77.0.3" ) )
+
+    message = ""
+    if setuptools_installed_version < setuptools_support_for_pep_639:
+        message = (
+            "Cannot build because setuptools is at version "
+            f"{ '.'''.join( map( str, setuptools_installed_version ) ) } "
+            "yet requires version "
+            f"{ '.'''.join( map( str, setuptools_support_for_pep_639 ) ) } "
+            "to handle the 'license' field in pyproject.toml." )
+
+    return message
+
+
 def _check_for_t_o_d_o_s(
     indicator ):
+    ''' Check through every file, not just source, for a T O D O'''
 
     paths = [
         "indicatorbase",
@@ -1006,6 +1039,9 @@ def build_wheel(
     '''
     message = ""
 
+    #TODO Put back in on release
+    # message = _check_setuptools()
+
     # This checks for T_O_D_O_s in EVERY file, irrespective of the indicator(s)
     # being built.
     #
@@ -1014,7 +1050,8 @@ def build_wheel(
     #
     # If all is well, comment out and run the build again to generate the wheel.
     #
-    # message = _check_for_t_o_d_o_s( indicator )
+    # if not message:
+    #     message = _check_for_t_o_d_o_s( indicator )
 
     if not message:
         directory_dist = (

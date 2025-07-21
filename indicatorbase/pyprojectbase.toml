@@ -10,10 +10,7 @@ authors = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
 maintainers = [
   { name = "Bernard Giannetti", email = "thebernmeister@hotmail.com" } ]
-#TODO The license line below is unsupported on Ubuntu 20.04.
-# When building for a release to PyPI / TestPyPI,
-# uncomment the license line and build on Ubuntu 22.04+
-#license = "GPL-3.0-or-later"
+#license = "GPL-3.0-or-later" #TODO Put back in on release and build on Ubuntu 22.04+ or Debian 12+
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
