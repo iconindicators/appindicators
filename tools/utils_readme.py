@@ -16,15 +16,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Mention something about log files?
-
-
 #TODO Mention something about running on a future distro that is not listed?
 # If so, also mention something about only long term releases are supported.
-
-
-#TODO Mention .config and/or .cache?
-# Maybe put all the above in a section on its own?
 
 
 '''
@@ -752,6 +745,33 @@ def _get_usage(
     return usage
 
 
+def _get_cache_config_log(
+    indicator ):
+
+    indicator_writes_to_cache = (
+        _is_indicator(
+            indicator,
+            IndicatorName.INDICATORFORTUNE,
+            IndicatorName.INDICATORLUNAR,
+            IndicatorName.INDICATORONTHISDAY,
+            IndicatorName.INDICATORTEST ) )
+
+    title = "Config / Log"
+    cache = ""
+    if indicator_writes_to_cache:
+        title = "Cache / " + title
+        cache = f"the cache at `$HOME/.cache/{ indicator }` and "
+
+    return (
+        f"{ title }\n"
+        f"{ '-' * len( title ) }\n\n"
+        "During the course of normal operation, the indicator may write to "
+        f"{ cache }"
+        f"the config at `$HOME/.config/{ indicator }`.\n\n"
+        "In the event an error occurs, a log file will be written to "
+        f"`$HOME/{ indicator }.log`.\n\n" )
+
+
 def _get_limitations(
     indicator ):
 
@@ -927,6 +947,7 @@ def build_readme(
         _get_introduction( indicator ) +
         _get_install( indicator ) +
         _get_usage( indicator, indicator_human_readable ) +
+        _get_cache_config_log( indicator ) +
         _get_limitations( indicator ) +
         _get_uninstall( indicator ) +
         _get_license( authors_emails, start_year ) )
