@@ -6,6 +6,7 @@ When these versions are released, will likely have to switch to
 libgirepository-2.0-dev and so changes need to be made in:
  - build_wheel
  - utils_readme
+and possibly elsewhere!
 
 
 ### No autostart on Kubuntu and Manjaro
