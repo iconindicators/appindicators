@@ -2,7 +2,7 @@
 
 ## v1.0.44 (2024-09-04)
 
-- Fortunes are now defined only by their .dat file, rather than an entire directory, allowing for precise control.
+- Fortunes are now defined only by a .dat file, rather than an entire directory.
 - No longer remove characters/glyphs which render as hexadecimal.  Has become a never ending chase as other distros/versions were tested, where some glyphs rendered correctly on one distro/version, yet on others required removal.
 - Fixed PyGObject 3.11 deprecation warnings.
 - Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
