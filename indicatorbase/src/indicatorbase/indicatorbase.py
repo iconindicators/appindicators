@@ -16,23 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Testing done on...
-# Debian 11 / 12
-# Fedora 38 / 39 - Install of PyGObject fails due to no CMAKE (suspect EOL)
-# Fedora 40 / 41 / 42
-# Kubuntu 22.04 / 24.04
-# Linux Mint 20 / 21 / 22 Cinnamon
-# Lubuntu 22.04 / 24.04
-# Manjaro 24.0.7
-# Manjaro 25.0.5
-# openSUSE Tumbleweed
-# Ubuntu 22.04 / 24.04
-# Ubuntu Budgie 24.04
-# Ubuntu MATE 24.04
-# Ubuntu Unity 22.04 / 24.04
-# Xubuntu 24.04
-
-
 #TODO Testing
 #
 #   Functional
