@@ -23,6 +23,10 @@
 # If so, also mention something about only long term releases are supported.
 
 
+#TODO Mention .config and/or .cache?
+# Maybe put all the above in a section on its own?
+
+
 '''
 Create a README.md for an indicator.
 
