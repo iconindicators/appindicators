@@ -118,6 +118,10 @@ class IndicatorName( Enum ):
     INDICATORVIRTUALBOX = auto()
 
 
+URL_GNOME_EXTENSION = (
+    "https://extensions.gnome.org/extension/615/appindicator-support" )
+
+
 def _is_indicator(
     indicator,
     *indicators ):
@@ -164,7 +168,34 @@ def _get_introduction(
 
             break
 
+
+    supported_indicators = [
+        "Debian",
+        "Fedora",
+        "Ubuntu" ]
+
+    # Manjaro and openSUSE Tumbleweed do not contain the 'calendar' package.
+    #
+    # For indicatoronthisday, drop references to Manjaro/openSUSE.
+    #
+    # For indicatortest, the calendar test is hidden and the remainder of the
+    # indicator works, so leave in the reference to openSUSE/Manjaro.
+    if not _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
+        supported_indicators.extend( [
+            "Manjaro",
+            "openSUSE" ] )
+
     introduction = (
+        f"`{ indicator }` { comments } on "
+        f"`{ '`, `' .join( sorted( supported_indicators, key = str.lower ) ) }`"
+        " and theoretically, any platform which supports the "
+        "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n" )
+
+
+    introduction += "xxx\n\n\n"
+
+        
+    introduction += (
         f"`{ indicator }` { comments } on `Debian`, `Ubuntu`, `Fedora`" )
 
     # Manjaro and openSUSE Tumbleweed do not contain the 'calendar' package.
@@ -444,11 +475,10 @@ def _get_extension_install(
             OperatingSystem.KUBUNTU_2204,
             OperatingSystem.OPENSUSE_TUMBLEWEED } ) ):
 
-        url = "https://extensions.gnome.org/extension/615/appindicator-support"
         extension = (
             "Install the "
             "`GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
-            f"[extension]({ url }).\n\n" )
+            f"[extension]({ URL_GNOME_EXTENSION }).\n\n" )
 
     return extension
 
@@ -457,6 +487,7 @@ def _get_extension_uninstall(
     operating_system ):
 
     return "" #TODO Should write something...but what?
+# URL_GNOME_EXTENSION
 
 
 def _get_summary(
