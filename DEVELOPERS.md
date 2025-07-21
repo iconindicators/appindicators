@@ -80,6 +80,9 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 TODO
     Test
     Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
+    For release to PyPI, can I also use the --repository flag (and what would it be)?
+    https://twine.readthedocs.io/en/stable/
+    https://packaging.python.org/en/latest/tutorials/packaging-projects/
 
 For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`:
 
@@ -97,14 +100,10 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
 
 ## Install from TestPyPI
 
-To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`, first, install the operating system packages listed at the indicator's `PyPI` page listed in the introduction above.
+To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`, first, install the operating system packages listed at the indicator's `PyPI` [page](https://pypi.org/project/indicatortest).
 
 Then install `indicatortest`:
 
-TODO
-    Should the command below be put into a script?
-    If so, perhaps also combine with install from PyPI with a switch?
-    Test (the command itself and/or if a script is created).
 ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
@@ -144,7 +143,7 @@ References:
 
 ## Install from PyPI
 
-To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` page listed in the introduction above.
+To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` [page](https://pypi.org/project/indicatortest).
 
 Note that if installing over an existing install with the same version, will need to add `--force-reinstall` after `--upgrade` (which may be removed from a [future release](https://github.com/pypa/pip/issues/8238) of `pip`).
 
