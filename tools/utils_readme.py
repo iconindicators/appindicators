@@ -435,9 +435,10 @@ def _get_extension_install(
     extension = ""
 
     if (
-        { operating_system }.issubset( {
+        _is_operating_system(
+            operating_system,
             OperatingSystem.DEBIAN_11,
-            OperatingSystem.DEBIAN_12 } ) ):
+            OperatingSystem.DEBIAN_12 ) ):
 
         extension = (
             "For the `appindicator` extension to take effect, log out / in "
@@ -447,12 +448,13 @@ def _get_extension_install(
             "    ```\n\n" )
 
     if (
-        { operating_system }.issubset( {
+        _is_operating_system(
+            operating_system,
             OperatingSystem.FEDORA_40,
             OperatingSystem.FEDORA_41,
             OperatingSystem.FEDORA_42,
             OperatingSystem.KUBUNTU_2204,
-            OperatingSystem.OPENSUSE_TUMBLEWEED } ) ):
+            OperatingSystem.OPENSUSE_TUMBLEWEED ) ):
 
         extension = (
             "Install the "
@@ -465,8 +467,23 @@ def _get_extension_install(
 def _get_extension_uninstall(
     operating_system ):
 
-    return "" #TODO Should write something...but what?
-# URL_GNOME_EXTENSION
+    extension = ""
+
+    if (
+        _is_operating_system(
+            operating_system,
+            OperatingSystem.FEDORA_40,
+            OperatingSystem.FEDORA_41,
+            OperatingSystem.FEDORA_42,
+            OperatingSystem.KUBUNTU_2204,
+            OperatingSystem.OPENSUSE_TUMBLEWEED ) ):
+
+        extension = (
+            "The `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
+            f"extension may be turned [off]({ URL_GNOME_EXTENSION }) if no "
+            "longer in use by other indicators.\n\n" )
+
+    return extension
 
 
 def _get_summary(
