@@ -97,7 +97,7 @@ def _create_update_pot(
     indicator,
     locale_directory,
     authors_emails,
-    version,
+    version_,
     copyright_ ):
 
     pot_file_new = f"{ locale_directory / indicator }.pot"
@@ -113,7 +113,7 @@ def _create_update_pot(
             f"-D { str( Path( indicator ) / 'src' / indicator ) } "
             f"--copyright-holder='{ authors_emails[ 0 ][ 0 ] }.' "
             f"--package-name={ indicator } "
-            f"--package-version={ version } "
+            f"--package-version={ version_ } "
             f"--msgid-bugs-address='<{ authors_emails[ 0 ][ 1 ] }>' "
             f"-o { pot_file_new }" ) )
 
@@ -226,7 +226,7 @@ def _update_po(
     indicator,
     pot_file,
     po_file_original,
-    version,
+    version_,
     copyright_ ):
 
     po_file_new = str( po_file_original ).replace( '.po', '.new.po' )
@@ -252,7 +252,7 @@ def _update_po(
         new = (
             re.sub(
                 "Project-Id-Version.*",
-                f"Project-Id-Version: { indicator } { version }\\\\n\"",
+                f"Project-Id-Version: { indicator } { version_ }\\\\n\"",
                 new ) )
 
         indicatorbase.IndicatorBase.write_text_file( po_file_new, new )
@@ -273,7 +273,7 @@ def _update_po(
 def _create_update_po(
     indicator,
     linguas_codes,
-    version,
+    version_,
     copyright_ ):
 
     locale_directory = _get_locale_directory( indicator )
@@ -292,7 +292,7 @@ def _create_update_po(
                     indicator,
                     pot_file,
                     po_file_original,
-                    version,
+                    version_,
                     copyright_ ) )
 
         else:
@@ -679,14 +679,14 @@ def _create_manifest_dot_in(
 def _get_version_in_changelog_markdown(
     changelog_markdown ):
 
-    version = ""
+    version_ = ""
     lines = indicatorbase.IndicatorBase.read_text_file( changelog_markdown )
     for line in lines:
         if line.startswith( "## v" ):
-            version = line.split( ' ' )[ 1 ][ 1 : ]
+            version_ = line.split( ' ' )[ 1 ][ 1 : ]
             break
 
-    return version
+    return version_
 
 
 def _get_pyproject_toml_authors(
