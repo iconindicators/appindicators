@@ -1039,17 +1039,10 @@ def build_wheel(
     '''
     message = ""
 
-    #TODO Put back in on release
+#TODO Put back in on release
     # message = _check_setuptools()
 
-    # This checks for T_O_D_O_s in EVERY file, irrespective of the indicator(s)
-    # being built.
-    #
-    # Run a build with the check uncommented and if any T_O_D_O_s are reported,
-    # check they are benign or do not apply.
-    #
-    # If all is well, comment out and run the build again to generate the wheel.
-    #
+#TODO Put back in on release
     # if not message:
     #     message = _check_for_t_o_d_o_s( indicator )
 
@@ -1067,23 +1060,19 @@ def build_wheel(
 
         message = _package_source( directory_dist, indicator )
 
-#TODO Uncomment
-    # if not message:
-    #     command = (
-    #         "python3 -m build --outdir "
-    #         f"{ directory_dist } { directory_dist / indicator }" )
-    #
-    #     stdout_, stderr_, return_code = (
-    #         indicatorbase.IndicatorBase.process_run( command ) )
-    #
-    #     message = ""
-    #     if return_code == 0:
-    #         message = stdout_
-    #
-    #     else:
-    #         message = _get_message( stderr_, return_code )
-
-# TODO Uncomment
-#    shutil.rmtree( directory_dist / indicator )
+    if not message:
+        command = (
+            "python3 -m build --outdir "
+            f"{ directory_dist } { directory_dist / indicator }" )
+    
+        stdout_, stderr_, return_code = (
+            indicatorbase.IndicatorBase.process_run( command ) )
+    
+        message = ""
+        if return_code == 0:
+            message = stdout_
+    
+        else:
+            message = _get_message( stderr_, return_code )
 
     sys.stdout.write( message )
