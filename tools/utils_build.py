@@ -536,7 +536,7 @@ def _check_setuptools():
 
 def _check_for_t_o_d_o_s(
     indicator ):
-    ''' Check through every file, not just source, for a T O D O'''
+    ''' Check through EVERY file for a T_O_D_O'''
 
     paths = [
         "indicatorbase",
