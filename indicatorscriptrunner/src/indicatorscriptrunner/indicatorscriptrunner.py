@@ -16,6 +16,11 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Think about using a frame or whatever it is called
+# to encapsulate/border the background and non-background
+# sections when add/edit a script.
+
+
 '''
 Application indicator to run a terminal command/script from the indicator menu.
 '''
