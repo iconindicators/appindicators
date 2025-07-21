@@ -16,6 +16,13 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
+#TODO Mention something about log files?
+
+
+#TODO Mention something about running on a future distro that is not listed?
+# If so, also mention something about only long term releases are supported.
+
+
 '''
 Create a README.md for an indicator.
 
