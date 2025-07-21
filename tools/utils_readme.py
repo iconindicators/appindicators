@@ -168,8 +168,7 @@ def _get_introduction(
 
             break
 
-
-    supported_indicators = [
+    supported_distributions = [
         "Debian",
         "Fedora",
         "Ubuntu" ]
@@ -181,33 +180,13 @@ def _get_introduction(
     # For indicatortest, the calendar test is hidden and the remainder of the
     # indicator works, so leave in the reference to openSUSE/Manjaro.
     if not _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
-        supported_indicators.extend( [
+        supported_distributions.extend( [
             "Manjaro",
             "openSUSE" ] )
 
     introduction = (
         f"`{ indicator }` { comments } on "
-        f"`{ '`, `' .join( sorted( supported_indicators, key = str.lower ) ) }`"
-        " and theoretically, any platform which supports the "
-        "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n" )
-
-
-    introduction += "xxx\n\n\n"
-
-        
-    introduction += (
-        f"`{ indicator }` { comments } on `Debian`, `Ubuntu`, `Fedora`" )
-
-    # Manjaro and openSUSE Tumbleweed do not contain the 'calendar' package.
-    #
-    # For indicatoronthisday, drop references to Manjaro/openSUSE.
-    #
-    # For indicatortest, the calendar test is hidden and the remainder of the
-    # indicator works, so leave in the reference to openSUSE/Manjaro.
-    if not _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
-        introduction += ", `openSUSE`, `Manjaro`"
-
-    introduction += (
+        f"`{ '`, `' .join( sorted( supported_distributions, key = str.lower ) ) }`"
         " and theoretically, any platform which supports the "
         "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n" )
 
