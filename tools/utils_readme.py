@@ -171,7 +171,28 @@ def _get_indicator_names_sans_current(
     return indicators
 
 
-def _get_introduction(
+def _get_introduction_project():
+
+    content = (
+        "AppIndicators for Ubuntu et al\n"
+        "------------------------------\n\n"
+
+        "This project contains application indicators written in `Python3` for "
+        "`Ubuntu 20.04` or similar:\n\n" )
+    
+    url = "https://pypi.org/project/"
+    for indicator in IndicatorName:
+        indicator_name = indicator.name.lower()
+        url_ = f"{ url }{ indicator_name }"
+        content += f"- `{ indicator_name }` [{ url_ }]({ url_ })\n"
+
+    content += "\n\n"
+
+    return content
+
+
+#TODO Mention that the install/uninstall etc can be found at the GitHub site.         
+def _get_introduction_indicator(
     indicator ):
 
     pattern_tag = re.compile( r".*comments = _\(.*" )
@@ -328,7 +349,7 @@ def _get_install(
             indicator,
 
             "Installation / Updating\n"
-            "------------------------\n\n",
+            "-----------------------\n\n",
 
             "Install operating system packages:\n\n",
 
@@ -975,44 +996,54 @@ def build_readme(
 
 
 def build_readme_for_project():
-    '''
-    Build the README.md file for the indicator.
-    '''
-    # Path( directory ).mkdir( parents = True, exist_ok = True )
-    #
+    ''' Build the README.md file for the project. '''
+
     # content = (
-    #     _get_introduction( indicator ) +
+    #     _get_introduction_project() +
     #     _get_install( indicator ) +
     #     _get_usage( indicator, indicator_human_readable ) +
     #     _get_cache_config_log( indicator ) +
     #     _get_limitations( indicator ) +
     #     _get_uninstall( indicator ) +
     #     _get_license( authors_emails, start_year ) )
-    #
-    # indicatorbase.IndicatorBase.write_text_file(
-    #     Path( directory, "README.md" ),
-    #     content )
+    
+    
+    content = (
+        "<details>"
+        f"<summary><b>indicatorfortune</b></summary>\n"
+        f"    indicatorfortune introduction\n\n"
+
+        f"install"
+        "<details>"
+        f"<summary><b>Debian 11</b></summary>\n"
+        f"install for debian"
+        "</details>\n"
+        "<details>"
+        f"<summary><b>Fedroa</b></summary>\n"
+        f"install for fedora"
+        "</details>\n"
+        
+        "</details>\n\n" )
+    
+    
+
+    indicatorbase.IndicatorBase.write_text_file(
+        Path( Path.cwd(), "README.md" ),
+        content )
     pass
 
 
 def build_readme_for_indicator(
     directory,
     indicator,
-    indicator_human_readable,
     authors_emails,
     start_year ):
-    '''
-    Build the README.md file for the indicator.
-    '''
+    '''     Build the README.md file for the indicator. '''
+
     Path( directory ).mkdir( parents = True, exist_ok = True )
 
     content = (
-        _get_introduction( indicator ) +
-        _get_install( indicator ) +
-        _get_usage( indicator, indicator_human_readable ) +
-        _get_cache_config_log( indicator ) +
-        _get_limitations( indicator ) +
-        _get_uninstall( indicator ) +
+        _get_introduction_indicator( indicator ) +
         _get_license( authors_emails, start_year ) )
 
     indicatorbase.IndicatorBase.write_text_file(

@@ -23,25 +23,17 @@ from . import utils
 
 
 if __name__ == "__main__":
-    indicators_to_process = (
-        utils.get_indicators_to_process(
-            "Build a Python3 wheel for one or more indicators at "
-            f"{ utils.RELEASE_DIRECTORY }.",
-            "build" ) )
+    command = (
+        "python3 -c \"import tools.utils_readme; "
+        f"tools.utils_readme.build_readme_for_project()\"" )
 
-    for indicator in indicators_to_process:
-        command = (
-            "python3 -c \"import tools.utils_build; "
-            f"tools.utils_readme.build_readme_for_project()\"" )
+    modules_to_install = [
+        "readme_renderer[md]" ]
 
-        modules_to_install = [
-            "readme_renderer[md]" ]
+    result = (
+        utils.python_run(
+            command,
+            utils.VENV_BUILD,
+            *modules_to_install ) )
 
-        result = (
-            utils.python_run(
-                command,
-                utils.VENV_BUILD,
-                *modules_to_install ) )
-
-        if not utils.print_stdout_stderr_return_code( *result ):
-            break
+    utils.print_stdout_stderr_return_code( *result )

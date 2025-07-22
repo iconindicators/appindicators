@@ -966,7 +966,6 @@ def _package_source(
         utils_readme.build_readme_for_indicator(
             directory_indicator,
             indicator,
-            name,
             authors,
             start_year )
 
