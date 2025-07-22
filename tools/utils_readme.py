@@ -47,6 +47,7 @@ References:
 '''
 
 
+import configparser
 import datetime
 import re
 import sys
@@ -177,21 +178,22 @@ def _get_introduction_project():
         "AppIndicators for Ubuntu et al\n"
         "------------------------------\n\n"
 
-        "This project contains application indicators written in `Python3` for "
-        "`Ubuntu 20.04` or similar:\n\n" )
-    
-    url = "https://pypi.org/project/"
+        "This project contains application indicators written in `Python3` "
+        "for `Ubuntu 20.04` or similar. For installation instructions and other "
+        "details, see the links below:\n\n" )
+
     for indicator in IndicatorName:
         indicator_name = indicator.name.lower()
-        url_ = f"{ url }{ indicator_name }"
-        content += f"- `{ indicator_name }` [{ url_ }]({ url_ })\n"
+        link = indicator_name
+        url = f"{ indicator_name }/{ indicator_name }.md"
+        content += f"- [{ link }]({ url })\n"
 
     content += "\n\n"
 
     return content
 
 
-#TODO Mention that the install/uninstall etc can be found at the GitHub site.         
+#TODO Mention that the install/uninstall etc can be found at the GitHub site.
 def _get_introduction_indicator(
     indicator ):
 
@@ -233,6 +235,7 @@ def _get_introduction_indicator(
 
     introduction += "Other indicators in this series are:\n"
     for indicator_ in _get_indicator_names_sans_current( indicator ):
+#TODO URL below needs to point to the .md on Github I think rather than pypi
         introduction += f"- [{ indicator_ }](https://pypi.org/project/{ indicator_ })\n"
 
     introduction += '\n'
@@ -995,57 +998,82 @@ def build_readme(
         content )
 
 
-def build_readme_for_project():
-    ''' Build the README.md file for the project. '''
-
-    # content = (
-    #     _get_introduction_project() +
-    #     _get_install( indicator ) +
-    #     _get_usage( indicator, indicator_human_readable ) +
-    #     _get_cache_config_log( indicator ) +
-    #     _get_limitations( indicator ) +
-    #     _get_uninstall( indicator ) +
-    #     _get_license( authors_emails, start_year ) )
-    
-    
-    content = (
-        "<details>"
-        f"<summary><b>indicatorfortune</b></summary>\n"
-        f"    indicatorfortune introduction\n\n"
-
-        f"install"
-        "<details>"
-        f"<summary><b>Debian 11</b></summary>\n"
-        f"install for debian"
-        "</details>\n"
-        "<details>"
-        f"<summary><b>Fedroa</b></summary>\n"
-        f"install for fedora"
-        "</details>\n"
-        
-        "</details>\n\n" )
-    
-    
-
-    indicatorbase.IndicatorBase.write_text_file(
-        Path( Path.cwd(), "README.md" ),
-        content )
-    pass
-
-
-def build_readme_for_indicator(
+def build_readme_for_wheel(
     directory,
     indicator,
+    indicator_human_readable,
     authors_emails,
     start_year ):
-    '''     Build the README.md file for the indicator. '''
+    ''' Build the README.md for the indicator's wheel. '''
 
     Path( directory ).mkdir( parents = True, exist_ok = True )
 
     content = (
-        _get_introduction_indicator( indicator ) +
+        _get_introduction( indicator ) +
+        _get_install( indicator ) +
+        _get_usage( indicator, indicator_human_readable ) +
+        _get_cache_config_log( indicator ) +
+        _get_limitations( indicator ) +
+        _get_uninstall( indicator ) +
         _get_license( authors_emails, start_year ) )
 
     indicatorbase.IndicatorBase.write_text_file(
         Path( directory, "README.md" ),
         content )
+
+
+def build_readme_for_project():
+    ''' Build the README.md file for the project. '''
+
+    pyprojectbase_toml = Path.cwd() / "indicatorbase" / "pyprojectbase.toml"
+    config = configparser.ConfigParser()
+    config.read( pyprojectbase_toml )
+    authors_emails = utils._get_pyproject_toml_authors( config )
+    start_year = "2012"  #TODO COmment as to where this comes from.
+
+    content = (
+        _get_introduction_project() +
+        _get_license( authors_emails, start_year ) )
+
+    indicatorbase.IndicatorBase.write_text_file(
+        Path( Path.cwd(), "README.md" ),
+        content )
+
+
+def build_readme_for_indicators():
+    ''' Build the README.md for each indicator. '''
+
+    pyprojectbase_toml = Path.cwd() / "indicatorbase" / "pyprojectbase.toml"
+
+    for indicator in IndicatorName:
+        indicator_name = indicator.name.lower()
+
+        config = configparser.ConfigParser()
+        config.read( pyprojectbase_toml )
+        authors_emails = utils._get_pyproject_toml_authors( config )
+        start_year = "2012"  #TODO Need to move a function from utils_build to utils
+
+        # name, categories, comments, message = (
+            # _get_name_categories_comments_from_indicator(
+                # indicator,
+                # directory_indicator ) )
+
+            # _get_usage( indicator_name, indicator_human_readable ) +
+#TODO name_human_readable is the name from above.
+# Need to move this function into utils.py
+        indicator_human_readable = f"{ indicator_name } human_readable"
+
+        content = (
+            _get_introduction_indicator( indicator_name ) +
+            _get_install( indicator_name ) +
+            _get_usage( indicator_name, indicator_human_readable ) +
+            _get_cache_config_log( indicator_name ) +
+            _get_limitations( indicator_name ) +
+            _get_uninstall( indicator_name ) +
+            _get_license( authors_emails, start_year ) )
+
+        indicatorbase.IndicatorBase.write_text_file(
+            Path( Path.cwd() / indicator_name, "README.md" ), #TODO Perhaps this should go src/indicatorname/ ?
+           # But will it clash with the readme.md created in build wheel?
+           # https://packaging.python.org/en/latest/guides/making-a-pypi-friendly-readme/
+            content )

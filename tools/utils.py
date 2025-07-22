@@ -20,6 +20,7 @@
 
 
 import argparse
+import configparser
 import sys
 
 from pathlib import Path
@@ -250,3 +251,34 @@ def get_indicators_to_process(
             {
                 "indicators" :
                     "+" } ) ).indicators
+
+
+def _get_pyproject_toml_authors(
+    pyproject_toml_config ):
+
+    authors = (
+        pyproject_toml_config.get( "project", "authors" )
+        .replace( '[', '' )
+        .replace( ']', '' )
+        .replace( '{', '' )
+        .replace( '},', '' )
+        .replace( '}', '' )
+        .strip() )
+
+    names_emails = [ ]
+    for line in authors.split( '\n' ):
+        line_ = line.split( '=' )
+        if "name" in line and "email" in line:
+            name = line_[ 1 ].split( '\"' )[ 1 ]
+            email = line_[ 2 ].split( '\"' )[ 1 ]
+            names_emails.append( ( name, email ) )
+
+        elif "name" in line:
+            name = line_[ 1 ].split( '\"' )[ 1 ]
+            names_emails.append( ( name, "" ) )
+
+        elif "email" in line:
+            email = line_[ 1 ].split( '\"' )[ 1 ]
+            names_emails.append( ( "", email ) )
+
+    return tuple( names_emails )

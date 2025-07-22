@@ -689,37 +689,6 @@ def _get_version_in_changelog_markdown(
     return version_
 
 
-def _get_pyproject_toml_authors(
-    pyproject_toml_config ):
-
-    authors = (
-        pyproject_toml_config.get( "project", "authors" )
-        .replace( '[', '' )
-        .replace( ']', '' )
-        .replace( '{', '' )
-        .replace( '},', '' )
-        .replace( '}', '' )
-        .strip() )
-
-    names_emails = [ ]
-    for line in authors.split( '\n' ):
-        line_ = line.split( '=' )
-        if "name" in line and "email" in line:
-            name = line_[ 1 ].split( '\"' )[ 1 ]
-            email = line_[ 2 ].split( '\"' )[ 1 ]
-            names_emails.append( ( name, email ) )
-
-        elif "name" in line:
-            name = line_[ 1 ].split( '\"' )[ 1 ]
-            names_emails.append( ( name, "" ) )
-
-        elif "email" in line:
-            email = line_[ 1 ].split( '\"' )[ 1 ]
-            names_emails.append( ( "", email ) )
-
-    return tuple( names_emails )
-
-
 def _get_name_categories_comments_from_indicator(
     indicator,
     directory_indicator ):
@@ -940,7 +909,7 @@ def _package_source(
             "CHANGELOG.md does not match that in pyprojectspecific.toml\n" )
 
     if not message:
-        authors = _get_pyproject_toml_authors( config )
+        authors = utils._get_pyproject_toml_authors( config )
         start_year = (
             indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
                 changelog_markdown ) )
@@ -963,7 +932,7 @@ def _package_source(
                 directory_indicator ) )
 
     if not message:
-        utils_readme.build_readme_for_indicator(
+        utils_readme.build_readme_for_wheel(
             directory_indicator,
             indicator,
             authors,
