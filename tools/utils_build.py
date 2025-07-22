@@ -963,7 +963,7 @@ def _package_source(
                 directory_indicator ) )
 
     if not message:
-        utils_readme.build_readme(
+        utils_readme.build_readme_for_indicator(
             directory_indicator,
             indicator,
             name,
