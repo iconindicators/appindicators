@@ -185,7 +185,8 @@ def _get_introduction_project():
     for indicator in IndicatorName:
         indicator_name = indicator.name.lower()
         link = indicator_name
-        url = f"{ indicator_name }/{ indicator_name }.md"
+        url = f"{ indicator_name }/{ indicator_name }.md"  #TODO Not sure yet if this link is correct...
+        #may need to be a directory or two down.
         content += f"- [{ link }]({ url })\n"
 
     content += "\n\n"
@@ -1077,3 +1078,12 @@ def build_readme_for_indicators():
            # But will it clash with the readme.md created in build wheel?
            # https://packaging.python.org/en/latest/guides/making-a-pypi-friendly-readme/
             content )
+
+
+#TODO Not sure what the readme.md should be...
+#    For the top level, have a readme.md which describes/lists the indicators.
+#
+#    For in each indicator, a readme.md which describes...what?
+#    What about a different file (not readme.md) for the install stuff?
+
+
