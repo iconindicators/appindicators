@@ -1,3 +1,8 @@
+TODO What about some information about the layout/workings of the project?
+That is, the reason for pyprojectbase.toml and all the building/shuffling
+during a build wheel?
+
+
 ## Build an Indicator's Wheel
 
 To build a wheel for `indicatortest`, at the root of the source tree:
