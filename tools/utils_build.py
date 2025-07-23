@@ -898,18 +898,14 @@ def _package_source(
                 indicator,
                 directory_indicator ) )
 
-#TODO I think the readme.md for each indicator,
-# whether called readme.md or something else,
-# MUST be present and part of the repository.
-# So don't need to make the readme here.
-    # if not message:
-        # utils_readme.build_readme_for_wheel(
-            # directory_indicator,
-            # indicator,
-            # authors,
-            # start_year )
+    if not message:
+        utils_readme.build_readme_for_wheel(
+            directory_indicator,
+            indicator,
+            authors,
+            start_year )
 
-#TODO Is this still necessary?
+#TODO I don't think this is required...
         # message = _markdown_to_html( directory_dist, indicator )
 
     if not message:

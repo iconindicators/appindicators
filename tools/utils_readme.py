@@ -194,9 +194,9 @@ def _get_introduction_project():
     return content
 
 
-#TODO Mention that the install/uninstall etc can be found at the GitHub site.
 def _get_introduction_indicator(
-    indicator ):
+    indicator,
+    wheel = True ):
 
     pattern_tag = re.compile( r".*comments = _\(.*" )
     filename = indicator + '/src/' + indicator + '/' + indicator + ".py"
@@ -234,12 +234,15 @@ def _get_introduction_indicator(
         " and theoretically, any platform which supports the "
         "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n" )
 
-    introduction += "Other indicators in this series are:\n"
-    for indicator_ in _get_indicator_names_sans_current( indicator ):
-#TODO URL below needs to point to the .md on Github I think rather than pypi
-        introduction += f"- [{ indicator_ }](https://pypi.org/project/{ indicator_ })\n"
+    if wheel:
+        #TODO Need to also add in link back to github.
+        pass
 
-    introduction += '\n'
+    else:
+        introduction += "Other indicators in this series are:\n"
+        for indicator_ in _get_indicator_names_sans_current( indicator ):
+    #TODO URL below needs to point to the .md on Github I think rather than pypi
+            introduction += f"- [{ indicator_ }](https://pypi.org/project/{ indicator_ })\n"
 
     return introduction
 
@@ -1002,20 +1005,16 @@ def build_readme(
 def build_readme_for_wheel(
     directory,
     indicator,
-    indicator_human_readable,
     authors_emails,
     start_year ):
-    ''' Build the README.md for the indicator's wheel. '''
-
-    Path( directory ).mkdir( parents = True, exist_ok = True )
+    '''
+    Build the README.md for the indicator's wheel.
+    '''
+#TODO Why is this needed? Surely the directory should already exist?
+    # Path( directory ).mkdir( parents = True, exist_ok = True )
 
     content = (
-        _get_introduction( indicator ) +
-        _get_install( indicator ) +
-        _get_usage( indicator, indicator_human_readable ) +
-        _get_cache_config_log( indicator ) +
-        _get_limitations( indicator ) +
-        _get_uninstall( indicator ) +
+        _get_introduction_indicator( indicator ) +
         _get_license( authors_emails, start_year ) )
 
     indicatorbase.IndicatorBase.write_text_file(
@@ -1024,8 +1023,9 @@ def build_readme_for_wheel(
 
 
 def build_readme_for_project_and_indicators():
-    ''' Build the README.md file for the project and each indicator. '''
-
+    '''
+    Build the README.md file for the project and each indicator.
+    '''
     pyprojectbase_toml = Path.cwd() / "indicatorbase" / "pyprojectbase.toml"
 
     config = configparser.ConfigParser()
@@ -1054,7 +1054,7 @@ def build_readme_for_project_and_indicators():
                 Path( indicator_name ) ) )
 
         content = (
-            _get_introduction_indicator( indicator_name ) +
+            _get_introduction_indicator( indicator_name, wheel = False ) +
             _get_install( indicator_name ) +
             _get_usage( indicator_name, name ) +
             _get_cache_config_log( indicator_name ) +
@@ -1064,16 +1064,15 @@ def build_readme_for_project_and_indicators():
 
 #TODO Will this readme.md clash with the readme.md created in build wheel?
 # https://packaging.python.org/en/latest/guides/making-a-pypi-friendly-readme/
+# The readme.md created in the build_wheel sits at
+#     indicator_name
+# and this readme.md sits at
+#     indicator_name / src / indicator_name
+# So keep this one in the wheel?
         readme_md = (
             Path.cwd() / indicator_name / "src" / indicator_name / "README.md" )
 
         indicatorbase.IndicatorBase.write_text_file( readme_md, content )
-
-#TODO Not sure what the readme.md should be...
-#    For the top level, have a readme.md which describes/lists the indicators.
-#
-#    For in each indicator, a readme.md which describes...what?
-#    What about a different file (not readme.md) for the install stuff?
 
     # Build README.md for project.
     content = (
@@ -1083,71 +1082,3 @@ def build_readme_for_project_and_indicators():
     indicatorbase.IndicatorBase.write_text_file(
         Path( Path.cwd(), "README.md" ),
         content )
-
-
-def build_readme_for_project():
-    ''' Build the README.md file for the project. '''
-
-    pyprojectbase_toml = Path.cwd() / "indicatorbase" / "pyprojectbase.toml"
-    config = configparser.ConfigParser()
-    config.read( pyprojectbase_toml )
-    authors_emails = utils.get_pyproject_toml_authors( config )
-    start_year = "2012"  #TODO COmment as to where this comes from.
-    #If this function is combined with the one below,
-    # then as the start year for each indicator is obtained,
-    # find the minimum and use that!
-
-    content = (
-        _get_introduction_project() +
-        _get_license( authors_emails, start_year ) )
-
-    indicatorbase.IndicatorBase.write_text_file(
-        Path( Path.cwd(), "README.md" ),
-        content )
-
-
-def build_readme_for_indicators():
-    ''' Build the README.md for each indicator. '''
-
-    pyprojectbase_toml = Path.cwd() / "indicatorbase" / "pyprojectbase.toml"
-
-    for indicator in IndicatorName:
-        indicator_name = indicator.name.lower()
-
-        config = configparser.ConfigParser()
-        config.read( pyprojectbase_toml )
-        authors_emails = utils.get_pyproject_toml_authors( config )
-
-        changelog_markdown = (
-            Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
-
-        start_year = (
-            indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
-                changelog_markdown ) )
-
-        name, categories, comments, message = (
-            utils.get_name_categories_comments_from_indicator(
-                indicator_name,
-                Path( indicator_name ) ) )
-
-        content = (
-            _get_introduction_indicator( indicator_name ) +
-            _get_install( indicator_name ) +
-            _get_usage( indicator_name, name ) +
-            _get_cache_config_log( indicator_name ) +
-            _get_limitations( indicator_name ) +
-            _get_uninstall( indicator_name ) +
-            _get_license( authors_emails, start_year ) )
-
-#TODO Will this readme.md clash with the readme.md created in build wheel?
-# https://packaging.python.org/en/latest/guides/making-a-pypi-friendly-readme/
-        readme_md = (
-            Path.cwd() / indicator_name / "src" / indicator_name / "README.md" )
-
-        indicatorbase.IndicatorBase.write_text_file( readme_md, content )
-
-#TODO Not sure what the readme.md should be...
-#    For the top level, have a readme.md which describes/lists the indicators.
-#
-#    For in each indicator, a readme.md which describes...what?
-#    What about a different file (not readme.md) for the install stuff?
