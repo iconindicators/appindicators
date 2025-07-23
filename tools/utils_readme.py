@@ -1029,8 +1029,11 @@ def build_readme_for_project():
     pyprojectbase_toml = Path.cwd() / "indicatorbase" / "pyprojectbase.toml"
     config = configparser.ConfigParser()
     config.read( pyprojectbase_toml )
-    authors_emails = utils._get_pyproject_toml_authors( config )
+    authors_emails = utils.get_pyproject_toml_authors( config )
     start_year = "2012"  #TODO COmment as to where this comes from.
+    #If this function is combined with the one below,
+    # then as the start year for each indicator is obtained,
+    # find the minimum and use that!
 
     content = (
         _get_introduction_project() +
@@ -1051,39 +1054,38 @@ def build_readme_for_indicators():
 
         config = configparser.ConfigParser()
         config.read( pyprojectbase_toml )
-        authors_emails = utils._get_pyproject_toml_authors( config )
-        start_year = "2012"  #TODO Need to move a function from utils_build to utils
+        authors_emails = utils.get_pyproject_toml_authors( config )
 
-        # name, categories, comments, message = (
-            # _get_name_categories_comments_from_indicator(
-                # indicator,
-                # directory_indicator ) )
+        changelog_markdown = (
+            Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
 
-            # _get_usage( indicator_name, indicator_human_readable ) +
-#TODO name_human_readable is the name from above.
-# Need to move this function into utils.py
-        indicator_human_readable = f"{ indicator_name } human_readable"
+        start_year = (
+            indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
+                changelog_markdown ) )
+
+        name, categories, comments, message = (
+            utils.get_name_categories_comments_from_indicator(
+                indicator_name,
+                Path( indicator_name ) ) )
 
         content = (
             _get_introduction_indicator( indicator_name ) +
             _get_install( indicator_name ) +
-            _get_usage( indicator_name, indicator_human_readable ) +
+            _get_usage( indicator_name, name ) +
             _get_cache_config_log( indicator_name ) +
             _get_limitations( indicator_name ) +
             _get_uninstall( indicator_name ) +
             _get_license( authors_emails, start_year ) )
 
-        indicatorbase.IndicatorBase.write_text_file(
-            Path( Path.cwd() / indicator_name, "README.md" ), #TODO Perhaps this should go src/indicatorname/ ?
-           # But will it clash with the readme.md created in build wheel?
-           # https://packaging.python.org/en/latest/guides/making-a-pypi-friendly-readme/
-            content )
+#TODO Will this readme.md clash with the readme.md created in build wheel?
+# https://packaging.python.org/en/latest/guides/making-a-pypi-friendly-readme/
+        readme_md = (
+            Path.cwd() / indicator_name / "src" / indicator_name / "README.md" )
 
+        indicatorbase.IndicatorBase.write_text_file( readme_md, content )
 
 #TODO Not sure what the readme.md should be...
 #    For the top level, have a readme.md which describes/lists the indicators.
 #
 #    For in each indicator, a readme.md which describes...what?
 #    What about a different file (not readme.md) for the install stuff?
-
-

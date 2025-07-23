@@ -21,6 +21,7 @@
 
 import argparse
 import configparser
+import re
 import sys
 
 from pathlib import Path
@@ -253,9 +254,11 @@ def get_indicators_to_process(
                     "+" } ) ).indicators
 
 
-def _get_pyproject_toml_authors(
+def get_pyproject_toml_authors(
     pyproject_toml_config ):
-
+    '''
+    TODO Update
+    '''
     authors = (
         pyproject_toml_config.get( "project", "authors" )
         .replace( '[', '' )
@@ -282,3 +285,48 @@ def _get_pyproject_toml_authors(
             names_emails.append( ( "", email ) )
 
     return tuple( names_emails )
+
+
+def get_name_categories_comments_from_indicator(
+    indicator,
+    directory_indicator ):
+    '''
+    TODO Update
+    '''
+
+    def parse( line ):
+        return line.split( '\"' )[ 1 ].replace( '\"', '' ).strip()
+
+
+    indicator_source = (
+        Path( '.' ) /
+        directory_indicator /
+        "src" /
+        indicator /
+        ( indicator + ".py" ) )
+
+    name = ""
+    categories = ""
+    comments = ""
+    message = ""
+    lines = indicatorbase.IndicatorBase.read_text_file( indicator_source)
+    for line in lines:
+        if re.search( r"INDICATOR_NAME_HUMAN_READABLE = _\( ", line ):
+            name = parse( line )
+
+        if re.search( r"INDICATOR_CATEGORIES = ", line ):
+            categories = parse( line )
+
+        if re.search( r"comments = _\(", line ):
+            comments = parse( line )
+
+    if name == "":
+        message += f"ERROR: Unable to obtain 'indicator_name' from \n\t{ indicator_source }\n"
+
+    if categories == "":
+        message += f"ERROR: Unable to obtain 'categories' from \n\t{ indicator_source }\n"
+
+    if comments == "":
+        message += f"ERROR: Unable to obtain 'comments' from the constructor of\n\t{ indicator_source }\n"
+
+    return name, categories, comments, message

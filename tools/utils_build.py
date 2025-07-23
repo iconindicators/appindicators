@@ -23,6 +23,15 @@ Requires polib to be installed by the calling script.
 '''
 
 
+#TODO There is a (what seems to be mandatory) LICENSE file on the GitHub site
+#   https://github.com/iconindicators/appindicators
+# so maybe create a mock LICENSE file in the project root and see where it ends
+# up in the build.
+#
+# I think the LICENSE file is redundant for building a wheel though,
+# given using the 'license' field in pyproject.toml
+
+
 import configparser
 import datetime
 import filecmp
@@ -689,48 +698,6 @@ def _get_version_in_changelog_markdown(
     return version_
 
 
-def _get_name_categories_comments_from_indicator(
-    indicator,
-    directory_indicator ):
-
-    def parse( line ):
-        return line.split( '\"' )[ 1 ].replace( '\"', '' ).strip()
-
-
-    indicator_source = (
-        Path( '.' ) /
-        directory_indicator /
-        "src" /
-        indicator /
-        ( indicator + ".py" ) )
-
-    name = ""
-    categories = ""
-    comments = ""
-    message = ""
-    lines = indicatorbase.IndicatorBase.read_text_file( indicator_source)
-    for line in lines:
-        if re.search( r"INDICATOR_NAME_HUMAN_READABLE = _\( ", line ):
-            name = parse( line )
-
-        if re.search( r"INDICATOR_CATEGORIES = ", line ):
-            categories = parse( line )
-
-        if re.search( r"comments = _\(", line ):
-            comments = parse( line )
-
-    if name == "":
-        message += f"ERROR: Unable to obtain 'indicator_name' from \n\t{ indicator_source }\n"
-
-    if categories == "":
-        message += f"ERROR: Unable to obtain 'categories' from \n\t{ indicator_source }\n"
-
-    if comments == "":
-        message += f"ERROR: Unable to obtain 'comments' from the constructor of\n\t{ indicator_source }\n"
-
-    return name, categories, comments, message
-
-
 def _create_dot_desktop(
     directory_platform_linux,
     indicator,
@@ -909,7 +876,7 @@ def _package_source(
             "CHANGELOG.md does not match that in pyprojectspecific.toml\n" )
 
     if not message:
-        authors = utils._get_pyproject_toml_authors( config )
+        authors = utils.get_pyproject_toml_authors( config )
         start_year = (
             indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
                 changelog_markdown ) )
@@ -927,18 +894,23 @@ def _package_source(
 
     if not message:
         name, categories, comments, message = (
-            _get_name_categories_comments_from_indicator(
+            utils.get_name_categories_comments_from_indicator(
                 indicator,
                 directory_indicator ) )
 
-    if not message:
-        utils_readme.build_readme_for_wheel(
-            directory_indicator,
-            indicator,
-            authors,
-            start_year )
+#TODO I think the readme.md for each indicator,
+# whether called readme.md or something else,
+# MUST be present and part of the repository.
+# So don't need to make the readme here.
+    # if not message:
+        # utils_readme.build_readme_for_wheel(
+            # directory_indicator,
+            # indicator,
+            # authors,
+            # start_year )
 
-        message = _markdown_to_html( directory_dist, indicator )
+#TODO Is this still necessary?
+        # message = _markdown_to_html( directory_dist, indicator )
 
     if not message:
         directory_indicator_locale = (
