@@ -1,6 +1,30 @@
-TODO What about some information about the layout/workings of the project?
-That is, the reason for pyprojectbase.toml and all the building/shuffling
-during a build wheel?
+## Introduction
+
+This project produces the following `appindicators` for `Ubuntu 20.04` and similar:
+
+- `indicatorfortune`
+- `indicatorlunar`
+- `indicatoronthisday`
+- `indicatorppadownloadstatistics`
+- `indicatorpunycode`
+- `indicatorscriptrunner`
+- `indicatorstardate`
+- `indicatortest`
+- `indicatortide`
+- `indicatorvirtualbox`
+
+where each indicator is built upon `indicatorbase`.
+
+Rather than have a separate top-level project for each indicator, `indicatorbase` has
+`pyprojectbase.toml` and each indicator has its own `pyprojectspecific.toml`. 
+When building a `.whl` for release to `PyPI`, `pyprojectbase.toml` and 
+`pyprojectspecific.toml` are merged to create a `pyproject.toml`.
+
+Similarly for `MANIFESTbase.in` and `MANIFESTspecific.in`, if an indicator uses a manifest.
+
+Files common across all indicators such as `.desktop` and various `bash` scripts
+differ slightly by some tags which are replaced during the build to create specific
+versions for the indicator.
 
 
 ## Build an Indicator's Wheel
