@@ -127,8 +127,9 @@ class IndicatorName( Enum ):
 URL_GNOME_EXTENSION = (
     "https://extensions.gnome.org/extension/615/appindicator-support" )
 
-URL_INDICATOR_ON_GITHUB = (
-    "https://github.com/iconindicators/appindicators/blob/main" )
+URL_GITHUB_REPOSITORY = "https://github.com/iconindicators/appindicators"
+
+URL_GITHUB_INDICATOR = URL_GITHUB_REPOSITORY + "/blob/main"
 
 
 def _is_indicator(
@@ -161,8 +162,7 @@ def _get_indicator_names_sans_current(
 
 
 def _get_url_to_indicator_on_github( indicator ):
-    return (
-        f"{ URL_INDICATOR_ON_GITHUB }/{ indicator }/src/{ indicator }" )
+    return f"{ URL_GITHUB_INDICATOR }/{ indicator }/src/{ indicator }"
 
 
 def _get_introduction_project():
