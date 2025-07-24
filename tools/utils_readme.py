@@ -16,11 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Check if licence should be license in ALL files.
-# Licence is the noun and license is the verb
-# but Americans use license for both.
-
-
 '''
 Create a README.md for an indicator.
 
@@ -173,19 +168,15 @@ def _get_introduction_project():
 
         "This project contains application indicators written in `Python3` "
         "for `Ubuntu 20.04` or similar. For more details, including how to "
-        "install, see the links below:\n\n" )
+        "install, see the links below:\n" )
 
     for indicator in IndicatorName:
-#TODO Maybe have a descriptiopn of each indicator?
-# If so, where does it come from?
-#
-# Maybe it's redundant given each indicator's page will have a description...?
         indicator_name = indicator.name.lower()
         link = indicator_name
         url = f"{ _get_url_to_indicator_on_github( indicator_name ) }/README.md"
         content += f"- [{ link }]({ url })\n"
 
-    content += "\n\n"
+    content += "\n"
 
     return content
 
@@ -231,8 +222,11 @@ def _get_introduction_indicator(
         "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n" )
 
     if wheel:
-        #TODO Need to also add in link back to github.
-        pass
+        introduction += (
+            "Installation requires operating system packages, "
+            "a `Python3` virtual environment and finally `pip`. Refer to "
+            f"[{ URL_GITHUB_REPOSITORY }]({ URL_GITHUB_REPOSITORY }) "
+            "for details.\n" )
 
     else:
         introduction += "Other indicators in this series are:\n"
@@ -240,6 +234,8 @@ def _get_introduction_indicator(
             link = indicator_
             url = f"{ _get_url_to_indicator_on_github( indicator_ ) }/README.md"
             introduction += f"- [{ link }]({ url })\n"
+
+    introduction += "\n"
 
     return introduction
 
@@ -953,7 +949,7 @@ def _get_limitations(
         message = (
             "Limitations\n"
             "-----------\n\n"
-            f"{ ''.join( sorted( messages, key = str.casefold ) ) }\n\n" )
+            f"{ ''.join( sorted( messages, key = str.casefold ) ) }\n" )
 
     return message
 
@@ -971,32 +967,6 @@ def _get_license(
         "This project in its entirety is licensed under the terms of the "
         "GNU General Public License v3.0 license.\n\n"
         f"Copyright { start_year }-{ end_year } { ', '.join( authors ) }.\n" )
-
-
-#TODO Delete
-# def build_readme(
-#     directory,
-#     indicator,
-#     indicator_human_readable,
-#     authors_emails,
-#     start_year ):
-#     '''
-#     Build the README.md file for the indicator.
-#     '''
-#     Path( directory ).mkdir( parents = True, exist_ok = True )
-#
-#     content = (
-#         _get_introduction( indicator ) +
-#         _get_install( indicator ) +
-#         _get_usage( indicator, indicator_human_readable ) +
-#         _get_cache_config_log( indicator ) +
-#         _get_limitations( indicator ) +
-#         _get_uninstall( indicator ) +
-#         _get_license( authors_emails, start_year ) )
-#
-#     indicatorbase.IndicatorBase.write_text_file(
-#         Path( directory, "README.md" ),
-#         content )
 
 
 def build_readme_for_wheel(

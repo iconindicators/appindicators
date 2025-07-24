@@ -10,6 +10,7 @@ Other indicators in this series are:
 - [indicatorstardate](https://github.com/iconindicators/appindicators/blob/main/indicatorstardate/src/indicatorstardate/README.md)
 - [indicatortest](https://github.com/iconindicators/appindicators/blob/main/indicatortest/src/indicatortest/README.md)
 - [indicatortide](https://github.com/iconindicators/appindicators/blob/main/indicatortide/src/indicatortide/README.md)
+
 Installation / Updating
 -----------------------
 
@@ -169,7 +170,6 @@ Limitations
 - `Manjaro 24`: No autostart.
 - `Manjaro 25`: No autostart.
 - `Wayland`: The command `wmctrl` is unsupported.
-
 
 Uninstall
 ---------

@@ -10,6 +10,7 @@ Other indicators in this series are:
 - [indicatortest](https://github.com/iconindicators/appindicators/blob/main/indicatortest/src/indicatortest/README.md)
 - [indicatortide](https://github.com/iconindicators/appindicators/blob/main/indicatortide/src/indicatortide/README.md)
 - [indicatorvirtualbox](https://github.com/iconindicators/appindicators/blob/main/indicatorvirtualbox/src/indicatorvirtualbox/README.md)
+
 Installation / Updating
 -----------------------
 
@@ -174,7 +175,6 @@ Limitations
 - `X-Cinnamon`: The icon disappears when changed from that originally set, leaving a blank space.
 - `X-Cinnamon`: The icon label is unsupported; the icon tooltip is used in lieu.
 - `XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.
-
 
 Uninstall
 ---------

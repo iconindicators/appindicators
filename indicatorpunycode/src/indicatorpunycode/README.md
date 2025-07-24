@@ -10,6 +10,7 @@ Other indicators in this series are:
 - [indicatortest](https://github.com/iconindicators/appindicators/blob/main/indicatortest/src/indicatortest/README.md)
 - [indicatortide](https://github.com/iconindicators/appindicators/blob/main/indicatortide/src/indicatortide/README.md)
 - [indicatorvirtualbox](https://github.com/iconindicators/appindicators/blob/main/indicatorvirtualbox/src/indicatorvirtualbox/README.md)
+
 Installation / Updating
 -----------------------
 
@@ -167,7 +168,6 @@ Limitations
 - `Kubuntu 24.04`: No autostart.
 - `Manjaro 24`: No autostart.
 - `Manjaro 25`: No autostart.
-
 
 Uninstall
 ---------
