@@ -21,13 +21,6 @@
 # but Americans use license for both.
 
 
-#TODO Why isn't
-#    indicatorfortune/src/indicatorfortune/README.md
-# and for all the indicators in the repository?
-#
-# Or have I missed something here...?
-
-
 '''
 Create a README.md for an indicator.
 
