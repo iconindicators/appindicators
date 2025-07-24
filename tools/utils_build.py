@@ -30,6 +30,10 @@ Requires polib to be installed by the calling script.
 #
 # I think the LICENSE file is redundant for building a wheel though,
 # given using the 'license' field in pyproject.toml
+#
+# So maybe copy whatever GitHub uses and place that at root of project.
+# When doing the build, ensure that same file is not part of the orig.tar.gz
+# nor the .whl
 
 
 import configparser
@@ -450,6 +454,7 @@ def _get_msgstr_from_po(
     return msgstr
 
 
+#TODO May not be needed but could be useful...
 def _markdown_to_html(
     directory_release,
     indicator ):
@@ -876,7 +881,7 @@ def _package_source(
             "CHANGELOG.md does not match that in pyprojectspecific.toml\n" )
 
     if not message:
-        authors = utils.get_pyproject_toml_authors( config )
+        authors_emails = utils.get_pyproject_toml_authors( config )
         start_year = (
             indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
                 changelog_markdown ) )
@@ -884,7 +889,7 @@ def _package_source(
         message = (
             _update_locale_source(
                 indicator,
-                authors,
+                authors_emails,
                 start_year,
                 version_from_pyproject_toml,
                 version_indicator_base ) )
@@ -893,7 +898,7 @@ def _package_source(
         message = _build_locale_for_release( directory_dist, indicator )
 
     if not message:
-        name, categories, comments, message = (
+        name_human_readable, categories, comments, message = (
             utils.get_name_categories_comments_from_indicator(
                 indicator,
                 directory_indicator ) )
@@ -902,7 +907,7 @@ def _package_source(
         utils_readme.build_readme_for_wheel(
             directory_indicator,
             indicator,
-            authors,
+            authors_emails,
             start_year )
 
 #TODO I don't think this is required...
@@ -915,7 +920,7 @@ def _package_source(
         names_from_po_files, comments_from_po_files = (
             _get_translated_names_and_comments_from_po_files(
                 directory_indicator_locale,
-                name,
+                name_human_readable,
                 comments ) )
 
         directory_platform_linux = (
@@ -931,7 +936,7 @@ def _package_source(
         _create_dot_desktop(
             directory_platform_linux,
             indicator,
-            name,
+            name_human_readable,
             names_from_po_files,
             comments,
             comments_from_po_files,

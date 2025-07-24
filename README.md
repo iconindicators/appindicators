@@ -1,7 +1,7 @@
 AppIndicators for Ubuntu et al
 ------------------------------
 
-This project contains application indicators written in `Python3` for `Ubuntu 20.04` or similar. For installation instructions and other details, see the links below:
+This project contains application indicators written in `Python3` for `Ubuntu 20.04` or similar. For more details, including how to install, see the links below:
 
 - [indicatorfortune](indicatorfortune/indicatorfortune.md)
 - [indicatorlunar](indicatorlunar/indicatorlunar.md)

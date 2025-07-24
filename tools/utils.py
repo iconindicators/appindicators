@@ -20,7 +20,6 @@
 
 
 import argparse
-import configparser
 import re
 import sys
 
@@ -257,7 +256,8 @@ def get_indicators_to_process(
 def get_pyproject_toml_authors(
     pyproject_toml_config ):
     '''
-    TODO Update
+    Return the authors (and emails if present) from the config of a
+    pyproject.toml file
     '''
     authors = (
         pyproject_toml_config.get( "project", "authors" )
@@ -291,7 +291,10 @@ def get_name_categories_comments_from_indicator(
     indicator,
     directory_indicator ):
     '''
-    TODO Update
+    Read from the indicator's main .py file and return as a tuple:
+        Indicator name in human readable form
+        The categories
+        The comments
     '''
 
     def parse( line ):
@@ -309,7 +312,7 @@ def get_name_categories_comments_from_indicator(
     categories = ""
     comments = ""
     message = ""
-    lines = indicatorbase.IndicatorBase.read_text_file( indicator_source)
+    lines = indicatorbase.IndicatorBase.read_text_file( indicator_source )
     for line in lines:
         if re.search( r"INDICATOR_NAME_HUMAN_READABLE = _\( ", line ):
             name = parse( line )

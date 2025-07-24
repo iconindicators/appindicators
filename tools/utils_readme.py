@@ -21,21 +21,6 @@
 # but Americans use license for both.
 
 
-#TODO Change this file...
-#
-# 1. Want the build to call a function, same as build_readme()
-#    but that function just creates an introduction and perhaps licence section.
-#    Need a section, maybe in the introduction, that says for all install/run/
-#    uninstall etc, go see the homepage.
-#    Used in an indicator for release to PyPI.
-#    Maybe call the function build_readme_for_indicator()
-#
-# 2. Have another front end function that is called by a script build_readme.py
-#    and that script calls the front end function that does the dynamic install/
-#    run/uninstall/usage/limitations/license functions.
-#    Maybe call the function build_readme_for_project()
-
-
 '''
 Create a README.md for an indicator.
 
@@ -179,8 +164,8 @@ def _get_introduction_project():
         "------------------------------\n\n"
 
         "This project contains application indicators written in `Python3` "
-        "for `Ubuntu 20.04` or similar. For installation instructions and other "
-        "details, see the links below:\n\n" )
+        "for `Ubuntu 20.04` or similar. For more details, including how to "
+        "install, see the links below:\n\n" )
 
     for indicator in IndicatorName:
         indicator_name = indicator.name.lower()
@@ -977,29 +962,29 @@ def _get_license(
 
 
 #TODO Delete
-def build_readme(
-    directory,
-    indicator,
-    indicator_human_readable,
-    authors_emails,
-    start_year ):
-    '''
-    Build the README.md file for the indicator.
-    '''
-    Path( directory ).mkdir( parents = True, exist_ok = True )
-
-    content = (
-        _get_introduction( indicator ) +
-        _get_install( indicator ) +
-        _get_usage( indicator, indicator_human_readable ) +
-        _get_cache_config_log( indicator ) +
-        _get_limitations( indicator ) +
-        _get_uninstall( indicator ) +
-        _get_license( authors_emails, start_year ) )
-
-    indicatorbase.IndicatorBase.write_text_file(
-        Path( directory, "README.md" ),
-        content )
+# def build_readme(
+#     directory,
+#     indicator,
+#     indicator_human_readable,
+#     authors_emails,
+#     start_year ):
+#     '''
+#     Build the README.md file for the indicator.
+#     '''
+#     Path( directory ).mkdir( parents = True, exist_ok = True )
+#
+#     content = (
+#         _get_introduction( indicator ) +
+#         _get_install( indicator ) +
+#         _get_usage( indicator, indicator_human_readable ) +
+#         _get_cache_config_log( indicator ) +
+#         _get_limitations( indicator ) +
+#         _get_uninstall( indicator ) +
+#         _get_license( authors_emails, start_year ) )
+#
+#     indicatorbase.IndicatorBase.write_text_file(
+#         Path( directory, "README.md" ),
+#         content )
 
 
 def build_readme_for_wheel(
@@ -1014,7 +999,7 @@ def build_readme_for_wheel(
     # Path( directory ).mkdir( parents = True, exist_ok = True )
 
     content = (
-        _get_introduction_indicator( indicator ) +
+        _get_introduction_indicator( indicator, wheel = True ) +
         _get_license( authors_emails, start_year ) )
 
     indicatorbase.IndicatorBase.write_text_file(
@@ -1048,7 +1033,7 @@ def build_readme_for_project_and_indicators():
         if start_year < start_year_smallest:
             start_year_smallest = start_year
 
-        name, categories, comments, message = (
+        name_human_readable, categories, comments, message = (
             utils.get_name_categories_comments_from_indicator(
                 indicator_name,
                 Path( indicator_name ) ) )
@@ -1056,7 +1041,7 @@ def build_readme_for_project_and_indicators():
         content = (
             _get_introduction_indicator( indicator_name, wheel = False ) +
             _get_install( indicator_name ) +
-            _get_usage( indicator_name, name ) +
+            _get_usage( indicator_name, name_human_readable ) +
             _get_cache_config_log( indicator_name ) +
             _get_limitations( indicator_name ) +
             _get_uninstall( indicator_name ) +
@@ -1082,3 +1067,12 @@ def build_readme_for_project_and_indicators():
     indicatorbase.IndicatorBase.write_text_file(
         Path( Path.cwd(), "README.md" ),
         content )
+
+
+#TODO Perhaps either link to the images/screenshots on stackexchange
+# or include those images in either the front page, or each indicator's install
+# page.
+#
+# Don't do this for the PyPI readme as any change (such as a broken image/link)
+# will require a release just to fix.
+# KEEP PyPI PAGE A SIMPLE AS POSSIBLE!!!
