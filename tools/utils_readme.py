@@ -21,6 +21,13 @@
 # but Americans use license for both.
 
 
+#TODO Why isn't
+#    indicatorfortune/src/indicatorfortune/README.md
+# and for all the indicators in the repository?
+#
+# Or have I missed something here...?
+
+
 '''
 Create a README.md for an indicator.
 
@@ -176,6 +183,10 @@ def _get_introduction_project():
         "install, see the links below:\n\n" )
 
     for indicator in IndicatorName:
+#TODO Maybe have a descriptiopn of each indicator?
+# If so, where does it come from?
+#
+# Maybe it's redundant given each indicator's page will have a description...?
         indicator_name = indicator.name.lower()
         link = indicator_name
         url = f"{ _get_url_to_indicator_on_github( indicator_name ) }/README.md"
@@ -1003,9 +1014,6 @@ def build_readme_for_wheel(
     '''
     Build the README.md for the indicator's wheel.
     '''
-#TODO Why is this needed? Surely the directory should already exist?
-    # Path( directory ).mkdir( parents = True, exist_ok = True )
-
     content = (
         _get_introduction_indicator( indicator, wheel = True ) +
         _get_license( authors_emails, start_year ) )
@@ -1015,9 +1023,11 @@ def build_readme_for_wheel(
         content )
 
 
+#TODO Perhaps link to the images/screenshots on stackexchange or include
+# those images in either the front page, or each indicator's install page.
 def build_readme_for_project_and_indicators():
     '''
-    Build the README.md file for the project and each indicator.
+    Build the README.md for the project and each indicator.
     '''
     pyprojectbase_toml = Path.cwd() / "indicatorbase" / "pyprojectbase.toml"
 
@@ -1025,7 +1035,7 @@ def build_readme_for_project_and_indicators():
     config.read( pyprojectbase_toml )
     authors_emails = utils.get_pyproject_toml_authors( config )
 
-    start_year_smallest = "9999"
+    start_year_earliest = "9999"
 
     # Build README.md for each indicator.
     for indicator in IndicatorName:
@@ -1038,8 +1048,8 @@ def build_readme_for_project_and_indicators():
             indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
                 changelog_markdown ) )
 
-        if start_year < start_year_smallest:
-            start_year_smallest = start_year
+        if start_year < start_year_earliest:
+            start_year_earliest = start_year
 
         name_human_readable, categories, comments, message = (
             utils.get_name_categories_comments_from_indicator(
@@ -1055,13 +1065,6 @@ def build_readme_for_project_and_indicators():
             _get_uninstall( indicator_name ) +
             _get_license( authors_emails, start_year ) )
 
-#TODO Will this readme.md clash with the readme.md created in build wheel?
-# https://packaging.python.org/en/latest/guides/making-a-pypi-friendly-readme/
-# The readme.md created in the build_wheel sits at
-#     indicator_name
-# and this readme.md sits at
-#     indicator_name / src / indicator_name
-# So keep this one in the wheel?
         readme_md = (
             Path.cwd() / indicator_name / "src" / indicator_name / "README.md" )
 
@@ -1070,17 +1073,8 @@ def build_readme_for_project_and_indicators():
     # Build README.md for project.
     content = (
         _get_introduction_project() +
-        _get_license( authors_emails, start_year_smallest ) )
+        _get_license( authors_emails, start_year_earliest ) )
 
     indicatorbase.IndicatorBase.write_text_file(
         Path( Path.cwd(), "README.md" ),
         content )
-
-
-#TODO Perhaps either link to the images/screenshots on stackexchange
-# or include those images in either the front page, or each indicator's install
-# page.
-#
-# Don't do this for the PyPI readme as any change (such as a broken image/link)
-# will require a release just to fix.
-# KEEP PyPI PAGE A SIMPLE AS POSSIBLE!!!
