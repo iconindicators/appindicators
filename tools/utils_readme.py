@@ -176,7 +176,7 @@ def _get_introduction_project():
         url = f"{ _get_url_to_indicator_on_github( indicator_name ) }/README.md"
         content += f"- [{ link }]({ url })\n"
 
-    content += "\n"
+    content += "\n\n"
 
     return content
 
@@ -235,7 +235,7 @@ def _get_introduction_indicator(
             url = f"{ _get_url_to_indicator_on_github( indicator_ ) }/README.md"
             introduction += f"- [{ link }]({ url })\n"
 
-    introduction += "\n"
+    introduction += "\n\n"
 
     return introduction
 
@@ -338,7 +338,7 @@ def _get_install_uninstall(
             f"{ operating_systems_to_content[ operating_systems ].pop() }"
             "</details>\n\n" )
 
-    return content
+    return content + '\n'
 
 
 def _get_install(
@@ -779,7 +779,7 @@ def _get_usage(
             "additional modules installed to the virtual environment at "
             f"`{ utils.VENV_INSTALL }`.\n\n" )
 
-    return usage
+    return usage + '\n'
 
 
 def _get_cache_config_log(
@@ -806,7 +806,7 @@ def _get_cache_config_log(
         f"{ cache }"
         f"the config at `$HOME/.config/{ indicator }`.\n\n"
         "In the event an error occurs, a log file will be written to "
-        f"`$HOME/{ indicator }.log`.\n\n" )
+        f"`$HOME/{ indicator }.log`.\n\n\n" )
 
 
 def _get_limitations(
@@ -951,7 +951,7 @@ def _get_limitations(
             "-----------\n\n"
             f"{ ''.join( sorted( messages, key = str.casefold ) ) }\n" )
 
-    return message
+    return message + '\n'
 
 
 def _get_license(

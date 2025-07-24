@@ -11,6 +11,7 @@ Other indicators in this series are:
 - [indicatortide](https://github.com/iconindicators/appindicators/blob/main/indicatortide/src/indicatortide/README.md)
 - [indicatorvirtualbox](https://github.com/iconindicators/appindicators/blob/main/indicatorvirtualbox/src/indicatorvirtualbox/README.md)
 
+
 Installation / Updating
 -----------------------
 
@@ -123,6 +124,7 @@ Installation / Updating
     ```
 </details>
 
+
 Usage
 -----
 
@@ -132,6 +134,7 @@ Alternatively, to run from the terminal:
 
 ```. $HOME/.local/bin/indicatoronthisday.sh```
 
+
 Cache / Config / Log
 --------------------
 
@@ -139,11 +142,13 @@ During the course of normal operation, the indicator may write to the cache at `
 
 In the event an error occurs, a log file will be written to `$HOME/indicatoronthisday.log`.
 
+
 Limitations
 -----------
 
 - `ICEWM`: Notifications are unsupported.
 - `Kubuntu 24.04`: No autostart.
+
 
 Uninstall
 ---------
@@ -291,6 +296,7 @@ Uninstall
     If no other indicators remain installed, the virtual environment will be deleted.
 
 </details>
+
 
 License
 -------

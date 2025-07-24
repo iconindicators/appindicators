@@ -11,6 +11,7 @@ Other indicators in this series are:
 - [indicatortide](https://github.com/iconindicators/appindicators/blob/main/indicatortide/src/indicatortide/README.md)
 - [indicatorvirtualbox](https://github.com/iconindicators/appindicators/blob/main/indicatorvirtualbox/src/indicatorvirtualbox/README.md)
 
+
 Installation / Updating
 -----------------------
 
@@ -145,6 +146,7 @@ Installation / Updating
 
 </details>
 
+
 Usage
 -----
 
@@ -154,6 +156,7 @@ Alternatively, to run from the terminal:
 
 ```. $HOME/.local/bin/indicatorppadownloadstatistics.sh```
 
+
 Config / Log
 ------------
 
@@ -161,12 +164,14 @@ During the course of normal operation, the indicator may write to the config at 
 
 In the event an error occurs, a log file will be written to `$HOME/indicatorppadownloadstatistics.log`.
 
+
 Limitations
 -----------
 
 - `Kubuntu 24.04`: No autostart.
 - `Manjaro 24`: No autostart.
 - `Manjaro 25`: No autostart.
+
 
 Uninstall
 ---------
@@ -344,6 +349,7 @@ Uninstall
 3. The `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` extension may be turned [off](https://extensions.gnome.org/extension/615/appindicator-support) if no longer in use by other indicators.
 
 </details>
+
 
 License
 -------

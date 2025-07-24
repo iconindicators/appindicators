@@ -13,6 +13,7 @@ This project contains application indicators written in `Python3` for `Ubuntu 20
 - [indicatortide](https://github.com/iconindicators/appindicators/blob/main/indicatortide/src/indicatortide/README.md)
 - [indicatorvirtualbox](https://github.com/iconindicators/appindicators/blob/main/indicatorvirtualbox/src/indicatorvirtualbox/README.md)
 
+
 License
 -------
 
