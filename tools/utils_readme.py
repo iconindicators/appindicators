@@ -127,6 +127,9 @@ class IndicatorName( Enum ):
 URL_GNOME_EXTENSION = (
     "https://extensions.gnome.org/extension/615/appindicator-support" )
 
+URL_INDICATOR_ON_GITHUB = (
+    "https://github.com/iconindicators/appindicators/blob/main" )
+
 
 def _is_indicator(
     indicator,
@@ -157,6 +160,11 @@ def _get_indicator_names_sans_current(
     return indicators
 
 
+def _get_url_to_indicator_on_github( indicator ):
+    return (
+        f"{ URL_INDICATOR_ON_GITHUB }/{ indicator }/src/{ indicator }" )
+
+
 def _get_introduction_project():
 
     content = (
@@ -170,8 +178,7 @@ def _get_introduction_project():
     for indicator in IndicatorName:
         indicator_name = indicator.name.lower()
         link = indicator_name
-        url = f"{ indicator_name }/{ indicator_name }.md"  #TODO Not sure yet if this link is correct...
-        #may need to be a directory or two down.
+        url = f"{ _get_url_to_indicator_on_github( indicator_name ) }/README.md"
         content += f"- [{ link }]({ url })\n"
 
     content += "\n\n"
@@ -226,8 +233,9 @@ def _get_introduction_indicator(
     else:
         introduction += "Other indicators in this series are:\n"
         for indicator_ in _get_indicator_names_sans_current( indicator ):
-    #TODO URL below needs to point to the .md on Github I think rather than pypi
-            introduction += f"- [{ indicator_ }](https://pypi.org/project/{ indicator_ })\n"
+            link = indicator_
+            url = f"{ _get_url_to_indicator_on_github( indicator_ ) }/README.md"
+            introduction += f"- [{ link }]({ url })\n"
 
     return introduction
 
