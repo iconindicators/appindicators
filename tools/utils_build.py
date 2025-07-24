@@ -454,32 +454,6 @@ def _get_msgstr_from_po(
     return msgstr
 
 
-#TODO May not be needed but could be useful...
-def _markdown_to_html(
-    directory_release,
-    indicator ):
-
-    readme_md = directory_release / indicator / "README.md"
-    command = f"python3 -m tools.markdown_to_html { readme_md }"
-
-    stdout_, stderr_, return_code = (
-        utils.python_run(
-            command,
-            utils.VENV_BUILD ) )
-
-    if return_code == 0:
-        readme_html = Path( readme_md.parent / "README.html" )
-        readme_html.rename(
-            readme_html.parent / "src" / indicator / "README.html" )
-
-        message = ""
-
-    else:
-        message = _get_message( stderr_, return_code )
-
-    return message
-
-
 def _get_translated_names_and_comments_from_po_files(
     directory_indicator_locale,
     name,
@@ -909,9 +883,6 @@ def _package_source(
             indicator,
             authors_emails,
             start_year )
-
-#TODO I don't think this is required...
-        # message = _markdown_to_html( directory_dist, indicator )
 
     if not message:
         directory_indicator_locale = (
