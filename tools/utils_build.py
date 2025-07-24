@@ -23,19 +23,6 @@ Requires polib to be installed by the calling script.
 '''
 
 
-#TODO There is a (what seems to be mandatory) LICENSE file on the GitHub site
-#   https://github.com/iconindicators/appindicators
-# so maybe create a mock LICENSE file in the project root and see where it ends
-# up in the build.
-#
-# I think the LICENSE file is redundant for building a wheel though,
-# given using the 'license' field in pyproject.toml
-#
-# So maybe copy whatever GitHub uses and place that at root of project.
-# When doing the build, ensure that same file is not part of the orig.tar.gz
-# nor the .whl
-
-
 import configparser
 import datetime
 import filecmp
