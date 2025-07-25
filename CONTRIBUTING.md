@@ -48,7 +48,7 @@ To run `indicatortest`:
 
 The virtual environment `venv_run` will be created.
 
-Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` [page](https://pypi.org/project/indicatortest).
+Various operating system packages will likely need to be installed; refer to the installation [instructions](https://github.com/iconindicators/appindicators).
 
 Additional indicators may be appended to the above command.
 
@@ -79,7 +79,7 @@ The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_in
 
 Additional indicators may be appended to the above command.
 
-Various operating system packages will likely need to be installed; refer to the installation instructions at the indicator's `PyPI` [page](https://pypi.org/project/indicatortest).
+Various operating system packages will likely need to be installed; refer to the installation [instructions](https://github.com/iconindicators/appindicators).
 
 ---
 
@@ -101,13 +101,6 @@ Alternatively to running in a terminal, edit `$HOME/.local/share/applications/in
 
 ## Release to TestPyPI
 
-TODO
-    Test
-    Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
-    For release to PyPI, can I also use the --repository flag (and what would it be)?
-    https://twine.readthedocs.io/en/stable/
-    https://packaging.python.org/en/latest/tutorials/packaging-projects/
-
 For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`:
 
 ```
@@ -115,7 +108,7 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
     venv=venv_build && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install pip twine && \
+    python3 -m pip install twine && \
     python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_${indicator}/* && \
     deactivate
 ```
@@ -124,7 +117,7 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
 
 ## Install from TestPyPI
 
-To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`, first, install the operating system packages listed at the indicator's `PyPI` [page](https://pypi.org/project/indicatortest).
+To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`, first, install the [operating system packages](https://github.com/iconindicators/appindicators).
 
 Then install `indicatortest`:
 
@@ -142,10 +135,6 @@ Then install `indicatortest`:
 
 ## Release to PyPI
 
-TODO
-    Test
-    Maybe have a release_wheel.py which takes a flag for PyPI or TestPyPI?
-
 To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
 
 ```
@@ -153,7 +142,7 @@ To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
     venv=venv_build && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install pip twine && \
+    python3 -m pip install twine && \
     python3 -m twine upload --username __token__ release/wheel/dist_${indicator}/* && \
     deactivate
 ```
@@ -167,7 +156,7 @@ References:
 
 ## Install from PyPI
 
-To install the indicator from `PyPI` to a virtual environment in `$HOME/.local/venv_indicators`, refer to the indicator's `PyPI` [page](https://pypi.org/project/indicatortest).
+To install the indicator from `PyPI`, refer to instructions [here](https://github.com/iconindicators/appindicators).
 
 Note that if installing over an existing install with the same version, will need to add `--force-reinstall` after `--upgrade` (which may be removed from a [future release](https://github.com/pypa/pip/issues/8238) of `pip`).
 
