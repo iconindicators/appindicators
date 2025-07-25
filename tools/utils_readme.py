@@ -986,8 +986,6 @@ def build_readme_for_wheel(
         content )
 
 
-#TODO Perhaps link to the images/screenshots on stackexchange or include
-# those images in either the front page, or each indicator's install page.
 def build_readme_for_project_and_indicators():
     '''
     Build the README.md for the project and each indicator.
