@@ -59,28 +59,46 @@ libayatana-appindicator-glib and update the install instructions.
 
 ### Migration of Indicators from Subversion to GitHub
 
-Created an organisation:
+https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
 
-  https://github.com/iconindicators
+https://git-scm.com/book/ms/v2/Git-and-Other-Systems-Migrating-to-Git
 
-Created a respository for the Python3 appindicators:
+https://git-scm.com/docs/git-svn
 
-  https://github.com/iconindicators/appindicators
+svn checkout http://192.168.1.102/indicators indicators-svn
+git svn clone http://192.168.1.102/indicators -r HEAD indicators-git
+cd indicators-git
 
-Import Subversion to GitHub; include commit history?
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
 
-  https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
-  https://git-scm.com/book/ms/v2/Git-and-Other-Systems-Migrating-to-Git
-  http://esr.ibiblio.org/?p=6778
-  http://www.catb.org/~esr/reposurgeon/repository-editing.html#conversion
-  https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
-  https://stackoverflow.com/questions/22931404/import-svn-repo-to-git-without-history
-  https://stackoverflow.com/questions/43362551/import-svn-folder-structure-to-git-repo-without-history-users
-  https://stackoverflow.com/questions/747075/how-to-git-svn-clone-the-last-n-revisions-from-a-subversion-repository
-  https://stackoverflow.com/questions/79165/how-do-i-migrate-an-svn-repository-with-history-to-a-new-git-repository
-  https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
-  https://git-scm.com/docs/git-svn
-  https://stackoverflow.com/questions/6695783/import-subversion-repository-into-git
+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
+
+git remote add origin https://github.com/iconindicators/test.git
+
+https://github.com/iconindicators
+https://github.com/iconindicators/appindicators
+
+https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github
+
+
+### GitHub Recovery Codes
+
+6071b-8ba40
+24e60-afd2c
+5ca7c-338e4
+58f09-3b732
+5a007-1f19d
+4f23e-0069a
+6c055-c5a34
+8f701-3c2cf
+4eccf-0249a
+6bbbb-8e516
+7ddad-d506f
+1e289-258bd
+e08e8-2689b
+b42ee-0fd96
+5379a-4c8b5
+1acd0-c254e
 
 
 ### Migration of Sourceforge projects to GitHub
