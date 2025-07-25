@@ -19,57 +19,64 @@
 ''' Run Pylint, with several checks disabled. '''
 
 
+from pathlib import Path
+
 from . import utils
 
 
 if __name__ == "__main__":
-    command = (
-        # Remove symbolic links to indicatorbase.py to avoid duplicates.
+
+    # Remove symbolic links to indicatorbase.py to avoid duplicates.
+    command_remove_symbolic_links = (
         "for dirs in indicator*; do "
         "if [ -L $dirs/src/$dirs/indicatorbase.py ] ; "
         "then rm $dirs/src/$dirs/indicatorbase.py ; fi ; "
-        "done && "
+        "done" )
 
-        # Any check may be enabled/disabled by appropriate commenting.
-        "python3 -m pylint "
+    # Re-enable any check by commenting out the appropriate line.
+    pylint_disabled_checks = (
         "--disable=attribute-defined-outside-init "
-        # "--disable=f-string-without-interpolation "
         "--disable=fixme "
-        # "--disable=import-error "
         "--disable=line-too-long "
-        # "--disable=missing-function-docstring "
-        # "--disable=no-member "
         "--disable=no-name-in-module "
         "--disable=relative-beyond-top-level "
         "--disable=too-few-public-methods "
         "--disable=too-many-arguments "
-        # "--disable=too-many-boolean-expressions "
-        # "--disable=too-many-branches "
         "--disable=too-many-instance-attributes "
         "--disable=too-many-lines "
         "--disable=too-many-locals "
-        # "--disable=too-many-nested-blocks "
         # "--disable=too-many-positional-arguments " # Does not work on Ubuntu 20.04
         "--disable=too-many-public-methods "
         "--disable=too-many-statements "
         "--disable=undefined-variable "
         "--disable=unused-argument "
         "--disable=unused-variable "
-        "--disable=wrong-import-position "
+        "--disable=wrong-import-position" )
 
+    command_pylint = (
+        "python3 -m pylint "
         "--recursive=y "
-        "--ignore=release,venv_build,venv_run,meteorshowertest.py "
-        "../Indicators "
-        "--output=pylint.txt ; " # Must be ; not && otherwise will stop.
+        "--ignore=release,venv_build,venv_run,astroskyfield.pymeteorshowertest.py "
+        "--output=pylint.txt " 
+        f"{ pylint_disabled_checks } "
+        f"../{ Path.cwd().stem }" )
 
-        "sort --output=pylint.txt -t ':' --key=4,4 --key=1,1 --key=2,2n pylint.txt && "
+    command_sort = (
+        "sort --output=pylint.txt -t ':' --key=4,4 --key=1,1 --key=2,2n pylint.txt" )
 
-        # Reinstate symbolic links to indicatorbase.py.
+    # Reinstate symbolic links to indicatorbase.py.
+    command_reinstate_symbolic_links = (
         "for dirs in indicator*; do "
         "if [ ! -f $dirs/src/$dirs/indicatorbase.py ]; "
         "then ln -sr indicatorbase/src/indicatorbase/indicatorbase.py "
         "$dirs/src/$dirs/indicatorbase.py; fi ; "
         "done" )
+
+    command = (
+        f"{ command_remove_symbolic_links } && "
+        f"{ command_pylint } ; " # Must be ; not && otherwise will stop.
+        f"{ command_sort } && "
+        f"{ command_reinstate_symbolic_links }" )
 
     modules_to_install = [
         "pylint" ]
