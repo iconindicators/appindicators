@@ -1,7 +1,6 @@
 ## Introduction
 
-This project produces the following `appindicators` for `Ubuntu 20.04` and similar:
-
+This project produces the following `appindicators` for `Ubuntu 20.04` et al:
 - `indicatorfortune`
 - `indicatorlunar`
 - `indicatoronthisday`
@@ -15,16 +14,11 @@ This project produces the following `appindicators` for `Ubuntu 20.04` and simil
 
 where each indicator is built upon `indicatorbase`.
 
-Rather than have a separate top-level project for each indicator, `indicatorbase` has
-`pyprojectbase.toml` and each indicator has its own `pyprojectspecific.toml`.
-When building a `.whl` for release to `PyPI`, `pyprojectbase.toml` and
-`pyprojectspecific.toml` are merged to create a `pyproject.toml`.
+Rather than have a project for each indicator, `indicatorbase` has `pyprojectbase.toml` which covers the fields common to all indicators and each indicator has its own `pyprojectspecific.toml` for variations.  When building a `.whl` for release to `PyPI`, `pyprojectbase.toml` and `pyprojectspecific.toml` are merged to create a `pyproject.toml`.
 
 Similarly for `MANIFESTbase.in` and `MANIFESTspecific.in`, if an indicator uses a manifest.
 
-Files common across all indicators such as `.desktop` and various `bash` scripts
-differ slightly by some tags which are replaced during the build to create specific
-versions for the indicator.
+Files such as `.desktop` and various `bash` scripts are common enough across all indicators that they only need tags replaced during the build to create specific versions for an indicator.
 
 ---
 
