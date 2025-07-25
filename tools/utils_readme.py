@@ -1009,8 +1009,7 @@ def build_readme_for_project_and_indicators():
             indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
                 changelog_markdown ) )
 
-        if start_year < start_year_earliest:
-            start_year_earliest = start_year
+        start_year_earliest = min( start_year, start_year_earliest )
 
         name_human_readable, categories, comments, message = (
             utils.get_name_categories_comments_from_indicator(
