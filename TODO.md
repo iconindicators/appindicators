@@ -39,6 +39,8 @@ update the URL at the top with:
 Also update the indicator name (remove the hyphen from the name).
 
 
+# Long Term
+
 ### Test on distros dropping X11 support
 If wmctrl is no longer available in a given distro's packages,
 will need a new entry in the installation instructions dropping wmctrl.
@@ -47,8 +49,6 @@ Fedora 43 is expected to drop X11; when released (Nov 2025)
 Ubuntu 25.10 is expected to drop X11; when released (Oct 2025)
 Ubuntu 26.04 is expected to drop X11; when released (Apr 2026)
 
-
-# Long Term
 
 ### Deprecation of libayatana-appindicator
 When running indicator on Manjaro 25 got a deprecation warning that
