@@ -25,7 +25,7 @@ from . import utils
 if __name__ == "__main__":
     command = (
         "python3 -c \"import tools.utils_readme; "
-        f"tools.utils_readme.build_readme_for_project_and_indicators()\"" )
+        "tools.utils_readme.build_readme_for_project_and_indicators()\"" )
 
     modules_to_install = [
         "readme_renderer[md]" ]
