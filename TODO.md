@@ -14,12 +14,6 @@ For each indicator's CHANGELOG.md, at release time, update the release date in
 the latest entry to the date of release.
 
 
-### When indicatortest is released
-Post a note to
-  https://github.com/AyatanaIndicators/libayatana-appindicator/issues/76
-to help the guy out.
-
-
 ### Update the PPA description
 At
 	https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
