@@ -20,76 +20,23 @@ Post a note to
 to help the guy out.
 
 
-### Update the PPA description at
-  https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
-with the following:
+### Update the PPA description
+At
+	https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
+change the description to the following:
 
-This PPA no longer provides releases for indicators.
-Instead, for Ubuntu 20.04 and forward, all releases are made via pip (PyPI).
+For releases for Ubuntu 20.04 and forward:
 
-Refer to the new URL for each indicator:
-
-indicator-fortune: https://pypi.org/project/indicatorfortune
-indicator-lunar: https://pypi.org/project/indicatorlunar
-indicator-on-this-day: https://pypi.org/project/indicatoronthisday
-indicator-ppa-download-statistics: https://pypi.org/project/indicatorppadownloadstatistics
-indicator-punycode: https://pypi.org/project/indicatorpunycode
-indicator-script-runner: https://pypi.org/project/indicatorscriptrunner
-indicator-stardate: https://pypi.org/project/indicatorstardate
-indicator-test: https://pypi.org/project/indicatortest
-indicator-tide: https://pypi.org/project/indicatortide
-indicator-virtual-box: https://pypi.org/project/indicatorvirtualbox
-
-Screenshots for the indicators can be found at https://askubuntu.com/q/30334/67335
+    https://github.com/iconindicators/appindicators
 
 
 ### For each indicator at
-  https://askubuntu.com/questions/30334/what-application-indicators-are-available?answertab=modifieddes
-update the URL at the top with the relevant URL at PyPI.
+	https://askubuntu.com/questions/30334/what-application-indicators-are-available
+update the URL at the top with:
+
+    https://github.com/iconindicators/appindicators
 
 Also update the indicator name (remove the hyphen from the name).
-
-  https://pypi.org/project/indicatorfortune/
-  https://pypi.org/project/indicatorlunar/
-  https://pypi.org/project/indicatoronthisday/
-  https://pypi.org/project/indicatorppadownloadstatistics/
-  https://pypi.org/project/indicatorpunycode/
-  https://pypi.org/project/indicatorscriptrunner/
-  https://pypi.org/project/indicatorstardate/
-  https://pypi.org/project/indicatortide/
-  https://pypi.org/project/indicatorvirtualbox/
-
-
-When indicators released to pypi, update description at
-  https://sourceforge.net/p/appindicators/admin/overview
-to read:
-
-Source code repository for:
- - indicatorfortune
- - indicatorlunar
- - indicatoronthisday
- - indicatorppadownloadstatistics
- - indicatorpunycode
- - indicatorscriptrunner
- - indicatorstardate
- - indicatortest
- - indicatortide
- - indicatorvirtualbox
-
-More details and screenshots:
- -  https://askubuntu.com/q/30334/67335
-
-Releases:
-- https://pypi.org/project/indicatorfortune
-- https://pypi.org/project/indicatorlunar
-- https://pypi.org/project/indicatoronthisday
-- https://pypi.org/project/indicatorppadownloadstatistics
-- https://pypi.org/project/indicatorpunycode
-- https://pypi.org/project/indicatorscriptrunner
-- https://pypi.org/project/indicatorstardate
-- https://pypi.org/project/indicatortest
-- https://pypi.org/project/indicatortide
-- https://pypi.org/project/indicatorvirtualbox
 
 
 ### Test on distros dropping X11 support
