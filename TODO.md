@@ -9,16 +9,6 @@ libgirepository-2.0-dev and so changes need to be made in:
 and possibly elsewhere!
 
 
-### No autostart on Kubuntu and Manjaro
-Given there is no autostart on Kubuntu 24.04 and Manjaro 24.04.7,
-should the autostart checkbox and delay spinner be hidden?
-If some fix through an OS update appears in the meantime,
-will need to release ALL indicators again unhiding checkbox and spinner.
-Could have a tooltip...but if the fix comes, don't need to re-release but should.
-Otherwise just leave as is...and keep the entry in the changelog.
-What to do?
-
-
 ### Update date in CHANGELOG.md
 For each indicator's CHANGELOG.md, at release time, update the release date in
 the latest entry to the date of release.
