@@ -974,4 +974,9 @@ def build_wheel(
         else:
             message = _get_message( stderr_, return_code )
 
+    # Must remove the directory otherwise when uploading to PyPI/TestPyPI,
+    # an error will occur if a directory is found (rather than just files).
+    # Comment this line out if just doing build/debug/test.
+    shutil.rmtree( directory_dist / indicator )
+
     sys.stdout.write( message )
