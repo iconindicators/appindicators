@@ -370,7 +370,9 @@ class IndicatorScriptRunner( IndicatorBase ):
                             "[" + key + "]",
                             command_result ) )
 
-        return indicator_text_processed[ 0 : - len( self.indicator_text_separator ) ] # Trim last separator.
+        return (
+            indicator_text_processed[
+                0 : - len( self.indicator_text_separator ) ] ) # Trim last separator.
 
 
     def on_preferences(

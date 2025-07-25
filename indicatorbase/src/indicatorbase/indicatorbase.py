@@ -629,7 +629,9 @@ class IndicatorBase( ABC ):
 
                 elif line.startswith( self._DOT_DESKTOP_EXEC ):
                     if not exec_with_sleep_present:
-                        line_ = line.replace( "{indicator}", self.indicator_name )
+                        line_ = (
+                            line.replace( "{indicator}", self.indicator_name ) )
+
                         if delay:
                             output += line_.replace( '0', delay )
 
@@ -1882,7 +1884,7 @@ class IndicatorBase( ABC ):
         Return a box created with labels, corresponding tooltips and functions
         with arguments.
 
-        The labels, tooltips and function/arguments must be tuples of equal size.
+        The labels, tooltips and function/arguments must be equal-sized tuples.
         '''
         buttons_and_expands = [ ]
         z = zip( labels, tooltip_texts, clicked_functionandarguments )
@@ -2185,12 +2187,15 @@ class IndicatorBase( ABC ):
                 treeviewcolumn.pack_start(
                     renderer_attribute_columnmodelid[ 0 ], False )
 
-                treeviewcolumn.add_attribute( *renderer_attribute_columnmodelid )
+                treeviewcolumn.add_attribute(
+                    *renderer_attribute_columnmodelid )
 
             else:
                 # Assume a tuple of tuples of
                 #   renderer, attribute, column model id.
-                for renderer, attribute, columnmodelid in renderer_attribute_columnmodelid:
+                for renderer, attribute, columnmodelid in (
+                    renderer_attribute_columnmodelid ):
+
                     treeviewcolumn.pack_start( renderer, False )
                     treeviewcolumn.add_attribute(
                         renderer, attribute, columnmodelid )
@@ -2213,7 +2218,9 @@ class IndicatorBase( ABC ):
             treeview.append_column( treeviewcolumn )
 
         if celldatafunctionandarguments_renderers_columnviewids:
-            for data_function_and_arguments, renderer, columnviewid in celldatafunctionandarguments_renderers_columnviewids:
+            for data_function_and_arguments, renderer, columnviewid in (
+                celldatafunctionandarguments_renderers_columnviewids ):
+
                 for i, treeviewcolumn in enumerate( treeview.get_columns() ):
                     if columnviewid == i:
                         treeviewcolumn.set_cell_data_func(
@@ -2227,16 +2234,24 @@ class IndicatorBase( ABC ):
 
         if sortcolumnviewids_columnmodelids:
             for columnviewid, columnmodelid in sortcolumnviewids_columnmodelids:
-                for indexcolumn, treeviewcolumn in enumerate( treeview.get_columns() ):
+                for indexcolumn, treeviewcolumn in (
+                    enumerate( treeview.get_columns() ) ):
+
                     if columnviewid == indexcolumn:
                         treeviewcolumn.set_sort_column_id( columnmodelid )
-                        if sortcolumnviewids_columnmodelids.index( ( columnviewid, columnmodelid ) ) == 0:
+                        index = (
+                            sortcolumnviewids_columnmodelids.index(
+                                ( columnviewid, columnmodelid ) ) )
+
+                        if index == 0:
                             # Set first sorted column as default ascending.
                             treemodel.set_sort_column_id(
                                 columnmodelid, Gtk.SortType.ASCENDING )
 
         if clickablecolumnviewids_functionsandarguments:
-            for columnviewid_functionandarguments in clickablecolumnviewids_functionsandarguments:
+            for columnviewid_functionandarguments in (
+                clickablecolumnviewids_functionsandarguments ):
+
                 for i, treeviewcolumn in enumerate( treeview.get_columns() ):
                     if columnviewid_functionandarguments[ 0 ] == i:
                         treeviewcolumn.set_clickable( True )
@@ -2369,9 +2384,11 @@ class IndicatorBase( ABC ):
         # fortunes/calendars, not just those selected/defined by the user.
         for system_fortune_or_calendar in system_fortunes_or_calendars:
             system_fortune_or_calendar_in_user_fortunes_or_calendars = (
-                [ system_fortune_or_calendar, True ] in user_fortunes_or_calendars
+                [ system_fortune_or_calendar, True ] in
+                    user_fortunes_or_calendars
                 or
-                [ system_fortune_or_calendar, False ] in user_fortunes_or_calendars )
+                [ system_fortune_or_calendar, False ] in
+                    user_fortunes_or_calendars )
 
             if not system_fortune_or_calendar_in_user_fortunes_or_calendars:
                 store.append( [ system_fortune_or_calendar, False ] )
@@ -2797,7 +2814,9 @@ class IndicatorBase( ABC ):
         '''
         is_qterminal_and_broken_ = False
         if "qterminal" in terminal:
-            qterminal_version = IndicatorBase.process_run( "qterminal --version" )[ 0 ]
+            qterminal_version = (
+                IndicatorBase.process_run( "qterminal --version" )[ 0 ] )
+
             is_qterminal_and_broken_ = qterminal_version < "1.2.0"
 
         return is_qterminal_and_broken_
@@ -2811,7 +2830,8 @@ class IndicatorBase( ABC ):
         '''
         terminal = None
         execution_flag = None
-        for _terminal, _execution_flag in IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS:
+        for _terminal, _execution_flag in (
+            IndicatorBase._TERMINALS_AND_EXECUTION_FLAGS ):
             terminal = (
                 IndicatorBase.process_run(
                     "which " + _terminal,
@@ -3339,7 +3359,11 @@ class IndicatorBase( ABC ):
         The full directory path will be
             ~/user_base_directory/application_base_directory
         '''
-        directory = Path.home() / user_base_directory / application_base_directory
+        directory = (
+            Path.home() /
+            user_base_directory /
+            application_base_directory )
+
         directory.mkdir( parents = True, exist_ok = True )
         return directory
 
@@ -3377,17 +3401,17 @@ class IndicatorBase( ABC ):
         On stderr, a non-zero return code, or exception, a log entry will be
         made (where logging is available).
 
-        If ignore_stderr_and_non_zero_return_code is True and either stderr or
-        a non-zero return code results, no log entry will be made.
-        If ignore_stderr_and_non_zero_return_code is False and either stderr or
-        a non-zero return code results, a log entry will be made only if
+        If ignore_stderr_and_non_zero_return_code is True and either stderr
+        or a non-zero return code results, no log entry will be made.
+        If ignore_stderr_and_non_zero_return_code is False and either stderr
+        or a non-zero return code results, a log entry will be made only if
         capture_output is True.
         On an exception, a log entry will be made.
 
         If capture_output is True, stdout and stderr will be captured and
         returned to the user, along with the return code.
-        On False, stdout and stderr will be set to None and returned to the user
-        along with the return code.
+        On False, stdout and stderr will be set to None and returned to the
+        user along with the return code.
         If an exception occurs, a log entry will be made.
         '''
 

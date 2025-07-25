@@ -622,7 +622,8 @@ class IndicatorLunar( IndicatorBase ):
                 processed_text[ 0 : last_separator_index ]
                 +
                 processed_text[
-                    last_separator_index + len( self.indicator_text_separator ) : ] )
+                    last_separator_index +
+                    len( self.indicator_text_separator ) : ] )
 
         # Remove remaining tags (will not have been removed because they were
         # not contained within { }.
@@ -757,7 +758,8 @@ class IndicatorLunar( IndicatorBase ):
         illumination_percentage = int( round( float( self.data[ key_ ] ) ) )
 
         key_ = key + ( IndicatorLunar.astro_backend.DATA_TAG_BRIGHT_LIMB, )
-        bright_limb_angle_in_degrees = int( math.degrees( float( self.data[ key_ ] ) ) )
+        bright_limb_angle_in_degrees = (
+            int( math.degrees( float( self.data[ key_ ] ) ) ) )
 
         svg_icon_text = (
             self.get_svg_icon_text(
@@ -907,17 +909,20 @@ class IndicatorLunar( IndicatorBase ):
                     key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_AZIMUTH, ) ],
                 IndicatorLunar.DATE_TIME_FORMAT_HHcolonMM ) )
 
+        satellite_data = (
+            self.satellite_general_perturbation_data[ number ] )
+
         summary = (
             self.satellite_notification_summary.
             replace(
                 IndicatorLunar.astro_backend.SATELLITE_TAG_NAME,
-                self.satellite_general_perturbation_data[ number ].get_name() ).
+                satellite_data.get_name() ).
             replace(
                 IndicatorLunar.astro_backend.SATELLITE_TAG_NUMBER,
-                self.satellite_general_perturbation_data[ number ].get_number() ).
+                satellite_data.get_number() ).
             replace(
                 IndicatorLunar.astro_backend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR,
-                self.satellite_general_perturbation_data[ number ].get_international_designator() ).
+                satellite_data.get_international_designator() ).
             replace(
                 IndicatorLunar.astro_backend.SATELLITE_TAG_RISE_AZIMUTH,
                 rise_azimuth ).
@@ -936,13 +941,13 @@ class IndicatorLunar( IndicatorBase ):
             self.satellite_notification_message.
             replace(
                 IndicatorLunar.astro_backend.SATELLITE_TAG_NAME,
-                self.satellite_general_perturbation_data[ number ].get_name() ).
+                satellite_data.get_name() ).
             replace(
                 IndicatorLunar.astro_backend.SATELLITE_TAG_NUMBER,
-                self.satellite_general_perturbation_data[ number ].get_number() ).
+                satellite_data.get_number() ).
             replace(
                 IndicatorLunar.astro_backend.SATELLITE_TAG_INTERNATIONAL_DESIGNATOR,
-                self.satellite_general_perturbation_data[ number ].get_international_designator() ).
+                satellite_data.get_international_designator() ).
             replace(
                 IndicatorLunar.astro_backend.SATELLITE_TAG_RISE_AZIMUTH,
                 rise_azimuth ).
@@ -1070,14 +1075,16 @@ class IndicatorLunar( IndicatorBase ):
                 self._format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_EQUINOX,
                     self.data[
-                        key + ( IndicatorLunar.astro_backend.DATA_TAG_EQUINOX, ) ] ) )
+                        key +
+                        ( IndicatorLunar.astro_backend.DATA_TAG_EQUINOX, ) ] ) )
 
             solstice_label = (
                 _( "Solstice: " ) +
                 self._format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE,
                     self.data[
-                        key + ( IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE, ) ] ) )
+                        key +
+                        ( IndicatorLunar.astro_backend.DATA_TAG_SOLSTICE, ) ] ) )
 
             equinox_before_solsitce = (
                 self.data[ key + ( IndicatorLunar.astro_backend.DATA_TAG_EQUINOX, ) ]
@@ -1149,7 +1156,8 @@ class IndicatorLunar( IndicatorBase ):
             self._format_data(
                 IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME,
                 self.data[
-                    key +( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
+                    key +
+                    ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_DATE_TIME, ) ] ),
             name = url,
             activate_functionandarguments = (
                 self.get_on_click_menuitem_open_browser_function(), ),
@@ -1161,7 +1169,8 @@ class IndicatorLunar( IndicatorBase ):
             self._format_data(
                 IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_TYPE,
                 self.data[
-                    key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_TYPE, ) ] ),
+                    key +
+                    ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_TYPE, ) ] ),
             name = url,
             activate_functionandarguments = (
                 self.get_on_click_menuitem_open_browser_function(), ),
@@ -1177,13 +1186,15 @@ class IndicatorLunar( IndicatorBase ):
                 self._format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE,
                     self.data[
-                        key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE, ) ] ) )
+                        key +
+                        ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LATITUDE, ) ] ) )
 
             longitude = (
                 self._format_data(
                     IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LONGITUDE,
                     self.data[
-                        key + ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LONGITUDE, ) ] ) )
+                        key +
+                        ( IndicatorLunar.astro_backend.DATA_TAG_ECLIPSE_LONGITUDE, ) ] ) )
 
             self.create_and_append_menuitem(
                 menu,
@@ -1470,15 +1481,18 @@ class IndicatorLunar( IndicatorBase ):
 
                     sun_rise = (
                         self.data[
-                            key_sun + ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] )
+                            key_sun +
+                            ( IndicatorLunar.astro_backend.DATA_TAG_RISE_DATE_TIME, ) ] )
 
                     sun_set = (
                         self.data[
-                            key_sun + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] )
+                            key_sun +
+                            ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] )
 
                     body_set_date_time = (
                         self.data[
-                            key + ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] )
+                            key +
+                            ( IndicatorLunar.astro_backend.DATA_TAG_SET_DATE_TIME, ) ] )
 
                     if target_body_type and body_set_date_time < sun_set < sun_rise:
                         if not self.hide_bodies_below_horizon:
@@ -1604,9 +1618,9 @@ class IndicatorLunar( IndicatorBase ):
 
         Next rise/set:
 
-                      R       S                           Satellite will rise within the five minute window; display next rise/set.
-                      R               S                   Satellite will rise within the five minute window; display next rise/set.
-                                      R       S           Satellite will rise after five minute window; display next rise; check if in previous transit.
+                      R       S                    Rise within the five minute window; display next rise/set.
+                      R               S            Rise within the five minute window; display next rise/set.
+                                      R       S    Rise after five minute window; display next rise; check if in previous transit.
              ^                    ^
           utc_now             utc_now + 5
 
@@ -1615,12 +1629,12 @@ class IndicatorLunar( IndicatorBase ):
 
         Previous rise/set:
 
-           R       S                                                   Satellite has set; display next rise/set.
-           R                       S                                   Satellite in transit; display previous rise/set.
-           R                                           S               Satellite in transit; display previous rise/set.
-                                   R       S                           Satellite will rise within the five minute window; display previous rise/set.
-                                   R                   S               Satellite will rise within the five minute window; display previous rise/set.
-                                                       R       S       Satellite will rise after five minute window; display next rise.
+           R       S                                               Satellite has set; display next rise/set.
+           R                       S                               In transit; display previous rise/set.
+           R                                           S           In transit; display previous rise/set.
+                                   R       S                       Rise within the five minute window; display previous rise/set.
+                                   R                   S           Rise within the five minute window; display previous rise/set.
+                                                       R       S   Rise after five minute window; display next rise.
                           ^                    ^
                        utc_now             utc_now + 5
 

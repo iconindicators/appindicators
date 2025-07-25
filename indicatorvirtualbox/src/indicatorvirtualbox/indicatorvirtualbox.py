@@ -762,10 +762,18 @@ class IndicatorVirtualBox( IndicatorBase ):
         response_type = dialog.run()
         if response_type == Gtk.ResponseType.OK:
             self.virtualbox_manager_window_name = window_name.get_text().strip()
-            self.delay_between_autostart_in_seconds = spinner_delay.get_value_as_int()
+
+            self.delay_between_autostart_in_seconds = (
+                spinner_delay.get_value_as_int() )
+
             self.show_submenu = show_as_submenus_checkbox.get_active()
-            self.sort_groups_and_virtual_machines_equally = sort_groups_and_virtual_machines_equally_checkbox.get_active()
-            self.refresh_interval_in_minutes = spinner_refresh_interval.get_value_as_int()
+
+            self.sort_groups_and_virtual_machines_equally = (
+                sort_groups_and_virtual_machines_equally_checkbox.get_active() )
+
+            self.refresh_interval_in_minutes = (
+                spinner_refresh_interval.get_value_as_int() )
+
             self.virtual_machine_preferences.clear()
 
             self._update_virtual_machine_preferences(
