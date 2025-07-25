@@ -1,5 +1,27 @@
 # Immediate
 
+### Migration of Indicators from Subversion to GitHub
+
+https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
+
+https://git-scm.com/book/ms/v2/Git-and-Other-Systems-Migrating-to-Git
+
+https://git-scm.com/docs/git-svn
+
+svn checkout http://192.168.1.102/indicators indicators-svn
+git svn clone http://192.168.1.102/indicators -r HEAD indicators-git
+cd indicators-git
+
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
+
+git remote add origin https://github.com/iconindicators/test.git
+
+https://github.com/iconindicators
+https://github.com/iconindicators/appindicators
+
+https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github
+
+
 ### Debian 13 / Ubuntu 26.04
 
 When these versions are released, will likely have to switch to
@@ -55,50 +77,6 @@ for ALL distros are yet to upgrade.
 
 Will need to eventually swap over each distro as it is released with
 libayatana-appindicator-glib and update the install instructions.
-
-
-### Migration of Indicators from Subversion to GitHub
-
-https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
-
-https://git-scm.com/book/ms/v2/Git-and-Other-Systems-Migrating-to-Git
-
-https://git-scm.com/docs/git-svn
-
-svn checkout http://192.168.1.102/indicators indicators-svn
-git svn clone http://192.168.1.102/indicators -r HEAD indicators-git
-cd indicators-git
-
-https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
-
-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
-
-git remote add origin https://github.com/iconindicators/test.git
-
-https://github.com/iconindicators
-https://github.com/iconindicators/appindicators
-
-https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github
-
-
-### GitHub Recovery Codes
-
-6071b-8ba40
-24e60-afd2c
-5ca7c-338e4
-58f09-3b732
-5a007-1f19d
-4f23e-0069a
-6c055-c5a34
-8f701-3c2cf
-4eccf-0249a
-6bbbb-8e516
-7ddad-d506f
-1e289-258bd
-e08e8-2689b
-b42ee-0fd96
-5379a-4c8b5
-1acd0-c254e
 
 
 ### Migration of Sourceforge projects to GitHub
