@@ -1,41 +1,42 @@
 # Russian translation for indicatorppadownloadstatistics.
-# Copyright (C) 2012-2025 Bernard Giannetti.
+# Copyright (C) 2015-2025 Bernard Giannetti
 # This file is distributed under the same license as the indicatorppadownloadstatistics package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2024.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2025.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorppadownloadstatistics 1.0.81\n"
+"Project-Id-Version: indicator-ppa-download-statistics 1.0.81\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2025-07-13 20:20+1000\n"
-"PO-Revision-Date: 2025-03-14 16:55+1100\n"
+"PO-Revision-Date: 2025-07-25 16:54+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: indicatorppadownloadstatistics.py:41
 msgid "Indicator PPA Download Statistics"
-msgstr "Индикатор статистики закачек из PPA"
+msgstr "Индикатор статистики загрузок из PPA"
 
 #: indicatorppadownloadstatistics.py:58
 msgid "(network error - check the log)"
-msgstr ""
+msgstr "(сетевая ошибка - проверьте журнал)"
 
 #: indicatorppadownloadstatistics.py:59
 msgid "(unknown error - check the log)"
-msgstr ""
+msgstr "(неизвестная ошибка - проверьте журнал)"
 
 #: indicatorppadownloadstatistics.py:60
 msgid "(timeout error - check the log)"
-msgstr ""
+msgstr "(ошибка ожидания - проверьте журнал)"
 
 #: indicatorppadownloadstatistics.py:61
 msgid "(published binaries completely filtered)"
-msgstr "(двоичные файлы полностью отфильтрованы)"
+msgstr "(опубликованные двоичные файлы полностью отфильтрованы)"
 
 #: indicatorppadownloadstatistics.py:62
 msgid "(no published binaries)"
@@ -43,7 +44,7 @@ msgstr "(нет опубликованных двоичных файлов)"
 
 #: indicatorppadownloadstatistics.py:70
 msgid "Displays the total downloads of PPAs."
-msgstr "Показать статистику закачек из PPA."
+msgstr "Отображает общее количество загрузок из PPA."
 
 #: indicatorppadownloadstatistics.py:413
 msgid "Double click to edit a PPA."
@@ -54,14 +55,12 @@ msgid "Remove the selected PPA."
 msgstr "Удалить выбранный PPA."
 
 #: indicatorppadownloadstatistics.py:420 indicatorppadownloadstatistics.py:671
-#, fuzzy
 msgid "User"
-msgstr "Пользователь PPA"
+msgstr "Имя пользователя"
 
 #: indicatorppadownloadstatistics.py:421 indicatorppadownloadstatistics.py:701
-#, fuzzy
 msgid "Name"
-msgstr "Название PPA"
+msgstr "Название"
 
 #: indicatorppadownloadstatistics.py:422 indicatorppadownloadstatistics.py:731
 msgid "Filter"
@@ -97,16 +96,15 @@ msgstr ""
 
 #: indicatorppadownloadstatistics.py:490
 msgid "Sort by download"
-msgstr "Сортировать по закачкам"
+msgstr "Сортировать по загрузкам"
 
 #: indicatorppadownloadstatistics.py:491
 msgid "Sort by download count within each PPA."
-msgstr "Сортировать по количеству закачек в каждом PPA."
+msgstr "Сортировать по количеству загрузок в каждом PPA."
 
 #: indicatorppadownloadstatistics.py:497
-#, fuzzy
 msgid "Clip amount"
-msgstr "  Ограничить количество"
+msgstr "Ограничить количество"
 
 #: indicatorppadownloadstatistics.py:507
 msgid ""
@@ -137,7 +135,6 @@ msgid "Remove the selected PPA?"
 msgstr "Удалить выбранный PPA?"
 
 #: indicatorppadownloadstatistics.py:747
-#, fuzzy
 msgid ""
 "Each line of plain text is compared\n"
 "against the name of each built package,\n"
@@ -151,16 +148,17 @@ msgid ""
 "may help by reducing the quantity of\n"
 "network requests."
 msgstr ""
-"Каждая строка текста представляет собой\n"
-"одиночный шаблон, который сравнивается\n"
-"с каждым названием пакета при загрузке.\n"
+"Каждая строка простого текста сравнивается\n"
+"НЕ с названием пакета, а с названием\n"
+"каждого собранного пакета.\n"
 "\n"
-"Если название пакета содержит ЛЮБУЮ часть\n"
-"ЛЮБОГО шаблона, то этот пакет\n"
+"Если название собранного пакета содержит\n"
+"ЛЮБУЮ часть ЛЮБОГО фильтра, то этот пакет\n"
 "включается в статистику загрузок.\n"
 "\n"
-"Регулярные выражения и символы\n"
-"группировки не допускаются!"
+"Если возникает ошибка ожидания, фильтрация\n"
+"может помочь за счёт снижения количества\n"
+"сетевых запросов."
 
 #: indicatorppadownloadstatistics.py:764
 msgid "Edit PPA"
@@ -171,26 +169,24 @@ msgid "Add PPA"
 msgstr "Добавить PPA"
 
 #: indicatorppadownloadstatistics.py:786
-#, fuzzy
 msgid "User cannot be empty."
-msgstr "Пользователь PPA не может быть пустым."
+msgstr "Имя пользователя не может быть пустым."
 
 #: indicatorppadownloadstatistics.py:791
-#, fuzzy
 msgid "Name cannot be empty."
-msgstr "Название PPA не может быть пустым."
+msgstr "Название не может быть пустым."
 
 #: indicatorppadownloadstatistics.py:811
 msgid "User and name already in use!"
-msgstr ""
+msgstr "Имя пользователя и название уже используются!"
 
 #: indicatorppadownloadstatistics.py:827
 msgid "Filter text may not contain duplicates."
-msgstr ""
+msgstr "Текст фильтра не должен содержать повторов."
 
 #: indicatorppadownloadstatistics.py:839
 msgid "Filter text may not contain spaces."
-msgstr ""
+msgstr "Текст фильтра не должен содержать пробелов."
 
 #: indicatorppadownloadstatistics.py:961
 msgid ""
@@ -198,3 +194,6 @@ msgid ""
 "\n"
 "Restore the sample PPA?"
 msgstr ""
+"PPA не заданы.\n"
+"\n"
+"Восстановить исходные значения?"

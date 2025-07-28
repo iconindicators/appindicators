@@ -1,21 +1,22 @@
 # Russian translation for indicatortide.
-# Copyright (C) 2015-2025 Bernard Giannetti.
-# This file is distributed under the same license as the indicatortide package.
-# Oleg Moiseichuk <berroll@mail.ru>, 2025.
+# Copyright (C) 2015-2025 Bernard Giannetti
+# This file is distributed under the same license as the indicator-tide package.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2025.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatortide 1.0.30\n"
+"Project-Id-Version: indicator-tide 1.0.30\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2025-07-20 00:58+1000\n"
-"PO-Revision-Date: 2025-03-14 18:28+1100\n"
+"PO-Revision-Date: 2025-07-28 15:53+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
 #: indicatortide.py:40
 msgid "Indicator Tide"
@@ -27,38 +28,35 @@ msgstr "Показывает сведения о приливах."
 
 #: indicatortide.py:69 indicatortide.py:70
 msgid "No user script specified!"
-msgstr ""
+msgstr "Пользовательский сценарий не задан!"
 
 #: indicatortide.py:72
 msgid "Please specify a user script and class name in the preferences."
-msgstr ""
+msgstr "Задайте пользовательский сценарий и имя класса в Параметрах."
 
 #: indicatortide.py:96 indicatortide.py:97
-#, fuzzy
 msgid "User script could not be found!"
-msgstr "Пользовательский сценарий с заданным именем не найден."
+msgstr "Пользовательский сценарий не найден!"
 
 #: indicatortide.py:99
 msgid "Please check the user script in the preferences."
-msgstr ""
+msgstr "Проверьте настройку пользовательского сценария в Параметрах."
 
 #: indicatortide.py:102 indicatortide.py:103
-#, fuzzy
 msgid "User script class name could not be found!"
-msgstr "Имя класса в пользовательском сценарии не может быть пустым."
+msgstr "Имя класса в пользовательском сценарии не найдено!"
 
 #: indicatortide.py:105
-#, fuzzy
 msgid "Please check the user script class name in the preferences."
-msgstr "Имя класса в пользовательском сценарии не может быть пустым."
+msgstr "Проверьте настройку имени класса в Параметрах."
 
 #: indicatortide.py:109 indicatortide.py:110
 msgid "User function could not be found!"
-msgstr ""
+msgstr "Пользовательская функция не найдена!"
 
 #: indicatortide.py:112
 msgid "You must implement the function 'get_tide_data()'."
-msgstr ""
+msgstr "Вы должны внедрить функцию 'get_tide_data()'."
 
 #: indicatortide.py:167 indicatortide.py:210
 msgid "HIGH"
@@ -69,23 +67,22 @@ msgid "LOW"
 msgstr "ОТЛИВ"
 
 #: indicatortide.py:263
-#, fuzzy
 msgid "User Script"
 msgstr "Пользовательский сценарий"
 
 #: indicatortide.py:270
-#, fuzzy
 msgid ""
 "Full path and filename\n"
 "of user's Python3 script."
-msgstr "Полный путь и имя файла пользовательского сценария Python3."
+msgstr ""
+"Полный путь и имя файла\n"
+"пользовательского сценария Python3."
 
 #: indicatortide.py:275
 msgid "Path and filename"
-msgstr ""
+msgstr "Путь и имя файла"
 
 #: indicatortide.py:284
-#, fuzzy
 msgid ""
 "Class name within the user script\n"
 "which must contain the function\n"
@@ -98,13 +95,14 @@ msgstr ""
 "Имя класса в пользовательском сценарии,\n"
 "которое должно содержать функцию\n"
 "\n"
-"    getTideData()\n"
+"    get_tide_data()\n"
 "\n"
-"разработанную пользователем, для полученияданных о приливах."
+"разработанную пользователем, для получения\n"
+"данных о приливах."
 
 #: indicatortide.py:293
 msgid "Class name"
-msgstr ""
+msgstr "Имя класса"
 
 #: indicatortide.py:300
 msgid "Show as submenus"
@@ -133,7 +131,3 @@ msgstr "Имя пользовательского сценария не може
 #: indicatortide.py:363
 msgid "The user script class name cannot be empty."
 msgstr "Имя класса в пользовательском сценарии не может быть пустым."
-
-#, fuzzy
-#~ msgid "Check the log file in your home directory."
-#~ msgstr "Проверьте журнал в домашней папке."
