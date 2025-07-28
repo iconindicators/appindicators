@@ -21,6 +21,8 @@ https://github.com/iconindicators/appindicators
 
 https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github
 
+https://docs.github.com/en/get-started/git-basics/caching-your-github-credentials-in-git
+
 
 ### Debian 13 / Ubuntu 26.04
 
@@ -81,30 +83,31 @@ libayatana-appindicator-glib and update the install instructions.
 
 ### Migration of Sourceforge projects to GitHub
 
-Need to create a repository for each stardatesystemtray and worldtimesystemtray
-on GitHub, perhaps:
-
-  https://github.com/iconindicators/stardatesystemtray
-  https://github.com/iconindicators/worldtimesystemtray
-
 Need to import from SourceForge
 
   https://sourceforge.net/projects/stardatesystray
   https://sourceforge.net/projects/wrldtimesystray
 
-into GitHub repositories; include commit history?
+into GitHub repositories
 
-When done, need to at least leave a note on the SourceForge pages
-and/or remove code.
+  https://github.com/iconindicators/stardatesystemtray
+  https://github.com/iconindicators/worldtimesystemtray
 
-Can the issues be migrated?
+include commit history?
 
-Need to look into what version of Java and/or Windows to support.
-Windows XP is no longer supported and neither is Java 6.
-So maybe look at supporting only Windows 10/11 (check for the EOL dates),
-along with the versions of Java supported for those versions of Windows.
-Consider also one or more versions prior to Windows 10 and whatever version of
-Java was last supported.
+Need to leave a note on the SourceForge pages about the change.
+Should the code be removed?
+What about old releases?  Migrate and/or remove?
+
+Can the issues/forums be migrated?
+
+
+## Upgrade of StardateSystemTray and WorldTimeSystemTray
+
+For StardateSystemTray, have set minimum Java to 1.7 as this is lowest version
+still supported.
+
+Yet to consider WorldTimeSystemTray.
 
 Windows EOL
     Vista 2017
@@ -136,36 +139,12 @@ Java EOL
     24 2025
     25 2030
 
-Downloaded Java for Windows 11; was recommended by the Oracle website to
-download Java 8.
+Downloaded Java for Windows 11;
+was recommended by the Oracle website to download Java 8.
 Installed Java 8.
 Installed Stardate System Tray.
 Installed World Time System Tray.
 Both work!
-
-
-### Swap Joda Time for Java 8 or Better
-
-According to
-  https://www.joda.org/joda-time
-if Java 8 or better is used, consider using standard Java library instead of
-Joda Time.
-
-Need to see if the required libraries (the chronologies) are available in Java 8
-and if so, look at migrating.
-
-Perhaps could even move to Java 11.
-
-The file in question is
-  stardatesystemtray/src/TrayIcon.java
-
-  https://stackoverflow.com/questions/74994050/converting-joda-datetime-to-javatime
-  https://www.securecodewarrior.com/article/migrating-joda-time-to-java-time
-  https://blog.joda.org/2014/11/converting-from-joda-time-to-javatime.html
-  https://stackoverflow.com/questions/35043788/migrate-from-joda-time-library-to-java-time-java-8
-  https://stackoverflow.com/questions/45348503/joda-time-to-java-8-conversion
-  https://stackoverflow.com/questions/73472548/converting-from-joda-to-java-time
-  https://docs.openrewrite.org/recipes/java/migrate/joda/jodatimerecipe
 
 
 ### Create non-symbolic icons
