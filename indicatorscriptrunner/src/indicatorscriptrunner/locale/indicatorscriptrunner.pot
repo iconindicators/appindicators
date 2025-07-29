@@ -210,7 +210,7 @@ msgstr ""
 #: indicatorscriptrunner.py:926
 msgid ""
 "Remove the selected group and\n"
-".all scripts within the group."
+"all scripts within the group."
 msgstr ""
 
 #: indicatorscriptrunner.py:1001

@@ -925,7 +925,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "and all scripts within the group." ) )
 
                 remove.set_tooltip_text( _(
-                    "Remove the selected group and\n." +
+                    "Remove the selected group and\n" +
                     "all scripts within the group." ) )
 
             textview.get_buffer().set_text( command_text )
