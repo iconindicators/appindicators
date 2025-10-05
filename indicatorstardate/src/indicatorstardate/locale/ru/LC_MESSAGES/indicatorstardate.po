@@ -34,7 +34,7 @@ msgstr "Показывать \"классическую\" звёздную да�
 msgid ""
 "If checked, show stardate 'classic' based on\n"
 "\n"
-"\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n"
+"\tSTARDATES IN STAR TREK FAQ V1.6 by Andrew Main.\n"
 "\n"
 "Otherwise, show stardate '2009 revised' based on\n"
 "\n"
