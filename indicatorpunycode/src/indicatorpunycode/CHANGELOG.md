@@ -2,10 +2,13 @@
 
 ## v1.0.16 (2024-09-04)
 
-- Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
-- Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
+- Reinstated the autostart option in Preferences with the addition of a optional
+  delay to start up.
+- Now includes a symbolic icon allowing the colour to be adjusted for the
+  current theme.
 - Overhauled to adhere to the pyproject.toml standard.
-- Deployment using the .deb format is superceded; PyPI (pip) is used with operating system packages and file copy.
+- Deployment using the .deb format is superceded; PyPI (pip) is used with
+  operating system packages and file copy.
 - Now includes an opt-in check during start up for the latest version at PyPI.
 
 
@@ -17,7 +20,8 @@
 
 ## v1.0.14 (2022-11-03)
 
-- Bug fix: When reducing the maximum results in the Preferences, the results were not actually reduced until the next conversion.
+- Bug fix: When reducing the maximum results in the Preferences, the results
+  were not actually reduced until the next conversion.
 - Bug fix: Fixed a deprecation warning when creating menu items.
 - Now works on the following Ubuntu variants/versions...
   - Kubuntu 20.04
@@ -48,15 +52,18 @@
 
 ## v1.0.11 (2020-11-05)
 
-- On computer startup when the indicator is set to autostart, sometimes the indicator can become unresponsive. The end user can set the property
+- On computer startup when the indicator is set to autostart, sometimes the
+  indicator can become unresponsive. The end user can set the property
 
         X-GNOME-Autostart-Delay=120
     in
 
         ~/.config/autostart/indicator-lunar.py.desktop
 
-    to delay the indicator startup (for two minutes) avoiding the issue. For new installations, by default, the value is set to zero.
-- Removed the preference for autostart. To change indicator autostart (off or on), open the file
+    to delay the indicator startup (for two minutes) avoiding the issue. For new
+    installations, by default, the value is set to zero.
+- Removed the preference for autostart. To change indicator autostart (off or
+  on), open the file
 
         ~/.config/autostart/indicator-lunar.py.desktop
 
@@ -68,7 +75,8 @@
 
         X-GNOME-Autostart-enabled=false
 
-    Alternatively, add the indicator using Startup Applications. For new installations, by default, autostart will be set to true.
+    Alternatively, add the indicator using Startup Applications. For new
+    installations, by default, autostart will be set to true.
 
 
 ## v1.0.10 (2020-04-26)
@@ -86,8 +94,10 @@
 
 - Bug fix: Dialogs now have a parent specified.
 - Now uses a base class to share functionality amongst indicators.
-- Whilst starting up, a single menu item "Initialising..." is displayed. Once fully initialised, the menu proper is shown.
-- When an update is underway or the About/Preferences dialogs are displayed, the About/Preferences/Quit menu items are disabled.
+- Whilst starting up, a single menu item "Initialising..." is displayed. Once
+  fully initialised, the menu proper is shown.
+- When an update is underway or the About/Preferences dialogs are displayed, the
+  About/Preferences/Quit menu items are disabled.
 - About dialog now shows copyright, artists and corrected URL for website.
 - Update debian/compat to 9.
 
@@ -95,8 +105,10 @@
 ## v1.0.7 (2019-05-02)
 
 - Tidy up load config of user preferences.
-- Added hyperlink to the About dialog which links to the error log text file (only visible if the underlying file is present).
-- About dialog now pulls the changelog directly from /usr/share/doc rather than a redundant duplicate in the installation directory.
+- Added hyperlink to the About dialog which links to the error log text file
+  (only visible if the underlying file is present).
+- About dialog now pulls the changelog directly from /usr/share/doc rather than
+  a redundant duplicate in the installation directory.
 - Update release to xenial as trusty is end of life.
 - Update debian/control Standards-Version to 3.9.7.
 
@@ -108,7 +120,9 @@
 
 ## v1.0.5 (2017-10-06)
 
-- Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and ubuntu-mono-light would not load due to directories not present in the underlying index.theme file.
+- Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
+  ubuntu-mono-light would not load due to directories not present in the
+  underlying index.theme file.
 
 
 ## v1.0.4 (2017-05-01)
@@ -116,7 +130,9 @@
 - Corrected warnings in .desktop file.
 - Tidied up tooltips in the Preferences dialog.
 - About/Preferences dialogs now block each other - only show one at a time.
-- User settings now stored in the directory specified by the environment variable XDG_CONFIG_HOME, or, if not present, $HOME/.config (existing user settings stored in $HOME are migrated to the new location).
+- User settings now stored in the directory specified by the environment
+  variable XDG_CONFIG_HOME, or, if not present, $HOME/.config (existing user
+  settings stored in $HOME are migrated to the new location).
 - Update release to trusty as precise is end of life.
 
 
@@ -130,13 +146,16 @@
 - Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
 - Added utf-8 encoding line.
 - Fixed PyGIWarnings on imports.
-- Overhaul of icons: only the hicolor icon is required and all theme icons are created from the hicolor via the build script.
-- Overhaul of build script: extracted common functions into a separate script used by all indicators.
+- Overhaul of icons: only the hicolor icon is required and all theme icons are
+  created from the hicolor via the build script.
+- Overhaul of build script: extracted common functions into a separate script
+  used by all indicators.
 
 
 ## v1.0.1 (2016-06-15)
 
-- If a conversion result already exists in the menu, the result is simply moved to the top of the menu.
+- If a conversion result already exists in the menu, the result is simply moved
+  to the top of the menu.
 - Removed unnecessary 'Name' translation from .desktop file.
 - Added translation capability to 'Unicode' and 'ASCII'.
 
@@ -144,4 +163,3 @@
 ## v1.0.0 (2016-06-11)
 
 - Initial release - collaboration and inspiration from Oleg Moiseichuk.
-

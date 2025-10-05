@@ -9,10 +9,13 @@
 
         datetime.datetime.utcnow()
 
-- Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
-- Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
+- Reinstated the autostart option in Preferences with the addition of a optional
+  delay to start up.
+- Now includes a symbolic icon allowing the colour to be adjusted for the
+  current theme.
 - Overhauled to adhere to the pyproject.toml standard.
-- Deployment using the .deb format is superceded; PyPI (pip) is used with operating system packages and file copy.
+- Deployment using the .deb format is superceded; PyPI (pip) is used with
+  operating system packages and file copy.
 - Now includes an opt-in check during start up for the latest version at PyPI.
 
 
@@ -54,15 +57,18 @@
 
 ## v1.0.40 (2020-11-05)
 
-- On computer startup when the indicator is set to autostart, sometimes the indicator can become unresponsive. The end user can set the property
+- On computer startup when the indicator is set to autostart, sometimes the
+  indicator can become unresponsive. The end user can set the property
 
         X-GNOME-Autostart-Delay=120
     in
 
         ~/.config/autostart/indicator-lunar.py.desktop
 
-    to delay the indicator startup (for two minutes) avoiding the issue. For new installations, by default, the value is set to zero.
-- Removed the preference for autostart. To change indicator autostart (off or on), open the file
+    to delay the indicator startup (for two minutes) avoiding the issue. For new
+    installations, by default, the value is set to zero.
+- Removed the preference for autostart. To change indicator autostart (off or
+  on), open the file
 
         ~/.config/autostart/indicator-lunar.py.desktop
 
@@ -74,7 +80,8 @@
 
         X-GNOME-Autostart-enabled=false
 
-    Alternatively, add the indicator using Startup Applications. For new installations, by default, autostart will be set to true.
+    Alternatively, add the indicator using Startup Applications. For new
+    installations, by default, autostart will be set to true.
 
 
 ## v1.0.39 (2020-04-26)
@@ -85,11 +92,14 @@
 
 ## v1.0.38 (2019-09-23)
 
-- Bug fix: On some variants of Lubuntu/Xubuntu, the icon label is absent. As a workaround, show the stardate in the mouse hover tooltip.
+- Bug fix: On some variants of Lubuntu/Xubuntu, the icon label is absent. As a
+  workaround, show the stardate in the mouse hover tooltip.
 - Bug fix: Dialogs now have a parent specified.
 - Now uses a base class to share functionality amongst indicators.
-- Whilst starting up, a single menu item "Initialising..." is displayed. Once fully initialised, the menu proper is shown.
-- When an update is underway or the About/Preferences dialogs are displayed, the About/Preferences/Quit menu items are disabled.
+- Whilst starting up, a single menu item "Initialising..." is displayed. Once
+  fully initialised, the menu proper is shown.
+- When an update is underway or the About/Preferences dialogs are displayed, the
+  About/Preferences/Quit menu items are disabled.
 - The stardate library now computes when the next update will occur.
 - About dialog now shows copyright, artists and corrected URL for website.
 - Update debian/compat to 9.
@@ -98,8 +108,10 @@
 ## v1.0.37 (2019-05-02)
 
 - Tidy up load config of user preferences.
-- Added hyperlink to the About dialog which links to the error log text file (only visible if the underlying file is present).
-- About dialog now pulls the changelog directly from /usr/share/doc rather than a redundant duplicate in the installation directory.
+- Added hyperlink to the About dialog which links to the error log text file
+  (only visible if the underlying file is present).
+- About dialog now pulls the changelog directly from /usr/share/doc rather than
+  a redundant duplicate in the installation directory.
 - Update release to xenial as trusty is end of life.
 - Update debian/control Standards-Version to 3.9.7.
 
@@ -112,19 +124,26 @@
 
 ## v1.0.35 (2017-10-06)
 
-- Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and ubuntu-mono-light would not load due to directories not present in the underlying index.theme file.
+- Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
+  ubuntu-mono-light would not load due to directories not present in the
+  underlying index.theme file.
 
 
 ## v1.0.34 (2017-04-27)
 
-- Bug fix: Underlying Stardate API incorrectly converted from '2009 revised' stardate to Gregorian datetime.datetime (was off by one day).
-- Removed the "show in menu" option as all supported platforms allow a label next to the icon.
+- Bug fix: Underlying Stardate API incorrectly converted from '2009 revised'
+  stardate to Gregorian datetime.datetime (was off by one day).
+- Removed the "show in menu" option as all supported platforms allow a label
+  next to the icon.
 - Corrected warnings in .desktop file.
 - Tidied up tool tip text in Preferences dialog.
-- Simplified the Stardate API to provide getters for conversion between Gregorian datetime.datetime and 'classic stardate and '2009 revised' stardates.
+- Simplified the Stardate API to provide getters for conversion between
+  Gregorian datetime.datetime and 'classic stardate and '2009 revised' stardates.
 - Reduced icon to a single colour.
 - About/Preferences dialogs now block each other - only show one at a time.
-- User settings now stored in the directory specified by the environment variable XDG_CONFIG_HOME, or, if not present, $HOME/.config (existing user settings stored in $HOME are migrated to the new location).
+- User settings now stored in the directory specified by the environment
+  variable XDG_CONFIG_HOME, or, if not present, $HOME/.config (existing user
+  settings stored in $HOME are migrated to the new location).
 - Update release to trusty as precise is end of life.
 
 
@@ -133,13 +152,16 @@
 - Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
 - Scrolling the mouse wheel over the icon/label cycles through all formats.
 - Fixed PyGIWarnings on imports.
-- Overhaul of icons: only the hicolor icon is required and all theme icons are created from the hicolor via the build script.
-- Overhaul of build script: extracted common functions into a separate script used by all indicators.
+- Overhaul of icons: only the hicolor icon is required and all theme icons are
+  created from the hicolor via the build script.
+- Overhaul of build script: extracted common functions into a separate script
+  used by all indicators.
 
 
 ## v1.0.32 (2016-06-06)
 
-- Fixed Lintian warnings - added extended description to control file and copyright file now refers to common license file for GPL-3.
+- Fixed Lintian warnings - added extended description to control file and
+  copyright file now refers to common license file for GPL-3.
 - Updated comment of desktop file.
 
 
@@ -160,7 +182,10 @@
 
 ## v1.0.28 (2015-05-20)
 
-- GTK.AboutDialog now uses a Stack rather than Notebook to hold the underlying widgets.  Rather than try to (constantly) reverse engineer the GTK.AboutDialog to retrofit the changelog tab, the default GTK.AboutDialog is used with a hyperlink to the changelog inserted.
+- GTK.AboutDialog now uses a Stack rather than Notebook to hold the underlying
+  widgets.  Rather than try to (constantly) reverse engineer the GTK.AboutDialog
+  to retrofit the changelog tab, the default GTK.AboutDialog is used with a
+  hyperlink to the changelog inserted.
 
 
 ## v1.0.27 (2015-04-10)
@@ -170,7 +195,8 @@
 
 ## v1.0.26 (2015-02-12)
 
-- Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental in this miracle!
+- Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental in
+  this miracle!
 - Added Russian translation.  Thanks to Oleg Moiseichuk.
 - About dialog changed to accept translator information.
 - Overhaul of repository structure and build script.
@@ -189,20 +215,24 @@
 
 ## v1.0.23 (2014-07-08)
 
-- Bug fix: Handle 'add_credit_section' on Ubuntu 12.04 (was causing a segmentation fault).
+- Bug fix: Handle 'add_credit_section' on Ubuntu 12.04 (was causing a
+  segmentation fault).
 
 
 ## v1.0.22 (2014-06-12)
 
-- Optionally shows the stardate in the menu for desktop environments which don't support text labels next to the icon (Lubuntu 14.04).
+- Optionally shows the stardate in the menu for desktop environments which don't
+  support text labels next to the icon (Lubuntu 14.04).
 - New log handler which truncates the log file to 10,000 bytes.
 - Removed legacy code to support old appindicator framework.
 
 
 ## v1.0.21 (2014-03-15)
 
-- Fixed a bug where non-toggle buttons (the close button) were having the toggled signal set.
-- Put in a fix for Ubuntu 12.04 (Python 3.2) which does not handle AboutDialog::add_credit_section().
+- Fixed a bug where non-toggle buttons (the close button) were having the
+  toggled signal set.
+- Put in a fix for Ubuntu 12.04 (Python 3.2) which does not handle
+  AboutDialog::add_credit_section().
 
 
 ## v1.0.20 (2014-03-01)
@@ -240,7 +270,8 @@
 
 ## v1.0.14 (2013-07-05)
 
-- Only create the log file when needed. Thanks to Rafael Cavalcanti <rafael.kavalkanti@gmail.com>.
+- Only create the log file when needed. Thanks to Rafael Cavalcanti
+  <rafael.kavalkanti@gmail.com>.
 
 
 ## v1.0.13 (2013-04-04)
@@ -251,7 +282,8 @@
 
 ## v1.0.12 (2013-03-15)
 
-- Revised the icons to fill in a square boundary; no longer stretched on Lubuntu/Xubuntu.
+- Revised the icons to fill in a square boundary; no longer stretched on
+  Lubuntu/Xubuntu.
 - Updated labels/tooltips on Preferences.
 - Icons for Preferences/About now show for Lubuntu/Xubuntu.
 
@@ -268,8 +300,10 @@
 ## v1.0.10 (2012-11-16)
 
 - Added python3-gi to debian/control Depends (for Precise support).
-- Swapped out python-appindicator for gir1.2-appindicator3-0.1 in debian/control Depends.
-- Simpler handling for creating the indicator - should hopefully sustain more environments.
+- Swapped out python-appindicator for gir1.2-appindicator3-0.1 in debian/control
+  Depends.
+- Simpler handling for creating the indicator - should hopefully sustain more
+  environments.
 
 
 ## v1.0.9 (2012-10-25)
@@ -295,7 +329,8 @@
 
 ## v1.0.5 (2012-07-11)
 
-- Now included example.py in the release to demonstrate the use of the Stardate API.
+- Now included example.py in the release to demonstrate the use of the Stardate
+  API.
 - Corrected the API version such that it matches the Java API version.
 
 
@@ -312,14 +347,16 @@
 
         sudo gtk-update-icon-cache -f /usr/share/icons/elementary
 
-- If the warning 'Unable to locate theme engine in module_path: "pixmap"' appears on execution, install:
+- If the warning 'Unable to locate theme engine in module_path: "pixmap"'
+  appears on execution, install:
 
         sudo apt-get install gtk2-engines-pixbuf
 
 
 ## v1.0.3 (2012-06-25)
 
-- Put in detection of Unity to handle the case where python-appindicator is installed but should not be used (Lubuntu) and GTK icon used instead.
+- Put in detection of Unity to handle the case where python-appindicator is
+  installed but should not be used (Lubuntu) and GTK icon used instead.
 
 
 ## v1.0.2 (2012-06-24)
@@ -337,4 +374,3 @@
 
 - Initial release.
 - Untested!
-

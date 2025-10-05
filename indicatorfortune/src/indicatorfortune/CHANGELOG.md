@@ -3,23 +3,29 @@
 ## v1.0.44 (2024-09-04)
 
 - Fortunes are now defined only by a .dat file, rather than an entire directory.
-- No longer remove characters/glyphs which render as hexadecimal.  Has become a never ending chase as other distros/versions were tested, where some glyphs rendered correctly on one distro/version, yet on others required removal.
+- No longer remove characters/glyphs which render as hexadecimal.  Has become a
+  never ending chase as other distros/versions were tested, where some glyphs
+  rendered correctly on one distro/version, yet on others required removal.
 - Fixed PyGObject 3.11 deprecation warnings.
-- Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
+- Now includes a symbolic icon allowing the colour to be adjusted for the
+  current theme.
 - Now includes an opt-in check during start up for the latest version at PyPI.
 
 
 ## v1.0.43 (2023-11-22)
 
-- Corrections made to install and run scripts to avoid globbing paths.  Many thanks to Oleg Moiseichuck!
+- Corrections made to install and run scripts to avoid globbing paths.
+  Many thanks to Oleg Moiseichuck!
 
 
 ## v1.0.42 (2023-11-22)
 
 - Bug fix: Remove characters/glyphs which appear as hexadecimal.
-- Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
+- Reinstated the autostart option in Preferences with the addition of a optional
+  delay to start up.
 - Overhauled to adhere to the pyproject.toml standard.
-- Deployment using the .deb format is superceded; PyPI (pip) is used with operating system packages and file copy.
+- Deployment using the .deb format is superceded; PyPI (pip) is used with
+  operating system packages and file copy.
 
 
 ## v1.0.41 (2023-01-09)
@@ -59,7 +65,8 @@
 
 ## v1.0.37 (2022-06-22)
 
-- The debian/compat file had version 11 whereas should have been version 10 which caused build problems.
+- The debian/compat file had version 11 whereas should have been version 10
+  which caused build problems.
 
 
 ## v1.0.36 (2022-06-21)
@@ -70,15 +77,18 @@
 
 ## v1.0.35 (2020-11-05)
 
-- On computer startup when the indicator is set to autostart, sometimes the indicator can become unresponsive. The end user can set the property
+- On computer startup when the indicator is set to autostart, sometimes the
+  indicator can become unresponsive. The end user can set the property
 
         X-GNOME-Autostart-Delay=120
     in
 
         ~/.config/autostart/indicator-lunar.py.desktop
 
-    to delay the indicator startup (for two minutes) avoiding the issue. For new installations, by default, the value is set to zero.
-- Removed the preference for autostart. To change indicator autostart (off or on), open the file
+    to delay the indicator startup (for two minutes) avoiding the issue. For new
+    installations, by default, the value is set to zero.
+- Removed the preference for autostart. To change indicator autostart (off or
+  on), open the file
 
         ~/.config/autostart/indicator-lunar.py.desktop
 
@@ -90,7 +100,8 @@
 
         X-GNOME-Autostart-enabled=false
 
-    Alternatively, add the indicator using Startup Applications. For new installations, by default, autostart will be set to true.
+    Alternatively, add the indicator using Startup Applications. For new
+    installations, by default, autostart will be set to true.
 
 
 ## v1.0.34 (2020-04-27)
@@ -121,8 +132,10 @@
 - Bug fix: Default fortune would cause a crash on a reset.
 - Bug fix: Dialogs now have a parent specified.
 - Now uses a base class to share functionality amongst indicators.
-- Whilst starting up, a single menu item "Initialising..." is displayed. Once fully initialised, the menu proper is shown.
-- When an update is underway or the About/Preferences dialogs are displayed, the About/Preferences/Quit menu items are disabled.
+- Whilst starting up, a single menu item "Initialising..." is displayed. Once
+  fully initialised, the menu proper is shown.
+- When an update is underway or the About/Preferences dialogs are displayed, the
+  About/Preferences/Quit menu items are disabled.
 - About dialog now shows copyright, artists and corrected URL for website.
 - Update debian/compat to 9.
 
@@ -130,8 +143,10 @@
 ## v1.0.29 (2019-05-02)
 
 - Tidy up load config of user preferences.
-- Added hyperlink to the About dialog which links to the error log text file (only visible if the underlying file is present).
-- About dialog now pulls the changelog directly from /usr/share/doc rather than a redundant duplicate in the installation directory.
+- Added hyperlink to the About dialog which links to the error log text file
+  (only visible if the underlying file is present).
+- About dialog now pulls the changelog directly from /usr/share/doc rather than
+  a redundant duplicate in the installation directory.
 - Update release to xenial as trusty is end of life.
 - Update debian/control Standards-Version to 3.9.7.
 
@@ -143,7 +158,9 @@
 
 ## v1.0.27 (2017-10-06)
 
-- Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and ubuntu-mono-light would not load due to directories not present in the underlying index.theme file.
+- Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
+  ubuntu-mono-light would not load due to directories not present in the
+  underlying index.theme file.
 
 
 ## v1.0.26 (2017-04-25)
@@ -152,34 +169,42 @@
 - Corrected warnings in .desktop file.
 - Corrections and updates to the tool tip text in the Preferences dialog.
 - Can now sort fortunes in the Preferences.
-- Changed default function of middle mouse button click from showing a new fortune to showing the current fortune.
+- Changed default function of middle mouse button click from showing a new
+  fortune to showing the current fortune.
 - Handle bogus/missing fortune locations.
 - Reduced icon to a single colour.
 - About/Preferences dialogs now block each other - only show one at a time.
-- User settings now stored in the directory specified by the environment variable XDG_CONFIG_HOME, or, if not present, $HOME/.config (existing user settings stored in $HOME are migrated to the new location).
+- User settings now stored in the directory specified by the environment
+  variable XDG_CONFIG_HOME, or, if not present, $HOME/.config (existing user
+  settings stored in $HOME are migrated to the new location).
 - Update release to trusty as precise is end of life.
 
 
 ## v1.0.25 (2016-12-14)
 
-- Bug fix: Attempting to delete the history file if it did not exist caused a crash.
+- Bug fix: Attempting to delete the history file if it did not exist caused a
+  crash.
 
 
 ## v1.0.24 (2016-07-24)
 
 - Bug fix: Now uses the X-GNOME-Autostart-enabled tag for autostart.
 - When adding a new fortune, it is enabled by default.
-- Displayed fortunes are now written to ~/.indicator-fortune-history. Each time the indicator is started the file is reset.
+- Displayed fortunes are now written to ~/.indicator-fortune-history. Each time
+  the indicator is started the file is reset.
 - Clicking OK in the Preferences initiates a new fortune.
 - Added utf-8 encoding line.
 - Fixed PyGIWarnings on imports.
-- Overhaul of icons: only the hicolor icon is required and all theme icons are created from the hicolor via the build script.
-- Overhaul of build script: extracted common functions into a separate script used by all indicators.
+- Overhaul of icons: only the hicolor icon is required and all theme icons are
+  created from the hicolor via the build script.
+- Overhaul of build script: extracted common functions into a separate script
+  used by all indicators.
 
 
 ## v1.0.23 (2015-09-30)
 
-- Fixed Lintian warnings - added extended description to control file and copyright file now refers to common license file for GPL-3.
+- Fixed Lintian warnings - added extended description to control file and
+  copyright file now refers to common license file for GPL-3.
 - Cleaned up imports.
 - Updated comment of desktop file.
 - Changes to API for showing message dialogs.
@@ -202,7 +227,10 @@
 
 ## v1.0.19 (2015-05-20)
 
-- GTK.AboutDialog now uses a Stack rather than Notebook to hold the underlying widgets.  Rather than try to (constantly) reverse engineer the GTK.AboutDialog to retrofit the changelog tab, the default GTK.AboutDialog is used with a hyperlink to the changelog inserted.
+- GTK.AboutDialog now uses a Stack rather than Notebook to hold the underlying
+  widgets.  Rather than try to (constantly) reverse engineer the GTK.AboutDialog
+  to retrofit the changelog tab, the default GTK.AboutDialog is used with a
+  hyperlink to the changelog inserted.
 
 
 ## v1.0.18 (2015-05-06)
@@ -217,13 +245,15 @@
 
 ## v1.0.16 (2015-03-07)
 
-- Added a tooltip to suggest other fortune packages may be available, other than the English default.
+- Added a tooltip to suggest other fortune packages may be available, other than
+  the English default.
 - Made the default directory when adding to be /usr/share/games/fortunes.
 
 
 ## v1.0.15 (2015-02-13)
 
-- Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental in this miracle!
+- Internationalisation.  Many thanks to Oleg Moiseichuk who was instrumental in
+  this miracle!
 - Added Russian translation.  Thanks to Oleg Moiseichuk.
 - About dialog changed to accept translator information.
 - Overhaul of repository structure and build script.
@@ -249,7 +279,9 @@
 
 ## v1.0.11 (2014-06-12)
 
-- Now supports a middle mouse click on the icon to trigger one of the New/Copy/Show fortune menu items (not supported on all versions/derivatives of Ubuntu).
+- Now supports a middle mouse click on the icon to trigger one of the
+  New/Copy/Show fortune menu items (not supported on all versions/derivatives of
+  Ubuntu).
 - New log handler which truncates the log file to 10,000 bytes.
 - Removed legacy code to support old appindicator framework.
 
@@ -261,8 +293,10 @@
 
 ## v1.0.9 (2014-03-15)
 
-- Fixed a bug where non-toggle buttons (the close button) were having the toggled signal set.
-- Put in a fix for Ubuntu 12.04 (Python 3.2) which does not handle AboutDialog::add_credit_section().
+- Fixed a bug where non-toggle buttons (the close button) were having the
+  toggled signal set.
+- Put in a fix for Ubuntu 12.04 (Python 3.2) which does not handle
+  AboutDialog::add_credit_section().
 
 
 ## v1.0.8 (2014-03-01)
@@ -296,7 +330,8 @@
 ## v1.0.3 (2013-12-04)
 
 - Fixed bug when the fortune path contained spaces.
-- Made the text field containing the fortune path wide enough to display the path.
+- Made the text field containing the fortune path wide enough to display the
+  path.
 
 
 ## v1.0.2 (2013-12-02)
@@ -314,4 +349,3 @@
 ## v1.0.0 (2013-12-01)
 
 - First release.
-
