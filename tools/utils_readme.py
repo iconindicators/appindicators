@@ -27,6 +27,10 @@ References:
 '''
 
 
+#TODO Somehow try to limit the output to 80 chars.
+# https://stackoverflow.com/questions/36728953/how-can-i-wrap-a-line-at-80-characters-in-markdown
+
+
 import configparser
 import datetime
 import re
@@ -430,7 +434,7 @@ def _get_python_virtual_environment_install(
 
     return (
         f"Create a `Python3` virtual environment at `{ utils.VENV_INSTALL }` "
-        f"and install `{ indicator }`, including icons, .desktop and run "
+        f"and install `{ indicator }`, including icons, .desktop and run"
         " script:\n"
         "    ```\n"
         f"    indicator={ indicator } && \\\n"
