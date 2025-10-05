@@ -21,7 +21,7 @@ Converts between Star Trek™ stardates and Gregorian date/times.
 There are two types of stardates: 'classic' and '2009 revised'.
 
 
- 'classic' stardates
+'classic' stardates
 ===================
 
 The 'classic' stardate is based on STARDATES IN STAR TREK FAQ V1.6
@@ -38,8 +38,8 @@ time line:
                  46 BC       2162-01-04    2283-10-05
 
 From 6000 BC up to 46 BC, the Egyptian-developed calendar was used.
-Initially based on counting lunar cycles, it was eventually changed
-to a solar calendar.
+Initially based on counting lunar cycles, it was eventually changed to a solar
+calendar.
 
 Between 46 BC to 1582 AD, the Julian calendar was used.
 This was the first calendar to introduce the "leap year".
@@ -54,15 +54,15 @@ The stardate rate from this date to 2270/1/26 was 5 units per day.
 Between 2270/1/26 ( [19]7340.0 ) and 2283/10/5 ( [19]7840.0 ),
 the rate changes to 0.1 units per day.
 
-Between 2283/10/5 ( [19]7840.0 ), to 2323/1/1 ( [20]5006.0 ),
+Between 2283/10/5 ( [19]7840.0 ) to 2323/1/1 ( [20]5006.0 ),
 the rate changes to 0.5 units per day.
 
 From 2323/1/1 ( [20]5006.0 ) the rate changed to 1000 units per mean solar year.
 Also, stardate [20]5006.0 becomes [21]00000.0.
 
 
-'2009 revised'
-==============
+'2009 revised' stardates
+========================
 
 The '2009 revised' stardate is based on https://en.wikipedia.org/wiki/Stardate.
 '''
@@ -89,14 +89,14 @@ _gregorian_dates = [
 
 
 ''' Rates (in stardate units per day) for each 'classic' stardate era. '''
-_stardate_rates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
+_stardate_classic_rates = [ 5.0, 5.0, 0.1, 0.5, 1000.0 / 365.2425 ]
 
 
 def get_version():
     '''
     Return the version.
     '''
-    return "Version 6.0 (2024-06-11)"
+    return "6.0.0"
 
 
 def get_stardate_classic(
@@ -132,7 +132,7 @@ def get_stardate_classic(
             ( _gregorian_dates[ index ] - gregorian_date_time ).total_seconds() )
 
         number_of_days = number_of_seconds / 60.0 / 60.0 / 24.0
-        rate = _stardate_rates[ index ]
+        rate = _stardate_classic_rates[ index ]
         units = number_of_days * rate
 
         stardate_issue = (
@@ -191,7 +191,7 @@ def get_stardate_classic(
             gregorian_date_time - _gregorian_dates[ index ] ).total_seconds()
 
         number_of_days = number_of_seconds / 60.0 / 60.0 / 24.0
-        units = number_of_days * _stardate_rates[ index ]
+        units = number_of_days * _stardate_classic_rates[ index ]
         stardate_issue = (
             int( units / stardate_ranges[ index ] ) + stardate_issues[ index ] )
 
@@ -360,7 +360,7 @@ def get_gregorian_from_stardate_classic(
             "Illegal issue/integer: "
             + str( stardate_issue ) + "/" + str( stardate_integer ) )
 
-    days = units / _stardate_rates[ index ]
+    days = units / _stardate_classic_rates[ index ]
     hours = ( days - int( days ) ) * 24.0
     minutes = ( hours - int( hours ) ) * 60.0
     seconds = ( minutes - int( minutes ) ) * 60.0
@@ -419,51 +419,52 @@ def get_gregorian_from_stardate_2009_revised(
     return gregorian_date_time
 
 
-def to_stardate_string(
+def to_stardate_classic_string(
     stardate_issue,
     stardate_integer,
     stardate_fraction,
     show_issue,
     pad_integer ):
     '''
-    Returns a stardate in string format.
+    If show_issue is True, the issue will be included in the string.
 
-    The stardate issue must be set to None for '2009 revised'.
-    If show_issue is True, the issue will be included in the string
-    (ignored for '2009 revised').
     If padded is True, the integer part of the string will be zero padded
     (if required).
 
-    Returns A stardate in string format.
+    Returns A 'classic' stardate in string format.
     '''
     string_builder = ""
-    if stardate_issue is None:
-        string_builder = (
-            str( stardate_integer ) + "." + str( stardate_fraction ) )
+    if show_issue:
+        string_builder = "[" + str( stardate_issue ) + "] "
 
-    else:
-        if show_issue:
-            string_builder = "[" + str( stardate_issue ) + "] "
-
-        if pad_integer:
-            if stardate_issue < 21:
-                padding = len( "1000" ) - len( str( stardate_integer ) )
-
-            else:
-                padding = len( "10000" ) - len( str( stardate_integer ) )
-
-            stardate_integer = str( stardate_integer )
-            for i in range( padding ):
-                stardate_integer = "0" + stardate_integer
-
-            string_builder += str( stardate_integer )
+    if pad_integer:
+        if stardate_issue < 21:
+            padding = len( "1000" ) - len( str( stardate_integer ) )
 
         else:
-            string_builder += str( stardate_integer )
+            padding = len( "10000" ) - len( str( stardate_integer ) )
 
-        string_builder += "." + str( stardate_fraction )
+        stardate_integer = str( stardate_integer )
+        for i in range( padding ):
+            stardate_integer = "0" + stardate_integer
+
+        string_builder += str( stardate_integer )
+
+    else:
+        string_builder += str( stardate_integer )
+
+    string_builder += "." + str( stardate_fraction )
 
     return string_builder
+
+
+def to_stardate_2009_revised_string(
+    stardate_integer,
+    stardate_fraction ):
+    '''
+    Returns a '2009 revised' stardate in string format.
+    '''
+    return str( stardate_integer ) + "." + str( stardate_fraction )
 
 
 def requires_padding(

@@ -73,6 +73,13 @@ class IndicatorStardate( IndicatorBase ):
             number_of_seconds_to_next_update = (
                 stardate.get_next_update_in_seconds( utc_now, True ) )
 
+            stardate_string = (
+                stardate.to_stardate_classic_string(
+                    stardate_issue,
+                    stardate_integer,
+                    stardate_fraction,
+                    self.show_issue,
+                    self.pad_integer ) )
         else:
             stardate_issue = None
             stardate_integer, stardate_fraction = (
@@ -81,13 +88,10 @@ class IndicatorStardate( IndicatorBase ):
             number_of_seconds_to_next_update = (
                 stardate.get_next_update_in_seconds( utc_now, False ) )
 
-        stardate_string = (
-            stardate.to_stardate_string(
-                stardate_issue,
-                stardate_integer,
-                stardate_fraction,
-                self.show_issue,
-                self.pad_integer ) )
+            stardate_string = (
+                stardate.to_stardate_2009_revised_string(
+                    stardate_integer,
+                    stardate_fraction ) )
 
         if not self.set_label_or_tooltip( stardate_string ):
             menu.append( Gtk.MenuItem.new_with_label( stardate_string ) )
