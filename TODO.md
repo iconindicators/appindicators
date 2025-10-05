@@ -104,10 +104,7 @@ Can the issues/forums be migrated?
 
 ## Upgrade of StardateSystemTray and WorldTimeSystemTray
 
-For StardateSystemTray, have set minimum Java to 1.7 as this is lowest version
-still supported.
-
-Yet to consider WorldTimeSystemTray.
+Have set minimum Java to 1.8 as this is lowest version still supported.
 
 Windows EOL
     Vista 2017
@@ -138,13 +135,6 @@ Java EOL
     23 2025
     24 2025
     25 2030
-
-Downloaded Java for Windows 11;
-was recommended by the Oracle website to download Java 8.
-Installed Java 8.
-Installed Stardate System Tray.
-Installed World Time System Tray.
-Both work!
 
 
 ### Create non-symbolic icons
