@@ -19,6 +19,79 @@
 ''' Application indicator which displays tidal information. '''
 
 
+#TODO Run indicator tide without internet and the indicator hangs on debian 
+#
+# From laptop when there was no internet
+'''
+2025-08-30 22:39:12,741 - root - ERROR - <urlopen error [Errno -2] Name or service not known>
+Traceback (most recent call last):
+  File "/usr/lib/python3.11/urllib/request.py", line 1348, in do_open
+    h.request(req.get_method(), req.selector, req.data, headers,
+  File "/usr/lib/python3.11/http/client.py", line 1282, in request
+    self._send_request(method, url, body, headers, encode_chunked)
+  File "/usr/lib/python3.11/http/client.py", line 1328, in _send_request
+    self.endheaders(body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.11/http/client.py", line 1277, in endheaders
+    self._send_output(message_body, encode_chunked=encode_chunked)
+  File "/usr/lib/python3.11/http/client.py", line 1037, in _send_output
+    self.send(msg)
+  File "/usr/lib/python3.11/http/client.py", line 975, in send
+    self.connect()
+  File "/usr/lib/python3.11/http/client.py", line 941, in connect
+    self.sock = self._create_connection(
+                ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/socket.py", line 827, in create_connection
+    for res in getaddrinfo(host, port, 0, SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/socket.py", line 962, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno -2] Name or service not known
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/home/bernard/Programming/getTideDataFromBOM.py", line 51, in get_tide_data
+    urllib.request.urlopen(
+  File "/usr/lib/python3.11/urllib/request.py", line 216, in urlopen
+    return opener.open(url, data, timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/urllib/request.py", line 519, in open
+    response = self._open(req, data)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/urllib/request.py", line 536, in _open
+    result = self._call_chain(self.handle_open, protocol, protocol +
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/urllib/request.py", line 496, in _call_chain
+    result = func(*args)
+             ^^^^^^^^^^^
+  File "/usr/lib/python3.11/urllib/request.py", line 1377, in http_open
+    return self.do_open(http.client.HTTPConnection, req)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/urllib/request.py", line 1351, in do_open
+    raise URLError(err)
+urllib.error.URLError: <urlopen error [Errno -2] Name or service not known>
+2025-08-30 22:39:12,835 - root - ERROR - Error retrieving/parsing tidal data from http://www.bom.gov.au/australia/tides/print.php?aac=NSW_TP032&type=tide&date=30-8-2025&region=NSW&tz=Australia/Sydney&tz_js=AEDT&days=7
+'''
+#
+# From desktop, presumably no internet
+'''
+2025-09-14 17:39:17,421 - root - ERROR - timed out
+Traceback (most recent call last):
+  File "/home/bernard/Programming/getTideDataFromBOM.py", line 55, in get_tide_data
+    lines = response.read().decode( "utf-8" ).splitlines()
+  File "/usr/lib/python3.8/http/client.py", line 472, in read
+    s = self._safe_read(self.length)
+  File "/usr/lib/python3.8/http/client.py", line 613, in _safe_read
+    data = self.fp.read(amt)
+  File "/usr/lib/python3.8/socket.py", line 669, in readinto
+    return self._sock.recv_into(b)
+socket.timeout: timed out
+2025-09-14 17:39:17,486 - root - ERROR - Error retrieving/parsing tidal data from http://www.bom.gov.au/australia/tides/print.php?aac=NSW_TP032&type=tide&date=14-9-2025&region=NSW&tz=Australia/Sydney&tz_js=AEDT&days=7
+'''
+
+
+
 import datetime
 import importlib.util
 import sys
