@@ -325,6 +325,64 @@ References:
 
 Any `markdown` document may be converted to `html` using the same script.
 
+---
+
+## Migraton from Subversion
+
+Documentation of the process used to bring the legacy `Subversion` repository
+into `GitHub`.
+
+Check out a working copy of the `Subversion` repository and verify list of
+authors (should only be `bernard =`):
+
+  ```
+    cd <svn working copy of indicators>
+    svn log --xml --quiet | grep author | sort -u | perl -pe 's/.*>(.*?)<.*/$1 = /'
+
+        bernard = 
+  ```
+
+Create `users.txt` to match the list of authors:
+
+  ```
+    echo "bernard = Bernard Giannetti <thebernmeister@hotmail.com>" > users.txt
+  ```
+
+Convert `Subversion` repository (at internal IP address) to a `Git` repository
+(note there is no `trunk`, `branches`, `tags`):
+
+  ```
+    git svn clone http://192.168.1.102/indicators \
+      --authors-file=users.txt \
+      --no-metadata \
+      --prefix "" \
+      indicatorsgit
+  ```
+
+Clone the main repository from `GitHub`:
+
+  ```
+    git clone https://github.com/iconindicators/appindicators appindicatorsgithub     TODO USE TEST FIRST
+  ```
+
+Insert the converted `Git` repository from above to the clone (roundabout way as
+`git subtree` does not allow adding to the root), then push back up to `GitHub`:
+
+  ```
+    cd appindicatorsgithub
+    git remote add indicatorsgit $(pwd)/../indicatorsgit/.git
+    git subtree add -P temp indicatorsgit HEAD
+    mv temp/* .
+    rm -r temp
+    git add .
+    git commit -m "From Subversion."
+    git push origin main
+  ```
+
+References
+- [https://git-scm.com/book/ms/v2/Git-and-Other-Systems-Migrating-to-Git](https://git-scm.com/book/ms/v2/Git-and-Other-Systems-Migrating-to-Git)
+
+---
 
 ## Useful Links
 
