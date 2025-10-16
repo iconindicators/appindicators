@@ -23,7 +23,7 @@ Installation / Updating
     sudo apt-get -y install calendar gir1.2-ayatanaappindicator3-0.1 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev python3-pip python3-venv wl-clipboard
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatoronthisday`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatoronthisday`, including icons, .desktop and run script:
     ```
     indicator=indicatoronthisday && \
     venv=$HOME/.local/venv_indicators && \
@@ -48,7 +48,7 @@ Installation / Updating
     sudo dnf -y install cairo-gobject-devel calendar gcc gobject-introspection-devel libappindicator-gtk3 python3-devel python3-pip wl-clipboard
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatoronthisday`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatoronthisday`, including icons, .desktop and run script:
     ```
     indicator=indicatoronthisday && \
     venv=$HOME/.local/venv_indicators && \
@@ -70,7 +70,7 @@ Installation / Updating
     sudo apt-get -y install calendar gir1.2-ayatanaappindicator3-0.1 libcairo2-dev libgirepository1.0-dev python3-pip python3-venv wl-clipboard
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatoronthisday`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatoronthisday`, including icons, .desktop and run script:
     ```
     indicator=indicatoronthisday && \
     venv=$HOME/.local/venv_indicators && \
@@ -92,7 +92,7 @@ Installation / Updating
     sudo apt-get -y install calendar gir1.2-ayatanaappindicator3-0.1 libcairo2-dev libgirepository1.0-dev python3-pip python3-venv wl-clipboard
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatoronthisday`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatoronthisday`, including icons, .desktop and run script:
     ```
     indicator=indicatoronthisday && \
     venv=$HOME/.local/venv_indicators && \
@@ -112,7 +112,7 @@ Installation / Updating
     sudo apt-get -y install gir1.2-ayatanaappindicator3-0.1 libcairo2-dev libgirepository1.0-dev python3-pip python3-venv wl-clipboard
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatoronthisday`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatoronthisday`, including icons, .desktop and run script:
     ```
     indicator=indicatoronthisday && \
     venv=$HOME/.local/venv_indicators && \
@@ -138,7 +138,7 @@ Alternatively, to run from the terminal:
 Cache / Config / Log
 --------------------
 
-During the course of normal operation, the indicator may write to the cache at `$HOME/.cache/indicatoronthisday` and the config at `$HOME/.config/indicatoronthisday`.
+During the course of normal operation, the indicator may write to the cache at `$HOME/.cache/indicatoronthisday` and/or the config at `$HOME/.config/indicatoronthisday`.
 
 In the event an error occurs, a log file will be written to `$HOME/indicatoronthisday.log`.
 

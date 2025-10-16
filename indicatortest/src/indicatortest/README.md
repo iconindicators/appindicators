@@ -23,7 +23,7 @@ Installation / Updating
     sudo apt-get -y install calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev libnotify-bin pulseaudio-utils python3-pip python3-venv wl-clipboard wmctrl
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run script:
     ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
@@ -48,7 +48,7 @@ Installation / Updating
     sudo dnf -y install cairo-gobject-devel calendar fortune-mod gcc gobject-introspection-devel libappindicator-gtk3 pulseaudio-utils python3-devel python3-pip wl-clipboard wmctrl
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run script:
     ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
@@ -70,7 +70,7 @@ Installation / Updating
     sudo dnf -y install cairo-gobject-devel calendar fortune-mod gcc gobject-introspection-devel libappindicator-gtk3 python3-devel python3-pip wl-clipboard wmctrl
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run script:
     ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
@@ -92,7 +92,7 @@ Installation / Updating
     sudo apt-get -y install calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 libcairo2-dev libgirepository1.0-dev libnotify-bin pulseaudio-utils python3-pip python3-venv wl-clipboard wmctrl
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run script:
     ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
@@ -114,7 +114,7 @@ Installation / Updating
     sudo apt-get -y install calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 libcairo2-dev libgirepository1.0-dev libnotify-bin pulseaudio-utils python3-pip python3-venv wl-clipboard wmctrl
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run script:
     ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
@@ -134,7 +134,7 @@ Installation / Updating
     sudo apt-get -y install fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 libcairo2-dev libgirepository1.0-dev libnotify-bin pulseaudio-utils python3-pip python3-venv wl-clipboard wmctrl
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run script:
     ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
@@ -154,7 +154,7 @@ Installation / Updating
     sudo pacman -S --noconfirm cairo fortune-mod gcc libayatana-appindicator pkgconf wl-clipboard wmctrl
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run script:
     ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
@@ -174,7 +174,7 @@ Installation / Updating
     sudo zypper install -y cairo-devel fortune gcc gobject-introspection-devel python3-devel typelib-1_0-AyatanaAppIndicator3-0_1 wl-clipboard
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run script:
     ```
     indicator=indicatortest && \
     venv=$HOME/.local/venv_indicators && \
@@ -202,7 +202,7 @@ Alternatively, to run from the terminal:
 Cache / Config / Log
 --------------------
 
-During the course of normal operation, the indicator may write to the cache at `$HOME/.cache/indicatortest` and the config at `$HOME/.config/indicatortest`.
+During the course of normal operation, the indicator may write to the cache at `$HOME/.cache/indicatortest` and/or the config at `$HOME/.config/indicatortest`.
 
 In the event an error occurs, a log file will be written to `$HOME/indicatortest.log`.
 

@@ -23,7 +23,7 @@ Installation / Updating
     sudo apt-get -y install gir1.2-ayatanaappindicator3-0.1 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev python3-pip python3-venv
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorppadownloadstatistics`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorppadownloadstatistics`, including icons, .desktop and run script:
     ```
     indicator=indicatorppadownloadstatistics && \
     venv=$HOME/.local/venv_indicators && \
@@ -48,7 +48,7 @@ Installation / Updating
     sudo dnf -y install cairo-gobject-devel gcc gobject-introspection-devel libappindicator-gtk3 python3-devel python3-pip
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorppadownloadstatistics`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorppadownloadstatistics`, including icons, .desktop and run script:
     ```
     indicator=indicatorppadownloadstatistics && \
     venv=$HOME/.local/venv_indicators && \
@@ -70,7 +70,7 @@ Installation / Updating
     sudo apt-get -y install gir1.2-ayatanaappindicator3-0.1 libcairo2-dev libgirepository1.0-dev python3-pip python3-venv
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorppadownloadstatistics`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorppadownloadstatistics`, including icons, .desktop and run script:
     ```
     indicator=indicatorppadownloadstatistics && \
     venv=$HOME/.local/venv_indicators && \
@@ -92,7 +92,7 @@ Installation / Updating
     sudo apt-get -y install gir1.2-ayatanaappindicator3-0.1 libcairo2-dev libgirepository1.0-dev python3-pip python3-venv
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorppadownloadstatistics`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorppadownloadstatistics`, including icons, .desktop and run script:
     ```
     indicator=indicatorppadownloadstatistics && \
     venv=$HOME/.local/venv_indicators && \
@@ -112,7 +112,7 @@ Installation / Updating
     sudo pacman -S --noconfirm cairo gcc libayatana-appindicator pkgconf
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorppadownloadstatistics`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorppadownloadstatistics`, including icons, .desktop and run script:
     ```
     indicator=indicatorppadownloadstatistics && \
     venv=$HOME/.local/venv_indicators && \
@@ -132,7 +132,7 @@ Installation / Updating
     sudo zypper install -y cairo-devel gcc gobject-introspection-devel python3-devel typelib-1_0-AyatanaAppIndicator3-0_1
     ```
 
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorppadownloadstatistics`, including icons, .desktop and run  script:
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorppadownloadstatistics`, including icons, .desktop and run script:
     ```
     indicator=indicatorppadownloadstatistics && \
     venv=$HOME/.local/venv_indicators && \
