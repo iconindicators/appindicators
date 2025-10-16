@@ -1,11 +1,11 @@
 # Russian translation for indicatoronthisday.
-# Copyright (C) 2017-2025 Bernard Giannetti
+# Copyright (C) 2017-2025 Bernard Giannetti.
 # This file is distributed under the same license as the indicatoronthisday package.
 # Oleg Moiseichuk <berroll@mail.ru>, 2017-2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicator-on-this-day 1.0.17\n"
+"Project-Id-Version: indicatoronthisday 1.0.17\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
 "POT-Creation-Date: 2025-07-12 22:49+1000\n"
 "PO-Revision-Date: 2025-07-25 16:10+0300\n"
@@ -104,6 +104,7 @@ msgid "Lines"
 msgstr "Строки"
 
 #: indicatoronthisday.py:371
+#, python-brace-format
 msgid ""
 "The URL to search for the event.\n"
 "\n"

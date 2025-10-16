@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorscriptrunner 1.0.25\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-20 00:58+1000\n"
+"POT-Creation-Date: 2025-10-16 17:45+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -45,7 +45,7 @@ msgstr ""
 msgid "...has completed."
 msgstr ""
 
-#: indicatorscriptrunner.py:393
+#: indicatorscriptrunner.py:395
 msgid ""
 "The text shown next to the indicator icon,\n"
 "or tooltip, where applicable.\n"
@@ -56,63 +56,63 @@ msgid ""
 "will be added to the icon text."
 msgstr ""
 
-#: indicatorscriptrunner.py:403 indicatorscriptrunner.py:1517
+#: indicatorscriptrunner.py:405 indicatorscriptrunner.py:1511
 msgid "The terminal script/command, along with any arguments."
 msgstr ""
 
-#: indicatorscriptrunner.py:408
+#: indicatorscriptrunner.py:410
 msgid "Add"
 msgstr ""
 
-#: indicatorscriptrunner.py:408
+#: indicatorscriptrunner.py:410
 msgid "Copy"
 msgstr ""
 
-#: indicatorscriptrunner.py:408
+#: indicatorscriptrunner.py:410
 msgid "Remove"
 msgstr ""
 
-#: indicatorscriptrunner.py:409
+#: indicatorscriptrunner.py:411
 msgid "Add a new script."
 msgstr ""
 
-#: indicatorscriptrunner.py:464 indicatorscriptrunner.py:669
-#: indicatorscriptrunner.py:1075 indicatorscriptrunner.py:1348
-#: indicatorscriptrunner.py:1486
+#: indicatorscriptrunner.py:466 indicatorscriptrunner.py:671
+#: indicatorscriptrunner.py:1075 indicatorscriptrunner.py:1344
+#: indicatorscriptrunner.py:1480
 msgid "Group"
 msgstr ""
 
-#: indicatorscriptrunner.py:465 indicatorscriptrunner.py:670
-#: indicatorscriptrunner.py:1084 indicatorscriptrunner.py:1498
+#: indicatorscriptrunner.py:467 indicatorscriptrunner.py:672
+#: indicatorscriptrunner.py:1084 indicatorscriptrunner.py:1492
 msgid "Name"
 msgstr ""
 
-#: indicatorscriptrunner.py:466 indicatorscriptrunner.py:671
+#: indicatorscriptrunner.py:468 indicatorscriptrunner.py:673
 msgid "Sound"
 msgstr ""
 
-#: indicatorscriptrunner.py:467 indicatorscriptrunner.py:672
+#: indicatorscriptrunner.py:469 indicatorscriptrunner.py:674
 msgid "Notification"
 msgstr ""
 
-#: indicatorscriptrunner.py:468 indicatorscriptrunner.py:1643
+#: indicatorscriptrunner.py:470 indicatorscriptrunner.py:1637
 msgid "Background"
 msgstr ""
 
-#: indicatorscriptrunner.py:469
+#: indicatorscriptrunner.py:471
 msgid "Terminal"
 msgstr ""
 
-#: indicatorscriptrunner.py:470 indicatorscriptrunner.py:673
-#: indicatorscriptrunner.py:1671
+#: indicatorscriptrunner.py:472 indicatorscriptrunner.py:675
+#: indicatorscriptrunner.py:1665
 msgid "Interval"
 msgstr ""
 
-#: indicatorscriptrunner.py:471 indicatorscriptrunner.py:674
+#: indicatorscriptrunner.py:473 indicatorscriptrunner.py:676
 msgid "Force Update"
 msgstr ""
 
-#: indicatorscriptrunner.py:531
+#: indicatorscriptrunner.py:533
 msgid ""
 "Double-click to edit a script.\n"
 "\n"
@@ -123,110 +123,110 @@ msgid ""
 "default, the name will appear in bold."
 msgstr ""
 
-#: indicatorscriptrunner.py:550 indicatorscriptrunner.py:1505
+#: indicatorscriptrunner.py:552 indicatorscriptrunner.py:1499
 msgid "Command"
 msgstr ""
 
-#: indicatorscriptrunner.py:579
+#: indicatorscriptrunner.py:581
 msgid "Send command to log"
 msgstr ""
 
-#: indicatorscriptrunner.py:581
+#: indicatorscriptrunner.py:583
 msgid ""
 "When a script is run,\n"
 "send the command to the log\n"
 "(located in your home directory)."
 msgstr ""
 
-#: indicatorscriptrunner.py:588
+#: indicatorscriptrunner.py:590
 msgid "Scripts"
 msgstr ""
 
-#: indicatorscriptrunner.py:595
+#: indicatorscriptrunner.py:597
 msgid "Show non-background scripts"
 msgstr ""
 
-#: indicatorscriptrunner.py:601
+#: indicatorscriptrunner.py:603
 msgid "In sub-menus"
 msgstr ""
 
-#: indicatorscriptrunner.py:610
+#: indicatorscriptrunner.py:612
 msgid "Indented by group"
 msgstr ""
 
-#: indicatorscriptrunner.py:618
+#: indicatorscriptrunner.py:620
 msgid "Hide groups"
 msgstr ""
 
-#: indicatorscriptrunner.py:620
+#: indicatorscriptrunner.py:622
 msgid ""
 "If checked, only script names are displayed.\n"
 "Otherwise, script names are indented\n"
 "within their respective group."
 msgstr ""
 
-#: indicatorscriptrunner.py:635
+#: indicatorscriptrunner.py:637
 msgid "Menu"
 msgstr ""
 
-#: indicatorscriptrunner.py:643
+#: indicatorscriptrunner.py:645
 msgid "Icon Text"
 msgstr ""
 
-#: indicatorscriptrunner.py:651
+#: indicatorscriptrunner.py:653
 msgid "The separator will be added between script tags."
 msgstr ""
 
-#: indicatorscriptrunner.py:656
+#: indicatorscriptrunner.py:658
 msgid "Separator"
 msgstr ""
 
-#: indicatorscriptrunner.py:715
+#: indicatorscriptrunner.py:717
 msgid "Double click on a script to add to the icon text."
 msgstr ""
 
-#: indicatorscriptrunner.py:722
+#: indicatorscriptrunner.py:724
 msgid "Icon"
 msgstr ""
 
-#: indicatorscriptrunner.py:732
+#: indicatorscriptrunner.py:734
 msgid "General"
 msgstr ""
 
-#: indicatorscriptrunner.py:917
+#: indicatorscriptrunner.py:919
 msgid "Duplicate the selected script."
 msgstr ""
 
-#: indicatorscriptrunner.py:918
+#: indicatorscriptrunner.py:920
 msgid "Remove the selected script."
 msgstr ""
 
-#: indicatorscriptrunner.py:922
+#: indicatorscriptrunner.py:924
 msgid ""
 "Duplicate the selected group,\n"
 "and all scripts within the group."
 msgstr ""
 
-#: indicatorscriptrunner.py:926
+#: indicatorscriptrunner.py:928
 msgid ""
 "Remove the selected group and\n"
 "all scripts within the group."
 msgstr ""
 
-#: indicatorscriptrunner.py:1001
+#: indicatorscriptrunner.py:1003
 msgid "Group Name"
 msgstr ""
 
-#: indicatorscriptrunner.py:1009
+#: indicatorscriptrunner.py:1011
 msgid "Copy Group"
 msgstr ""
 
-#: indicatorscriptrunner.py:1020 indicatorscriptrunner.py:1103
-#: indicatorscriptrunner.py:1368 indicatorscriptrunner.py:1747
+#: indicatorscriptrunner.py:1022 indicatorscriptrunner.py:1103
+#: indicatorscriptrunner.py:1364 indicatorscriptrunner.py:1741
 msgid "The group cannot be empty."
 msgstr ""
 
-#: indicatorscriptrunner.py:1028 indicatorscriptrunner.py:1376
+#: indicatorscriptrunner.py:1030 indicatorscriptrunner.py:1372
 msgid "The group already exists!"
 msgstr ""
 
@@ -238,7 +238,7 @@ msgstr ""
 msgid "Copy Script"
 msgstr ""
 
-#: indicatorscriptrunner.py:1112 indicatorscriptrunner.py:1755
+#: indicatorscriptrunner.py:1112 indicatorscriptrunner.py:1749
 msgid "The name cannot be empty."
 msgstr ""
 
@@ -246,36 +246,36 @@ msgstr ""
 msgid "A script of the same group and name already exists!"
 msgstr ""
 
-#: indicatorscriptrunner.py:1204
+#: indicatorscriptrunner.py:1202
 msgid ""
 "Remove the selected group and\n"
 "all scripts within the group?"
 msgstr ""
 
-#: indicatorscriptrunner.py:1247
+#: indicatorscriptrunner.py:1244
 msgid "Remove the selected script?"
 msgstr ""
 
-#: indicatorscriptrunner.py:1356
+#: indicatorscriptrunner.py:1352
 msgid "Edit Group"
 msgstr ""
 
-#: indicatorscriptrunner.py:1476
+#: indicatorscriptrunner.py:1470
 msgid ""
 "The group to which the script belongs.\n"
 "\n"
 "Choose an existing group or enter a new one."
 msgstr ""
 
-#: indicatorscriptrunner.py:1493
+#: indicatorscriptrunner.py:1487
 msgid "The name of the script."
 msgstr ""
 
-#: indicatorscriptrunner.py:1534
+#: indicatorscriptrunner.py:1528
 msgid "Play sound"
 msgstr ""
 
-#: indicatorscriptrunner.py:1536
+#: indicatorscriptrunner.py:1530
 msgid ""
 "For non-background scripts, play a sound\n"
 "on script completion.\n"
@@ -284,11 +284,11 @@ msgid ""
 "only if the script returns non-empty text."
 msgstr ""
 
-#: indicatorscriptrunner.py:1555
+#: indicatorscriptrunner.py:1549
 msgid "Show notification"
 msgstr ""
 
-#: indicatorscriptrunner.py:1557
+#: indicatorscriptrunner.py:1551
 msgid ""
 "For non-background scripts, show a\n"
 "notification on script completion.\n"
@@ -297,30 +297,30 @@ msgid ""
 "only if the script returns non-empty text."
 msgstr ""
 
-#: indicatorscriptrunner.py:1580
+#: indicatorscriptrunner.py:1574
 msgid "Non-background"
 msgstr ""
 
-#: indicatorscriptrunner.py:1582
+#: indicatorscriptrunner.py:1576
 msgid ""
 "Non-background scripts are displayed\n"
 "in the menu and run when the user\n"
 "clicks on the corresponding menu item."
 msgstr ""
 
-#: indicatorscriptrunner.py:1601
+#: indicatorscriptrunner.py:1595
 msgid "Leave terminal open"
 msgstr ""
 
-#: indicatorscriptrunner.py:1603
+#: indicatorscriptrunner.py:1597
 msgid "Leave the terminal open on script completion."
 msgstr ""
 
-#: indicatorscriptrunner.py:1625
+#: indicatorscriptrunner.py:1619
 msgid "Default script"
 msgstr ""
 
-#: indicatorscriptrunner.py:1627
+#: indicatorscriptrunner.py:1621
 msgid ""
 "One script may be set as default\n"
 "which is run on a middle mouse\n"
@@ -329,7 +329,7 @@ msgid ""
 "Not supported on all desktops."
 msgstr ""
 
-#: indicatorscriptrunner.py:1645
+#: indicatorscriptrunner.py:1639
 msgid ""
 "A background script, added to the icon text,\n"
 "will be run at the interval specified.\n"
@@ -342,15 +342,15 @@ msgid ""
 "tag will remain in the icon text."
 msgstr ""
 
-#: indicatorscriptrunner.py:1666
+#: indicatorscriptrunner.py:1660
 msgid "Interval, in minutes, between runs."
 msgstr ""
 
-#: indicatorscriptrunner.py:1690
+#: indicatorscriptrunner.py:1684
 msgid "Force update"
 msgstr ""
 
-#: indicatorscriptrunner.py:1692
+#: indicatorscriptrunner.py:1686
 msgid ""
 "Useful for a script which generally returns\n"
 "an empty string, but on occasion returns\n"
@@ -362,23 +362,23 @@ msgid ""
 "if the script returned a non-empty message."
 msgstr ""
 
-#: indicatorscriptrunner.py:1736
+#: indicatorscriptrunner.py:1730
 msgid "Add Script"
 msgstr ""
 
-#: indicatorscriptrunner.py:1736
+#: indicatorscriptrunner.py:1730
 msgid "Edit Script"
 msgstr ""
 
-#: indicatorscriptrunner.py:1763
+#: indicatorscriptrunner.py:1757
 msgid "The command cannot be empty."
 msgstr ""
 
-#: indicatorscriptrunner.py:1770
+#: indicatorscriptrunner.py:1764
 msgid "A script of the same group and name already exists."
 msgstr ""
 
-#: indicatorscriptrunner.py:2122
+#: indicatorscriptrunner.py:2113
 msgid ""
 "No scripts are present.\n"
 "\n"

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorstardate 1.0.45\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-21 19:13+1000\n"
+"POT-Creation-Date: 2025-10-16 17:45+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -23,33 +23,33 @@ msgstr ""
 msgid "Shows the current Star Trek™ stardate."
 msgstr ""
 
-#: indicatorstardate.py:170
+#: indicatorstardate.py:174
 msgid "Show stardate 'classic'"
 msgstr ""
 
-#: indicatorstardate.py:172
+#: indicatorstardate.py:176
 msgid ""
 "If checked, show stardate 'classic' based on\n"
 "\n"
-"\tSTARDATES IN STAR TREK FAQ V1.6 by Andrew Main.\n"
+"\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n"
 "\n"
 "Otherwise, show stardate '2009 revised' based on\n"
 "\n"
 "\thttps://en.wikipedia.org/wiki/Stardate"
 msgstr ""
 
-#: indicatorstardate.py:182
+#: indicatorstardate.py:186
 msgid "Show ISSUE"
 msgstr ""
 
-#: indicatorstardate.py:183
+#: indicatorstardate.py:187
 msgid "Show the ISSUE of the stardate 'classic'."
 msgstr ""
 
-#: indicatorstardate.py:192
+#: indicatorstardate.py:196
 msgid "Pad INTEGER"
 msgstr ""
 
-#: indicatorstardate.py:194
+#: indicatorstardate.py:198
 msgid "Pad the INTEGER part of the stardate 'classic' with leading zeros."
 msgstr ""

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorvirtualbox 1.0.75\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-12 00:14+1000\n"
+"POT-Creation-Date: 2025-10-16 17:45+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -157,7 +157,7 @@ msgstr ""
 msgid "General"
 msgstr ""
 
-#: indicatorvirtualbox.py:857
+#: indicatorvirtualbox.py:865
 msgid ""
 "The start command must contain\n"
 "\t%VM%\n"
