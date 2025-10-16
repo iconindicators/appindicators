@@ -14,11 +14,18 @@ This project produces the following `appindicators` for `Ubuntu 20.04` et al:
 
 where each indicator is built upon `indicatorbase`.
 
-Rather than have a project for each indicator, `indicatorbase` has `pyprojectbase.toml` which covers the fields common to all indicators and each indicator has its own `pyprojectspecific.toml` for variations.  When building a `.whl` for release to `PyPI`, `pyprojectbase.toml` and `pyprojectspecific.toml` are merged to create a `pyproject.toml`.
+Rather than have a project for each indicator, `indicatorbase` has
+`pyprojectbase.toml` which covers the fields common to all indicators and each
+indicator has its own `pyprojectspecific.toml` for variations.  When building a
+`.whl` for release to `PyPI`, `pyprojectbase.toml` and `pyprojectspecific.toml`
+are merged to create a `pyproject.toml`.
 
-Similarly for `MANIFESTbase.in` and `MANIFESTspecific.in`, if an indicator uses a manifest.
+Similarly for `MANIFESTbase.in` and `MANIFESTspecific.in`, if an indicator uses
+a manifest.
 
-Files such as `.desktop` and various `bash` scripts are common enough across all indicators that they only need tags replaced during the build to create specific versions for an indicator.
+Files such as `.desktop` and various `bash` scripts are common enough across all
+indicators that they only need tags replaced during the build to create
+specific versions for an indicator.
 
 ---
 
@@ -30,7 +37,9 @@ To build a wheel for `indicatortest`, at the root of the source tree:
     python3 -m tools.build_wheel indicatortest
 ```
 
-which creates a virtual environment `venv_build`, updates locale files `.pot` / `.po` and creates a `.whl` / `.tar.gz` for `indicatortest` in `release/wheel/dist_indicatortest`.
+which creates a virtual environment `venv_build`, updates locale files
+`.pot` / `.po` and creates a `.whl` / `.tar.gz` for `indicatortest` in
+`release/wheel/dist_indicatortest`.
 
 Additional indicators may be appended to the above command.
 
@@ -48,13 +57,16 @@ To run `indicatortest`:
 
 The virtual environment `venv_run` will be created.
 
-Various operating system packages will likely need to be installed; refer to the installation [instructions](https://github.com/iconindicators/appindicators).
+Various operating system packages will likely need to be installed; refer to
+the installation [instructions](https://github.com/iconindicators/appindicators).
 
 Additional indicators may be appended to the above command.
 
-If the indicator has not previously been installed to `$HOME/.local/venv_indicators`, the icon and locale will be absent.
+If the indicator has not previously been installed to `$HOME/.local/venv_indicators`,
+the icon and locale will be absent.
 
-As part of running the indicator, a symbolic link to `indicatorbase.py` is created for all indicators.  To remove:
+As part of running the indicator, a symbolic link to `indicatorbase.py` is
+created for all indicators.  To remove:
 
 ```
     for dirs in indicator*; do \
@@ -79,7 +91,8 @@ The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_in
 
 Additional indicators may be appended to the above command.
 
-Various operating system packages will likely need to be installed; refer to the installation [instructions](https://github.com/iconindicators/appindicators).
+Various operating system packages will likely need to be installed; refer to
+the installation [instructions](https://github.com/iconindicators/appindicators).
 
 ---
 
@@ -87,7 +100,10 @@ Various operating system packages will likely need to be installed; refer to the
 
 **Prerequisite:** the indicator's `.whl` must be built and installed.
 
-To run an indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
+To run an indicator, open the applications menu (via the `Super` key) and
+select the indicator.  If this is the first time the indicator has been
+installed, you may have to log out/in for the indicator icon to appear in the
+list of applications.
 
 To run from a terminal (to observe any messages/errors) from any directory:
 
@@ -95,13 +111,18 @@ To run from a terminal (to observe any messages/errors) from any directory:
     . $HOME/.local/bin/indicatortest.sh
 ```
 
-Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and change `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
+Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop`
+and change `Terminal=false` to `Terminal=true`. Run the indicator as normal
+from the applications menu and a terminal window should display.  If the
+terminal window does not display, refresh the `.desktop` by renaming to a bogus
+name and then rename back, or log out/in.
 
 ---
 
 ## Release to TestPyPI
 
-For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded to `TestPyPI`:
+For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded
+to `TestPyPI`:
 
 ```
     indicator=indicatortest && \
@@ -117,7 +138,8 @@ For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded t
 
 ## Install from TestPyPI
 
-To install `indicatortest` from `TestPyPI` to a virtual environment in `$HOME/.local/venv_indicators`, first, install the [operating system packages](https://github.com/iconindicators/appindicators).
+To install `indicatortest` from `TestPyPI` to a virtual environment in
+`$HOME/.local/venv_indicators`, first, install the [operating system packages](https://github.com/iconindicators/appindicators).
 
 Then install `indicatortest`:
 
@@ -147,7 +169,9 @@ To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
     deactivate
 ```
 
-which assumes the username `__token__` and prompts for the password (starts with `pypi-`) and uploads the `.whl` / `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
+which assumes the username `__token__` and prompts for the password (starts
+with `pypi-`) and uploads the `.whl` / `.tar.gz` to `PyPI`.  Only one indicator
+may be uploaded at a time.
 
 References:
 - [https://twine.readthedocs.io/en/latest](https://twine.readthedocs.io/en/latest)
@@ -158,7 +182,9 @@ References:
 
 To install the indicator from `PyPI`, refer to instructions [here](https://github.com/iconindicators/appindicators).
 
-Note that if installing over an existing install with the same version, will need to add `--force-reinstall` after `--upgrade` (which may be removed from a [future release](https://github.com/pypa/pip/issues/8238) of `pip`).
+Note that if installing over an existing install with the same version, will
+need to add `--force-reinstall` after `--upgrade` (which may be removed from a
+[future release](https://github.com/pypa/pip/issues/8238) of `pip`).
 
 ---
 
@@ -186,7 +212,8 @@ Several checks have been disabled; re-enable by editing the script.
 
 ## Development under Geany
 
-**Prerequisite:** the indicator's `.whl` must be built and run within the source tree.
+**Prerequisite:** the indicator's `.whl` must be built and run within the
+source tree.
 
 **Geany Setup**
 
@@ -197,7 +224,9 @@ Run `Geany` then:
         Execute: cd /home/bernard/Programming/Indicators/%e/src ; /home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.%e"
 ```
 
-NOTE: Because of `%e` variable above, running any of the `tools` is not possible, nor any other non-indicator code, such as `example.py` in `indicatorstardate`.
+NOTE: Because of `%e` variable above, running any of the `tools` is not
+possible, nor any other non-indicator code, such as `example.py` in
+`indicatorstardate`.
 
 **Project Setup**
 
@@ -210,7 +239,9 @@ NOTE: Because of `%e` variable above, running any of the `tools` is not possible
 
 The indicator should now run via `Build > Execute` or `F5`.
 
-NOTE: If editing `README.md` or any `markdown` document under `Geany`, using two spaces to insert an empty line may not work as `Geany` removes trailing spaces by default.
+NOTE: If editing `README.md` or any `markdown` document under `Geany`, using
+two spaces to insert an empty line may not work as `Geany` removes trailing
+spaces by default.
 
 References:
 
@@ -221,11 +252,13 @@ References:
 
 ## Development under Eclipse
 
-**Prerequisite:** the indicator's `.whl` must be built and run within the source tree.
+**Prerequisite:** the indicator's `.whl` must be built and run within the
+source tree.
 
 **Eclipse Setup**
 
-Run `Eclipse` and install [Liclipse](https://www.liclipse.com/) via the update site.
+Run `Eclipse` and install [Liclipse](https://www.liclipse.com/) via the update
+site.
 
 Create a `Python` interpreter which uses `venv_run`:
 
@@ -275,7 +308,8 @@ Repeat for each indicator, or as each indicator is run.
 
 **Run Tool**
 
-Under `Run Configurations...` for the tool, ensure that `Working Directory` is set to `Default` and the `Python` interpreter is set to `python3`.
+Under `Run Configurations...` for the tool, ensure that `Working Directory` is
+set to `Default` and the `Python` interpreter is set to `python3`.
 
 References:
 
