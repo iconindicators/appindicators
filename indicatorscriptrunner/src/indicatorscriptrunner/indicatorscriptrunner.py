@@ -455,7 +455,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 treestore.append( parent, row )
 
-        print( self.dump_treestore( treestore ) )
+        self._dump_treestore( treestore )
 
         renderer_column_name_text = Gtk.CellRendererText()
 
@@ -1046,9 +1046,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             break
 
         dialog.destroy()
-
-        print( self.dump_treestore( model ) )
-
+        self._dump_treestore( model )
         return parent
 
 
@@ -1140,9 +1138,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             break
 
         dialog.destroy()
-
-        print( self.dump_treestore( model ) )
-
+        self._dump_treestore( model )
         return iter_select
 
 
@@ -1233,8 +1229,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
             model.remove( iter_group )
 
-        print( self.dump_treestore( model ) )
-
+        self._dump_treestore( model )
         return iter_select, old_tag_new_tag_pairs
 
 
@@ -1291,8 +1286,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
                 model.remove( iter_group )
 
-        print( self.dump_treestore( model ) )
-
+        self._dump_treestore( model )
         return iter_select, old_tag_new_tag_pairs
 
 
@@ -1420,9 +1414,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             break
 
         dialog.destroy()
-
-        print( self.dump_treestore( model ) )
-
+        self._dump_treestore( model )
         return iter_select, old_tag_new_tag_pairs
 
 
@@ -1875,9 +1867,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             break
 
         dialog.destroy()
-
-        print( self.dump_treestore( model ) )
-
+        self._dump_treestore( model )
         return iter_select, old_tag_new_tag_pairs
 
 
@@ -1964,12 +1954,11 @@ class IndicatorScriptRunner( IndicatorBase ):
         return scripts_by_group
 
 
-#TODO For testing
-    def dump_treestore(
+    def _dump_treestore(
         self,
         model ):
         '''
-        Keep Pylint happy!
+        Print the contents of the treestore model. 
         '''
 
         def dump_treestore_( model, treepath, iter_, dump ):
@@ -1994,7 +1983,7 @@ class IndicatorScriptRunner( IndicatorBase ):
             "Force Update\n" )
 
         model.foreach( dump_treestore_, dump )
-        return dump[ 0 ]+ "\n\n"
+        print( dump[ 0 ]+ "\n\n" )
 
 
     def _select_row(
