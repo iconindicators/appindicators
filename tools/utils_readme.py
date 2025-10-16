@@ -27,10 +27,6 @@ References:
 '''
 
 
-#TODO Somehow try to limit the output to 80 chars.
-# https://stackoverflow.com/questions/36728953/how-can-i-wrap-a-line-at-80-characters-in-markdown
-
-
 import configparser
 import datetime
 import re
@@ -801,7 +797,7 @@ def _get_cache_config_log(
     cache = ""
     if indicator_writes_to_cache:
         title = "Cache / " + title
-        cache = f"the cache at `$HOME/.cache/{ indicator }` and "
+        cache = f"the cache at `$HOME/.cache/{ indicator }` and/or "
 
     return (
         f"{ title }\n"
