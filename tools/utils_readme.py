@@ -47,6 +47,7 @@ class OperatingSystem( Enum ):
     ''' Supported operating systems. '''
     DEBIAN_11 = auto()
     DEBIAN_12 = auto()
+    DEBIAN_13 = auto()
     FEDORA_40 = auto()
     FEDORA_41 = auto()
     FEDORA_42 = auto()
@@ -73,6 +74,7 @@ class OperatingSystem( Enum ):
 OPERATING_SYSTEMS_DEBIAN_BASED = {
     OperatingSystem.DEBIAN_11,
     OperatingSystem.DEBIAN_12,
+    OperatingSystem.DEBIAN_13,
     OperatingSystem.KUBUNTU_2204,
     OperatingSystem.KUBUNTU_2404,
     OperatingSystem.LINUX_MINT_CINNAMON_20,
@@ -478,7 +480,8 @@ def _get_extension_install(
         _is_operating_system(
             operating_system,
             OperatingSystem.DEBIAN_11,
-            OperatingSystem.DEBIAN_12 ) ):
+            OperatingSystem.DEBIAN_12,
+            OperatingSystem.DEBIAN_13 ) ):
 
         extension = (
             "For the `appindicator` extension to take effect, log out / in "
@@ -579,7 +582,8 @@ def _get_operating_system_packages_debian(
         _is_operating_system(
             operating_system,
             OperatingSystem.DEBIAN_11,
-            OperatingSystem.DEBIAN_12 ) ):
+            OperatingSystem.DEBIAN_12,
+            OperatingSystem.DEBIAN_13 ) ):
         packages.append( "gnome-shell-extension-appindicator" )
 
     needs_calendar = (
@@ -587,6 +591,7 @@ def _get_operating_system_packages_debian(
             operating_system,
             OperatingSystem.DEBIAN_11,
             OperatingSystem.DEBIAN_12,
+            OperatingSystem.DEBIAN_13,
             OperatingSystem.KUBUNTU_2204,
             OperatingSystem.KUBUNTU_2404,
             OperatingSystem.LINUX_MINT_CINNAMON_21,

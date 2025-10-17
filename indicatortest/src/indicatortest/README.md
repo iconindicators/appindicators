@@ -33,6 +33,31 @@ Installation / Updating
 
 </details>
 
+<details><summary><b>Debian 13</b></summary>
+
+1. Install operating system packages:
+
+    ```
+    sudo apt-get -y install calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev libnotify-bin pulseaudio-utils python3-pip python3-venv wl-clipboard wmctrl
+    ```
+
+2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run script:
+    ```
+    indicator=indicatortest && \
+    venv=$HOME/.local/venv_indicators && \
+    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+    . ${venv}/bin/activate && \
+    python3 -m pip install --upgrade PyGObject ${indicator} && \
+    deactivate && \
+    . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
+    ```
+3. For the `appindicator` extension to take effect, log out / in (or restart) and in a terminal run:
+    ```
+    gnome-extensions enable ubuntu-appindicators@ubuntu.com
+    ```
+
+</details>
+
 <details><summary><b>Fedora 40 | Fedora 41</b></summary>
 
 1. Install operating system packages:
@@ -225,7 +250,7 @@ Limitations
 Uninstall
 ---------
 
-<details><summary><b>Debian 11 | Debian 12</b></summary>
+<details><summary><b>Debian 11 | Debian 12 | Debian 13</b></summary>
 
 1. Uninstall operating system packages:
 
