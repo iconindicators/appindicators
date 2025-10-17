@@ -1,60 +1,9 @@
 # Immediate
 
-### Migration of Indicators from Subversion to GitHub
+### Ubuntu 26.04
 
-https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/importing-a-subversion-repository
-
-https://git-scm.com/book/ms/v2/Git-and-Other-Systems-Migrating-to-Git
-
-https://git-scm.com/docs/git-svn
-
-svn checkout http://192.168.1.102/indicators indicators-svn
-git svn clone http://192.168.1.102/indicators -r HEAD indicators-git
-cd indicators-git
-
-https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
-
-git remote add origin https://github.com/iconindicators/test.git
-
-https://github.com/iconindicators
-https://github.com/iconindicators/appindicators
-
-https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github
-
-https://docs.github.com/en/get-started/git-basics/caching-your-github-credentials-in-git
-
-
-### Debian 13 / Ubuntu 26.04
-
-When these versions are released, will likely have to switch to
-libgirepository-2.0-dev and so changes need to be made in:
- - build_wheel
- - utils_readme
-and possibly elsewhere!
-
-
-### Update date in CHANGELOG.md
-For each indicator's CHANGELOG.md, at release time, update the release date in
-the latest entry to the date of release.
-
-
-### Update the PPA description
-At
-	https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
-change the description to the following:
-
-For releases for Ubuntu 20.04 and forward:
-
-    https://github.com/iconindicators/appindicators
-
-
-### For each indicator at
-	https://askubuntu.com/questions/30334/what-application-indicators-are-available
-update the URL at the top with:
-
-    https://github.com/iconindicators/appindicators
-
-Also update the indicator name (remove the hyphen from the name).
+When released, will likely have to switch to libgirepository-2.0-dev and so
+changes need to be made in tools/utils_readme.py
 
 
 # Long Term
@@ -79,62 +28,6 @@ for ALL distros are yet to upgrade.
 
 Will need to eventually swap over each distro as it is released with
 libayatana-appindicator-glib and update the install instructions.
-
-
-### Migration of Sourceforge projects to GitHub
-
-Need to import from SourceForge
-
-  https://sourceforge.net/projects/stardatesystray
-  https://sourceforge.net/projects/wrldtimesystray
-
-into GitHub repositories
-
-  https://github.com/iconindicators/stardatesystemtray
-  https://github.com/iconindicators/worldtimesystemtray
-
-include commit history?
-
-Need to leave a note on the SourceForge pages about the change.
-Should the code be removed?
-What about old releases?  Migrate and/or remove?
-
-Can the issues/forums be migrated?
-
-
-## Upgrade of StardateSystemTray and WorldTimeSystemTray
-
-Have set minimum Java to 1.8 as this is lowest version still supported.
-
-Windows EOL
-    Vista 2017
-    7 2020
-    8 2016
-    8.1 2023
-    10 2025
-    11 ...?
-
-Java EOL
-    1.6 2013
-    1.7 2015
-    8 2019...2026
-    9 2018
-    10 2018
-    11 2019...2027
-    12 2019
-    13 2020
-    14 2020
-    15 2021
-    16 2021
-    17 2024...2027
-    18 2022
-    19 2023
-    20 2023
-    21 2028...2029
-    22 2024
-    23 2025
-    24 2025
-    25 2030
 
 
 ### Create non-symbolic icons

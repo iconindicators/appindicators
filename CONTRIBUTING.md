@@ -390,18 +390,29 @@ Clone the main repository from `GitHub`:
   git clone https://github.com/iconindicators/appindicators appindicatorsgithub     TODO USE TEST FIRST
 ```
 
+TODO Update the TODO.md file
+
+
+TODO Do a release on test repo.
+
+
+TODO Should
+    https://github.com/iconindicators/appindicatorstest/blob/main/indicatorfortune/src/indicatorfortune/README.md
+have a title (and what would it be)?    
+
+
 Insert the converted `Git` repository from above to the clone (roundabout way as
-`git subtree` does not allow adding to the root), then push back up to `GitHub`:      TODO DOUBLE CHECK THE LOGIC OF THIS
+`git subtree` does not allow adding to the root), then push back up to `GitHub`:
 
 ```
-  cd appindicatorsgithub
-  git remote add indicatorsgit $(pwd)/../indicatorsgit/.git
-  git subtree add -P temp indicatorsgit HEAD
-  mv temp/* .
-  rm -r temp
-  git add .
-  git commit -m "From Subversion."
-  git push origin main
+cd appindicatorsgithub
+git remote add indicatorsgit $(pwd)/../indicatorsgit/.git
+git subtree add -P temp indicatorsgit HEAD
+git mv -f temp/* .
+git add .
+git commit -m "Moved files from temp to root."
+rm -r temp
+git push origin main
 ```
 
 References
