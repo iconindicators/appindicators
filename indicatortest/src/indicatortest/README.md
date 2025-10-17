@@ -1,15 +1,8 @@
+indicatortest
+---
+
 `indicatortest` exercises a range of indicator functionality on `Debian`, `Fedora`, `Manjaro`, `openSUSE`, `Ubuntu` and theoretically, any platform which supports the `AyatanaAppIndicator3` / `AppIndicator3` library.
 
-Other indicators in this series are:
-- [indicatorfortune](https://github.com/iconindicators/appindicators/blob/main/indicatorfortune/src/indicatorfortune/README.md)
-- [indicatorlunar](https://github.com/iconindicators/appindicators/blob/main/indicatorlunar/src/indicatorlunar/README.md)
-- [indicatoronthisday](https://github.com/iconindicators/appindicators/blob/main/indicatoronthisday/src/indicatoronthisday/README.md)
-- [indicatorppadownloadstatistics](https://github.com/iconindicators/appindicators/blob/main/indicatorppadownloadstatistics/src/indicatorppadownloadstatistics/README.md)
-- [indicatorpunycode](https://github.com/iconindicators/appindicators/blob/main/indicatorpunycode/src/indicatorpunycode/README.md)
-- [indicatorscriptrunner](https://github.com/iconindicators/appindicators/blob/main/indicatorscriptrunner/src/indicatorscriptrunner/README.md)
-- [indicatorstardate](https://github.com/iconindicators/appindicators/blob/main/indicatorstardate/src/indicatorstardate/README.md)
-- [indicatortide](https://github.com/iconindicators/appindicators/blob/main/indicatortide/src/indicatortide/README.md)
-- [indicatorvirtualbox](https://github.com/iconindicators/appindicators/blob/main/indicatorvirtualbox/src/indicatorvirtualbox/README.md)
 
 
 Installation / Updating
