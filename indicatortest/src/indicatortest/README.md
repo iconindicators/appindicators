@@ -38,7 +38,7 @@ Installation / Updating
 1. Install operating system packages:
 
     ```
-    sudo apt-get -y install calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev libnotify-bin pulseaudio-utils python3-pip python3-venv wl-clipboard wmctrl
+    sudo apt-get -y install calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gnome-shell-extension-appindicator libcairo2-dev libgirepository-2.0-dev libnotify-bin pulseaudio-utils python3-pip python3-venv wl-clipboard wmctrl
     ```
 
 2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatortest`, including icons, .desktop and run script:
@@ -250,12 +250,40 @@ Limitations
 Uninstall
 ---------
 
-<details><summary><b>Debian 11 | Debian 12 | Debian 13</b></summary>
+<details><summary><b>Debian 11 | Debian 12</b></summary>
 
 1. Uninstall operating system packages:
 
     ```
     sudo apt-get -y remove calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gnome-shell-extension-appindicator libcairo2-dev libgirepository1.0-dev libnotify-bin pulseaudio-utils python3-pip python3-venv wl-clipboard wmctrl
+    ```
+
+2. Uninstall the indicator from the `Python3` virtual environment, including icons, .desktop and run script:
+    ```
+    indicator=indicatortest && \
+    venv=$HOME/.local/venv_indicators && \
+    $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/uninstall.sh && \
+    . ${venv}/bin/activate && \
+    python3 -m pip uninstall --yes ${indicator} && \
+    count=$(python3 -m pip --disable-pip-version-check list | grep -o "indicator" | wc -l) && \
+    deactivate && \
+    if [ "$count" -eq "0" ]; then rm -f -r ${venv}; fi 
+    ```
+
+    The configuration directory `$HOME/.config/indicatortest` will not be deleted.
+
+    The cache directory `$HOME/.cache/indicatortest` will be deleted.
+
+    If no other indicators remain installed, the virtual environment will be deleted.
+
+</details>
+
+<details><summary><b>Debian 13</b></summary>
+
+1. Uninstall operating system packages:
+
+    ```
+    sudo apt-get -y remove calendar fortune-mod fortunes gir1.2-ayatanaappindicator3-0.1 gnome-shell-extension-appindicator libcairo2-dev libgirepository-2.0-dev libnotify-bin pulseaudio-utils python3-pip python3-venv wl-clipboard wmctrl
     ```
 
 2. Uninstall the indicator from the `Python3` virtual environment, including icons, .desktop and run script:
