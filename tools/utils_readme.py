@@ -215,7 +215,13 @@ def _get_introduction_indicator(
             "Manjaro",
             "openSUSE" ] )
 
-    introduction = (
+    introduction = ""
+    if not wheel:
+        introduction += (
+            f"{ indicator }\n"
+            "---\n\n" )
+
+    introduction += (
         f"`{ indicator }` { comments } on "
         f"`{ '`, `' .join( sorted( supported_distributions, key = str.lower ) ) }`"
         " and theoretically, any platform which supports the "
@@ -223,17 +229,10 @@ def _get_introduction_indicator(
 
     if wheel:
         introduction += (
-            "Installation requires operating system packages, "
-            "a `Python3` virtual environment and finally `pip`. Refer to "
-            f"[{ URL_GITHUB_REPOSITORY }]({ URL_GITHUB_REPOSITORY }) "
+            "Installation requires operating system packages, a `Python3` "
+            "virtual environment, `pip` and post installation commands.\n"
+            f"Refer to [{ URL_GITHUB_REPOSITORY }]({ URL_GITHUB_REPOSITORY }) "
             "for details.\n" )
-
-    else:
-        introduction += "Other indicators in this series are:\n"
-        for indicator_ in _get_indicator_names_sans_current( indicator ):
-            link = indicator_
-            url = f"{ _get_url_to_indicator_on_github( indicator_ ) }/README.md"
-            introduction += f"- [{ link }]({ url })\n"
 
     introduction += "\n\n"
 
