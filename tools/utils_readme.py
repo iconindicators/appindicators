@@ -27,6 +27,15 @@ References:
 '''
 
 
+# When running on Debian 13 (using libgirepository-2.0-dev) get the following:
+#
+#   libayatana-appindicator-WARNING **: 17:00:23.620: 
+#       libayatana-appindicator is deprecated. Please use
+#       libayatana-appindicator-glib in newly written code.
+#
+# Keep an eye out for future distributions supporting this library.
+
+
 import configparser
 import datetime
 import re
@@ -574,9 +583,17 @@ def _get_operating_system_packages_debian(
     packages = [
         "gir1.2-ayatanaappindicator3-0.1",
         "libcairo2-dev",
-        "libgirepository1.0-dev",
         "python3-pip",
         "python3-venv" ]
+
+    if (
+        _is_operating_system(
+            operating_system,
+            OperatingSystem.DEBIAN_13 ) ):
+        packages.append( "libgirepository-2.0-dev" )
+
+    else:
+        packages.append( "libgirepository1.0-dev" )
 
     if (
         _is_operating_system(
