@@ -138,7 +138,9 @@ one or more indicators change, modify the relevant section in
 
 Finally, commit the changed file(s).
 
-The `README.md` on each indicator's `PyPI` page is created automatically as part of the `build_wheel` process (and exists only within the release files so must not be committed).
+The `README.md` on each indicator's `PyPI` page is created automatically as part
+of the `build_wheel` process (and exists only within the release files so must
+not be committed).
 
 ---
 
