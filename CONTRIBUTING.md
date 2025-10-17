@@ -180,7 +180,7 @@ Then install `indicatortest`:
 
 ---
 
-## Release to PyPI
+## Release to PyPI   TODO Mention GitHub too...either here or a new section.
 
 To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
 
@@ -390,15 +390,13 @@ Clone the main repository from `GitHub`:
   git clone https://github.com/iconindicators/appindicators appindicatorsgithub     TODO USE TEST FIRST
 ```
 
-TODO Update the TODO.md file
-
 
 TODO Do a release on test repo.
 
 
 TODO Should
     https://github.com/iconindicators/appindicatorstest/blob/main/indicatorfortune/src/indicatorfortune/README.md
-have a title (and what would it be)?    
+have a title (and what would it be)?
 
 
 Insert the converted `Git` repository from above to the clone (roundabout way as
