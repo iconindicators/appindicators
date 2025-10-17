@@ -28,15 +28,6 @@
 #       Check install and uninstall and run
 
 
-#TODO Test
-# Debian 13
-# Manjaro 25.0.0  Zetar
-
-
-#TODO Check the link from each PyPI page back to GitHub goes to the appropriate
-# instructions to install.
-
-
 '''
 Base class for application indicators.
 
