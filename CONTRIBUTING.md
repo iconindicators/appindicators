@@ -34,7 +34,7 @@ specific versions for an indicator.
 To build a wheel for `indicatortest`, at the root of the source tree:
 
 ```
-    python3 -m tools.build_wheel indicatortest
+  python3 -m tools.build_wheel indicatortest
 ```
 
 which creates a virtual environment `venv_build`, updates locale files
@@ -52,7 +52,7 @@ Additional indicators may be appended to the above command.
 To run `indicatortest`:
 
 ```
-    python3 -m tools.run_indicator_from_source indicatortest
+  python3 -m tools.run_indicator_from_source indicatortest
 ```
 
 The virtual environment `venv_run` will be created.
@@ -69,10 +69,10 @@ As part of running the indicator, a symbolic link to `indicatorbase.py` is
 created for all indicators.  To remove:
 
 ```
-    for dirs in indicator*; do \
-    if [ -L $dirs/src/$dirs/indicatorbase.py ]; \
-    then rm $dirs/src/$dirs/indicatorbase.py; fi ; \
-    done;
+  for dirs in indicator*; do \
+  if [ -L $dirs/src/$dirs/indicatorbase.py ]; \
+  then rm $dirs/src/$dirs/indicatorbase.py; fi ; \
+  done;
 ```
 
 ---
@@ -84,7 +84,7 @@ created for all indicators.  To remove:
 To install a `.whl` for `indicatortest` located in `release/wheel/dist_indicatortest`:
 
 ```
-    python3 -m tools.install_wheel indicatortest
+  python3 -m tools.install_wheel indicatortest
 ```
 
 The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_indicators`.
@@ -108,7 +108,7 @@ list of applications.
 To run from a terminal (to observe any messages/errors) from any directory:
 
 ```
-    . $HOME/.local/bin/indicatortest.sh
+  . $HOME/.local/bin/indicatortest.sh
 ```
 
 Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop`
@@ -119,19 +119,42 @@ name and then rename back, or log out/in.
 
 ---
 
+## Updating README.md
+
+There are three types of `README.md`:
+1. The `README.md` for the `GitHub` main landing page.
+1. A `README.md` for each indicator's `PyPI` landing page.
+1. A `README.md` for each indicator, containing installation instructions and
+so on, located within the respective indicator's source tree on `GitHub`.
+
+The `GitHub` main `README.md` and each indicator's `GitHub` `README.md` are
+created/updated as needed. For example, if the installation instructions for
+one or more indicators change, modify the relevant section in
+`tools/utils_readme.py` and run:
+
+```
+  python3 -m tools.build_readme
+```
+
+Finally, commit the changed file(s).
+
+The `README.md` on each indicator's `PyPI` page is created automatically as part of the `build_wheel` process (and exists only within the release files so must not be committed).
+
+---
+
 ## Release to TestPyPI
 
 For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded
 to `TestPyPI`:
 
 ```
-    indicator=indicatortest && \
-    venv=venv_build && \
-    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-    . ${venv}/bin/activate && \
-    python3 -m pip install twine && \
-    python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_${indicator}/* && \
-    deactivate
+  indicator=indicatortest && \
+  venv=venv_build && \
+  if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+  . ${venv}/bin/activate && \
+  python3 -m pip install twine && \
+  python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_${indicator}/* && \
+  deactivate
 ```
 
 ---
@@ -144,13 +167,13 @@ To install `indicatortest` from `TestPyPI` to a virtual environment in
 Then install `indicatortest`:
 
 ```
-    indicator=indicatortest && \
-    venv=$HOME/.local/venv_indicators && \
-    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-    . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple ${indicator} && \
-    deactivate && \
-    $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
+  indicator=indicatortest && \
+  venv=$HOME/.local/venv_indicators && \
+  if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+  . ${venv}/bin/activate && \
+  python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple ${indicator} && \
+  deactivate && \
+  $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
 ```
 
 ---
@@ -160,13 +183,13 @@ Then install `indicatortest`:
 To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
 
 ```
-    indicator=indicatortest && \
-    venv=venv_build && \
-    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-    . ${venv}/bin/activate && \
-    python3 -m pip install twine && \
-    python3 -m twine upload --username __token__ release/wheel/dist_${indicator}/* && \
-    deactivate
+  indicator=indicatortest && \
+  venv=venv_build && \
+  if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+  . ${venv}/bin/activate && \
+  python3 -m pip install twine && \
+  python3 -m twine upload --username __token__ release/wheel/dist_${indicator}/* && \
+  deactivate
 ```
 
 which assumes the username `__token__` and prompts for the password (starts
@@ -203,7 +226,7 @@ Additional indicators may be appended to the above command.
 To run `Pylint` over the entire project:
 
 ```
-    python3 -m tools.pylint
+  python3 -m tools.pylint
 ```
 
 Several checks have been disabled; re-enable by editing the script.
@@ -220,8 +243,8 @@ source tree.
 Run `Geany` then:
 
 ```
-    Build > Set Build Commands > Execute Commands
-        Execute: cd /home/bernard/Programming/Indicators/%e/src ; /home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.%e"
+  Build > Set Build Commands > Execute Commands
+    Execute: cd /home/bernard/Programming/Indicators/%e/src ; /home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.%e"
 ```
 
 NOTE: Because of `%e` variable above, running any of the `tools` is not
@@ -231,10 +254,10 @@ possible, nor any other non-indicator code, such as `example.py` in
 **Project Setup**
 
 ```
-    Project > New
-        Name: Indicators
-        Filename: /home/bernard/Programming/Indicators/project.geany
-        Basepath: /home/bernard/Programming/Indicators
+  Project > New
+    Name: Indicators
+    Filename: /home/bernard/Programming/Indicators/project.geany
+    Basepath: /home/bernard/Programming/Indicators
 ```
 
 The indicator should now run via `Build > Execute` or `F5`.
@@ -263,45 +286,45 @@ site.
 Create a `Python` interpreter which uses `venv_run`:
 
 ```
-    Window > Preferences
-        PyDev > Python Interpreter
-            New > Browse for python/pypy exe
-                Browse to venv_run/bin/python3
-                Interpreter Name: python3 venv_run
-                Check site-packages within venv_run
+  Window > Preferences
+    PyDev > Python Interpreter
+      New > Browse for python/pypy exe
+        Browse to venv_run/bin/python3
+        Interpreter Name: python3 venv_run
+        Check site-packages within venv_run
 
-        PyDev > Run
-            Check Launch modules with 'python -m mod.name'
+    PyDev > Run
+      Check Launch modules with 'python -m mod.name'
 ```
 
 **Project Setup**
 
 ```
-    File > New > PyDev Project
-        Project Name: Indicators
-        Use default: Uncheck
-        Directory: /home/bernard/Programming/Indicators
-        Interpreter Name: python3 venv_run
-        Finish
+  File > New > PyDev Project
+    Project Name: Indicators
+    Use default: Uncheck
+    Directory: /home/bernard/Programming/Indicators
+    Interpreter Name: python3 venv_run
+    Finish
 ```
 
 **Run Indicator**
 
 ```
-    Right click on indicatortest.py
-        Run As > Python Run
+  Right click on indicatortest.py
+    Run As > Python Run
 ```
 
 which should fail, then:
 
 ```
-    Run > Run Configurations
-        Python Run: Indicators.indicatortest
-            Arguments
-                Working Directory:
-                    Other: ${workspace_loc:Indicators/indicatortest/src}
-            Interpreter
-                Interpreter: python3 venv_run
+  Run > Run Configurations
+    Python Run: Indicators.indicatortest
+      Arguments
+        Working Directory:
+          Other: ${workspace_loc:Indicators/indicatortest/src}
+      Interpreter
+        Interpreter: python3 venv_run
 ```
 
 Repeat for each indicator, or as each indicator is run.
@@ -320,7 +343,7 @@ References:
 ## Convert this Document from MD to HTML
 
 ```
-    python3 -m tools.markdown_to_html DEVELOPERS.md
+  python3 -m tools.markdown_to_html DEVELOPERS.md
 ```
 
 Any `markdown` document may be converted to `html` using the same script.
@@ -335,49 +358,49 @@ into `GitHub`.
 Check out a working copy of the `Subversion` repository and verify list of
 authors (should only be `bernard =`):
 
-  ```
-    cd <svn working copy of indicators>
-    svn log --xml --quiet | grep author | sort -u | perl -pe 's/.*>(.*?)<.*/$1 = /'
+```
+  cd <svn working copy of indicators>
+  svn log --xml --quiet | grep author | sort -u | perl -pe 's/.*>(.*?)<.*/$1 = /'
 
-        bernard = 
-  ```
+    bernard = 
+```
 
 Create `users.txt` to match the list of authors:
 
-  ```
-    echo "bernard = Bernard Giannetti <thebernmeister@hotmail.com>" > users.txt
-  ```
+```
+  echo "bernard = Bernard Giannetti <thebernmeister@hotmail.com>" > users.txt
+```
 
 Convert `Subversion` repository (at internal IP address) to a `Git` repository
 (note there is no `trunk`, `branches`, `tags`):
 
-  ```
-    git svn clone http://192.168.1.102/indicators \
-      --authors-file=users.txt \
-      --no-metadata \
-      --prefix "" \
-      indicatorsgit
-  ```
+```
+  git svn clone http://192.168.1.102/indicators \
+    --authors-file=users.txt \
+    --no-metadata \
+    --prefix "" \
+    indicatorsgit
+```
 
 Clone the main repository from `GitHub`:
 
-  ```
-    git clone https://github.com/iconindicators/appindicators appindicatorsgithub     TODO USE TEST FIRST
-  ```
+```
+  git clone https://github.com/iconindicators/appindicators appindicatorsgithub     TODO USE TEST FIRST
+```
 
 Insert the converted `Git` repository from above to the clone (roundabout way as
-`git subtree` does not allow adding to the root), then push back up to `GitHub`:
+`git subtree` does not allow adding to the root), then push back up to `GitHub`:      TODO DOUBLE CHECK THE LOGIC OF THIS
 
-  ```
-    cd appindicatorsgithub
-    git remote add indicatorsgit $(pwd)/../indicatorsgit/.git
-    git subtree add -P temp indicatorsgit HEAD
-    mv temp/* .
-    rm -r temp
-    git add .
-    git commit -m "From Subversion."
-    git push origin main
-  ```
+```
+  cd appindicatorsgithub
+  git remote add indicatorsgit $(pwd)/../indicatorsgit/.git
+  git subtree add -P temp indicatorsgit HEAD
+  mv temp/* .
+  rm -r temp
+  git add .
+  git commit -m "From Subversion."
+  git push origin main
+```
 
 References
 - [https://git-scm.com/book/ms/v2/Git-and-Other-Systems-Migrating-to-Git](https://git-scm.com/book/ms/v2/Git-and-Other-Systems-Migrating-to-Git)
