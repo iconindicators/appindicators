@@ -1,6 +1,6 @@
 # Indicator VirtualBox™ changelog
 
-## v1.0.75 (2024-09-04)
+## v1.0.75 (2025-10-18)
 
 - Can now edit a virtual machine's autostart and start command in place in the
   Preferences.

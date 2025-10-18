@@ -1,6 +1,6 @@
 # Indicator PPA Download Statistics changelog
 
-## v1.0.81 (2024-09-04)
+## v1.0.81 (2025-10-18)
 
 - PPAs are now specified only by the user/name with an optional filter; the
   series/architecture is redundant.

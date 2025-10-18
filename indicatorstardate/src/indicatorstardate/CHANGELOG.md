@@ -1,6 +1,6 @@
 # Indicator Stardate changelog
 
-## v1.0.45 (2024-09-04)
+## v1.0.45 (2025-10-18)
 
 - Now uses
 

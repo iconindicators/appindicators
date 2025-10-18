@@ -1,6 +1,6 @@
 # Indicator Script Runner changelog
 
-## v1.0.25 (2024-09-04)
+## v1.0.25 (2025-10-18)
 
 - Groups may now be copied, includig all scripts within the group.
 - Group names may now be changed.

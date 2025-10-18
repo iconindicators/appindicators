@@ -1,6 +1,6 @@
 # Indicator Punycode changelog
 
-## v1.0.16 (2024-09-04)
+## v1.0.16 (2025-10-18)
 
 - Reinstated the autostart option in Preferences with the addition of a optional
   delay to start up.

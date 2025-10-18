@@ -1,6 +1,6 @@
 # Indicator Fortune changelog
 
-## v1.0.44 (2024-09-04)
+## v1.0.44 (2025-10-18)
 
 - Fortunes are now defined only by a .dat file, rather than an entire directory.
 - No longer remove characters/glyphs which render as hexadecimal.  Has become a

@@ -1,6 +1,6 @@
 # Indicator Tide changelog
 
-## v1.0.30 (2024-09-04)
+## v1.0.30 (2025-10-18)
 
 - Reinstated the autostart option in Preferences with the addition of a optional
   delay to start up.

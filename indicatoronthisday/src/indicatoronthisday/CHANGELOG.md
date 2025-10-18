@@ -1,6 +1,6 @@
 # Indicator On This Day changelog
 
-## v1.0.17 (2024-09-04)
+## v1.0.17 (2025-10-18)
 
 - When show event notifcations is enabled, a three second delay between each
   notification is now included.
