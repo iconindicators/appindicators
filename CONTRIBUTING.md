@@ -220,18 +220,6 @@ References:
 
 ---
 
-## Install from PyPI
-
-TODO Is this section still needed?
-
-To install the indicator from `PyPI`, refer to instructions [here](https://github.com/iconindicators/appindicators).
-
-Note that if installing over an existing install with the same version, will
-need to add `--force-reinstall` after `--upgrade` (which may be removed from a
-[future release](https://github.com/pypa/pip/issues/8238) of `pip`).
-
----
-
 ## Uninstall an Indicator
 
 ```
