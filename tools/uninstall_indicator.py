@@ -21,6 +21,9 @@ Uninstall one or more indicators, including the .desktop, run script, icons,
 .config and .cache.
 
 Remove the virtual environment if no further indicators are installed.
+
+Note that any operating system packages installed for the indicator(s) will
+still be present.
 '''
 
 
