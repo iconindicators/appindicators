@@ -1,12 +1,40 @@
+#TODO Testing
+#
+#   Functional
+#       Ensure all buttons clicked, checked and so on.
+#
+#   User acceptance
+#       Does the indicator behave/achieve as an end user expects?
+#
+#   Install/Uninstall
+#       Check install and uninstall and run
+
+
+#TODO Update date in CHANGELOG.md
+#For each indicator's CHANGELOG.md, at release time, update the release date in
+#the latest entry to the date of release.
+
+
+#TODO Update the PPA description
+#At
+#   https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
+#change the description to the following:
+#
+#For releases for Ubuntu 20.04 and forward:
+#
+#    https://github.com/iconindicators/appindicators
+
+
+#TODO For each indicator at
+#   https://askubuntu.com/questions/30334/what-application-indicators-are-available
+#update the URL at the top with:
+#
+#    https://github.com/iconindicators/appindicators
+#
+#Also update the indicator name (remove the hyphen from the name).
+
+
 # Immediate
-
-### Ubuntu 26.04
-
-When released, will likely have to switch to libgirepository-2.0-dev and so
-changes need to be made in tools/utils_readme.py
-
-
-# Long Term
 
 ### Test on distros dropping X11 support
 If wmctrl is no longer available in a given distro's packages,
@@ -17,14 +45,25 @@ Ubuntu 25.10 is expected to drop X11; when released (Oct 2025)
 Ubuntu 26.04 is expected to drop X11; when released (Apr 2026)
 
 
-### Deprecation of libayatana-appindicator
-When running indicator on Manjaro 25 got a deprecation warning that
-libayatana-appindicator is deprecated and to use libayatana-appindicator-glib
-instead.
+### Ubuntu 26.04
 
-However, there is no package for that and some internet searching suggests
-that perhaps the deprecation message is quite early and package managers
-for ALL distros are yet to upgrade.
+When released, will likely have to switch to libgirepository-2.0-dev and so
+changes need to be made in tools/utils_readme.py
+
+
+# Long Term
+
+### Deprecation of libayatana-appindicator
+When running on Debian 13 and Manjaro 25 (using libgirepository-2.0-dev) get
+the following:
+
+    libayatana-appindicator-WARNING **: 17:00:23.620: 
+        libayatana-appindicator is deprecated. Please use
+        libayatana-appindicator-glib in newly written code.
+
+There is no package for that and some internet searching suggests that perhaps
+the deprecation message is quite early and package managers for ALL distros are
+yet to upgrade.
 
 Will need to eventually swap over each distro as it is released with
 libayatana-appindicator-glib and update the install instructions.
@@ -76,14 +115,13 @@ in regards to satellites, comets, and minor planets.  For the most part,
 astroskyfield could be released as it runs accurately and fast enough on a good
 system.
 
-However, on the 32 bit laptop running Debian 12, I was unable to install both
-numpy and pandas, both required for skyfield.  I was able to achieve this on a
-virtual machine running 32 bit Debian 12 on a physical 64 bit host, so I don't
-know if there was a specific issue with the laptop installation or somehow
-the virtual machine installation seemed to be treated as 64 bit or something
-else again.
+However, Debian 12 32 bit, I was unable to install both numpy and pandas,
+both required for skyfield.  I was able to achieve this on a virtual machine
+running 32 bit Debian 12 on a physical 64 bit host, so I don't know if there was
+a specific issue with the laptop installation or somehow the virtual machine
+installation seemed to be treated as 64 bit or something else again.
 
-When installing on the laptop I even pinned the versions of pandas/numpy back to
+When installing on the laptop I pinned the versions of pandas/numpy back to
 quite old levels in an attempt to install what should be a 32 bit equivalent,
 but that didn't work.
 
@@ -144,3 +182,5 @@ Where to distribute the .deb/.rpm?  Does Sourceforge or Github allow this?
 
 ### Add meteor shower information to indicatorlunar
 Already have some elementary code: meteorshower.py
+TODO Should this TODO above still be here?
+Should  meteorshower.py be commited (somewhere)?

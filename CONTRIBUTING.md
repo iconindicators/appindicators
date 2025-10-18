@@ -49,6 +49,10 @@ Additional indicators may be appended to the above command.
 
 **Prerequisite:** the indicator's `.whl` must be built.
 
+**Prerequisite:** various operating system packages are needed.
+For `indicatortest`, refer to the installation [instructions](https://github.com/iconindicators/appindicators),
+choose `indicatortest` and for your distribution, install the specified packages.
+
 To run `indicatortest`:
 
 ```
@@ -56,11 +60,6 @@ To run `indicatortest`:
 ```
 
 The virtual environment `venv_run` will be created.
-
-Various operating system packages will likely need to be installed; refer to
-the installation [instructions](https://github.com/iconindicators/appindicators).
-
-Additional indicators may be appended to the above command.
 
 If the indicator has not previously been installed to `$HOME/.local/venv_indicators`,
 the icon and locale will be absent.
@@ -81,7 +80,12 @@ created for all indicators.  To remove:
 
 **Prerequisite:** the indicator's `.whl` must be built.
 
-To install a `.whl` for `indicatortest` located in `release/wheel/dist_indicatortest`:
+**Prerequisite:** various operating system packages are needed.
+For `indicatortest`, refer to the installation [instructions](https://github.com/iconindicators/appindicators),
+choose `indicatortest` and for your distribution, install the specified packages.
+
+To install a `.whl` for `indicatortest` located in
+`release/wheel/dist_indicatortest`:
 
 ```
   python3 -m tools.install_wheel indicatortest
@@ -91,14 +95,15 @@ The `.whl` will be installed into a virtual environment at `$HOME/.local/venv_in
 
 Additional indicators may be appended to the above command.
 
-Various operating system packages will likely need to be installed; refer to
-the installation [instructions](https://github.com/iconindicators/appindicators).
-
 ---
 
 ## Run an Installed Indicator
 
 **Prerequisite:** the indicator's `.whl` must be built and installed.
+
+**Prerequisite:** various operating system packages are needed.
+For `indicatortest`, refer to the installation [instructions](https://github.com/iconindicators/appindicators),
+choose `indicatortest` and for your distribution, install the specified packages.
 
 To run an indicator, open the applications menu (via the `Super` key) and
 select the indicator.  If this is the first time the indicator has been
@@ -123,14 +128,13 @@ name and then rename back, or log out/in.
 
 There are three types of `README.md`:
 1. The `README.md` for the `GitHub` main landing page.
-1. A `README.md` for each indicator's `PyPI` landing page.
-1. A `README.md` for each indicator, containing installation instructions and
-so on, located within the respective indicator's source tree on `GitHub`.
+1. A `README.md` for each indicator's `PyPI` page.
+1. A `README.md` for each indicator, containing installation instructions,
+located within the respective indicator's source tree on `GitHub`.
 
 The `GitHub` main `README.md` and each indicator's `GitHub` `README.md` are
-created/updated as needed. For example, if the installation instructions for
-one or more indicators change, modify the relevant section in
-`tools/utils_readme.py` and run:
+created/updated as needed. For example, if the installation instructions change,
+modify the relevant section in `tools/utils_readme.py` and run:
 
 ```
   python3 -m tools.build_readme
@@ -140,7 +144,7 @@ Finally, commit the changed file(s).
 
 The `README.md` on each indicator's `PyPI` page is created automatically as part
 of the `build_wheel` process (and exists only within the release files so must
-not be committed).
+**not** be committed).
 
 ---
 
@@ -163,10 +167,12 @@ to `TestPyPI`:
 
 ## Install from TestPyPI
 
-To install `indicatortest` from `TestPyPI` to a virtual environment in
-`$HOME/.local/venv_indicators`, first, install the [operating system packages](https://github.com/iconindicators/appindicators).
+**Prerequisite:** various operating system packages are needed.
+For `indicatortest`, refer to the installation [instructions](https://github.com/iconindicators/appindicators),
+choose `indicatortest` and for your distribution, install the specified packages.
 
-Then install `indicatortest`:
+To install `indicatortest` from `TestPyPI` to a virtual environment in
+`$HOME/.local/venv_indicators`:
 
 ```
   indicator=indicatortest && \
@@ -180,23 +186,34 @@ Then install `indicatortest`:
 
 ---
 
-## Release to PyPI   TODO Mention GitHub too...either here or a new section.
+## Release to PyPI / GitHub
 
-To upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
+The release process is twofold:
 
-```
-  indicator=indicatortest && \
-  venv=venv_build && \
-  if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-  . ${venv}/bin/activate && \
-  python3 -m pip install twine && \
-  python3 -m twine upload --username __token__ release/wheel/dist_${indicator}/* && \
-  deactivate
-```
+1. Upload to `PyPI`
 
-which assumes the username `__token__` and prompts for the password (starts
-with `pypi-`) and uploads the `.whl` / `.tar.gz` to `PyPI`.  Only one indicator
-may be uploaded at a time.
+    Upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
+
+    ```
+    indicator=indicatortest && \
+    venv=venv_build && \
+    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
+    . ${venv}/bin/activate && \
+    python3 -m pip install twine && \
+    python3 -m twine upload --username __token__ release/wheel/dist_${indicator}/* && \
+    deactivate
+    ```
+
+    which assumes the username `__token__` and prompts for the password (starts
+    with `pypi-`) and uploads the `.whl` / `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
+
+2. Create a release on `GitHub`
+
+    On `GitHub` create a new release with version tag and upload the
+    `.whl` / `.tar.gz` for `indicatortest`.
+
+    If more than one indicator is part of the release, include the
+    `.whl` / `.tar.gz` for that indicator(s) as part of the same release.
 
 References:
 - [https://twine.readthedocs.io/en/latest](https://twine.readthedocs.io/en/latest)
@@ -204,6 +221,8 @@ References:
 ---
 
 ## Install from PyPI
+
+TODO Is this section still needed?
 
 To install the indicator from `PyPI`, refer to instructions [here](https://github.com/iconindicators/appindicators).
 
@@ -220,6 +239,9 @@ need to add `--force-reinstall` after `--upgrade` (which may be removed from a
 ```
 
 Additional indicators may be appended to the above command.
+
+Note that any operating system packages installed for the indicator(s) will
+still be present.
 
 ---
 
@@ -397,6 +419,7 @@ TODO Do a release on test repo.
 TODO Should
     https://github.com/iconindicators/appindicatorstest/blob/main/indicatorfortune/src/indicatorfortune/README.md
 have a title (and what would it be)?
+I think this is already fixed...what is on GitHub right now is old.
 
 
 Insert the converted `Git` repository from above to the clone (roundabout way as

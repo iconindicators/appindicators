@@ -16,42 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-#TODO Testing
-#
-#   Functional
-#       Ensure all buttons clicked, checked and so on.
-#
-#   User acceptance
-#       Does the indicator behave/achieve as an end user expects?
-#
-#   Install/Uninstall
-#       Check install and uninstall and run
-
-
-#TODO Update date in CHANGELOG.md
-#For each indicator's CHANGELOG.md, at release time, update the release date in
-#the latest entry to the date of release.
-
-
-#TODO Update the PPA description
-#At
-#	https://launchpad.net/~thebernmeister/+archive/ubuntu/ppa
-#change the description to the following:
-#
-#For releases for Ubuntu 20.04 and forward:
-#
-#    https://github.com/iconindicators/appindicators
-
-
-#TODO For each indicator at
-#	https://askubuntu.com/questions/30334/what-application-indicators-are-available
-#update the URL at the top with:
-#
-#    https://github.com/iconindicators/appindicators
-#
-#Also update the indicator name (remove the hyphen from the name).
-
-
 '''
 Base class for application indicators.
 

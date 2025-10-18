@@ -27,15 +27,6 @@ References:
 '''
 
 
-# When running on Debian 13 (using libgirepository-2.0-dev) get the following:
-#
-#   libayatana-appindicator-WARNING **: 17:00:23.620: 
-#       libayatana-appindicator is deprecated. Please use
-#       libayatana-appindicator-glib in newly written code.
-#
-# Keep an eye out for future distributions supporting this library.
-
-
 import configparser
 import datetime
 import re
