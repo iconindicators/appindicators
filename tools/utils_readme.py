@@ -17,7 +17,7 @@
 
 
 '''
-Create a README.md for an indicator.
+Create the README.md for the project or an indicator.
 
 References:
     https://pygobject.gnome.org/getting_started.html
@@ -158,28 +158,6 @@ def _get_indicator_names_sans_current(
     return indicators
 
 
-def _get_introduction_project():
-
-    content = (
-        "AppIndicators for Ubuntu et al\n"
-        "------------------------------\n\n"
-
-        "This project contains application indicators written in `Python3` "
-        "for `Ubuntu 20.04` or similar. For more details, including how to "
-        "install, see the links below:\n" )
-
-    for indicator in IndicatorName:
-        indicator_ = indicator.name.lower()
-        link = indicator_
-        url = f"{ URL_GITHUB_INDICATOR }/{ indicator_ }/README.md"
-        description = _get_indicator_comments( indicator_ )
-        content += f"- [{ link }]({ url }) { description }\n"
-
-    content += "\n\n"
-
-    return content
-
-
 def _get_indicator_comments(
     indicator ):
 
@@ -201,45 +179,51 @@ def _get_indicator_comments(
     return comments
 
 
+def _get_introduction_project():
+    content = (
+        "AppIndicators for Ubuntu et al\n"
+        "------------------------------\n\n"
+
+        "This project contains application indicators written in `Python3` "
+        "for `Debian`, `Fedora`, `Manjaro`, `openSUSE Tumbleweed`, `Ubuntu` "
+        "and theoretically, any platform which supports the "
+        "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n"
+        "For more details, including how to install, see below:\n" )
+
+    for indicator in IndicatorName:
+        indicator_ = indicator.name.lower()
+        link = indicator_
+        url = f"{ URL_GITHUB_INDICATOR }/{ indicator_ }/README.md"
+        description = _get_indicator_comments( indicator_ )
+        content += f"- [{ link }]({ url }) { description }.\n"
+
+    content += "\n\n"
+
+    return content
+
+
 def _get_introduction_indicator(
-    indicator,
-    wheel = True ):
-    supported_distributions = [
-        "Debian",
-        "Fedora",
-        "Ubuntu" ]
+    indicator ):
 
-    # Manjaro and openSUSE Tumbleweed do not contain the 'calendar' package.
-    #
-    # For indicatoronthisday, drop references to Manjaro/openSUSE.
-    #
-    # For indicatortest, the calendar test is hidden and the remainder of the
-    # indicator works, so leave in the reference to openSUSE/Manjaro.
-    if not _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
-        supported_distributions.extend( [
-            "Manjaro",
-            "openSUSE" ] )
-
-    introduction = ""
-    if not wheel:
-        introduction += (
-            f"{ indicator }\n"
-            "---\n\n" )
+    introduction = (
+        f"{ indicator }\n"
+        "---\n\n" )
 
     comments = _get_indicator_comments( indicator )
 
-    introduction += (
-        f"`{ indicator }` { comments } on "
-        f"`{ '`, `' .join( sorted( supported_distributions, key = str.lower ) ) }`"
-        " and theoretically, any platform which supports the "
-        "`AyatanaAppIndicator3` / `AppIndicator3` library.\n\n" )
+    introduction += f"`{ indicator }` { comments }."
 
-    if wheel:
+    # Manjaro and openSUSE Tumbleweed do not contain the 'calendar' package.
+    #
+    # Therefore:
+    #   indicatoronthisday is unsupported on Manjaro/openSUSE.
+    #
+    #   indicatortest uses the 'calendar' package, but test specific test is
+    #   hidden on openSUSE/Manjaro so no need to flag to the user.
+    if _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
         introduction += (
-            "Installation requires operating system packages, a `Python3` "
-            "virtual environment, `pip` and post installation commands.\n"
-            f"Refer to [{ URL_GITHUB_REPOSITORY }]({ URL_GITHUB_REPOSITORY }) "
-            "for details.\n" )
+            " Note that `Manjaro` and `openSUSE Tumbleweed` are unsupported as "
+            "these distrubutions do not contain the `calendar` package." )
 
     introduction += "\n\n"
 
@@ -1027,7 +1011,7 @@ def build_readme_for_indicator(
             Path( indicator ) ) )
 
     content = (
-        _get_introduction_indicator( indicator, wheel = False ) +
+        _get_introduction_indicator( indicator ) +
         _get_install( indicator, version, tag ) +
         _get_usage( indicator, name_human_readable ) +
         _get_cache_config_log( indicator ) +
