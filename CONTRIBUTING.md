@@ -327,6 +327,7 @@ Convert `Subversion` repository (at internal IP address) to a `Git` repository
 (note there is no `trunk`, `branches`, `tags`):
 
 ```
+  cd ..
   git svn clone http://192.168.1.102/indicators \
     --authors-file=users.txt \
     --no-metadata \
