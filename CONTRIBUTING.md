@@ -17,8 +17,8 @@ where each indicator is built upon `indicatorbase`.
 Rather than have a project for each indicator, `indicatorbase` has
 `pyprojectbase.toml` which covers the fields common to all indicators and each
 indicator has its own `pyprojectspecific.toml` for variations.  When building a
-`.whl` for release to `PyPI`, `pyprojectbase.toml` and `pyprojectspecific.toml`
-are merged to create a `pyproject.toml`.
+`.whl`, `pyprojectbase.toml` and `pyprojectspecific.toml` are merged to create a
+`pyproject.toml`.
 
 Similarly for `MANIFESTbase.in` and `MANIFESTspecific.in`, if an indicator uses
 a manifest.
@@ -34,7 +34,7 @@ specific versions for an indicator.
 To build a wheel for `indicatortest`, at the root of the source tree:
 
 ```
-  python3 -m tools.build_wheel indicatortest
+  python3 -m tools.build_wheel tag indicatortest
 ```
 
 which creates a virtual environment `venv_build`, updates locale files
@@ -42,6 +42,11 @@ which creates a virtual environment `venv_build`, updates locale files
 `release/wheel/dist_indicatortest`.
 
 Additional indicators may be appended to the above command.
+
+The `tag` argument is the tag value (say 1.0) created at the time a release is
+created on `GitHub`.  When building a wheel for testing/development purposes,
+the tag value is irrelevant.  However, when building wheels for a release,
+the tag value must match that of the intended release.
 
 ---
 
@@ -124,96 +129,13 @@ name and then rename back, or log out/in.
 
 ---
 
-## Updating README.md
+## Release to GitHub
 
-There are three types of `README.md`:
-1. The `README.md` for the `GitHub` main landing page.
-1. A `README.md` for each indicator's `PyPI` page.
-1. A `README.md` for each indicator, containing installation instructions,
-located within the respective indicator's source tree on `GitHub`.
+**Prerequisite:** ALL indicators' `.whl` / `.tar.gz` must be built with the
+corresponing release `tag` from `GitHub`.
 
-The `GitHub` main `README.md` and each indicator's `GitHub` `README.md` are
-created/updated as needed. For example, if the installation instructions change,
-modify the relevant section in `tools/utils_readme.py` and run:
-
-```
-  python3 -m tools.build_readme
-```
-
-Finally, commit the changed file(s).
-
-The `README.md` on each indicator's `PyPI` page is created automatically as part
-of the `build_wheel` process (and exists only within the release files so must
-**not** be committed).
-
----
-
-## Release to TestPyPI
-
-For testing purposes, a `.whl` / `.tar.gz` for `indicatortest` may be uploaded
-to `TestPyPI`:
-
-```
-  indicator=indicatortest && \
-  venv=venv_build && \
-  if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-  . ${venv}/bin/activate && \
-  python3 -m pip install twine && \
-  python3 -m twine upload --username __token__ --repository testpypi release/wheel/dist_${indicator}/* && \
-  deactivate
-```
-
----
-
-## Install from TestPyPI
-
-**Prerequisite:** various operating system packages are needed.
-For `indicatortest`, refer to the installation [instructions](https://github.com/iconindicators/appindicators),
-choose `indicatortest` and for your distribution, install the specified packages.
-
-To install `indicatortest` from `TestPyPI` to a virtual environment in
-`$HOME/.local/venv_indicators`:
-
-```
-  indicator=indicatortest && \
-  venv=$HOME/.local/venv_indicators && \
-  if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-  . ${venv}/bin/activate && \
-  python3 -m pip install --upgrade --force-reinstall --extra-index-url https://test.pypi.org/simple ${indicator} && \
-  deactivate && \
-  $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh
-```
-
----
-
-## Release to PyPI / GitHub
-
-The release process is twofold:
-
-1. Upload to `PyPI`
-
-    Upload a `.whl` / `.tar.gz` for `indicatortest` to `PyPI`:
-
-    ```
-    indicator=indicatortest && \
-    venv=venv_build && \
-    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-    . ${venv}/bin/activate && \
-    python3 -m pip install twine && \
-    python3 -m twine upload --username __token__ release/wheel/dist_${indicator}/* && \
-    deactivate
-    ```
-
-    which assumes the username `__token__` and prompts for the password (starts
-    with `pypi-`) and uploads the `.whl` / `.tar.gz` to `PyPI`.  Only one indicator may be uploaded at a time.
-
-2. Create a release on `GitHub`
-
-    On `GitHub` create a new release with version tag and upload the
-    `.whl` / `.tar.gz` for `indicatortest`.
-
-    If more than one indicator is part of the release, include the
-    `.whl` / `.tar.gz` for that indicator(s) as part of the same release.
+On `GitHub` create a new release with version tag and upload the `.whl` and
+`.tar.gz` for **all** indicators.
 
 References:
 - [https://twine.readthedocs.io/en/latest](https://twine.readthedocs.io/en/latest)
@@ -230,6 +152,27 @@ Additional indicators may be appended to the above command.
 
 Note that any operating system packages installed for the indicator(s) will
 still be present.
+
+---
+
+## Updating README.md
+
+There are two types of `README.md`:
+1. The `README.md` for the `GitHub` main landing page.
+1. A `README.md` for each indicator, containing specific installation
+instructions.
+
+The `GitHub` main `README.md` is updated as needed, for example, if an
+indicator's comment is changed.  To update the main `README.md` run:
+
+```
+  python3 -m tools.build_readme
+```
+
+Each indicator's `GitHub` `README.md` is rebuilt as part of the `build_wheel`
+process described earlier.
+
+Any time any `README.md` is altered, the file must be committed.
 
 ---
 
