@@ -1,9 +1,7 @@
 indicatorstardate
 ---
 
-`indicatorstardate` shows the current Star Trek™ stardate on `Debian`, `Fedora`, `Manjaro`, `openSUSE`, `Ubuntu` and theoretically, any platform which supports the `AyatanaAppIndicator3` / `AppIndicator3` library.
-
-
+`indicatorstardate` shows the current Star Trek™ stardate.
 
 Installation / Updating
 -----------------------

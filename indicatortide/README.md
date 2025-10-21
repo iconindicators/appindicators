@@ -1,9 +1,7 @@
 indicatortide
 ---
 
-`indicatortide` displays tidal information on `Debian`, `Fedora`, `Manjaro`, `openSUSE`, `Ubuntu` and theoretically, any platform which supports the `AyatanaAppIndicator3` / `AppIndicator3` library.
-
-
+`indicatortide` displays tidal information.
 
 Installation / Updating
 -----------------------

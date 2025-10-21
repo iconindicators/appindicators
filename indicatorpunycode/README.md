@@ -1,9 +1,7 @@
 indicatorpunycode
 ---
 
-`indicatorpunycode` converts domain names between Unicode and ASCII on `Debian`, `Fedora`, `Manjaro`, `openSUSE`, `Ubuntu` and theoretically, any platform which supports the `AyatanaAppIndicator3` / `AppIndicator3` library.
-
-
+`indicatorpunycode` converts domain names between Unicode and ASCII.
 
 Installation / Updating
 -----------------------

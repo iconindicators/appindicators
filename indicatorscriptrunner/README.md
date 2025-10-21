@@ -1,9 +1,7 @@
 indicatorscriptrunner
 ---
 
-`indicatorscriptrunner` runs a terminal command or script; optionally display results in the icon label on `Debian`, `Fedora`, `Manjaro`, `openSUSE`, `Ubuntu` and theoretically, any platform which supports the `AyatanaAppIndicator3` / `AppIndicator3` library.
-
-
+`indicatorscriptrunner` runs a terminal command or script; optionally display results in the icon label.
 
 Installation / Updating
 -----------------------

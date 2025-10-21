@@ -1,9 +1,7 @@
 indicatoronthisday
 ---
 
-`indicatoronthisday` calls the 'calendar' program and displays events in the menu on `Debian`, `Fedora`, `Ubuntu` and theoretically, any platform which supports the `AyatanaAppIndicator3` / `AppIndicator3` library.
-
-
+`indicatoronthisday` calls the 'calendar' program and displays events in the menu. Note that `Manjaro` and `openSUSE Tumbleweed` are unsupported as these distrubutions do not contain the `calendar` package.
 
 Installation / Updating
 -----------------------

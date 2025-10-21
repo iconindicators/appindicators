@@ -1,9 +1,7 @@
 indicatorlunar
 ---
 
-`indicatorlunar` displays lunar, solar, planetary, minor planet, comet, star and satellite information on `Debian`, `Fedora`, `Manjaro`, `openSUSE`, `Ubuntu` and theoretically, any platform which supports the `AyatanaAppIndicator3` / `AppIndicator3` library.
-
-
+`indicatorlunar` displays lunar, solar, planetary, minor planet, comet, star and satellite information.
 
 Installation / Updating
 -----------------------

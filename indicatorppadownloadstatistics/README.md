@@ -1,9 +1,7 @@
 indicatorppadownloadstatistics
 ---
 
-`indicatorppadownloadstatistics` displays the total downloads of PPAs on `Debian`, `Fedora`, `Manjaro`, `openSUSE`, `Ubuntu` and theoretically, any platform which supports the `AyatanaAppIndicator3` / `AppIndicator3` library.
-
-
+`indicatorppadownloadstatistics` displays the total downloads of PPAs.
 
 Installation / Updating
 -----------------------

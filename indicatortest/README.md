@@ -1,9 +1,7 @@
 indicatortest
 ---
 
-`indicatortest` exercises a range of indicator functionality on `Debian`, `Fedora`, `Manjaro`, `openSUSE`, `Ubuntu` and theoretically, any platform which supports the `AyatanaAppIndicator3` / `AppIndicator3` library.
-
-
+`indicatortest` exercises a range of indicator functionality.
 
 Installation / Updating
 -----------------------

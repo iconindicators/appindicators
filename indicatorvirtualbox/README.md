@@ -1,9 +1,7 @@
 indicatorvirtualbox
 ---
 
-`indicatorvirtualbox` shows VirtualBox™ virtual machines and allows them to be started on `Debian`, `Fedora`, `Manjaro`, `openSUSE`, `Ubuntu` and theoretically, any platform which supports the `AyatanaAppIndicator3` / `AppIndicator3` library.
-
-
+`indicatorvirtualbox` shows VirtualBox™ virtual machines and allows them to be started.
 
 Installation / Updating
 -----------------------
