@@ -2,16 +2,16 @@ AppIndicators for Ubuntu et al
 ------------------------------
 
 This project contains application indicators written in `Python3` for `Ubuntu 20.04` or similar. For more details, including how to install, see the links below:
-- [indicatorfortune](https://github.com/iconindicators/appindicators/blob/main/indicatorfortune/src/indicatorfortune/README.md)
-- [indicatorlunar](https://github.com/iconindicators/appindicators/blob/main/indicatorlunar/src/indicatorlunar/README.md)
-- [indicatoronthisday](https://github.com/iconindicators/appindicators/blob/main/indicatoronthisday/src/indicatoronthisday/README.md)
-- [indicatorppadownloadstatistics](https://github.com/iconindicators/appindicators/blob/main/indicatorppadownloadstatistics/src/indicatorppadownloadstatistics/README.md)
-- [indicatorpunycode](https://github.com/iconindicators/appindicators/blob/main/indicatorpunycode/src/indicatorpunycode/README.md)
-- [indicatorscriptrunner](https://github.com/iconindicators/appindicators/blob/main/indicatorscriptrunner/src/indicatorscriptrunner/README.md)
-- [indicatorstardate](https://github.com/iconindicators/appindicators/blob/main/indicatorstardate/src/indicatorstardate/README.md)
-- [indicatortest](https://github.com/iconindicators/appindicators/blob/main/indicatortest/src/indicatortest/README.md)
-- [indicatortide](https://github.com/iconindicators/appindicators/blob/main/indicatortide/src/indicatortide/README.md)
-- [indicatorvirtualbox](https://github.com/iconindicators/appindicators/blob/main/indicatorvirtualbox/src/indicatorvirtualbox/README.md)
+- [indicatorfortune](https://github.com/iconindicators/appindicators/blob/main/indicatorfortune/README.md) calls the 'fortune' program displaying the result in the on-screen notification
+- [indicatorlunar](https://github.com/iconindicators/appindicators/blob/main/indicatorlunar/README.md) displays lunar, solar, planetary, minor planet, comet, star and satellite information
+- [indicatoronthisday](https://github.com/iconindicators/appindicators/blob/main/indicatoronthisday/README.md) calls the 'calendar' program and displays events in the menu
+- [indicatorppadownloadstatistics](https://github.com/iconindicators/appindicators/blob/main/indicatorppadownloadstatistics/README.md) displays the total downloads of PPAs
+- [indicatorpunycode](https://github.com/iconindicators/appindicators/blob/main/indicatorpunycode/README.md) converts domain names between Unicode and ASCII
+- [indicatorscriptrunner](https://github.com/iconindicators/appindicators/blob/main/indicatorscriptrunner/README.md) runs a terminal command or script; optionally display results in the icon label
+- [indicatorstardate](https://github.com/iconindicators/appindicators/blob/main/indicatorstardate/README.md) shows the current Star Trek™ stardate
+- [indicatortest](https://github.com/iconindicators/appindicators/blob/main/indicatortest/README.md) exercises a range of indicator functionality
+- [indicatortide](https://github.com/iconindicators/appindicators/blob/main/indicatortide/README.md) displays tidal information
+- [indicatorvirtualbox](https://github.com/iconindicators/appindicators/blob/main/indicatorvirtualbox/README.md) shows VirtualBox™ virtual machines and allows them to be started
 
 
 License
