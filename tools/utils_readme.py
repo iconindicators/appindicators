@@ -158,10 +158,6 @@ def _get_indicator_names_sans_current(
     return indicators
 
 
-def _get_url_to_indicator_on_github( indicator ):
-    return f"{ URL_GITHUB_INDICATOR }/{ indicator }/src/{ indicator }"
-
-
 def _get_introduction_project():
 
     content = (
@@ -175,7 +171,7 @@ def _get_introduction_project():
     for indicator in IndicatorName:
         indicator_ = indicator.name.lower()
         link = indicator_
-        url = f"{ _get_url_to_indicator_on_github( indicator_ ) }/README.md"
+        url = f"{ URL_GITHUB_INDICATOR }/{ indicator_ }/README.md"
         description = _get_indicator_comments( indicator_ )
         content += f"- [{ link }]({ url }) { description }\n"
 
