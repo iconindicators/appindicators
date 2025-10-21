@@ -137,9 +137,6 @@ corresponing release `tag` from `GitHub`.
 On `GitHub` create a new release with version tag and upload the `.whl` and
 `.tar.gz` for **all** indicators.
 
-References:
-- [https://twine.readthedocs.io/en/latest](https://twine.readthedocs.io/en/latest)
-
 ---
 
 ## Uninstall an Indicator
@@ -172,7 +169,7 @@ indicator's comment is changed.  To update the main `README.md` run:
 Each indicator's `GitHub` `README.md` is rebuilt as part of the `build_wheel`
 process described earlier.
 
-Any time any `README.md` is altered, the file must be committed.
+Any time any `README.md` is altered it must be committed.
 
 ---
 
@@ -298,7 +295,7 @@ References:
 ## Convert this Document from MD to HTML
 
 ```
-  python3 -m tools.markdown_to_html DEVELOPERS.md
+  python3 -m tools.markdown_to_html CONTRIBUTING.md
 ```
 
 Any `markdown` document may be converted to `html` using the same script.
@@ -340,18 +337,8 @@ Convert `Subversion` repository (at internal IP address) to a `Git` repository
 Clone the main repository from `GitHub`:
 
 ```
-  git clone https://github.com/iconindicators/appindicators appindicatorsgithub     TODO USE TEST FIRST
+  git clone https://github.com/iconindicators/appindicators appindicatorsgithub
 ```
-
-
-TODO Do a release on test repo.
-
-
-TODO Should
-    https://github.com/iconindicators/appindicatorstest/blob/main/indicatorfortune/src/indicatorfortune/README.md
-have a title (and what would it be)?
-I think this is already fixed...what is on GitHub right now is old.
-
 
 Insert the converted `Git` repository from above to the clone (roundabout way as
 `git subtree` does not allow adding to the root), then push back up to `GitHub`:
