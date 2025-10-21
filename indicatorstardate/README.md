@@ -3,6 +3,8 @@ indicatorstardate
 
 `indicatorstardate` shows the current Star Trek™ stardate.
 
+
+---
 Installation / Updating
 -----------------------
 
@@ -163,6 +165,8 @@ Installation / Updating
 </details>
 
 
+
+---
 Usage
 -----
 
@@ -173,6 +177,8 @@ Alternatively, to run from the terminal:
 ```. $HOME/.local/bin/indicatorstardate.sh```
 
 
+
+---
 Config / Log
 ------------
 
@@ -181,6 +187,8 @@ During the course of normal operation, the indicator may write to the config at 
 In the event an error occurs, a log file will be written to `$HOME/indicatorstardate.log`.
 
 
+
+---
 Limitations
 -----------
 
@@ -195,6 +203,8 @@ Limitations
 - `XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.
 
 
+
+---
 Uninstall
 ---------
 
@@ -401,6 +411,8 @@ Uninstall
 </details>
 
 
+
+---
 License
 -------
 

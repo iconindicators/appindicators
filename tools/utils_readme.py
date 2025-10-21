@@ -1010,13 +1010,21 @@ def build_readme_for_indicator(
             indicator,
             Path( indicator ) ) )
 
+    separator = "\n---\n"
+
     content = (
         _get_introduction_indicator( indicator ) +
+        separator +
         _get_install( indicator, version, tag ) +
+        separator +
         _get_usage( indicator, name_human_readable ) +
+        separator +
         _get_cache_config_log( indicator ) +
+        separator +
         _get_limitations( indicator ) +
+        separator +
         _get_uninstall( indicator, version, tag ) +
+        separator +
         _get_license( authors_emails, start_year ) )
 
     readme_md = Path.cwd() / indicator / "README.md"

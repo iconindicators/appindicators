@@ -3,6 +3,8 @@ indicatorscriptrunner
 
 `indicatorscriptrunner` runs a terminal command or script; optionally display results in the icon label.
 
+
+---
 Installation / Updating
 -----------------------
 
@@ -185,6 +187,8 @@ Installation / Updating
 </details>
 
 
+
+---
 Usage
 -----
 
@@ -197,6 +201,8 @@ Alternatively, to run from the terminal:
 Note that any `Python3` scripts you add to `indicatorscriptrunner` may require additional modules installed to the virtual environment at `$HOME/.local/venv_indicators`.
 
 
+
+---
 Config / Log
 ------------
 
@@ -205,6 +211,8 @@ During the course of normal operation, the indicator may write to the config at 
 In the event an error occurs, a log file will be written to `$HOME/indicatorscriptrunner.log`.
 
 
+
+---
 Limitations
 -----------
 
@@ -220,6 +228,8 @@ Limitations
 - `XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.
 
 
+
+---
 Uninstall
 ---------
 
@@ -456,6 +466,8 @@ Uninstall
 </details>
 
 
+
+---
 License
 -------
 

@@ -3,6 +3,8 @@ indicatorvirtualbox
 
 `indicatorvirtualbox` shows VirtualBox™ virtual machines and allows them to be started.
 
+
+---
 Installation / Updating
 -----------------------
 
@@ -163,6 +165,8 @@ Installation / Updating
 </details>
 
 
+
+---
 Usage
 -----
 
@@ -173,6 +177,8 @@ Alternatively, to run from the terminal:
 ```. $HOME/.local/bin/indicatorvirtualbox.sh```
 
 
+
+---
 Config / Log
 ------------
 
@@ -181,6 +187,8 @@ During the course of normal operation, the indicator may write to the config at 
 In the event an error occurs, a log file will be written to `$HOME/indicatorvirtualbox.log`.
 
 
+
+---
 Limitations
 -----------
 
@@ -192,6 +200,8 @@ Limitations
 - `Wayland`: The command `wmctrl` is unsupported.
 
 
+
+---
 Uninstall
 ---------
 
@@ -398,6 +408,8 @@ Uninstall
 </details>
 
 
+
+---
 License
 -------
 

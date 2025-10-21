@@ -3,6 +3,8 @@ indicatorpunycode
 
 `indicatorpunycode` converts domain names between Unicode and ASCII.
 
+
+---
 Installation / Updating
 -----------------------
 
@@ -163,6 +165,8 @@ Installation / Updating
 </details>
 
 
+
+---
 Usage
 -----
 
@@ -173,6 +177,8 @@ Alternatively, to run from the terminal:
 ```. $HOME/.local/bin/indicatorpunycode.sh```
 
 
+
+---
 Config / Log
 ------------
 
@@ -181,6 +187,8 @@ During the course of normal operation, the indicator may write to the config at 
 In the event an error occurs, a log file will be written to `$HOME/indicatorpunycode.log`.
 
 
+
+---
 Limitations
 -----------
 
@@ -190,6 +198,8 @@ Limitations
 - `Manjaro 25`: No autostart.
 
 
+
+---
 Uninstall
 ---------
 
@@ -396,6 +406,8 @@ Uninstall
 </details>
 
 
+
+---
 License
 -------
 

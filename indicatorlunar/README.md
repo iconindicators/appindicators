@@ -3,6 +3,8 @@ indicatorlunar
 
 `indicatorlunar` displays lunar, solar, planetary, minor planet, comet, star and satellite information.
 
+
+---
 Installation / Updating
 -----------------------
 
@@ -163,6 +165,8 @@ Installation / Updating
 </details>
 
 
+
+---
 Usage
 -----
 
@@ -173,6 +177,8 @@ Alternatively, to run from the terminal:
 ```. $HOME/.local/bin/indicatorlunar.sh```
 
 
+
+---
 Cache / Config / Log
 --------------------
 
@@ -181,6 +187,8 @@ During the course of normal operation, the indicator may write to the cache at `
 In the event an error occurs, a log file will be written to `$HOME/indicatorlunar.log`.
 
 
+
+---
 Limitations
 -----------
 
@@ -197,6 +205,8 @@ Limitations
 - `XFCE`: The icon label is unsupported; the icon tooltip is used in lieu.
 
 
+
+---
 Uninstall
 ---------
 
@@ -403,6 +413,8 @@ Uninstall
 </details>
 
 
+
+---
 License
 -------
 

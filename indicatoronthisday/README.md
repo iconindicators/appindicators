@@ -3,6 +3,8 @@ indicatoronthisday
 
 `indicatoronthisday` calls the 'calendar' program and displays events in the menu. Note that `Manjaro` and `openSUSE Tumbleweed` are unsupported as these distrubutions do not contain the `calendar` package.
 
+
+---
 Installation / Updating
 -----------------------
 
@@ -141,6 +143,8 @@ Installation / Updating
 </details>
 
 
+
+---
 Usage
 -----
 
@@ -151,6 +155,8 @@ Alternatively, to run from the terminal:
 ```. $HOME/.local/bin/indicatoronthisday.sh```
 
 
+
+---
 Cache / Config / Log
 --------------------
 
@@ -159,6 +165,8 @@ During the course of normal operation, the indicator may write to the cache at `
 In the event an error occurs, a log file will be written to `$HOME/indicatoronthisday.log`.
 
 
+
+---
 Limitations
 -----------
 
@@ -166,6 +174,8 @@ Limitations
 - `Kubuntu 24.04`: No autostart.
 
 
+
+---
 Uninstall
 ---------
 
@@ -342,6 +352,8 @@ Uninstall
 </details>
 
 
+
+---
 License
 -------
 

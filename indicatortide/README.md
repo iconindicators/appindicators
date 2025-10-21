@@ -3,6 +3,8 @@ indicatortide
 
 `indicatortide` displays tidal information.
 
+
+---
 Installation / Updating
 -----------------------
 
@@ -163,6 +165,8 @@ Installation / Updating
 </details>
 
 
+
+---
 Usage
 -----
 
@@ -175,6 +179,8 @@ Alternatively, to run from the terminal:
 Note that you will need to write a `Python3` script to retrieve your tidal data.  In addition, your `Python` script may require additional modules installed to the virtual environment at `$HOME/.local/venv_indicators`.
 
 
+
+---
 Config / Log
 ------------
 
@@ -183,6 +189,8 @@ During the course of normal operation, the indicator may write to the config at 
 In the event an error occurs, a log file will be written to `$HOME/indicatortide.log`.
 
 
+
+---
 Limitations
 -----------
 
@@ -192,6 +200,8 @@ Limitations
 - `Manjaro 25`: No autostart.
 
 
+
+---
 Uninstall
 ---------
 
@@ -398,6 +408,8 @@ Uninstall
 </details>
 
 
+
+---
 License
 -------
 
