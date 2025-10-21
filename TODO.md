@@ -25,7 +25,7 @@ the following:
         libayatana-appindicator is deprecated. Please use
         libayatana-appindicator-glib in newly written code.
 
-There is no package for that and some internet searching suggests that perhaps
+There is presently no available package and some searching suggests that perhaps
 the deprecation message is quite early and package managers for ALL distros are
 yet to upgrade.
 
@@ -33,7 +33,7 @@ Will need to eventually swap over each distro as it is released with
 libayatana-appindicator-glib and update the install instructions.
 
 
-### Create non-symbolic icons
+### Non-symbolic icons
 Some distros/desktops do not utilise the GNOME symbolic icon mechanism.
 Determine which distros/desktops these are and if anything can be done.
 
@@ -113,38 +113,3 @@ Consider this once Ubuntu 20.04 / Debian 11 (et al) are no longer supported.
 May need to continue to run as GTK3 simulataneously.
 - https://discourse.gnome.org/t/migrating-gtk3-treestore-to-gtk4-liststore-and-handling-child-rows/12159
 - https://stackoverflow.com/questions/73006299/unable-to-get-application-icons-to-display-with-gtk4-under-ubuntu
-
-
-### Installation other than via PyPI
-Current implementation builds a self-contained wheel uploaded to PyPI.
-
-An end-user installs an indicator by:
-- installing OS packages
-- creating a venv
-- installing wheel from PyPI
-- copy icons/desktop/locale
-- some distros require setting an extension
-
-Consider either building a .deb/.rpm or even adding to each major distro's
-package repository.
-
-I read on Debian's documentation for getting a package into the repository
-requires that there must be a "need" for the package.
-So it is possible some but not all indicators are accepted.
-No point in that; all or nothing.
-
-If installing via a .deb/.rpm (or repository package), will likely need to
-change the venv location to /opt rather than the user $HOME, particulary given
-icons/locale/.desktop will then be installed under /usr/share.
-
-https://github.com/jordansissel/fpm
-Takes a Python project and converts to .deb/.rpm
-Does not yet support pyproject.toml
-
-Where to distribute the .deb/.rpm?  Does Sourceforge or Github allow this?
-
-
-### Add meteor shower information to indicatorlunar
-Already have some elementary code: meteorshower.py
-TODO Should this TODO above still be here?
-Should  meteorshower.py be commited (somewhere)?
