@@ -173,23 +173,24 @@ def _get_introduction_project():
         "install, see the links below:\n" )
 
     for indicator in IndicatorName:
-        indicator_name = indicator.name.lower()
-        link = indicator_name
-        url = f"{ _get_url_to_indicator_on_github( indicator_name ) }/README.md"
-        content += f"- [{ link }]({ url })\n"
+        indicator_ = indicator.name.lower()
+        link = indicator_
+        url = f"{ _get_url_to_indicator_on_github( indicator_ ) }/README.md"
+        description = _get_indicator_comments( indicator_ )
+        content += f"- [{ link }]({ url }) { description }\n"
 
     content += "\n\n"
 
     return content
 
 
-def _get_introduction_indicator(
-    indicator,
-    wheel = True ):
+def _get_indicator_comments(
+    indicator ):
 
     pattern_tag = re.compile( r".*comments = _\(.*" )
     filename = indicator + '/src/' + indicator + '/' + indicator + ".py"
     lines = indicatorbase.IndicatorBase.read_text_file( filename )
+    comments = ""
     for line in lines:
         matches = pattern_tag.search( line )
         if matches:
@@ -201,6 +202,12 @@ def _get_introduction_indicator(
 
             break
 
+    return comments
+
+
+def _get_introduction_indicator(
+    indicator,
+    wheel = True ):
     supported_distributions = [
         "Debian",
         "Fedora",
@@ -223,6 +230,8 @@ def _get_introduction_indicator(
             f"{ indicator }\n"
             "---\n\n" )
 
+    comments = _get_indicator_comments( indicator )
+
     introduction += (
         f"`{ indicator }` { comments } on "
         f"`{ '`, `' .join( sorted( supported_distributions, key = str.lower ) ) }`"
@@ -243,6 +252,8 @@ def _get_introduction_indicator(
 
 def _get_install_uninstall(
     indicator,
+    version,
+    tag,
     content_heading,
     content_install_uninstall_operating_system_packages,
     install_uninstall_command_debian,
@@ -299,6 +310,8 @@ def _get_install_uninstall(
         python_install_uninstall = (
             get_python_virtual_environment_install_uninstall_function(
                 indicator,
+                version,
+                tag,
                 operating_system ) )
 
         operating_system_to_content[ operating_system ] += (
@@ -343,11 +356,15 @@ def _get_install_uninstall(
 
 
 def _get_install(
-    indicator ):
+    indicator,
+    version,
+    tag ):
 
     return (
         _get_install_uninstall(
             indicator,
+            version,
+            tag,
 
             "Installation / Updating\n"
             "-----------------------\n\n",
@@ -365,11 +382,15 @@ def _get_install(
 
 
 def _get_uninstall(
-    indicator ):
+    indicator,
+    version,
+    tag ):
 
     return (
         _get_install_uninstall(
             indicator,
+            version,
+            tag,
 
             "Uninstall\n"
             "---------\n\n",
@@ -388,6 +409,8 @@ def _get_uninstall(
 
 def _get_python_virtual_environment_install(
     indicator,
+    version,
+    tag,
     operating_system ):
 
     # On Debian based distributions, PyGObject 3.51.0+ requires
@@ -429,6 +452,10 @@ def _get_python_virtual_environment_install(
 
         pygobject = r"PyGObject\<=3.50.0"
 
+    wheel_url = (
+        "https://github.com/iconindicators/appindicatorstest/releases/download/"
+        f"{ tag }/{ indicator }-{ version }-py3-none-any.whl" )
+
     return (
         f"Create a `Python3` virtual environment at `{ utils.VENV_INSTALL }` "
         f"and install `{ indicator }`, including icons, .desktop and run"
@@ -438,15 +465,17 @@ def _get_python_virtual_environment_install(
         f"    venv={ utils.VENV_INSTALL } && \\\n"
         f"    if [ ! -d ${{venv}} ]; then python3 -m venv ${{venv}}; fi && \\\n"
         f"    . ${{venv}}/bin/activate && \\\n"
-        f"    python3 -m pip install --upgrade { pygobject } ${{indicator}} && \\\n"
+        f"    python3 -m pip install --upgrade { pygobject } { wheel_url } && \\\n"
         "    deactivate && \\\n"
         f"    . $(ls -d ${{venv}}/lib/python3.* | head -1)/"
-        f"site-packages/${{indicator}}/platform/linux/install.sh\n"
+        f"site-packages/${{indicator}}/platform/linux/install.sh ${{venv}}\n"
         "    ```\n" )
 
 
 def _get_python_virtual_environment_uninstall(
     indicator,
+    version,
+    tag,
     operating_system ):
 
     return (
@@ -981,26 +1010,42 @@ def _get_license(
         f"Copyright { start_year }-{ end_year } { ', '.join( authors ) }.\n" )
 
 
-def build_readme_for_wheel(
-    directory,
+def build_readme_for_indicator(
     indicator,
+    version,
     authors_emails,
-    start_year ):
+    tag ):
     '''
-    Build the README.md for the indicator's wheel.
+    Build the README.md for the indicator.
     '''
+    changelog_markdown = (
+        Path( indicator ) / "src" / indicator / "CHANGELOG.md" )
+
+    start_year = (
+        indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
+            changelog_markdown ) )
+
+    name_human_readable, categories, comments, message = (
+        utils.get_name_categories_comments_from_indicator(
+            indicator,
+            Path( indicator ) ) )
+
     content = (
-        _get_introduction_indicator( indicator, wheel = True ) +
+        _get_introduction_indicator( indicator, wheel = False ) +
+        _get_install( indicator, version, tag ) +
+        _get_usage( indicator, name_human_readable ) +
+        _get_cache_config_log( indicator ) +
+        _get_limitations( indicator ) +
+        _get_uninstall( indicator, version, tag ) +
         _get_license( authors_emails, start_year ) )
 
-    indicatorbase.IndicatorBase.write_text_file(
-        Path( directory, "README.md" ),
-        content )
+    readme_md = Path.cwd() / indicator / "README.md"
+    indicatorbase.IndicatorBase.write_text_file( readme_md, content )
 
 
-def build_readme_for_project_and_indicators():
+def build_readme_for_project():
     '''
-    Build the README.md for the project and each indicator.
+    Build the README.md for the project.
     '''
     pyprojectbase_toml = Path.cwd() / "indicatorbase" / "pyprojectbase.toml"
 
@@ -1009,13 +1054,11 @@ def build_readme_for_project_and_indicators():
     authors_emails = utils.get_pyproject_toml_authors( config )
 
     start_year_earliest = "9999"
-
-    # Build README.md for each indicator.
     for indicator in IndicatorName:
-        indicator_name = indicator.name.lower()
+        indicator_ = indicator.name.lower()
 
         changelog_markdown = (
-            Path( indicator_name ) / "src" / indicator_name / "CHANGELOG.md" )
+            Path( indicator_ ) / "src" / indicator_ / "CHANGELOG.md" )
 
         start_year = (
             indicatorbase.IndicatorBase.get_year_in_changelog_markdown(
@@ -1023,26 +1066,6 @@ def build_readme_for_project_and_indicators():
 
         start_year_earliest = min( start_year, start_year_earliest )
 
-        name_human_readable, categories, comments, message = (
-            utils.get_name_categories_comments_from_indicator(
-                indicator_name,
-                Path( indicator_name ) ) )
-
-        content = (
-            _get_introduction_indicator( indicator_name, wheel = False ) +
-            _get_install( indicator_name ) +
-            _get_usage( indicator_name, name_human_readable ) +
-            _get_cache_config_log( indicator_name ) +
-            _get_limitations( indicator_name ) +
-            _get_uninstall( indicator_name ) +
-            _get_license( authors_emails, start_year ) )
-
-        readme_md = (
-            Path.cwd() / indicator_name / "src" / indicator_name / "README.md" )
-
-        indicatorbase.IndicatorBase.write_text_file( readme_md, content )
-
-    # Build README.md for project.
     content = (
         _get_introduction_project() +
         _get_license( authors_emails, start_year_earliest ) )

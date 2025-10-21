@@ -33,6 +33,8 @@ from . import utils
 if __name__ == "__main__":
     indicators_to_process = (
         utils.get_indicators_to_process(
+            None,
+            None,
             f"Uninstall one or more indicators, from the Python3 virtual "
             f"environment at { utils.VENV_INSTALL } including the "
             ".desktop, run script, icons, .config and .cache.  "

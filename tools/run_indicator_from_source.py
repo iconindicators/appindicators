@@ -43,6 +43,8 @@ indicator_to_dependencies = {
 if __name__ == "__main__":
     indicators_to_process = (
         utils.get_indicators_to_process(
+            None,
+            None,
             "Run an indicator from within the source tree.",
             "install" ) )
 

@@ -218,7 +218,8 @@ def get_arguments(
     Creates an argument parser from a tuple of argument names and returns the
     result of parsing the arguments.
 
-    Associated help and nargs may also be provided as same length tuples.
+    Associated help and nargs may also be provided as tuples,
+    the same length of the arguments.
     '''
     if argument_helps is None:
         argument_helps = { }
@@ -238,19 +239,55 @@ def get_arguments(
 
 
 def get_indicators_to_process(
+    positional_arguments_names,
+    positional_arguments_helps,
     description,
     last_word ):
-    ''' Returns the list of indicators on the command line. '''
-    return (
+    '''
+    If the positional arguments are both None, returns the list of indicators
+    on the command line.
+
+    If the positional arguments are both not None, they must be tuples of the
+    same length.  The parsed arguments are returned, one of which is the
+    `indicators` specified on the command line and the other positional
+    arguments are available as they have been named by the caller.
+    '''
+    argument_names = [ "indicators" ]
+
+    argument_helps = {
+        "indicators" :
+            f"List of indicators { last_word } (separated by spaces)." }
+
+    argument_nargs = {
+        "indicators" :
+            "+" }
+
+    positional_arguments_present = (
+        positional_arguments_names
+        and
+        positional_arguments_helps )
+
+    if positional_arguments_present:
+        argument_names = tuple(
+            list( positional_arguments_names ) + argument_names )
+
+        argument_helps.update(
+            dict(
+                zip(
+                    positional_arguments_names,
+                    positional_arguments_helps ) ) )
+
+    return_value = (
         get_arguments(
             description,
-            ( "indicators", ),
-            {
-                "indicators" :
-                    f"List of indicators separated by spaces to { last_word }." },
-            {
-                "indicators" :
-                    "+" } ) ).indicators
+            tuple( argument_names ),
+            argument_helps,
+            argument_nargs ) )
+
+    if not positional_arguments_present:
+        return_value = return_value.indicators
+
+    return return_value
 
 
 def get_pyproject_toml_authors(

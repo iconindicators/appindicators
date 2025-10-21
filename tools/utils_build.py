@@ -805,7 +805,8 @@ def _create_symbolic_icons(
 
 def _package_source(
     directory_dist,
-    indicator ):
+    indicator,
+    tag ):
 
     directory_indicator = directory_dist / indicator
 
@@ -865,13 +866,12 @@ def _package_source(
                 directory_indicator ) )
 
     if not message:
-        utils_readme.build_readme_for_wheel(
-            directory_indicator,
+        utils_readme.build_readme_for_indicator(
             indicator,
+            version_from_pyproject_toml,
             authors_emails,
-            start_year )
+            tag )
 
-    if not message:
         directory_indicator_locale = (
             Path( '.' ) / directory_indicator / "src" / indicator / "locale" )
 
@@ -932,9 +932,10 @@ def _package_source(
 
 
 def build_wheel(
-    indicator ):
+    indicator,
+    tag ):
     '''
-    Build the wheel for the indicator.
+    Build the wheel (and tar.gz) for the indicator.
     '''
     message = ""
 
@@ -957,7 +958,7 @@ def build_wheel(
 
         directory_dist.mkdir( parents = True )
 
-        message = _package_source( directory_dist, indicator )
+        message = _package_source( directory_dist, indicator, tag )
 
     if not message:
         command = (

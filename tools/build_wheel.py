@@ -31,16 +31,18 @@ from . import utils
 
 
 if __name__ == "__main__":
-    indicators_to_process = (
+    arguments = (
         utils.get_indicators_to_process(
-            "Build a Python3 wheel for one or more indicators at "
+            ( "tag", ),
+            ( "The GitHub tag of the release for which this whl/tar.gz is built.", ),
+            "Build a Python3 whl/tar.gz for one or more indicators at "
             f"{ utils.RELEASE_DIRECTORY }.",
             "build" ) )
 
-    for indicator in indicators_to_process:
+    for indicator in arguments.indicators:
         command = (
             "python3 -c \"import tools.utils_build; "
-            f"tools.utils_build.build_wheel( \\\"{ indicator }\\\" )\"" )
+            f"tools.utils_build.build_wheel( \\\"{ indicator }\\\", \\\"{ arguments.tag }\\\" )\"" )
 
         modules_to_install = [
             "build",

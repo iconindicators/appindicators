@@ -16,7 +16,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 
-''' Build the README.md for the project and each indicator. '''
+''' Build the README.md for the project. '''
 
 
 from . import utils
@@ -25,7 +25,7 @@ from . import utils
 if __name__ == "__main__":
     command = (
         "python3 -c \"import tools.utils_readme; "
-        "tools.utils_readme.build_readme_for_project_and_indicators()\"" )
+        "tools.utils_readme.build_readme_for_project()\"" )
 
     modules_to_install = [
         "readme_renderer[md]" ]
