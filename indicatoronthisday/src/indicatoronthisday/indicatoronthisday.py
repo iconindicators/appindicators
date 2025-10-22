@@ -35,8 +35,8 @@ then run make as part of the copy files set of instructions.
 3. The project
      https://pypi.org/project/bsd-calendar/
 is based on the original calendar program, but modifies date formats.
-This code could be used to create a standalone Python calendar module,
-ultimately released to PyPI.
+This code could be used to create a standalone Python calendar module, released
+to PyPI or GitHub.
 Alternatively, incorporate some version of this implementation into the
 indicator, along with calendar files.
 '''
