@@ -1,0 +1,464 @@
+# Russian translation for indicatorscriptrunner.
+# Copyright (C) 2016-2025 Bernard Giannetti.
+# This file is distributed under the same license as the indicator-script-runner package.
+# Oleg Moiseichuk <berroll@mail.ru>, 2016-2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatorscriptrunner 1.0.25\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2025-10-16 17:45+1100\n"
+"PO-Revision-Date: 2025-07-28 15:23+0300\n"
+"Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: indicatorscriptrunner.py:45
+msgid "Indicator Script Runner"
+msgstr "Индикатор запуска сценариев"
+
+#: indicatorscriptrunner.py:108
+msgid ""
+"Runs a terminal command or script;\n"
+"optionally display results in the icon label."
+msgstr ""
+"Запускает команду или сценарий в терминале;\n"
+"имеет возможность вывода результатов на панель."
+
+#: indicatorscriptrunner.py:209
+msgid "Cannot run script"
+msgstr "Невозможно запустить сценарий"
+
+#: indicatorscriptrunner.py:212
+msgid ""
+"Cannot run script as no terminal and/or terminal execution flag found; "
+"please install gnome-terminal."
+msgstr ""
+"Невозможно запустить сценарий: отсутствует терминал и/или флаг исполнения в "
+"терминале; просьба установить gnome-terminal."
+
+#: indicatorscriptrunner.py:226
+msgid ""
+"Cannot run script as qterminal incorrectly parses arguments; install gnome-"
+"terminal instead."
+msgstr ""
+"Невозможно запустить сценарий: qterminal некорректно обрабатывает аргументы; "
+"установите gnome-terminal."
+
+#: indicatorscriptrunner.py:241
+msgid "...has completed."
+msgstr "завершился."
+
+#: indicatorscriptrunner.py:395
+msgid ""
+"The text shown next to the indicator icon,\n"
+"or tooltip, where applicable.\n"
+"\n"
+"A background script will only be run\n"
+"if added to the icon text.\n"
+"The result of running a background script\n"
+"will be added to the icon text."
+msgstr ""
+"Текст, отображаемый возле значка индикатора\n"
+"или в виде всплывающей подсказки (если возможно).\n"
+"\n"
+"Фоновые сценарии будут запускаться только\n"
+"в том случае, если выводят текст на панель.\n"
+"Результат выполнения фонового сценария\n"
+"будет добавлен к тексту возле значка."
+
+#: indicatorscriptrunner.py:405 indicatorscriptrunner.py:1511
+msgid "The terminal script/command, along with any arguments."
+msgstr ""
+"Команда/сценарий с любыми аргументами\n"
+"для запуска в терминале."
+
+#: indicatorscriptrunner.py:410
+msgid "Add"
+msgstr "Добавить"
+
+#: indicatorscriptrunner.py:410
+msgid "Copy"
+msgstr "Копировать"
+
+#: indicatorscriptrunner.py:410
+msgid "Remove"
+msgstr "Удалить"
+
+#: indicatorscriptrunner.py:411
+msgid "Add a new script."
+msgstr "Добавить новый сценарий."
+
+#: indicatorscriptrunner.py:466 indicatorscriptrunner.py:671
+#: indicatorscriptrunner.py:1075 indicatorscriptrunner.py:1344
+#: indicatorscriptrunner.py:1480
+msgid "Group"
+msgstr "Группа"
+
+#: indicatorscriptrunner.py:467 indicatorscriptrunner.py:672
+#: indicatorscriptrunner.py:1084 indicatorscriptrunner.py:1492
+msgid "Name"
+msgstr "Название"
+
+#: indicatorscriptrunner.py:468 indicatorscriptrunner.py:673
+msgid "Sound"
+msgstr "Звук"
+
+#: indicatorscriptrunner.py:469 indicatorscriptrunner.py:674
+msgid "Notification"
+msgstr "Уведомление"
+
+#: indicatorscriptrunner.py:470 indicatorscriptrunner.py:1637
+msgid "Background"
+msgstr "Фоновый"
+
+#: indicatorscriptrunner.py:471
+msgid "Terminal"
+msgstr "Терминал"
+
+#: indicatorscriptrunner.py:472 indicatorscriptrunner.py:675
+#: indicatorscriptrunner.py:1665
+msgid "Interval"
+msgstr "Интервал"
+
+#: indicatorscriptrunner.py:473 indicatorscriptrunner.py:676
+msgid "Force Update"
+msgstr "Принудительное обновление"
+
+#: indicatorscriptrunner.py:533
+msgid ""
+"Double-click to edit a script.\n"
+"\n"
+"If an attribute does not apply to a script,\n"
+"a dash is displayed.\n"
+"\n"
+"If a non-background script is checked as\n"
+"default, the name will appear in bold."
+msgstr ""
+"Двойной щелчок позволяет задать сценарий.\n"
+"\n"
+"Если атрибут не применим к сценарию,\n"
+"то отображается прочерк.\n"
+"\n"
+"Название сценария, заданного по умолчанию,\n"
+"будет отображено жирным шрифтом\n"
+"(кроме фоновых сценариев)."
+
+#: indicatorscriptrunner.py:552 indicatorscriptrunner.py:1499
+msgid "Command"
+msgstr "Команда"
+
+#: indicatorscriptrunner.py:581
+msgid "Send command to log"
+msgstr "Записать команду в журнал"
+
+#: indicatorscriptrunner.py:583
+msgid ""
+"When a script is run,\n"
+"send the command to the log\n"
+"(located in your home directory)."
+msgstr ""
+"При запуске сценария записать\n"
+"полную команду в журнал\n"
+"(находящийся в домашней папке)."
+
+#: indicatorscriptrunner.py:590
+msgid "Scripts"
+msgstr "Сценарии"
+
+#: indicatorscriptrunner.py:597
+msgid "Show non-background scripts"
+msgstr "Отображать сценарии (кроме фоновых)"
+
+#: indicatorscriptrunner.py:603
+msgid "In sub-menus"
+msgstr "В виде подменю"
+
+#: indicatorscriptrunner.py:612
+msgid "Indented by group"
+msgstr "В виде групп с отступом"
+
+#: indicatorscriptrunner.py:620
+msgid "Hide groups"
+msgstr "Скрыть группы"
+
+#: indicatorscriptrunner.py:622
+msgid ""
+"If checked, only script names are displayed.\n"
+"Otherwise, script names are indented\n"
+"within their respective group."
+msgstr ""
+"Если включено, то отображаются\n"
+"только названия сценариев.\n"
+"Иначе названия сценариев группируются\n"
+"в виде списка с отступами."
+
+#: indicatorscriptrunner.py:637
+msgid "Menu"
+msgstr "Меню"
+
+#: indicatorscriptrunner.py:645
+msgid "Icon Text"
+msgstr "Текст на панели"
+
+#: indicatorscriptrunner.py:653
+msgid "The separator will be added between script tags."
+msgstr "Разделитель, добавляемый между метками сценариев."
+
+#: indicatorscriptrunner.py:658
+msgid "Separator"
+msgstr "Разделитель"
+
+#: indicatorscriptrunner.py:717
+msgid "Double click on a script to add to the icon text."
+msgstr "Щёлкните дважды по сценарию, чтобы добавить текст для панели."
+
+#: indicatorscriptrunner.py:724
+msgid "Icon"
+msgstr "Значок"
+
+#: indicatorscriptrunner.py:734
+msgid "General"
+msgstr "Общие"
+
+#: indicatorscriptrunner.py:919
+msgid "Duplicate the selected script."
+msgstr "Создать копию выбранного сценария."
+
+#: indicatorscriptrunner.py:920
+msgid "Remove the selected script."
+msgstr "Удалить выбранный сценарий."
+
+#: indicatorscriptrunner.py:924
+msgid ""
+"Duplicate the selected group,\n"
+"and all scripts within the group."
+msgstr ""
+"Создать копию выбранной группы\n"
+"и всех сценариев в этой группе."
+
+#: indicatorscriptrunner.py:928
+msgid ""
+"Remove the selected group and\n"
+"all scripts within the group."
+msgstr ""
+"Удалить выбранную группу и\n"
+"все сценарии в этой группе."
+
+#: indicatorscriptrunner.py:1003
+msgid "Group Name"
+msgstr "Название группы"
+
+#: indicatorscriptrunner.py:1011
+msgid "Copy Group"
+msgstr "Копировать группу"
+
+#: indicatorscriptrunner.py:1022 indicatorscriptrunner.py:1103
+#: indicatorscriptrunner.py:1364 indicatorscriptrunner.py:1741
+msgid "The group cannot be empty."
+msgstr "Группа не может быть пустой."
+
+#: indicatorscriptrunner.py:1030 indicatorscriptrunner.py:1372
+msgid "The group already exists!"
+msgstr "Группа с таким названием уже существует!"
+
+#: indicatorscriptrunner.py:1066
+msgid "Choose an existing group or enter a new one."
+msgstr "Выберите существующую группу или создайте новую."
+
+#: indicatorscriptrunner.py:1092
+msgid "Copy Script"
+msgstr "Копировать сценарий"
+
+#: indicatorscriptrunner.py:1112 indicatorscriptrunner.py:1749
+msgid "The name cannot be empty."
+msgstr "Название не может быть пустым."
+
+#: indicatorscriptrunner.py:1120
+msgid "A script of the same group and name already exists!"
+msgstr "Сценарий с таким названием и группой уже существует!"
+
+#: indicatorscriptrunner.py:1202
+msgid ""
+"Remove the selected group and\n"
+"all scripts within the group?"
+msgstr ""
+"Удалить выбранную группу и\n"
+"все сценарии в этой группе?"
+
+#: indicatorscriptrunner.py:1244
+msgid "Remove the selected script?"
+msgstr "Удалить выбранный сценарий?"
+
+#: indicatorscriptrunner.py:1352
+msgid "Edit Group"
+msgstr "Редактировать группу"
+
+#: indicatorscriptrunner.py:1470
+msgid ""
+"The group to which the script belongs.\n"
+"\n"
+"Choose an existing group or enter a new one."
+msgstr ""
+"Группа, к которой принадлежит сценарий.\n"
+"\n"
+"Выберите существующую группу\n"
+"или создайте новую."
+
+#: indicatorscriptrunner.py:1487
+msgid "The name of the script."
+msgstr "Название сценария."
+
+#: indicatorscriptrunner.py:1528
+msgid "Play sound"
+msgstr "Воспроизвести звук"
+
+#: indicatorscriptrunner.py:1530
+msgid ""
+"For non-background scripts, play a sound\n"
+"on script completion.\n"
+"\n"
+"For background scripts, play a sound\n"
+"only if the script returns non-empty text."
+msgstr ""
+"Воспроизвести звук по завершении сценария.\n"
+"\n"
+"Для фоновых сценариев -- воспроизвести звук\n"
+"только если сценарий возвращает непустой текст."
+
+#: indicatorscriptrunner.py:1549
+msgid "Show notification"
+msgstr "Показать уведомление"
+
+#: indicatorscriptrunner.py:1551
+msgid ""
+"For non-background scripts, show a\n"
+"notification on script completion.\n"
+"\n"
+"For background scripts, show a notification\n"
+"only if the script returns non-empty text."
+msgstr ""
+"Показать уведомление по завершении сценария.\n"
+"\n"
+"Для фоновых сценариев -- показать уведомление\n"
+"только если сценарий возвращает непустой текст."
+
+#: indicatorscriptrunner.py:1574
+msgid "Non-background"
+msgstr "Не фоновый"
+
+#: indicatorscriptrunner.py:1576
+msgid ""
+"Non-background scripts are displayed\n"
+"in the menu and run when the user\n"
+"clicks on the corresponding menu item."
+msgstr ""
+"Не фоновые сценарии отображаются в меню\n"
+"и запускаются по нажатию на пункт в меню."
+
+#: indicatorscriptrunner.py:1595
+msgid "Leave terminal open"
+msgstr "Оставить терминал открытым"
+
+#: indicatorscriptrunner.py:1597
+msgid "Leave the terminal open on script completion."
+msgstr "Оставить терминал открытым по завершении сценария."
+
+#: indicatorscriptrunner.py:1619
+msgid "Default script"
+msgstr "Сценарий по умолчанию"
+
+#: indicatorscriptrunner.py:1621
+msgid ""
+"One script may be set as default\n"
+"which is run on a middle mouse\n"
+"click of the indicator icon.\n"
+"\n"
+"Not supported on all desktops."
+msgstr ""
+"Один сценарий может быть выбран как сценарий\n"
+"по умолчанию, который запускается по щелчку\n"
+"средней кнопкой на значке индикатора.\n"
+"\n"
+"Поддерживается не во всех средах рабочего стола."
+
+#: indicatorscriptrunner.py:1639
+msgid ""
+"A background script, added to the icon text,\n"
+"will be run at the interval specified.\n"
+"\n"
+"A background script must return a string,\n"
+"which may be empty.\n"
+"\n"
+"Any exception will be logged to a file in\n"
+"the user's home directory and the script's\n"
+"tag will remain in the icon text."
+msgstr ""
+"Фоновый сценарий, добавленный к тексту возле значка,\n"
+"будет запускаться с выбранным интервалом.\n"
+"\n"
+"Фоновый сценарий должен возвращать строку,\n"
+"которая может быть пустой.\n"
+"\n"
+"Любое исключение будет занесено в журнал,\n"
+"находящийся в домашней папке пользователя,\n"
+"а метка сценария останется в тексте значка."
+
+#: indicatorscriptrunner.py:1660
+msgid "Interval, in minutes, between runs."
+msgstr "Интервал между запусками в минутах."
+
+#: indicatorscriptrunner.py:1684
+msgid "Force update"
+msgstr "Обновлять принудительно"
+
+#: indicatorscriptrunner.py:1686
+msgid ""
+"Useful for a script which generally returns\n"
+"an empty string, but on occasion returns\n"
+"a message, say, when new mail has arrived,\n"
+"or a log file is present.\n"
+"\n"
+"When force update is enabled, the script will\n"
+"be run on the next update of ANY script,\n"
+"if the script returned a non-empty message."
+msgstr ""
+"Может пригодиться для сценариев, которые\n"
+"обычно возвращают пустую строку, но иногда\n"
+"возвращают сообщение (например, о получении\n"
+"почты или наличии файла журнала).\n"
+"\n"
+"При включённом режиме принудительного обновления,\n"
+"если сценарий вернул непустое сообщение, то он\n"
+"будет запущен при следующем запуске ЛЮБОГО сценария."
+
+#: indicatorscriptrunner.py:1730
+msgid "Add Script"
+msgstr "Добавить сценарий"
+
+#: indicatorscriptrunner.py:1730
+msgid "Edit Script"
+msgstr "Редактировать сценарий"
+
+#: indicatorscriptrunner.py:1757
+msgid "The command cannot be empty."
+msgstr "Команда не может быть пустой."
+
+#: indicatorscriptrunner.py:1764
+msgid "A script of the same group and name already exists."
+msgstr "Сценарий с таким названием и группой уже существует."
+
+#: indicatorscriptrunner.py:2113
+msgid ""
+"No scripts are present.\n"
+"\n"
+"Restore the sample scripts?"
+msgstr ""
+"Сценарии не найдены.\n"
+"\n"
+"Восстановить исходные сценарии?"

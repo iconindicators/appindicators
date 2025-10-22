@@ -1,0 +1,65 @@
+# Russian translation for indicatorstardate.
+# Copyright (C) 2012-2025 Bernard Giannetti.
+# This file is distributed under the same license as the indicatorstardate package.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatorstardate 1.0.45\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2025-10-16 17:45+1100\n"
+"PO-Revision-Date: 2025-07-28 15:33+0300\n"
+"Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: indicatorstardate.py:37
+msgid "Indicator Stardate"
+msgstr "Индикатор звёздной даты"
+
+#: indicatorstardate.py:50
+msgid "Shows the current Star Trek™ stardate."
+msgstr "Показывает текущую звёздную дату \"Звёздного пути\"."
+
+#: indicatorstardate.py:174
+msgid "Show stardate 'classic'"
+msgstr "Показывать \"классическую\" звёздную дату"
+
+#: indicatorstardate.py:176
+#, fuzzy
+msgid ""
+"If checked, show stardate 'classic' based on\n"
+"\n"
+"\tSTARDATES IN STAR TREK FAQ by Andrew Main.\n"
+"\n"
+"Otherwise, show stardate '2009 revised' based on\n"
+"\n"
+"\thttps://en.wikipedia.org/wiki/Stardate"
+msgstr ""
+"Если стоит отметка, показываются \"классические\"\n"
+"звёздные даты, основанные на\n"
+"\"ЧАВО ПО ЗВЁЗДНЫМ ДАТАМ В \"ЗВЁЗДНОМ ПУТИ\", автор Эндрю Мэйн.\n"
+"\n"
+"Иначе показываются звёздные даты \"ревизии 2009 года\"\n"
+"https://en.wikipedia.org/wiki/Stardate"
+
+#: indicatorstardate.py:186
+msgid "Show ISSUE"
+msgstr "Показывать ВЫПУСК"
+
+#: indicatorstardate.py:187
+msgid "Show the ISSUE of the stardate 'classic'."
+msgstr "Показывать ВЫПУСК \"классической\" звёздной даты."
+
+#: indicatorstardate.py:196
+msgid "Pad INTEGER"
+msgstr "Выравнивать целую часть"
+
+#: indicatorstardate.py:198
+msgid "Pad the INTEGER part of the stardate 'classic' with leading zeros."
+msgstr "Дополнять нулями целую часть \"классической\" звёздной даты."

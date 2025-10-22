@@ -1,0 +1,178 @@
+# Russian translation for indicatorfortune.
+# Copyright (C) 2013-2025 Bernard Giannetti.
+# This file is distributed under the same license as the indicatorfortune package.
+# Oleg Moiseichuk <berroll@mail.ru>, 2015-2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatorfortune 1.0.44\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2025-07-12 22:48+1000\n"
+"PO-Revision-Date: 2025-07-25 12:39+0300\n"
+"Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: indicatorfortune.py:41
+msgid "Indicator Fortune"
+msgstr "Индикатор изречений"
+
+#: indicatorfortune.py:61
+msgid "Fortune. . ."
+msgstr "Изречение. . ."
+
+#: indicatorfortune.py:72
+msgid ""
+"Calls the 'fortune' program displaying the result\n"
+"in the on-screen notification."
+msgstr ""
+"Вызывает программу 'fortune', показывающую изречения\n"
+"в виде всплывающих сообщений."
+
+#: indicatorfortune.py:95
+msgid "New Fortune"
+msgstr "Новое изречение"
+
+#: indicatorfortune.py:106
+msgid "Copy Last Fortune"
+msgstr "Скопировать последнее"
+
+#: indicatorfortune.py:118
+msgid "Show Last Fortune"
+msgstr "Показать последнее"
+
+#: indicatorfortune.py:130
+msgid "History"
+msgstr "История"
+
+#: indicatorfortune.py:148
+msgid "WARNING. . ."
+msgstr "ПРЕДУПРЕЖДЕНИЕ. . ."
+
+#: indicatorfortune.py:154
+msgid "Ensure enabled fortunes contain data!"
+msgstr "Убедитесь, что включённые файлы изречений содержат данные!"
+
+#: indicatorfortune.py:175
+msgid "No enabled fortunes have a valid location!"
+msgstr "Неверно заданы пути у включённых файлов изречений!"
+
+#: indicatorfortune.py:178
+msgid "No fortunes are enabled!"
+msgstr "Ни один из файлов изречений не включён!"
+
+#: indicatorfortune.py:241
+msgid "Fortune History for Session"
+msgstr "История изречений"
+
+#: indicatorfortune.py:278
+msgid "Fortune"
+msgstr "Файл изречений"
+
+#: indicatorfortune.py:280
+msgid ""
+"Double click to edit a fortune.\n"
+"\n"
+"Fortunes which cannot be found\n"
+"are shown in italics."
+msgstr ""
+"Щёлкните дважды, чтобы\n"
+"отредактировать свойства.\n"
+"\n"
+"Файлы изречений, которые не могут быть\n"
+"найдены, отображаются курсивом."
+
+#: indicatorfortune.py:283
+msgid "Choose a fortune .dat file"
+msgstr "Выберите файл .dat с изречениями"
+
+#: indicatorfortune.py:284
+msgid "This fortune already exists!"
+msgstr "Этот файл изречений уже существует!"
+
+#: indicatorfortune.py:285
+msgid "This is a system fortune and cannot be modified."
+msgstr "Системный файл с изречениями не может быть изменён."
+
+#: indicatorfortune.py:286
+msgid "Add a new fortune."
+msgstr "Добавить новый файл изречений."
+
+#: indicatorfortune.py:287
+msgid "Remove the selected fortune."
+msgstr "Удалить выбранный файл изречений."
+
+#: indicatorfortune.py:288
+msgid "This is a system fortune and cannot be removed."
+msgstr "Системный файл с изречениями не может быть удалён."
+
+#: indicatorfortune.py:289
+msgid "Remove the selected fortune?"
+msgstr "Удалить выбранный файл изречений?"
+
+#: indicatorfortune.py:292
+msgid "Fortunes"
+msgstr "Файлы изречений"
+
+#: indicatorfortune.py:302
+msgid "How often a fortune is displayed."
+msgstr "Насколько часто показываются изречения."
+
+#: indicatorfortune.py:304
+msgid "Refresh interval (minutes)"
+msgstr "Интервал обновления (в минутах)"
+
+#: indicatorfortune.py:315
+msgid "The summary text for the notification."
+msgstr "Текст заголовка всплывающего сообщения."
+
+#: indicatorfortune.py:320
+msgid "Notification summary"
+msgstr "Заголовок сообщения"
+
+#: indicatorfortune.py:331
+msgid ""
+"If the fortune exceeds the limit,\n"
+"a new fortune is created.\n"
+"\n"
+"Do not set too low (below 50) as\n"
+"many fortunes may be dropped,\n"
+"resulting in excessive calls to the\n"
+"'fortune' program."
+msgstr ""
+"Если длина изречения превышает лимит,\n"
+"то будет выведено новое изречение.\n"
+"\n"
+"Не задавайте слишком низкий лимит\n"
+"(меньше 50), так как многие изречения\n"
+"будут пропущены, что вызовет чрезмерное\n"
+"обращение к программе 'fortune'."
+
+#: indicatorfortune.py:341
+msgid "Message character limit"
+msgstr "Лимит количества символов"
+
+#: indicatorfortune.py:346
+msgid "Middle mouse click of the icon"
+msgstr "Щелчок средней кнопкой мыши по значку"
+
+#: indicatorfortune.py:362
+msgid "Show a new fortune"
+msgstr "Показать новое изречение"
+
+#: indicatorfortune.py:377
+msgid "Copy current fortune to clipboard"
+msgstr "Скопировать последнее изречение в буфер"
+
+#: indicatorfortune.py:393
+msgid "Show current fortune"
+msgstr "Показать последнее изречение"
+
+#: indicatorfortune.py:405
+msgid "General"
+msgstr "Общие"

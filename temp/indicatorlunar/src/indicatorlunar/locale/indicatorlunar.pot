@@ -1,0 +1,1590 @@
+# Portable Object Template for indicatorlunar.
+# Copyright (C) 2012-2025 Bernard Giannetti.
+# This file is distributed under the same license as the indicatorlunar package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatorlunar 1.0.101\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2025-10-16 17:44+1100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: astrobase.py:87
+msgid "ALTITUDE"
+msgstr ""
+
+#: astrobase.py:88
+msgid "AZIMUTH"
+msgstr ""
+
+#: astrobase.py:89
+msgid "BRIGHT LIMB"
+msgstr ""
+
+#: astrobase.py:90
+msgid "ECLIPSE DATE TIME"
+msgstr ""
+
+#: astrobase.py:91
+msgid "ECLIPSE LATITUDE"
+msgstr ""
+
+#: astrobase.py:92
+msgid "ECLIPSE LONGITUDE"
+msgstr ""
+
+#: astrobase.py:93
+msgid "ECLIPSE TYPE"
+msgstr ""
+
+#: astrobase.py:94
+msgid "EQUINOX"
+msgstr ""
+
+#: astrobase.py:95
+msgid "FIRST QUARTER"
+msgstr ""
+
+#: astrobase.py:96
+msgid "ILLUMINATION"
+msgstr ""
+
+#: astrobase.py:97
+msgid "FULL"
+msgstr ""
+
+#: astrobase.py:98
+msgid "NEW"
+msgstr ""
+
+#: astrobase.py:99
+msgid "PHASE"
+msgstr ""
+
+#: astrobase.py:100 astrobase.py:398
+msgid "RISE AZIMUTH"
+msgstr ""
+
+#: astrobase.py:101
+msgid "RISE DATE TIME"
+msgstr ""
+
+#: astrobase.py:102 astrobase.py:400
+msgid "SET AZIMUTH"
+msgstr ""
+
+#: astrobase.py:103
+msgid "SET DATE TIME"
+msgstr ""
+
+#: astrobase.py:104
+msgid "SOLSTICE"
+msgstr ""
+
+#: astrobase.py:105
+msgid "THIRD QUARTER"
+msgstr ""
+
+#: astrobase.py:172
+msgid "MOON"
+msgstr ""
+
+#: astrobase.py:173
+msgid "SUN"
+msgstr ""
+
+#: astrobase.py:194
+msgid "Mercury"
+msgstr ""
+
+#: astrobase.py:195
+msgid "Venus"
+msgstr ""
+
+#: astrobase.py:196
+msgid "Mars"
+msgstr ""
+
+#: astrobase.py:197
+msgid "Jupiter"
+msgstr ""
+
+#: astrobase.py:198
+msgid "Saturn"
+msgstr ""
+
+#: astrobase.py:199
+msgid "Uranus"
+msgstr ""
+
+#: astrobase.py:200
+msgid "Neptune"
+msgstr ""
+
+#: astrobase.py:204
+msgid "MERCURY"
+msgstr ""
+
+#: astrobase.py:205
+msgid "VENUS"
+msgstr ""
+
+#: astrobase.py:206
+msgid "MARS"
+msgstr ""
+
+#: astrobase.py:207
+msgid "JUPITER"
+msgstr ""
+
+#: astrobase.py:208
+msgid "SATURN"
+msgstr ""
+
+#: astrobase.py:209
+msgid "URANUS"
+msgstr ""
+
+#: astrobase.py:210
+msgid "NEPTUNE"
+msgstr ""
+
+#: astrobase.py:224
+msgid "Full Moon"
+msgstr ""
+
+#: astrobase.py:225
+msgid "Waning Gibbous"
+msgstr ""
+
+#: astrobase.py:226
+msgid "Third Quarter"
+msgstr ""
+
+#: astrobase.py:227
+msgid "Waning Crescent"
+msgstr ""
+
+#: astrobase.py:228
+msgid "New Moon"
+msgstr ""
+
+#: astrobase.py:229
+msgid "Waxing Crescent"
+msgstr ""
+
+#: astrobase.py:230
+msgid "First Quarter"
+msgstr ""
+
+#: astrobase.py:231
+msgid "Waxing Gibbous"
+msgstr ""
+
+#: astrobase.py:276
+msgid "Acamar"
+msgstr ""
+
+#: astrobase.py:276
+msgid "ACAMAR"
+msgstr ""
+
+#: astrobase.py:277
+msgid "Achernar"
+msgstr ""
+
+#: astrobase.py:277
+msgid "ACHERNAR"
+msgstr ""
+
+#: astrobase.py:278
+msgid "Acrux"
+msgstr ""
+
+#: astrobase.py:278
+msgid "ACRUX"
+msgstr ""
+
+#: astrobase.py:279
+msgid "Adhara"
+msgstr ""
+
+#: astrobase.py:279
+msgid "ADHARA"
+msgstr ""
+
+#: astrobase.py:280
+msgid "Alcor"
+msgstr ""
+
+#: astrobase.py:280
+msgid "ALCOR"
+msgstr ""
+
+#: astrobase.py:281
+msgid "Alcyone"
+msgstr ""
+
+#: astrobase.py:281
+msgid "ALCYONE"
+msgstr ""
+
+#: astrobase.py:282
+msgid "Aldebaran"
+msgstr ""
+
+#: astrobase.py:282
+msgid "ALDEBARAN"
+msgstr ""
+
+#: astrobase.py:283
+msgid "Alderamin"
+msgstr ""
+
+#: astrobase.py:283
+msgid "ALDERAMIN"
+msgstr ""
+
+#: astrobase.py:284
+msgid "Alfirk"
+msgstr ""
+
+#: astrobase.py:284
+msgid "ALFIRK"
+msgstr ""
+
+#: astrobase.py:285
+msgid "Algenib"
+msgstr ""
+
+#: astrobase.py:285
+msgid "ALGENIB"
+msgstr ""
+
+#: astrobase.py:286
+msgid "Algieba"
+msgstr ""
+
+#: astrobase.py:286
+msgid "ALGIEBA"
+msgstr ""
+
+#: astrobase.py:287
+msgid "Algol"
+msgstr ""
+
+#: astrobase.py:287
+msgid "ALGOL"
+msgstr ""
+
+#: astrobase.py:288
+msgid "Alhena"
+msgstr ""
+
+#: astrobase.py:288
+msgid "ALHENA"
+msgstr ""
+
+#: astrobase.py:289
+msgid "Alioth"
+msgstr ""
+
+#: astrobase.py:289
+msgid "ALIOTH"
+msgstr ""
+
+#: astrobase.py:290
+msgid "Alkaid"
+msgstr ""
+
+#: astrobase.py:290
+msgid "ALKAID"
+msgstr ""
+
+#: astrobase.py:291
+msgid "Almach"
+msgstr ""
+
+#: astrobase.py:291
+msgid "ALMACH"
+msgstr ""
+
+#: astrobase.py:292
+msgid "Alnair"
+msgstr ""
+
+#: astrobase.py:292
+msgid "ALNAIR"
+msgstr ""
+
+#: astrobase.py:293
+msgid "Alnilam"
+msgstr ""
+
+#: astrobase.py:293
+msgid "ALNILAM"
+msgstr ""
+
+#: astrobase.py:294
+msgid "Alnitak"
+msgstr ""
+
+#: astrobase.py:294
+msgid "ALNITAK"
+msgstr ""
+
+#: astrobase.py:295
+msgid "Alphard"
+msgstr ""
+
+#: astrobase.py:295
+msgid "ALPHARD"
+msgstr ""
+
+#: astrobase.py:296
+msgid "Alphecca"
+msgstr ""
+
+#: astrobase.py:296
+msgid "ALPHECCA"
+msgstr ""
+
+#: astrobase.py:297
+msgid "Alpheratz"
+msgstr ""
+
+#: astrobase.py:297
+msgid "ALPHERATZ"
+msgstr ""
+
+#: astrobase.py:298
+msgid "Alshain"
+msgstr ""
+
+#: astrobase.py:298
+msgid "ALSHAIN"
+msgstr ""
+
+#: astrobase.py:299
+msgid "Altair"
+msgstr ""
+
+#: astrobase.py:299
+msgid "ALTAIR"
+msgstr ""
+
+#: astrobase.py:300
+msgid "Ankaa"
+msgstr ""
+
+#: astrobase.py:300
+msgid "ANKAA"
+msgstr ""
+
+#: astrobase.py:301
+msgid "Antares"
+msgstr ""
+
+#: astrobase.py:301
+msgid "ANTARES"
+msgstr ""
+
+#: astrobase.py:302
+msgid "Arcturus"
+msgstr ""
+
+#: astrobase.py:302
+msgid "ARCTURUS"
+msgstr ""
+
+#: astrobase.py:303
+msgid "Arkab Posterior"
+msgstr ""
+
+#: astrobase.py:303
+msgid "ARKAB POSTERIOR"
+msgstr ""
+
+#: astrobase.py:304
+msgid "Arkab Prior"
+msgstr ""
+
+#: astrobase.py:304
+msgid "ARKAB PRIOR"
+msgstr ""
+
+#: astrobase.py:305
+msgid "Arneb"
+msgstr ""
+
+#: astrobase.py:305
+msgid "ARNEB"
+msgstr ""
+
+#: astrobase.py:306
+msgid "Atlas"
+msgstr ""
+
+#: astrobase.py:306
+msgid "ATLAS"
+msgstr ""
+
+#: astrobase.py:307
+msgid "Atria"
+msgstr ""
+
+#: astrobase.py:307
+msgid "ATRIA"
+msgstr ""
+
+#: astrobase.py:308
+msgid "Avior"
+msgstr ""
+
+#: astrobase.py:308
+msgid "AVIOR"
+msgstr ""
+
+#: astrobase.py:309
+msgid "Bellatrix"
+msgstr ""
+
+#: astrobase.py:309
+msgid "BELLATRIX"
+msgstr ""
+
+#: astrobase.py:310
+msgid "Betelgeuse"
+msgstr ""
+
+#: astrobase.py:310
+msgid "BETELGEUSE"
+msgstr ""
+
+#: astrobase.py:311
+msgid "Canopus"
+msgstr ""
+
+#: astrobase.py:311
+msgid "CANOPUS"
+msgstr ""
+
+#: astrobase.py:312
+msgid "Capella"
+msgstr ""
+
+#: astrobase.py:312
+msgid "CAPELLA"
+msgstr ""
+
+#: astrobase.py:313
+msgid "Caph"
+msgstr ""
+
+#: astrobase.py:313
+msgid "CAPH"
+msgstr ""
+
+#: astrobase.py:314
+msgid "Castor"
+msgstr ""
+
+#: astrobase.py:314
+msgid "CASTOR"
+msgstr ""
+
+#: astrobase.py:315
+msgid "Cebalrai"
+msgstr ""
+
+#: astrobase.py:315
+msgid "CEBALRAI"
+msgstr ""
+
+#: astrobase.py:316
+msgid "Deneb"
+msgstr ""
+
+#: astrobase.py:316
+msgid "DENEB"
+msgstr ""
+
+#: astrobase.py:317
+msgid "Denebola"
+msgstr ""
+
+#: astrobase.py:317
+msgid "DENEBOLA"
+msgstr ""
+
+#: astrobase.py:318
+msgid "Diphda"
+msgstr ""
+
+#: astrobase.py:318
+msgid "DIPHDA"
+msgstr ""
+
+#: astrobase.py:319
+msgid "Dubhe"
+msgstr ""
+
+#: astrobase.py:319
+msgid "DUBHE"
+msgstr ""
+
+#: astrobase.py:320
+msgid "Electra"
+msgstr ""
+
+#: astrobase.py:320
+msgid "ELECTRA"
+msgstr ""
+
+#: astrobase.py:321
+msgid "Elnath"
+msgstr ""
+
+#: astrobase.py:321
+msgid "ELNATH"
+msgstr ""
+
+#: astrobase.py:322
+msgid "Eltanin"
+msgstr ""
+
+#: astrobase.py:322
+msgid "ELTANIN"
+msgstr ""
+
+#: astrobase.py:323
+msgid "Enif"
+msgstr ""
+
+#: astrobase.py:323
+msgid "ENIF"
+msgstr ""
+
+#: astrobase.py:324
+msgid "Fomalhaut"
+msgstr ""
+
+#: astrobase.py:324
+msgid "FOMALHAUT"
+msgstr ""
+
+#: astrobase.py:325
+msgid "Gacrux"
+msgstr ""
+
+#: astrobase.py:325
+msgid "GACRUX"
+msgstr ""
+
+#: astrobase.py:326
+msgid "Gienah"
+msgstr ""
+
+#: astrobase.py:326
+msgid "GIENAH"
+msgstr ""
+
+#: astrobase.py:327
+msgid "Hadar"
+msgstr ""
+
+#: astrobase.py:327
+msgid "HADAR"
+msgstr ""
+
+#: astrobase.py:328
+msgid "Hamal"
+msgstr ""
+
+#: astrobase.py:328
+msgid "HAMAL"
+msgstr ""
+
+#: astrobase.py:329
+msgid "Izar"
+msgstr ""
+
+#: astrobase.py:329
+msgid "IZAR"
+msgstr ""
+
+#: astrobase.py:330
+msgid "Kaus Australis"
+msgstr ""
+
+#: astrobase.py:330
+msgid "KAUS AUSTRALIS"
+msgstr ""
+
+#: astrobase.py:331
+msgid "Kochab"
+msgstr ""
+
+#: astrobase.py:331
+msgid "KOCHAB"
+msgstr ""
+
+#: astrobase.py:332
+msgid "Maia"
+msgstr ""
+
+#: astrobase.py:332
+msgid "MAIA"
+msgstr ""
+
+#: astrobase.py:333
+msgid "Markab"
+msgstr ""
+
+#: astrobase.py:333
+msgid "MARKAB"
+msgstr ""
+
+#: astrobase.py:334
+msgid "Megrez"
+msgstr ""
+
+#: astrobase.py:334
+msgid "MEGREZ"
+msgstr ""
+
+#: astrobase.py:335
+msgid "Menkalinan"
+msgstr ""
+
+#: astrobase.py:335
+msgid "MENKALINAN"
+msgstr ""
+
+#: astrobase.py:336
+msgid "Menkar"
+msgstr ""
+
+#: astrobase.py:336
+msgid "MENKAR"
+msgstr ""
+
+#: astrobase.py:337
+msgid "Menkent"
+msgstr ""
+
+#: astrobase.py:337
+msgid "MENKENT"
+msgstr ""
+
+#: astrobase.py:338
+msgid "Merak"
+msgstr ""
+
+#: astrobase.py:338
+msgid "MERAK"
+msgstr ""
+
+#: astrobase.py:339
+msgid "Merope"
+msgstr ""
+
+#: astrobase.py:339
+msgid "MEROPE"
+msgstr ""
+
+#: astrobase.py:340
+msgid "Miaplacidus"
+msgstr ""
+
+#: astrobase.py:340
+msgid "MIAPLACIDUS"
+msgstr ""
+
+#: astrobase.py:341
+msgid "Mimosa"
+msgstr ""
+
+#: astrobase.py:341
+msgid "MIMOSA"
+msgstr ""
+
+#: astrobase.py:342
+msgid "Mintaka"
+msgstr ""
+
+#: astrobase.py:342
+msgid "MINTAKA"
+msgstr ""
+
+#: astrobase.py:343
+msgid "Mirach"
+msgstr ""
+
+#: astrobase.py:343
+msgid "MIRACH"
+msgstr ""
+
+#: astrobase.py:344
+msgid "Mirfak"
+msgstr ""
+
+#: astrobase.py:344
+msgid "MIRFAK"
+msgstr ""
+
+#: astrobase.py:345
+msgid "Mirzam"
+msgstr ""
+
+#: astrobase.py:345
+msgid "MIRZAM"
+msgstr ""
+
+#: astrobase.py:346
+msgid "Mizar"
+msgstr ""
+
+#: astrobase.py:346
+msgid "MIZAR"
+msgstr ""
+
+#: astrobase.py:347
+msgid "Naos"
+msgstr ""
+
+#: astrobase.py:347
+msgid "NAOS"
+msgstr ""
+
+#: astrobase.py:348
+msgid "Nihal"
+msgstr ""
+
+#: astrobase.py:348
+msgid "NIHAL"
+msgstr ""
+
+#: astrobase.py:349
+msgid "Nunki"
+msgstr ""
+
+#: astrobase.py:349
+msgid "NUNKI"
+msgstr ""
+
+#: astrobase.py:350
+msgid "Peacock"
+msgstr ""
+
+#: astrobase.py:350
+msgid "PEACOCK"
+msgstr ""
+
+#: astrobase.py:351
+msgid "Phecda"
+msgstr ""
+
+#: astrobase.py:351
+msgid "PHECDA"
+msgstr ""
+
+#: astrobase.py:352
+msgid "Polaris"
+msgstr ""
+
+#: astrobase.py:352
+msgid "POLARIS"
+msgstr ""
+
+#: astrobase.py:353
+msgid "Pollux"
+msgstr ""
+
+#: astrobase.py:353
+msgid "POLLUX"
+msgstr ""
+
+#: astrobase.py:354
+msgid "Procyon"
+msgstr ""
+
+#: astrobase.py:354
+msgid "PROCYON"
+msgstr ""
+
+#: astrobase.py:355
+msgid "Rasalgethi"
+msgstr ""
+
+#: astrobase.py:355
+msgid "RASALGETHI"
+msgstr ""
+
+#: astrobase.py:356
+msgid "Rasalhague"
+msgstr ""
+
+#: astrobase.py:356
+msgid "RASALHAGUE"
+msgstr ""
+
+#: astrobase.py:357
+msgid "Regulus"
+msgstr ""
+
+#: astrobase.py:357
+msgid "REGULUS"
+msgstr ""
+
+#: astrobase.py:358
+msgid "Rigel"
+msgstr ""
+
+#: astrobase.py:358
+msgid "RIGEL"
+msgstr ""
+
+#: astrobase.py:359
+msgid "Rigil Kentaurus"
+msgstr ""
+
+#: astrobase.py:359
+msgid "RIGIL KENTAURUS"
+msgstr ""
+
+#: astrobase.py:360
+msgid "Rukbat"
+msgstr ""
+
+#: astrobase.py:360
+msgid "RUKBAT"
+msgstr ""
+
+#: astrobase.py:361
+msgid "Sabik"
+msgstr ""
+
+#: astrobase.py:361
+msgid "SABIK"
+msgstr ""
+
+#: astrobase.py:362
+msgid "Sadalmelik"
+msgstr ""
+
+#: astrobase.py:362
+msgid "SADALMELIK"
+msgstr ""
+
+#: astrobase.py:363
+msgid "Sadr"
+msgstr ""
+
+#: astrobase.py:363
+msgid "SADR"
+msgstr ""
+
+#: astrobase.py:364
+msgid "Saiph"
+msgstr ""
+
+#: astrobase.py:364
+msgid "SAIPH"
+msgstr ""
+
+#: astrobase.py:365
+msgid "Scheat"
+msgstr ""
+
+#: astrobase.py:365
+msgid "SCHEAT"
+msgstr ""
+
+#: astrobase.py:366
+msgid "Schedar"
+msgstr ""
+
+#: astrobase.py:366
+msgid "SCHEDAR"
+msgstr ""
+
+#: astrobase.py:367
+msgid "Shaula"
+msgstr ""
+
+#: astrobase.py:367
+msgid "SHAULA"
+msgstr ""
+
+#: astrobase.py:368
+msgid "Sheliak"
+msgstr ""
+
+#: astrobase.py:368
+msgid "SHELIAK"
+msgstr ""
+
+#: astrobase.py:369
+msgid "Sirius"
+msgstr ""
+
+#: astrobase.py:369
+msgid "SIRIUS"
+msgstr ""
+
+#: astrobase.py:370
+msgid "Spica"
+msgstr ""
+
+#: astrobase.py:370
+msgid "SPICA"
+msgstr ""
+
+#: astrobase.py:371
+msgid "Suhail"
+msgstr ""
+
+#: astrobase.py:371
+msgid "SUHAIL"
+msgstr ""
+
+#: astrobase.py:372
+msgid "Sulafat"
+msgstr ""
+
+#: astrobase.py:372
+msgid "SULAFAT"
+msgstr ""
+
+#: astrobase.py:373
+msgid "Tarazed"
+msgstr ""
+
+#: astrobase.py:373
+msgid "TARAZED"
+msgstr ""
+
+#: astrobase.py:374
+msgid "Taygeta"
+msgstr ""
+
+#: astrobase.py:374
+msgid "TAYGETA"
+msgstr ""
+
+#: astrobase.py:375
+msgid "Thuban"
+msgstr ""
+
+#: astrobase.py:375
+msgid "THUBAN"
+msgstr ""
+
+#: astrobase.py:376
+msgid "Unukalhai"
+msgstr ""
+
+#: astrobase.py:376
+msgid "UNUKALHAI"
+msgstr ""
+
+#: astrobase.py:377
+msgid "Vega"
+msgstr ""
+
+#: astrobase.py:377
+msgid "VEGA"
+msgstr ""
+
+#: astrobase.py:378
+msgid "Vindemiatrix"
+msgstr ""
+
+#: astrobase.py:378
+msgid "VINDEMIATRIX"
+msgstr ""
+
+#: astrobase.py:379
+msgid "Wezen"
+msgstr ""
+
+#: astrobase.py:379
+msgid "WEZEN"
+msgstr ""
+
+#: astrobase.py:380
+msgid "Zaurak"
+msgstr ""
+
+#: astrobase.py:380
+msgid "ZAURAK"
+msgstr ""
+
+#: astrobase.py:381
+msgid "Zubenelgenubi"
+msgstr ""
+
+#: astrobase.py:381
+msgid "ZUBENELGENUBI"
+msgstr ""
+
+#: astrobase.py:394
+msgid "NAME"
+msgstr ""
+
+#: astrobase.py:395
+msgid "NUMBER"
+msgstr ""
+
+#: astrobase.py:397
+msgid "INTERNATIONAL DESIGNATOR"
+msgstr ""
+
+#: astrobase.py:399
+msgid "RISE TIME"
+msgstr ""
+
+#: astrobase.py:401
+msgid "SET TIME"
+msgstr ""
+
+#: eclipse.py:511
+msgid "Annular"
+msgstr ""
+
+#: eclipse.py:514
+msgid "Hybrid (Annular/Total)"
+msgstr ""
+
+#: eclipse.py:517
+msgid "Partial"
+msgstr ""
+
+#: eclipse.py:520
+msgid "Penumbral"
+msgstr ""
+
+#: eclipse.py:523
+msgid "Total"
+msgstr ""
+
+#: indicatorlunar.py:50
+msgid "Indicator Lunar"
+msgstr ""
+
+#: indicatorlunar.py:169
+msgid "Rise Time: "
+msgstr ""
+
+#: indicatorlunar.py:171
+msgid "Rise Azimuth: "
+msgstr ""
+
+#: indicatorlunar.py:173
+msgid "Set Time: "
+msgstr ""
+
+#: indicatorlunar.py:175
+msgid "Set Azimuth: "
+msgstr ""
+
+#: indicatorlunar.py:182
+msgid "now rising..."
+msgstr ""
+
+#: indicatorlunar.py:207
+msgid "                                          ...werewolves about ! ! !"
+msgstr ""
+
+#: indicatorlunar.py:208
+msgid "W  A  R  N  I  N  G"
+msgstr ""
+
+#: indicatorlunar.py:214
+msgid ""
+"Displays lunar, solar, planetary, minor planet,\n"
+"comet, star and satellite information."
+msgstr ""
+
+#: indicatorlunar.py:710 indicatorlunar.py:2330
+msgid "Planets"
+msgstr ""
+
+#: indicatorlunar.py:717 indicatorlunar.py:2366
+msgid "Minor Planets"
+msgstr ""
+
+#: indicatorlunar.py:724 indicatorlunar.py:2383
+msgid "Comets"
+msgstr ""
+
+#: indicatorlunar.py:731 indicatorlunar.py:2412
+msgid "Stars"
+msgstr ""
+
+#: indicatorlunar.py:982
+msgid "Moon"
+msgstr ""
+
+#: indicatorlunar.py:991
+msgid "Phase: "
+msgstr ""
+
+#: indicatorlunar.py:1002
+msgid "Next Phases"
+msgstr ""
+
+#: indicatorlunar.py:1013
+msgid "First Quarter: "
+msgstr ""
+
+#: indicatorlunar.py:1016
+msgid "Full: "
+msgstr ""
+
+#: indicatorlunar.py:1019
+msgid "New: "
+msgstr ""
+
+#: indicatorlunar.py:1022
+msgid "Third Quarter: "
+msgstr ""
+
+#: indicatorlunar.py:1066
+msgid "Sun"
+msgstr ""
+
+#: indicatorlunar.py:1074
+msgid "Equinox: "
+msgstr ""
+
+#: indicatorlunar.py:1082
+msgid "Solstice: "
+msgstr ""
+
+#: indicatorlunar.py:1147
+msgid "Eclipse"
+msgstr ""
+
+#: indicatorlunar.py:1155 indicatorlunar.py:1826 indicatorlunar.py:1860
+msgid "Date/Time: "
+msgstr ""
+
+#: indicatorlunar.py:1168
+msgid "Type: "
+msgstr ""
+
+#: indicatorlunar.py:1201
+msgid "Latitude/Longitude: "
+msgstr ""
+
+#: indicatorlunar.py:1274
+msgid "Unable to lookup comet..."
+msgstr ""
+
+#: indicatorlunar.py:1275
+msgid "An error occurred; check the log for more details."
+msgstr ""
+
+#: indicatorlunar.py:1568
+msgid "Rise: "
+msgstr ""
+
+#: indicatorlunar.py:1579 indicatorlunar.py:1791 indicatorlunar.py:1839
+#: indicatorlunar.py:1873
+msgid "Azimuth: "
+msgstr ""
+
+#: indicatorlunar.py:1589 indicatorlunar.py:1804
+msgid "Altitude: "
+msgstr ""
+
+#: indicatorlunar.py:1600
+msgid "Set: "
+msgstr ""
+
+#: indicatorlunar.py:1724 indicatorlunar.py:2510
+msgid "Satellites"
+msgstr ""
+
+#: indicatorlunar.py:1736
+msgid "Satellites (Polar)"
+msgstr ""
+
+#: indicatorlunar.py:1777
+msgid "Rise Date/Time: "
+msgstr ""
+
+#: indicatorlunar.py:1813
+msgid "Rise"
+msgstr ""
+
+#: indicatorlunar.py:1847
+msgid "Set"
+msgstr ""
+
+#: indicatorlunar.py:1932
+msgid "S"
+msgstr ""
+
+#: indicatorlunar.py:1935
+msgid "N"
+msgstr ""
+
+#: indicatorlunar.py:1940
+msgid "E"
+msgstr ""
+
+#: indicatorlunar.py:1943
+msgid "W"
+msgstr ""
+
+#: indicatorlunar.py:2102
+msgid ""
+"The text shown next to the indicator icon,\n"
+"or tooltip where applicable.\n"
+"\n"
+"The icon text may contain text and/or\n"
+"tags from the table below.\n"
+"\n"
+"To associate text with one or more tags,\n"
+"enclose the text and tag(s) within { }.\n"
+"\n"
+"For example\n"
+"\n"
+"\t{The sun will rise at [SUN RISE DATE TIME]}\n"
+"\n"
+"If any tag contains no data at render time,\n"
+"the tag will be removed.\n"
+"\n"
+"If a removed tag is within { }, the tag and\n"
+"text will be removed.\n"
+"\n"
+"Not supported on all desktops."
+msgstr ""
+
+#: indicatorlunar.py:2119
+msgid "Icon Text"
+msgstr ""
+
+#: indicatorlunar.py:2127
+msgid "The separator will be added between pairs of { }."
+msgstr ""
+
+#: indicatorlunar.py:2132
+msgid "Separator"
+msgstr ""
+
+#: indicatorlunar.py:2161
+msgid "Tag"
+msgstr ""
+
+#: indicatorlunar.py:2162
+msgid "Value"
+msgstr ""
+
+#: indicatorlunar.py:2176
+msgid "Double click to add a tag to the icon text."
+msgstr ""
+
+#: indicatorlunar.py:2184
+msgid "Icon"
+msgstr ""
+
+#: indicatorlunar.py:2191
+msgid "Show rise when set is before sunset"
+msgstr ""
+
+#: indicatorlunar.py:2193
+msgid ""
+"If a body sets before sunset,\n"
+"show the body's next rise instead\n"
+"(excludes satellites)."
+msgstr ""
+
+#: indicatorlunar.py:2202
+msgid "Hide bodies below the horizon"
+msgstr ""
+
+#: indicatorlunar.py:2204
+msgid ""
+"Hide a body if it is yet to rise\n"
+"(excludes satellites)."
+msgstr ""
+
+#: indicatorlunar.py:2217
+msgid ""
+"A body with a fainter magnitude will be hidden\n"
+"(excludes satellites)."
+msgstr ""
+
+#: indicatorlunar.py:2224
+msgid "Hide bodies fainter than magnitude"
+msgstr ""
+
+#: indicatorlunar.py:2234
+msgid "Add new minor planets"
+msgstr ""
+
+#: indicatorlunar.py:2235
+msgid "All minor planets are automatically added."
+msgstr ""
+
+#: indicatorlunar.py:2243
+msgid "Add new comets"
+msgstr ""
+
+#: indicatorlunar.py:2244
+msgid "All comets are automatically added."
+msgstr ""
+
+#: indicatorlunar.py:2252
+msgid "Add new satellites"
+msgstr ""
+
+#: indicatorlunar.py:2253
+msgid "All satellites are automatically added."
+msgstr ""
+
+#: indicatorlunar.py:2261
+msgid "Sort satellites by rise date/time"
+msgstr ""
+
+#: indicatorlunar.py:2263
+msgid ""
+"If checked, satellites are sorted\n"
+"by rise date/time.\n"
+"\n"
+"Otherwise, satellites are sorted\n"
+"by Name then Number."
+msgstr ""
+
+#: indicatorlunar.py:2279
+msgid "Show satellite passes after this hour (inclusive)"
+msgstr ""
+
+#: indicatorlunar.py:2288
+msgid "Show satellite passes before this hour (inclusive)"
+msgstr ""
+
+#: indicatorlunar.py:2294
+msgid "Show satellites passes from"
+msgstr ""
+
+#: indicatorlunar.py:2300
+msgid "to"
+msgstr ""
+
+#: indicatorlunar.py:2309
+msgid "Menu"
+msgstr ""
+
+#: indicatorlunar.py:2332
+msgid ""
+"Check a planet to display in the menu.\n"
+"\n"
+"Click the header of the first column\n"
+"to toggle all checkboxes."
+msgstr ""
+
+#: indicatorlunar.py:2354
+msgid ""
+"Check a minor planet to display in the menu.\n"
+"\n"
+"Click the header of the first column\n"
+"to toggle all checkboxes."
+msgstr ""
+
+#: indicatorlunar.py:2358
+msgid ""
+"Minor planet data is unavailable;\n"
+"the source could not be reached,\n"
+"or no data was available, or the data\n"
+"was completely filtered by magnitude."
+msgstr ""
+
+#: indicatorlunar.py:2385
+msgid ""
+"Check a comet to display in the menu.\n"
+"\n"
+"Click the header of the first column\n"
+"to toggle all checkboxes."
+msgstr ""
+
+#: indicatorlunar.py:2389
+msgid ""
+"Comet data is unavailable; the source\n"
+"could not be reached, or no data was\n"
+"available from the source, or the data\n"
+"was completely filtered by magnitude."
+msgstr ""
+
+#: indicatorlunar.py:2414
+msgid ""
+"Check a star to display in the menu.\n"
+"\n"
+"Click the header of the first column\n"
+"to toggle all checkboxes."
+msgstr ""
+
+#: indicatorlunar.py:2429
+msgid "Natural Bodies"
+msgstr ""
+
+#: indicatorlunar.py:2458
+msgid "Name"
+msgstr ""
+
+#: indicatorlunar.py:2459
+msgid "Number"
+msgstr ""
+
+#: indicatorlunar.py:2460
+msgid "International Designator"
+msgstr ""
+
+#: indicatorlunar.py:2493
+msgid ""
+"Check a satellite to display in the menu.\n"
+"\n"
+"Click the header of the first column\n"
+"to toggle all checkboxes."
+msgstr ""
+
+#: indicatorlunar.py:2497
+msgid ""
+"Satellite data is unavailable;\n"
+"the source could not be reached,\n"
+"or no data was available."
+msgstr ""
+
+#: indicatorlunar.py:2514
+msgid "For formatting, refer to https://wiki.ubuntu.com/NotifyOSD"
+msgstr ""
+
+#: indicatorlunar.py:2558
+msgid ""
+"The summary for the satellite rise notification.\n"
+"\n"
+"Available tags:\n"
+"\t"
+msgstr ""
+
+#: indicatorlunar.py:2563
+msgid ""
+"The message for the satellite rise notification.\n"
+"\n"
+"Available tags:\n"
+"\t"
+msgstr ""
+
+#: indicatorlunar.py:2571
+msgid "Satellite rise"
+msgstr ""
+
+#: indicatorlunar.py:2572
+msgid "Screen notification when a satellite rises above the horizon."
+msgstr ""
+
+#: indicatorlunar.py:2574 indicatorlunar.py:2591
+msgid "Summary"
+msgstr ""
+
+#: indicatorlunar.py:2577 indicatorlunar.py:2594
+msgid "Message"
+msgstr ""
+
+#: indicatorlunar.py:2580 indicatorlunar.py:2598
+msgid "Test"
+msgstr ""
+
+#: indicatorlunar.py:2581 indicatorlunar.py:2599
+msgid "Show the notification using the current summary/message."
+msgstr ""
+
+#: indicatorlunar.py:2588
+msgid "Werewolf warning"
+msgstr ""
+
+#: indicatorlunar.py:2589 indicatorlunar.py:2593
+msgid "Hourly screen notification leading up to full moon."
+msgstr ""
+
+#: indicatorlunar.py:2596
+msgid ""
+"The message for the werewolf notification.\n"
+"\n"
+msgstr ""
+
+#: indicatorlunar.py:2605
+msgid "Notifications"
+msgstr ""
+
+#: indicatorlunar.py:2619
+msgid ""
+"Choose a city from the list.\n"
+"Or, add in your own city name."
+msgstr ""
+
+#: indicatorlunar.py:2626
+msgid "City"
+msgstr ""
+
+#: indicatorlunar.py:2635
+msgid "Latitude of your location in decimal degrees."
+msgstr ""
+
+#: indicatorlunar.py:2640
+msgid "Latitude"
+msgstr ""
+
+#: indicatorlunar.py:2649
+msgid "Longitude of your location in decimal degrees."
+msgstr ""
+
+#: indicatorlunar.py:2654
+msgid "Longitude"
+msgstr ""
+
+#: indicatorlunar.py:2662
+msgid "Height in metres above sea level."
+msgstr ""
+
+#: indicatorlunar.py:2667
+msgid "Elevation"
+msgstr ""
+
+#: indicatorlunar.py:2683
+msgid "Location"
+msgstr ""
+
+#: indicatorlunar.py:2693
+msgid "General"
+msgstr ""
+
+#: indicatorlunar.py:2706
+msgid "City cannot be empty."
+msgstr ""
+
+#: indicatorlunar.py:2722
+msgid "Latitude must be a number between 90 and -90 inclusive."
+msgstr ""
+
+#: indicatorlunar.py:2739
+msgid "Longitude must be a number between 180 and -180 inclusive."
+msgstr ""
+
+#: indicatorlunar.py:2756
+msgid "Elevation must be a number between 0 and 10000 inclusive."
+msgstr ""
+
+#: indicatorlunar.py:2770
+msgid "The start hour for satellite passes must be lower than the end hour."
+msgstr ""

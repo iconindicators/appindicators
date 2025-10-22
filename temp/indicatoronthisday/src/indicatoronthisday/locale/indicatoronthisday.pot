@@ -1,0 +1,139 @@
+# Portable Object Template for indicatoronthisday.
+# Copyright (C) 2017-2025 Bernard Giannetti.
+# This file is distributed under the same license as the indicatoronthisday package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatoronthisday 1.0.17\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2025-07-12 22:49+1000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: indicatoronthisday.py:68
+msgid "Indicator On This Day"
+msgstr ""
+
+#: indicatoronthisday.py:85
+msgid "EVENT"
+msgstr ""
+
+#: indicatoronthisday.py:94
+msgid ""
+"Calls the 'calendar' program and\n"
+"displays events in the menu."
+msgstr ""
+
+#: indicatoronthisday.py:136
+msgid "On this day..."
+msgstr ""
+
+#: indicatoronthisday.py:242 indicatoronthisday.py:247
+msgid "Warning"
+msgstr ""
+
+#: indicatoronthisday.py:243
+msgid "No enabled calendars have a valid location!"
+msgstr ""
+
+#: indicatoronthisday.py:248
+msgid "No calendars are enabled!"
+msgstr ""
+
+#: indicatoronthisday.py:327
+msgid "Calendar"
+msgstr ""
+
+#: indicatoronthisday.py:329
+msgid ""
+"Double click to edit a calendar.\n"
+"\n"
+"Calendars which cannot be found\n"
+"are shown in italics."
+msgstr ""
+
+#: indicatoronthisday.py:332
+msgid "Choose a calendar file"
+msgstr ""
+
+#: indicatoronthisday.py:333
+msgid "This calendar already exists!"
+msgstr ""
+
+#: indicatoronthisday.py:334 indicatoronthisday.py:337
+msgid "This is a system calendar and cannot be modified."
+msgstr ""
+
+#: indicatoronthisday.py:335
+msgid "Add a new calendar."
+msgstr ""
+
+#: indicatoronthisday.py:336
+msgid "Remove the selected calendar."
+msgstr ""
+
+#: indicatoronthisday.py:338
+msgid "Remove the selected calendar?"
+msgstr ""
+
+#: indicatoronthisday.py:341
+msgid "Calendars"
+msgstr ""
+
+#: indicatoronthisday.py:352
+msgid "The number of menu items available for display."
+msgstr ""
+
+#: indicatoronthisday.py:357
+msgid "Lines"
+msgstr ""
+
+#: indicatoronthisday.py:371
+#, python-brace-format
+msgid ""
+"The URL to search for the event.\n"
+"\n"
+"Use {0} in the URL to specify the\n"
+"position of the event text/date.\n"
+"\n"
+"If the URL is empty and 'search' is selected,\n"
+"the search will effectively be ignored.\n"
+"\n"
+"If the URL is empty and 'copy' is selected,\n"
+"the URL is reset back to factory default."
+msgstr ""
+
+#: indicatoronthisday.py:386
+msgid "On event click"
+msgstr ""
+
+#: indicatoronthisday.py:395
+msgid "Copy event to clipboard"
+msgstr ""
+
+#: indicatoronthisday.py:405
+msgid "Search using URL"
+msgstr ""
+
+#: indicatoronthisday.py:434
+msgid "On event click, search using URL"
+msgstr ""
+
+#: indicatoronthisday.py:452
+msgid "Notify"
+msgstr ""
+
+#: indicatoronthisday.py:454
+msgid ""
+"On startup or when saving preferences,\n"
+"show a notification for each of today's events."
+msgstr ""
+
+#: indicatoronthisday.py:467
+msgid "General"
+msgstr ""

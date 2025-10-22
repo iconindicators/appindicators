@@ -1,0 +1,176 @@
+# Portable Object Template for indicatorppadownloadstatistics.
+# Copyright (C) 2012-2025 Bernard Giannetti.
+# This file is distributed under the same license as the indicatorppadownloadstatistics package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatorppadownloadstatistics 1.0.81\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2025-07-13 20:20+1000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: indicatorppadownloadstatistics.py:41
+msgid "Indicator PPA Download Statistics"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:58
+msgid "(network error - check the log)"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:59
+msgid "(unknown error - check the log)"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:60
+msgid "(timeout error - check the log)"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:61
+msgid "(published binaries completely filtered)"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:62
+msgid "(no published binaries)"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:70
+msgid "Displays the total downloads of PPAs."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:413
+msgid "Double click to edit a PPA."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:414
+msgid "Remove the selected PPA."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:420 indicatorppadownloadstatistics.py:671
+msgid "User"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:421 indicatorppadownloadstatistics.py:701
+msgid "Name"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:422 indicatorppadownloadstatistics.py:731
+msgid "Filter"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:446
+msgid "Add"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:447
+msgid "Remove"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:449
+msgid "Add a new PPA."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:473
+msgid "PPAs"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:480
+msgid "Show PPAs as submenus"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:482
+msgid ""
+"The download statistics for each PPA\n"
+"are shown in a separate submenu."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:490
+msgid "Sort by download"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:491
+msgid "Sort by download count within each PPA."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:497
+msgid "Clip amount"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:507
+msgid ""
+"Limit the number of entries\n"
+"when sorting by download.\n"
+"\n"
+"A value of zero will not clip."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:529
+msgid "Low bandwidth"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:531
+msgid "Enable if your internet connection is slow."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:542
+msgid "General"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:620
+msgid "Remove the selected PPA?"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:747
+msgid ""
+"Each line of plain text is compared\n"
+"against the name of each built package,\n"
+"NOT the package name.\n"
+"\n"
+"If a built package contains ANY part\n"
+"of ANY filter, that package will be\n"
+"included in the download statistics.\n"
+"\n"
+"If a timeout error occurs, filtering\n"
+"may help by reducing the quantity of\n"
+"network requests."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:764
+msgid "Edit PPA"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:766
+msgid "Add PPA"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:786
+msgid "User cannot be empty."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:791
+msgid "Name cannot be empty."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:811
+msgid "User and name already in use!"
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:827
+msgid "Filter text may not contain duplicates."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:839
+msgid "Filter text may not contain spaces."
+msgstr ""
+
+#: indicatorppadownloadstatistics.py:961
+msgid ""
+"No PPAs are present.\n"
+"\n"
+"Restore the sample PPA?"
+msgstr ""

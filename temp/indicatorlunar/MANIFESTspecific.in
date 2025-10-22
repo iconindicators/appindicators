@@ -1,0 +1,8 @@
+exclude src/indicatorlunar/astroskyfield.py
+exclude src/indicatorlunar/meteorshowertest.py
+
+# The following warnings appear during the build which can be ignored.
+# https://github.com/pypa/setuptools/discussions/4905
+#
+# warning: no previously-included files found matching 'src/indicatorlunar/astroskyfield.py'
+# warning: no previously-included files found matching 'src/indicatorlunar/meteorshowertest.py'

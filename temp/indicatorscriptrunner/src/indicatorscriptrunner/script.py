@@ -1,0 +1,298 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
+
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+
+'''
+Script information.
+
+Base class encapsulating basic script information.
+Implementation classes for background and non-background scripts.
+'''
+
+
+import locale
+
+from abc import ABC
+
+
+class Info( ABC ):
+    ''' Base class for script information. '''
+
+    def __init__(
+        self,
+        group,
+        name,
+        command,
+        play_sound,
+        show_notification ):
+        '''
+        Group to which a script belongs.
+        Name of script.
+        The command or script with any arguments as needed.
+        True to play a sound on completion of script/command execution.
+        True to show a notification on completion of script/command execution.
+        '''
+        self.group = group
+        self.name = name
+        self.command = command
+        self.play_sound = play_sound
+        self.show_notification = show_notification
+
+
+    def get_group( self ):
+        '''
+        Return the script's group.
+        '''
+        return self.group
+
+
+    def get_name( self ):
+        '''
+        Return the script's name.
+        '''
+        return self.name
+
+
+    def get_command( self ):
+        '''
+        Return the script's command.
+        '''
+        return self.command
+
+
+    def get_play_sound( self ):
+        '''
+        Return True if a sound is to be played after this script's execution;
+        False otherwise.
+        '''
+        return self.play_sound
+
+
+    def get_show_notification( self ):
+        '''
+        Return True is a notification is to be shown after this script's
+        execution; False otherwise.
+        '''
+        return self.show_notification
+
+
+    def __eq__(
+        self,
+        other ):
+
+        return (
+            self.__class__ == other.__class__
+            and
+            self.get_group() == other.get_group()
+            and
+            self.get_name() == other.get_name()
+            and
+            self.get_command() == other.get_command()
+            and
+            self.get_play_sound() == other.get_play_sound()
+            and
+            self.get_show_notification() == other.get_show_notification() )
+
+
+    def __str__( self ):
+        return (
+            self.group + " | "
+            +
+            self.name + " | "
+            +
+            self.command + " | "
+            +
+            str( self.play_sound ) + " | "
+            +
+            str( self.show_notification ) )
+
+
+    def __repr__( self ):
+        return self.__str__()
+
+
+    @staticmethod
+    def compare(
+        group1,
+        name1,
+        group2,
+        name2 ):
+        '''
+        Compare two Infos by group, then by name,
+        if the groups are equal.
+        '''
+        group1_ = locale.strxfrm( group1 )
+        group2_ = locale.strxfrm( group2 )
+        if group1_ < group2_:
+            sort_value = -1
+
+        elif group1_ > group2_:
+            sort_value = 1
+
+        else:
+            name1_ = locale.strxfrm( name1 )
+            name2_ = locale.strxfrm( name2 )
+            if name1_ < name2_:
+                sort_value = -1
+
+            elif name1_ > name2_:
+                sort_value = 1
+
+            else:
+                sort_value = 0
+
+        return sort_value
+
+
+class Background( Info ):
+    ''' Background script information. '''
+
+    def __init__(
+        self,
+        group,
+        name,
+        command,
+        play_sound,
+        show_notification,
+        interval_in_minutes,
+        force_update ):
+        '''
+        Group to which a script belongs.
+        Name of script.
+        The command or script with any arguments as needed.
+        True to play a sound on completion of script/command execution.
+        True to show a notification on completion of script/command execution.
+        Update interval (in minutes).
+        Force update; script will update on the next update for ANY
+        background script.
+        '''
+        super().__init__( group, name, command, play_sound, show_notification )
+        self.interval_in_minutes = interval_in_minutes
+        self.force_update = force_update
+
+
+    def get_interval_in_minutes( self ):
+        '''
+        Return the interval in minutes for this script.
+        '''
+        return int( self.interval_in_minutes )
+
+
+    def get_force_update( self ):
+        '''
+        Returns True if this script will update on the next update for any
+        background script; False otherwise.
+        '''
+        return self.force_update
+
+
+    def __eq__(
+        self,
+        other ):
+
+        return (
+            super().__eq__( other )
+            and
+            self.__class__ == other.__class__
+            and
+            self.get_interval_in_minutes() == other.get_interval_in_minutes()
+            and
+            self.get_force_update() == other.get_force_update() )
+
+
+    def __str__( self ):
+        return (
+            super().__str__() + " | "
+            +
+            str( self.interval_in_minutes ) + " | "
+            +
+            str( self.force_update ) )
+
+
+    def __repr__( self ):
+        return self.__str__()
+
+
+class NonBackground( Info ):
+    ''' Non-background (foreground) script information. '''
+
+    def __init__(
+        self,
+        group,
+        name,
+        command,
+        play_sound,
+        show_notification,
+        terminal_open,
+        default ):
+        '''
+        Group to which a script belongs.
+        Name of script.
+        The command or script with any arguments as needed.
+        True plays a sound on completion of script/command execution.
+        True shows a notification on completion of script/command execution.
+        True leaves the terminal open on completion of script/command execution.
+        True if the script is the default; only one non-background script can
+        be default.
+        '''
+        super().__init__(
+            group, name, command, play_sound, show_notification )
+
+        self.terminal_open = terminal_open
+        self.default = default
+
+
+    def get_terminal_open( self ):
+        '''
+        Returns True if the terminal is to remain open after this script's
+        execution; False otherwise.
+        '''
+        return self.terminal_open
+
+
+    def get_default( self ):
+        '''
+        Returns True if this script is the default script; False otherwise.
+        '''
+        return self.default
+
+
+    def __eq__(
+        self,
+        other ):
+
+        return (
+            super().__eq__( other )
+            and
+            self.__class__ == other.__class__
+            and
+            self.get_terminal_open() == other.get_terminal_open()
+            and
+            self.get_default() == other.get_default() )
+
+
+    def __str__( self ):
+        return (
+            super().__str__() + " | "
+            +
+            str( self.terminal_open ) + " | "
+            +
+            str( self.default ) )
+
+
+    def __repr__( self ):
+        return self.__str__()

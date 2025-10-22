@@ -1,0 +1,161 @@
+# Russian translation for indicatoronthisday.
+# Copyright (C) 2017-2025 Bernard Giannetti.
+# This file is distributed under the same license as the indicatoronthisday package.
+# Oleg Moiseichuk <berroll@mail.ru>, 2017-2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatoronthisday 1.0.17\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2025-07-12 22:49+1000\n"
+"PO-Revision-Date: 2025-07-25 16:10+0300\n"
+"Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
+"Language-Team: Russian\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: indicatoronthisday.py:68
+msgid "Indicator On This Day"
+msgstr "Индикатор \"В этот день\""
+
+#: indicatoronthisday.py:85
+msgid "EVENT"
+msgstr "СОБЫТИЕ"
+
+#: indicatoronthisday.py:94
+msgid ""
+"Calls the 'calendar' program and\n"
+"displays events in the menu."
+msgstr ""
+"Вызывает программу 'calendar'\n"
+"и показывает события в меню."
+
+#: indicatoronthisday.py:136
+msgid "On this day..."
+msgstr "В этот день..."
+
+#: indicatoronthisday.py:242 indicatoronthisday.py:247
+msgid "Warning"
+msgstr "Предупреждение"
+
+#: indicatoronthisday.py:243
+msgid "No enabled calendars have a valid location!"
+msgstr "Ни один из включённых календарей не найден!"
+
+#: indicatoronthisday.py:248
+msgid "No calendars are enabled!"
+msgstr "Ни один календарь не включён!"
+
+#: indicatoronthisday.py:327
+msgid "Calendar"
+msgstr "Календарь"
+
+#: indicatoronthisday.py:329
+msgid ""
+"Double click to edit a calendar.\n"
+"\n"
+"Calendars which cannot be found\n"
+"are shown in italics."
+msgstr ""
+"Щёлкните дважды, чтобы\n"
+"отредактировать свойства.\n"
+"\n"
+"Календари, которые не могут быть\n"
+"найдены, отображаются курсивом."
+
+#: indicatoronthisday.py:332
+msgid "Choose a calendar file"
+msgstr "Выберите файл календаря"
+
+#: indicatoronthisday.py:333
+msgid "This calendar already exists!"
+msgstr "Этот календарь уже существует!"
+
+#: indicatoronthisday.py:334 indicatoronthisday.py:337
+msgid "This is a system calendar and cannot be modified."
+msgstr "Системный календарь не может быть изменён."
+
+#: indicatoronthisday.py:335
+msgid "Add a new calendar."
+msgstr "Добавить новый календарь."
+
+#: indicatoronthisday.py:336
+msgid "Remove the selected calendar."
+msgstr "Удалить выбранный календарь."
+
+#: indicatoronthisday.py:338
+msgid "Remove the selected calendar?"
+msgstr "Удалить выбранный календарь?"
+
+#: indicatoronthisday.py:341
+msgid "Calendars"
+msgstr "Календари"
+
+#: indicatoronthisday.py:352
+msgid "The number of menu items available for display."
+msgstr "Количество строк событий, отображаемых в меню."
+
+#: indicatoronthisday.py:357
+msgid "Lines"
+msgstr "Строки"
+
+#: indicatoronthisday.py:371
+#, python-brace-format
+msgid ""
+"The URL to search for the event.\n"
+"\n"
+"Use {0} in the URL to specify the\n"
+"position of the event text/date.\n"
+"\n"
+"If the URL is empty and 'search' is selected,\n"
+"the search will effectively be ignored.\n"
+"\n"
+"If the URL is empty and 'copy' is selected,\n"
+"the URL is reset back to factory default."
+msgstr ""
+"Ссылка для поиска события.\n"
+"\n"
+"Используйте {0} в ссылке, чтобы задать\n"
+"позицию текста и даты события при поиске.\n"
+"\n"
+"Если ссылка пустая, и задана опция \"Искать\",\n"
+"то поиск будет игнорироваться.\n"
+"\n"
+"Если ссылка пустая, и задана опция \"Скопировать\",\n"
+"то будет восстановлена ссылка по умолчанию."
+
+#: indicatoronthisday.py:386
+msgid "On event click"
+msgstr "При щелчке по событию"
+
+#: indicatoronthisday.py:395
+msgid "Copy event to clipboard"
+msgstr "Скопировать событие в буфер"
+
+#: indicatoronthisday.py:405
+msgid "Search using URL"
+msgstr "Искать, используя ссылку"
+
+#: indicatoronthisday.py:434
+msgid "On event click, search using URL"
+msgstr "При щелчке по событию искать, используя ссылку"
+
+#: indicatoronthisday.py:452
+msgid "Notify"
+msgstr "Уведомлять"
+
+#: indicatoronthisday.py:454
+msgid ""
+"On startup or when saving preferences,\n"
+"show a notification for each of today's events."
+msgstr ""
+"При запуске или сохранении настроек показывать\n"
+"уведомление о всех событиях текущего дня."
+
+#: indicatoronthisday.py:467
+msgid "General"
+msgstr "Общие"

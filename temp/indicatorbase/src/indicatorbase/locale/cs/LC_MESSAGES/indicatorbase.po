@@ -1,0 +1,103 @@
+# Czech translation for indicatorbase.
+# Copyright (C) 2017-2025 Bernard Giannetti.
+# This file is distributed under the same license as the indicatorbase package.
+# Pavel Rehak <pavel-rehak@email.cz>, 2017.
+msgid ""
+msgstr ""
+"Project-Id-Version: indicatorbase 1.0.1\n"
+"Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
+"POT-Creation-Date: 2025-10-19 16:25+1100\n"
+"PO-Revision-Date: 2025-03-14 11:29+1100\n"
+"Last-Translator: Pavel Rehak <pavel-rehak@email.cz>\n"
+"Language-Team: Czech\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
+
+#: indicatorbase.py:255
+msgid "Initialising..."
+msgstr ""
+
+#: indicatorbase.py:303
+msgid "Refer to the Preferences for details."
+msgstr ""
+
+#: indicatorbase.py:305
+#, python-brace-format
+msgid "New version of {0} available..."
+msgstr ""
+
+#: indicatorbase.py:778 indicatorbase.py:1134
+msgid "Preferences"
+msgstr "Předvolby"
+
+#: indicatorbase.py:778
+msgid "About"
+msgstr "O aplikaci"
+
+#: indicatorbase.py:778
+msgid "Quit"
+msgstr "Ukončit"
+
+#: indicatorbase.py:1061
+msgid "translator-credits"
+msgstr "Pavel Řehák <pavel-rehak@email.cz>"
+
+#: indicatorbase.py:1067
+msgid "Credits"
+msgstr ""
+
+#: indicatorbase.py:1072 indicatorbase.py:1081
+msgid "View the"
+msgstr "Zobrazit"
+
+#: indicatorbase.py:1073
+msgid "changelog"
+msgstr "přehled změn"
+
+#: indicatorbase.py:1074 indicatorbase.py:1083
+msgid "text file."
+msgstr "jako textový soubor."
+
+#: indicatorbase.py:1082
+msgid "error log"
+msgstr ""
+
+#: indicatorbase.py:1534
+msgid "Autostart"
+msgstr ""
+
+#: indicatorbase.py:1535
+msgid "Run the indicator automatically."
+msgstr ""
+
+#: indicatorbase.py:1543
+msgid "Start up delay (seconds)."
+msgstr ""
+
+#: indicatorbase.py:1561
+msgid "Check Latest Version"
+msgstr ""
+
+#: indicatorbase.py:1563
+msgid "Check for the latest version of the indicator on start up."
+msgstr ""
+
+#: indicatorbase.py:1576
+#, python-brace-format
+msgid "An update is available at <a href=\"{0}\">{1}</a>."
+msgstr ""
+
+#: indicatorbase.py:2396
+msgid "Enabled"
+msgstr ""
+
+#: indicatorbase.py:2434
+msgid "Add"
+msgstr ""
+
+#: indicatorbase.py:2435
+msgid "Remove"
+msgstr ""
