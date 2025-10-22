@@ -937,8 +937,6 @@ def build_wheel(
     '''
     Build the wheel (and tar.gz) for the indicator.
     '''
-    message = ""
-
     message = _check_setuptools()
 
     if not message:
