@@ -28,6 +28,7 @@ if __name__ == "__main__":
         "tools.utils_readme.build_readme_for_project()\"" )
 
     modules_to_install = [
+        utils.get_pygobject(),
         "readme_renderer[md]" ]
 
     result = (
