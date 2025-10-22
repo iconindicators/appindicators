@@ -76,8 +76,9 @@
 # https://github.com/brandon-rhodes/python-jplephem/issues/60
 
 
-#TODO Document perhaps in the PyPI page about how to make a new planets.bsp
-# Refer to the jplephem page?
+#TODO Document (perhaps on the GitHub page for indicatorlunar) how to make a
+# new planets.bsp
+# Refer to the PyPI jplephem page?
 
 
 #TODO Ran the indicator with skyfield on Ubuntu 20.04
