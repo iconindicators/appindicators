@@ -17,9 +17,9 @@
 - Now includes a symbolic icon allowing the colour to be adjusted for the
   current theme.
 - Overhauled to adhere to the pyproject.toml standard.
-- Deployment using the .deb format is superceded; PyPI (pip) is used with
-  operating system packages and file copy.
-- Now includes an opt-in check during start up for the latest version at PyPI.
+- Deployment using the .deb format is superceded; pip is used with operating
+  system packages and file copy.
+- Now includes an opt-in check during start up for the latest version at GitHub.
 - Removed old eclipse information.
 
 

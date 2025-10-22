@@ -4,7 +4,9 @@
 
 - Consolidated menu options.
 - Updated README.md.
-- Now includes an opt-in check during start up for the latest version at PyPI.
+- Now includes an opt-in check during start up for the latest version at GitHub.
+- Deployment using the .deb format is superceded; pip is used with operating
+  system packages and file copy.
 
 
 ## v1.0.16 (2023-12-22)

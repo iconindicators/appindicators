@@ -9,7 +9,7 @@
 - Fixed PyGObject 3.11 deprecation warnings.
 - Now includes a symbolic icon allowing the colour to be adjusted for the
   current theme.
-- Now includes an opt-in check during start up for the latest version at PyPI.
+- Now includes an opt-in check during start up for the latest version at GitHub.
 
 
 ## v1.0.43 (2023-11-22)
@@ -24,8 +24,8 @@
 - Reinstated the autostart option in Preferences with the addition of a optional
   delay to start up.
 - Overhauled to adhere to the pyproject.toml standard.
-- Deployment using the .deb format is superceded; PyPI (pip) is used with
-  operating system packages and file copy.
+- Deployment using the .deb format is superceded; pip is used with operating
+  system packages and file copy.
 
 
 ## v1.0.41 (2023-01-09)
