@@ -31,7 +31,6 @@ References
     https://wiki.ubuntu.com/NotifyOSD
     https://lazka.github.io/pgi-docs/Gtk-3.0
     https://pygobject.readthedocs.io/en/latest/getting_started.html
-    https://twine.readthedocs.io/en/latest/
     https://packaging.python.org/en/latest/tutorials/packaging-projects/
     https://specifications.freedesktop.org/icon-theme-spec/latest/
     https://pypi.org/project/pystray/
@@ -47,6 +46,7 @@ import gettext
 import json
 import logging.handlers
 import pickle
+import re
 import shutil
 import signal
 import socket
@@ -127,6 +127,8 @@ class IndicatorBase( ABC ):
 
     _EXTENSION_JSON = ".json"
 
+    _GITHUB_REPOSITORY_URL = f"https://github.com/iconindicators/appindicators"
+
     _LOGGING_INITIALISED = False
 
     _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ]
@@ -182,8 +184,10 @@ class IndicatorBase( ABC ):
 
         comments
             Must be a translated string.
-            Used in the About dialog and incorporated into the Project
-            Description on the PyPI page.
+            Used in the
+                - About dialog
+                - Project README.md
+                - Indicator's README.md
 
         artwork, creditz
             A list of strings or string/URL pairs where the string is the name
@@ -299,18 +303,33 @@ class IndicatorBase( ABC ):
 
 
     def _check_for_newer_version( self ):
-        url = f"https://pypi.org/pypi/{ self.indicator_name }/json"
-        message = _( "Refer to the Preferences for details." )
-        summary = _(
-            "New version of {0} available..." ).format( self.indicator_name )
-
+        url = "https://api.github.com/repos/iconindicators/appindicators/releases"
         data_json, error_network, error_timeout = self.get_json( url )
+        version_github = ""
         if data_json:
-            version_pypi = self.versiontuple( data_json[ "info" ][ "version" ] )
+            for item in data_json:
+                if type( item ) is dict:
+                    for key in item:
+                        if key == "assets":
+                            assets = item[ key ]
+                            for asset in assets:
+                                name = asset[ "name" ]
+                                if self.indicator_name in name and "whl" in name:
+                                    version_github = name.split( '-' )[ 1 ]
+                                    break
 
-            if self.versiontuple( self.get_version() ) < version_pypi:
+                        if version_github:
+                            break
+
+                if version_github:
+                    break
+
+        if version_github:
+            if self.versiontuple( self.get_version() ) < self.versiontuple( version_github ):
                 self.new_version_available = True
-                self.show_notification( summary, message )
+                self.show_notification(
+                    _( "New version of {0} available..." ).format( self.indicator_name ),
+                    _( "Refer to the Preferences for details." ) )
 
 
     @staticmethod
@@ -430,9 +449,9 @@ class IndicatorBase( ABC ):
             self._get_desktop_file_in_home_config_autostart() )
 
         # When running in production, this resolves to the .desktop file
-        # within the installation from PyPI.
+        # within the installation from GitHub.
         #
-        # When running in development, this resolves to a non-existant path.
+        # When running in development, this resolves to a non-existent path.
         #
         # Use this difference to discriminate running in production versus
         # development.
@@ -1570,7 +1589,10 @@ class IndicatorBase( ABC ):
                 margin_top = self.INDENT_WIDGET_TOP ) )
 
         if self.new_version_available and self.check_latest_version:
-            url = f"https://pypi.org/project/{ self.indicator_name }"
+            url = (
+                f"{ IndicatorBase._GITHUB_REPOSITORY_URL }"
+                f"/tree/main/{ self.indicator_name }" )
+
             label = Gtk.Label.new()
             label.set_markup( _(
                 "An update is available at " +
