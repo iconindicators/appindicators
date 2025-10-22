@@ -939,12 +939,10 @@ def build_wheel(
     '''
     message = ""
 
-#TODO Put back in on release
-    # message = _check_setuptools()
+    message = _check_setuptools()
 
-#TODO Put back in on release
-    # if not message:
-    #     message = _check_for_t_o_d_o_s( indicator )
+    if not message:
+        message = _check_for_t_o_d_o_s( indicator )
 
     if not message:
         directory_dist = (
