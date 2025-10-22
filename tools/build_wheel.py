@@ -48,6 +48,7 @@ if __name__ == "__main__":
             "build",
             "polib",
             utils.get_pygobject(),
+            "setuptools",
             "readme_renderer[md]" ]
 
         result = (
