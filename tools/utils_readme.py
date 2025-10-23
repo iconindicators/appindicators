@@ -433,7 +433,7 @@ def _get_python_virtual_environment_install(
         pygobject = r"PyGObject\<=3.50.0"
 
     wheel_url = (
-        "https://github.com/iconindicators/appindicatorstest/releases/download/"
+        "https://github.com/iconindicators/appindicators/releases/download/"
         f"{ tag }/{ indicator }-{ version }-py3-none-any.whl" )
 
     return (
