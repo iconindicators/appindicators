@@ -1589,14 +1589,12 @@ class IndicatorBase( ABC ):
                 margin_top = self.INDENT_WIDGET_TOP ) )
 
         if self.new_version_available and self.check_latest_version:
-            url = (
-                f"{ IndicatorBase._GITHUB_REPOSITORY_URL }"
-                f"/tree/main/{ self.indicator_name }" )
+            url = f"{ IndicatorBase._GITHUB_REPOSITORY_URL }"
 
             label = Gtk.Label.new()
             label.set_markup( _(
                 "An update is available at " +
-                "<a href=\"{0}\">{1}</a>." ).format( url, url ) )
+                "<a href=\"{0}\">{1}</a>" ).format( url, url ) )
 
             box_new_version = (
                 self.create_box(
