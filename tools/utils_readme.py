@@ -51,6 +51,7 @@ class OperatingSystem( Enum ):
     FEDORA_40 = auto()
     FEDORA_41 = auto()
     FEDORA_42 = auto()
+    FEDORA_43 = auto()
     KUBUNTU_2204 = auto()
     KUBUNTU_2404 = auto()
     LINUX_MINT_CINNAMON_20 = auto()
@@ -95,7 +96,8 @@ OPERATING_SYSTEMS_DEBIAN_BASED = {
 OPERATING_SYSTEMS_FEDORA_BASED = {
     OperatingSystem.FEDORA_40,
     OperatingSystem.FEDORA_41,
-    OperatingSystem.FEDORA_42 }
+    OperatingSystem.FEDORA_42,
+    OperatingSystem.FEDORA_43 }
 
 
 OPERATING_SYSTEMS_MANJARO_BASED = {
@@ -505,6 +507,7 @@ def _get_extension_install(
             OperatingSystem.FEDORA_40,
             OperatingSystem.FEDORA_41,
             OperatingSystem.FEDORA_42,
+            OperatingSystem.FEDORA_43,
             OperatingSystem.KUBUNTU_2204,
             OperatingSystem.OPENSUSE_TUMBLEWEED ) ):
 
@@ -527,6 +530,7 @@ def _get_extension_uninstall(
             OperatingSystem.FEDORA_40,
             OperatingSystem.FEDORA_41,
             OperatingSystem.FEDORA_42,
+            OperatingSystem.FEDORA_43,
             OperatingSystem.KUBUNTU_2204,
             OperatingSystem.OPENSUSE_TUMBLEWEED ) ):
 

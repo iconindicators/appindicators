@@ -4,9 +4,9 @@
 If wmctrl is no longer available in a given distro's packages,
 will need a new entry in the installation instructions dropping wmctrl.
   https://www.theregister.com/2025/06/12/ubuntu_2510_to_drop_x11/
-Fedora 43 is expected to drop X11; when released (Nov 2025)
-Ubuntu 25.10 is expected to drop X11; when released (Oct 2025)
-Ubuntu 26.04 is expected to drop X11; when released (Apr 2026)
+Ubuntu 25.10 is expected to drop X11 (Oct 2025)
+Ubuntu 26.04 is expected to drop X11 (Apr 2026)
+Fedora 44 is expected to drop X11 (Apr 2026)
 
 
 ### Ubuntu 26.04
