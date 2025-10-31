@@ -80,7 +80,7 @@ Installation / Updating
 
 </details>
 
-<details><summary><b>Fedora 42</b></summary>
+<details><summary><b>Fedora 42 | Fedora 43</b></summary>
 
 1. Install operating system packages:
 
@@ -319,7 +319,7 @@ Uninstall
 
 </details>
 
-<details><summary><b>Fedora 42</b></summary>
+<details><summary><b>Fedora 42 | Fedora 43</b></summary>
 
 1. Uninstall operating system packages:
 
