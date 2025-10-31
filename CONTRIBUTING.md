@@ -239,7 +239,7 @@ Create a `Python` interpreter which uses `venv_run`:
 
 ```
   Window > Preferences
-    PyDev > Python Interpreter
+    PyDev > Interpreters > Python Interpreter
       New > Browse for python/pypy exe
         Browse to venv_run/bin/python3
         Interpreter Name: python3 venv_run
