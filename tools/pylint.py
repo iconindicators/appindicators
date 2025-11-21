@@ -45,7 +45,7 @@ if __name__ == "__main__":
         "--disable=too-many-instance-attributes "
         "--disable=too-many-lines "
         "--disable=too-many-locals "
-        # "--disable=too-many-positional-arguments " # Does not work on Ubuntu 20.04
+        "--disable=too-many-positional-arguments " # Does not work on Ubuntu 20.04
         "--disable=too-many-public-methods "
         "--disable=too-many-statements "
         "--disable=undefined-variable "
@@ -56,10 +56,10 @@ if __name__ == "__main__":
     command_pylint = (
         "python3 -m pylint "
         "--recursive=y "
-        "--ignore=release,venv_build,venv_run,astroskyfield.pymeteorshowertest.py "
+        "--ignore=release,venv_build,venv_run,astroskyfield.py "
         "--output=pylint.txt " 
         f"{ pylint_disabled_checks } "
-        f"../{ Path.cwd().stem }" )
+        f"../{ Path.cwd().parts[ -1 ] }" )
 
     command_sort = (
         "sort --output=pylint.txt -t ':' --key=4,4 --key=1,1 --key=2,2n pylint.txt" )
