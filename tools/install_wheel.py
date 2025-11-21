@@ -40,11 +40,12 @@ if __name__ == "__main__":
     for indicator in indicators_to_process:
         command = (
             f"$(ls -d { utils.VENV_INSTALL }/lib/python3.* | head -1)/"
-            f"site-packages/{ indicator }/platform/linux/install.sh" )
+            f"site-packages/{ indicator }/platform/linux/install.sh "
+            f"{ utils.VENV_INSTALL }" )
 
         modules_to_install = [
             utils.get_pygobject(),
-            f"$(ls -d { utils.RELEASE_DIRECTORY }/wheel/dist_{ indicator }/{ indicator }*.whl | head -1)" ]
+             f"$(ls -d { utils.RELEASE_DIRECTORY }/wheel/dist_{ indicator }/{ indicator }*.whl | head -1)" ]
 
         result = (
             utils.python_run(
@@ -52,6 +53,6 @@ if __name__ == "__main__":
                 utils.VENV_INSTALL,
                 *modules_to_install,
                 force_reinstall = True ) )
-
+        
         if not utils.print_stdout_stderr_return_code( *result ):
             break
