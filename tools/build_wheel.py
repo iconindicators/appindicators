@@ -27,6 +27,10 @@ To view the contents of a .tar.gz:
 '''
 
 
+import shutil
+
+from pathlib import Path
+
 from . import utils
 
 
@@ -39,17 +43,31 @@ if __name__ == "__main__":
             f"{ utils.RELEASE_DIRECTORY }.",
             "build" ) )
 
+    modules_to_install = [
+        "build",
+        "polib",
+        utils.get_pygobject(),
+        "setuptools",
+        "readme_renderer[md]" ]
+
     for indicator in arguments.indicators:
+        directory_dist = (
+            Path( '.' ) /
+            utils.RELEASE_DIRECTORY /
+            "wheel" /
+            ( "dist_" + indicator ) )
+
+        if directory_dist.exists():
+            shutil.rmtree( str( directory_dist ) )
+
+        directory_dist.mkdir( parents = True )
+
         command = (
             "python3 -c \"import tools.utils_build; "
-            f"tools.utils_build.build_wheel( \\\"{ indicator }\\\", \\\"{ arguments.tag }\\\" )\"" )
-
-        modules_to_install = [
-            "build",
-            "polib",
-            utils.get_pygobject(),
-            "setuptools",
-            "readme_renderer[md]" ]
+            f"tools.utils_build.package_source( "
+            f"\\\"{ indicator }\\\", "
+            f"\\\"{ arguments.tag }\\\", "
+            f"\\\"{ str( directory_dist ) }\\\" )\"" )
 
         result = (
             utils.python_run(
@@ -57,5 +75,26 @@ if __name__ == "__main__":
                 utils.VENV_BUILD,
                 *modules_to_install ) )
 
-        if not utils.print_stdout_stderr_return_code( *result ):
+        utils.print_stdout_stderr_return_code( *result )
+
+        stderr_ = result[ 1 ]
+        return_code = result[ 2 ]
+        if stderr_ or return_code != 0:
+            break
+
+        command = (
+            "python3 -m build --outdir "
+            f"{ directory_dist } { directory_dist / indicator }" )
+
+        result = (
+            utils.python_run(
+                command,
+                utils.VENV_BUILD,
+                *modules_to_install ) )
+
+        utils.print_stdout_stderr_return_code( *result )
+
+        stderr_ = result[ 1 ]
+        return_code = result[ 2 ]
+        if stderr_ or return_code != 0:
             break

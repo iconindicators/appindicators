@@ -819,6 +819,11 @@ def _package_source(
         Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "indicatorbase.py",
         Path( '.' ) / directory_indicator / "src" / indicator )
 
+    # The build process requires that a README.md be present in the src directory.
+    shutil.copy(
+        Path( '.' ) / directory_indicator / "README.md",
+        Path( '.' ) / directory_indicator / "src" / indicator )
+
     pyproject_toml, version_indicator_base = (
         _create_pyproject_dot_toml( indicator, directory_dist ) )
 
@@ -871,6 +876,10 @@ def _package_source(
             version_from_pyproject_toml,
             authors_emails,
             tag )
+
+        shutil.copy(
+            Path( '.' ) / "indicatorbase" / "src" / "indicatorbase" / "indicatorbase.py",
+            Path( '.' ) / directory_indicator / "src" / indicator )
 
         directory_indicator_locale = (
             Path( '.' ) / directory_indicator / "src" / indicator / "locale" )
@@ -931,11 +940,13 @@ def _package_source(
     return message
 
 
-def build_wheel(
+def package_source(
     indicator,
-    tag ):
+    tag,
+    directory_dist ):
     '''
-    Build the wheel (and tar.gz) for the indicator.
+    Prepare the indicator's source in the release directory for building the
+    wheel.
     '''
     message = _check_setuptools()
 
@@ -943,33 +954,6 @@ def build_wheel(
         message = _check_for_t_o_d_o_s( indicator )
 
     if not message:
-        directory_dist = (
-            Path( '.' ) /
-            utils.RELEASE_DIRECTORY /
-            "wheel" /
-            ( "dist_" + indicator ) )
+        message = _package_source( Path( directory_dist ), indicator, tag )
 
-        if Path( directory_dist ).exists():
-            shutil.rmtree( str( directory_dist ) )
-
-        directory_dist.mkdir( parents = True )
-
-        message = _package_source( directory_dist, indicator, tag )
-
-    if not message:
-        command = (
-            "python3 -m build --outdir "
-            f"{ directory_dist } { directory_dist / indicator }" )
-
-        stdout_, stderr_, return_code = (
-            indicatorbase.IndicatorBase.process_run( command ) )
-
-        message = ""
-        if return_code == 0:
-            message = stdout_
-            shutil.rmtree( directory_dist / indicator )
-
-        else:
-            message = _get_message( stderr_, return_code )
-
-    sys.stdout.write( message )
+    sys.stderr.write( message )
