@@ -181,6 +181,8 @@ To run `Pylint` over the entire project:
   python3 -m tools.pylint
 ```
 
+Produces `pylint.txt` in the project root.
+
 Several checks have been disabled; re-enable by editing the script.
 
 ---
