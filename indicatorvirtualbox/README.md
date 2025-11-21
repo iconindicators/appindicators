@@ -22,7 +22,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.0/indicatorvirtualbox-1.0.75-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.1/indicatorvirtualbox-1.0.76-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -47,7 +47,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.0/indicatorvirtualbox-1.0.75-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.1/indicatorvirtualbox-1.0.76-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -72,7 +72,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.0/indicatorvirtualbox-1.0.75-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.1/indicatorvirtualbox-1.0.76-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -94,7 +94,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.0/indicatorvirtualbox-1.0.75-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.1/indicatorvirtualbox-1.0.76-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -116,7 +116,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.0/indicatorvirtualbox-1.0.75-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.1/indicatorvirtualbox-1.0.76-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -136,7 +136,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.0/indicatorvirtualbox-1.0.75-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.1/indicatorvirtualbox-1.0.76-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -156,7 +156,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.0/indicatorvirtualbox-1.0.75-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.1/indicatorvirtualbox-1.0.76-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
