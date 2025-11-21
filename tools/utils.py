@@ -171,19 +171,18 @@ def print_stdout_stderr_return_code(
     stderr_,
     return_code ):
     '''
-    Print either stdout or stderr along with the (non-zero) return code.
+    Print non-empty stdout/stderr, along with the (non-zero) return code.
 
     Return True if the return code is 0; False otherwise.
     '''
-    if return_code == 0:
-        print( stdout_ )
-        if stderr_:
-            # Warnings may be printed to stderr despite a return code of 0.
-            print( stderr_ )
+    if stdout_:
+        print( f"\n\nstdout:\n{ stdout_ }" )
 
-    else:
+    if stderr_:
         print( f"\n\nstderr:\n{ stderr_ }" )
-        print( f"\n\nReturn code:\n{ return_code }" )
+
+    if return_code != 0:
+        print( f"\n\nReturn code:{ return_code }" )
 
     return return_code == 0
 
