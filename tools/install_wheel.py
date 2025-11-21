@@ -53,6 +53,6 @@ if __name__ == "__main__":
                 utils.VENV_INSTALL,
                 *modules_to_install,
                 force_reinstall = True ) )
-        
+
         if not utils.print_stdout_stderr_return_code( *result ):
             break
