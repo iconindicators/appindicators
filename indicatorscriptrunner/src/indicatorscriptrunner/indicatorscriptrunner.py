@@ -2173,7 +2173,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 Background(
                     "Network",
                     "Internet Down",
-                    "if wget -qO /dev/null google.com > /dev/null; " +
+                    "if wget -qO /dev/null http://google.com > /dev/null; " +
                     "then echo \"\"; else echo \"Internet is DOWN\"; fi",
                     False, True, 60, True ) )
 

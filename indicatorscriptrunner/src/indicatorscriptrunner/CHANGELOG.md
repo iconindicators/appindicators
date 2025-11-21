@@ -2,8 +2,8 @@
 
 ## v1.0.27 TODO
 
-- Prepended `http://` to `google.com` in example script `Up or down` as `wget`
-  now complains otherwise.
+- Prepended `http://` to `google.com` in example scripts `Up or down` and
+  `Internet Down` as `wget` now complains if the protocol is absent.
 - Set `autoclean` and `autoremove` to take place after `update` and
   `dist-upgrade` in `Update` example script.
 
