@@ -1,5 +1,11 @@
 # Indicator Fortune changelog
 
+## v1.0.45 (2025-11-21)
+
+- Bug fix: the build resulted in erroneous hard coding of `indicatortest` in
+  the install script for all indicators.
+
+
 ## v1.0.44 (2025-10-18)
 
 - Fortunes are now defined only by a .dat file, rather than an entire directory.

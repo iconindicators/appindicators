@@ -1,5 +1,11 @@
 # Indicator On This Day changelog
 
+## v1.0.18 (2025-11-21)
+
+- Bug fix: the build resulted in erroneous hard coding of `indicatortest` in
+  the install script for all indicators.
+
+
 ## v1.0.17 (2025-10-18)
 
 - When show event notifcations is enabled, a three second delay between each

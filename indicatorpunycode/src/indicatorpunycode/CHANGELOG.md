@@ -1,5 +1,11 @@
 # Indicator Punycode changelog
 
+## v1.0.17 (2025-11-21)
+
+- Bug fix: the build resulted in erroneous hard coding of `indicatortest` in
+  the install script for all indicators.
+
+
 ## v1.0.16 (2025-10-18)
 
 - Reinstated the autostart option in Preferences with the addition of a optional

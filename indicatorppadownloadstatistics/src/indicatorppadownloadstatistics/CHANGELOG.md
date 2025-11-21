@@ -1,5 +1,11 @@
 # Indicator PPA Download Statistics changelog
 
+## v1.0.82 (2025-11-21)
+
+- Bug fix: the build resulted in erroneous hard coding of `indicatortest` in
+  the install script for all indicators.
+
+
 ## v1.0.81 (2025-10-18)
 
 - PPAs are now specified only by the user/name with an optional filter; the

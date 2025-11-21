@@ -1,5 +1,11 @@
 # Indicator VirtualBox™ changelog
 
+## v1.0.76 (2025-11-21)
+
+- Bug fix: the build resulted in erroneous hard coding of `indicatortest` in
+  the install script for all indicators.
+
+
 ## v1.0.75 (2025-10-18)
 
 - Can now edit a virtual machine's autostart and start command in place in the

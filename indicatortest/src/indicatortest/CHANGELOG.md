@@ -1,5 +1,11 @@
 # Indicator Test changelog
 
+## v1.0.18 (2025-11-21)
+
+- Bug fix: the build resulted in erroneous hard coding of `indicatortest` in
+  the install script for all indicators.
+
+
 ## v1.0.17 (2025-10-18)
 
 - Consolidated menu options.

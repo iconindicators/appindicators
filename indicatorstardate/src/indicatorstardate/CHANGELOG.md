@@ -1,5 +1,11 @@
 # Indicator Stardate changelog
 
+## v1.0.46 (2025-11-21)
+
+- Bug fix: the build resulted in erroneous hard coding of `indicatortest` in
+  the install script for all indicators.
+
+
 ## v1.0.45 (2025-10-18)
 
 - Now uses
