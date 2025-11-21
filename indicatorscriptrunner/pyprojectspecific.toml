@@ -2,7 +2,7 @@
 # USED BY THE BUILD WHEEL SCRIPT
 # TO CREATE A COMPLETE PYPROJECT.TOML.
 [project]
-version = "1.0.26"
+version = "1.0.27"
 description = "Application indicator to run a terminal command or script."
 classifiers = [
   "Topic :: Utilities" ]

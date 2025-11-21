@@ -2135,7 +2135,7 @@ class IndicatorScriptRunner( IndicatorBase ):
                 NonBackground(
                     "Network",
                     "Up or down",
-                    "if wget -qO /dev/null google.com > /dev/null; " +
+                    "if wget -qO /dev/null http://google.com > /dev/null; " +
                     "then notify-send -i " + self.get_icon_name() +
                     " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi",
                     False, False, False, True ) )
@@ -2162,10 +2162,10 @@ class IndicatorScriptRunner( IndicatorBase ):
                 NonBackground(
                     "Update",
                     "autoclean | autoremove | update | dist-upgrade",
-                    "sudo apt-get autoclean && " +
-                    "sudo apt-get -y autoremove && " +
                     "sudo apt-get update && " +
-                    "sudo apt-get -y dist-upgrade",
+                    "sudo apt-get -y dist-upgrade && " +
+                    "sudo apt-get autoclean && " +
+                    "sudo apt-get -y autoremove",
                     True, True, True, False ) )
 
             # Example background scripts.

@@ -1,5 +1,13 @@
 # Indicator Script Runner changelog
 
+## v1.0.27 TODO
+
+- Prepended `http://` to `google.com` in example script `Up or down` as `wget`
+  now complains otherwise.
+- Set `autoclean` and `autoremove` to take place after `update` and
+  `dist-upgrade` in `Update` example script.
+
+
 ## v1.0.26 (2025-11-21)
 
 - Bug fix: the build resulted in erroneous hard coding of `indicatortest` in
