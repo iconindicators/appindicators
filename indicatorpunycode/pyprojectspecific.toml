@@ -2,7 +2,7 @@
 # USED BY THE BUILD WHEEL SCRIPT
 # TO CREATE A COMPLETE PYPROJECT.TOML.
 [project]
-version = "1.0.16"
+version = "1.0.17"
 description = "Application indicator which converts domain names between Unicode and ASCII."
 classifiers = [
   "Topic :: Utilities" ]
