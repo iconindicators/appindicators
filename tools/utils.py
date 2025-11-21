@@ -268,8 +268,9 @@ def get_indicators_to_process(
         positional_arguments_helps )
 
     if positional_arguments_present:
-        argument_names = tuple(
-            list( positional_arguments_names ) + argument_names )
+        argument_names = (
+            tuple(
+                list( positional_arguments_names ) + argument_names ) )
 
         argument_helps.update(
             dict(
