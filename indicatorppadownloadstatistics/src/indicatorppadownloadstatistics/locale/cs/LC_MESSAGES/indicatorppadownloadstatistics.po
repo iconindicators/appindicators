@@ -4,9 +4,9 @@
 # Pavel Rehak <pavel-rehak@email.cz>, 2017.
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorppadownloadstatistics 1.0.81\n"
+"Project-Id-Version: indicatorppadownloadstatistics 1.0.82\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-13 20:20+1000\n"
+"POT-Creation-Date: 2025-11-21 11:46+1100\n"
 "PO-Revision-Date: 2024-07-09 00:24+1100\n"
 "Last-Translator: Pavel Rehak <pavel-rehak@email.cz>\n"
 "Language: cs\n"

@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatoronthisday 1.0.17\n"
+"Project-Id-Version: indicatoronthisday 1.0.18\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-07-12 22:49+1000\n"
+"POT-Creation-Date: 2025-11-21 11:46+1100\n"
 "PO-Revision-Date: 2025-07-25 16:10+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
