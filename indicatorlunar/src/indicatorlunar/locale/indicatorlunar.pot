@@ -4,9 +4,9 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorlunar 1.0.102\n"
+"Project-Id-Version: indicatorlunar 1.0.103\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-11-21 20:12+1100\n"
+"POT-Creation-Date: 2025-11-25 22:36+1100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
