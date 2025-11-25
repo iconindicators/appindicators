@@ -1,11 +1,12 @@
 # Indicator Script Runner changelog
 
-## v1.0.27 TODO
+## v1.0.27 (2025-11-25)
 
 - Prepended `http://` to `google.com` in example scripts `Up or down` and
   `Internet Down` as `wget` now complains if the protocol is absent.
 - Set `autoclean` and `autoremove` to take place after `update` and
   `dist-upgrade` in `Update` example script.
+- Ignore a failure to connect to `GitHub` when checking for a new release.
 
 
 ## v1.0.26 (2025-11-21)

@@ -1,5 +1,10 @@
 # Indicator Stardate changelog
 
+## v1.0.47 (2025-11-25)
+
+- Ignore a failure to connect to `GitHub` when checking for a new release.
+
+
 ## v1.0.46 (2025-11-21)
 
 - Bug fix: the build resulted in erroneous hard coding of `indicatortest` in

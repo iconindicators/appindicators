@@ -2,6 +2,7 @@
 
 ## v1.0.103 (2025-11-25)
 
+- Ignore a failure to connect to `GitHub` when checking for a new release.
 - Bug fix: the message text field for satellite rise and werewolf warning
   notifications was read only.
 
