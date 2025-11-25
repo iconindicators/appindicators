@@ -1,5 +1,11 @@
 # Indicator Lunar changelog
 
+## v1.0.103 (2025-11-25)
+
+- Bug fix: the message text field for satellite rise and werewolf warning
+  notifications was read only.
+
+
 ## v1.0.102 (2025-11-21)
 
 - Bug fix: the build resulted in erroneous hard coding of `indicatortest` in
