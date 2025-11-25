@@ -304,7 +304,13 @@ class IndicatorBase( ABC ):
 
     def _check_for_newer_version( self ):
         url = "https://api.github.com/repos/iconindicators/appindicators/releases"
-        data_json, error_network, error_timeout = self.get_json( url )
+
+        # Ignore failure on version check as this is non-critical.
+        data_json, error_network, error_timeout = (
+            self.get_json(
+                url,
+                ignore_failure = True ) )
+
         version_github = ""
         if data_json:
             for item in data_json:
@@ -335,7 +341,8 @@ class IndicatorBase( ABC ):
     @staticmethod
     def get_json(
         url,
-        data = None ):
+        data = None,
+        ignore_failure = False ):
         '''
         Retrieves the JSON content from a URL.
 
@@ -348,6 +355,9 @@ class IndicatorBase( ABC ):
         JSON followed by two booleans, one of which will be set to True.
         The first boolean indicates a network error and the second boolean
         indicates a timeout.
+
+        If ignore_failure is True, any error/exception will be ignored and the
+        timeout and network booleans will be set to None (as will be the json).
 
         https://stackoverflow.com/q/72388829/2156453
         https://stackoverflow.com/q/8763451/2156453
@@ -368,23 +378,25 @@ class IndicatorBase( ABC ):
                 json_ = json.loads( f.read().decode( "utf-8" ) )
 
         except ( HTTPError, URLError ) as e:
-            if isinstance( e.reason, socket.timeout ):
-                error_timeout = True
-
-            else:
-                error_network = True
-
-            if IndicatorBase._LOGGING_INITIALISED:
-                logging.error( f"Problem with { url }" )
-                logging.exception( e )
+            if not ignore_failure:
+                if isinstance( e.reason, socket.timeout ):
+                    error_timeout = True
+    
+                else:
+                    error_network = True
+    
+                if IndicatorBase._LOGGING_INITIALISED:
+                    logging.error( f"Problem with { url }" )
+                    logging.exception( e )
 
             json_ = None
 
         except socket.timeout as e:
-            error_timeout = True
-            if IndicatorBase._LOGGING_INITIALISED:
-                logging.error( f"Problem with { url }" )
-                logging.exception( e )
+            if not ignore_failure:
+                error_timeout = True
+                if IndicatorBase._LOGGING_INITIALISED:
+                    logging.error( f"Problem with { url }" )
+                    logging.exception( e )
 
             json_ = None
 
