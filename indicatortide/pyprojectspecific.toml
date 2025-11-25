@@ -2,7 +2,7 @@
 # USED BY THE BUILD WHEEL SCRIPT
 # TO CREATE A COMPLETE PYPROJECT.TOML.
 [project]
-version = "1.0.31"
+version = "1.0.32"
 description = "Application indicator which displays tidal information."
 classifiers = [
   "Topic :: Utilities" ]

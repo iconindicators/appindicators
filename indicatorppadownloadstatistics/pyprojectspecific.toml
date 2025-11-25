@@ -2,7 +2,7 @@
 # USED BY THE BUILD WHEEL SCRIPT
 # TO CREATE A COMPLETE PYPROJECT.TOML.
 [project]
-version = "1.0.82"
+version = "1.0.83"
 description = "Application indicator which displays PPA download statistics."
 classifiers = [
   "Topic :: Utilities" ]
