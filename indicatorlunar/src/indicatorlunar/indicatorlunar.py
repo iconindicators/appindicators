@@ -3208,8 +3208,7 @@ class IndicatorLunar( IndicatorBase ):
         message_text_view = (
             self.create_textview(
                 text = message_text,
-                tooltip_text = message_tooltip,
-                editable = False ) )
+                tooltip_text = message_tooltip ) )
 
         box = (
             self.create_box(
