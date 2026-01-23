@@ -45,63 +45,45 @@ from . import utils
 
 class OperatingSystem( Enum ):
     ''' Supported operating systems. '''
-    DEBIAN_11 = auto()
     DEBIAN_12 = auto()
     DEBIAN_13 = auto()
-    FEDORA_40 = auto()
-    FEDORA_41 = auto()
     FEDORA_42 = auto()
     FEDORA_43 = auto()
-    KUBUNTU_2204 = auto()
     KUBUNTU_2404 = auto()
-    LINUX_MINT_CINNAMON_20 = auto()
     LINUX_MINT_CINNAMON_21 = auto()
     LINUX_MINT_CINNAMON_22 = auto()
-    LUBUNTU_2204 = auto()
     LUBUNTU_2404 = auto()
-    MANJARO_24 = auto()
     MANJARO_25 = auto()
     OPENSUSE_TUMBLEWEED = auto()
-    UBUNTU_2004 = auto()
     UBUNTU_2204 = auto()
     UBUNTU_2404 = auto()
     UBUNTU_BUDGIE_2404 = auto()
     UBUNTU_MATE_2404 = auto()
-    UBUNTU_UNITY_2204 = auto()
     UBUNTU_UNITY_2404 = auto()
     XUBUNTU_2404 = auto()
 
 
 OPERATING_SYSTEMS_DEBIAN_BASED = {
-    OperatingSystem.DEBIAN_11,
     OperatingSystem.DEBIAN_12,
     OperatingSystem.DEBIAN_13,
-    OperatingSystem.KUBUNTU_2204,
     OperatingSystem.KUBUNTU_2404,
-    OperatingSystem.LINUX_MINT_CINNAMON_20,
     OperatingSystem.LINUX_MINT_CINNAMON_21,
     OperatingSystem.LINUX_MINT_CINNAMON_22,
-    OperatingSystem.LUBUNTU_2204,
     OperatingSystem.LUBUNTU_2404,
-    OperatingSystem.UBUNTU_2004,
     OperatingSystem.UBUNTU_2204,
     OperatingSystem.UBUNTU_2404,
     OperatingSystem.UBUNTU_BUDGIE_2404,
     OperatingSystem.UBUNTU_MATE_2404,
-    OperatingSystem.UBUNTU_UNITY_2204,
     OperatingSystem.UBUNTU_UNITY_2404,
     OperatingSystem.XUBUNTU_2404 }
 
 
 OPERATING_SYSTEMS_FEDORA_BASED = {
-    OperatingSystem.FEDORA_40,
-    OperatingSystem.FEDORA_41,
     OperatingSystem.FEDORA_42,
     OperatingSystem.FEDORA_43 }
 
 
 OPERATING_SYSTEMS_MANJARO_BASED = {
-    OperatingSystem.MANJARO_24,
     OperatingSystem.MANJARO_25 }
 
 
@@ -252,7 +234,6 @@ def _get_install_uninstall(
             and
             _is_operating_system(
                 operating_system,
-                OperatingSystem.MANJARO_24,
                 OperatingSystem.MANJARO_25,
                 OperatingSystem.OPENSUSE_TUMBLEWEED ) ):
 
@@ -414,21 +395,15 @@ def _get_python_virtual_environment_install(
     if (
         _is_operating_system(
             operating_system,
-            OperatingSystem.DEBIAN_11,
             OperatingSystem.DEBIAN_12,
-            OperatingSystem.KUBUNTU_2204,
             OperatingSystem.KUBUNTU_2404,
-            OperatingSystem.LINUX_MINT_CINNAMON_20,
             OperatingSystem.LINUX_MINT_CINNAMON_21,
             OperatingSystem.LINUX_MINT_CINNAMON_22,
-            OperatingSystem.LUBUNTU_2204,
             OperatingSystem.LUBUNTU_2404,
-            OperatingSystem.UBUNTU_2004,
             OperatingSystem.UBUNTU_2204,
             OperatingSystem.UBUNTU_2404,
             OperatingSystem.UBUNTU_BUDGIE_2404,
             OperatingSystem.UBUNTU_MATE_2404,
-            OperatingSystem.UBUNTU_UNITY_2204,
             OperatingSystem.UBUNTU_UNITY_2404,
             OperatingSystem.XUBUNTU_2404 ) ):
 
@@ -490,7 +465,6 @@ def _get_extension_install(
     if (
         _is_operating_system(
             operating_system,
-            OperatingSystem.DEBIAN_11,
             OperatingSystem.DEBIAN_12,
             OperatingSystem.DEBIAN_13 ) ):
 
@@ -504,11 +478,8 @@ def _get_extension_install(
     if (
         _is_operating_system(
             operating_system,
-            OperatingSystem.FEDORA_40,
-            OperatingSystem.FEDORA_41,
             OperatingSystem.FEDORA_42,
             OperatingSystem.FEDORA_43,
-            OperatingSystem.KUBUNTU_2204,
             OperatingSystem.OPENSUSE_TUMBLEWEED ) ):
 
         extension = (
@@ -527,11 +498,8 @@ def _get_extension_uninstall(
     if (
         _is_operating_system(
             operating_system,
-            OperatingSystem.FEDORA_40,
-            OperatingSystem.FEDORA_41,
             OperatingSystem.FEDORA_42,
             OperatingSystem.FEDORA_43,
-            OperatingSystem.KUBUNTU_2204,
             OperatingSystem.OPENSUSE_TUMBLEWEED ) ):
 
         extension = (
@@ -602,7 +570,6 @@ def _get_operating_system_packages_debian(
     if (
         _is_operating_system(
             operating_system,
-            OperatingSystem.DEBIAN_11,
             OperatingSystem.DEBIAN_12,
             OperatingSystem.DEBIAN_13 ) ):
         packages.append( "gnome-shell-extension-appindicator" )
@@ -610,20 +577,16 @@ def _get_operating_system_packages_debian(
     needs_calendar = (
         _is_operating_system(
             operating_system,
-            OperatingSystem.DEBIAN_11,
             OperatingSystem.DEBIAN_12,
             OperatingSystem.DEBIAN_13,
-            OperatingSystem.KUBUNTU_2204,
             OperatingSystem.KUBUNTU_2404,
             OperatingSystem.LINUX_MINT_CINNAMON_21,
             OperatingSystem.LINUX_MINT_CINNAMON_22,
-            OperatingSystem.LUBUNTU_2204,
             OperatingSystem.LUBUNTU_2404,
             OperatingSystem.UBUNTU_2204,
             OperatingSystem.UBUNTU_2404,
             OperatingSystem.UBUNTU_BUDGIE_2404,
             OperatingSystem.UBUNTU_MATE_2404,
-            OperatingSystem.UBUNTU_UNITY_2204,
             OperatingSystem.UBUNTU_UNITY_2404,
             OperatingSystem.XUBUNTU_2404 ) )
 
@@ -685,25 +648,11 @@ def _get_operating_system_packages_fedora(
     if _is_indicator( indicator, IndicatorName.INDICATORPUNYCODE ):
         packages.append( "wl-clipboard" )
 
-    # Fedora 42 uses pw-play so pulseaudio is not required.
-    needs_pulseaudio = (
-        _is_operating_system(
-            operating_system,
-            OperatingSystem.FEDORA_40,
-            OperatingSystem.FEDORA_41 ) )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
-        if needs_pulseaudio:
-            packages.append( "pulseaudio-utils" )
-
     if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
         packages.append( "calendar" )
         packages.append( "fortune-mod" )
         packages.append( "wl-clipboard" )
         packages.append( "wmctrl" )
-
-        if needs_pulseaudio:
-            packages.append( "pulseaudio-utils" )
 
     if _is_indicator( indicator, IndicatorName.INDICATORVIRTUALBOX ):
         packages.append( "wmctrl" )
