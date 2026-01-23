@@ -1,5 +1,17 @@
 # Indicator VirtualBox™ changelog
 
+## v1.0.78 (2026-01-23)
+
+- To denote a running virtual machine, a radio button was used.
+
+  GNOME made a change such that the name of a running virtual machine (with
+  the radio button) is out of alignment with virtual machines which are not
+  running.  This can be seen in Debian 13, Fedora 42, Fedora 43,
+  openSUSE Tumbleweedand and Ubuntu 24.04.
+
+  Instead of a radio button, a bullet symbol is now used.
+
+
 ## v1.0.77 (2025-11-25)
 
 - Ignore a failure to connect to `GitHub` when checking for a new release.

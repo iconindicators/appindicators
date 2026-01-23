@@ -188,22 +188,39 @@ class IndicatorVirtualBox( IndicatorBase ):
         virtual_machine,
         indent,
         is_running ):
+        '''
+        Originally a radiomenuitem was used to denote a running virtual machine.
+
+        Under GNOME on
+            Debian 13
+            Fedora 42
+            Fedora 43
+            openSUSE Tumbleweedand
+            Ubuntu 24.04
+
+        the radiomenuitem pushes the name of the running virtual machine out of
+        alignment with the names of non-running virtual machines.
+
+        Use a bullet symbol instead of the radiomenuitem.
+
+        https://discourse.gnome.org/t/indent-for-radiomenuitem-changed-somewhere-around-gnome-version-46/33717
+        '''
+        symbol_en_space = '\u2002' 
+        symbol_bullet = '\u2022'
 
         if is_running:
-            self.create_and_append_radiomenuitem(
-                menu,
-                virtual_machine.get_name(),
-                activate_functionandarguments = (
-                    self._on_virtual_machine, virtual_machine ),
-                indent = indent )
+            text_before_indent = symbol_bullet + symbol_en_space
 
         else:
-            self.create_and_append_menuitem(
-                menu,
-                virtual_machine.get_name(),
-                activate_functionandarguments = (
-                    self._on_virtual_machine, virtual_machine ),
-                indent = indent )
+            text_before_indent = symbol_en_space * 2
+
+        self.create_and_append_menuitem(
+            menu,
+            virtual_machine.get_name(),
+            activate_functionandarguments = (
+                self._on_virtual_machine, virtual_machine ),
+            indent = indent,
+            text_before_indent = text_before_indent )
 
 
     def _on_virtual_machine(

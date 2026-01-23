@@ -46,7 +46,6 @@ import gettext
 import json
 import logging.handlers
 import pickle
-import re
 import shutil
 import signal
 import socket
@@ -1684,14 +1683,17 @@ class IndicatorBase( ABC ):
         name = None,
         activate_functionandarguments = None,
         indent = ( 0, 0 ),
-        is_secondary_activate_target = False ):
+        is_secondary_activate_target = False,
+        text_before_indent = "" ):
         '''
         indent:
             First element: indent level when adding to a non-detachable menu.
             Second element: equivalent for a detachable menu.
         '''
         indent_amount = self._get_menu_indent_amount( indent )
-        menuitem = Gtk.MenuItem.new_with_label( indent_amount + label )
+        menuitem = (
+            Gtk.MenuItem.new_with_label(
+                text_before_indent + indent_amount + label ) )
 
         if name:
             menuitem.set_name( name )
