@@ -75,11 +75,7 @@ if __name__ == "__main__":
                 utils.VENV_BUILD,
                 *modules_to_install ) )
 
-        utils.print_stdout_stderr_return_code( *result )
-
-        stderr_ = result[ 1 ]
-        return_code = result[ 2 ]
-        if stderr_ or return_code != 0:
+        if not utils.print_stdout_stderr_return_code( *result ):
             break
 
         command = (
@@ -92,9 +88,5 @@ if __name__ == "__main__":
                 utils.VENV_BUILD,
                 *modules_to_install ) )
 
-        utils.print_stdout_stderr_return_code( *result )
-
-        stderr_ = result[ 1 ]
-        return_code = result[ 2 ]
-        if stderr_ or return_code != 0:
+        if not utils.print_stdout_stderr_return_code( *result ):
             break

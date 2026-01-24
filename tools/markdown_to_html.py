@@ -45,8 +45,7 @@ if __name__ == "__main__":
                 utils.VENV_BUILD,
                 *modules_to_install ) )
 
-        utils.print_stdout_stderr_return_code( *result )
-        if result[ 2 ] == 0: # Return code of zero; all is well.
+        if utils.print_stdout_stderr_return_code( *result ):
             print( f"\nCreated { f_out }" )
 
     else:
