@@ -1,12 +1,12 @@
 # <English language name for ru> translation for indicatortest.
-# Copyright (C) 2016-2025 Bernard Giannetti.
+# Copyright (C) 2016-2026 Bernard Giannetti.
 # This file is distributed under the same license as the indicatortest package.
 # <author name> <<author email>>, 2025.
 msgid ""
 msgstr ""
 "Project-Id-Version: indicatortest 1.0.19\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2025-11-26 10:36+1100\n"
+"POT-Creation-Date: 2026-01-23 16:39+1100\n"
 "PO-Revision-Date: 2025-03-14 18:25+1100\n"
 "Last-Translator: <author name> <<author email>>\n"
 "Language-Team: <English language name for ru>\n"

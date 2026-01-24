@@ -8,7 +8,7 @@ indicatorstardate
 Installation / Updating
 -----------------------
 
-<details><summary><b>Debian 11 | Debian 12</b></summary>
+<details><summary><b>Debian 12</b></summary>
 
 1. Install operating system packages:
 
@@ -22,7 +22,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.2/indicatorstardate-1.0.47-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorstardate-1.0.47-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -47,7 +47,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.2/indicatorstardate-1.0.47-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorstardate-1.0.47-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -58,7 +58,7 @@ Installation / Updating
 
 </details>
 
-<details><summary><b>Fedora 40 | Fedora 41 | Fedora 42 | Fedora 43</b></summary>
+<details><summary><b>Fedora 42 | Fedora 43</b></summary>
 
 1. Install operating system packages:
 
@@ -72,7 +72,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.2/indicatorstardate-1.0.47-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorstardate-1.0.47-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -80,7 +80,7 @@ Installation / Updating
 
 </details>
 
-<details><summary><b>Kubuntu 22.04</b></summary>
+<details><summary><b>Kubuntu 24.04 | Linux Mint Cinnamon 21 | Linux Mint Cinnamon 22 | Lubuntu 24.04 | Ubuntu 22.04 | Ubuntu 24.04 | Ubuntu Budgie 24.04 | Ubuntu MATE 24.04 | Ubuntu Unity 24.04 | Xubuntu 24.04</b></summary>
 
 1. Install operating system packages:
 
@@ -94,35 +94,13 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.2/indicatorstardate-1.0.47-py3-none-any.whl && \
-    deactivate && \
-    . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
-    ```
-3. Install the `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` [extension](https://extensions.gnome.org/extension/615/appindicator-support).
-
-</details>
-
-<details><summary><b>Kubuntu 24.04 | Linux Mint Cinnamon 20 | Linux Mint Cinnamon 21 | Linux Mint Cinnamon 22 | Lubuntu 22.04 | Lubuntu 24.04 | Ubuntu 20.04 | Ubuntu 22.04 | Ubuntu 24.04 | Ubuntu Budgie 24.04 | Ubuntu MATE 24.04 | Ubuntu Unity 22.04 | Ubuntu Unity 24.04 | Xubuntu 24.04</b></summary>
-
-1. Install operating system packages:
-
-    ```
-    sudo apt-get -y install gir1.2-ayatanaappindicator3-0.1 libcairo2-dev libgirepository1.0-dev python3-pip python3-venv
-    ```
-
-2. Create a `Python3` virtual environment at `$HOME/.local/venv_indicators` and install `indicatorstardate`, including icons, .desktop and run script:
-    ```
-    indicator=indicatorstardate && \
-    venv=$HOME/.local/venv_indicators && \
-    if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
-    . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.2/indicatorstardate-1.0.47-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorstardate-1.0.47-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
 </details>
 
-<details><summary><b>Manjaro 24 | Manjaro 25</b></summary>
+<details><summary><b>Manjaro 25</b></summary>
 
 1. Install operating system packages:
 
@@ -136,7 +114,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.2/indicatorstardate-1.0.47-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorstardate-1.0.47-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -156,7 +134,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.2/indicatorstardate-1.0.47-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorstardate-1.0.47-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -208,7 +186,7 @@ Limitations
 Uninstall
 ---------
 
-<details><summary><b>Debian 11 | Debian 12</b></summary>
+<details><summary><b>Debian 12</b></summary>
 
 1. Uninstall operating system packages:
 
@@ -264,7 +242,7 @@ Uninstall
 
 </details>
 
-<details><summary><b>Fedora 40 | Fedora 41 | Fedora 42 | Fedora 43</b></summary>
+<details><summary><b>Fedora 42 | Fedora 43</b></summary>
 
 1. Uninstall operating system packages:
 
@@ -294,37 +272,7 @@ Uninstall
 
 </details>
 
-<details><summary><b>Kubuntu 22.04</b></summary>
-
-1. Uninstall operating system packages:
-
-    ```
-    sudo apt-get -y remove gir1.2-ayatanaappindicator3-0.1 libcairo2-dev libgirepository1.0-dev python3-pip python3-venv
-    ```
-
-2. Uninstall the indicator from the `Python3` virtual environment, including icons, .desktop and run script:
-    ```
-    indicator=indicatorstardate && \
-    venv=$HOME/.local/venv_indicators && \
-    $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/uninstall.sh && \
-    . ${venv}/bin/activate && \
-    python3 -m pip uninstall --yes ${indicator} && \
-    count=$(python3 -m pip --disable-pip-version-check list | grep -o "indicator" | wc -l) && \
-    deactivate && \
-    if [ "$count" -eq "0" ]; then rm -f -r ${venv}; fi 
-    ```
-
-    The configuration directory `$HOME/.config/indicatorstardate` will not be deleted.
-
-    The cache directory `$HOME/.cache/indicatorstardate` will be deleted.
-
-    If no other indicators remain installed, the virtual environment will be deleted.
-
-3. The `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` extension may be turned [off](https://extensions.gnome.org/extension/615/appindicator-support) if no longer in use by other indicators.
-
-</details>
-
-<details><summary><b>Kubuntu 24.04 | Linux Mint Cinnamon 20 | Linux Mint Cinnamon 21 | Linux Mint Cinnamon 22 | Lubuntu 22.04 | Lubuntu 24.04 | Ubuntu 20.04 | Ubuntu 22.04 | Ubuntu 24.04 | Ubuntu Budgie 24.04 | Ubuntu MATE 24.04 | Ubuntu Unity 22.04 | Ubuntu Unity 24.04 | Xubuntu 24.04</b></summary>
+<details><summary><b>Kubuntu 24.04 | Linux Mint Cinnamon 21 | Linux Mint Cinnamon 22 | Lubuntu 24.04 | Ubuntu 22.04 | Ubuntu 24.04 | Ubuntu Budgie 24.04 | Ubuntu MATE 24.04 | Ubuntu Unity 24.04 | Xubuntu 24.04</b></summary>
 
 1. Uninstall operating system packages:
 
@@ -352,7 +300,7 @@ Uninstall
 
 </details>
 
-<details><summary><b>Manjaro 24 | Manjaro 25</b></summary>
+<details><summary><b>Manjaro 25</b></summary>
 
 1. Uninstall operating system packages:
 
@@ -418,4 +366,4 @@ License
 
 This project in its entirety is licensed under the terms of the GNU General Public License v3.0 license.
 
-Copyright 2012-2025 Bernard Giannetti.
+Copyright 2012-2026 Bernard Giannetti.
