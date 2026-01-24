@@ -182,7 +182,7 @@ def print_stdout_stderr_return_code(
         print( f"\n\nstderr:\n{ stderr_ }" )
 
     if return_code != 0:
-        print( f"\n\nReturn code:{ return_code }" )
+        print( f"\n\nReturn code: { return_code }" )
 
     return return_code == 0
 

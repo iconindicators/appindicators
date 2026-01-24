@@ -957,3 +957,6 @@ def package_source(
         message = _package_source( Path( directory_dist ), indicator, tag )
 
     sys.stderr.write( message )
+    
+    return_code = 0 if len( message ) == 0 else 1
+    sys.exit( return_code )
