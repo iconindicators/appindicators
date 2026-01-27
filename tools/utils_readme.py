@@ -54,6 +54,7 @@ class OperatingSystem( Enum ):
     LINUX_MINT_CINNAMON_22 = auto()
     LUBUNTU_2404 = auto()
     MANJARO_25 = auto()
+    MANJARO_26 = auto()
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2204 = auto()
     UBUNTU_2404 = auto()
@@ -84,7 +85,8 @@ OPERATING_SYSTEMS_FEDORA_BASED = {
 
 
 OPERATING_SYSTEMS_MANJARO_BASED = {
-    OperatingSystem.MANJARO_25 }
+    OperatingSystem.MANJARO_25,
+    OperatingSystem.MANJARO_26 }
 
 
 OPERATING_SYSTEMS_OPENSUSE_BASED = {
@@ -235,6 +237,7 @@ def _get_install_uninstall(
             _is_operating_system(
                 operating_system,
                 OperatingSystem.MANJARO_25,
+                OperatingSystem.MANJARO_26,
                 OperatingSystem.OPENSUSE_TUMBLEWEED ) ):
 
             continue
