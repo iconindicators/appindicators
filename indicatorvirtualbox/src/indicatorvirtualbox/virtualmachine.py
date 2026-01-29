@@ -19,7 +19,7 @@
 ''' Virtual Machine information. '''
 
 
-import locale
+import re
 
 
 class VirtualMachine():
@@ -132,20 +132,30 @@ class Group():
         sort_groups_and_virtual_machines_equally = False ):
         '''
         Sort virtual machines and groups.
+
+        https://stackoverflow.com/a/4836734/2156453
         '''
+        convert = (
+            lambda char: int( char ) if char.isdigit() else char.lower() )
+
+        alphanum_key = (
+            lambda item:
+                [ convert( char ) for char in re.split( '([0-9]+)', item ) ] )
+
         if sort_groups_and_virtual_machines_equally:
-            sorted_items = (
-                sorted(
-                    items,
-                    key = lambda x: locale.strxfrm( x.get_name() ) ) )
+            the_key = (
+                lambda item:
+                    alphanum_key( item.get_name() ) )
 
         else:
-            sorted_items = (
-                sorted(
-                    items,
-                    key = (
-                        lambda x: (
-                            not isinstance( x, Group ),
-                            locale.strxfrm( x.get_name() ) ) ) ) )
+            the_key = (
+                lambda item: (
+                    not isinstance( item, Group ),
+                    alphanum_key( item.get_name() ) ) )
+
+        sorted_items = (
+            sorted(
+                items,
+                key = the_key ) )
 
         return sorted_items

@@ -117,7 +117,8 @@ class IndicatorVirtualBox( IndicatorBase ):
                     self.get_running_virtual_machines() )
 
                 self._build_menu_for_items(
-                    menu, virtual_machines,
+                    menu,
+                    virtual_machines,
                     ( 0, 0 ),
                     running_uuids )
 
