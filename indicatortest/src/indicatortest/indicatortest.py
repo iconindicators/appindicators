@@ -78,6 +78,29 @@ class IndicatorTest( IndicatorBase ):
         self.set_label_or_tooltip( IndicatorTest.LABEL )
 
 
+        # Source - https://stackoverflow.com/a/55157266
+        # Posted by dzmanto, modified by community. See post 'Timeline' for change history
+        # Retrieved 2026-01-27, License - CC BY-SA 4.0
+        
+        import dbus
+        session_bus = dbus.SessionBus()
+        screensaver_list = ['org.gnome.ScreenSaver',
+                            'org.cinnamon.ScreenSaver',
+                            'org.kde.screensaver',
+                            'org.freedesktop.ScreenSaver']
+        
+        for each in screensaver_list:
+            try:
+                object_path = '/{0}'.format(each.replace('.', '/'))
+                get_object = session_bus.get_object(each, object_path)
+                get_interface = dbus.Interface(get_object, each)
+                status = bool(get_interface.GetActive())        
+                print(status)
+            except dbus.exceptions.DBusException:
+                pass
+
+
+
     def on_mouse_wheel_scroll(
         self,
         indicator,
