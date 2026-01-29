@@ -7,21 +7,16 @@
 
 ## v1.0.18 (2025-11-21)
 
-- Bug fix: the build resulted in erroneous hard coding of `indicatortest` in
-  the install script for all indicators.
+- Bug fix: the build resulted in erroneous hard coding of `indicatortest` in the install script for all indicators.
 
 
 ## v1.0.17 (2025-10-18)
 
-- When show event notifcations is enabled, a three second delay between each
-  notification is now included.
-- Reinstated the autostart option in Preferences with the addition of a optional
-  delay to start up.
-- Now includes a symbolic icon allowing the colour to be adjusted for the
-  current theme.
+- When show event notifcations is enabled, a three second delay between each notification is now included.
+- Reinstated the autostart option in Preferences with the addition of a optional delay to start up.
+- Now includes a symbolic icon allowing the colour to be adjusted for the current theme.
 - Overhauled to adhere to the pyproject.toml standard.
-- Deployment using the .deb format is superceded; pip is used with operating
-  system packages and file copy.
+- Deployment using the .deb format is superceded; pip is used with operating system packages and file copy.
 - Now includes an opt-in check during start up for the latest version at GitHub.
 - Fixed PyGObject 3.11 deprecation warnings.
 
@@ -29,8 +24,7 @@
 ## v1.0.16 (2023-11-08)
 
 - Bug fix: Added missing 'calendar' to debian/control "Depends".
-- Lowered the initial guess for numbers of menu items as the menu would flow off
-  the screen at times.
+- Lowered the initial guess for numbers of menu items as the menu would flow off the screen at times.
 
 
 ## v1.0.15 (2023-01-09)
@@ -69,8 +63,7 @@
 
 ## v1.0.11 (2022-06-22)
 
-- The debian/compat file had version 11 whereas should have been version 10
-  which caused build problems.
+- The debian/compat file had version 11 whereas should have been version 10 which caused build problems.
 
 
 ## v1.0.10 (2022-05-21)
@@ -81,18 +74,16 @@
 
 ## v1.0.9 (2020-11-05)
 
-- On computer startup when the indicator is set to autostart, sometimes the
-  indicator can become unresponsive. The end user can set the property
+- On computer startup when the indicator is set to autostart, sometimes the indicator can become unresponsive. The end user can set the property
 
         X-GNOME-Autostart-Delay=120
+
     in
 
         ~/.config/autostart/indicator-lunar.py.desktop
 
-    to delay the indicator startup (for two minutes) avoiding the issue. For new
-    installations, by default, the value is set to zero.
-- Removed the preference for autostart. To change indicator autostart (off or
-  on), open the file
+    to delay the indicator startup (for two minutes) avoiding the issue. For new installations, by default, the value is set to zero.
+- Removed the preference for autostart. To change indicator autostart (off or on), open the file
 
         ~/.config/autostart/indicator-lunar.py.desktop
 
@@ -104,8 +95,7 @@
 
         X-GNOME-Autostart-enabled=false
 
-    Alternatively, add the indicator using Startup Applications. For new
-    installations, by default, autostart will be set to true.
+    Alternatively, add the indicator using Startup Applications. For new installations, by default, autostart will be set to true.
 
 
 ## v1.0.8 (2020-05-02)
@@ -128,10 +118,8 @@
 
 - Bug fix: Dialogs now have a parent specified.
 - Now uses a base class to share functionality amongst indicators.
-- Whilst starting up, a single menu item "Initialising..." is displayed. Once
-  fully initialised, the menu proper is shown.
-- When an update is underway or the About/Preferences dialogs are displayed, the
-  About/Preferences/Quit menu items are disabled.
+- Whilst starting up, a single menu item "Initialising..." is displayed. Once fully initialised, the menu proper is shown.
+- When an update is underway or the About/Preferences dialogs are displayed, the About/Preferences/Quit menu items are disabled.
 - About dialog now shows copyright, artists and corrected URL for website.
 - Update debian/compat to 9.
 
@@ -140,18 +128,15 @@
 
 - The estimate for the number of menu items (lines) was off for GNOME Shell.
 - Tidy up load config of user preferences.
-- Added hyperlink to the About dialog which links to the error log text file
-  (only visible if the underlying file is present).
-- About dialog now pulls the changelog directly from /usr/share/doc rather than
-  a redundant duplicate in the installation directory.
+- Added hyperlink to the About dialog which links to the error log text file (only visible if the underlying file is present).
+- About dialog now pulls the changelog directly from /usr/share/doc rather than a redundant duplicate in the installation directory.
 - Update release to xenial as trusty is end of life.
 - Update debian/control Standards-Version to 3.9.7.
 
 
 ## v1.0.3 (2018-08-13)
 
-- Allow the user to limit the number of events such that a scroll bar does not
-  appear.  Removed the 'Days' preference as it is now redundant.
+- Allow the user to limit the number of events such that a scroll bar does not  appear. Removed the 'Days' preference as it is now redundant.
 
 
 ## v1.0.2 (2018-06-08)
@@ -162,8 +147,7 @@
 ## v1.0.1 (2017-10-06)
 
 - Bug fix: In Ubuntu 16.04 and greater, icons for ubuntu-mono-dark and
-  ubuntu-mono-light would not load due to directories not present in the
-  underlying index.theme file.
+  ubuntu-mono-light would not load due to directories not present in the underlying index.theme file.
 
 
 ## v1.0.0 (2017-09-16)
