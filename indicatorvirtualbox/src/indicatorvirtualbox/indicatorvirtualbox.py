@@ -65,6 +65,9 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     MESSAGE_NOT_INSTALLED = _( "VirtualBox™ is not installed" )
 
+    SYMBOL_EN_SPACE = '\u2002'
+    SYMBOL_BULLET = '\u2022'
+
 
     def __init__( self ):
         super().__init__(
@@ -170,10 +173,11 @@ class IndicatorVirtualBox( IndicatorBase ):
         group,
         indent ):
 
+        symbol_en_space = '\u2002' 
         menuitem = (
             self.create_and_append_menuitem(
                 menu,
-                group.get_name(),
+                IndicatorVirtualBox.SYMBOL_EN_SPACE * 2 + group.get_name(),
                 indent = indent ) )
 
         if self.show_submenu:
@@ -190,7 +194,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         indent,
         is_running ):
         '''
-        Originally a radiomenuitem was used to denote a running virtual machine.
+        Originally a radiomenuitem was used to denote a running virtual
+        machine.
 
         Under GNOME on
             Debian 13
@@ -199,21 +204,21 @@ class IndicatorVirtualBox( IndicatorBase ):
             openSUSE Tumbleweedand
             Ubuntu 24.04
 
-        the radiomenuitem pushes the name of the running virtual machine out of
-        alignment with the names of non-running virtual machines.
+        the radiomenuitem pushes the name of the running virtual machine out
+        of alignment with respect to the names of non-running virtual
+        machines.
 
         Use a bullet symbol instead of the radiomenuitem.
 
         https://discourse.gnome.org/t/indent-for-radiomenuitem-changed-somewhere-around-gnome-version-46/33717
         '''
-        symbol_en_space = '\u2002' 
-        symbol_bullet = '\u2022'
-
         if is_running:
-            text_before_indent = symbol_bullet + symbol_en_space
+            text_before_indent = (
+                IndicatorVirtualBox.SYMBOL_BULLET +
+                IndicatorVirtualBox.SYMBOL_EN_SPACE )
 
         else:
-            text_before_indent = symbol_en_space * 2
+            text_before_indent = IndicatorVirtualBox.SYMBOL_EN_SPACE * 2
 
         self.create_and_append_menuitem(
             menu,
