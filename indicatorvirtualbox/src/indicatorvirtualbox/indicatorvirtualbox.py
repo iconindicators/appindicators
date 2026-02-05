@@ -97,7 +97,7 @@ class IndicatorVirtualBox( IndicatorBase ):
         if vboxmanage_installed:
             virtual_machines = self.get_virtual_machines()
 
-            # Autostart viritual machines here rather than in __init__ ensures
+            # Autostart virtual machines here rather than in __init__ ensures
             # the indicator icon/menu is displayed without delay.
             if self.auto_start_required:
                 self.auto_start_required = False
@@ -123,7 +123,8 @@ class IndicatorVirtualBox( IndicatorBase ):
                     menu,
                     virtual_machines,
                     ( 0, 0 ),
-                    running_uuids )
+                    running_uuids,
+                    len( running_uuids ) == 0 )
 
                 menu.append( Gtk.SeparatorMenuItem() )
 
@@ -144,7 +145,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         menu,
         items,
         indent,
-        running_uuids ):
+        running_uuids,
+        no_running_virtual_machines ):
 
         sorted_items = (
             Group.sort(
@@ -154,30 +156,42 @@ class IndicatorVirtualBox( IndicatorBase ):
         for item in sorted_items:
             if isinstance( item, Group ):
                 self._build_menu_for_items(
-                    self._add_group_to_menu( menu, item, indent ),
+                    self._add_group_to_menu(
+                        menu,
+                        item,
+                        indent,
+                        no_running_virtual_machines ),
                     item.get_items(),
                     ( indent[ 0 ] + 1, indent[ 1 ] + 1 ),
-                    running_uuids )
+                    running_uuids,
+                    no_running_virtual_machines )
 
             else:
                 self._add_virtual_machine_to_menu(
                     menu,
                     item,
                     indent,
-                    item.get_uuid() in running_uuids )
+                    item.get_uuid() in running_uuids,
+                    no_running_virtual_machines )
 
 
     def _add_group_to_menu(
         self,
         menu,
         group,
-        indent ):
+        indent,
+        no_running_virtual_machines ):
 
-        symbol_en_space = '\u2002' 
+        space = (
+            ""
+            if no_running_virtual_machines
+            else
+            IndicatorVirtualBox.SYMBOL_EN_SPACE * 2 )
+
         menuitem = (
             self.create_and_append_menuitem(
                 menu,
-                IndicatorVirtualBox.SYMBOL_EN_SPACE * 2 + group.get_name(),
+                space + group.get_name(),
                 indent = indent ) )
 
         if self.show_submenu:
@@ -192,7 +206,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         menu,
         virtual_machine,
         indent,
-        is_running ):
+        is_running,
+        no_running_virtual_machines ):
         '''
         Originally a radiomenuitem was used to denote a running virtual
         machine.
@@ -218,7 +233,11 @@ class IndicatorVirtualBox( IndicatorBase ):
                 IndicatorVirtualBox.SYMBOL_EN_SPACE )
 
         else:
-            text_before_indent = IndicatorVirtualBox.SYMBOL_EN_SPACE * 2
+            text_before_indent = (
+                ""
+                if no_running_virtual_machines
+                else
+                IndicatorVirtualBox.SYMBOL_EN_SPACE * 2 )
 
         self.create_and_append_menuitem(
             menu,
