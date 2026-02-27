@@ -125,25 +125,27 @@ Note that any operating system packages installed for the indicator(s) will stil
 
 ---
 
-## Updating README.md
+## Updating GitHub main landing page (README.md)
 
-There are two types of `README.md`:
-1. The `README.md` for the `GitHub` main landing page.
-1. A `README.md` for each indicator, containing specific installation instructions.
+The `README.md` for the `GitHub` main landing page is created by the function `build_readme_for_project()` in the script `tools/utils_readme.py`.
 
-The content for all the `README.md` is handled via the script `tools/utils_readme.py`:
-1. For the `GitHub` main landing page, refer to the function `build_readme_for_project()`.
-1. For each indicator, refer to `build_readme_for_indicator()`.
+The function `build_readme_for_project()` uses each indicator's metadata (`pyproject.toml` and `CHANGELOG.md`) to build the page (so each indicator's metadata must be up to date prior to updating this `README.md`).
 
-To update the `README.md` for the `GitHub` main landing page, run:
+To update the `README.md` run:
 
 ```
   python3 -m tools.build_readme
 ```
 
-The `README.md` for each indicator is updated as part of the `build_wheel` process described earlier.
+The `README.md` must be committed after it is updated.
 
-Any time any `README.md` is updated, that `README.md` must be committed.
+---
+
+## Updating an Indicator's README.md
+
+The `README.md` for each indicator is created by the function `build_readme_for_indicator()` in the script `tools/utils_readme.py` which is called as part of the 'build wheel' process described earlier.
+
+Any time an indicator's `README.md` is updated, that `README.md` must be committed.
 
 ---
 
