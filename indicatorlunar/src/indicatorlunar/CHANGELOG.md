@@ -1,5 +1,10 @@
 # Indicator Lunar changelog
 
+## v1.0.104 (2026-03-01)
+
+- Added the star `Albireo` as it is now [included](https://github.com/brandon-rhodes/pyephem/issues/289) in `PyEphem`.
+
+
 ## v1.0.103 (2025-11-25)
 
 - Ignore a failure to connect to `GitHub` when checking for a new release.

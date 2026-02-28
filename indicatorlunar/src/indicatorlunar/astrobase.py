@@ -265,18 +265,13 @@ class AstroBase( ABC ):
     # Solution: Start with PyEphem's stars, remove duplicates/misspellings
     # and drop stars not listed in the IAU CSN Catalog.
     #
-    # Further, until
-    #   https://github.com/brandon-rhodes/pyephem/issues/289
-    # is resolved, omit Albireo as it is incorrect but also omit Albereo
-    # because it is not part of PyEphem.
-    # When resolved, add Albereo back.
-    #
     # Also, omit the star Minkar which appears in PyEphem but not in the IAU.
     STARS = [
         [ "ACAMAR",          13847,  _( "Acamar" ),          _( "ACAMAR" ) ],
         [ "ACHERNAR",        7588,   _( "Achernar" ),        _( "ACHERNAR" ) ],
         [ "ACRUX",           60718,  _( "Acrux" ),           _( "ACRUX" ) ],
         [ "ADHARA",          33579,  _( "Adhara" ),          _( "ADHARA" ) ],
+        [ "ALBIREO",         95947,  _( "Albireo" ),         _( "ALBIREO" ) ],
         [ "ALCOR",           65477,  _( "Alcor" ),           _( "ALCOR" ) ],
         [ "ALCYONE",         17702,  _( "Alcyone" ),         _( "ALCYONE" ) ],
         [ "ALDEBARAN",       21421,  _( "Aldebaran" ),       _( "ALDEBARAN" ) ],
