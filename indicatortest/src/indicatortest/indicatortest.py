@@ -78,29 +78,6 @@ class IndicatorTest( IndicatorBase ):
         self.set_label_or_tooltip( IndicatorTest.LABEL )
 
 
-        # Source - https://stackoverflow.com/a/55157266
-        # Posted by dzmanto, modified by community. See post 'Timeline' for change history
-        # Retrieved 2026-01-27, License - CC BY-SA 4.0
-        
-        import dbus
-        session_bus = dbus.SessionBus()
-        screensaver_list = ['org.gnome.ScreenSaver',
-                            'org.cinnamon.ScreenSaver',
-                            'org.kde.screensaver',
-                            'org.freedesktop.ScreenSaver']
-        
-        for each in screensaver_list:
-            try:
-                object_path = '/{0}'.format(each.replace('.', '/'))
-                get_object = session_bus.get_object(each, object_path)
-                get_interface = dbus.Interface(get_object, each)
-                status = bool(get_interface.GetActive())        
-                print(status)
-            except dbus.exceptions.DBusException:
-                pass
-
-
-
     def on_mouse_wheel_scroll(
         self,
         indicator,
@@ -126,6 +103,7 @@ class IndicatorTest( IndicatorBase ):
         menu.append( Gtk.SeparatorMenuItem() )
 
         self.create_and_append_menuitem( menu, _( "Functionality" ) )
+        self._build_menu_radio_menu_items( menu )
         self._build_menu_icon( menu )
         self._build_menu_label_tooltip_osd( menu )
         self._build_menu_execute_command( menu )
@@ -142,12 +120,12 @@ class IndicatorTest( IndicatorBase ):
 
         uname = platform.uname()
         labels = (
-            _( "Machine: " ) + str( uname.machine ),
-            _( "Node: " ) + str( uname.node ),
-            _( "Processor: " ) + str( uname.processor ),
-            _( "Release: " ) + str( uname.release ),
-            _( "System: " ) + str( uname.system ),
-            _( "Version: " ) + str( uname.version ) )
+            _( "Machine:  " ) + str( uname.machine ),
+            _( "Node:  " ) + str( uname.node ),
+            _( "Processor:  " ) + str( uname.processor ),
+            _( "Release:  " ) + str( uname.release ),
+            _( "System:  " ) + str( uname.system ),
+            _( "Version:  " ) + str( uname.version ) )
 
         for label in labels:
             self.create_and_append_menuitem(
@@ -165,18 +143,32 @@ class IndicatorTest( IndicatorBase ):
 
         submenu = Gtk.Menu()
 
-        label = "echo $XDG_CURRENT_DESKTOP" + ": " + self.get_current_desktop()
+        label = (
+            "echo $XDG_CURRENT_DESKTOP:  " +
+            self.get_current_desktop() )
+
         self.create_and_append_menuitem( submenu, label, indent = ( 2, 0 ) )
 
         label = (
-            "os.environ.get( 'DESKTOP_SESSION' ): "
+            "os.environ.get( 'DESKTOP_SESSION' ):  "
             +
             os.environ.get( "DESKTOP_SESSION" ) )
 
         self.create_and_append_menuitem( submenu, label, indent = ( 2, 0 ) )
 
-        label = "echo $XDG_SESSION_TYPE" + ": " + self.get_session_type()
+        label = (
+            "echo $XDG_SESSION_TYPE:  "
+            +
+            self.get_session_type() )
+
         self.create_and_append_menuitem( submenu, label, indent = ( 2, 0 ) )
+
+        gnome_shell_version = self.get_gnome_shell_version()
+        if gnome_shell_version > -1.0:
+            self.create_and_append_menuitem(
+                submenu,
+                "gnome-shell --version" + ":  " + str( gnome_shell_version ),
+                indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
             menu,
@@ -192,7 +184,7 @@ class IndicatorTest( IndicatorBase ):
 
         property_ = "gtk-icon-theme-name"
         label = (
-            f"Gtk.Settings().get_default().get_property( \"{ property_ }\" ): "
+            f"Gtk.Settings().get_default().get_property( \"{ property_ }\" ):  "
             +
             Gtk.Settings().get_default().get_property( f"{ property_ }" ) )
 
@@ -204,14 +196,14 @@ class IndicatorTest( IndicatorBase ):
         result = result.replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
-            command + "icon-theme: " + result,
+            command + "icon-theme:  " + result,
             indent = ( 2, 0 ) )
 
         result = self.process_run( command + "gtk-theme" )[ 0 ]
         result = result.replace( '"', '' ).replace( '\'', '' )
         self.create_and_append_menuitem(
             submenu,
-            command + "gtk-theme: " + result,
+            command + "gtk-theme:  " + result,
             indent = ( 2, 0 ) )
 
         self.create_and_append_menuitem(
@@ -230,7 +222,7 @@ class IndicatorTest( IndicatorBase ):
 
 
         label = (
-            _( "Terminal: " ) +
+            _( "Terminal:  " ) +
             (
                 _( "Unknown terminal!" )
                 if terminal is None
@@ -240,7 +232,7 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem( submenu, label, indent = ( 2, 0 ) )
 
         label = (
-            _( "Execution flag: " ) +
+            _( "Execution flag:  " ) +
             (
                 _( "Unknown terminal!" )
                 if terminal is None
@@ -252,6 +244,41 @@ class IndicatorTest( IndicatorBase ):
         self.create_and_append_menuitem(
             menu,
             _( "Terminal" ),
+            indent = ( 1, 1 ) ).set_submenu( submenu )
+
+
+    def _build_menu_radio_menu_items(
+        self,
+        menu ):
+        submenu = Gtk.Menu()
+
+        self.create_and_append_menuitem(
+            submenu,
+            _( "Menu item" ),
+            indent = ( 2, 0 ) )
+
+        self.create_and_append_radiomenuitem(
+            submenu,
+            _( "Radio menu item" ),
+            indent = ( 2, 0 ) )
+
+        submenu.append( Gtk.SeparatorMenuItem() )
+
+        self.create_and_append_menuitem(
+            submenu,
+            _( "Menu item with a bullet" ),
+            indent = ( 2, 0 ),
+            text_before_indent = self.SYMBOL_BULLET )
+
+        self.create_and_append_menuitem(
+            submenu,
+            _( "Menu item with a space" ),
+            indent = ( 2, 0 ),
+            text_before_indent = self.SYMBOL_EN_SPACE )
+
+        self.create_and_append_menuitem(
+            menu,
+            _( "Menu Items" ),
             indent = ( 1, 1 ) ).set_submenu( submenu )
 
 

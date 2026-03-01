@@ -1,5 +1,12 @@
 # Indicator Test changelog
 
+## v1.0.20 (2026-03-01)
+
+- Display gnome-shell version (where applicable).
+- Added the menu `Menu Items` under `Functionality` to show a radiomenuitem versus a menuitem with a bullet symbol.
+- Added spacing to some menu items to improve readability.
+
+
 ## v1.0.19 (2025-11-25)
 
 - Ignore a failure to connect to `GitHub` when checking for a new release.

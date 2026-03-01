@@ -2,7 +2,7 @@
 # USED BY THE BUILD WHEEL SCRIPT
 # TO CREATE A COMPLETE PYPROJECT.TOML.
 [project]
-version = "1.0.19"
+version = "1.0.20"
 description = "Application indicator to test indicator functionality."
 classifiers = [
   "Topic :: Software Development :: Testing" ]
