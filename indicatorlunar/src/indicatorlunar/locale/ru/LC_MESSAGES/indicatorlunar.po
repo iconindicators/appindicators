@@ -5,9 +5,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: indicatorlunar 1.0.103\n"
+"Project-Id-Version: indicatorlunar 1.0.104\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2026-01-24 18:16+1100\n"
+"POT-Creation-Date: 2026-03-01 13:42+1100\n"
 "PO-Revision-Date: 2025-07-25 15:40+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -70,7 +70,7 @@ msgstr "НОВОЛУНИЕ"
 msgid "PHASE"
 msgstr "ФАЗА"
 
-#: astrobase.py:100 astrobase.py:398
+#: astrobase.py:100 astrobase.py:393
 msgid "RISE AZIMUTH"
 msgstr "АЗИМУТ ВОСХОДА"
 
@@ -78,7 +78,7 @@ msgstr "АЗИМУТ ВОСХОДА"
 msgid "RISE DATE TIME"
 msgstr "ВОСХОД ДАТА ВРЕМЯ"
 
-#: astrobase.py:102 astrobase.py:400
+#: astrobase.py:102 astrobase.py:395
 msgid "SET AZIMUTH"
 msgstr "АЗИМУТ ЗАХОДА"
 
@@ -190,871 +190,879 @@ msgstr "Первая четверть"
 msgid "Waxing Gibbous"
 msgstr "Растущая луна"
 
-#: astrobase.py:276
+#: astrobase.py:270
 msgid "Acamar"
 msgstr "Акамар"
 
-#: astrobase.py:276
+#: astrobase.py:270
 msgid "ACAMAR"
 msgstr "АКАМАР"
 
-#: astrobase.py:277
+#: astrobase.py:271
 msgid "Achernar"
 msgstr "Ахернар"
 
-#: astrobase.py:277
+#: astrobase.py:271
 msgid "ACHERNAR"
 msgstr "АХЕРНАР"
 
-#: astrobase.py:278
+#: astrobase.py:272
 msgid "Acrux"
 msgstr "Акрукс"
 
-#: astrobase.py:278
+#: astrobase.py:272
 msgid "ACRUX"
 msgstr "АКРУКС"
 
-#: astrobase.py:279
+#: astrobase.py:273
 msgid "Adhara"
 msgstr "Адара"
 
-#: astrobase.py:279
+#: astrobase.py:273
 msgid "ADHARA"
 msgstr "АДАРА"
 
-#: astrobase.py:280
+#: astrobase.py:274
+msgid "Albireo"
+msgstr ""
+
+#: astrobase.py:274
+msgid "ALBIREO"
+msgstr ""
+
+#: astrobase.py:275
 msgid "Alcor"
 msgstr "Алькор"
 
-#: astrobase.py:280
+#: astrobase.py:275
 msgid "ALCOR"
 msgstr "АЛЬКОР"
 
-#: astrobase.py:281
+#: astrobase.py:276
 msgid "Alcyone"
 msgstr "Альциона"
 
-#: astrobase.py:281
+#: astrobase.py:276
 msgid "ALCYONE"
 msgstr "АЛЬЦИОНА"
 
-#: astrobase.py:282
+#: astrobase.py:277
 msgid "Aldebaran"
 msgstr "Альдебаран"
 
-#: astrobase.py:282
+#: astrobase.py:277
 msgid "ALDEBARAN"
 msgstr "АЛЬДЕБАРАН"
 
-#: astrobase.py:283
+#: astrobase.py:278
 msgid "Alderamin"
 msgstr "Альдерамин"
 
-#: astrobase.py:283
+#: astrobase.py:278
 msgid "ALDERAMIN"
 msgstr "АЛЬДЕРАМИН"
 
-#: astrobase.py:284
+#: astrobase.py:279
 msgid "Alfirk"
 msgstr "Альфирк"
 
-#: astrobase.py:284
+#: astrobase.py:279
 msgid "ALFIRK"
 msgstr "АЛЬФИРК"
 
-#: astrobase.py:285
+#: astrobase.py:280
 msgid "Algenib"
 msgstr "Альгениб"
 
-#: astrobase.py:285
+#: astrobase.py:280
 msgid "ALGENIB"
 msgstr "АЛЬГЕНИБ"
 
-#: astrobase.py:286
+#: astrobase.py:281
 msgid "Algieba"
 msgstr "Альгиеба"
 
-#: astrobase.py:286
+#: astrobase.py:281
 msgid "ALGIEBA"
 msgstr "АЛЬГИЕБА"
 
-#: astrobase.py:287
+#: astrobase.py:282
 msgid "Algol"
 msgstr "Алголь"
 
-#: astrobase.py:287
+#: astrobase.py:282
 msgid "ALGOL"
 msgstr "АЛГОЛЬ"
 
-#: astrobase.py:288
+#: astrobase.py:283
 msgid "Alhena"
 msgstr "Альхена"
 
-#: astrobase.py:288
+#: astrobase.py:283
 msgid "ALHENA"
 msgstr "АЛЬХЕНА"
 
-#: astrobase.py:289
+#: astrobase.py:284
 msgid "Alioth"
 msgstr "Алиот"
 
-#: astrobase.py:289
+#: astrobase.py:284
 msgid "ALIOTH"
 msgstr "АЛИОТ"
 
-#: astrobase.py:290
+#: astrobase.py:285
 msgid "Alkaid"
 msgstr "Алькаид"
 
-#: astrobase.py:290
+#: astrobase.py:285
 msgid "ALKAID"
 msgstr "АЛЬКАИД"
 
-#: astrobase.py:291
+#: astrobase.py:286
 msgid "Almach"
 msgstr "Аламак"
 
-#: astrobase.py:291
+#: astrobase.py:286
 msgid "ALMACH"
 msgstr "АЛАМАК"
 
-#: astrobase.py:292
+#: astrobase.py:287
 msgid "Alnair"
 msgstr "Альнаир"
 
-#: astrobase.py:292
+#: astrobase.py:287
 msgid "ALNAIR"
 msgstr "АЛЬНАИР"
 
-#: astrobase.py:293
+#: astrobase.py:288
 msgid "Alnilam"
 msgstr "Альнилам"
 
-#: astrobase.py:293
+#: astrobase.py:288
 msgid "ALNILAM"
 msgstr "АЛЬНИЛАМ"
 
-#: astrobase.py:294
+#: astrobase.py:289
 msgid "Alnitak"
 msgstr "Альнитак"
 
-#: astrobase.py:294
+#: astrobase.py:289
 msgid "ALNITAK"
 msgstr "АЛЬНИТАК"
 
-#: astrobase.py:295
+#: astrobase.py:290
 msgid "Alphard"
 msgstr "Альфард"
 
-#: astrobase.py:295
+#: astrobase.py:290
 msgid "ALPHARD"
 msgstr "АЛЬФАРД"
 
-#: astrobase.py:296
+#: astrobase.py:291
 msgid "Alphecca"
 msgstr "Альфекка"
 
-#: astrobase.py:296
+#: astrobase.py:291
 msgid "ALPHECCA"
 msgstr "АЛЬФЕККА"
 
-#: astrobase.py:297
+#: astrobase.py:292
 msgid "Alpheratz"
 msgstr "Альферац"
 
-#: astrobase.py:297
+#: astrobase.py:292
 msgid "ALPHERATZ"
 msgstr "АЛЬФЕРАЦ"
 
-#: astrobase.py:298
+#: astrobase.py:293
 msgid "Alshain"
 msgstr "Альшаин"
 
-#: astrobase.py:298
+#: astrobase.py:293
 msgid "ALSHAIN"
 msgstr "АЛЬШАИН"
 
-#: astrobase.py:299
+#: astrobase.py:294
 msgid "Altair"
 msgstr "Альтаир"
 
-#: astrobase.py:299
+#: astrobase.py:294
 msgid "ALTAIR"
 msgstr "АЛЬТАИР"
 
-#: astrobase.py:300
+#: astrobase.py:295
 msgid "Ankaa"
 msgstr "Анкаа"
 
-#: astrobase.py:300
+#: astrobase.py:295
 msgid "ANKAA"
 msgstr "АНКАА"
 
-#: astrobase.py:301
+#: astrobase.py:296
 msgid "Antares"
 msgstr "Антарес"
 
-#: astrobase.py:301
+#: astrobase.py:296
 msgid "ANTARES"
 msgstr "АНТАРЕС"
 
-#: astrobase.py:302
+#: astrobase.py:297
 msgid "Arcturus"
 msgstr "Арктур"
 
-#: astrobase.py:302
+#: astrobase.py:297
 msgid "ARCTURUS"
 msgstr "АРКТУР"
 
-#: astrobase.py:303
+#: astrobase.py:298
 msgid "Arkab Posterior"
 msgstr "Аркаб Постериор"
 
-#: astrobase.py:303
+#: astrobase.py:298
 msgid "ARKAB POSTERIOR"
 msgstr "АРКАБ ПОСТЕРИОР"
 
-#: astrobase.py:304
+#: astrobase.py:299
 msgid "Arkab Prior"
 msgstr "Аркаб Приор"
 
-#: astrobase.py:304
+#: astrobase.py:299
 msgid "ARKAB PRIOR"
 msgstr "АРКАБ ПРИОР"
 
-#: astrobase.py:305
+#: astrobase.py:300
 msgid "Arneb"
 msgstr "Арнеб"
 
-#: astrobase.py:305
+#: astrobase.py:300
 msgid "ARNEB"
 msgstr "АРНЕБ"
 
-#: astrobase.py:306
+#: astrobase.py:301
 msgid "Atlas"
 msgstr "Атлас"
 
-#: astrobase.py:306
+#: astrobase.py:301
 msgid "ATLAS"
 msgstr "АТЛАС"
 
-#: astrobase.py:307
+#: astrobase.py:302
 msgid "Atria"
 msgstr "Атрия"
 
-#: astrobase.py:307
+#: astrobase.py:302
 msgid "ATRIA"
 msgstr "АТРИЯ"
 
-#: astrobase.py:308
+#: astrobase.py:303
 msgid "Avior"
 msgstr "Авиор"
 
-#: astrobase.py:308
+#: astrobase.py:303
 msgid "AVIOR"
 msgstr "АВИОР"
 
-#: astrobase.py:309
+#: astrobase.py:304
 msgid "Bellatrix"
 msgstr "Беллатрикс"
 
-#: astrobase.py:309
+#: astrobase.py:304
 msgid "BELLATRIX"
 msgstr "БЕЛЛАТРИКС"
 
-#: astrobase.py:310
+#: astrobase.py:305
 msgid "Betelgeuse"
 msgstr "Бетельгейзе"
 
-#: astrobase.py:310
+#: astrobase.py:305
 msgid "BETELGEUSE"
 msgstr "БЕТЕЛЬГЕЙЗЕ"
 
-#: astrobase.py:311
+#: astrobase.py:306
 msgid "Canopus"
 msgstr "Канопус"
 
-#: astrobase.py:311
+#: astrobase.py:306
 msgid "CANOPUS"
 msgstr "КАНОПУС"
 
-#: astrobase.py:312
+#: astrobase.py:307
 msgid "Capella"
 msgstr "Капелла"
 
-#: astrobase.py:312
+#: astrobase.py:307
 msgid "CAPELLA"
 msgstr "КАПЕЛЛА"
 
-#: astrobase.py:313
+#: astrobase.py:308
 msgid "Caph"
 msgstr "Каф"
 
-#: astrobase.py:313
+#: astrobase.py:308
 msgid "CAPH"
 msgstr "КАФ"
 
-#: astrobase.py:314
+#: astrobase.py:309
 msgid "Castor"
 msgstr "Кастор"
 
-#: astrobase.py:314
+#: astrobase.py:309
 msgid "CASTOR"
 msgstr "КАСТОР"
 
-#: astrobase.py:315
+#: astrobase.py:310
 msgid "Cebalrai"
 msgstr "Цельбальрай"
 
-#: astrobase.py:315
+#: astrobase.py:310
 msgid "CEBALRAI"
 msgstr "ЦЕЛЬБАЛЬРАЙ"
 
-#: astrobase.py:316
+#: astrobase.py:311
 msgid "Deneb"
 msgstr "Денеб"
 
-#: astrobase.py:316
+#: astrobase.py:311
 msgid "DENEB"
 msgstr "ДЕНЕБ"
 
-#: astrobase.py:317
+#: astrobase.py:312
 msgid "Denebola"
 msgstr "Денебола"
 
-#: astrobase.py:317
+#: astrobase.py:312
 msgid "DENEBOLA"
 msgstr "ДЕНЕБОЛА"
 
-#: astrobase.py:318
+#: astrobase.py:313
 msgid "Diphda"
 msgstr "Дифда"
 
-#: astrobase.py:318
+#: astrobase.py:313
 msgid "DIPHDA"
 msgstr "ДИФДА"
 
-#: astrobase.py:319
+#: astrobase.py:314
 msgid "Dubhe"
 msgstr "Дубхе"
 
-#: astrobase.py:319
+#: astrobase.py:314
 msgid "DUBHE"
 msgstr "ДУБХЕ"
 
-#: astrobase.py:320
+#: astrobase.py:315
 msgid "Electra"
 msgstr "Электра"
 
-#: astrobase.py:320
+#: astrobase.py:315
 msgid "ELECTRA"
 msgstr "ЭЛЕКТРА"
 
-#: astrobase.py:321
+#: astrobase.py:316
 msgid "Elnath"
 msgstr "Нат"
 
-#: astrobase.py:321
+#: astrobase.py:316
 msgid "ELNATH"
 msgstr "НАТ"
 
-#: astrobase.py:322
+#: astrobase.py:317
 msgid "Eltanin"
 msgstr "Этамин"
 
-#: astrobase.py:322
+#: astrobase.py:317
 msgid "ELTANIN"
 msgstr "ЭТАМИН"
 
-#: astrobase.py:323
+#: astrobase.py:318
 msgid "Enif"
 msgstr "Эниф"
 
-#: astrobase.py:323
+#: astrobase.py:318
 msgid "ENIF"
 msgstr "ЭНИФ"
 
-#: astrobase.py:324
+#: astrobase.py:319
 msgid "Fomalhaut"
 msgstr "Фомальгаут"
 
-#: astrobase.py:324
+#: astrobase.py:319
 msgid "FOMALHAUT"
 msgstr "ФОМАЛЬГАУТ"
 
-#: astrobase.py:325
+#: astrobase.py:320
 msgid "Gacrux"
 msgstr "Гакрукс"
 
-#: astrobase.py:325
+#: astrobase.py:320
 msgid "GACRUX"
 msgstr "ГАКРУКС"
 
-#: astrobase.py:326
+#: astrobase.py:321
 msgid "Gienah"
 msgstr "Дженах"
 
-#: astrobase.py:326
+#: astrobase.py:321
 msgid "GIENAH"
 msgstr "ДЖЕНАХ"
 
-#: astrobase.py:327
+#: astrobase.py:322
 msgid "Hadar"
 msgstr "Хадар"
 
-#: astrobase.py:327
+#: astrobase.py:322
 msgid "HADAR"
 msgstr "ХАДАР"
 
-#: astrobase.py:328
+#: astrobase.py:323
 msgid "Hamal"
 msgstr "Хамаль"
 
-#: astrobase.py:328
+#: astrobase.py:323
 msgid "HAMAL"
 msgstr "ХАМАЛЬ"
 
-#: astrobase.py:329
+#: astrobase.py:324
 msgid "Izar"
 msgstr "Ицар"
 
-#: astrobase.py:329
+#: astrobase.py:324
 msgid "IZAR"
 msgstr "ИЦАР"
 
-#: astrobase.py:330
+#: astrobase.py:325
 msgid "Kaus Australis"
 msgstr "Каус Аустралис"
 
-#: astrobase.py:330
+#: astrobase.py:325
 msgid "KAUS AUSTRALIS"
 msgstr "КАУС АУСТРАЛИС"
 
-#: astrobase.py:331
+#: astrobase.py:326
 msgid "Kochab"
 msgstr "Кохаб"
 
-#: astrobase.py:331
+#: astrobase.py:326
 msgid "KOCHAB"
 msgstr "КОХАБ"
 
-#: astrobase.py:332
+#: astrobase.py:327
 msgid "Maia"
 msgstr "Майя"
 
-#: astrobase.py:332
+#: astrobase.py:327
 msgid "MAIA"
 msgstr "МАЙЯ"
 
-#: astrobase.py:333
+#: astrobase.py:328
 msgid "Markab"
 msgstr "Маркаб"
 
-#: astrobase.py:333
+#: astrobase.py:328
 msgid "MARKAB"
 msgstr "МАРКАБ"
 
-#: astrobase.py:334
+#: astrobase.py:329
 msgid "Megrez"
 msgstr "Мегрец"
 
-#: astrobase.py:334
+#: astrobase.py:329
 msgid "MEGREZ"
 msgstr "МЕГРЕЦ"
 
-#: astrobase.py:335
+#: astrobase.py:330
 msgid "Menkalinan"
 msgstr "Менкалинан"
 
-#: astrobase.py:335
+#: astrobase.py:330
 msgid "MENKALINAN"
 msgstr "МЕНКАЛИНАН"
 
-#: astrobase.py:336
+#: astrobase.py:331
 msgid "Menkar"
 msgstr "Менкар"
 
-#: astrobase.py:336
+#: astrobase.py:331
 msgid "MENKAR"
 msgstr "МЕНКАР"
 
-#: astrobase.py:337
+#: astrobase.py:332
 msgid "Menkent"
 msgstr "Менкент"
 
-#: astrobase.py:337
+#: astrobase.py:332
 msgid "MENKENT"
 msgstr "МЕНКЕНТ"
 
-#: astrobase.py:338
+#: astrobase.py:333
 msgid "Merak"
 msgstr "Мерак"
 
-#: astrobase.py:338
+#: astrobase.py:333
 msgid "MERAK"
 msgstr "МЕРАК"
 
-#: astrobase.py:339
+#: astrobase.py:334
 msgid "Merope"
 msgstr "Меропа"
 
-#: astrobase.py:339
+#: astrobase.py:334
 msgid "MEROPE"
 msgstr "МЕРОПА"
 
-#: astrobase.py:340
+#: astrobase.py:335
 msgid "Miaplacidus"
 msgstr "Миаплацидус"
 
-#: astrobase.py:340
+#: astrobase.py:335
 msgid "MIAPLACIDUS"
 msgstr "МИАПЛАЦИДУС"
 
-#: astrobase.py:341
+#: astrobase.py:336
 msgid "Mimosa"
 msgstr "Мимоза"
 
-#: astrobase.py:341
+#: astrobase.py:336
 msgid "MIMOSA"
 msgstr "МИМОЗА"
 
-#: astrobase.py:342
+#: astrobase.py:337
 msgid "Mintaka"
 msgstr "Минтака"
 
-#: astrobase.py:342
+#: astrobase.py:337
 msgid "MINTAKA"
 msgstr "МИНТАКА"
 
-#: astrobase.py:343
+#: astrobase.py:338
 msgid "Mirach"
 msgstr "Мирах"
 
-#: astrobase.py:343
+#: astrobase.py:338
 msgid "MIRACH"
 msgstr "МИРАХ"
 
-#: astrobase.py:344
+#: astrobase.py:339
 msgid "Mirfak"
 msgstr "Мирфак"
 
-#: astrobase.py:344
+#: astrobase.py:339
 msgid "MIRFAK"
 msgstr "МИРФАК"
 
-#: astrobase.py:345
+#: astrobase.py:340
 msgid "Mirzam"
 msgstr "Мирцам"
 
-#: astrobase.py:345
+#: astrobase.py:340
 msgid "MIRZAM"
 msgstr "МИРЦАМ"
 
-#: astrobase.py:346
+#: astrobase.py:341
 msgid "Mizar"
 msgstr "Мицар"
 
-#: astrobase.py:346
+#: astrobase.py:341
 msgid "MIZAR"
 msgstr "МИЦАР"
 
-#: astrobase.py:347
+#: astrobase.py:342
 msgid "Naos"
 msgstr "Наос"
 
-#: astrobase.py:347
+#: astrobase.py:342
 msgid "NAOS"
 msgstr "НАОС"
 
-#: astrobase.py:348
+#: astrobase.py:343
 msgid "Nihal"
 msgstr "Нихал"
 
-#: astrobase.py:348
+#: astrobase.py:343
 msgid "NIHAL"
 msgstr "НИХАЛ"
 
-#: astrobase.py:349
+#: astrobase.py:344
 msgid "Nunki"
 msgstr "Нунки"
 
-#: astrobase.py:349
+#: astrobase.py:344
 msgid "NUNKI"
 msgstr "НУНКИ"
 
-#: astrobase.py:350
+#: astrobase.py:345
 msgid "Peacock"
 msgstr "Пикок"
 
-#: astrobase.py:350
+#: astrobase.py:345
 msgid "PEACOCK"
 msgstr "ПИКОК"
 
-#: astrobase.py:351
+#: astrobase.py:346
 msgid "Phecda"
 msgstr "Фекда"
 
-#: astrobase.py:351
+#: astrobase.py:346
 msgid "PHECDA"
 msgstr "ФЕКДА"
 
-#: astrobase.py:352
+#: astrobase.py:347
 msgid "Polaris"
 msgstr "Полярная звезда"
 
-#: astrobase.py:352
+#: astrobase.py:347
 msgid "POLARIS"
 msgstr "ПОЛЯРНАЯ ЗВЕЗДА"
 
-#: astrobase.py:353
+#: astrobase.py:348
 msgid "Pollux"
 msgstr "Поллукс"
 
-#: astrobase.py:353
+#: astrobase.py:348
 msgid "POLLUX"
 msgstr "ПОЛЛУКС"
 
-#: astrobase.py:354
+#: astrobase.py:349
 msgid "Procyon"
 msgstr "Процион"
 
-#: astrobase.py:354
+#: astrobase.py:349
 msgid "PROCYON"
 msgstr "ПРОЦИОН"
 
-#: astrobase.py:355
+#: astrobase.py:350
 msgid "Rasalgethi"
 msgstr "Рас Альгети"
 
-#: astrobase.py:355
+#: astrobase.py:350
 msgid "RASALGETHI"
 msgstr "РАС АЛЬГЕТИ"
 
-#: astrobase.py:356
+#: astrobase.py:351
 msgid "Rasalhague"
 msgstr "Расальхаг"
 
-#: astrobase.py:356
+#: astrobase.py:351
 msgid "RASALHAGUE"
 msgstr "РАСАЛЬХАГ"
 
-#: astrobase.py:357
+#: astrobase.py:352
 msgid "Regulus"
 msgstr "Регул"
 
-#: astrobase.py:357
+#: astrobase.py:352
 msgid "REGULUS"
 msgstr "РЕГУЛ"
 
-#: astrobase.py:358
+#: astrobase.py:353
 msgid "Rigel"
 msgstr "Ригель"
 
-#: astrobase.py:358
+#: astrobase.py:353
 msgid "RIGEL"
 msgstr "РИГЕЛЬ"
 
-#: astrobase.py:359
+#: astrobase.py:354
 msgid "Rigil Kentaurus"
 msgstr "Ригель Кентаурус"
 
-#: astrobase.py:359
+#: astrobase.py:354
 msgid "RIGIL KENTAURUS"
 msgstr "РИГЕЛЬ КЕНТАУРУС"
 
-#: astrobase.py:360
+#: astrobase.py:355
 msgid "Rukbat"
 msgstr "Рукбат"
 
-#: astrobase.py:360
+#: astrobase.py:355
 msgid "RUKBAT"
 msgstr "РУКБАТ"
 
-#: astrobase.py:361
+#: astrobase.py:356
 msgid "Sabik"
 msgstr "Сабик"
 
-#: astrobase.py:361
+#: astrobase.py:356
 msgid "SABIK"
 msgstr "САБИК"
 
-#: astrobase.py:362
+#: astrobase.py:357
 msgid "Sadalmelik"
 msgstr "Садальмелик"
 
-#: astrobase.py:362
+#: astrobase.py:357
 msgid "SADALMELIK"
 msgstr "САДАЛЬМЕЛИК"
 
-#: astrobase.py:363
+#: astrobase.py:358
 msgid "Sadr"
 msgstr "Садр"
 
-#: astrobase.py:363
+#: astrobase.py:358
 msgid "SADR"
 msgstr "САДР"
 
-#: astrobase.py:364
+#: astrobase.py:359
 msgid "Saiph"
 msgstr "Саиф"
 
-#: astrobase.py:364
+#: astrobase.py:359
 msgid "SAIPH"
 msgstr "САИФ"
 
-#: astrobase.py:365
+#: astrobase.py:360
 msgid "Scheat"
 msgstr "Шеат"
 
-#: astrobase.py:365
+#: astrobase.py:360
 msgid "SCHEAT"
 msgstr "ШЕАТ"
 
-#: astrobase.py:366
+#: astrobase.py:361
 msgid "Schedar"
 msgstr "Шедар"
 
-#: astrobase.py:366
+#: astrobase.py:361
 msgid "SCHEDAR"
 msgstr "ШЕДАР"
 
-#: astrobase.py:367
+#: astrobase.py:362
 msgid "Shaula"
 msgstr "Шаула"
 
-#: astrobase.py:367
+#: astrobase.py:362
 msgid "SHAULA"
 msgstr "ШАУЛА"
 
-#: astrobase.py:368
+#: astrobase.py:363
 msgid "Sheliak"
 msgstr "Шелиак"
 
-#: astrobase.py:368
+#: astrobase.py:363
 msgid "SHELIAK"
 msgstr "ШЕЛИАК"
 
-#: astrobase.py:369
+#: astrobase.py:364
 msgid "Sirius"
 msgstr "Сириус"
 
-#: astrobase.py:369
+#: astrobase.py:364
 msgid "SIRIUS"
 msgstr "СИРИУС"
 
-#: astrobase.py:370
+#: astrobase.py:365
 msgid "Spica"
 msgstr "Спика"
 
-#: astrobase.py:370
+#: astrobase.py:365
 msgid "SPICA"
 msgstr "СПИКА"
 
-#: astrobase.py:371
+#: astrobase.py:366
 msgid "Suhail"
 msgstr "Сухайль"
 
-#: astrobase.py:371
+#: astrobase.py:366
 msgid "SUHAIL"
 msgstr "СУХАЙЛЬ"
 
-#: astrobase.py:372
+#: astrobase.py:367
 msgid "Sulafat"
 msgstr "Сулафат"
 
-#: astrobase.py:372
+#: astrobase.py:367
 msgid "SULAFAT"
 msgstr "СУЛАФАТ"
 
-#: astrobase.py:373
+#: astrobase.py:368
 msgid "Tarazed"
 msgstr "Таразед"
 
-#: astrobase.py:373
+#: astrobase.py:368
 msgid "TARAZED"
 msgstr "ТАРАЗЕД"
 
-#: astrobase.py:374
+#: astrobase.py:369
 msgid "Taygeta"
 msgstr "Тайгета"
 
-#: astrobase.py:374
+#: astrobase.py:369
 msgid "TAYGETA"
 msgstr "ТАЙГЕТА"
 
-#: astrobase.py:375
+#: astrobase.py:370
 msgid "Thuban"
 msgstr "Тубан"
 
-#: astrobase.py:375
+#: astrobase.py:370
 msgid "THUBAN"
 msgstr "ТУБАН"
 
-#: astrobase.py:376
+#: astrobase.py:371
 msgid "Unukalhai"
 msgstr "Унукалхай"
 
-#: astrobase.py:376
+#: astrobase.py:371
 msgid "UNUKALHAI"
 msgstr "УНУКАЛХАЙ"
 
-#: astrobase.py:377
+#: astrobase.py:372
 msgid "Vega"
 msgstr "Вега"
 
-#: astrobase.py:377
+#: astrobase.py:372
 msgid "VEGA"
 msgstr "ВЕГА"
 
-#: astrobase.py:378
+#: astrobase.py:373
 msgid "Vindemiatrix"
 msgstr "Виндемиатрикс"
 
-#: astrobase.py:378
+#: astrobase.py:373
 msgid "VINDEMIATRIX"
 msgstr "ВИНДЕМИАТРИКС"
 
-#: astrobase.py:379
+#: astrobase.py:374
 msgid "Wezen"
 msgstr "Везен"
 
-#: astrobase.py:379
+#: astrobase.py:374
 msgid "WEZEN"
 msgstr "ВЕЗЕН"
 
-#: astrobase.py:380
+#: astrobase.py:375
 msgid "Zaurak"
 msgstr "Заурак"
 
-#: astrobase.py:380
+#: astrobase.py:375
 msgid "ZAURAK"
 msgstr "ЗАУРАК"
 
-#: astrobase.py:381
+#: astrobase.py:376
 msgid "Zubenelgenubi"
 msgstr "Зубен Эльгенуби"
 
-#: astrobase.py:381
+#: astrobase.py:376
 msgid "ZUBENELGENUBI"
 msgstr "ЗУБЕН ЭЛЬГЕНУБИ"
 
-#: astrobase.py:394
+#: astrobase.py:389
 msgid "NAME"
 msgstr "НАЗВАНИЕ"
 
-#: astrobase.py:395
+#: astrobase.py:390
 msgid "NUMBER"
 msgstr "НОМЕР"
 
-#: astrobase.py:397
+#: astrobase.py:392
 msgid "INTERNATIONAL DESIGNATOR"
 msgstr "МЕЖДУНАРОДНОЕ ОБОЗНАЧЕНИЕ"
 
-#: astrobase.py:399
+#: astrobase.py:394
 msgid "RISE TIME"
 msgstr "ВРЕМЯ ВОСХОДА"
 
-#: astrobase.py:401
+#: astrobase.py:396
 msgid "SET TIME"
 msgstr "ВРЕМЯ ЗАХОДА"
 

@@ -22,7 +22,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorlunar-1.0.103-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorlunar-1.0.104-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -47,7 +47,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorlunar-1.0.103-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorlunar-1.0.104-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -72,7 +72,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorlunar-1.0.103-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorlunar-1.0.104-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -94,13 +94,13 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorlunar-1.0.103-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject\<=3.50.0 https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorlunar-1.0.104-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
 </details>
 
-<details><summary><b>Manjaro 25</b></summary>
+<details><summary><b>Manjaro 25 | Manjaro 26</b></summary>
 
 1. Install operating system packages:
 
@@ -114,7 +114,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorlunar-1.0.103-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorlunar-1.0.104-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -134,7 +134,7 @@ Installation / Updating
     venv=$HOME/.local/venv_indicators && \
     if [ ! -d ${venv} ]; then python3 -m venv ${venv}; fi && \
     . ${venv}/bin/activate && \
-    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorlunar-1.0.103-py3-none-any.whl && \
+    python3 -m pip install --upgrade PyGObject https://github.com/iconindicators/appindicators/releases/download/1.3/indicatorlunar-1.0.104-py3-none-any.whl && \
     deactivate && \
     . $(ls -d ${venv}/lib/python3.* | head -1)/site-packages/${indicator}/platform/linux/install.sh ${venv}
     ```
@@ -302,7 +302,7 @@ Uninstall
 
 </details>
 
-<details><summary><b>Manjaro 25</b></summary>
+<details><summary><b>Manjaro 25 | Manjaro 26</b></summary>
 
 1. Uninstall operating system packages:
 

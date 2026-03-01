@@ -2,7 +2,7 @@
 # USED BY THE BUILD WHEEL SCRIPT
 # TO CREATE A COMPLETE PYPROJECT.TOML.
 [project]
-version = "1.0.103"
+version = "1.0.104"
 description = "Application indicator for the home astronomer."
 classifiers = [
   "Topic :: Scientific/Engineering :: Astronomy" ]
