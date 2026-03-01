@@ -128,6 +128,10 @@ class IndicatorBase( ABC ):
 
     _GITHUB_REPOSITORY_URL = f"https://github.com/iconindicators/appindicators"
 
+    # From (approximately) GNOME Shell version 44, the text in a radiomenuitem
+    # is out of alignment with respect to text in a menuitem.
+    _GNOME_SHELL_VERSION_FOR_RADIOMENUITEM_WORKAROUND = 44.0
+
     _LOGGING_INITIALISED = False
 
     _TERMINALS_AND_EXECUTION_FLAGS = [ [ "gnome-terminal", "--" ] ]
@@ -157,7 +161,9 @@ class IndicatorBase( ABC ):
     SESSION_TYPE_WAYLAND = "wayland"
     SESSION_TYPE_X11 = "x11"
 
+    SYMBOL_BULLET = '\u2022'
     SYMBOL_DASH = '—'
+    SYMBOL_EN_SPACE = '\u2002'
     SYMBOL_TICK = '✔'
 
     TIMEOUT_IN_SECONDS = 10
@@ -1348,6 +1354,76 @@ class IndicatorBase( ABC ):
         primary_received_callback_function( text )
 
 
+    def get_gnome_shell_version( self ):
+        '''
+        If GNOME Shell is installed, return the version as a floating point
+        number.
+
+        Otherwise, return -1.0
+        '''
+        version = -1.0
+        result = (
+            self.process_run(
+                "which gnome-shell",
+                ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
+        if len( result ) > 0:
+            result = (
+                self.process_run(
+                    "gnome-shell --version",
+                    ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
+            try:
+                version = float( result.split()[ -1 ] )
+
+            except ValueError:
+                version = -1.0
+
+        return version
+
+
+    def use_radiomenuitem_workaround( self ):
+        '''
+        On
+            Debian 13 (GNOME Shell 48)
+            Fedora 42 (GNOME Shell 48)
+            Fedora 43 (GNOME Shell 49)
+            Manjaro 26 (GNOME Shell 49)
+            openSUSE Tumbleweed (GNOME Shell 49)
+            Ubuntu 24.04 (GNOME Shell 46)
+
+        a radiomenuitem's text is out of alignment with respect to a menuitem's
+        text.
+
+        Using a menuitem with a bullet symbol prepended to the text instead of
+        a radiomenuitem results in the text being aligned.
+
+        However, for the distributions
+            Debian 12 (GNOME Shell 43)
+            Kubuntu 24.04
+            Linux Mint 22 Cinnamon
+            Lubuntu 24.04
+            Manjaro KDE 24
+            Manjaro KDE 25
+            Ubuntu 22.04 (GNOME Shell 42)
+            Ubuntu Budgie 24.04
+            Ubuntu MATE 24.04 MATE
+            Ubuntu UNITY 24.04
+            Xubuntu 24.04
+
+        the text is no longer aligned, so continue to use a radiomenuitem.        
+
+        Apply this workaround only to those distributions with gnome-shell
+        with version 44+
+
+        https://discourse.gnome.org/t/indent-for-radiomenuitem-changed-somewhere-around-gnome-version-46/33717
+        '''
+        return (
+            self.get_gnome_shell_version()
+            >=
+            IndicatorBase._GNOME_SHELL_VERSION_FOR_RADIOMENUITEM_WORKAROUND )
+
+
     def _get_play_sound_complete_command( self ):
         '''
         Determine if paplay is present and if not, then pw-play.
@@ -1691,9 +1767,8 @@ class IndicatorBase( ABC ):
             Second element: equivalent for a detachable menu.
         '''
         indent_amount = self._get_menu_indent_amount( indent )
-        menuitem = (
-            Gtk.MenuItem.new_with_label(
-                text_before_indent + indent_amount + label ) )
+        label_ = text_before_indent + indent_amount + label
+        menuitem = Gtk.MenuItem.new_with_label( label_ )
 
         if name:
             menuitem.set_name( name )
