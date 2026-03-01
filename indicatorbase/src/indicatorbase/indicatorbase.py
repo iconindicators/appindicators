@@ -128,9 +128,9 @@ class IndicatorBase( ABC ):
 
     _GITHUB_REPOSITORY_URL = f"https://github.com/iconindicators/appindicators"
 
-    # From (approximately) GNOME Shell version 44, the text in a radiomenuitem
+    # From (approximately) GNOME Shell version 46, the text in a radiomenuitem
     # is out of alignment with respect to text in a menuitem.
-    _GNOME_SHELL_VERSION_FOR_RADIOMENUITEM_WORKAROUND = 44.0
+    _GNOME_SHELL_VERSION_FOR_RADIOMENUITEM_WORKAROUND = 46.0
 
     _LOGGING_INITIALISED = False
 
