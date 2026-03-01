@@ -65,9 +65,6 @@ class IndicatorVirtualBox( IndicatorBase ):
 
     MESSAGE_NOT_INSTALLED = _( "VirtualBox™ is not installed" )
 
-    SYMBOL_EN_SPACE = '\u2002'
-    SYMBOL_BULLET = '\u2022'
-
 
     def __init__( self ):
         super().__init__(
@@ -208,44 +205,46 @@ class IndicatorVirtualBox( IndicatorBase ):
         indent,
         is_running,
         no_running_virtual_machines ):
-        '''
-        Originally a radiomenuitem was used to denote a running virtual
-        machine.
 
-        Under GNOME on
-            Debian 13
-            Fedora 42
-            Fedora 43
-            openSUSE Tumbleweedand
-            Ubuntu 24.04
+        if self.use_radiomenuitem_workaround():
+            # For GNOME Shell version 46+, the text in a radiomenuitem is out
+            # of alignment with respect to text in a menuitem.
+            # Instead of a radiomenuitem, use a menuitem with a bullet symbol.
+            if is_running:
+                text_before_indent = self.SYMBOL_BULLET + self.SYMBOL_EN_SPACE
 
-        the radiomenuitem pushes the name of the running virtual machine out
-        of alignment with respect to the names of non-running virtual
-        machines.
+            else:
+                text_before_indent = (
+                    ""
+                    if no_running_virtual_machines else
+                    IndicatorVirtualBox.SYMBOL_EN_SPACE * 2 )
 
-        Use a bullet symbol instead of the radiomenuitem.
-
-        https://discourse.gnome.org/t/indent-for-radiomenuitem-changed-somewhere-around-gnome-version-46/33717
-        '''
-        if is_running:
-            text_before_indent = (
-                IndicatorVirtualBox.SYMBOL_BULLET +
-                IndicatorVirtualBox.SYMBOL_EN_SPACE )
+            self.create_and_append_menuitem(
+                menu,
+                virtual_machine.get_name(),
+                activate_functionandarguments = (
+                    self._on_virtual_machine, virtual_machine ),
+                indent = indent,
+                text_before_indent = text_before_indent )
 
         else:
-            text_before_indent = (
-                ""
-                if no_running_virtual_machines
-                else
-                IndicatorVirtualBox.SYMBOL_EN_SPACE * 2 )
+            # For GNOME Shell version 45 or lower (and non GNOME Shell)
+            # use a radiomenuitem as usual.
+            if is_running:
+                self.create_and_append_radiomenuitem(
+                    menu,
+                    virtual_machine.get_name(),
+                    activate_functionandarguments = (
+                        self._on_virtual_machine, virtual_machine ),
+                    indent = indent )
 
-        self.create_and_append_menuitem(
-            menu,
-            virtual_machine.get_name(),
-            activate_functionandarguments = (
-                self._on_virtual_machine, virtual_machine ),
-            indent = indent,
-            text_before_indent = text_before_indent )
+            else:
+                self.create_and_append_menuitem(
+                    menu,
+                    virtual_machine.get_name(),
+                    activate_functionandarguments = (
+                        self._on_virtual_machine, virtual_machine ),
+                    indent = indent )
 
 
     def _on_virtual_machine(
@@ -260,7 +259,8 @@ class IndicatorVirtualBox( IndicatorBase ):
             self.start_virtual_machine( virtual_machine.get_uuid() )
 
             # Delay the refresh as the virtual machine will have been started
-            # in the background and VBoxManage will not have had time to update.
+            # in the background and VBoxManage will not have had time to
+            # update.
             self.request_update( delay = 10 )
 
 
@@ -390,8 +390,8 @@ class IndicatorVirtualBox( IndicatorBase ):
         '''
         Zealous mouse wheel scrolling can cause too many notifications,
         subsequently popping the graphics stack!
-        Prevent notifications from appearing until a set time has elapsed since
-        the previous notification.
+        Prevent notifications from appearing until a set time has elapsed
+        since the previous notification.
         '''
         date_time_of_last_notification_plus_delay = (
             self.date_time_of_last_notification
@@ -456,8 +456,8 @@ class IndicatorVirtualBox( IndicatorBase ):
             # Only want one instance of VirtualBox manager.
             #
             # The executable for VirtualBox manager does not necessarily appear
-            # in the process list because the executable might be a script which
-            # calls another executable.
+            # in the process list because the executable might be a script
+            # which calls another executable.
             #
             # Instead, the user specifies the title of the VirtualBox manager
             # window in the preferences and using that, find the window by the

@@ -2,11 +2,11 @@
 
 ## v1.0.78 (2026-01-23)
 
-- To denote a running virtual machine, a radio button was used.
+- To denote a running virtual machine, a radiomenuitem is used.
 
-  GNOME made a change such that the name of a running virtual machine (with the radio button) is out of alignment with virtual machines which are not running. This can be seen in Debian 13, Fedora 42, Fedora 43, openSUSE Tumbleweedand and Ubuntu 24.04.
+  A change in GNOME Shell (likely version 46+) causes the name of a running virtual machine (in a radiomenuitem) to be out of alignment with virtual machines which are not running (normal menuitem).
 
-  Instead of a radio button, a bullet symbol is now used.
+  Instead of a radiomenuitem, a bullet symbol is now used (only for those distributions which have gnome-shell installed and is of version 46+).
 
 - Sorts virtual machine and group names naturally. For example,
 

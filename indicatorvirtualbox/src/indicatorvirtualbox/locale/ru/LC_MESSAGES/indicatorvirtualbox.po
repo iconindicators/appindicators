@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indicatorvirtualbox 1.0.78\n"
 "Report-Msgid-Bugs-To: <thebernmeister@hotmail.com>\n"
-"POT-Creation-Date: 2026-02-05 19:49+1100\n"
+"POT-Creation-Date: 2026-03-01 14:16+1100\n"
 "PO-Revision-Date: 2025-07-28 16:37+0300\n"
 "Last-Translator: Oleg Moiseichuk <berroll@mail.ru>\n"
 "Language-Team: Russian\n"
@@ -26,7 +26,7 @@ msgstr "Индикатор VirtualBox"
 msgid "VirtualBox™ is not installed"
 msgstr "VirtualBox не установлен"
 
-#: indicatorvirtualbox.py:75
+#: indicatorvirtualbox.py:72
 msgid ""
 "Shows VirtualBox™ virtual machines\n"
 "and allows them to be started."
@@ -34,7 +34,7 @@ msgstr ""
 "Показывает виртуальные машины VirtualBox\n"
 "и позволяет запускать их."
 
-#: indicatorvirtualbox.py:133
+#: indicatorvirtualbox.py:130
 msgid "Launch VirtualBox™ Manager"
 msgstr "Запустить Менеджер VirtualBox"
 

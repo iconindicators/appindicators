@@ -100,7 +100,7 @@ Installation / Updating
     ```
 </details>
 
-<details><summary><b>Manjaro 25</b></summary>
+<details><summary><b>Manjaro 25 | Manjaro 26</b></summary>
 
 1. Install operating system packages:
 
@@ -297,7 +297,7 @@ Uninstall
 
 </details>
 
-<details><summary><b>Manjaro 25</b></summary>
+<details><summary><b>Manjaro 25 | Manjaro 26</b></summary>
 
 1. Uninstall operating system packages:
 
