@@ -1,5 +1,10 @@
 # Indicator Stardate changelog
 
+## v1.0.48 (2026-03-01)
+
+- When returning from screen lock/blank, on some distributions, the label is absent until the indicator refreshes.  Now listens for when the screen lock/blank is over and initiates a refresh.
+
+
 ## v1.0.47 (2025-11-25)
 
 - Ignore a failure to connect to `GitHub` when checking for a new release.

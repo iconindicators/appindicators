@@ -2,7 +2,7 @@
 # USED BY THE BUILD WHEEL SCRIPT
 # TO CREATE A COMPLETE PYPROJECT.TOML.
 [project]
-version = "1.0.47"
+version = "1.0.48"
 description = "Application indicator which displays the current Star Trek™ stardate."
 classifiers = [
   "Topic :: Games/Entertainment" ]

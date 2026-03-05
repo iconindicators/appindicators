@@ -5,6 +5,7 @@
 - Display gnome-shell version (where applicable).
 - Added the menu `Menu Items` under `Functionality` to show a radiomenuitem versus a menuitem with a bullet symbol.
 - Added spacing to some menu items to improve readability.
+- When returning from screen lock/blank, on some distributions, the label is absent until the indicator refreshes.  Now listens for when the screen lock/blank is over and initiates a refresh.
 
 
 ## v1.0.19 (2025-11-25)

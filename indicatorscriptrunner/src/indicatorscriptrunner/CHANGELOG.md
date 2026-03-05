@@ -1,5 +1,10 @@
 # Indicator Script Runner changelog
 
+## v1.0.28 (2026-03-01)
+
+- When returning from screen lock/blank, on some distributions, the label is absent until the indicator refreshes.  Now listens for when the screen lock/blank is over and initiates a refresh.
+
+
 ## v1.0.27 (2025-11-25)
 
 - Prepended `http://` to `google.com` in example scripts `Up or down` and `Internet Down` as `wget` now complains if the protocol is absent.
