@@ -69,6 +69,9 @@ import gi
 gi.require_version( "Gdk", "3.0" )
 from gi.repository import Gdk
 
+gi.require_version( "Gio", "2.0" )
+from gi.repository import Gio
+
 gi.require_version( "GLib", "2.0" )
 from gi.repository import GLib
 
@@ -77,8 +80,10 @@ from gi.repository import Gtk
 
 try:
     gi.require_version( "Notify", "0.7" )
+
 except ValueError:
     gi.require_version( "Notify", "0.8" )
+
 from gi.repository import Notify
 
 gi.require_version( "Pango", "1.0" )
@@ -87,10 +92,12 @@ from gi.repository import Pango
 try:
     gi.require_version( "AyatanaAppIndicator3", "0.1" )
     from gi.repository import AyatanaAppIndicator3 as AppIndicator
+
 except ValueError:
     try:
         gi.require_version( "AppIndicator3", "0.1" )
         from gi.repository import AppIndicator3 as AppIndicator # For Fedora.
+
     except ValueError:
         print( "Unable to find neither AyatanaAppIndicator3 nor AppIndicator3.")
         sys.exit( 1 )
@@ -104,7 +111,20 @@ class IndicatorBase( ABC ):
     _CONFIG_CHECK_LATEST_VERSION = "checklatestversion"
     _CONFIG_VERSION = "version"
 
-    # Supported desktops; values are the result of calling
+    # On return from a screen lock/blank or suspend, need to refresh indicators
+    # which have a text label (on some distributions).
+    #
+    # For the screen lock, the refresh needs to take place after the user has
+    # successfully entered the password, so give about 20 seconds.
+    # If the refresh occurs before the password is (successfully) entered,
+    # each indicator (aside from indicatortest) will update on the next
+    # scheduled update.
+    #
+    # For the screen blank and suspend, the refresh can take place immediately,
+    # so waiting 20 seconds is not a problem.
+    _DELAY_AFTER_SCREEN_LOCK = 20
+
+    # Result of calling
     #   echo $XDG_CURRENT_DESKTOP
     #
     # Different results come from calling
@@ -126,7 +146,7 @@ class IndicatorBase( ABC ):
 
     _EXTENSION_JSON = ".json"
 
-    _GITHUB_REPOSITORY_URL = f"https://github.com/iconindicators/appindicators"
+    _GITHUB_REPOSITORY_URL = "https://github.com/iconindicators/appindicators"
 
     # From (approximately) GNOME Shell version 46, the text in a radiomenuitem
     # is out of alignment with respect to text in a menuitem.
@@ -241,6 +261,8 @@ class IndicatorBase( ABC ):
         self.play_sound_complete_command = None
         self.session_type = None
 
+        self._initialise_system_bus_listeners()
+
         self.lock_update = Lock()
         self.id_update = 0 # ID returned when scheduling an update.
 
@@ -319,7 +341,7 @@ class IndicatorBase( ABC ):
         version_github = ""
         if data_json:
             for item in data_json:
-                if type( item ) is dict:
+                if isinstance( item, dict ):
                     for key in item:
                         if key == "assets":
                             assets = item[ key ]
@@ -386,10 +408,10 @@ class IndicatorBase( ABC ):
             if not ignore_failure:
                 if isinstance( e.reason, socket.timeout ):
                     error_timeout = True
-    
+
                 else:
                     error_network = True
-    
+
                 if IndicatorBase._LOGGING_INITIALISED:
                     logging.error( f"Problem with { url }" )
                     logging.exception( e )
@@ -672,6 +694,145 @@ class IndicatorBase( ABC ):
                 output )
 
 
+    def _initialise_system_bus_listeners( self ):
+        '''
+        When returning from a screen lock/blank or suspend, on some
+        distributions, indicators with a text label adjacent to the icon only
+        displays the icon (until the indicator does a scheduled refresh and
+        then the text label displays).
+
+        More details of the issue:
+            https://discourse.gnome.org/t/appindicator-icon-labels-absent-after-return-from-lock-screen/33863
+            https://discussion.fedoraproject.org/t/appindicator-icon-labels-absent-after-return-from-lock-screen-in-gnome-except-on-fedora/181342
+
+        To workaround this issue, listen for when the screen lock/blank and
+        suspend are terminated (using D-BUS signals) and then kick off an
+        update.
+
+        References:
+            https://api.pygobject.gnome.org/Gio-2.0/class-DBusConnection.html
+            https://api.pygobject.gnome.org/Gio-2.0/functions.html
+            https://bbs.archlinux.org/viewtopic.php?id=238749
+            https://serverfault.com/q/573379/292752
+            The application 'D-feet'
+
+        When a screen blank/lock is in place, pressing a key immediately fires
+        the property change for IdleHint with a value of False.
+
+        For the screen blank, after pressing a key, the desktop is shown after
+        a second or two.  Immediately updating will update the text.
+
+        For a screen lock, after pressing a key, the password prompt appears
+        after a second or two.  On entering the password, the desktop is
+        displayed after a second or two.  If the update occurs immediately after
+        the property change event, the desktop will not be visible and the text
+        will not be displayed.  Therefore, want a delay before updating, rather
+        that immediately.
+
+        When a suspend is in place, pressing a key immediately fires the signal
+        PrepareForSleep.  The desktop more or less is shown immediately, so
+        updating will update the text.
+
+        For simplicity, set a delay for screen lock, screen blank and suspend
+        before updating.
+        '''
+        if self._refresh_required_on_return_from_screen_lock():
+            # Need to keep a global reference to the system bus otherwise,
+            # for reasons unknown, the signal handler functions are not called
+            # on return from screen lock/blank and suspend.
+            self.system_bus = Gio.bus_get_sync( Gio.BusType.SYSTEM, None )
+
+            self.system_bus.signal_subscribe(
+                'org.freedesktop.login1',
+                'org.freedesktop.DBus.Properties',
+                'PropertiesChanged',
+                '/org/freedesktop/login1',
+                None,
+                Gio.DBusSignalFlags.NONE,
+                self._dbus_properties_changed_idle_hint,
+                None )
+
+            self.system_bus.signal_subscribe(
+                'org.freedesktop.login1',
+                'org.freedesktop.login1.Manager',
+                'PrepareForSleep',
+                '/org/freedesktop/login1',
+                None,
+                Gio.DBusSignalFlags.NONE,
+                self._dbus_prepare_for_sleep,
+                None )
+
+
+    def _refresh_required_on_return_from_screen_lock( self ):
+        '''
+        Return True if running on 
+            Debian 12
+            Debian 13
+            openSUSE Tumbleweed
+            Ubuntu 24.04
+
+        False otherwise.
+        '''
+        etc_os_release = self.get_etc_os_release()
+        return (
+            (
+                'ID=debian' in etc_os_release
+                and
+                'VERSION_ID="12"' in etc_os_release )
+            or
+            (
+                'ID=debian' in etc_os_release
+                and
+                'VERSION_ID="13"' in etc_os_release )
+            or
+            (
+                'ID="opensuse-tumbleweed"' in etc_os_release )
+            or
+            (
+                'ID=ubuntu' in etc_os_release
+                and
+                'VERSION_ID="24.04"' in etc_os_release ) )
+
+
+    def _dbus_properties_changed_idle_hint(
+        self,
+        dbus_connection,
+        unique_name,
+        path,
+        name,
+        signal_name,
+        parameters,
+        data ):
+        '''
+        Called when screen lock/blank is terminated.
+        '''
+        if signal_name == "PropertiesChanged":
+            for parameter in parameters:
+                if isinstance( parameter, dict ):
+                    if "IdleHint" in parameter and not parameter[ "IdleHint" ]:
+                        self.request_update(
+                            delay = IndicatorBase._DELAY_AFTER_SCREEN_LOCK )
+
+                        break
+
+
+    def _dbus_prepare_for_sleep(
+        self,
+        dbus_connection,
+        unique_name,
+        path,
+        name,
+        signal_name,
+        parameters,
+        data ):
+        '''
+        Called when suspend is terminated.
+        '''
+        if signal_name == "PrepareForSleep" and not parameters[ 0 ]:
+            self.request_update(
+                delay = IndicatorBase._DELAY_AFTER_SCREEN_LOCK )
+
+
     @staticmethod
     def get_authors_emails(
         project_metadata ):
@@ -889,10 +1050,9 @@ class IndicatorBase( ABC ):
         tooltip contains the indicator source filename and so would return a
         False value.
         '''
-        label_or_tooltip_update_supported = (
-            self._is_label_or_tooltip_update_supported() )
-
-        if label_or_tooltip_update_supported:
+        label_or_tooltip_update_supported = False
+        if self._is_label_or_tooltip_update_supported():
+            label_or_tooltip_update_supported = True
             self.indicator.set_label( text, text )
             self.indicator.set_title( text )
 
