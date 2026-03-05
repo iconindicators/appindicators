@@ -48,7 +48,11 @@ VENV_INSTALL = "$HOME/.local/venv_indicators"
 
 def is_debian11_or_debian12():
     '''
-    Return True if running on Debian 11 or Debian 12; False otherwise.
+    Return True if running on
+        Debian 11,
+        Debian 12.
+
+    False otherwise.
     '''
     etc_os_release = indicatorbase.IndicatorBase.get_etc_os_release()
     return (
@@ -61,8 +65,11 @@ def is_debian11_or_debian12():
 
 def is_ubuntu2004_or_is_ubuntu2204_or_ubuntu2404():
     '''
-    Return True if running on Ubuntu 20.04 to Ubuntu 24.04, inclusive,
-    or derivative distributions.
+    Return True if running on
+        Ubuntu 20.04,
+        Ubuntu 22.04,
+        Ubuntu 24.04,
+        or a derivative distribution.
 
     False otherwise.
     '''
