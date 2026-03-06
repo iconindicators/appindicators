@@ -56,9 +56,7 @@ _months = {
 # https://eclipse.gsfc.nasa.gov/5MCLE/5MKLEcatalog.txt
 # https://eclipse.gsfc.nasa.gov/LEcat5/LEcatkey.html
 _ECLIPSES_LUNAR = (
-''' 2025  Sep  07  18:12:58   75  T    6S   87E
-    2026  Mar  03  11:34:52   75  T    6N  171W
-    2026  Aug  28  04:14:04   75  P    9S   63W
+''' 2026  Aug  28  04:14:04   75  P    9S   63W
     2027  Feb  20  23:14:06   76  N   10N   15E
     2027  Jul  18  16:04:09   76  Ne  22S  121E
     2027  Aug  17  07:14:59   76  N   12S  108W
@@ -231,9 +229,7 @@ _ECLIPSES_LUNAR = (
 # https://eclipse.gsfc.nasa.gov/5MCSE/5MKSEcatalog.txt
 # https://eclipse.gsfc.nasa.gov/SEcat5/catkey.html
 _ECLIPSES_SOLAR = (
-''' 2025  Sep  21  19:43:04   75  P   60.9S  153.5E
-    2026  Feb  17  12:13:06   75  A   64.7S   86.8E
-    2026  Aug  12  17:47:06   75  T   65.2N   25.2W
+''' 2026  Aug  12  17:47:06   75  T   65.2N   25.2W
     2027  Feb  06  16:00:48   76  A   31.3S   48.5W
     2027  Aug  02  10:07:50   76  T   25.5N   33.2E
     2028  Jan  26  15:08:59   76  A    3.0N   51.5W
