@@ -117,7 +117,7 @@ class IndicatorScriptRunner( IndicatorBase ):
         today = datetime.datetime.now()
         self._update_menu( menu )
         self._update_background_scripts( today )
-        self.set_label_or_tooltip( self.process_tags() )
+        self.set_label_or_tooltip( ' ' + self.process_tags() )
 
         # Calculate next update; default to well into the future.
         next_update = today + datetime.timedelta( hours = 100 )
@@ -338,7 +338,7 @@ class IndicatorScriptRunner( IndicatorBase ):
 
     def process_tags( self ):
         '''
-        Fpr each tag in the indicator label, execute the corresppnding script
+        For each tag in the indicator label, execute the corresponding script
         and replace the tag with the script's output.
         '''
         indicator_text_processed = self.indicator_text

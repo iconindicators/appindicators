@@ -489,7 +489,7 @@ class AstroSkyfield( AstroBase ):
     @staticmethod
     def get_credit():
         '''
-        Return rhe credit.
+        Return the credit.
         '''
         return "Skyfield https://github.com/skyfielders/python-skyfield"
 

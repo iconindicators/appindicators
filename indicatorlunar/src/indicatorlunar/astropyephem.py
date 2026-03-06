@@ -148,7 +148,7 @@ class AstroPyEphem( AstroBase ):
     @staticmethod
     def get_credit():
         '''
-        Return rhe credit.
+        Return the credit.
         '''
         return "PyEphem https://github.com/brandon-rhodes/pyephem"
 

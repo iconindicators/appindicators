@@ -81,7 +81,7 @@ class Group():
 
     def get_name( self ):
         '''
-        Return the mame of this group.
+        Return the name of this group.
         '''
         return self.name
 

@@ -30,7 +30,7 @@ from .indicatorbase import IndicatorBase
 
 
 class DataProviderGeneralPerturbation( DataProvider ):
-    ''' Download and persist general pertubation for satellites. '''
+    ''' Download and persist general perturbation for satellites. '''
 
     @staticmethod
     def download(
