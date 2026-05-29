@@ -610,6 +610,7 @@ def _get_operating_system_packages_debian(
     if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
         packages.append( "libnotify-bin" )
         packages.append( "pulseaudio-utils" )
+        packages.append( "wget" )
 
     if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
         packages.append( "fortune-mod" )
@@ -651,6 +652,9 @@ def _get_operating_system_packages_fedora(
     if _is_indicator( indicator, IndicatorName.INDICATORPUNYCODE ):
         packages.append( "wl-clipboard" )
 
+    if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
+        packages.append( "wget" )
+
     if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
         packages.append( "calendar" )
         packages.append( "fortune-mod" )
@@ -683,6 +687,9 @@ def _get_operating_system_packages_manjaro(
     if _is_indicator( indicator, IndicatorName.INDICATORPUNYCODE ):
         packages.append( "wl-clipboard" )
 
+    if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
+        packages.append( "wget" )
+
     if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
         packages.append( "fortune-mod" )
         packages.append( "wl-clipboard" )
@@ -714,6 +721,9 @@ def _get_operating_system_packages_opensuse(
 
     if _is_indicator( indicator, IndicatorName.INDICATORPUNYCODE ):
         packages.append( "wl-clipboard" )
+
+    if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
+        packages.append( "wget" )
 
     if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
         packages.append( "fortune" )
