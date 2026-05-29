@@ -14,7 +14,7 @@ This project produces the following `appindicators` for `Ubuntu 20.04` et al:
 
 where each indicator is built upon `indicatorbase`.
 
-Rather than have a project for each indicator, `indicatorbase` has `pyprojectbase.toml` which covers the fields common to all indicators and each indicator has its own `pyprojectspecific.toml` for variations.  When building a `.whl`, `pyprojectbase.toml` and `pyprojectspecific.toml` are merged to create a `pyproject.toml`.
+Rather than have a project for each indicator, `indicatorbase` has `pyprojectbase.toml` which covers the fields common to all indicators and each indicator has its own `pyprojectspecific.toml` for variations. When building a `.whl`, `pyprojectbase.toml` and `pyprojectspecific.toml` are merged to create a `pyproject.toml`.
 
 Similarly for `MANIFESTbase.in` and `MANIFESTspecific.in`, if an indicator uses a manifest.
 
@@ -23,6 +23,8 @@ Files such as `.desktop` and various `bash` scripts are common enough across all
 ---
 
 ## Build an Indicator's Wheel
+
+**Prerequisite:** various operating system packages are needed. For `indicatortest`, refer to the installation [instructions](https://github.com/iconindicators/appindicators), choose `indicatortest` and for your distribution, install the specified packages and extensions, if applicable.
 
 To build a wheel for `indicatortest`, at the root of the source tree:
 
@@ -34,16 +36,13 @@ which creates a virtual environment `venv_build`, updates locale files `.pot` / 
 
 Additional indicators may be appended to the above command.
 
-The `tag` argument is the tag value (say 1.0) created at the time a release is created on `GitHub`.  When building a wheel for testing/development purposes, the tag value is irrelevant.  However, when building wheels for a release, the tag value must match that of the intended release.
+The `tag` argument is the tag value (say 1.0) created at the time a release is created on `GitHub`. When building a wheel for testing/development purposes, the tag value is irrelevant. However, when building wheels for a release, the tag value must match that of the intended release.
 
 ---
 
 ## Run an Indicator (from within the source tree)
 
 **Prerequisite:** the indicator's `.whl` must be built.
-
-**Prerequisite:** various operating system packages are needed.
-For `indicatortest`, refer to the installation [instructions](https://github.com/iconindicators/appindicators), choose `indicatortest` and for your distribution, install the specified packages.
 
 To run `indicatortest`:
 
@@ -55,7 +54,7 @@ The virtual environment `venv_run` will be created.
 
 If the indicator has not previously been installed to `$HOME/.local/venv_indicators`, the icon and locale will be absent.
 
-As part of running the indicator, a symbolic link to `indicatorbase.py` is created for all indicators.  To remove:
+As part of running the indicator, a symbolic link to `indicatorbase.py` is created for all indicators. To remove:
 
 ```
   for dirs in indicator*; do \
@@ -93,7 +92,7 @@ Additional indicators may be appended to the above command.
 **Prerequisite:** various operating system packages are needed.
 For `indicatortest`, refer to the installation [instructions](https://github.com/iconindicators/appindicators), choose `indicatortest` and for your distribution, install the specified packages.
 
-To run an indicator, open the applications menu (via the `Super` key) and select the indicator.  If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
+To run an indicator, open the applications menu (via the `Super` key) and select the indicator. If this is the first time the indicator has been installed, you may have to log out/in for the indicator icon to appear in the list of applications.
 
 To run from a terminal (to observe any messages/errors) from any directory:
 
@@ -101,7 +100,7 @@ To run from a terminal (to observe any messages/errors) from any directory:
   . $HOME/.local/bin/indicatortest.sh
 ```
 
-Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and change `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display.  If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
+Alternatively to running in a terminal, edit `$HOME/.local/share/applications/indicatortest.py.desktop` and change `Terminal=false` to `Terminal=true`. Run the indicator as normal from the applications menu and a terminal window should display. If the terminal window does not display, refresh the `.desktop` by renaming to a bogus name and then rename back, or log out/in.
 
 ---
 
