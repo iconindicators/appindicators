@@ -1901,10 +1901,9 @@ class IndicatorBase( ABC ):
                     parts[ 0 ] +
                     "sleep " + str( delay ) +
                     " &&" +
-                    right +
-                    '\n' )
+                    right )
 
-            else:
+            elif len( line.strip() ):
                 output += line
 
         self.write_text_file(
