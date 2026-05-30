@@ -2122,13 +2122,14 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "ping -c 3 www.google.com",
                     False, False, False, False ) )
 
+            notify_send = "notify-send -i " + self.get_icon_name() + " "
             self.scripts.append(
                 NonBackground(
                     "Network",
                     "Public IP address",
-                    "notify-send -i " +
-                    self.get_icon_name() +
-                    " \"Public IP address: $(wget https://ipinfo.io/ip -qO -)\"",
+                    notify_send +
+                    "\"Public IP address:\" " +
+                    "\"$( wget https://ipinfo.io/ip -qO - )\"",
                     False, False, False, False ) )
 
             self.scripts.append(
@@ -2136,26 +2137,19 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "Network",
                     "Up or down",
                     "if wget -qO /dev/null http://google.com > /dev/null; " +
-                    "then notify-send -i " + self.get_icon_name() +
-                    " \"Internet is UP\"; else notify-send \"Internet is DOWN\"; fi",
+                    "then " + notify_send + "\"Internet is UP\"; " +
+                    "else " + notify_send + "\"Internet is DOWN\"; fi",
                     False, False, False, True ) )
 
-            system_usage = " \"System Usage:\" "
-            ram = "\"RAM: $( free | grep Mem | awk \'\\'' { printf \"%.0f\", $3/$2*100 } \'\\'' )%  "
-            hdd = "HDD: $( df -h /dev/sda2 | grep sda2 | awk \'\\'' { print $5 } \'\\''  )\""
+            usage_ram = "$( free | grep Mem | awk \'\\'' { printf \"%.0f\", $3/$2*100 } \'\\'' )"
+            usage_hdd = "$( df -h | grep sda2 | awk \'\\'' { print $5 } \'\\'' )"
             self.scripts.append(
                 NonBackground(
                     "System",
-                    "RAM + HDD (/dev/sda2)",
-                    "notify-send -i "
-                    +
-                    self.get_icon_name()
-                    +
-                    system_usage
-                    +
-                    ram
-                    +
-                    hdd,
+                    "Usage RAM / HDD (sda2)",
+                    notify_send +
+                    "\"System Usage:\" " +
+                    f"\"RAM { usage_ram }%   HDD (sda2) { usage_hdd }\"",
                     False, False, False, False ) )
 
             self.scripts.append(
@@ -2177,16 +2171,25 @@ class IndicatorScriptRunner( IndicatorBase ):
                     "then echo \"\"; else echo \"Internet is DOWN\"; fi",
                     False, True, 60, True ) )
 
+            usage_ram = "$( free | grep Mem | awk ' { printf \"%.0f\", $3/$2*100 } ' )\"%\""
             self.scripts.append(
                 Background(
                     "System",
-                    "Available Memory",
-                    "echo \"Free Memory: \"$(expr $( cat /proc/meminfo | " +
-                    "grep MemAvailable | tr -d -c 0-9 ) / 1024)\" MB\"",
+                    "Usage RAM",
+                    f"echo \"Usage RAM: \"{ usage_ram }",
+                    False, False, 5, False ) )
+
+            # Assume /dev/sda2...good enough and the user can easily change if not.
+            usage_hdd = "$( df -h /dev/sda2 | grep sda2 | awk ' { print $5 } ' )"
+            self.scripts.append(
+                Background(
+                    "System",
+                    "Usage HDD (sda2)",
+                    f"echo \"Usage: HDD (sda2)) \" { usage_hdd }",
                     False, False, 5, False ) )
 
             self.indicator_text = (
-                " [Network::Internet Down][System::Available Memory]" )
+                " [Network::Internet Down][System::Usage RAM][System::Usage HDD (sda2)]" )
 
             self.request_save_config( 1 )
 
