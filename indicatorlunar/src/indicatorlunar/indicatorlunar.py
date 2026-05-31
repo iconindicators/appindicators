@@ -374,8 +374,11 @@ class IndicatorLunar( IndicatorBase ):
                 DataProviderOrbitalElement.load,
                 ( IndicatorLunar.COMET_DATA_TYPE, ) ) )
 
-        if self.comets_add_new:
-            self._add_new_bodies( self.comet_orbital_element_data, self.comets )
+        self.comets = (
+            self._update_bodies(
+                self.comets_add_new,
+                self.comet_orbital_element_data,
+                self.comets ) )
 
         # Update minor planet data.
         (
@@ -397,9 +400,11 @@ class IndicatorLunar( IndicatorBase ):
                 DataProviderOrbitalElement.load,
                 ( IndicatorLunar.MINOR_PLANET_DATA_TYPE, ) ) )
 
-        if self.minor_planets_add_new:
-            self._add_new_bodies(
-                self.minor_planet_orbital_element_data, self.minor_planets )
+        self.minor_planets = (
+            self._update_bodies(
+                self.minor_planets_add_new,
+                self.minor_planet_orbital_element_data,
+                self.minor_planets ) )
 
         # Update minor planet apparent magnitudes.
         (
@@ -437,9 +442,11 @@ class IndicatorLunar( IndicatorBase ):
                 DataProviderGeneralPerturbation.load,
                 ( ) ) )
 
-        if self.satellites_add_new:
-            self._add_new_bodies(
-                self.satellite_general_perturbation_data, self.satellites )
+        self.satellites = (
+            self._update_bodies(
+                self.satellites_add_new,
+                self.satellite_general_perturbation_data,
+                self.satellites ) )
 
 
     def _update_data(
@@ -526,14 +533,22 @@ class IndicatorLunar( IndicatorBase ):
         return next_download_time
 
 
-    def _add_new_bodies(
+    def _update_bodies(
         self,
+        add_new_bodies,
         data,
         bodies ):
 
-        for body in data:
-            if body not in bodies:
-                bodies.append( body )
+        if add_new_bodies:
+            # Ensure all bodies are available in the newly downloaded data;
+            bodies = data.keys()
+
+        else:
+            # Ensure the bodies selected by the user are actually available in
+            # the newly downloaded data.
+            bodies = [ body for body in bodies if body in data ]
+
+        return bodies
 
 
     def _process_tags( self ):
