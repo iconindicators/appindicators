@@ -164,7 +164,9 @@ Several checks have been disabled; re-enable by editing the script.
 
 ## Development under Geany
 
-**Prerequisite:** the indicator's `.whl` must be built and run within the source tree.
+**Prerequisite:** the indicator's `.whl` must be built **and** run within the source tree.
+
+**Prerequisite:** the source code is located in a folder `appindicators.git` (which typically would be if cloned from this repository).
 
 **Geany Setup**
 
@@ -172,7 +174,7 @@ Run `Geany` then:
 
 ```
   Build > Set Build Commands > Execute Commands
-    Execute: cd /home/bernard/Programming/Indicators/%e/src ; /home/bernard/Programming/Indicators/venv_run/bin/python3 -m "%e.%e"
+    Execute: cd /home/<username>/<path to>/appindicators.git/%e/src ; /home/<username>/<path to>/appindicators.git/venv_run/bin/python3 -m "%e.%e"
 ```
 
 NOTE: Because of `%e` variable above, running any of the `tools` is not possible, nor any other non-indicator code, such as `example.py` in `indicatorstardate`.
@@ -182,8 +184,8 @@ NOTE: Because of `%e` variable above, running any of the `tools` is not possible
 ```
   Project > New
     Name: Indicators
-    Filename: /home/bernard/Programming/Indicators/project.geany
-    Basepath: /home/bernard/Programming/Indicators
+    Filename: /home/<username>/<path to>/appindicators.git/project.geany
+    Basepath: /home/<username>/<path to>/appindicators.git
 ```
 
 The indicator should now run via `Build > Execute` or `F5`.
@@ -199,11 +201,13 @@ References:
 
 ## Development under Eclipse
 
-**Prerequisite:** the indicator's `.whl` must be built and run within the source tree.
+**Prerequisite:** the indicator's `.whl` must be built **and** run within the source tree.
+
+**Prerequisite:** the source code is located in a folder `appindicators.git` (which typically would be if cloned from this repository).
 
 **Eclipse Setup**
 
-Run `Eclipse` and install [Liclipse](https://www.liclipse.com/) via the update site.
+Run `Eclipse`, select `Help -> Install New Software`, add the `Liclipse` site `http://update.liclipse.com/latest/` and install `LiClipse Editor`.
 
 Create a `Python` interpreter which uses `venv_run`:
 
@@ -223,9 +227,9 @@ Create a `Python` interpreter which uses `venv_run`:
 
 ```
   File > New > PyDev Project
-    Project Name: Indicators
+    Project Name: appindicators.git
     Use default: Uncheck
-    Directory: /home/bernard/Programming/Indicators
+    Directory: /home/<username>/<path to>/appindicators.git
     Interpreter Name: python3 venv_run
     Finish
 ```
@@ -241,10 +245,10 @@ which should fail, then:
 
 ```
   Run > Run Configurations
-    Python Run: Indicators.indicatortest
+    Python Run: appindicators.git.indicatortest
       Arguments
         Working Directory:
-          Other: ${workspace_loc:Indicators/indicatortest/src}
+          Other: ${workspace_loc:appindicators.git/indicatortest/src}
       Interpreter
         Interpreter: python3 venv_run
 ```
