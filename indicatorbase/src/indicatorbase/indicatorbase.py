@@ -124,7 +124,7 @@ class IndicatorBase( ABC ):
     # so waiting 20 seconds is not a problem.
     _DELAY_AFTER_SCREEN_LOCK = 20
 
-    # Result of calling
+    # Supported desktops; values are the result of calling
     #   echo $XDG_CURRENT_DESKTOP
     #
     # Different results come from calling
@@ -3718,6 +3718,50 @@ class IndicatorBase( ABC ):
             log( command, stdout_, stderr_, return_code )
 
         return stdout_, stderr_, return_code
+
+
+    def get_timezone( self ):
+        '''
+        Get the timezone from the computer.
+
+        On error, return "".
+        '''
+        command_timedatectl = "timedatectl show | grep Timezone"
+        timezone = (
+            self.process_run(
+                command_timedatectl,
+                ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
+        if timezone.startswith( "Timezone=" ):
+            timezone = timezone.split( '=' )[ 1 ]
+
+        else:
+            command_cat = "cat /etc/timezone"
+            timezone = (
+                self.process_run(
+                    command_cat,
+                    ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
+
+        if len( timezone ) == 0:
+            self.get_logging().warn(
+                f"Unable to locate neither '{ command_timedatectl }' "
+                f"nor '{ command_cat }' to obtain the timezone." )
+
+        return timezone
+
+
+    def get_country( self ):
+        '''
+        Get the country from the computer's timezone.
+
+        On error, return "".
+        '''
+        timezone = self.get_timezone()
+        country = ""
+        if timezone:
+            country = timezone.split( '/' )[ 0 ]
+
+        return country
 
 
 class TruncatedFileHandler( logging.handlers.RotatingFileHandler ):

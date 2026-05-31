@@ -355,24 +355,23 @@ class IndicatorLunar( IndicatorBase ):
         '''
 
         # Update comet data.
-        (
+        self.comet_orbital_element_data,
+        self.download_count_comet,
+        self.next_download_time_comet = (
+        self._update_data(
+            utc_now,
             self.comet_orbital_element_data,
+            IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME,
+            self.EXTENSION_TEXT,
+            IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
             self.download_count_comet,
-            self.next_download_time_comet ) = (
-            self._update_data(
-                utc_now,
-                self.comet_orbital_element_data,
-                IndicatorLunar.COMET_CACHE_ORBITAL_ELEMENT_BASENAME,
-                self.EXTENSION_TEXT,
-                IndicatorLunar.COMET_CACHE_MAXIMUM_AGE_HOURS,
-                self.download_count_comet,
-                self.next_download_time_comet,
-                DataProviderOrbitalElement.download,
-                (
-                    IndicatorLunar.COMET_DATA_TYPE,
-                    IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ),
-                DataProviderOrbitalElement.load,
-                ( IndicatorLunar.COMET_DATA_TYPE, ) ) )
+            self.next_download_time_comet,
+            DataProviderOrbitalElement.download,
+            (
+                IndicatorLunar.COMET_DATA_TYPE,
+                IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ),
+            DataProviderOrbitalElement.load,
+            ( IndicatorLunar.COMET_DATA_TYPE, ) ) )
 
         self.comets = (
             self._update_bodies(
@@ -381,24 +380,23 @@ class IndicatorLunar( IndicatorBase ):
                 self.comets ) )
 
         # Update minor planet data.
-        (
+        self.minor_planet_orbital_element_data,
+        self.download_count_minor_planet,
+        self.next_download_time_minor_planet = (
+        self._update_data(
+            utc_now,
             self.minor_planet_orbital_element_data,
+            IndicatorLunar.MINOR_PLANET_CACHE_ORBITAL_ELEMENT_BASENAME,
+            self.EXTENSION_TEXT,
+            IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
             self.download_count_minor_planet,
-            self.next_download_time_minor_planet ) = (
-            self._update_data(
-                utc_now,
-                self.minor_planet_orbital_element_data,
-                IndicatorLunar.MINOR_PLANET_CACHE_ORBITAL_ELEMENT_BASENAME,
-                self.EXTENSION_TEXT,
-                IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
-                self.download_count_minor_planet,
-                self.next_download_time_minor_planet,
-                DataProviderOrbitalElement.download,
-                (
-                    IndicatorLunar.MINOR_PLANET_DATA_TYPE,
-                    IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ),
-                DataProviderOrbitalElement.load,
-                ( IndicatorLunar.MINOR_PLANET_DATA_TYPE, ) ) )
+            self.next_download_time_minor_planet,
+            DataProviderOrbitalElement.download,
+            (
+                IndicatorLunar.MINOR_PLANET_DATA_TYPE,
+                IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ),
+            DataProviderOrbitalElement.load,
+            ( IndicatorLunar.MINOR_PLANET_DATA_TYPE, ) ) )
 
         self.minor_planets = (
             self._update_bodies(
@@ -407,40 +405,38 @@ class IndicatorLunar( IndicatorBase ):
                 self.minor_planets ) )
 
         # Update minor planet apparent magnitudes.
-        (
+        self.minor_planet_apparent_magnitude_data,
+        self.download_count_apparent_magnitude,
+        self.next_download_time_apparent_magnitude = (
+        self._update_data(
+            utc_now,
             self.minor_planet_apparent_magnitude_data,
+            IndicatorLunar.MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME,
+            self.EXTENSION_TEXT,
+            IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
             self.download_count_apparent_magnitude,
-            self.next_download_time_apparent_magnitude ) = (
-            self._update_data(
-                utc_now,
-                self.minor_planet_apparent_magnitude_data,
-                IndicatorLunar.MINOR_PLANET_CACHE_APPARENT_MAGNITUDE_BASENAME,
-                self.EXTENSION_TEXT,
-                IndicatorLunar.MINOR_PLANET_CACHE_MAXIMUM_AGE_HOURS,
-                self.download_count_apparent_magnitude,
-                self.next_download_time_apparent_magnitude,
-                DataProviderApparentMagnitude.download,
-                ( False, IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ),
-                DataProviderApparentMagnitude.load,
-                ( ) ) )
+            self.next_download_time_apparent_magnitude,
+            DataProviderApparentMagnitude.download,
+            ( False, IndicatorLunar.astro_backend.MAGNITUDE_MAXIMUM ),
+            DataProviderApparentMagnitude.load,
+            ( ) ) )
 
         # Update satellite data.
-        (
+        self.satellite_general_perturbation_data,
+        self.download_count_satellite,
+        self.next_download_time_satellite = (
+        self._update_data(
+            utc_now,
             self.satellite_general_perturbation_data,
+            IndicatorLunar.SATELLITE_CACHE_BASENAME,
+            IndicatorLunar.SATELLITE_CACHE_EXTENSION,
+            IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS,
             self.download_count_satellite,
-            self.next_download_time_satellite ) = (
-            self._update_data(
-                utc_now,
-                self.satellite_general_perturbation_data,
-                IndicatorLunar.SATELLITE_CACHE_BASENAME,
-                IndicatorLunar.SATELLITE_CACHE_EXTENSION,
-                IndicatorLunar.SATELLITE_CACHE_MAXIMUM_AGE_HOURS,
-                self.download_count_satellite,
-                self.next_download_time_satellite,
-                DataProviderGeneralPerturbation.download,
-                ( ),
-                DataProviderGeneralPerturbation.load,
-                ( ) ) )
+            self.next_download_time_satellite,
+            DataProviderGeneralPerturbation.download,
+            ( ),
+            DataProviderGeneralPerturbation.load,
+            ( ) ) )
 
         self.satellites = (
             self._update_bodies(
@@ -3347,33 +3343,13 @@ class IndicatorLunar( IndicatorBase ):
             elevation.set_text( str( the_elevation ) )
 
 
-    def get_default_city( self ):
+    def get_city( self ):
         '''
-        Get the default city based on the system's timezone.
+        Get the default city.
         '''
-        command_timedatectl = "timedatectl show | grep Timezone"
-        timezone = (
-            self.process_run(
-                command_timedatectl,
-                ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
-
-        if timezone.startswith( "Timezone=" ):
-            timezone = timezone.split( '=' )[ 1 ]
-
-        else:
-            command_cat = "cat /etc/timezone"
-            timezone = (
-                self.process_run(
-                    command_cat,
-                    ignore_stderr_and_non_zero_return_code = True )[ 0 ] )
-
-        if len( timezone ) == 0:
-            self.get_logging().warn(
-                f"Unable to locate neither '{ command_timedatectl }' "
-                f"nor '{ command_cat }'." )
-
         cities = IndicatorLunar.astro_backend.get_cities()
         the_city = cities[ 0 ] # Default to first city.
+        timezone = self.get_timezone()
         for city in cities:
             if city in timezone:
                 the_city = city
@@ -3390,7 +3366,7 @@ class IndicatorLunar( IndicatorBase ):
         '''
         self.city = config.get( IndicatorLunar.CONFIG_CITY_NAME )
         if self.city is None:
-            self.city = self.get_default_city()
+            self.city = self.get_city()
             self.latitude, self.longitude, self.elevation = (
                 IndicatorLunar.astro_backend.get_latitude_longitude_elevation( self.city ) )
 
