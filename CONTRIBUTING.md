@@ -177,7 +177,7 @@ Run `Geany` then:
     Execute: cd /home/<username>/<path to>/appindicators.git/%e/src ; /home/<username>/<path to>/appindicators.git/venv_run/bin/python3 -m "%e.%e"
 ```
 
-NOTE: Because of `%e` variable above, running any of the `tools` is not possible, nor any other non-indicator code, such as `example.py` in `indicatorstardate`.
+NOTE: Because of the `%e` variable above, it is not possible to run any of the scripts in `tools`, nor any other non-indicator code, such as `example.py` in `indicatorstardate`.
 
 **Project Setup**
 
@@ -255,9 +255,9 @@ which should fail, then:
 
 Repeat for each indicator, or as each indicator is run.
 
-**Run Tool**
+**Run a Script**
 
-Under `Run Configurations...` for the tool, ensure that `Working Directory` is set to `Default` and the `Python` interpreter is set to `python3`.
+To run any of the scripts in `tools`, under `Run Configurations...` for the script, ensure that `Working Directory` is set to `Default` and the `Python` interpreter is set to `python3`.
 
 References:
 
