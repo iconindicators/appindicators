@@ -130,6 +130,7 @@ class IndicatorBase( ABC ):
     # Different results come from calling
     #   os.environ.get( "DESKTOP_SESSION" )
     # giving 'plasma' rather than 'KDE' on 'Plasma (X11)' on Kubuntu.
+    _DESKTOP_BUDGIE = "Budgie"
     _DESKTOP_BUDGIE_GNOME = "Budgie:GNOME"
     _DESKTOP_ICEWM = "ICEWM"
     _DESKTOP_KDE = "KDE"
@@ -2020,6 +2021,7 @@ class IndicatorBase( ABC ):
             indent_amount = "   "
 
         detatched_submenus = (
+            self.get_current_desktop() == self._DESKTOP_BUDGIE or
             self.get_current_desktop() == self._DESKTOP_BUDGIE_GNOME or
             self.get_current_desktop() == self._DESKTOP_ICEWM or
             self.get_current_desktop() == self._DESKTOP_KDE or
