@@ -565,11 +565,7 @@ def _create_pyproject_dot_toml(
     config_indicator = configparser.ConfigParser()
     config_indicator.read( indicator_pyproject_toml )
 
-    indicatorbase_pyproject_toml = (
-        Path( '.' ) / "indicatorbase" / "pyprojectbase.toml" )
-
-    config_indicatorbase = configparser.ConfigParser()
-    config_indicatorbase.read( indicatorbase_pyproject_toml )
+    config_indicatorbase = utils.get_pyprojectbase_toml_config()
 
     version_indicatorbase = (
         config_indicatorbase.get( "project", "version" ).replace( '"', '' ) )

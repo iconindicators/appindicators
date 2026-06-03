@@ -20,6 +20,7 @@
 
 
 import argparse
+import configparser
 import re
 import sys
 
@@ -295,6 +296,19 @@ def get_indicators_to_process(
         return_value = return_value.indicators
 
     return return_value
+
+
+def get_pyprojectbase_toml_config():
+    pyprojectbase_toml = Path.cwd() / "indicatorbase" / "pyprojectbase.toml"
+    config = configparser.ConfigParser()
+    config.read( pyprojectbase_toml )
+    return config
+
+
+def get_project_url_homepage():
+    return (
+        get_pyprojectbase_toml_config().get(
+            "project.urls", "homepage" ).replace( "\"", '' ).strip() )
 
 
 def get_pyproject_toml_authors(

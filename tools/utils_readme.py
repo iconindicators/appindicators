@@ -27,7 +27,6 @@ References:
 '''
 
 
-import configparser
 import datetime
 import re
 import sys
@@ -43,49 +42,63 @@ from indicatorbase.src.indicatorbase import indicatorbase
 from . import utils
 
 
+_URL_GNOME_EXTENSION = (
+    "https://extensions.gnome.org/extension/615/appindicator-support" )
+
+
 class OperatingSystem( Enum ):
     ''' Supported operating systems. '''
     DEBIAN_12 = auto()
     DEBIAN_13 = auto()
-    FEDORA_42 = auto()
     FEDORA_43 = auto()
+    FEDORA_44 = auto()
     KUBUNTU_2404 = auto()
+    KUBUNTU_2604 = auto()
     LINUX_MINT_CINNAMON_21 = auto()
     LINUX_MINT_CINNAMON_22 = auto()
     LUBUNTU_2404 = auto()
-    MANJARO_25 = auto()
+    LUBUNTU_2604 = auto()
     MANJARO_26 = auto()
     OPENSUSE_TUMBLEWEED = auto()
     UBUNTU_2204 = auto()
     UBUNTU_2404 = auto()
+    UBUNTU_2604 = auto()
     UBUNTU_BUDGIE_2404 = auto()
+    UBUNTU_BUDGIE_2604 = auto()
+    UBUNTU_CINNAMON_2604 = auto()
     UBUNTU_MATE_2404 = auto()
     UBUNTU_UNITY_2404 = auto()
     XUBUNTU_2404 = auto()
+    XUBUNTU_2604 = auto()
 
 
 OPERATING_SYSTEMS_DEBIAN_BASED = {
     OperatingSystem.DEBIAN_12,
     OperatingSystem.DEBIAN_13,
     OperatingSystem.KUBUNTU_2404,
+    OperatingSystem.KUBUNTU_2604,
     OperatingSystem.LINUX_MINT_CINNAMON_21,
     OperatingSystem.LINUX_MINT_CINNAMON_22,
     OperatingSystem.LUBUNTU_2404,
+    OperatingSystem.LUBUNTU_2604,
     OperatingSystem.UBUNTU_2204,
     OperatingSystem.UBUNTU_2404,
+    OperatingSystem.UBUNTU_2604,
     OperatingSystem.UBUNTU_BUDGIE_2404,
+    OperatingSystem.UBUNTU_BUDGIE_2604,
+    OperatingSystem.UBUNTU_CINNAMON_2604,
     OperatingSystem.UBUNTU_MATE_2404,
     OperatingSystem.UBUNTU_UNITY_2404,
-    OperatingSystem.XUBUNTU_2404 }
+    OperatingSystem.XUBUNTU_2404,
+    OperatingSystem.XUBUNTU_2604 }
 
 
 OPERATING_SYSTEMS_FEDORA_BASED = {
-    OperatingSystem.FEDORA_42,
-    OperatingSystem.FEDORA_43 }
+    OperatingSystem.FEDORA_43,
+    OperatingSystem.FEDORA_44 }
 
 
 OPERATING_SYSTEMS_MANJARO_BASED = {
-    OperatingSystem.MANJARO_25,
     OperatingSystem.MANJARO_26 }
 
 
@@ -105,14 +118,6 @@ class IndicatorName( Enum ):
     INDICATORTEST = auto()
     INDICATORTIDE = auto()
     INDICATORVIRTUALBOX = auto()
-
-
-URL_GNOME_EXTENSION = (
-    "https://extensions.gnome.org/extension/615/appindicator-support" )
-
-URL_GITHUB_REPOSITORY = "https://github.com/iconindicators/appindicators"
-
-URL_GITHUB_INDICATOR = URL_GITHUB_REPOSITORY + "/blob/main"
 
 
 def _is_indicator(
@@ -165,7 +170,9 @@ def _get_indicator_comments(
     return comments
 
 
-def _get_introduction_project():
+def _get_introduction_project(
+        project_url ):
+
     content = (
         "AppIndicators for Ubuntu et al\n"
         "------------------------------\n\n"
@@ -179,7 +186,7 @@ def _get_introduction_project():
     for indicator in IndicatorName:
         indicator_ = indicator.name.lower()
         link = indicator_
-        url = f"{ URL_GITHUB_INDICATOR }/{ indicator_ }/README.md"
+        url = f"{ project_url }/blob/main/{ indicator_ }/README.md"
         description = _get_indicator_comments( indicator_ )
         content += f"- [{ link }]({ url }) { description }.\n"
 
@@ -220,6 +227,7 @@ def _get_install_uninstall(
     indicator,
     version,
     tag,
+    project_url_homepage,
     content_heading,
     content_install_uninstall_operating_system_packages,
     install_uninstall_command_debian,
@@ -236,7 +244,6 @@ def _get_install_uninstall(
             and
             _is_operating_system(
                 operating_system,
-                OperatingSystem.MANJARO_25,
                 OperatingSystem.MANJARO_26,
                 OperatingSystem.OPENSUSE_TUMBLEWEED ) ):
 
@@ -278,7 +285,8 @@ def _get_install_uninstall(
                 indicator,
                 version,
                 tag,
-                operating_system ) )
+                operating_system,
+                project_url_homepage ) )
 
         operating_system_to_content[ operating_system ] += (
             f"2. { python_install_uninstall }" )
@@ -324,13 +332,15 @@ def _get_install_uninstall(
 def _get_install(
     indicator,
     version,
-    tag ):
+    tag,
+    project_url_homepage ):
 
     return (
         _get_install_uninstall(
             indicator,
             version,
             tag,
+            project_url_homepage,
 
             "Installation / Updating\n"
             "-----------------------\n\n",
@@ -350,13 +360,15 @@ def _get_install(
 def _get_uninstall(
     indicator,
     version,
-    tag ):
+    tag,
+    project_url_homepage ):
 
     return (
         _get_install_uninstall(
             indicator,
             version,
             tag,
+            project_url_homepage,
 
             "Uninstall\n"
             "---------\n\n",
@@ -377,7 +389,8 @@ def _get_python_virtual_environment_install(
     indicator,
     version,
     tag,
-    operating_system ):
+    operating_system,
+    project_url_homepage ):
 
     # On Debian based distributions, PyGObject 3.51.0+ requires
     # libgirepository-2.0-dev which is only available on Debian 13+ and
@@ -412,9 +425,8 @@ def _get_python_virtual_environment_install(
 
         pygobject = r"PyGObject\<=3.50.0"
 
-    wheel_url = (
-        "https://github.com/iconindicators/appindicators/releases/download/"
-        f"{ tag }/{ indicator }-{ version }-py3-none-any.whl" )
+    wheel_file = f"{ indicator }-{ version }-py3-none-any.whl"
+    wheel_url = f"{ project_url_homepage }/releases/download/{ tag }/{ wheel_file }"
 
     return (
         f"Create a `Python3` virtual environment at `{ utils.VENV_INSTALL }` "
@@ -436,7 +448,8 @@ def _get_python_virtual_environment_uninstall(
     indicator,
     version,
     tag,
-    operating_system ):
+    operating_system,
+    project_url_homepage ):
 
     return (
         "Uninstall the indicator from the `Python3` virtual environment, "
@@ -481,14 +494,14 @@ def _get_extension_install(
     if (
         _is_operating_system(
             operating_system,
-            OperatingSystem.FEDORA_42,
             OperatingSystem.FEDORA_43,
+            OperatingSystem.FEDORA_44,
             OperatingSystem.OPENSUSE_TUMBLEWEED ) ):
 
         extension = (
             "Install the "
             "`GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
-            f"[extension]({ URL_GNOME_EXTENSION }).\n\n" )
+            f"[extension]({ _URL_GNOME_EXTENSION }).\n\n" )
 
     return extension
 
@@ -501,13 +514,13 @@ def _get_extension_uninstall(
     if (
         _is_operating_system(
             operating_system,
-            OperatingSystem.FEDORA_42,
             OperatingSystem.FEDORA_43,
+            OperatingSystem.FEDORA_44,
             OperatingSystem.OPENSUSE_TUMBLEWEED ) ):
 
         extension = (
             "The `GNOME Shell` `AppIndicator and KStatusNotifierItem Support` "
-            f"extension may be turned [off]({ URL_GNOME_EXTENSION }) if no "
+            f"extension may be turned [off]({ _URL_GNOME_EXTENSION }) if no "
             "longer in use by other indicators.\n\n" )
 
     return extension
@@ -564,7 +577,13 @@ def _get_operating_system_packages_debian(
     if (
         _is_operating_system(
             operating_system,
-            OperatingSystem.DEBIAN_13 ) ):
+            OperatingSystem.DEBIAN_13,
+            OperatingSystem.KUBUNTU_2604,
+            OperatingSystem.LUBUNTU_2604,
+            OperatingSystem.UBUNTU_2604,
+            OperatingSystem.UBUNTU_BUDGIE_2604,
+            OperatingSystem.UBUNTU_CINNAMON_2604,
+            OperatingSystem.XUBUNTU_2604 ) ):
         packages.append( "libgirepository-2.0-dev" )
 
     else:
@@ -583,6 +602,32 @@ def _get_operating_system_packages_debian(
             OperatingSystem.DEBIAN_12,
             OperatingSystem.DEBIAN_13,
             OperatingSystem.KUBUNTU_2404,
+            OperatingSystem.KUBUNTU_2604,
+            OperatingSystem.LINUX_MINT_CINNAMON_21,
+            OperatingSystem.LINUX_MINT_CINNAMON_22,
+            OperatingSystem.LUBUNTU_2404,
+            OperatingSystem.LUBUNTU_2604,
+            OperatingSystem.UBUNTU_2204,
+            OperatingSystem.UBUNTU_2404,
+            OperatingSystem.UBUNTU_2604,
+            OperatingSystem.UBUNTU_BUDGIE_2404,
+            OperatingSystem.UBUNTU_BUDGIE_2604,
+            OperatingSystem.UBUNTU_CINNAMON_2604,
+            OperatingSystem.UBUNTU_MATE_2404,
+            OperatingSystem.UBUNTU_UNITY_2404,
+            OperatingSystem.XUBUNTU_2404,
+            OperatingSystem.XUBUNTU_2604 ) )
+
+    needs_notify = (
+        _is_operating_system(
+            operating_system,
+            OperatingSystem.XUBUNTU_2604 ) )
+
+    needs_pulseaudio = (
+        _is_operating_system(
+            operating_system,
+            OperatingSystem.DEBIAN_12,
+            OperatingSystem.KUBUNTU_2404,
             OperatingSystem.LINUX_MINT_CINNAMON_21,
             OperatingSystem.LINUX_MINT_CINNAMON_22,
             OperatingSystem.LUBUNTU_2404,
@@ -593,10 +638,32 @@ def _get_operating_system_packages_debian(
             OperatingSystem.UBUNTU_UNITY_2404,
             OperatingSystem.XUBUNTU_2404 ) )
 
+    needs_wmctrl = (
+        _is_operating_system(
+            operating_system,
+            OperatingSystem.DEBIAN_12,
+            OperatingSystem.DEBIAN_13,
+            OperatingSystem.KUBUNTU_2404,
+            OperatingSystem.LINUX_MINT_CINNAMON_21,
+            OperatingSystem.LINUX_MINT_CINNAMON_22,
+            OperatingSystem.LUBUNTU_2404,
+            OperatingSystem.LUBUNTU_2604,
+            OperatingSystem.UBUNTU_2204,
+            OperatingSystem.UBUNTU_2404,
+            OperatingSystem.UBUNTU_BUDGIE_2404,
+            OperatingSystem.UBUNTU_CINNAMON_2604,
+            OperatingSystem.UBUNTU_MATE_2404,
+            OperatingSystem.UBUNTU_UNITY_2404,
+            OperatingSystem.XUBUNTU_2404,
+            OperatingSystem.XUBUNTU_2604 ) )
+
     if _is_indicator( indicator, IndicatorName.INDICATORFORTUNE ):
         packages.append( "fortune-mod" )
         packages.append( "fortunes" )
         packages.append( "wl-clipboard" )
+
+        if needs_notify:
+            packages.append( "gir1.2-notify-0.7" )
 
     if _is_indicator( indicator, IndicatorName.INDICATORONTHISDAY ):
         packages.append( "wl-clipboard" )
@@ -604,27 +671,49 @@ def _get_operating_system_packages_debian(
         if needs_calendar:
             packages.append( "calendar" )
 
+        if needs_notify:
+            packages.append( "gir1.2-notify-0.7" )
+
     if _is_indicator( indicator, IndicatorName.INDICATORPUNYCODE ):
         packages.append( "wl-clipboard" )
 
+        if needs_notify:
+            packages.append( "gir1.2-notify-0.7" )
+
     if _is_indicator( indicator, IndicatorName.INDICATORSCRIPTRUNNER ):
         packages.append( "libnotify-bin" )
-        packages.append( "pulseaudio-utils" )
         packages.append( "wget" )
+
+        if needs_notify:
+            packages.append( "gir1.2-notify-0.7" )
+
+        if needs_pulseaudio:
+            packages.append( "pulseaudio-utils" )
 
     if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
         packages.append( "fortune-mod" )
         packages.append( "fortunes" )
         packages.append( "libnotify-bin" )
-        packages.append( "pulseaudio-utils" )
         packages.append( "wl-clipboard" )
-        packages.append( "wmctrl" )
 
         if needs_calendar:
             packages.append( "calendar" )
 
+        if needs_notify:
+            packages.append( "gir1.2-notify-0.7" )
+
+        if needs_pulseaudio:
+            packages.append( "pulseaudio-utils" )
+
+        if needs_wmctrl:
+            packages.append( "wmctrl" )
+
     if _is_indicator( indicator, IndicatorName.INDICATORVIRTUALBOX ):
-        packages.append( "wmctrl" )
+        if needs_notify:
+            packages.append( "gir1.2-notify-0.7" )
+
+        if needs_wmctrl:
+            packages.append( "wmctrl" )
 
     return packages
 
@@ -659,10 +748,6 @@ def _get_operating_system_packages_fedora(
         packages.append( "calendar" )
         packages.append( "fortune-mod" )
         packages.append( "wl-clipboard" )
-        packages.append( "wmctrl" )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORVIRTUALBOX ):
-        packages.append( "wmctrl" )
 
     return packages
 
@@ -693,10 +778,6 @@ def _get_operating_system_packages_manjaro(
     if _is_indicator( indicator, IndicatorName.INDICATORTEST ):
         packages.append( "fortune-mod" )
         packages.append( "wl-clipboard" )
-        packages.append( "wmctrl" )
-
-    if _is_indicator( indicator, IndicatorName.INDICATORVIRTUALBOX ):
-        packages.append( "wmctrl" )
 
     return packages
 
@@ -792,8 +873,10 @@ def _get_cache_config_log(
         "During the course of normal operation, the indicator may write to "
         f"{ cache }"
         f"the config at `$HOME/.config/{ indicator }`.\n\n"
-        "In the event an error occurs, a log file will be written to "
-        f"`$HOME/{ indicator }.log`.\n\n\n" )
+        "In the event an error occurs, a log file should be written to "
+        f"`$HOME/{ indicator }.log`.  Running the indicator from the terminal "
+        "(refer to the previous section `Usage`) should show any "
+        "warnings/errors which do not appear in the log.\n\n\n" )
 
 
 def _get_limitations(
@@ -809,10 +892,7 @@ def _get_limitations(
         messages.append(
             "- `Wayland`: The command `wmctrl` is unsupported.\n" )
 
-    # Kubuntu 22.04     KDE     No mouse wheel scroll.
     # Kubuntu 24.04     KDE     No mouse wheel scroll.
-    # Manjaro 24.0.7    KDE     No mouse wheel scroll.
-    # Manjaro 25.0.5    KDE     No mouse wheel scroll.
     if (
         _is_indicator(
             indicator,
@@ -822,17 +902,15 @@ def _get_limitations(
         messages.append(
             "- `KDE`: Mouse wheel scroll over icon is unsupported.\n" )
 
-    # Kubuntu 22.04         KDE         Tooltip in lieu of label.
     # Kubuntu 24.04         KDE         Tooltip in lieu of label.
-    # Linux Mint 20         X-Cinnamon  Tooltip in lieu of label.
     # Linux Mint 21         X-Cinnamon  Tooltip in lieu of label.
     # Linux Mint 22         X-Cinnamon  Tooltip in lieu of label.
-    # Lubuntu 22.04         LXQt        No label; tooltip is indicator filename.
     # Lubuntu 24.04         LXQt        No label; tooltip is indicator filename.
-    # Manjaro 24.0.7        KDE         Tooltip in lieu of label.
-    # Manjaro 25.0.5        KDE         No label/tooltip.
+    # Lubuntu 26.04         LXQt        No label; tooltip is indicator filename.
     # openSUSE Tumbleweed   ICEWM       No label/tooltip.
+    # Ubuntu Cinnamon 26.04 X-Cinnamon  Tooltip in lieu of label.
     # Xubuntu 24.04         XFCE        Tooltip in lieu of label.
+    # Xubuntu 26.04         XFCE        Tooltip in lieu of label.
     if (
         _is_indicator(
             indicator,
@@ -855,11 +933,11 @@ def _get_limitations(
         messages.append(
             "- `ICEWM`: The icon label and icon tooltip are unsupported.\n" )
 
-    # Linux Mint 20     X-Cinnamon  When icon is changed, it disappears.
-    # Linux Mint 21     X-Cinnamon  When icon is changed, it disappears.
-    # Linux Mint 22     X-Cinnamon  When icon is changed, it disappears.
-    # Lubuntu 22.04     LXQt        Cannot change the icon once initially set.
-    # Lubuntu 24.04     LXQt        Cannot change the icon once initially set.
+    # Linux Mint 21     X-Cinnamon      When icon is changed, it disappears.
+    # Linux Mint 22     X-Cinnamon      When icon is changed, it disappears.
+    # Lubuntu 24.04     LXQt            Cannot change the icon once initially set.
+    # Lubuntu 26.04     LXQt            Cannot change the icon once initially set.
+    # Ubuntu Cinnamon 26.04 X-Cinnamon  When icon is changed, it disappears.
     if (
         _is_indicator(
             indicator,
@@ -871,8 +949,8 @@ def _get_limitations(
             "- `X-Cinnamon`: The icon disappears when changed from that "
             "originally set, leaving a blank space.\n" )
 
-    # Lubuntu 22.04     LXQt    Default terminal (qterminal) does not work.
     # Lubuntu 24.04     LXQt    Default terminal (qterminal) all good.
+    # Lubuntu 26.04     LXQt    Default terminal (qterminal) all good.
     if (
         _is_indicator(
             indicator,
@@ -884,8 +962,6 @@ def _get_limitations(
             "[preserved](https://github.com/lxqt/qterminal/issues/335). "
             "Install `gnome-terminal` as a workaround.\n" )
 
-    # Manjaro 24            No `calendar` command.
-    # Manjaro 25            No `calendar` command.
     # openSUSE Tumbleweed   No `calendar` command.
     if (
         _is_indicator(
@@ -917,11 +993,9 @@ def _get_limitations(
     messages.append(
         "- `Kubuntu 24.04`: No autostart.\n" )
 
-    # Manjaro 24.0.7   No autostart.
-    # Manjaro 25.0.5   No autostart.
-    # As indicatoronthisday is unsupported on Manjaro (and openSUSE) as there
-    # is no calendar package, only flag that that autostart does not work for
-    # all the indicators other than indicatoronthisday.
+    # As indicatoronthisday is unsupported on Manjaro and openSUSE as there is
+    # no calendar package, only flag that that autostart does not work for all
+    # the indicators other than indicatoronthisday.
     if not (
         _is_indicator(
             indicator,
@@ -978,10 +1052,12 @@ def build_readme_for_indicator(
 
     separator = "\n---\n"
 
+    project_url_homepage = utils.get_project_url_homepage()
+
     content = (
         _get_introduction_indicator( indicator ) +
         separator +
-        _get_install( indicator, version, tag ) +
+        _get_install( indicator, version, tag, project_url_homepage ) +
         separator +
         _get_usage( indicator, name_human_readable ) +
         separator +
@@ -989,7 +1065,7 @@ def build_readme_for_indicator(
         separator +
         _get_limitations( indicator ) +
         separator +
-        _get_uninstall( indicator, version, tag ) +
+        _get_uninstall( indicator, version, tag, project_url_homepage ) +
         separator +
         _get_license( authors_emails, start_year ) )
 
@@ -1001,11 +1077,11 @@ def build_readme_for_project():
     '''
     Build the README.md for the project.
     '''
-    pyprojectbase_toml = Path.cwd() / "indicatorbase" / "pyprojectbase.toml"
+    introduction = _get_introduction_project( utils.get_project_url_homepage() )
 
-    config = configparser.ConfigParser()
-    config.read( pyprojectbase_toml )
-    authors_emails = utils.get_pyproject_toml_authors( config )
+    authors_emails = (
+        utils.get_pyproject_toml_authors(
+            utils.get_pyprojectbase_toml_config() ) )
 
     start_year_earliest = "9999"
     for indicator in IndicatorName:
@@ -1020,10 +1096,8 @@ def build_readme_for_project():
 
         start_year_earliest = min( start_year, start_year_earliest )
 
-    content = (
-        _get_introduction_project() +
-        _get_license( authors_emails, start_year_earliest ) )
+    license_ = _get_license( authors_emails, start_year_earliest )
 
     indicatorbase.IndicatorBase.write_text_file(
         Path( Path.cwd(), "README.md" ),
-        content )
+        introduction + license_ )
