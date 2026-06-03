@@ -147,8 +147,6 @@ class IndicatorBase( ABC ):
 
     _EXTENSION_JSON = ".json"
 
-    _GITHUB_REPOSITORY_URL = "https://github.com/iconindicators/appindicators"
-
     # From (approximately) GNOME Shell version 46, the text in a radiomenuitem
     # is out of alignment with respect to text in a menuitem.
     _GNOME_SHELL_VERSION_FOR_RADIOMENUITEM_WORKAROUND = 46.0
@@ -325,18 +323,60 @@ class IndicatorBase( ABC ):
 
     def get_version( self ):
         '''
-        Return the version from the project metadata (pyproject.toml).
+        Return the version (from the project metadata).
         '''
         return self.project_metadata[ "Version" ]
 
 
-    def _check_for_newer_version( self ):
-        url = "https://api.github.com/repos/iconindicators/appindicators/releases"
+    def _get_metadata_section_project_url( self ):
+        '''
+        Return the project URL section (from the project metadata).
+        '''
+        return self.project_metadata.get_all( "Project-URL" )
 
+
+    def get_project_url_homepage( self ):
+        '''
+        Return the project homepage URL (from the project metadata).
+        '''
+        return self.project_metadata.get_all( "Project-URL" )[ 0 ].split( ',' )[ 1 ].strip()
+
+
+    def get_project_url_releases_api( self ):
+        '''
+        Return the project releases API URL.
+
+        The releases API URL
+            https://api.github.com/repos/iconindicators/appindicators/releases
+        is a modification of the project homepage URL
+            https://github.com/iconindicators/appindicators
+        '''
+        releases_api_url = self.get_project_url_homepage() + "/releases"
+        return releases_api_url.replace( 'github.com', 'api.github.com/repos' )
+
+
+    def get_project_authors_names_emails( self ):
+        '''
+        Extract the authors (and emails) from the project metadata.
+        https://stackoverflow.com/a/75803208/2156453
+        '''
+        email_message_object = (
+            email.message_from_string(
+                f'To: { self.project_metadata[ "Author-email" ] }',
+                policy = email.policy.default, ) )
+
+        authors_emails = [ ]
+        for address in email_message_object[ "to" ].addresses:
+            authors_emails.append( [ address.display_name, address.addr_spec ] )
+
+        return authors_emails
+
+
+    def _check_for_newer_version( self ):
         # Ignore failure on version check as this is non-critical.
         data_json, error_network, error_timeout = (
             self.get_json(
-                url,
+                self.get_project_url_releases_api(),
                 ignore_failure = True ) )
 
         version_github = ""
@@ -775,7 +815,7 @@ class IndicatorBase( ABC ):
         False otherwise.
         '''
         etc_os_release = self.get_etc_os_release()
-        return (
+        os_requires_refresh = (
             (
                 'ID=debian' in etc_os_release
                 and
@@ -793,6 +833,14 @@ class IndicatorBase( ABC ):
                 'ID=ubuntu' in etc_os_release
                 and
                 'VERSION_ID="24.04"' in etc_os_release ) )
+
+        indicator_requires_refresh = (
+            self.indicator_name == "indicatorlunar" or
+            self.indicator_name == "indicatorscriptrunner" or
+            self.indicator_name == "indicatorstardate" or
+            self.indicator_name == "indicatortest" )
+
+        return os_requires_refresh and indicator_requires_refresh
 
 
     def _dbus_properties_changed_idle_hint(
@@ -832,25 +880,6 @@ class IndicatorBase( ABC ):
         if signal_name == "PrepareForSleep" and not parameters[ 0 ]:
             self.request_update(
                 delay = IndicatorBase._DELAY_AFTER_SCREEN_LOCK )
-
-
-    @staticmethod
-    def get_authors_emails(
-        project_metadata ):
-        '''
-        Extract the authors (and emails) from the project metadata.
-        https://stackoverflow.com/a/75803208/2156453
-        '''
-        email_message_object = (
-            email.message_from_string(
-                f'To: { project_metadata[ "Author-email" ] }',
-                policy = email.policy.default, ) )
-
-        authors_emails = [ ]
-        for address in email_message_object[ "to" ].addresses:
-            authors_emails.append( [ address.display_name, address.addr_spec ] )
-
-        return authors_emails
 
 
     @staticmethod
@@ -1222,10 +1251,9 @@ class IndicatorBase( ABC ):
         about_dialog = Gtk.AboutDialog()
         about_dialog.set_transient_for( menuitem.get_parent().get_parent() )
 
-        project_url = self.project_metadata.get_all( "Project-URL" )[ 0 ]
-        website = project_url.split( ',' )[ 1 ].strip()
+        authors_and_emails = self.get_project_authors_names_emails()
 
-        authors_and_emails = self.get_authors_emails( self.project_metadata )
+        website = self.get_project_url_homepage()
 
         authors_and_websites = [ ]
         for author_and_email in authors_and_emails:
@@ -1837,7 +1865,7 @@ class IndicatorBase( ABC ):
                 margin_top = self.INDENT_WIDGET_TOP ) )
 
         if self.new_version_available and self.check_latest_version:
-            url = f"{ IndicatorBase._GITHUB_REPOSITORY_URL }"
+            url = f"{ self.get_project_url_homepage() }"
 
             label = Gtk.Label.new()
             label.set_markup( _(
