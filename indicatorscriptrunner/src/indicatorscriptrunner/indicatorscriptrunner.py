@@ -2188,8 +2188,20 @@ class IndicatorScriptRunner( IndicatorBase ):
                     f"echo \"Usage: HDD (sda2)) \" { usage_hdd }",
                     False, False, 5, False ) )
 
+            battery_level_warning = (
+                "if [ -f \"/sys/class/power_supply/BAT0/status\" ]; then "
+                "  if [ $(cat /sys/class/power_supply/BAT0/status) = \"Discharging\" ]; then "
+                "    if [ $(cat /sys/class/power_supply/BAT0/capacity) -lt \"15\" ]; then "
+                "      echo \"BATTERY LEVEL CRITICAL ! ! !\"; fi; fi; fi" )
+            self.scripts.append(
+                Background(
+                    "System",
+                    "Battery Level Warning",
+                    battery_level_warning,
+                    True, True, 5, False ) )
+
             self.indicator_text = (
-                " [Network::Internet Down][System::Usage RAM][System::Usage HDD (sda2)]" )
+                " [Network::Internet Down][System::Usage RAM][System::Usage HDD (sda2)][System::Battery Level Warning]" )
 
             self.request_save_config( 1 )
 
